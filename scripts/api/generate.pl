@@ -12,6 +12,9 @@ my $Template = read_file('Core.yml.template') || die "unable to open Core.yml.te
 
 my $Operations = '';
 foreach my $Line (@Definition) {
+    # ignore comments or empty lines
+    next if ($Line =~ /^\s*#/ || $Line =~ /^\s*$/g);
+
     my ($Route, $Method, $Module, $Additions) = split(/\s*\|\s*/, $Line);
     my $Operation = (split(/::/, $Module))[-1];
     my @AdditionList = $Additions ? split(/,/, $Additions) : ();
