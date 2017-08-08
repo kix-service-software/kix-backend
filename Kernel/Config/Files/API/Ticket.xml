@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketCreate###ArticleType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">webrequest</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketCreate###HistoryType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">NewTicket</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketCreate###HistoryComment" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">%%API Create</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketCreate###AutoResponseType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">auto reply</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketUpdate###ArticleType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">webrequest</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketUpdate###HistoryType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">AddNote</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketUpdate###HistoryComment" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">%%API Note</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketUpdate###AutoResponseType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">auto follow up</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketSearch###SearchLimit" Required="1" Valid="1">
+        <Description Translatable="1">Maximum number of tickets to be displayed in the result of this operation.</Description>
+        <Setting>
+            <String Regex="^[0-9]{1,8}$">500</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketSearch###SortBy::Default" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default ticket attribute for ticket sorting of the ticket search result of this operation.</Description>
+        <Setting>
+            <Option SelectedID="Age">
+                <Item Key="Age" Translatable="1">Age</Item>
+                <Item Key="Ticket" Translatable="1">Ticket</Item>
+                <Item Key="Subject" Translatable="1">Subject</Item>
+                <Item Key="Queue" Translatable="1">Queue</Item>
+                <Item Key="Priority" Translatable="1">Priority</Item>
+                <Item Key="EscalationTime" Translatable="1">EscalationTime</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::TicketSearch###Order::Default" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default ticket order in the ticket search result of the this operation. Up: oldest on top. Down: latest on top.</Description>
+        <Setting>
+            <Option SelectedID="Down">
+                <Item Key="Down" Translatable="1">Down</Item>
+                <Item Key="Up" Translatable="1">Up</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    
+</kix_config>
+    

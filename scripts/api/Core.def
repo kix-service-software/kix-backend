@@ -1,0 +1,2 @@
+/auth/login     |   POST    | V1::Auth::Login       | NoAuthorizationNeeded: 1
+/auth/logout    |   GET     | V1::Auth::Logout

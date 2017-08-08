@@ -1,0 +1,43 @@
+---
+Debugger:
+  DebugThreshold: debug
+  TestMode: 0
+Description: KIX Core API
+FrameworkVersion: __VERSION__
+Provider:
+  Operation:
+    Login:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Auth::Login
+        NoAuthorizationNeeded: 1
+    Logout:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Auth::Logout
+
+  Transport:
+    Config:
+      KeepAlive: ''
+      MaxLength: '10485760'
+      RouteOperationMapping:
+        Login:
+          RequestMethod:
+          - POST
+          Route: /auth/login
+        Logout:
+          RequestMethod:
+          - GET
+          Route: /auth/logout
+
+    Type: HTTP::REST
+RemoteSystem: ''
+Requester:
+  Transport:
+    Type: ''
