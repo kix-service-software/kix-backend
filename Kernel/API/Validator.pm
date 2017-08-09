@@ -69,7 +69,7 @@ sub new {
     # init all validators
     my $ValidatorList = $Kernel::OM->Get('Kernel::Config')->Get('API::Validator::Module');
     
-    foreach my $Validator (sort keys %{$ValildatorList}) {
+    foreach my $Validator (sort keys %{$ValidatorList}) {
         my $Backend = 'Kernel::API::Validator::' . $ValidatorList->{$Validator}->{Module};
 
         if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
@@ -81,7 +81,7 @@ sub new {
         return $BackendObject if ref $Self->{Validators}->{$Validator} ne $Backend;
 
         # register backend for each validated attribute
-        foreach my $ValidatedAttribute ( sort split(/\s*,\s*/, $ValidatorList->{$Validator}->{Validates} ) {
+        foreach my $ValidatedAttribute ( sort split(/\s*,\s*/, $ValidatorList->{$Validator}->{Validates}) ) {
             if ( !IsArrayRefWithData( $Self->{Validators}->{$ValidatedAttribute} ) ) {
                 $Self->{Validators}->{$ValidatedAttribute} = [];
             }
@@ -113,7 +113,7 @@ sub Validate {
     my ( $Self, %Param ) = @_;
     my $Result = {
         Success => 1,
-    }
+    };
 
     # if no Data is given to validate, then return successful
     if ( !IsHashRefWithData($Param{Data}) ) {
@@ -126,11 +126,11 @@ sub Validate {
     ATTRIBUTE:
     foreach my $Attribute ( sort keys %{$Param{Data}} ) {
         # execute validator if one exists for this attribute
-        if ( (IsArrayRefWithData{$Self->{Validators}->{$Attribute}) ) {
-            foreach $Validator ( @{$Self->{Validators}->{$Attribute}} ) {
+        if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
+            foreach my $Validator ( @{$Self->{Validators}->{$Attribute}} ) {
                 my $ValidatorResult = $Validator->Validate(
                     Attribute => $Attribute,
-                    Value     => $Param{Data}->{$Attribute},
+                    Data      => $Param{Data},
                 );
 
                 if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {

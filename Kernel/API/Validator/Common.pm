@@ -32,10 +32,11 @@ Kernel::API::Validator - API data validation interface
 
 =item Validate()
 
-validate given data hash using registered validator modules
+validate a attribute in the data hash
 
     my $Result = $ValidatorObject->Validate(
-        Data => {
+        Attribute => '...',
+        Data      => {
             ...
         }
     );

@@ -19,6 +19,7 @@ use Kernel::API::Debugger;
 use Kernel::API::Transport;
 use Kernel::API::Mapping;
 use Kernel::API::Operation;
+use Kernel::API::Validator;
 use Kernel::System::API::Webservice;
 use Kernel::System::VariableCheck (qw(IsHashRefWithData));
 

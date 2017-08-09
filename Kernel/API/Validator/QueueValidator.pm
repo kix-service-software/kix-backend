@@ -77,7 +77,9 @@ validate given data attribute
 
     my $Result = $ValidatorObject->Validate(
         Attribute => '...',
-        Value     => ...
+        Data      => {
+            ...
+        }
     );
 
     $Result = {
