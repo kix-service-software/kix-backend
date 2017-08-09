@@ -70,7 +70,12 @@ remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
-            Token => '...',
+            Authorization => {
+                Token    => '...',
+                UserID   => '123',
+                UserType => 'User' | 'Customer'
+                ...
+            }
         },
     );
 
@@ -84,8 +89,6 @@ remove token (invalidate)
 sub Run {
     my ( $Self, %Param ) = @_;
 
-use Data::Dumper;
-print STDERR Dumper(\%Param);
     # check needed stuff
     if ( !IsHashRefWithData( $Param{Data} ) ) {
 
@@ -96,7 +99,7 @@ print STDERR Dumper(\%Param);
     }
 
     for my $Needed (qw( Token )) {
-        if ( !$Param{Data}->{$Needed} ) {
+        if ( !$Param{Data}->{Authorization}->{$Needed} ) {
 
             return $Self->ReturnError(
                 ErrorCode    => 'Logout.MissingParameter',
@@ -106,7 +109,7 @@ print STDERR Dumper(\%Param);
     }
 
     my $Result = $Kernel::OM->Get('Kernel::System::JWT')->RemoveToken(
-        Token => $Param{Data}->{Token}
+        Token => $Param{Data}->{Authorization}->{Token}
     );
 
     return {

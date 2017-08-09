@@ -245,9 +245,54 @@ sub Run {
             );
         }
         else {
-            # add Token to Data hash
-            $DataIn->{Token} = $FunctionResult->{Data}->{Token};
+            # add Authorization info to Data hash
+            $DataIn->{Authorization} = $FunctionResult->{Data}->{Authorization};
         }
+    }
+
+    #
+    # Validate given data.
+    #
+
+    my $ValidatorObject = Kernel::API::Validator->new(
+        DebuggerObject          => $DebuggerObject,
+        APIVersion              => $Webservice->{Config}->{APIVersion},
+        Operation               => $Operation,
+        OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
+        WebserviceID            => $WebserviceID,
+    );
+
+    # if validator init failed, bail out
+    if ( ref $ValidatorObject ne 'Kernel::API::Validator' ) {
+        $DebuggerObject->Error(
+            Summary => 'Validator could not be initialized',
+            Data    => $ValidatorObject,
+        );
+
+        # set default error message
+        my $ErrorMessage = 'Unknown error in Validator initialization';
+
+        # check if we got an error message from the validator and overwrite it
+        if ( IsHashRefWithData($ValidatorObject) && $ValidatorObject->{ErrorMessage} ) {
+            $ErrorMessage = $ValidatorObject->{ErrorMessage};
+        }
+
+        return $Self->_GenerateErrorResponse(
+            DebuggerObject => $DebuggerObject,
+            ErrorMessage   => $ErrorMessage,
+        );
+    }
+
+    $FunctionResult = $ValidatorObject->Validate(
+        Data => $DataIn,
+    );
+
+    if ( !$FunctionResult->{Success} ) {
+
+        return $Self->_GenerateErrorResponse(
+            DebuggerObject => $DebuggerObject,
+            ErrorMessage   => $FunctionResult->{ErrorMessage},
+        );
     }
 
     #
