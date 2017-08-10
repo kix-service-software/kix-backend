@@ -83,8 +83,12 @@ check given parameters and parse them according to type
             ...
         },
         Parameters => {
-            <Parameter> => '<Type>[:required|requiredIfNot[:<AltParameter>]]'      # <Type> = SCALAR|ARRAY
-            ...
+            <Parameter> => {
+                Type          => 'ARRAY',               # optional
+                Required      => 1,                     # optional
+                RequiredIfNot => '<AltParameter>'       # optional
+                Default       => ...                    # optional
+            }
         }
     );
 
