@@ -46,15 +46,11 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (
-        qw(DebuggerObject WebserviceID)
-        )
-    {
+    for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
-
             return {
                 Success      => 0,
-                ErrorMessage => "Got no $Needed!"
+                ErrorMessage => "Got no $Needed!",
             };
         }
 
@@ -89,23 +85,40 @@ Authenticate user.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !IsHashRefWithData( $Param{Data} ) ) {
+    # init webservice
+    my $Result = $Self->Init(
+        WebserviceID => $Self->{WebserviceID},
+    );
 
-        return $Self->ReturnError(
-            ErrorCode    => 'Login.MissingParameter',
-            ErrorMessage => "Login: The request is empty!",
+    if ( !$Result->{Success} ) {
+        $Self->ReturnError(
+            ErrorCode    => 'Webservice.InvalidConfiguration',
+            ErrorMessage => $Result->{ErrorMessage},
         );
     }
 
-    for my $Needed (qw( Password )) {
-        if ( !$Param{Data}->{$Needed} ) {
-
-            return $Self->ReturnError(
-                ErrorCode    => 'Login.MissingParameter',
-                ErrorMessage => "Login: $Needed parameter is missing!",
-            );
+    # parse and prepare parameters
+    $Result = $Self->ParseParameters(
+        Data       => $Param{Data},
+        Parameters => {
+            'UserLogin' => {
+                RequiredIfNot => 'CustomerUserLogin'
+            },
+            'CustomerUserLogin' => {
+                RequiredIfNot => 'UserLogin'
+            }
+            'Password' => {
+                Required => 1
+            }
         }
+    );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'UserGet.MissingParameter',
+            ErrorMessage => $Result->{ErrorMessage},
+        );
     }
 
     my $User;

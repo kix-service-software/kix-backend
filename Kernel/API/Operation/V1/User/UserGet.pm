@@ -1,6 +1,6 @@
 # --
-# Kernel/GenericInterface/Operation/User/UserGet.pm - GenericInterface User Get operation backend
-# based upon Kernel/GenericInterface/Operation/Ticket/TicketGet.pm
+# Kernel/API/Operation/User/UserGet.pm - API User Get operation backend
+# based upon Kernel/API/Operation/Ticket/TicketGet.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
@@ -13,7 +13,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::GenericInterface::Operation::User::UserGet;
+package Kernel::API::Operation::V1::User::UserGet;
 
 use strict;
 use warnings;
@@ -23,15 +23,14 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::GenericInterface::Operation::Common
-    Kernel::GenericInterface::Operation::User::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::GenericInterface::Operation::User::UserGet - GenericInterface User Get Operation backend
+Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -44,7 +43,7 @@ Kernel::GenericInterface::Operation::User::UserGet - GenericInterface User Get O
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::GenericInterface::Operation->new();
+by using Kernel::API::Operation::V1::User::UserGet->new();
 
 =cut
 
@@ -67,7 +66,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('GenericInterface::Operation::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserGet');
 
     return $Self;
 }
@@ -79,14 +78,10 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserLogin         => 'some agent login',                            # UserLogin or CustomerUserLogin or SessionID is
-                                                                                #   required
-            CustomerUserLogin => 'some customer login',
-            SessionID         => 123,
-
-            Password          => 'some password',                                       # if UserLogin or customerUserLogin is sent then
-                                                                                #   Password is required
-            UserID            => '32,33',                                       # required, could be coma separated IDs or an Array
+            Authorization => {
+                ...
+            },
+            UserID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -110,6 +105,7 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -121,59 +117,46 @@ sub Run {
         );
     }
 
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
+    # parse and prepare parameters
+    $Result = $Self->ParseParameters(
+        Data       => $Param{Data},
+        Parameters => {
+            'UserID' => {
+                Type     => 'ARRAY',
+                Required => 1
+            }                
+        }
     );
 
-    return $Self->ReturnError(
-        ErrorCode    => 'UserGet.AuthFail',
-        ErrorMessage => "UserGet: Authorization failing!",
-    ) if !$UserID;
-
-    # check needed stuff
-    for my $Needed (qw(UserID)) {
-        if ( !$Param{Data}->{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'UserGet.MissingParameter',
-                ErrorMessage => "UserGet: $Needed parameter is missing!",
-            );
-        }
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'UserGet.MissingParameter',
+            ErrorMessage => $Result->{ErrorMessage},
+        );
     }
+
     my $ErrorMessage = '';
 
-    # all needed variables
-    my @UserIDs;
-    if ( IsStringWithData( $Param{Data}->{UserID} ) ) {
-        @UserIDs = split( /,/, $Param{Data}->{UserID} );
-    }
-    elsif ( IsArrayRefWithData( $Param{Data}->{UserID} ) ) {
-        @UserIDs = @{ $Param{Data}->{UserID} };
-    }
-    else {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserGet.WrongStructure',
-            ErrorMessage => "UserGet: Structure for UserID is not correct!",
-        );
-    }
-
-    my $ReturnData        = {
+    my $ReturnData = {
         Success => 1,
     };
-    my @Item;
+
+    my @UserList;
 
     # start user loop
-    USER:
-    for my $UserID (@UserIDs) {
+    USER:    
+    foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
 
-        # get the user entry
-        my %UserEntry = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID      => $UserID,
+        # get the user data
+        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            UserID => $UserID,
         );
 
-        if ( !IsHashRefWithData( \%UserEntry ) ) {
+        if ( !IsHashRefWithData( \%UserData ) ) {
 
             $ErrorMessage = 'Could not get user data'
-                . ' in Kernel::GenericInterface::Operation::User::UserGet::Run()';
+                . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
 
             return $Self->ReturnError(
                 ErrorCode    => 'UserGet.NotValidUserID',
@@ -182,17 +165,19 @@ sub Run {
         }
 
         # filter valid attributes
-        foreach my $Attr (sort keys %UserEntry) {
-            delete $UserEntry{$Attr} if !$Self->{Config}->{ExportedAttributes}->{$Attr};
+        if ($Self->{Config}->{ExportedAttributes}) {
+            foreach my $Attr (sort keys %UserData) {
+                delete $UserData{$Attr} if !$Self->{Config}->{ExportedAttributes}->{$Attr};
+            }
         }
         
         # add
-        push(@Item, \%UserEntry);
+        push(@UserList, \%UserData);
     }
 
-    if ( !scalar(@Item) ) {
+    if ( !scalar(@UserList) ) {
         $ErrorMessage = 'Could not get user data'
-            . ' in Kernel::GenericInterface::Operation::User::UserGet::Run()';
+            . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
 
         return $Self->ReturnError(
             ErrorCode    => 'UserGet.NotUserData',
@@ -202,7 +187,7 @@ sub Run {
     }
 
     # set user data into return structure
-    $ReturnData->{Data}->{User} = \@Item;
+    $ReturnData->{Data}->{User} = \@UserList;
 
     # return result
     return $ReturnData;

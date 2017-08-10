@@ -1,6 +1,6 @@
 # --
-# Kernel/GenericInterface/Operation/User/UserSearch.pm - GenericInterface User Search operation backend
-# based upon Kernel/GenericInterface/Operation/Ticket/TicketSearch.pm
+# Kernel/API/Operation/User/UserSearch.pm - API User Search operation backend
+# based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 # --
@@ -9,7 +9,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::GenericInterface::Operation::User::UserSearch;
+package Kernel::API::Operation::V1::User::UserSearch;
 
 use strict;
 use warnings;
@@ -17,15 +17,14 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
-    Kernel::GenericInterface::Operation::Common
-    Kernel::GenericInterface::Operation::User::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::GenericInterface::Operation::User::UserSearch - GenericInterface User Search Operation backend
+Kernel::API::Operation::User::UserSearch - API User Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -36,7 +35,7 @@ Kernel::GenericInterface::Operation::User::UserSearch - GenericInterface User Se
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::GenericInterface::Operation->new();
+by using Kernel::API::Operation->new();
 
 =cut
 
@@ -67,9 +66,11 @@ perform UserSearch Operation. This will return a User ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SessionID    => 123,                                          # required
+            Authorization => {
+                ...
+            },
             ChangedAfter => '2006-01-09 00:00:01',                        # (optional)            
-            OrderBy      => 'Down|Up',                                    # (optional) Default: Up                       
+            Order        => 'Down|Up',                                    # (optional) Default: Up                       
             Limit        => 122,                                          # (optional) Default: 500
         }
     );
@@ -98,22 +99,21 @@ sub Run {
         );
     }
 
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
+    # parse and prepare parameters
+    $Result = $Self->ParseParameters(
+        Data       => $Param{Data},
+        Parameters => {
+            'ChangedAfter' => {
+                Default => undef,
+            },
+            'Limit' => {
+                Default => 500,
+            },
+            'Order' => {
+                Default => 'Up'    
+            }
+        }
     );
-
-    return $Self->ReturnError(
-        ErrorCode    => 'UserSearch.AuthFail',
-        ErrorMessage => "UserSearch: Authorization failing!",
-    ) if !$UserID;
-
-    # all needed variables
-    $Self->{ChangedAfter} = $Param{Data}->{ChangedAfter}
-        || undef;
-    $Self->{Limit} = $Param{Data}->{Limit}
-        || 500;
-    $Self->{OrderBy} = $Param{Data}->{OrderBy}
-        || 'Up';
 
     # perform user search
     my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
@@ -123,9 +123,9 @@ sub Run {
     if (IsHashRefWithData(\%UserList)) {
         my @UserIDs = sort keys %UserList;
         
-        if ($Self->{ChangedAfter}) {
+        if ($Param{Data}->{ChangedAfter}) {
             my $ChangedAfterUnixtime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                String => $Self->{ChangedAfter},
+                String => $Param{Data}->{ChangedAfter},
             );
             
             # filter list
@@ -152,11 +152,11 @@ sub Run {
         }
         else {
             # limit list
-            @UserIDs = splice(@UserIDs, 0, $Self->{Limit}); 
+            @UserIDs = splice(@UserIDs, 0, $Param{Data}->{Limit}); 
         }
 
         # do we have to sort downwards ?
-        @UserIDs = reverse @UserIDs if ($Self->{OrderBy} eq 'Down');        
+        @UserIDs = reverse @UserIDs if ($Param{Data}->{OrderBy} eq 'Down');        
 
         if (IsArrayRefWithData(\@UserIDs)) {
             return {

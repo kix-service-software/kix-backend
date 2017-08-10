@@ -49,18 +49,9 @@
     </ConfigItem>
 
     <ConfigItem Name="API::Operation::V1::UserGet###ExportedAttributes" Required="0" Valid="1">
-        <Description Translatable="1">Defines which attributes of the user data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported.</Description>
+        <Description Translatable="1">Defines which attributes of the user data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
-                <Item Key="UserID">1</Item>
-                <Item Key="UserLogin">1</Item>
-                <Item Key="UserFirstname">1</Item>
-                <Item Key="UserLastname">1</Item>
-                <Item Key="UserTitle">1</Item>
-                <Item Key="UserEmail">1</Item>
-                <Item Key="UserPhone">1</Item>
-                <Item Key="CreateTime">1</Item>
-                <Item Key="ChangeTime">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>    

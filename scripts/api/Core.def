@@ -2,3 +2,5 @@
 
 /auth/login                                                         |   POST            | V1::Auth::Login                                                   | NoAuthorizationNeeded: 1
 /auth/logout                                                        |   GET             | V1::Auth::Logout
+/users/:UserID                                                      |   GET             | V1::User::UserGet
+/users                                                              |   GET             | V1::User::UserSearch

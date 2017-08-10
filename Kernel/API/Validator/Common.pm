@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::QueueValidator;
+package Kernel::API::Validator::Common;
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator - API data validation interface
+Kernel::API::Validator::Common - Base class for validators
 
 =head1 SYNOPSIS
 

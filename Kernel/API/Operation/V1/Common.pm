@@ -29,6 +29,116 @@ Kernel::API::Operation::V1::Common - Base class for all Operations
 
 =cut
 
+=item Init()
+
+initialize the operation by checking the webservice configuration
+
+    my $Return = $CommonObject->Init(
+        WebserviceID => 1,
+    );
+
+    $Return = {
+        Success => 1,                       # or 0 in case of failure,
+        ErrorMessage => 'Error Message',
+    }
+
+=cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    # check needed
+    if ( !$Param{WebserviceID} ) {
+        return {
+            Success      => 0,
+            ErrorMessage => "Got no WebserviceID!",
+        };
+    }
+
+    # get webservice configuration
+    my $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+        ID => $Param{WebserviceID},
+    );
+
+    if ( !IsHashRefWithData($Webservice) ) {
+        return {
+            Success => 0,
+            ErrorMessage =>
+                'Could not determine Web service configuration'
+                . ' in Kernel::API::Operation::V1::Common::Init()',
+        };
+    }
+
+    return {
+        Success => 1,
+    };
+}
+
+=item ParseParameters()
+
+check given parameters and parse them according to type
+
+    my $Return = $CommonObject->ParseParameters(
+        Data   => {
+            ...
+        },
+        Parameters => {
+            <Parameter> => '<Type>[:required|requiredIfNot[:<AltParameter>]]'      # <Type> = SCALAR|ARRAY
+            ...
+        }
+    );
+
+    $Return = {
+        Success => 1,                       # or 0 in case of failure,
+        ErrorMessage => 'Error Message',
+    }
+
+=cut
+
+sub ParseParameters {
+    my ( $Self, %Param ) = @_;
+    my $Result = {
+        Success => 1
+    };
+
+    # check needed stuff
+    for my $Needed (qw(Data Parameters)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->ReturnError(
+                ErrorCode    => 'ParseParameters.MissingParameter',
+                ErrorMessage => "ParseParameters: $Needed parameter is missing!",
+            );
+        }
+    }
+
+    foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
+        # check requirement
+        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Param{Data}->{$Parameter}) ) {
+            $Result->{Success} = 0;
+            $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter is missing!",
+            last;            
+        }
+        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && !exists($Param{Data}->{$Parameter}) && !exists($Param{Data}->{$Param{Parameters}->{$Parameter}->{RequiredIfNot}})) {            
+            $Result->{Success} = 0;
+            $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or $Param{Parameters}->{$Parameter}->{RequiredIfNot} is missing!",
+            last;            
+        }
+
+        # parse into arrayref if parameter value is scalar and ARRAY type is needed
+        if ( $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Param{Data}->{$Parameter} && ref($Param{Data}->{$Parameter}) ne 'ARRAY' ) {
+            $Param{Data}->{$Parameter} = [ split('\s*,\s*', $Param{Data}->{$Parameter}) ];
+        }
+
+        # set default value
+        if ( !$Param{Data}->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
+            $Param{Data}->{$Parameter} = $Param{Parameters}->{$Parameter}->{Default}
+        }
+    }
+
+    return $Result; 
+}
+
+
 =item ReturnError()
 
 helper function to return an error message.

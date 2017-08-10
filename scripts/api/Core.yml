@@ -21,6 +21,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Auth::Logout
+    UserGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserGet
+    UserSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserSearch
 
   Transport:
     Config:
@@ -35,6 +49,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /auth/logout
+        UserGet:
+          RequestMethod:
+          - GET
+          Route: /users/:UserID
+        UserSearch:
+          RequestMethod:
+          - GET
+          Route: /users
 
     Type: HTTP::REST
 RemoteSystem: ''
