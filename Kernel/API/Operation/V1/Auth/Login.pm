@@ -110,7 +110,7 @@ sub Run {
                     'Agent',
                     'Customer'
                 ]
-            }
+            },
             'Password' => {
                 Required => 1
             }
