@@ -66,7 +66,7 @@ sub ProviderCheckAuthorization {
 
     my %Authorization = split(/\s+/, $Headers{HTTP_AUTHORIZATION});
 
-    if (!$Authorization{JWT}) {
+    if (!$Authorization{Token}) {
         return $Self->_Error(
             Summary   => 'No JWT in authorization header found!',
             HTTPError => 500,
@@ -74,7 +74,7 @@ sub ProviderCheckAuthorization {
     }
 
     my $ValidatedToken = $Kernel::OM->Get('Kernel::System::JWT')->ValidateToken(
-        Token => $Authorization{JWT},
+        Token => $Authorization{Token},
     );
 
     if ( !IsHashRefWithData($ValidatedToken) ) {
@@ -89,7 +89,7 @@ sub ProviderCheckAuthorization {
         Success => 1,
         Data    => {
             Authorization => {
-                Token => $Authorization{JWT},
+                Token => $Authorization{Token},
                 %{$ValidatedToken},
             }
         }
