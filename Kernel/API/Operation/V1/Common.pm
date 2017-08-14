@@ -131,7 +131,7 @@ sub ParseParameters {
         }
 
         # parse into arrayref if parameter value is scalar and ARRAY type is needed
-        if ( $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Param{Data}->{$Parameter} && ref($Param{Data}->{$Parameter}) ne 'ARRAY' ) {
+        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Param{Data}->{$Parameter} && ref($Param{Data}->{$Parameter}) ne 'ARRAY' ) {
             $Param{Data}->{$Parameter} = [ split('\s*,\s*', $Param{Data}->{$Parameter}) ];
         }
 
