@@ -125,6 +125,7 @@ sub Run {
         );
     }
 
+    my $UserID;
     my $User;
 
     # get params
@@ -136,6 +137,11 @@ sub Run {
             User => $Param{Data}->{UserLogin} || '',
             Pw   => $PostPw,
         );
+        if ( $User ) {
+            $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+                UserLogin => $Param{Data}->{UserLogin},
+            );
+        }
     }
     elsif ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Customer' ) {
         # check submitted data
@@ -143,6 +149,9 @@ sub Run {
             User => $Param{Data}->{UserLogin} || '',
             Pw   => $PostPw,
         );
+        if ( $User ) {
+            $UserID = $Param{Data}->{UserLogin};
+        }        
     }
 
     # not authenticated
@@ -157,7 +166,7 @@ sub Run {
     # create new token
     my $Token = $Kernel::OM->Get('Kernel::System::JWT')->CreateToken(
         Payload => {
-            UserID      => $User,
+            UserID      => $UserID,
             UserType    => $Param{Data}->{UserType},
         }
     );
