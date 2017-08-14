@@ -84,7 +84,7 @@ check given parameters and parse them according to type
             ...
         },
         Parameters => {
-            <Parameter> => {                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
+            <Parameter> => {                            # if Parameter is a attribute of a hashref, just separate it by ->, i.e. "User->UserFirstname"
                 Type          => 'ARRAY',               # optional
                 Required      => 1,                     # optional
                 RequiredIfNot => '<AltParameter>'       # optional
