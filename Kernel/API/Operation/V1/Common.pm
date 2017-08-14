@@ -83,7 +83,7 @@ check given parameters and parse them according to type
             ...
         },
         Parameters => {
-            <Parameter> => {
+            <Parameter> => {                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
                 Type          => 'ARRAY',               # optional
                 Required      => 1,                     # optional
                 RequiredIfNot => '<AltParameter>'       # optional
@@ -116,28 +116,40 @@ sub ParseParameters {
         }
     }
 
+    # helper method to flatten structure for easier access to sub structures 
+    my $FlatData = $Self->_FlattenData(
+        Data => $Param{Data},
+    );
+    
     foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
-        
         # check requirement
-        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Param{Data}->{$Parameter}) ) {
+        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($FlatData->{$Parameter}) ) {
             $Result->{Success} = 0;
             $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter is missing!",
             last;            
         }
-        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && !exists($Param{Data}->{$Parameter}) && !exists($Param{Data}->{$Param{Parameters}->{$Parameter}->{RequiredIfNot}})) {            
+        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && !exists($FlatData->{$Parameter}) && !exists($FlatData->{$Param{Parameters}->{$Parameter}->{RequiredIfNot}})) {            
             $Result->{Success} = 0;
             $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or $Param{Parameters}->{$Parameter}->{RequiredIfNot} is missing!",
             last;            
         }
 
         # parse into arrayref if parameter value is scalar and ARRAY type is needed
-        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Param{Data}->{$Parameter} && ref($Param{Data}->{$Parameter}) ne 'ARRAY' ) {
-            $Param{Data}->{$Parameter} = [ split('\s*,\s*', $Param{Data}->{$Parameter}) ];
+        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $FlatData->{$Parameter} && ref($FlatData->{$Parameter}) ne 'ARRAY' ) {
+            $Self->_SetParameter(
+                Data      => $Param{Data},
+                Attribute => $Parameter,
+                Value     => [ split('\s*,\s*', $FlatData->{$Parameter}) ],
+            );
         }
 
         # set default value
-        if ( !$Param{Data}->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
-            $Param{Data}->{$Parameter} = $Param{Parameters}->{$Parameter}->{Default}
+        if ( !$FlatData->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
+            $Self->_SetParameter(
+                Data      => $Param{Data},
+                Attribute => $Parameter,
+                Value     => $Param{Parameters}->{$Parameter}->{Default},
+            );
         }
         
         # check valid values
@@ -185,6 +197,73 @@ sub ReturnError {
         },
     };
 }
+
+=begin Internal:
+
+sub _FlattenData {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Data)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->ReturnError(
+                ErrorCode    => 'ParseParameters.MissingParameter',
+                ErrorMessage => "ParseParameters: $Needed parameter is missing!",
+            );
+        }
+    }   
+
+    my $ParentKey = $Param{ParentKey} || '';
+    
+    # create copy of data structure to prevent changing the original data
+    my %Data = %{$Param{Data}};
+    
+    # get relevant keys
+    my @KeysToFlatten = grep('/::/', keys %Data);
+    
+    foreach my $Key (@KeysToFlatten) {
+        my ($SubKey) = split(/::/, $Key);
+        my %FlatData = $Self->_FlattenData(
+            Data      => $Data{$SubKey},
+            ParentKey => $ParentKey.'::'.$SubKey,
+        );
+        $Data{$ParentKey.'::'.$SubKey} = \%FlatData;
+    }
+    
+    return \%Data;
+}
+
+sub _SetParameter {
+    my ( $Self, %Param ) = @_;
+    
+    # check needed stuff
+    for my $Needed (qw(Data Attribute)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->ReturnError(
+                ErrorCode    => 'ParseParameters.MissingParameter',
+                ErrorMessage => "ParseParameters: $Needed parameter is missing!",
+            );
+        }
+    }
+    
+    my $Value = exists($Param{Value}) ? $Param{Value} || undef;
+    
+    if ($Param{Attribute} =~ /::/) {
+        my ($SubKey, $Rest) = split(/::/, $Param{Attribute});
+        $Self->_SetParameter(
+            Data      => $Param{Data}->{$SubKey},
+            Attribute => $Rest,
+            Value     => $Param{Value}
+        );    
+    }
+    else {
+        $Param{Data}->{$Attribute} = $Value;
+    }
+    
+    return 1;
+}
+
+=end Internal:
 
 1;
 
