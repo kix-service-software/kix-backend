@@ -120,13 +120,18 @@ sub ParseParameters {
     my $Data = $Param{Data};
 
     # if needed flatten hash structure for easier access to sub structures
-    if ( grep('/::/', keys %{$Data}) ) {
-        my $Data = Hash::Flatten::flatten( 
-            $Param{Data}, 
+    if ( grep('/::/', keys %{$Param{Parameters}}) ) {
+        
+        my $FlatData = Hash::Flatten::flatten(
+            $Param{Data},
             {
                 HashDelimiter => '::',
             }
         );
+        $Data = {
+            %{$Data},
+            %{$FlatData},
+        };
     }
     
     foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
