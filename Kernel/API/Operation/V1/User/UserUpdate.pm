@@ -1,5 +1,5 @@
 # --
-# Kernel/GenericInterface/Operation/User/UserUpdate.pm - GenericInterface User Update operation backend
+# Kernel/API/Operation/User/UserCreate.pm - API User Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::GenericInterface::Operation::User::UserUpdate;
+package Kernel::API::Operation::V1::User::UserCreate;
 
 use strict;
 use warnings;
@@ -19,15 +19,14 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::GenericInterface::Operation::Common
-    Kernel::GenericInterface::Operation::User::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::GenericInterface::Operation::User::UserUpdate - GenericInterface User Update Operation backend
+Kernel::API::Operation::User::V1::UserCreate - API User Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -40,7 +39,7 @@ Kernel::GenericInterface::Operation::User::UserUpdate - GenericInterface User Up
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::GenericInterface::Operation->new();
+by using Kernel::API::Operation->new();
 
 =cut
 
@@ -62,33 +61,28 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('GenericInterface::Operation::UserUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserCreate');
 
     return $Self;
 }
 
 =item Run()
 
-perform UserUpdate Operation. This will return the updated UserLogin.
+perform UserCreate Operation. This will return the created UserLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserLogin         => 'some agent login',                            # UserLogin or UserLogin or SessionID is
-                                                                                #   required
-            UserLogin => 'some customer login',
-            SessionID         => 123,
-
-            Password  => 'some password',                                       # if UserLogin or UserLogin is sent then
-                                                                                #   Password is required
+            Authorization => {
+                ...
+            },
 
             User => {
-                UserID          => 123,                                         # required
                 UserLogin       => '...'                                        # required
                 UserFirstname   => '...'                                        # required
                 UserLastname    => '...'                                        # required
                 UserEmail       => '...'                                        # required
-                UserPassword    => '...'                                        # optional
-                UserPhone       => '...'                                        # optional
+                UserPassword    => '...'                                        # optional                
+                UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
             },
         },
@@ -98,7 +92,7 @@ perform UserUpdate Operation. This will return the updated UserLogin.
         Success         => 1,                       # 0 or 1
         ErrorMessage    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            UserID  => '',                     # UserID 
+            UserID  => '',                          # UserID 
             Error => {                              # should not return errors
                     ErrorCode    => 'User.Create.ErrorCode'
                     ErrorMessage => 'Error Description'
@@ -111,6 +105,7 @@ perform UserUpdate Operation. This will return the updated UserLogin.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -122,55 +117,35 @@ sub Run {
         );
     }
 
-    # check needed stuff
-    if (
-        !$Param{Data}->{UserLogin}
-        && !$Param{Data}->{UserLogin}
-        && !$Param{Data}->{SessionID}
-        )
-    {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.MissingParameter',
-            ErrorMessage => "UserUpdate: UserLogin, UserLogin or SessionID is required!",
-        );
-    }
-
-    if ( $Param{Data}->{UserLogin} || $Param{Data}->{UserLogin} ) {
-
-        if ( !$Param{Data}->{Password} )
-        {
-            return $Self->ReturnError(
-                ErrorCode    => 'UserUpdate.MissingParameter',
-                ErrorMessage => "UserUpdate: Password or SessionID is required!",
-            );
+    # parse and prepare parameters
+    $Result = $Self->ParseParameters(
+        Data       => $Param{Data},
+        Parameters => {
+            'User' => {
+                Type     => 'HASH',
+                Required => 1
+            },
+            'User::UserLogin' => {
+                Required => 1
+            },            
+            'User::UserFirstname' => {
+                Required => 1
+            },            
+            'User::UserLastname' => {
+                Required => 1
+            },            
+            'User::UserEmail' => {
+                Required => 1
+            },            
         }
-    }
-
-    # authenticate user
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
     );
 
-    if ( !$UserID ) {
+    # check result
+    if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.AuthFail',
-            ErrorMessage => "UserUpdate: User could not be authenticated!",
+            ErrorCode    => 'UserGet.MissingParameter',
+            ErrorMessage => $Result->{ErrorMessage},
         );
-    }
-
-    my $PermissionUserID = $UserID;
-    if ( $UserType eq 'Customer' ) {
-        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check needed hashes
-    for my $Needed (qw(User)) {
-        if ( !IsHashRefWithData( $Param{Data}->{$Needed} ) ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'UserUpdate.MissingParameter',
-                ErrorMessage => "UserUpdate: $Needed parameter is missing or not valid!",
-            );
-        }
     }
 
     # isolate User parameter
@@ -188,19 +163,9 @@ sub Run {
         }
     }
 
-    # check User attribute values
-    for my $Needed (qw(UserID UserFirstname UserLastname UserLogin UserEmail)) {
-        if ( !$User->{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'UserUpdate.MissingParameter',
-                ErrorMessage => "UserUpdate: User->$Needed parameter is missing!",
-            );
-        }
-    }
-    
-    # check UserID exists
+    # check UserLogin exists
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        UserID => $User->{UserID},
+        User => $User->{UserLogin},
     );
     if ( !%UserData ) {
         return {
@@ -209,25 +174,14 @@ sub Run {
         }
     }
 
-    # check UserLogin exists
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        Search => $User->{UserLogin},
-    );
-    if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
-        return {
-            Success      => 0,
-            ErrorMessage => 'Can not update user. User with same login already exists.',
-        }
-    }
-
     # check UserEmail exists
-    %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
         Search => $User->{UserEmail},
     );
     if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
         return {
             Success      => 0,
-            ErrorMessage => 'Can not update user. User with same email address already exists.',
+            ErrorMessage => 'Can not update user. User with same login already exists.',
         }
     }
     
@@ -251,5 +205,4 @@ sub Run {
             UserID => $UserData{UserID},
         },
     };
-    
 }
