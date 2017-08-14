@@ -95,7 +95,6 @@ sub ValidateToken {
         );
     }
 
-print STDERR "LastRequestTime: $LastRequestTime\n";
     # nothing found
     if ( !$LastRequestTime ) {
         return;
@@ -107,8 +106,6 @@ print STDERR "LastRequestTime: $LastRequestTime\n";
         $ConfigObject->Get('JWTSecret') || 'KIX_JWT_SECRET!!!',
     );
 
-use Data::Dumper;
-print STDERR Dumper($Token);
     # unable to decode
     if ( !IsHashRefWithData($Token) ) {
         return;
@@ -209,7 +206,7 @@ sub CreateToken {
         return;
     }
 
-    if ( $Param{Payload}->{UserType} ne 'User' && $Param{Payload}->{UserType} ne 'Customer' ) {
+    if ( $Param{Payload}->{UserType} ne 'Agent' && $Param{Payload}->{UserType} ne 'Customer' ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Got wrong UserType!'
