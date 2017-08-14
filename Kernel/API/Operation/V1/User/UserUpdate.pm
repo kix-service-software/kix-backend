@@ -189,8 +189,8 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
         %UserData,
         %{$User},
-        ValidID => $UserData{ValidID},
-        ChangeUserID  => $UserID,
+        ValidID       => $UserData{ValidID},
+        ChangeUserID  => $Param{Data}->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
         return {
