@@ -88,6 +88,7 @@ check given parameters and parse them according to type
                 Required      => 1,                     # optional
                 RequiredIfNot => '<AltParameter>'       # optional
                 Default       => ...                    # optional
+                OneOf         => [...]                  # optional
             }
         }
     );
@@ -116,6 +117,7 @@ sub ParseParameters {
     }
 
     foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
+        
         # check requirement
         if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Param{Data}->{$Parameter}) ) {
             $Result->{Success} = 0;
@@ -136,6 +138,15 @@ sub ParseParameters {
         # set default value
         if ( !$Param{Data}->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
             $Param{Data}->{$Parameter} = $Param{Parameters}->{$Parameter}->{Default}
+        }
+        
+        # check valid values
+        if ( exists($Param{Parameters}->{$Parameter}->{OneOf}) && ref($Param{Parameters}->{$Parameter}->{OneOf}) eq 'ARRAY' ) {
+            if ( !grep(/^$Param{Data}->{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
+                $Result->{Success} = 0;
+                $Result->{ErrorMessage} = "ParseParameters: parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
+                last;                  
+            }
         }
     }
 
