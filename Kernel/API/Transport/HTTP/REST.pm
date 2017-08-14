@@ -119,7 +119,7 @@ sub ProviderProcessRequest {
     my $Operation;
     my %URIData;
     my $RequestURI = $ENV{REQUEST_URI} || $ENV{PATH_INFO};
-    $RequestURI =~ s{.*Webservice(?:ID)?\/[^\/]+(\/.*)$}{$1}xms;
+    $RequestURI =~ s{.*webservice\/[^\/]+(\/.*)$}{$1}xms;
 
     # remove any query parameter form the URL
     # e.g. from /Ticket/1/2?UserLogin=user&Password=secret
