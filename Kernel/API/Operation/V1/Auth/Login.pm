@@ -102,7 +102,7 @@ sub Run {
         Data       => $Param{Data},
         Parameters => {
             'UserLogin' => {
-                RequiredIfNot => 'CustomerContactLogin'
+                Required => 1
             },
             'UserType' => {
                 Required => 1,
