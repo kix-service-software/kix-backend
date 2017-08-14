@@ -66,9 +66,9 @@ Authenticate user.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserLogin         => 'Agent1',
-            CustomerUserLogin => 'Customer1',       # optional, provide UserLogin or CustomerUserLogin
-            Password          => 'some password',   # plain text password
+            UserLogin            => 'Login',             # required
+            Password             => 'some password',     # required, plain text password
+            UserType             => 'Agent'|'Customer'   # required
         },
     );
 
@@ -76,7 +76,7 @@ Authenticate user.
         Success      => 1,                                # 0 or 1
         ErrorMessage => '',                               # In case of an error
         Data         => {
-            SessionID => $SessionID,
+            Token => '..., 
         },
     };
 
@@ -102,10 +102,14 @@ sub Run {
         Data       => $Param{Data},
         Parameters => {
             'UserLogin' => {
-                RequiredIfNot => 'CustomerUserLogin'
+                RequiredIfNot => 'CustomerContactLogin'
             },
-            'CustomerUserLogin' => {
-                RequiredIfNot => 'UserLogin'
+            'UserType' => {
+                Required => 1,
+                OneOf => [
+                    'Agent',
+                    'Customer'
+                ]
             }
             'Password' => {
                 Required => 1
@@ -122,34 +126,23 @@ sub Run {
     }
 
     my $User;
-    my $UserType;
 
     # get params
     my $PostPw = $Param{Data}->{Password} || '';
 
-    if ( defined $Param{Data}->{UserLogin} && $Param{Data}->{UserLogin} ) {
-
-        # if UserLogin
-        my $PostUser = $Param{Data}->{UserLogin} || '';
-
+    if ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Agent' ) {
         # check submitted data
         $User = $Kernel::OM->Get('Kernel::System::Auth')->Auth(
-            User => $PostUser,
+            User => $Param{Data}->{UserLogin} || '',
             Pw   => $PostPw,
         );
-        $UserType = 'User';
     }
-    elsif ( defined $Param{Data}->{CustomerUserLogin} && $Param{Data}->{CustomerUserLogin} ) {
-
-        # if CustomerUserLogin
-        my $PostUser = $Param{Data}->{CustomerUserLogin} || '';
-
+    elsif ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Customer' ) {
         # check submitted data
         $User = $Kernel::OM->Get('Kernel::System::CustomerAuth')->Auth(
-            User => $PostUser,
+            User => $Param{Data}->{UserLogin} || '',
             Pw   => $PostPw,
         );
-        $UserType = 'Customer';
     }
 
     # not authenticated
@@ -165,7 +158,7 @@ sub Run {
     my $Token = $Kernel::OM->Get('Kernel::System::JWT')->CreateToken(
         Payload => {
             UserID      => $User,
-            UserType    => $UserType,
+            UserType    => $Param{Data}->{UserType},
         }
     );
 
