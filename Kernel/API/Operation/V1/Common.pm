@@ -12,6 +12,7 @@ package Kernel::API::Operation::V1::Common;
 
 use strict;
 use warnings;
+use Hash::Flatten;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -116,35 +117,37 @@ sub ParseParameters {
         }
     }
 
-    # helper method to flatten structure for easier access to sub structures 
-    my $FlatData = $Self->_FlattenData(
-        Data => $Param{Data},
-    );
+    my $Data = $Param{Data};
+
+    # if needed flatten hash structure for easier access to sub structures
+    if ( grep('/::/', keys %{$Data}) ) {
+        my $Data = Hash::Flatten::flatten( $Param{Data} );
+    }
     
     foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
         # check requirement
-        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($FlatData->{$Parameter}) ) {
+        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data->{$Parameter}) ) {
             $Result->{Success} = 0;
             $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter is missing!",
             last;            
         }
-        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && !exists($FlatData->{$Parameter}) && !exists($FlatData->{$Param{Parameters}->{$Parameter}->{RequiredIfNot}})) {            
+        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && !exists($Data->{$Parameter}) && !exists($Data->{$Param{Parameters}->{$Parameter}->{RequiredIfNot}})) {            
             $Result->{Success} = 0;
             $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or $Param{Parameters}->{$Parameter}->{RequiredIfNot} is missing!",
             last;            
         }
 
         # parse into arrayref if parameter value is scalar and ARRAY type is needed
-        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $FlatData->{$Parameter} && ref($FlatData->{$Parameter}) ne 'ARRAY' ) {
+        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Data->{$Parameter} && ref($Data->{$Parameter}) ne 'ARRAY' ) {
             $Self->_SetParameter(
                 Data      => $Param{Data},
                 Attribute => $Parameter,
-                Value     => [ split('\s*,\s*', $FlatData->{$Parameter}) ],
+                Value     => [ split('\s*,\s*', $Data->{$Parameter}) ],
             );
         }
 
         # set default value
-        if ( !$FlatData->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
+        if ( !$Data->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
             $Self->_SetParameter(
                 Data      => $Param{Data},
                 Attribute => $Parameter,
@@ -199,39 +202,6 @@ sub ReturnError {
 }
 
 =begin Internal:
-
-sub _FlattenData {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Data)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'ParseParameters.MissingParameter',
-                ErrorMessage => "ParseParameters: $Needed parameter is missing!",
-            );
-        }
-    }   
-
-    my $ParentKey = $Param{ParentKey} || '';
-    
-    # create copy of data structure to prevent changing the original data
-    my %Data = %{$Param{Data}};
-    
-    # get relevant keys
-    my @KeysToFlatten = grep('/::/', keys %Data);
-    
-    foreach my $Key (@KeysToFlatten) {
-        my ($SubKey) = split(/::/, $Key);
-        my %FlatData = $Self->_FlattenData(
-            Data      => $Data{$SubKey},
-            ParentKey => $ParentKey.'::'.$SubKey,
-        );
-        $Data{$ParentKey.'::'.$SubKey} = \%FlatData;
-    }
-    
-    return \%Data;
-}
 
 sub _SetParameter {
     my ( $Self, %Param ) = @_;
