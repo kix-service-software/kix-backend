@@ -188,7 +188,7 @@ sub Run {
     # create User
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
         %{$User},
-        ChangeUserID     => $UserID,
+        ChangeUserID     => $Param{Data}->{Autorization}->{UserID},
         ValidID          => 1,
     );    
     if ( !$UserID ) {
