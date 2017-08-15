@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Maint::JWT::RemoveAll;
+package Kernel::System::Console::Command::Maint::Token::RemoveAll;
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::JWT',
+    'Kernel::System::Token',
 );
 
 sub Configure {
@@ -30,10 +30,10 @@ sub Run {
 
     $Self->Print("<yellow>Removing all tokens...</yellow>\n");
 
-    my $JWTObject = $Kernel::OM->Get('Kernel::System::JWT');
+    my $JWTObject = $Kernel::OM->Get('Kernel::System::Token');
 
-    for my $Token ( keys %{$JWTObject->GetAllTokens()} ) {
-        my $Result = $JWTObject->RemoveToken(
+    for my $Token ( keys %{$TokenObject->GetAllTokens()} ) {
+        my $Result = $TokenObject->RemoveToken(
             Token => $Token,
         );
 
