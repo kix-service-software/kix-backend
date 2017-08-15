@@ -121,7 +121,7 @@ sub Run {
     }
 
 
-    my $Result = $Kernel::OM->Get('Kernel::System::JWT')->RemoveToken(
+    my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
         Token => $Param{Data}->{Token}
     );
 

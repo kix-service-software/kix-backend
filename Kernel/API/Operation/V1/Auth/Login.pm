@@ -164,7 +164,7 @@ sub Run {
     }
 
     # create new token
-    my $Token = $Kernel::OM->Get('Kernel::System::JWT')->CreateToken(
+    my $Token = $Kernel::OM->Get('Kernel::System::Token')->CreateToken(
         Payload => {
             UserID      => $UserID,
             UserType    => $Param{Data}->{UserType},

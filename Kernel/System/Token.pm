@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::JWT;
+package Kernel::System::Token;
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::JWT - handoling of JSON Web Tokens
+Kernel::System::Session - handling of user session tokens
 
 =head1 SYNOPSIS
 
@@ -103,7 +103,7 @@ sub ValidateToken {
     # decode token
     my $Token = decode_jwt(
         $Param{Token}, 
-        $ConfigObject->Get('JWTSecret') || 'KIX_JWT_SECRET!!!',
+        $ConfigObject->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
     );
 
     # unable to decode
@@ -163,7 +163,7 @@ sub ValidateToken {
     # update last request time
     $TimeNow = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => "UPDATE jwt SET last_request_time = ? WHERE token = ?",
+        SQL => "UPDATE token SET last_request_time = ? WHERE token = ?",
         Bind =>  [
             \$TimeNow,
             \$Param{Token} 
@@ -177,7 +177,7 @@ sub ValidateToken {
 
 create a new token with given data
 
-    my $Token = $JWTObject->CreateToken(
+    my $Token = $TokenObject->CreateToken(
         Payload => {
             UserType => 'User' | 'Customer'     # required
             UserID   => '...'                   # required
@@ -232,13 +232,13 @@ sub CreateToken {
 
     my $Token = encode_jwt(
         \%Payload, 
-        $Kernel::OM->Get('Kernel::Config')->Get('JWTSecret') || 'KIX_JWT_SECRET!!!',
+        $Kernel::OM->Get('Kernel::Config')->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
         'HS256', 
     );
 
     # store token in whitelist
     $Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL  => "INSERT INTO jwt (token, last_request_time) values (?, ?)",
+        SQL  => "INSERT INTO token (token, last_request_time) values (?, ?)",
         Bind => [
             \$Token,
             \$Payload{CreateTime},
@@ -271,7 +271,7 @@ sub RemoveToken {
 
     # delete token from the database
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL  => "DELETE FROM jwt WHERE token = ?",
+        SQL  => "DELETE FROM token WHERE token = ?",
         Bind => [ \$Param{Token} ],
     );
 
@@ -301,7 +301,7 @@ sub GetAllTokens {
 
     # get all session ids from the database
     return if !$DBObject->Prepare(
-        SQL => "SELECT token, last_request_time FROM jwt",
+        SQL => "SELECT token, last_request_time FROM token",
     );
 
     # fetch the result
@@ -325,7 +325,7 @@ sub CleanUp {
     my ( $Self, %Param ) = @_;
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do( 
-        SQL => "DELETE FROM jwt"
+        SQL => "DELETE FROM token"
     );
 
     return 1;
