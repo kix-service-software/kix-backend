@@ -84,12 +84,13 @@ check given parameters and parse them according to type
             ...
         },
         Parameters => {
-            <Parameter> => {                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
-                Type          => 'ARRAY',               # optional
-                Required      => 1,                     # optional
-                RequiredIfNot => '<AltParameter>'       # optional
-                Default       => ...                    # optional
-                OneOf         => [...]                  # optional
+            <Parameter> => {                                  # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
+                Type                => 'ARRAY',               # optional
+                Required            => 1,                     # optional
+                RequiredIfNot       => '<AltParameter>'       # optional
+                RequiresValueIfUsed => 1                      # optional
+                Default             => ...                    # optional
+                OneOf               => [...]                  # optional
             }
         }
     );
@@ -172,6 +173,13 @@ sub ParseParameters {
                 $Result->{ErrorMessage} = "ParseParameters: parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
                 last;                  
             }
+        }
+        
+        # check if we have an optional parameter that needs a value
+        if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data->{$Parameter}) && !defined($Data->{$Parameter}) ) {
+            $Result->{Success} = 0;
+            $Result->{ErrorMessage} = "ParseParameters: optional parameter $Parameter is used without a value!",
+            last;   
         }
     }
 
