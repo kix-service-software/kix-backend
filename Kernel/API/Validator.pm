@@ -70,6 +70,9 @@ sub new {
     my $ValidatorList = $Kernel::OM->Get('Kernel::Config')->Get('API::Validator::Module');
     
     foreach my $Validator (sort keys %{$ValidatorList}) {
+        # next validator if this one ignores our current operation
+        next if ( $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/g )
+
         my $Backend = 'Kernel::API::Validator::' . $ValidatorList->{$Validator}->{Module};
 
         if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
@@ -85,7 +88,7 @@ sub new {
             if ( !IsArrayRefWithData( $Self->{Validators}->{$ValidatedAttribute} ) ) {
                 $Self->{Validators}->{$ValidatedAttribute} = [];
             }
-            push @{$Self->{Validators}->{$ValidatedAttribute}}, $Backend;
+            push @{$Self->{Validators}->{$ValidatedAttribute}}, $BackendObject;
         }
     }
 
