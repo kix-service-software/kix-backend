@@ -235,7 +235,7 @@ sub Run {
     }
 
     my $XML = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-    $XML .= "<otrs_test>\n";
+    $XML .= "<kix_test>\n";
     $XML .= "<Summary>\n";
     for my $Key ( sort keys %ResultSummary ) {
         $ResultSummary{$Key} =~ s/&/&amp;/g;
@@ -266,7 +266,7 @@ sub Run {
 
         $XML .= "</Unit>\n";
     }
-    $XML .= "</otrs_test>\n";
+    $XML .= "</kix_test>\n";
 
     if ( $Self->{Output} eq 'XML' ) {
         print $XML;

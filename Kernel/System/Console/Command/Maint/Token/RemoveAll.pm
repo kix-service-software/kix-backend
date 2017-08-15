@@ -30,20 +30,7 @@ sub Run {
 
     $Self->Print("<yellow>Removing all tokens...</yellow>\n");
 
-    my $JWTObject = $Kernel::OM->Get('Kernel::System::Token');
-
-    for my $Token ( keys %{$TokenObject->GetAllTokens()} ) {
-        my $Result = $TokenObject->RemoveToken(
-            Token => $Token,
-        );
-
-        if ( !$Result ) {
-            $Self->PrintError("Token could not be deleted.");
-            return $Self->ExitCodeError();
-        }
-
-        $Self->Print("  Token deleted\n");
-    }
+    my $Result = $Kernel::OM->Get('Kernel::System::Token')->CleanUp();
 
     $Self->Print("<green>Done.</green>\n");
 
