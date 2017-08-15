@@ -42,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $JWTObject = $Kernel::OM->Get('Kernel::System::JWT');
+    my $TokenObject = $Kernel::OM->Get('Kernel::System::Token');
 
 =cut
 
@@ -60,7 +60,7 @@ sub new {
 
 validates a token, returns the payload (valid) or nothing (invalid)
 
-    my $Result = $JWTObject->ValidateToken(
+    my $Result = $TokenObject->ValidateToken(
         Token => '1234567890123456',
     );
 
@@ -84,7 +84,7 @@ sub ValidateToken {
 
     # check whitelist
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => "SELECT token, last_request_time FROM jwt WHERE token = ?",
+        SQL => "SELECT token, last_request_time FROM token WHERE token = ?",
         Bind => [ \$Param{Token} ],
     );
 
@@ -101,25 +101,25 @@ sub ValidateToken {
     }
 
     # decode token
-    my $Token = decode_jwt(
+    my $Payload = decode_jwt(
         $Param{Token}, 
         $ConfigObject->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
     );
 
     # unable to decode
-    if ( !IsHashRefWithData($Token) ) {
+    if ( !IsHashRefWithData($Payload) ) {
         return;
     }
 
     # remote ip check
     if (
         $ConfigObject->Get('TokenCheckRemoteIP') && 
-        $Token->{UserRemoteAddr} ne $RemoteAddr
+        $Payload->{UserRemoteAddr} ne $RemoteAddr
         )
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
-            Message  => "RemoteIP ($Token->{UserRemoteAddr}) of request is "
+            Message  => "RemoteIP ($Payload->{UserRemoteAddr}) of request is "
                 . "different from registered IP ($RemoteAddr). Invalidating token! "
                 . "Disable config 'TokenCheckRemoteIP' if you don't want this!",
         );
@@ -132,7 +132,7 @@ sub ValidateToken {
     # check time validity
     my $TimeNow = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
 
-    if ( $TimeNow > $Token->{ValidUntil} ) {
+    if ( $TimeNow > $Payload->{ValidUntil} ) {
 
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
@@ -170,7 +170,7 @@ sub ValidateToken {
         ],
     );
     
-    return $Token;
+    return $Payload;
 }
 
 =item CreateToken()
@@ -253,7 +253,7 @@ sub CreateToken {
 removes a token and returns true (deleted), false (if
 it can't get deleted)
 
-    $JWTObject->RemoveToken(Token => '1234567890123456');
+    $TokenObject->RemoveToken(Token => '1234567890123456');
 
 =cut
 
@@ -285,11 +285,71 @@ sub RemoveToken {
 
 }
 
+=item ExtractToken()
+
+returns the payload of a given token, adding LastRequestTime
+
+    my $Payload = $TokenObject->ValidateToken(
+        Token => '1234567890123456',
+    );
+
+=cut
+
+sub ExtractToken {
+    my ( $Self, %Param ) = @_;
+
+    # check session id
+    if ( !$Param{Token} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no token!!'
+        );
+        return;
+    }
+ 
+     # get config object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    # get time of last request
+    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        SQL => "SELECT last_request_time FROM token WHERE token = ?",
+        Bind => [ \$Param{Token} ],
+    );
+
+    my $LastRequestTime;
+    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        $LastRequestTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            String => $Row[0],
+        );
+    }
+
+    # nothing found, this token is invalid
+    if ( !$LastRequestTime ) {
+        return;
+    }
+
+    # decode token
+    my $Payload = decode_jwt(
+        $Param{Token}, 
+        $ConfigObject->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
+    );
+
+    # unable to decode
+    if ( !IsHashRefWithData($Payload) ) {
+        return;
+    }
+
+    # enrich payload
+    $Payload->{LastRequestTime} = $LastRequestTime;
+
+    return $Payload;
+}
+
 =item GetAllTokens()
 
 returns a hashref with all tokens, key = Token, value = last request time
 
-    my $Tokens = $JWTObject->GetAllTokens();
+    my $Tokens = $TokenObject->GetAllTokens();
 
 =cut
 
@@ -317,7 +377,7 @@ sub GetAllTokens {
 
 cleanup all tokens in system
 
-    $JWTObject->CleanUp();
+    $TokensObject->CleanUp();
 
 =cut
 
