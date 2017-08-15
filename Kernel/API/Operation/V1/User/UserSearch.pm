@@ -79,7 +79,7 @@ perform UserSearch Operation. This will return a User ID list.
         Success      => 1,                                # 0 or 1
         ErrorMessage => '',                               # In case of an error
         Data         => {
-            TicketID => [ 1, 2, 3, 4 ],
+            UserID => [ 1, 2, 3, 4 ],
         },
     };
 
