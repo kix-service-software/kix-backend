@@ -34,7 +34,7 @@ Kernel::API::Transport::HTTP::Common - Base class for all HTTP transports
 
 =item ProviderCheckAuthorization()
 
-Checks the incoming web service request for authorization header and validates JWT.
+Checks the incoming web service request for authorization header and validates token.
 
 The HTTP code is set accordingly
 - 403 unauthorized
@@ -68,7 +68,7 @@ sub ProviderCheckAuthorization {
 
     if (!$Authorization{Token}) {
         return $Self->_Error(
-            Summary   => 'No JWT in authorization header found!',
+            Summary   => 'No token in authorization header found!',
             HTTPError => 500,
         );
     }
