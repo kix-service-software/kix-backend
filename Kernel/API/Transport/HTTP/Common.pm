@@ -73,7 +73,7 @@ sub ProviderCheckAuthorization {
         );
     }
 
-    my $ValidatedToken = $Kernel::OM->Get('Kernel::System::JWT')->ValidateToken(
+    my $ValidatedToken = $Kernel::OM->Get('Kernel::System::Token')->ValidateToken(
         Token => $Authorization{Token},
     );
 
