@@ -84,6 +84,7 @@ perform UserUpdate Operation. This will return the updated UserID.
                 UserPassword    => '...'                                        # optional                
                 UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
+                ValidID         = 0 | 1 | 2                                     # optional
             },
         },
     );
@@ -136,7 +137,7 @@ sub Run {
             },
             'User::UserEmail' => {
                 RequiresValueIfUsed => 1
-            },       
+            },
         }
     );
 
@@ -189,7 +190,6 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
         %UserData,
         %{$User},
-        ValidID       => $UserData{ValidID},
         ChangeUserID  => $Param{Data}->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
