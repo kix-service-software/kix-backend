@@ -143,7 +143,7 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserGet.MissingParameter',
+            ErrorCode    => 'UserUpdate.MissingParameter',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
