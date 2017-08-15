@@ -1,7 +1,7 @@
 # <Route>                                                           | <Request Method>  | <Operation Type>                                                  | <additional Attribute (optional)>
 
-/auth/login                                                         |   POST            | V1::Auth::Login                                                   | NoAuthorizationNeeded: 1
-/auth/logout                                                        |   DELETE          | V1::Auth::Logout
+/sessions                                                           |   POST            | V1::Auth::Login                                                   | NoAuthorizationNeeded: 1
+/sessions/:Token                                                    |   DELETE          | V1::Auth::Logout
 /users                                                              |   GET             | V1::User::UserSearch
 /users                                                              |   POST            | V1::User::UserCreate
 /users/:UserID                                                      |   GET             | V1::User::UserGet
