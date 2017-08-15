@@ -75,7 +75,8 @@ remove token (invalidate)
                 UserID   => '123',
                 UserType => 'User' | 'Customer'
                 ...
-            }
+            },
+            Token => '...'                                # required
         },
     );
 
@@ -89,27 +90,39 @@ remove token (invalidate)
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !IsHashRefWithData( $Param{Data} ) ) {
+    # init webservice
+    my $Result = $Self->Init(
+        WebserviceID => $Self->{WebserviceID},
+    );
 
-        return $Self->ReturnError(
-            ErrorCode    => 'Logout.MissingParameter',
-            ErrorMessage => "Logout: The request is empty!",
+    if ( !$Result->{Success} ) {
+        $Self->ReturnError(
+            ErrorCode    => 'Webservice.InvalidConfiguration',
+            ErrorMessage => $Result->{ErrorMessage},
         );
     }
 
-    for my $Needed (qw( Token )) {
-        if ( !$Param{Data}->{Authorization}->{$Needed} ) {
-
-            return $Self->ReturnError(
-                ErrorCode    => 'Logout.MissingParameter',
-                ErrorMessage => "Logout: $Needed parameter is missing!",
-            );
+    # parse and prepare parameters
+    $Result = $Self->ParseParameters(
+        Data       => $Param{Data},
+        Parameters => {
+            'Token' => {
+                Required => 1
+            }                
         }
+    );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'Logout.MissingParameter',
+            ErrorMessage => $Result->{ErrorMessage},
+        );
     }
 
+
     my $Result = $Kernel::OM->Get('Kernel::System::JWT')->RemoveToken(
-        Token => $Param{Data}->{Authorization}->{Token}
+        Token => $Param{Data}->{Token}
     );
 
     return {
