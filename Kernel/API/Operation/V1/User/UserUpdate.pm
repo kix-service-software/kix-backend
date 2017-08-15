@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserCreate.pm - API User Create operation backend
+# Kernel/API/Operation/User/UserUpdate.pm - API User Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserCreate;
+package Kernel::API::Operation::V1::User::UserUpdate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::User::V1::UserCreate - API User Create Operation backend
+Kernel::API::Operation::User::V1::UserUpdate - API User Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,14 +61,14 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserCreate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserUpdate');
 
     return $Self;
 }
 
 =item Run()
 
-perform UserCreate Operation. This will return the created UserLogin.
+perform UserUpdate Operation. This will return the updated UserID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -77,10 +77,10 @@ perform UserCreate Operation. This will return the created UserLogin.
             },
 
             User => {
-                UserLogin       => '...'                                        # required
-                UserFirstname   => '...'                                        # required
-                UserLastname    => '...'                                        # required
-                UserEmail       => '...'                                        # required
+                UserLogin       => '...'                                        # requires a value if given
+                UserFirstname   => '...'                                        # requires a value if given
+                UserLastname    => '...'                                        # requires a value if given
+                UserEmail       => '...'                                        # requires a value if given
                 UserPassword    => '...'                                        # optional                
                 UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
@@ -126,17 +126,17 @@ sub Run {
                 Required => 1
             },
             'User::UserLogin' => {
-                Required => 1
-            },            
+                RequiresValueIfUsed => 1
+            },
             'User::UserFirstname' => {
-                Required => 1
-            },            
+                RequiresValueIfUsed => 1
+            },
             'User::UserLastname' => {
-                Required => 1
-            },            
+                RequiresValueIfUsed => 1
+            },
             'User::UserEmail' => {
-                Required => 1
-            },            
+                RequiresValueIfUsed => 1
+            },       
         }
     );
 
