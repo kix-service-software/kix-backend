@@ -71,7 +71,7 @@ sub new {
     
     foreach my $Validator (sort keys %{$ValidatorList}) {
         # next validator if this one ignores our current operation
-        next if ( $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/g )
+        next if ( $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/g );
 
         my $Backend = 'Kernel::API::Validator::' . $ValidatorList->{$Validator}->{Module};
 
