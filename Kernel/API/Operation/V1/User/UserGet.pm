@@ -189,9 +189,15 @@ sub Run {
 
     }
 
+    if ( scalar(@UserList) == 1 ) {
+        return $Self->ReturnSuccess(
+            User => $UserList[0],
+        );    
+    }
+
     return $Self->ReturnSuccess(
         User => \@UserList,
-    );    
+    );
 }
 
 1;

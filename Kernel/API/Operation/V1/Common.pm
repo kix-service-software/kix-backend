@@ -118,26 +118,34 @@ sub PrepareData {
         }
     }
 
-    # save special parameters for later 
-    for my $Parameter (qw(Fields)) {
-        $Self->{$Parameter} = $Param{Data}->{$Parameter};
+    # prepare field filter
+    if ( exists($Param{Data}->{Fields}) ) {
+        foreach my $FieldFilter ( split(/,/, $Self->{Fields}) ) {
+            my ($Object, $Field) = split(/\./, $FieldFilter);
+            if ( !IsArrayRefWithData($Self->{FieldFilter}->{$Object}) ) {
+                $Self->{FieldFilter}->{$Object} = [];
+            }
+            push @{$Self->{FieldFilter}->{$Object}}, $Field;
+        }
     }
 
     my %Data = %{$Param{Data}};
 
     # if needed flatten hash structure for easier access to sub structures
-    if ( ref($Param{Parameters}) eq 'HASH' && grep(/::/, keys %{$Param{Parameters}}) ) {
-
-        my $FlatData = Hash::Flatten::flatten(
-            $Param{Data},
-            {
-                HashDelimiter => '::',
-            }
-        );
-        %Data = (
-            %Data,
-            %{$FlatData},
-        );
+    if ( ref($Param{Parameters}) eq 'HASH' ) {
+        
+        if ( grep(/::/, keys %{$Param{Parameters}}) ) {
+            my $FlatData = Hash::Flatten::flatten(
+                $Param{Data},
+                {
+                    HashDelimiter => '::',
+                }
+            );
+            %Data = (
+                %Data,
+                %{$FlatData},
+            );
+        }
 
         foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
 
@@ -215,29 +223,23 @@ sub ReturnSuccess {
     my ( $Self, %Param ) = @_;
 
     # honor a field filter, if we have one
-    if ( $Self->{Fields} ) {
-        foreach my $FieldFilter ( split(/,/, $Self->{Fields}) ) {
-            my ($Object, $Field) = split(/\./, $FieldFilter);
-
-            if ( ref($Param{$Object}) eq 'HASH' ) {
-                # filter keys in this hash
+    if ( IsHashRefWithData($Self->{FieldFilter}) ) {
+        foreach my $FilteredObject ( keys %{$Self->{FieldFilter}} ) {
+            if ( ref($Param{$FilteredObject}) eq 'HASH' ) {
+                # extract filtered fields from hash
                 my %NewObject;
-                foreach my $Key ( keys %{$Param{$Object}} ) {
-                    if ( $Key eq $Field ) {
-                        $NewObject{$Key} = $Param{$Object}->{$Key};
-                    }
+                foreach my $Field ( @{$Self->{FieldFilter}->{$FilteredObject}} ) {
+                    $NewObject{$Field} = $Param{$FilteredObject}->{$Field};
                 }
                 $Param{$Object} = \%NewObject;
             }
-            elsif ( ref($Param{$Object}) eq 'ARRAY' ) {
+            elsif ( ref($Param{$FilteredObject}) eq 'ARRAY' ) {
                 # filter keys in each contained hash
-                foreach my $ObjectItem ( @{$Param{$Object}} ) {
+                foreach my $ObjectItem ( @{$Param{$FilteredObject}} ) {
                     if ( ref($ObjectItem) eq 'HASH' ) {
                         my %NewObject;
-                        foreach my $Key ( keys %{$ObjectItem} ) {
-                            if ( $Key eq $Field) {
-                                $NewObject{$Key} = $ObjectItem{$Key};
-                            }
+                        foreach my $Field ( @{$Self->{FieldFilter}->{$FilteredObject}} ) {
+                            $NewObject{$Field} = $ObjectItem->{$Field};
                         }
                         $ObjectItem = \%NewObject;
                     }
