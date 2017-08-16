@@ -118,80 +118,81 @@ sub ParseParameters {
         }
     }
 
-    my $Data = $Param{Data};
+    my %Data = %{$Param{Data}};
 
     # if needed flatten hash structure for easier access to sub structures
-    if ( grep('/::/', keys %{$Param{Parameters}}) ) {
-        
+    if ( grep(/::/, keys %{$Param{Parameters}}) ) {
+
         my $FlatData = Hash::Flatten::flatten(
             $Param{Data},
             {
                 HashDelimiter => '::',
             }
         );
-        $Data = {
-            %{$Data},
+        %Data = (
+            %Data,
             %{$FlatData},
-        };
+        );
     }
-    
+
     foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
+
         # check requirement
-        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data->{$Parameter}) ) {
+        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
             $Result->{Success} = 0;
             $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter is missing!",
-            last;            
+            last;
         }
         elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && ref($Param{Parameters}->{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
             my $AltParameterHasValue = 0;
             foreach my $AltParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}} ) {
-                if ( exists($Data->{$AltParameter}) && defined($Data->{$AltParameter}) ) {
+                if ( exists($Data{$AltParameter}) && defined($Data{$AltParameter}) ) {
                     $AltParameterHasValue = 1;
                     last;
                 }
             }
-            if ( !exists($Data->{$Parameter}) && !$AltParameterHasValue ) {            
+            if ( !exists($Data{$Parameter}) && !$AltParameterHasValue ) {
                 $Result->{Success} = 0;
                 $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
-                last;            
+                last;
             }
         }
 
         # parse into arrayref if parameter value is scalar and ARRAY type is needed
-        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Data->{$Parameter} && ref($Data->{$Parameter}) ne 'ARRAY' ) {
+        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
             $Self->_SetParameter(
                 Data      => $Param{Data},
                 Attribute => $Parameter,
-                Value     => [ split('\s*,\s*', $Data->{$Parameter}) ],
+               Value     => [ split('\s*,\s*', $Data{$Parameter}) ],
             );
         }
 
         # set default value
-        if ( !$Data->{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
+        if ( !$Data{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
             $Self->_SetParameter(
                 Data      => $Param{Data},
                 Attribute => $Parameter,
                 Value     => $Param{Parameters}->{$Parameter}->{Default},
             );
         }
-        
+
         # check valid values
         if ( exists($Param{Parameters}->{$Parameter}->{OneOf}) && ref($Param{Parameters}->{$Parameter}->{OneOf}) eq 'ARRAY' ) {
-            if ( !grep(/^$Param{Data}->{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
+            if ( !grep(/^$Data{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
                 $Result->{Success} = 0;
                 $Result->{ErrorMessage} = "ParseParameters: parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
-                last;                  
+                last;
             }
         }
-        
+
         # check if we have an optional parameter that needs a value
-        if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data->{$Parameter}) && !defined($Data->{$Parameter}) ) {
+        if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
             $Result->{Success} = 0;
             $Result->{ErrorMessage} = "ParseParameters: optional parameter $Parameter is used without a value!",
-            last;   
+            last;
         }
     }
-
+    
     return $Result; 
 }
 
