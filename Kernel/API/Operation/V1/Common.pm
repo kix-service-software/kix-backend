@@ -229,8 +229,6 @@ sub ReturnError {
     };
 }
 
-=begin Internal:
-
 sub _SetParameter {
     my ( $Self, %Param ) = @_;
     
@@ -244,7 +242,10 @@ sub _SetParameter {
         }
     }
     
-    my $Value = exists($Param{Value}) ? $Param{Value} || undef;
+    my $Value;
+    if ( exists($Param{Value}) ) {
+        $Value = $Param{Value};
+    };
     
     if ($Param{Attribute} =~ /::/) {
         my ($SubKey, $Rest) = split(/::/, $Param{Attribute});
@@ -255,13 +256,11 @@ sub _SetParameter {
         );    
     }
     else {
-        $Param{Data}->{$Attribute} = $Value;
+        $Param{Data}->{$Param{Attribute}} = $Value;
     }
     
     return 1;
 }
-
-=end Internal:
 
 1;
 
