@@ -76,8 +76,8 @@ sub new {
 validate given data attribute
 
     my $Result = $ValidatorObject->Validate(
-        Attribute => '...',
-        Data      => {
+        Attribute => '...',                     # required
+        Data      => {                          # required but may be empty
             ...
         }
     );

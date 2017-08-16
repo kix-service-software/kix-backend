@@ -84,13 +84,13 @@ check given parameters and parse them according to type
             ...
         },
         Parameters => {
-            <Parameter> => {                                  # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
-                Type                => 'ARRAY',               # optional
-                Required            => 1,                     # optional
-                RequiredIfNot       => '<AltParameter>'       # optional
-                RequiresValueIfUsed => 1                      # optional
-                Default             => ...                    # optional
-                OneOf               => [...]                  # optional
+            <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
+                Type                => 'ARRAY',                         # optional, use this to parse a comma separated string into an array
+                Required            => 1,                               # optional
+                RequiredIfNot       => [ '<AltParameter>', ... ]        # optional, specify the alternate parameters to be checked, if one of them has a value
+                RequiresValueIfUsed => 1                                # optional
+                Default             => ...                              # optional
+                OneOf               => [...]                            # optional
             }
         }
     );
@@ -142,10 +142,19 @@ sub ParseParameters {
             $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter is missing!",
             last;            
         }
-        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && !exists($Data->{$Parameter}) && !exists($Data->{$Param{Parameters}->{$Parameter}->{RequiredIfNot}})) {            
-            $Result->{Success} = 0;
-            $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or $Param{Parameters}->{$Parameter}->{RequiredIfNot} is missing!",
-            last;            
+        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && ref($Param{Parameters}->{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
+            my $AltParameterHasValue = 0;
+            foreach my $AltParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}} ) {
+                if ( exists($Data->{$AltParameter}) && defined($Data->{$AltParameter}) ) {
+                    $AltParameterHasValue = 1;
+                    last;
+                }
+            }
+            if ( !exists($Data->{$Parameter}) && !$AltParameterHasValue ) {            
+                $Result->{Success} = 0;
+                $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
+                last;            
+            }
         }
 
         # parse into arrayref if parameter value is scalar and ARRAY type is needed
