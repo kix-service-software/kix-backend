@@ -120,7 +120,7 @@ sub PrepareData {
 
     # prepare field filter
     if ( exists($Param{Data}->{Fields}) ) {
-        foreach my $FieldFilter ( split(/,/, $Self->{Fields}) ) {
+        foreach my $FieldFilter ( split(/,/, $Param{Data}->{Fields}) ) {
             my ($Object, $Field) = split(/\./, $FieldFilter);
             if ( !IsArrayRefWithData($Self->{FieldFilter}->{$Object}) ) {
                 $Self->{FieldFilter}->{$Object} = [];
@@ -231,7 +231,7 @@ sub ReturnSuccess {
                 foreach my $Field ( @{$Self->{FieldFilter}->{$FilteredObject}} ) {
                     $NewObject{$Field} = $Param{$FilteredObject}->{$Field};
                 }
-                $Param{$Object} = \%NewObject;
+                $Param{$FilteredObject} = \%NewObject;
             }
             elsif ( ref($Param{$FilteredObject}) eq 'ARRAY' ) {
                 # filter keys in each contained hash

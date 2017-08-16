@@ -145,9 +145,11 @@ sub Run {
             return $UserGetResult;
         }
 
+        my @UserDataList = IsArrayRefWithData($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
+        
         # filter list
         my @ResultList;
-        foreach my $User ( @{$UserGetResult->{Data}->{User}} ) {
+        foreach my $User ( @UserDataList ) {
             if ( $Param{Data}->{ChangedAfter} ) {
                 # filter change time
                 my $ChangeTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
