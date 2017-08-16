@@ -25,6 +25,8 @@ use Plack::Builder;
 use File::Path qw();
 use Fcntl qw(:flock);
 
+use Kernel::Config;
+
 # Workaround: some parts of KIX use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
 BEGIN {
@@ -75,16 +77,8 @@ my $App = CGI::Emulate::PSGI->handler(
 );
 
 sub _LockPID {
-	use Kernel::System::ObjectManager;
-
-	local $Kernel::OM = Kernel::System::ObjectManager->new(
-		'Kernel::System::Log' => {
-			LogPrefix => 'app.psgi',
-		},
-	);
-
-	# get config object
-	my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	# create ConfigObject
+	my $ConfigObject = Kernel::Config->new();
 
 	my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
 	my $PIDFile = $PIDDir . "service.pid";
@@ -95,22 +89,12 @@ sub _LockPID {
 		File::Path::mkpath( $PIDDir, 0, 0770 );    ## no critic
 
 		if ( !-e $PIDDir ) {
-
-			$Kernel::OM->Get('Kernel::System::Log')->Log(
-				Priority => 'error',
-				Message  => "Can't create directory '$PIDDir': $!",
-			);
-
+			print STDERR "Can't create directory '$PIDDir': $!";
 			exit 1;
 		}
 	}
 	if ( !-w $PIDDir ) {
-
-		$Kernel::OM->Get('Kernel::System::Log')->Log(
-			Priority => 'error',
-			Message  => "Don't have write permissions in directory '$PIDDir': $!",
-		);
-
+		print STDERR "Don't have write permissions in directory '$PIDDir': $!";
 		exit 1;
 	}
 
