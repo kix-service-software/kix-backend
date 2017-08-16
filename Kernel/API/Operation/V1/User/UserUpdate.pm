@@ -118,8 +118,8 @@ sub Run {
         );
     }
 
-    # parse and prepare parameters
-    $Result = $Self->ParseParameters(
+    # prepare data
+    $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'User' => {
@@ -144,7 +144,7 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.MissingParameter',
+            ErrorCode    => 'UserUpdate.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
@@ -169,10 +169,10 @@ sub Run {
         User => $User->{UserLogin},
     );
     if ( !%UserData ) {
-        return {
-            Success      => 0,
+        return $Self->ReturnError(
+            ErrorCode    => 'UserUpdate.NoUser',
             ErrorMessage => "Can not update user. No user with ID '$User->{UserID}' found.",
-        }
+        );
     }
 
     # check UserEmail exists
@@ -180,10 +180,10 @@ sub Run {
         Search => $User->{UserEmail},
     );
     if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
-        return {
-            Success      => 0,
+        return $Self->ReturnError(
+            ErrorCode    => 'UserUpdate.LoginExists',
             ErrorMessage => 'Can not update user. User with same login already exists.',
-        }
+        );
     }
     
     # update User
@@ -193,16 +193,13 @@ sub Run {
         ChangeUserID  => $Param{Data}->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
-        return {
-            Success      => 0,
+        return $Self->ReturnError(
+            ErrorCode    => 'UserUpdate.UnknownError',
             ErrorMessage => 'Could not update user, please contact the system administrator',
-        }
+        );
     }
     
-    return {
-        Success => 1,
-        Data    => {
-            UserID => $UserData{UserID},
-        },
-    };
+    return $Self->ReturnSuccess(
+        UserID => $UserData{UserID},
+    );   
 }

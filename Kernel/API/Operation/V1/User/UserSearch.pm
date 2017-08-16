@@ -100,8 +100,8 @@ sub Run {
         );
     }
 
-    # parse and prepare parameters
-    $Result = $Self->ParseParameters(
+    # prepare data
+    $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'Limit' => {
@@ -112,6 +112,14 @@ sub Run {
             }
         }
     );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'UserSearch.PrepareDataError',
+            ErrorMessage => $Result->{ErrorMessage},
+        );
+    }
 
     # perform user search
     my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
@@ -155,20 +163,16 @@ sub Run {
         }  
 
         if ( IsArrayRefWithData(\@ResultList) ) {
-            return {
-                Success => 1,
-                Data    => {
-                    Users => \@ResultList,
-                },
-            };
+            return $Self->ReturnSuccess(
+                Users => \@ResultList,
+            )
         }
     }
 
     # return result
-    return {
-        Success => 1,
-        Data    => {},
-    };
+    return $Self->ReturnSuccess(
+        Users => {},
+    );
 }
 
 1;

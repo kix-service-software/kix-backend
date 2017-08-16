@@ -102,8 +102,8 @@ sub Run {
         );
     }
 
-    # parse and prepare parameters
-    $Result = $Self->ParseParameters(
+    # prepare data
+    $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'Token' => {
@@ -115,7 +115,7 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'Logout.MissingParameter',
+            ErrorCode    => 'Logout.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
@@ -125,9 +125,7 @@ sub Run {
         Token => $Param{Data}->{Token}
     );
 
-    return {
-        Success => 1,
-    };
+    return $Self->ReturnSuccess();
 }
 
 1;

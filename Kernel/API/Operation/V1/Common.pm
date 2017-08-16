@@ -75,11 +75,11 @@ sub Init {
     };
 }
 
-=item ParseParameters()
+=item PrepareData()
 
-check given parameters and parse them according to type
+prepare data, check given parameters and parse them according to type
 
-    my $Return = $CommonObject->ParseParameters(
+    my $Return = $CommonObject->PrepareData(
         Data   => {
             ...
         },
@@ -102,26 +102,31 @@ check given parameters and parse them according to type
 
 =cut
 
-sub ParseParameters {
+sub PrepareData {
     my ( $Self, %Param ) = @_;
     my $Result = {
         Success => 1
     };
 
     # check needed stuff
-    for my $Needed (qw(Data Parameters)) {
+    for my $Needed (qw(Data)) {
         if ( !$Param{$Needed} ) {
             return $Self->ReturnError(
-                ErrorCode    => 'ParseParameters.MissingParameter',
-                ErrorMessage => "ParseParameters: $Needed parameter is missing!",
+                ErrorCode    => 'PrepareData.MissingParameter',
+                ErrorMessage => "PrepareData: $Needed parameter is missing!",
             );
         }
+    }
+
+    # save special parameters for later 
+    for my $Parameter (qw(Fields)) {
+        $Self->{$Parameter} = $Param{Data}->{$Parameter};
     }
 
     my %Data = %{$Param{Data}};
 
     # if needed flatten hash structure for easier access to sub structures
-    if ( grep(/::/, keys %{$Param{Parameters}}) ) {
+    if ( ref($Param{Parameters}) eq 'HASH' && grep(/::/, keys %{$Param{Parameters}}) ) {
 
         my $FlatData = Hash::Flatten::flatten(
             $Param{Data},
@@ -133,69 +138,122 @@ sub ParseParameters {
             %Data,
             %{$FlatData},
         );
-    }
 
-    foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
+        foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
 
-        # check requirement
-        if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
-            $Result->{Success} = 0;
-            $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter is missing!",
-            last;
-        }
-        elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && ref($Param{Parameters}->{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
-            my $AltParameterHasValue = 0;
-            foreach my $AltParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}} ) {
-                if ( exists($Data{$AltParameter}) && defined($Data{$AltParameter}) ) {
-                    $AltParameterHasValue = 1;
+            # check requirement
+            if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
+                $Result->{Success} = 0;
+                $Result->{ErrorMessage} = "PrepareData: required parameter $Parameter is missing!",
+                last;
+            }
+            elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && ref($Param{Parameters}->{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
+                my $AltParameterHasValue = 0;
+                foreach my $AltParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}} ) {
+                    if ( exists($Data{$AltParameter}) && defined($Data{$AltParameter}) ) {
+                        $AltParameterHasValue = 1;
+                        last;
+                    }
+                }
+                if ( !exists($Data{$Parameter}) && !$AltParameterHasValue ) {
+                    $Result->{Success} = 0;
+                    $Result->{ErrorMessage} = "PrepareData: required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
                     last;
                 }
             }
-            if ( !exists($Data{$Parameter}) && !$AltParameterHasValue ) {
+
+            # parse into arrayref if parameter value is scalar and ARRAY type is needed
+            if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
+                $Self->_SetParameter(
+                    Data      => $Param{Data},
+                    Attribute => $Parameter,
+                Value     => [ split('\s*,\s*', $Data{$Parameter}) ],
+                );
+            }
+
+            # set default value
+            if ( !$Data{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
+                $Self->_SetParameter(
+                    Data      => $Param{Data},
+                    Attribute => $Parameter,
+                    Value     => $Param{Parameters}->{$Parameter}->{Default},
+                );
+            }
+
+            # check valid values
+            if ( exists($Param{Parameters}->{$Parameter}->{OneOf}) && ref($Param{Parameters}->{$Parameter}->{OneOf}) eq 'ARRAY' ) {
+                if ( !grep(/^$Data{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
+                    $Result->{Success} = 0;
+                    $Result->{ErrorMessage} = "PrepareData: parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
+                    last;
+                }
+            }
+
+            # check if we have an optional parameter that needs a value
+            if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
-                $Result->{ErrorMessage} = "ParseParameters: required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
+                $Result->{ErrorMessage} = "PrepareData: optional parameter $Parameter is used without a value!",
                 last;
             }
-        }
-
-        # parse into arrayref if parameter value is scalar and ARRAY type is needed
-        if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
-            $Self->_SetParameter(
-                Data      => $Param{Data},
-                Attribute => $Parameter,
-               Value     => [ split('\s*,\s*', $Data{$Parameter}) ],
-            );
-        }
-
-        # set default value
-        if ( !$Data{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
-            $Self->_SetParameter(
-                Data      => $Param{Data},
-                Attribute => $Parameter,
-                Value     => $Param{Parameters}->{$Parameter}->{Default},
-            );
-        }
-
-        # check valid values
-        if ( exists($Param{Parameters}->{$Parameter}->{OneOf}) && ref($Param{Parameters}->{$Parameter}->{OneOf}) eq 'ARRAY' ) {
-            if ( !grep(/^$Data{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
-                $Result->{Success} = 0;
-                $Result->{ErrorMessage} = "ParseParameters: parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
-                last;
-            }
-        }
-
-        # check if we have an optional parameter that needs a value
-        if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
-            $Result->{Success} = 0;
-            $Result->{ErrorMessage} = "ParseParameters: optional parameter $Parameter is used without a value!",
-            last;
         }
     }
     
     return $Result; 
 }
 
+=item ReturnSuccess()
+
+helper function to return a successful result.
+
+    my $Return = $CommonObject->ReturnSuccess(
+        ...
+    );
+
+=cut
+
+sub ReturnSuccess {
+    my ( $Self, %Param ) = @_;
+
+    # honor a field filter, if we have one
+    if ( $Self->{Fields} ) {
+        foreach my $FieldFilter ( split(/,/, $Self->{Fields}) ) {
+            my ($Object, $Field) = split(/\./, $FieldFilter);
+
+            if ( ref($Param{$Object}) eq 'HASH' ) {
+                # filter keys in this hash
+                my %NewObject;
+                foreach my $Key ( keys %{$Param{$Object}} ) {
+                    if ( $Key eq $Field ) {
+                        $NewObject{$Key} = $Param{$Object}->{$Key};
+                    }
+                }
+                $Param{$Object} = \%NewObject;
+            }
+            elsif ( ref($Param{$Object}) eq 'ARRAY' ) {
+                # filter keys in each contained hash
+                foreach my $ObjectItem ( @{$Param{$Object}} ) {
+                    if ( ref($ObjectItem) eq 'HASH' ) {
+                        my %NewObject;
+                        foreach my $Key ( keys %{$ObjectItem} ) {
+                            if ( $Key eq $Field) {
+                                $NewObject{$Key} = $ObjectItem{$Key};
+                            }
+                        }
+                        $ObjectItem = \%NewObject;
+                    }
+                }
+            }
+        } 
+    }
+
+    # return structure
+    return {
+        Success      => 1,
+        Data         => {
+            %Param
+        },
+    };
+}
 
 =item ReturnError()
 
@@ -218,7 +276,7 @@ sub ReturnError {
 
     # return structure
     return {
-        Success      => 1,
+        Success      => 0,
         ErrorMessage => "$Param{ErrorCode}: $Param{ErrorMessage}",
         Data         => {
             Error => {

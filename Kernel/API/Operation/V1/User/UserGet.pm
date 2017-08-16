@@ -117,8 +117,8 @@ sub Run {
         );
     }
 
-    # parse and prepare parameters
-    $Result = $Self->ParseParameters(
+    # prepare data
+    $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'UserID' => {
@@ -131,16 +131,12 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserGet.MissingParameter',
+            ErrorCode    => 'UserGet.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
 
     my $ErrorMessage = '';
-
-    my $ReturnData = {
-        Success => 1,
-    };
 
     my @UserList;
 
@@ -193,11 +189,9 @@ sub Run {
 
     }
 
-    # set user data into return structure
-    $ReturnData->{Data}->{User} = \@UserList;
-
-    # return result
-    return $ReturnData;
+    return $Self->ReturnSuccess(
+        User => \@UserList,
+    );    
 }
 
 1;

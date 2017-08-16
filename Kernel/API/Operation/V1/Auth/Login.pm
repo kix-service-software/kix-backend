@@ -97,8 +97,8 @@ sub Run {
         );
     }
 
-    # parse and prepare parameters
-    $Result = $Self->ParseParameters(
+    # prepare data
+    $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'UserLogin' => {
@@ -120,7 +120,7 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserGet.MissingParameter',
+            ErrorCode    => 'UserGet.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
@@ -179,12 +179,9 @@ sub Run {
         );
     }
 
-    return {
-        Success => 1,
-        Data    => {
-            Token => $Token,
-        },
-    };
+    return $Self->ReturnSuccess(
+        Token => $Token,
+    );
 }
 
 1;

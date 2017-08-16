@@ -117,8 +117,8 @@ sub Run {
         );
     }
 
-    # parse and prepare parameters
-    $Result = $Self->ParseParameters(
+    # prepare data
+    $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'User' => {
@@ -143,7 +143,7 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserCreate.MissingParameter',
+            ErrorCode    => 'UserCreate.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
@@ -168,10 +168,10 @@ sub Run {
         User => $User->{UserLogin},
     );
     if ( %UserData ) {
-        return {
-            Success      => 0,
+        return $Self->ReturnError(
+            ErrorCode    => 'UserCreate.LoginExists',
             ErrorMessage => "Can not create user. User with same login '$User->{UserLogin}' already exists.",
-        }
+        );
     }
 
     # check UserEmail exists
@@ -179,10 +179,10 @@ sub Run {
         Search => $User->{UserEmail},
     );
     if ( %UserList ) {
-        return {
-            Success      => 0,
+        return $Self->ReturnError(
+            ErrorCode    => 'UserCreate.EmailExists',
             ErrorMessage => 'Can not create user. User with same email address already exists.',
-        }
+        );
     }
     
     # create User
@@ -192,17 +192,13 @@ sub Run {
         ValidID          => 1,
     );    
     if ( !$UserID ) {
-        return {
-            Success      => 0,
+        return $Self->ReturnError(
+            ErrorCode    => 'UserCreate.UnknownError',
             ErrorMessage => 'Could not create user, please contact the system administrator',
-        }
+        );
     }
     
-    return {
-        Success => 1,
-        Data    => {
-            UserID => $UserID,
-        },
-    };
-    
+    return $Self->ReturnSuccess(
+        UserID => $UserID,
+    );    
 }
