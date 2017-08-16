@@ -166,14 +166,14 @@ sub Run {
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->ReturnSuccess(
-                Users => \@ResultList,
+                User => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->ReturnSuccess(
-        Users => {},
+        User => {},
     );
 }
 
