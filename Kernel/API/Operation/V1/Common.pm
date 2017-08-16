@@ -229,6 +229,50 @@ sub ReturnError {
     };
 }
 
+=item ExecOperation()
+
+helper function to execute another operation to work with its result.
+
+    my $Return = $CommonObject->ExecOperation(
+        Operation => '...'                              # required
+        Data      => {
+
+        }
+    );
+
+=cut
+
+sub ExecOperation {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Operation Data)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->ReturnError(
+                ErrorCode    => 'ExecOperation.MissingParameter',
+                ErrorMessage => "ExecOperation: $Needed parameter is missing!",
+            );
+        }
+    }
+
+    my $Operation = 'Kernel::API::Operation::'.$Param{Operation};
+
+    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Operation) ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'ExecOperation.OperationNotFound',
+            ErrorMessage => "ExecOperation: $Operation not found!",
+        );
+    }
+    my $OperationObject = $Operation->new( %{$Self} );
+
+    return $OperationObject->Run(
+        Data => $Param{Data},
+    );
+}
+
+
+# BEGIN INTERNAL
+
 sub _SetParameter {
     my ( $Self, %Param ) = @_;
     
@@ -236,8 +280,8 @@ sub _SetParameter {
     for my $Needed (qw(Data Attribute)) {
         if ( !$Param{$Needed} ) {
             return $Self->ReturnError(
-                ErrorCode    => 'ParseParameters.MissingParameter',
-                ErrorMessage => "ParseParameters: $Needed parameter is missing!",
+                ErrorCode    => '_SetParameter.MissingParameter',
+                ErrorMessage => "_SetParameter: $Needed parameter is missing!",
             );
         }
     }

@@ -14,6 +14,7 @@ package Kernel::API::Operation::V1::User::UserSearch;
 use strict;
 use warnings;
 
+use Kernel::API::Operation::V1::User::UserGet;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
@@ -103,9 +104,6 @@ sub Run {
     $Result = $Self->ParseParameters(
         Data       => $Param{Data},
         Parameters => {
-            'ChangedAfter' => {
-                Default => undef,
-            },
             'Limit' => {
                 Default => 500,
             },
@@ -121,48 +119,46 @@ sub Run {
     );
 
     if (IsHashRefWithData(\%UserList)) {
-        my @UserIDs = sort keys %UserList;
-        
+
         if ($Param{Data}->{ChangedAfter}) {
-            my $ChangedAfterUnixtime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            $Param{Data}->{ChangedAfterUnixtime} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
                 String => $Param{Data}->{ChangedAfter},
             );
-            
-            # filter list
-            my @FilteredUserIDs;
-            foreach my $UserID (@UserIDs) {
-                my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-                    UserID => $UserID,
-                ); 
-                next if !IsHashRefWithData(\%UserData);
-                
+        }
+
+        # get already prepared user data from UserGet operation
+        my $UserGetResult = $Self->ExecOperation(
+            Operation => 'V1::User::UserGet',
+            Data      => {
+                UserID => join(',', sort keys %UserList),
+            }
+        );
+        if ( !IsHashRefWithData($UserGetResult) || !$UserGetResult->{Success} ) {
+            return $UserGetResult;
+        }
+
+        # filter list
+        my @ResultList;
+        foreach my $User ( @{$UserGetResult->{Data}->{User}} ) {
+            if ( $Param{Data}->{ChangedAfter} ) {
                 # filter change time
                 my $ChangeTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                    String => $UserData{ChangeTime},
+                    String => $User->{ChangeTime},
                 );
-                next if $ChangeTimeUnix < $ChangedAfterUnixtime;
-                
-                # limit list
-                last if scalar(@FilteredUserIDs) > $Self->{Limit};
-                
-                push(@FilteredUserIDs, $UserID);                                
+                next if $ChangeTimeUnix < $Param{Data}->{ChangedAfterUnixtime};
             }
             
-            @UserIDs = @FilteredUserIDs; 
-        }
-        else {
             # limit list
-            @UserIDs = splice(@UserIDs, 0, $Param{Data}->{Limit}); 
-        }
+            last if scalar(@ResultList) > $Param{Data}->{Limit};
+            
+            push(@ResultList, $User);                                
+        }  
 
-        # do we have to sort downwards ?
-        @UserIDs = reverse @UserIDs if ($Param{Data}->{OrderBy} eq 'Down');        
-
-        if (IsArrayRefWithData(\@UserIDs)) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return {
                 Success => 1,
                 Data    => {
-                    UserID => \@UserIDs,
+                    Users => \@ResultList,
                 },
             };
         }

@@ -165,9 +165,16 @@ sub Run {
         }
 
         # filter valid attributes
-        if ($Self->{Config}->{ExportedAttributes}) {
+        if ($Self->{Config}->{AttributeWhitelist}) {
             foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if !$Self->{Config}->{ExportedAttributes}->{$Attr};
+                delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+            }
+        }
+
+        # filter valid attributes
+        if ($Self->{Config}->{AttributeBacklist}) {
+            foreach my $Attr (sort keys %UserData) {
+                delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
         
