@@ -134,11 +134,11 @@ sub PrepareData {
     if ( exists($Param{Data}->{Limit}) ) {
         foreach my $Limiter ( split(/,/, $Param{Data}->{Limit}) ) {
             my ($Object, $Limit) = split(/\:/, $Limiter);
-            if ( $Limit !~ /\d+/ ) {
+            if ( $Limit && $Limit !~ /\d+/ ) {
                $Self->{Limiter}->{$Object} = $Limit;
             }
             else {
-                $Self->{Limiter}->{__COMMON} = $Limit;
+                $Self->{Limiter}->{__COMMON} = $Object;
             }
         }
     }
@@ -157,7 +157,7 @@ sub PrepareData {
             if ( !IsArrayRefWithData($Self->{Sorter}->{$Object}) ) {
                 $Self->{Sorter}->{$Object} = [];
             }
-            push @{$Self->{Sorter}->{$Object}}, { Field => $Field, Order => $ };
+            push @{$Self->{Sorter}->{$Object}}, { Field => $Field, Order => $Order };
         }
     }
 
@@ -363,23 +363,23 @@ sub ExecOperation {
 sub _FieldSelector {
     my ( $Self, %Param ) = @_;
 
-    if ( !IsHashRefWithData(\%Param) ) {
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
         # nothing to do
         return;
     }    
 
     foreach my $Object ( keys %{$Self->{FieldSelector}} ) {
-        if ( ref($Param{$Object}) eq 'HASH' ) {
+        if ( ref($Param{Data}->{$Object}) eq 'HASH' ) {
             # extract filtered fields from hash
             my %NewObject;
             foreach my $Field ( @{$Self->{FieldSelector}->{$Object}} ) {
-                $NewObject{$Field} = $Param{$Object}->{$Field};
+                $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
             }
-            $Param{$Object} = \%NewObject;
+            $Param{Data}->{$Object} = \%NewObject;
         }
-        elsif ( ref($Param{$Object}) eq 'ARRAY' ) {
+        elsif ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
             # filter keys in each contained hash
-            foreach my $ObjectItem ( @{$Param{$Object}} ) {
+            foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
                     my %NewObject;
                     foreach my $Field ( @{$Self->{FieldSelector}->{$Object}} ) {
@@ -397,25 +397,25 @@ sub _FieldSelector {
 sub _Limiter {
     my ( $Self, %Param ) = @_;
 
-    if ( !IsHashRefWithData(\%Param) ) {
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
         # nothing to do
         return;
     }    
 
     foreach my $Object ( keys %{$Self->{Limiter}} ) {
         if ( $Object eq '__COMMON' ) {
-            foreach my $Object (keys %Param) {
+            foreach my $DataObject ( keys %{$Param{Data}} ) {
                 # ignore the object if we have a specific limiter for it
                 next if exists($Self->{Limiter}->{$Object});
 
-                if ( ref($Param{$Object}) eq 'ARRAY' ) {
-                    my @LimitedArray = splice @{$Param{$Object}}, 0, $Self->{Limiter}->{$Object};
-                    $Param{$Object} = \@LimitedArray;
+                if ( ref($Param{Data}->{$DataObject}) eq 'ARRAY' ) {
+                    my @LimitedArray = splice @{$Param{Data}->{$DataObject}}, 0, $Self->{Limiter}->{$DataObject};
+                    $Param{Data}->{$DataObject} = \@LimitedArray;
                 }
             }
         }
-        elsif ( ref($Param{$Object}) eq 'ARRAY' ) {
-            my @LimitedArray = splice @{$Param{$Object}}, 0, $Self->{Limiter}->{$Object};
+        elsif ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
+            my @LimitedArray = splice @{$Param{Data}->{$Object}}, 0, $Self->{Limiter}->{$Object};
             $Param{$Object} = \@LimitedArray;
         }
     } 
@@ -424,13 +424,13 @@ sub _Limiter {
 sub _Sorter {
     my ( $Self, %Param ) = @_;
 
-    if ( !IsHashRefWithData(\%Param) ) {
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
         # nothing to do
         return;
     }    
 
     foreach my $Object ( keys %{$Self->{Sorter}} ) {
-        if ( ref($Param{$Object}) eq 'ARRAY' ) {
+        if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
             # sort array by given criteria
             my @SortCriteria;
             foreach my $Sorter ( @{$Self->{Sorter}->{$Object}} ) {
@@ -441,7 +441,7 @@ sub _Sorter {
                     push @SortCriteria, { -order => 'descending', [ $Sorter->{Field} ] };
                 }
             }
-            my @SortedArray = sorted_arrayref($Param{$Object}, @SortCriteria);
+            my @SortedArray = sorted_arrayref($Param{Data}->{$Object}, @SortCriteria);
             $Param{$Object} = \@SortedArray;
         }
     } 

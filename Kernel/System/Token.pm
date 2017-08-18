@@ -351,7 +351,7 @@ sub ExtractToken {
         }
     }
 
-    if ( !$Token ) {
+    if ( !$TokenFound ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
             Message  => 'Token not found in database!'
