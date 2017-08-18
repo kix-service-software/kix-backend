@@ -137,7 +137,7 @@ sub ValidateToken {
     # check time validity
     my $TimeNow = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
 
-    if ( $TimeNow > $Payload->{ValidUntil} ) {
+    if ( $TimeNow > $Payload->{ValidUntilTimeUnix} ) {
 
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
