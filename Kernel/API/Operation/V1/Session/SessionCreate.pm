@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Auth::Login;
+package Kernel::API::Operation::V1::Session::SessionCreate;
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Auth::Login - API Login Operation backend
+Kernel::API::Operation::V1::Session::SessionCreate - API Login Operation backend
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Kernel::API::Operation::V1::Auth::Login - API Login Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::Login->new();
+by using Kernel::API::Operation::V1::Session::SessionCreate->new();
 
 =cut
 
@@ -120,7 +120,7 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'UserGet.PrepareDataError',
+            ErrorCode    => 'SessionCreate.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
@@ -158,8 +158,8 @@ sub Run {
     if ( !$User ) {
 
         return $Self->ReturnError(
-            ErrorCode    => 'Login.AuthFail',
-            ErrorMessage => "Login: Authorization failing!",
+            ErrorCode    => 'SessionCreate.AuthFail',
+            ErrorMessage => "SessionCreate: Authorization failing!",
         );
     }
 
@@ -174,8 +174,8 @@ sub Run {
     if ( !$Token ) {
 
         return $Self->ReturnError(
-            ErrorCode    => 'Login.AuthFail',
-            ErrorMessage => "Login: Authorization failing!",
+            ErrorCode    => 'SessionCreate.AuthFail',
+            ErrorMessage => "SessionCreate: Authorization failing!",
         );
     }
 

@@ -6,10 +6,14 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Maint::Token::RemoveAll;
+package Kernel::System::Console::Command::Admin::Token::Inspect;
 
 use strict;
 use warnings;
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Console::BaseCommand);
 
@@ -20,7 +24,14 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Remove all tokens.');
+    $Self->Description('Inspect token.');
+    $Self->AddOption(
+        Name        => 'token',
+        Description => "The token to inspect.",
+        Required    => 1,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 
     return;
 }
@@ -28,9 +39,18 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Removing all tokens...</yellow>\n");
+    $Self->Print("<yellow>Inspecting token...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Token')->CleanUp();
+    my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
+        Token => $Self->GetOption('token'),
+    );
+
+    if ( !IsHashRefWithData($Payload) ) {
+        $Self->PrintError("Token does not exists or unable to extract token payload.");
+        return $Self->ExitCodeError();
+    }
+
+    $Self->Print("\n".Dumper($Payload)."\n");
 
     $Self->Print("<green>Done.</green>\n");
 

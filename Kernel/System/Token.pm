@@ -88,15 +88,20 @@ sub ValidateToken {
         Bind => [ \$Param{Token} ],
     );
 
-    my $LastRequestTime;
+    my $TokenFound = 0;
+    my $LastRequestTimeUnix;
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
-        $LastRequestTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-            String => $Row[1],
-        );
+        $TokenFound = $Row[0];
+
+        if ( $Row[1] ) {
+            $LastRequestTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                String => $Row[1],
+            );
+        }
     }
 
-    # nothing found
-    if ( !$LastRequestTime ) {
+    # nothing found, this token is invalid
+    if ( !$TokenFound ) {
         return;
     }
 
@@ -145,19 +150,21 @@ sub ValidateToken {
     }
 
     # check idle time
-    my $TokenMaxIdleTime = $ConfigObject->Get('TokenMaxIdleTime');
+    if ($LastRequestTimeUnix) {
+        my $TokenMaxIdleTime = $ConfigObject->Get('TokenMaxIdleTime');
 
-    if ( ( $TimeNow - $TokenMaxIdleTime ) >= $LastRequestTime ) {
+        if ( ( $TimeNow - $TokenMaxIdleTime ) >= $LastRequestTimeUnix ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'notice',
-            Message =>
-                "Token maximum idle time exceeded!",
-        );
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'notice',
+                Message =>
+                    "Token maximum idle time exceeded!",
+            );
 
-        $Self->RemoveToken( Token => $Param{Token} );
+            $Self->RemoveToken( Token => $Param{Token} );
 
-        return;
+            return;
+        }
     }
 
     # update last request time
@@ -179,9 +186,12 @@ create a new token with given data
 
     my $Token = $TokenObject->CreateToken(
         Payload => {
-            UserType => 'User' | 'Customer'     # required
-            UserID   => '...'                   # required
-            ...
+            UserType    => 'User' | 'Customer'     # required
+            UserID      => '...'                   # required
+            TokenType   => 'AccessToken',          # optional, used to create special AccessTokens
+            ValidUntil  => 'YYYY-MM-YY HH24:MI:SS' # optional, used to create special AccessTokens
+            RemoteIP    => '...'                   # optional, used to create special AccessTokens
+            Description => '...'                   # optional, used to create special AccessTokens
         }
     );
 
@@ -224,11 +234,25 @@ sub CreateToken {
 
     # enrich payload and create token
     my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+
+    my $ValidUntil;
+    if ( $Param{Payload}->{ValidUntil} ) {
+        $ValidUntil = $TimeObject->TimeStamp2SystemTime(
+            String => $Param{Payload}->{ValidUntil},
+        );
+    }
+
+    if ( !$ValidUntil ) {
+        $ValidUntil = $TimeObject->SystemTime() + $Kernel::OM->Get('Kernel::Config')->Get('TokenMaxTime');
+    } 
     
     my %Payload = %{$Param{Payload}};
-    $Payload{CreateTime}    = $TimeObject->CurrentTimestamp();
-    $Payload{ValidUntil}    = $TimeObject->SystemTime() + $Kernel::OM->Get('Kernel::Config')->Get('TokenMaxTime');
-    $Payload{RemoteIP}      = $ENV{REMOTE_ADDR} || 'none';
+    my $CreateTimeString     = $TimeObject->CurrentTimestamp();
+    $Payload{CreateTimeUnix} = $TimeObject->SystemTime();
+    $Payload{ValidUntilUnix} = $ValidUntil;
+    $Payload{RemoteIP}       = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
+    $Payload{Description}    = $Param{Payload}->{Description} || '';
+    $Payload{TokenType}      = $Param{Payload}->{TokenType} || 'Normal';
 
     my $Token = encode_jwt(
         \%Payload, 
@@ -238,10 +262,9 @@ sub CreateToken {
 
     # store token in whitelist
     $Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL  => "INSERT INTO token (token, last_request_time) values (?, ?)",
+        SQL  => "INSERT INTO token (token) values (?)",
         Bind => [
             \$Token,
-            \$Payload{CreateTime},
         ],
     );
 
@@ -312,19 +335,24 @@ sub ExtractToken {
 
     # get time of last request
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => "SELECT last_request_time FROM token WHERE token = ?",
+        SQL => "SELECT token, last_request_time FROM token WHERE token = ?",
         Bind => [ \$Param{Token} ],
     );
 
-    my $LastRequestTime;
+    my $TokenFound = 0;
+    my $LastRequestTimeUnix;
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
-        $LastRequestTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-            String => $Row[0],
-        );
+        $TokenFound = $Row[0];
+
+        if ( $Row[1] ) {
+            $LastRequestTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                String => $Row[1],
+            );
+        }
     }
 
     # nothing found, this token is invalid
-    if ( !$LastRequestTime ) {
+    if ( !$TokenFound ) {
         return;
     }
 
@@ -340,7 +368,19 @@ sub ExtractToken {
     }
 
     # enrich payload
-    $Payload->{LastRequestTime} = $LastRequestTime;
+    $Payload->{LastRequestTimeUnix} = $LastRequestTimeUnix || undef;
+    $Payload->{LastRequestTime} = undef;
+    if ( $LastRequestTimeUnix ) {
+        $Payload->{LastRequestTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+            SystemTime => $LastRequestTimeUnix,
+        );
+    }
+    $Payload->{CreateTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        SystemTime => $Payload->{CreateTimeUnix},
+    );
+    $Payload->{ValidUntil} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        SystemTime => $Payload->{ValidUntilUnix},
+    );
 
     return $Payload;
 }
@@ -384,9 +424,23 @@ cleanup all tokens in system
 sub CleanUp {
     my ( $Self, %Param ) = @_;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do( 
-        SQL => "DELETE FROM token"
-    );
+    my %TokenList = $Self->GetAllTokens();
+
+    foreach my $Token ( keys %TokenList ) {
+        my $Payload = $Self->ExtractToken(
+            Token => $Token,
+        );
+        if ( !IsHashRefWithData($Payload) ) {
+            return;
+        }
+
+        # only remove normal tokens
+        if ( $Payload->{TokenType} eq 'Normal' ) {
+            $Self->RemoveToken(
+                Token => $Token,
+            );
+        }
+    }
 
     return 1;
 }

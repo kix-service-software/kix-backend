@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Auth::Logout;
+package Kernel::API::Operation::V1::Session::SessionDelete;
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Auth::Logout - API Logout Operation backend
+Kernel::API::Operation::V1::Session::SessionDelete - API Logout Operation backend
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Kernel::API::Operation::V1::Auth::Logout - API Logout Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::Logout->new();
+by using Kernel::API::Operation::Session::SessionDelete->new();
 
 =cut
 
@@ -115,15 +115,22 @@ sub Run {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->ReturnError(
-            ErrorCode    => 'Logout.PrepareDataError',
+            ErrorCode    => 'SessionDelete.PrepareDataError',
             ErrorMessage => $Result->{ErrorMessage},
         );
     }
 
-
     my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
         Token => $Param{Data}->{Token}
     );
+
+    # check result
+    if ( !$Result ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'SessionDelete.DeleteError',
+            ErrorMessage => 'SessionDelete: unable to remove token!',
+        );
+    }
 
     return $Self->ReturnSuccess();
 }

@@ -1,0 +1,154 @@
+# --
+# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# based on the original work of:
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::API::Operation::V1::Session::SessionGet;
+use strict;
+use warnings;
+
+use Kernel::System::VariableCheck qw(IsStringWithData IsHashRefWithData);
+
+use base qw(
+    Kernel::API::Operation::V1::Common
+);
+
+our $ObjectManagerDisabled = 1;
+
+=head1 NAME
+
+Kernel::API::Operation::V1::Session::SessionGet - API Logout Operation backend
+
+=head1 SYNOPSIS
+
+=head1 PUBLIC INTERFACE
+
+=over 4
+
+=cut
+
+=item new()
+
+usually, you want to create an instance of this
+by using Kernel::API::Operation::Session::SessionGet->new();
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    my $Self = {};
+    bless( $Self, $Type );
+
+    # check needed objects
+    for my $Needed (
+        qw(DebuggerObject WebserviceID)
+        )
+    {
+        if ( !$Param{$Needed} ) {
+
+            return {
+                Success      => 0,
+                ErrorMessage => "Got no $Needed!"
+            };
+        }
+
+        $Self->{$Needed} = $Param{$Needed};
+    }
+
+    return $Self;
+}
+
+=item Run()
+
+remove token (invalidate)
+
+    my $Result = $OperationObject->Run(
+        Data => {
+            Authorization => {
+                Token    => '...',
+                UserID   => '123',
+                UserType => 'User' | 'Customer'
+                ...
+            },
+            Token => '...'                                # required
+        },
+    );
+
+    $Result = {
+        Success      => 1,                                # 0 or 1
+        ErrorMessage => '',                               # In case of an error
+    };
+
+=cut
+
+sub Run {
+    my ( $Self, %Param ) = @_;
+
+    # init webservice
+    my $Result = $Self->Init(
+        WebserviceID => $Self->{WebserviceID},
+    );
+
+    if ( !$Result->{Success} ) {
+        $Self->ReturnError(
+            ErrorCode    => 'Webservice.InvalidConfiguration',
+            ErrorMessage => $Result->{ErrorMessage},
+        );
+    }
+
+    # prepare data
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'Token' => {
+                Required => 1
+            }                
+        }
+    );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'SessionGet.PrepareDataError',
+            ErrorMessage => $Result->{ErrorMessage},
+        );
+    }
+
+    my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
+        Token => $Param{Data}->{Token}
+    );
+
+    # check result
+    if ( !$Result ) {
+        return $Self->ReturnError(
+            ErrorCode    => 'SessionGet.TokenError',
+            ErrorMessage => 'SessionGet: unable to extract token!',
+        );
+    }
+
+    return $Self->ReturnSuccess(
+        Payload => $Payload,
+    );
+}
+
+1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<http://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+COPYING for license information (AGPL). If you did not receive this file, see
+
+<http://www.gnu.org/licenses/agpl.txt>.
+
+=cut
