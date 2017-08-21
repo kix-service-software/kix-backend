@@ -119,6 +119,29 @@ sub PrepareData {
         }
     }
 
+    # prepare field filter
+    if ( exists($Param{Data}->{Filter}) ) {
+        foreach my $Filter ( split(/,/, $Param{Data}->{Filter}) ) {
+            my ($Object, $FieldFilter) = split(/\./, $Filter);
+            my ($Field, $Operation, $Value) = split(/\:/, $FieldFilter);
+            $Operation = uc($Operation);
+            if ( $Operation !~ /(EQ|NE|GT|LT|GTE|LTE|IN|CONTAINS)/g ) {
+                return $Self->ReturnError(
+                    ErrorCode    => 'PrepareData.InvalidFilterOperation',
+                    ErrorMessage => "PrepareData: unknown filter operation in $Filter!",
+                );                
+            }
+            if ( !IsArrayRefWithData($Self->{FieldFilter}->{$Object}) ) {
+                $Self->{FieldFilter}->{$Object} = [];
+            }
+            push @{$Self->{FieldFilter}->{$Object}}, { 
+                Field     => $Field, 
+                Operation => $Operation, 
+                Value     => $Value
+            };
+        }
+    }
+
     # prepare field selector
     if ( exists($Param{Data}->{Fields}) ) {
         foreach my $FieldSelector ( split(/,/, $Param{Data}->{Fields}) ) {
@@ -146,18 +169,23 @@ sub PrepareData {
     # prepare sorter
     if ( exists($Param{Data}->{Sort}) ) {
         foreach my $Sorter ( split(/,/, $Param{Data}->{Sort}) ) {
-            my ($Object, $FieldOrder) = split(/\./, $Sorter);
-            my ($Field, $Order) = split(/\:/, $Sorter);
-            if ($Order ne 'ASC' && $Order ne 'DESC') {
+            my ($Object, $FieldSort) = split(/\./, $Sorter);
+            my ($Field, $Direction, $Type) = split(/\:/, $FieldSort);
+            $Direction = uc($Direction);
+            if ( $Direction !~ /(ASC|DESC)/g ) {
                 return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidSort',
-                    ErrorMessage => "PrepareData: unknown sort order in $Sorter!",
+                    ErrorCode    => 'PrepareData.InvalidSortDirection',
+                    ErrorMessage => "PrepareData: unknown sort direction in $Sorter!",
                 );                
             }
             if ( !IsArrayRefWithData($Self->{Sorter}->{$Object}) ) {
                 $Self->{Sorter}->{$Object} = [];
             }
-            push @{$Self->{Sorter}->{$Object}}, { Field => $Field, Order => $Order };
+            push @{$Self->{Sorter}->{$Object}}, { 
+                Field => $Field, 
+                Direction => $Direction, 
+                Type  => lc($Type || 'cmp')
+            };
         }
     }
 
@@ -360,6 +388,20 @@ sub ExecOperation {
 
 # BEGIN INTERNAL
 
+sub _Filter {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
+        # nothing to do
+        return;
+    }    
+
+    foreach my $Object ( keys %{$Self->{Sorter}} ) {
+        if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
+        }
+    } 
+}
+
 sub _FieldSelector {
     my ( $Self, %Param ) = @_;
 
@@ -434,15 +476,21 @@ sub _Sorter {
             # sort array by given criteria
             my @SortCriteria;
             foreach my $Sorter ( @{$Self->{Sorter}->{$Object}} ) {
-                if ( $Sorter->{Order} eq 'ASC' ) {
-                    push @SortCriteria, { -order => 'ascending', [ $Sorter->{Field} ] };
+                my $Direction;
+                if ( $Sorter->{Direction} eq 'ASC' ) {
+                    $Direction = 'ascending'; 
                 }
-                elsif ( $Sorter->{Order} eq 'DESC' ) {
-                    push @SortCriteria, { -order => 'descending', [ $Sorter->{Field} ] };
+                elsif ( $Sorter->{Direction} eq 'DESC' ) {
+                    $Direction = 'descending';
                 }
+                push @SortCriteria, { 
+                    Direction   => $Direction, 
+                    compare => $Sorter->{Type}, 
+                    sortkey => $Sorter->{Field}
+                };
             }
             my @SortedArray = sorted_arrayref($Param{Data}->{$Object}, @SortCriteria);
-            $Param{$Object} = \@SortedArray;
+            $Param{Data}->{$Object} = \@SortedArray;
         }
     } 
 }
