@@ -125,7 +125,7 @@ sub PrepareData {
             my ($Object, $FieldFilter) = split(/\./, $Filter);
             my ($Field, $Operation, $Value) = split(/\:/, $FieldFilter);
             $Operation = uc($Operation);
-            if ( $Operation !~ /(EQ|NE|GT|LT|GTE|LTE|IN|CONTAINS)/g ) {
+            if ( $Operation !~ /^(EQ|NE|GT|LT|GTE|LTE|IN|CONTAINS)$/g ) {
                 return $Self->ReturnError(
                     ErrorCode    => 'PrepareData.InvalidFilterOperation',
                     ErrorMessage => "PrepareData: unknown filter operation in $Filter!",
