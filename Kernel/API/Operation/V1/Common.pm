@@ -14,6 +14,7 @@ use strict;
 use warnings;
 use Hash::Flatten;
 use Data::Sorting qw(:arrays);
+use Switch;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -121,23 +122,94 @@ sub PrepareData {
 
     # prepare field filter
     if ( exists($Param{Data}->{Filter}) ) {
+        my %OperationTypeMapping = (
+            'EQ'         => { 'NUMERIC' => 1, 'STRING'  => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'NE'         => { 'NUMERIC' => 1, 'STRING'  => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'LT'         => { 'NUMERIC' => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'GT'         => { 'NUMERIC' => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'LTE'        => { 'NUMERIC' => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'GTE'        => { 'NUMERIC' => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'IN'         => { 'NUMERIC' => 1, 'STRING'  => 1, 'DATE' => 1, 'DATETIME' => 1 },
+            'CONTAINS'   => { 'STRING'  => 1 },
+            'STARTSWITH' => { 'STRING'  => 1 },
+            'ENDSWITH'   => { 'STRING'  => 1 },
+        );
+        my $ValidOperations = join('|', keys %OperationTypeMapping);
+        my %ValidTypes;
+        foreach my $Tmp ( values %OperationTypeMapping ) {
+            foreach my $Type ( keys %{$Tmp} ) { 
+                $ValidTypes{$Type} = 1;
+            } 
+        }
+
         foreach my $Filter ( split(/,/, $Param{Data}->{Filter}) ) {
-            my ($Object, $FieldFilter) = split(/\./, $Filter);
-            my ($Field, $Operation, $Value) = split(/\:/, $FieldFilter);
+            my ($Object, $Filter) = split(/\./, $Filter, 2);
+            my ($Field, $Operation, $Value, $Type) = split(/\:/, $Filter);
             $Operation = uc($Operation);
-            if ( $Operation !~ /^(EQ|NE|GT|LT|GTE|LTE|IN|CONTAINS)$/g ) {
+            $Type = uc($Type || 'STRING') ;
+
+            # check if filter operation is valid
+            if ( $Operation !~ /^($ValidOperations)$/g ) {
                 return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidFilterOperation',
+                    ErrorCode    => 'PrepareData.InvalidFilter',
                     ErrorMessage => "PrepareData: unknown filter operation in $Filter!",
                 );                
             }
-            if ( !IsArrayRefWithData($Self->{FieldFilter}->{$Object}) ) {
-                $Self->{FieldFilter}->{$Object} = [];
+            # check if type is valid
+            if ( !$ValidTypes{$Type} ) {
+                return $Self->ReturnError(
+                    ErrorCode    => 'PrepareData.InvalidFilter',
+                    ErrorMessage => "PrepareData: unknown type $Type in $Filter!",
+                );                
             }
-            push @{$Self->{FieldFilter}->{$Object}}, { 
+            # check if combination of filter operation and type is valid
+            if ( !$OperationTypeMapping{$Operation}->{$Type} ) {
+                return $Self->ReturnError(
+                    ErrorCode    => 'PrepareData.InvalidFilter',
+                    ErrorMessage => "PrepareData: type $Type not valid for operation $Operation in $Filter!",
+                );                                
+            }
+
+            # prepare value if it is a DATE type
+            if ( $Type eq 'DATE' ) {
+                if ( $Value !~ /\d{4}-\d{2}-\d{2}/ && $Value !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
+                    return $Self->ReturnError(
+                        ErrorCode    => 'PrepareData.InvalidFilter',
+                        ErrorMessage => "PrepareData: invalid date value in $Filter!",
+                    );
+                }
+                my ($DatePart, $TimePart) = split(/T/, $Value);
+
+                # convert Value to unixtime to later compares
+                $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                    String => $DatePart.' 12:00:00',
+                );
+            }
+
+            if ( $Type eq 'DATETIME' ) {
+                if ( $Value !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
+                    return $Self->ReturnError(
+                        ErrorCode    => 'PrepareData.InvalidFilter',
+                        ErrorMessage => "PrepareData: invalid datetime value in $Filter!",
+                    );
+                }
+                my ($DatePart, $TimePart) = split(/T/, $Value);
+                $TimePart =~ s/-/:/g;
+
+                # convert Value to unixtime to later compares
+                $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                    String => $DatePart.' '.$TimePart,
+                );
+            }
+
+            if ( !IsArrayRefWithData($Self->{Filter}->{$Object}) ) {
+                $Self->{Filter}->{$Object} = [];
+            }
+            push @{$Self->{Filter}->{$Object}}, { 
                 Field     => $Field, 
                 Operation => $Operation, 
-                Value     => $Value
+                Value     => $Value,
+                Type      => $Type,
             };
         }
     }
@@ -145,7 +217,7 @@ sub PrepareData {
     # prepare field selector
     if ( exists($Param{Data}->{Fields}) ) {
         foreach my $FieldSelector ( split(/,/, $Param{Data}->{Fields}) ) {
-            my ($Object, $Field) = split(/\./, $FieldSelector);
+            my ($Object, $Field) = split(/\./, $FieldSelector, 2);
             if ( !IsArrayRefWithData($Self->{FieldSelector}->{$Object}) ) {
                 $Self->{FieldSelector}->{$Object} = [];
             }
@@ -156,7 +228,7 @@ sub PrepareData {
     # prepare limiter
     if ( exists($Param{Data}->{Limit}) ) {
         foreach my $Limiter ( split(/,/, $Param{Data}->{Limit}) ) {
-            my ($Object, $Limit) = split(/\:/, $Limiter);
+            my ($Object, $Limit) = split(/\:/, $Limiter, 2);
             if ( $Limit && $Limit !~ /\d+/ ) {
                $Self->{Limiter}->{$Object} = $Limit;
             }
@@ -169,22 +241,33 @@ sub PrepareData {
     # prepare sorter
     if ( exists($Param{Data}->{Sort}) ) {
         foreach my $Sorter ( split(/,/, $Param{Data}->{Sort}) ) {
-            my ($Object, $FieldSort) = split(/\./, $Sorter);
+            my ($Object, $FieldSort) = split(/\./, $Sorter, 2);
             my ($Field, $Direction, $Type) = split(/\:/, $FieldSort);
             $Direction = uc($Direction);
+            $Type = uc($Type);
+
+            # check if sort order is valid
             if ( $Direction !~ /(ASC|DESC)/g ) {
                 return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidSortDirection',
+                    ErrorCode    => 'PrepareData.InvalidSort',
                     ErrorMessage => "PrepareData: unknown sort direction in $Sorter!",
                 );                
             }
+            # check if sort type is valid
+            if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL)/g ) {
+                return $Self->ReturnError(
+                    ErrorCode    => 'PrepareData.InvalidSort',
+                    ErrorMessage => "PrepareData: unknown type $Type in $Sorter!",
+                );                
+            }
+            
             if ( !IsArrayRefWithData($Self->{Sorter}->{$Object}) ) {
                 $Self->{Sorter}->{$Object} = [];
             }
             push @{$Self->{Sorter}->{$Object}}, { 
                 Field => $Field, 
                 Direction => $Direction, 
-                Type  => lc($Type || 'cmp')
+                Type  => ($Type || 'cmp')
             };
         }
     }
@@ -281,6 +364,13 @@ helper function to return a successful result.
 
 sub ReturnSuccess {
     my ( $Self, %Param ) = @_;
+
+    # honor a filter, if we have one
+    if ( IsHashRefWithData($Self->{Filter}) ) {
+        $Self->_Filter(
+            Data => \%Param,
+        );
+    }
 
     # honor a sorter, if we have one
     if ( IsHashRefWithData($Self->{Sorter}) ) {
@@ -396,10 +486,134 @@ sub _Filter {
         return;
     }    
 
-    foreach my $Object ( keys %{$Self->{Sorter}} ) {
+    foreach my $Object ( keys %{$Self->{Filter}} ) {
         if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
+            # filter each contained hash
+            my @FilteredResult;
+            foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {                
+                if ( ref($ObjectItem) eq 'HASH' ) {
+                    my $Match = 1;
+                    foreach my $Filter ( @{$Self->{Filter}->{$Object}} ) {
+                        my $FieldValue = $ObjectItem->{$Filter->{Field}};
+                        my $FilterValue = $Filter->{Value};
+                        my $Type = $Filter->{Type};
+                        
+                        # check if the value references a field in our hash and take its value in this case
+                        if ( $FilterValue =~ /^\$(.*?)$/ ) {
+                            $FilterValue =  exists($ObjectItem->{$1}) ? $ObjectItem->{$1} : undef;
+                        }
+
+                        # prepare date compare
+                        if ( $Type eq 'DATE' ) {
+                            # convert values to unixtime
+                            my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
+                            $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                String => $DatePart.' 12:00:00',
+                            );
+                            # handle this as a numeric compare
+                            $Type = 'NUMERIC';
+                        }
+                        # prepare datetime compare
+                        elsif ( $Type eq 'DATETIME' ) {
+                            # convert values to unixtime
+                            $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                String => $FieldValue,
+                            );
+                            # handle this as a numeric compare
+                            $Type = 'NUMERIC';
+                        }
+
+                        switch ( $Filter->{Operation} ) {
+                            # equal (=)
+                            case 'EQ' {
+                                if ( $Type eq 'STRING' && $FieldValue ne $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }
+                                elsif ( $Type eq 'NUMERIC' && $FieldValue != $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }                                
+                            }
+                            # not equal (!=)
+                            case 'NE' {
+                                if ( $Type eq 'STRING' && $FieldValue eq $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }
+                                elsif ( $Type eq 'NUMERIC' && $FieldValue == $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }                                
+                            }
+                            # less than (<)
+                            case 'LT' {
+                                if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }                                
+                            }
+                            # greater than (>)
+                            case 'GT' {
+                                if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }                                
+                            }
+                            # less than or equal (<=)
+                            case 'LTE' {
+                                if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }                                
+                            }
+                            # greater than or equal (>=)
+                            case 'GTE' {
+                                if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                    $Match = 0;
+                                    last;
+                                }                                
+                            }
+                            # value is contained in an array or values
+                            case 'IN' {
+                                last;
+                            }
+                            # the string contains a part
+                            case 'CONTAINS' {
+                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                    $Match = 0;
+                                    last;
+                                }
+                            }
+                            # the string starts with the part
+                            case 'STARTSWITH' {
+                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
+                                    $Match = 0;
+                                    last;
+                                }
+                            }
+                            # the string ends with the part
+                            case 'ENDSWITH' {
+                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
+                                    $Match = 0;
+                                    last;
+                                }
+                            }
+                        }
+
+                    }
+
+                    # all filter criteria match, add to result
+                    if ($Match) {
+                        push @FilteredResult, $ObjectItem;
+                    }
+                }
+            }
+            $Param{Data}->{$Object} = \@FilteredResult;
         }
     } 
+
+    return 1;
 }
 
 sub _FieldSelector {
@@ -485,7 +699,7 @@ sub _Sorter {
                 }
                 push @SortCriteria, { 
                     Direction   => $Direction, 
-                    compare => $Sorter->{Type}, 
+                    compare => lc($Sorter->{Type}), 
                     sortkey => $Sorter->{Field}
                 };
             }
