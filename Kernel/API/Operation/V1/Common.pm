@@ -14,7 +14,6 @@ use strict;
 use warnings;
 use Hash::Flatten;
 use Data::Sorting qw(:arrays);
-use Switch;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -523,84 +522,81 @@ sub _Filter {
                             $Type = 'NUMERIC';
                         }
 
-                        switch ( $Filter->{Operation} ) {
-                            # equal (=)
-                            case 'EQ' {
-                                if ( $Type eq 'STRING' && $FieldValue ne $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }
-                                elsif ( $Type eq 'NUMERIC' && $FieldValue != $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }                                
-                            }
-                            # not equal (!=)
-                            case 'NE' {
-                                if ( $Type eq 'STRING' && $FieldValue eq $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }
-                                elsif ( $Type eq 'NUMERIC' && $FieldValue == $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }                                
-                            }
-                            # less than (<)
-                            case 'LT' {
-                                if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }                                
-                            }
-                            # greater than (>)
-                            case 'GT' {
-                                if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }                                
-                            }
-                            # less than or equal (<=)
-                            case 'LTE' {
-                                if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }                                
-                            }
-                            # greater than or equal (>=)
-                            case 'GTE' {
-                                if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
-                                    $Match = 0;
-                                    last;
-                                }                                
-                            }
-                            # value is contained in an array or values
-                            case 'IN' {
+                        # equal (=)
+                        if ( $Filter->{Operation} eq 'EQ' ) {
+                            if ( $Type eq 'STRING' && $FieldValue ne $FilterValue ) {
+                                $Match = 0;
                                 last;
                             }
-                            # the string contains a part
-                            case 'CONTAINS' {
-                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
-                                    $Match = 0;
-                                    last;
-                                }
+                            elsif ( $Type eq 'NUMERIC' && $FieldValue != $FilterValue ) {
+                                $Match = 0;
+                                last;
+                            }                                
+                        }
+                        # not equal (!=)
+                        elsif ( $Filter->{Operation} eq 'NE' ) {                        
+                            if ( $Type eq 'STRING' && $FieldValue eq $FilterValue ) {
+                                $Match = 0;
+                                last;
                             }
-                            # the string starts with the part
-                            case 'STARTSWITH' {
-                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
-                                    $Match = 0;
-                                    last;
-                                }
-                            }
-                            # the string ends with the part
-                            case 'ENDSWITH' {
-                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
-                                    $Match = 0;
-                                    last;
-                                }
+                            elsif ( $Type eq 'NUMERIC' && $FieldValue == $FilterValue ) {
+                                $Match = 0;
+                                last;
+                            }                                
+                        }
+                        # less than (<)
+                        elsif ( $Filter->{Operation} eq 'LT' ) {                        
+                            if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                $Match = 0;
+                                last;
+                            }                                
+                        }
+                        # greater than (>)
+                        elsif ( $Filter->{Operation} eq 'GT' ) {                        
+                            if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                $Match = 0;
+                                last;
+                            }                                
+                        }
+                        # less than or equal (<=)
+                        elsif ( $Filter->{Operation} eq 'LTE' ) {                        
+                            if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                $Match = 0;
+                                last;
+                            }                                
+                        }
+                        # greater than or equal (>=)
+                        elsif ( $Filter->{Operation} eq 'GTE' ) {                        
+                            if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                $Match = 0;
+                                last;
+                            }                                
+                        }
+                        # value is contained in an array or values
+                        elsif ( $Filter->{Operation} eq 'IN' ) {                        
+                            last;
+                        }
+                        # the string contains a part
+                        elsif ( $Filter->{Operation} eq 'CONTAINS' ) {                        
+                            if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                $Match = 0;
+                                last;
                             }
                         }
-
+                        # the string starts with the part
+                        elsif ( $Filter->{Operation} eq 'STARTSWITH' ) {                        
+                            if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
+                                $Match = 0;
+                                last;
+                            }
+                        }
+                        # the string ends with the part
+                        elsif ( $Filter->{Operation} eq 'ENDSWITH' ) {                        
+                            if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
+                                $Match = 0;
+                                last;
+                            }
+                        }
                     }
 
                     # all filter criteria match, add to result
