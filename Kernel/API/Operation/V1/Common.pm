@@ -160,7 +160,7 @@ sub PrepareData {
             my ($Object, $FieldSort) = split(/\./, $Sorter, 2);
             my ($Field, $Direction, $Type) = split(/\:/, $FieldSort);
             $Direction = uc($Direction);
-            $Type = uc($Type);
+            $Type = uc($Type || 'TEXTUAL');
 
             # check if sort order is valid
             if ( $Direction !~ /(ASC|DESC)/g ) {
@@ -170,7 +170,7 @@ sub PrepareData {
                 );                
             }
             # check if sort type is valid
-            if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL)/g ) {
+            if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
                 return $Self->ReturnError(
                     ErrorCode    => 'PrepareData.InvalidSort',
                     ErrorMessage => "PrepareData: unknown type $Type in $Sorter!",
@@ -178,9 +178,9 @@ sub PrepareData {
             }
             
             if ( !IsArrayRefWithData($Self->{Sorter}->{$Object}) ) {
-                $Self->{Sorter}->{$Object} = [];
+                $Self->{Sort}->{$Object} = [];
             }
-            push @{$Self->{Sorter}->{$Object}}, { 
+            push @{$Self->{Sort}->{$Object}}, { 
                 Field => $Field, 
                 Direction => $Direction, 
                 Type  => ($Type || 'cmp')
@@ -296,7 +296,7 @@ sub ReturnSuccess {
     }
     
     # honor a field selector, if we have one
-    if ( IsHashRefWithData($Self->{FieldSelector}) ) {
+    if ( IsHashRefWithData($Self->{Fields}) ) {
         $Self->_ApplyFieldSelector(
             Data => \%Param,
         );
@@ -654,11 +654,11 @@ sub _ApplyFieldSelector {
         return;
     }    
 
-    foreach my $Object ( keys %{$Self->{FieldSelector}} ) {
+    foreach my $Object ( keys %{$Self->{Fields}} ) {
         if ( ref($Param{Data}->{$Object}) eq 'HASH' ) {
             # extract filtered fields from hash
             my %NewObject;
-            foreach my $Field ( @{$Self->{FieldSelector}->{$Object}} ) {
+            foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
                 $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
             }
             $Param{Data}->{$Object} = \%NewObject;
@@ -667,11 +667,11 @@ sub _ApplyFieldSelector {
             # filter keys in each contained hash
             foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
-                    my %NewObject;
-                    foreach my $Field ( @{$Self->{FieldSelector}->{$Object}} ) {
-                        $NewObject{$Field} = $ObjectItem->{$Field};
+                    my %NewObjectItem;
+                    foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
+                        $NewObjectItem{$Field} = $ObjectItem->{$Field};
                     }
-                    $ObjectItem = \%NewObject;
+                    $ObjectItem = \%NewObjectItem;
                 }
             }
         }
@@ -719,21 +719,79 @@ sub _ApplySort {
         if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
             # sort array by given criteria
             my @SortCriteria;
+            my %SpecialSort;
             foreach my $Sort ( @{$Self->{Sort}->{$Object}} ) {
                 my $Direction;
+                my $SortField = $Sort->{Field};
+                my $Type = $Sort->{Type};
+
                 if ( $Sort->{Direction} eq 'ASC' ) {
                     $Direction = 'ascending'; 
                 }
                 elsif ( $Sort->{Direction} eq 'DESC' ) {
                     $Direction = 'descending';
                 }
+
+                # special handling for DATE and DATETIME sorts
+                if ( $Sort->{Type} eq 'DATE' ) {
+                    # handle this as a numeric compare
+                    $Type = 'NUMERIC';
+                    $SortField = $SortField.'_DateSort';
+                    $SpecialSort{'_DateSort'} = 1;
+
+                    # convert field values to unixtime
+                    foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
+                        my ($DatePart, $TimePart) = split(/\s+/, $ObjectItem->{$Sort->{Field}});
+                        $ObjectItem->{$SortField} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                            String => $DatePart.' 12:00:00',
+                        );
+                    }
+                }
+                elsif ( $Sort->{Type} eq 'DATETIME' ) {
+                    # handle this as a numeric compare
+                    $Type = 'NUMERIC';
+                    $SortField = $SortField.'_DateTimeSort';
+                    $SpecialSort{'_DateTimeSort'} = 1;
+
+                    # convert field values to unixtime
+                    foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
+                        $ObjectItem->{$SortField} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                            String => $ObjectItem->{$Sort->{Field}},
+                        );
+                    }
+                }
+
                 push @SortCriteria, { 
-                    Direction   => $Direction, 
-                    compare => lc($Sort->{Type}), 
-                    sortkey => $Sort->{Field}
+                    order     => $Direction, 
+                    compare   => lc($Type), 
+                    sortkey   => $SortField,                    
                 };
             }
+
             my @SortedArray = sorted_arrayref($Param{Data}->{$Object}, @SortCriteria);
+
+            # remove special sort attributes
+            if ( %SpecialSort ) {
+                SPECIALSORTKEY:
+                foreach my $SpecialSortKey ( keys %SpecialSort ) {
+                    foreach my $ObjectItem ( @SortedArray ) {
+                        last SPECIALSORTKEY if !IsHashRefWithData($ObjectItem);
+
+                        my %NewObjectItem;
+                        foreach my $ItemAttribute ( keys %{$ObjectItem}) {
+                            if ( $ItemAttribute !~ /.*?$SpecialSortKey$/g ) {
+                                $NewObjectItem{$ItemAttribute} = $ObjectItem->{$ItemAttribute};
+                            }
+                        }
+
+                        $ObjectItem = \%NewObjectItem;                    
+                    }
+                }
+            }
+
+use Data::Dumper;
+print STDERR "after: ".Dumper(\@SortedArray);
+
             $Param{Data}->{$Object} = \@SortedArray;
         }
     } 
