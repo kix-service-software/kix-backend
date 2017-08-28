@@ -145,11 +145,24 @@ sub PrepareData {
     if ( exists($Param{Data}->{Limit}) ) {
         foreach my $Limiter ( split(/,/, $Param{Data}->{Limit}) ) {
             my ($Object, $Limit) = split(/\:/, $Limiter, 2);
-            if ( $Limit && $Limit !~ /\d+/ ) {
-               $Self->{Limiter}->{$Object} = $Limit;
+            if ( $Limit && $Limit =~ /\d+/ ) {
+               $Self->{Limit}->{$Object} = $Limit;
             }
             else {
-                $Self->{Limiter}->{__COMMON} = $Object;
+                $Self->{Limit}->{__COMMON} = $Object;
+            }
+        }
+    }
+
+    # prepare pager
+    if ( exists($Param{Data}->{StartIndex}) ) {
+        foreach my $Starter ( split(/,/, $Param{Data}->{StartIndex}) ) {
+            my ($Object, $Index) = split(/\:/, $Starter, 2);
+            if ( $Index && $Index =~ /\d+/ ) {
+               $Self->{StartIndex}->{$Object} = $Index;
+            }
+            else {
+                $Self->{StartIndex}->{__COMMON} = $Object;
             }
         }
     }
@@ -298,6 +311,13 @@ sub ReturnSuccess {
     # honor a field selector, if we have one
     if ( IsHashRefWithData($Self->{Fields}) ) {
         $Self->_ApplyFieldSelector(
+            Data => \%Param,
+        );
+    }
+
+    # honor a start index, if we have one
+    if ( IsHashRefWithData($Self->{StartIndex}) ) {
+        $Self->_ApplyStartIndex(
             Data => \%Param,
         );
     }
@@ -678,6 +698,33 @@ sub _ApplyFieldSelector {
     } 
 
     return 1;
+}
+
+sub _ApplyStartIndex {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
+        # nothing to do
+        return;
+    }    
+
+    foreach my $Object ( keys %{$Self->{StartIndex}} ) {
+        if ( $Object eq '__COMMON' ) {
+            foreach my $DataObject ( keys %{$Param{Data}} ) {
+                # ignore the object if we have a specific start index for it
+                next if exists($Self->{StartIndex}->{$Object});
+
+                if ( ref($Param{Data}->{$DataObject}) eq 'ARRAY' ) {
+                    my @ResultArray = splice @{$Param{Data}->{$DataObject}}, $Self->{StartIndex}->{$DataObject};
+                    $Param{Data}->{$DataObject} = \@ResultArray;
+                }
+            }
+        }
+        elsif ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
+            my @ResultArray = splice @{$Param{Data}->{$Object}}, $Self->{StartIndex}->{$Object};
+            $Param{$Object} = \@ResultArray;
+        }
+    } 
 }
 
 sub _ApplyLimit {
