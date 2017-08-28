@@ -6,28 +6,42 @@ Description: KIX Core API
 FrameworkVersion: __VERSION__
 Provider:
   Operation:
-    Login:
+    SessionSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Auth::Login
+        Type: V1::Session::SessionSearch
+    SessionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Session::SessionCreate
         NoAuthorizationNeeded: 1
-    Logout:
+    SessionGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Auth::Logout
-    UserGet:
+        Type: V1::Session::SessionGet
+    SessionDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::User::UserGet
+        Type: V1::Session::SessionDelete
+    SessionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Own::SessionGet
     UserSearch:
         Description: ''
         MappingInbound:
@@ -35,28 +49,80 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::User::UserSearch
+    UserCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserCreate
+    UserGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserGet
+    UserUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserUpdate
+    UserGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Own::UserGet
 
   Transport:
     Config:
       KeepAlive: ''
       MaxLength: '10485760'
       RouteOperationMapping:
-        Login:
+        SessionSearch:
+          RequestMethod:
+          - GET
+          Route: /sessions
+        SessionCreate:
           RequestMethod:
           - POST
-          Route: /auth/login
-        Logout:
+          Route: /sessions
+        SessionGet:
           RequestMethod:
           - GET
-          Route: /auth/logout
-        UserGet:
+          Route: /sessions/:Token
+        SessionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /sessions/:Token
+        SessionGet:
           RequestMethod:
           - GET
-          Route: /users/:UserID
+          Route: /session
         UserSearch:
           RequestMethod:
           - GET
           Route: /users
+        UserCreate:
+          RequestMethod:
+          - POST
+          Route: /users
+        UserGet:
+          RequestMethod:
+          - GET
+          Route: /users/:UserID
+        UserUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /users/:UserID
+        UserGet:
+          RequestMethod:
+          - GET
+          Route: /user
 
     Type: HTTP::REST
 RemoteSystem: ''

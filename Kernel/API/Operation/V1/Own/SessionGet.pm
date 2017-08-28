@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Session::SessionGet;
+package Kernel::API::Operation::V1::Own::SessionGet;
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Session::SessionGet - API Logout Operation backend
+Kernel::API::Operation::V1::Own::SessionGet - API Logout Operation backend
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Kernel::API::Operation::V1::Session::SessionGet - API Logout Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::Session::SessionGet->new();
+by using Kernel::API::Operation::Own::SessionGet->new();
 
 =cut
 
@@ -76,7 +76,6 @@ remove token (invalidate)
                 UserType => 'User' | 'Customer'
                 ...
             },
-            Token => '...'                                # required
         },
     );
 
@@ -88,7 +87,6 @@ remove token (invalidate)
                 ...
             },
         },
-    }
 };
 
 =cut
@@ -111,11 +109,6 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
-        Parameters => {
-            'Token' => {
-                Required => 1
-            }                
-        }
     );
 
     # check result
@@ -127,7 +120,7 @@ sub Run {
     }
 
     my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
-        Token => $Param{Data}->{Token}
+        Token => $Param{Data}->{Authorization}->{Token}
     );
 
     # check result

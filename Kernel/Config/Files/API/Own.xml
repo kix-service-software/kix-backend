@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::Own::UserGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Own</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Own::SessionGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SessionGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Own</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>    
+
+    <ConfigItem Name="API::Operation::V1::Own::UserGet###AttributeWhitelist" Required="0" Valid="1">
+        <Description Translatable="1">Defines which attributes of the user data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
+        <Setting>
+            <Hash>
+            </Hash>
+        </Setting>
+    </ConfigItem>    
+    <ConfigItem Name="API::Operation::V1::Own::UserGet###AttributeBlacklist" Required="0" Valid="1">
+        <Description Translatable="1">Defines which attributes of the user data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
+        <Setting>
+            <Hash>
+                <Item Key="UserPw">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>  
+</kix_config>

@@ -4,7 +4,9 @@
 /sessions                                                           |   POST            | V1::Session::SessionCreate                                        | NoAuthorizationNeeded: 1
 /sessions/:Token                                                    |   GET             | V1::Session::SessionGet
 /sessions/:Token                                                    |   DELETE          | V1::Session::SessionDelete
+/session                                                            |   GET             | V1::Own::SessionGet
 /users                                                              |   GET             | V1::User::UserSearch
 /users                                                              |   POST            | V1::User::UserCreate
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
+/user                                                               |   GET             | V1::Own::UserGet

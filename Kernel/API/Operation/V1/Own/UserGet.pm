@@ -13,7 +13,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserGet;
+package Kernel::API::Operation::V1::Own::UserGet;
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
+Kernel::API::Operation::V1::Own::UserGet - API User Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::User::UserGet->new();
+by using Kernel::API::Operation::V1::Own::UserGet->new();
 
 =cut
 
@@ -66,7 +66,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Own::UserGet');
 
     return $Self;
 }
@@ -81,7 +81,6 @@ one or more ticket entries in one call.
             Authorization => {
                 ...
             },
-            UserID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -89,14 +88,9 @@ one or more ticket entries in one call.
         Success      => 1,                                # 0 or 1
         ErrorMessage => '',                               # In case of an error
         Data         => {
-            User => [
-                {
-                    ...
-                },
-                {
-                    ...
-                },
-            ]
+            User => {
+                ...
+            },
         },
     };
 
@@ -119,13 +113,7 @@ sub Run {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'UserID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            }                
-        }
+        Data => $Param{Data},
     );
 
     # check result
@@ -138,66 +126,56 @@ sub Run {
 
     my $ErrorMessage = '';
 
-    my @UserList;
-
-    # start user loop
-    USER:    
-    foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
-
-        # get the user data
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $UserID,
+    # get the user data
+    my %UserData;
+    if ( $Param{Data}->{Authorization}->{UserType} eq 'Agent' ) {
+        %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            UserID => $Param{Data}->{Authorization}->{UserID},
         );
-
-        if ( !IsHashRefWithData( \%UserData ) ) {
-
-            $ErrorMessage = 'Could not get user data'
-                . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
-
-            return $Self->ReturnError(
-                ErrorCode    => 'UserGet.NotValidUserID',
-                ErrorMessage => "UserGet: $ErrorMessage",
-            );
-        }
-
-        # filter valid attributes
-        if ($Self->{Config}->{AttributeWhitelist}) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
-            }
-        }
-
-        # filter valid attributes
-        if ($Self->{Config}->{AttributeBacklist}) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
-            }
-        }
-        
-        # add
-        push(@UserList, \%UserData);
     }
-
-    if ( !scalar(@UserList) ) {
-        $ErrorMessage = 'Could not get user data'
-            . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
+    elsif ( $Param{Data}->{Authorization}->{UserType} eq 'Agent' ) {
+        %UserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+            User => $Param{Data}->{Authorization}->{UserID},
+        );        
+    }
+    else {
+        $ErrorMessage = 'Unknown UserType $Param{Data}->{Authorization}->{UserType} '
+            . ' in Kernel::API::Operation::V1::Own::UserGet::Run()';
 
         return $Self->ReturnError(
-            ErrorCode    => 'UserGet.NotUserData',
+            ErrorCode    => 'UserGet.NotValidUserType',
             ErrorMessage => "UserGet: $ErrorMessage",
-        );
-
+        );        
     }
 
-    if ( scalar(@UserList) == 1 ) {
-        return $Self->ReturnSuccess(
-            User => $UserList[0],
-        );    
+    if ( !IsHashRefWithData( \%UserData ) ) {
+
+        $ErrorMessage = 'Could not get user data'
+            . ' in Kernel::API::Operation::V1::Own::UserGet::Run()';
+
+        return $Self->ReturnError(
+            ErrorCode    => 'UserGet.NotValidUserID',
+            ErrorMessage => "UserGet: $ErrorMessage",
+        );
+    }
+
+    # filter valid attributes
+    if ($Self->{Config}->{AttributeWhitelist}) {
+        foreach my $Attr (sort keys %UserData) {
+            delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+        }
+    }
+
+    # filter valid attributes
+    if ($Self->{Config}->{AttributeBacklist}) {
+        foreach my $Attr (sort keys %UserData) {
+            delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
+        }
     }
 
     return $Self->ReturnSuccess(
-        User => \@UserList,
-    );
+        User => \%UserData,
+    );    
 }
 
 1;
