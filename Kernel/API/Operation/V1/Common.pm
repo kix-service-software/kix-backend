@@ -789,9 +789,6 @@ sub _ApplySort {
                 }
             }
 
-use Data::Dumper;
-print STDERR "after: ".Dumper(\@SortedArray);
-
             $Param{Data}->{$Object} = \@SortedArray;
         }
     } 
