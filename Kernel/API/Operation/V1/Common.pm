@@ -171,23 +171,22 @@ sub PrepareData {
     if ( exists($Param{Data}->{sort}) ) {
         foreach my $Sorter ( split(/,/, $Param{Data}->{sort}) ) {
             my ($Object, $FieldSort) = split(/\./, $Sorter, 2);
-            my ($Field, $Direction, $Type) = split(/\:/, $FieldSort);
-            $Direction = uc($Direction);
+            my ($Field, $Type) = split(/\:/, $FieldSort);
+            my $Direction = 'ascending';
             $Type = uc($Type || 'TEXTUAL');
 
-            # check if sort order is valid
-            if ( $Direction !~ /(ASC|DESC)/g ) {
-                return $Self->_Error(
-                    Code    => 'PrepareData.InvalidSort',
-                    Message => "Unknown sort direction in $Sorter!",
-                );                
-            }
             # check if sort type is valid
             if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidSort',
                     Message => "Unknown type $Type in $Sorter!",
                 );                
+            }
+            
+            # should we sort ascending or descending
+            if ( $Field =~ /^-(.*?)$/g ) {
+                $Field = $1;
+                $Direction = 'descending';
             }
             
             if ( !IsArrayRefWithData($Self->{Sorter}->{$Object}) ) {
@@ -773,16 +772,8 @@ sub _ApplySort {
             my @SortCriteria;
             my %SpecialSort;
             foreach my $Sort ( @{$Self->{Sort}->{$Object}} ) {
-                my $Direction;
                 my $SortField = $Sort->{Field};
                 my $Type = $Sort->{Type};
-
-                if ( $Sort->{Direction} eq 'ASC' ) {
-                    $Direction = 'ascending'; 
-                }
-                elsif ( $Sort->{Direction} eq 'DESC' ) {
-                    $Direction = 'descending';
-                }
 
                 # special handling for DATE and DATETIME sorts
                 if ( $Sort->{Type} eq 'DATE' ) {
@@ -814,7 +805,7 @@ sub _ApplySort {
                 }
 
                 push @SortCriteria, { 
-                    order     => $Direction, 
+                    order     => $Sort->{Direction}, 
                     compare   => lc($Type), 
                     sortkey   => $SortField,                    
                 };
