@@ -120,9 +120,9 @@ sub PrepareData {
     }
 
     # prepare field filter
-    if ( exists($Param{Data}->{Filter}) ) {
+    if ( exists($Param{Data}->{filter}) ) {
         my $Result = $Self->_ValidateFilter(
-            Filter => $Param{Data}->{Filter},
+            Filter => $Param{Data}->{filter},
         );
         if ( IsHashRefWithData($Result) ) {
             # error occured
@@ -131,8 +131,8 @@ sub PrepareData {
     }
 
     # prepare field selector
-    if ( exists($Param{Data}->{Fields}) ) {
-        foreach my $FieldSelector ( split(/,/, $Param{Data}->{Fields}) ) {
+    if ( exists($Param{Data}->{fields}) ) {
+        foreach my $FieldSelector ( split(/,/, $Param{Data}->{fields}) ) {
             my ($Object, $Field) = split(/\./, $FieldSelector, 2);
             if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
                 $Self->{Fields}->{$Object} = [];
@@ -142,8 +142,8 @@ sub PrepareData {
     }
 
     # prepare limiter
-    if ( exists($Param{Data}->{Limit}) ) {
-        foreach my $Limiter ( split(/,/, $Param{Data}->{Limit}) ) {
+    if ( exists($Param{Data}->{limit}) ) {
+        foreach my $Limiter ( split(/,/, $Param{Data}->{limit}) ) {
             my ($Object, $Limit) = split(/\:/, $Limiter, 2);
             if ( $Limit && $Limit =~ /\d+/ ) {
                $Self->{Limit}->{$Object} = $Limit;
@@ -154,22 +154,22 @@ sub PrepareData {
         }
     }
 
-    # prepare pager
-    if ( exists($Param{Data}->{StartIndex}) ) {
-        foreach my $Starter ( split(/,/, $Param{Data}->{StartIndex}) ) {
-            my ($Object, $Index) = split(/\:/, $Starter, 2);
+    # prepare offset
+    if ( exists($Param{Data}->{offset}) ) {
+        foreach my $Offset ( split(/,/, $Param{Data}->{offset}) ) {
+            my ($Object, $Index) = split(/\:/, $Offset, 2);
             if ( $Index && $Index =~ /\d+/ ) {
-               $Self->{StartIndex}->{$Object} = $Index;
+               $Self->{Offset}->{$Object} = $Index;
             }
             else {
-                $Self->{StartIndex}->{__COMMON} = $Object;
+                $Self->{Offset}->{__COMMON} = $Object;
             }
         }
     }
 
     # prepare sorter
-    if ( exists($Param{Data}->{Sort}) ) {
-        foreach my $Sorter ( split(/,/, $Param{Data}->{Sort}) ) {
+    if ( exists($Param{Data}->{sort}) ) {
+        foreach my $Sorter ( split(/,/, $Param{Data}->{sort}) ) {
             my ($Object, $FieldSort) = split(/\./, $Sorter, 2);
             my ($Field, $Direction, $Type) = split(/\:/, $FieldSort);
             $Direction = uc($Direction);
@@ -315,9 +315,9 @@ sub _Success {
         );
     }
 
-    # honor a start index, if we have one
-    if ( IsHashRefWithData($Self->{StartIndex}) ) {
-        $Self->_ApplyStartIndex(
+    # honor an offset, if we have one
+    if ( IsHashRefWithData($Self->{Offset}) ) {
+        $Self->_ApplyOffset(
             Data => \%Param,
         );
     }
@@ -705,7 +705,7 @@ sub _ApplyFieldSelector {
     return 1;
 }
 
-sub _ApplyStartIndex {
+sub _ApplyOffset {
     my ( $Self, %Param ) = @_;
 
     if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
@@ -713,20 +713,20 @@ sub _ApplyStartIndex {
         return;
     }    
 
-    foreach my $Object ( keys %{$Self->{StartIndex}} ) {
+    foreach my $Object ( keys %{$Self->{Offset}} ) {
         if ( $Object eq '__COMMON' ) {
             foreach my $DataObject ( keys %{$Param{Data}} ) {
                 # ignore the object if we have a specific start index for it
-                next if exists($Self->{StartIndex}->{$DataObject});
+                next if exists($Self->{Offset}->{$DataObject});
 
                 if ( ref($Param{Data}->{$DataObject}) eq 'ARRAY' ) {
-                    my @ResultArray = splice @{$Param{Data}->{$DataObject}}, $Self->{StartIndex}->{$Object};
+                    my @ResultArray = splice @{$Param{Data}->{$DataObject}}, $Self->{Offset}->{$Object};
                     $Param{Data}->{$DataObject} = \@ResultArray;
                 }
             }
         }
         elsif ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
-            my @ResultArray = splice @{$Param{Data}->{$Object}}, $Self->{StartIndex}->{$Object};
+            my @ResultArray = splice @{$Param{Data}->{$Object}}, $Self->{Offset}->{$Object};
             $Param{$Object} = \@ResultArray;
         }
     } 
