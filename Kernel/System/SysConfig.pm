@@ -170,7 +170,7 @@ sub WriteDefault {
 
     # write default config file
     my $Out;
-    $Out .= "# OTRS config file (automatically generated)\n";
+    $Out .= "# KIX config file (automatically generated)\n";
     $Out .= "# VERSION:1.1\n";
     $Out .= "package Kernel::Config::Files::ZZZAAuto;\n";
     $Out .= "use strict;\n";
@@ -1776,10 +1776,13 @@ sub _Init {
         Recursive => 1,
     );
 
-    # KIXCore-capeIT
-    for my $Dir (@INC) {
-        last if ( $Dir =~ m/$Self->{Home}\/(.*?)\/Custom/ );
-        my $ConfDir = "$Dir/Kernel/Config/Files";
+    # load configs from registered custom packages
+    my @CustomPackages = $Kernel::OM->Get('Kernel::System::KIXUtils')->GetRegisteredCustomPackages(
+        Result => 'ARRAY',
+    );
+
+    for my $Dir (@CustomPackages) {
+        my $ConfDir = "$Self->{Home}/$Dir/Kernel/Config/Files";
         $ConfDir =~ s'\s'\\s'g;
         if ( -e "$ConfDir" ) {
             my @KIXFiles = $MainObject->DirectoryRead(
@@ -1790,8 +1793,6 @@ sub _Init {
             push @Files, @KIXFiles;
         }
     }
-
-    # EO KIXCore-capeIT
 
     # get the md5 representing the current configuration state
     my $ConfigChecksum = $Self->{ConfigObject}->ConfigChecksum();
@@ -1832,6 +1833,7 @@ sub _Init {
         }
 
 print STDERR "File: $File\n";
+
         # Ok, cache was not used, parse the config files
         my @XMLHash = $Kernel::OM->Get('Kernel::System::XML')->XMLParse2XMLHash(
             String     => $ConfigFile,
@@ -1877,16 +1879,16 @@ print STDERR "File: $File\n";
     # Loop over the sorted files and assign all configs to the init section
     for my $File ( sort keys %Data ) {
 
-        my $Init = $Data{$File}->[1]->{otrs_config}->[1]->{init} || '';
+        my $Init = $Data{$File}->[1]->{kix_config}->[1]->{init} || '';
         if ( !$ValidInit{$Init} ) {
             $Init = 'Unknown';    # Fallback for unknown init values
         }
 
         # Just use valid entries.
-        if ( $Data{$File}->[1]->{otrs_config}->[1]->{ConfigItem} ) {
+        if ( $Data{$File}->[1]->{kix_config}->[1]->{ConfigItem} ) {
             push(
                 @{ $XMLConfigTMP{$Init} },
-                @{ $Data{$File}->[1]->{otrs_config}->[1]->{ConfigItem} }
+                @{ $Data{$File}->[1]->{kix_config}->[1]->{ConfigItem} }
             );
         }
     }
