@@ -168,18 +168,18 @@ sub Run {
     if ( %UserData ) {
         return $Self->_Error(
             Code    => 'UserCreate.LoginExists',
-            Message => "Can not create user. User with same login '$User->{UserLogin}' already exists.",
+            Message => "Can not create user. Another user with same login already exists.",
         );
     }
 
     # check UserEmail exists
     my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        Search => $User->{UserEmail},
+        PostMasterSearch => $User->{UserEmail},
     );
     if ( %UserList ) {
         return $Self->_Error(
             Code    => 'UserCreate.EmailExists',
-            Message => 'Can not create user. User with same email address already exists.',
+            Message => 'Can not create user. Another user with same email address already exists.',
         );
     }
     

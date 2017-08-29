@@ -133,7 +133,7 @@ sub Run {
             UserID => $Param{Data}->{Authorization}->{UserID},
         );
     }
-    elsif ( $Param{Data}->{Authorization}->{UserType} eq 'Agent' ) {
+    elsif ( $Param{Data}->{Authorization}->{UserType} eq 'Customer' ) {
         %UserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
             User => $Param{Data}->{Authorization}->{UserID},
         );        

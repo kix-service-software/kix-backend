@@ -120,12 +120,6 @@ sub Run {
 
     if (IsHashRefWithData(\%UserList)) {
 
-        if ($Param{Data}->{ChangedAfter}) {
-            $Param{Data}->{ChangedAfterUnixtime} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                String => $Param{Data}->{ChangedAfter},
-            );
-        }
-
         # get already prepared user data from UserGet operation
         my $UserGetResult = $Self->ExecOperation(
             Operation => 'V1::User::UserGet',

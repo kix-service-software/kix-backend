@@ -166,23 +166,34 @@ sub Run {
 
     # check UserLogin exists
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        User => $User->{UserLogin},
+        UserID => $Param{Data}->{UserID},
     );
     if ( !%UserData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Can not update user. No user with ID '$User->{UserID}' found.",
+            Message => "Can not update user. No user with ID '$Param{Data}->{UserID}' found.",
         );
     }
 
-    # check UserEmail exists
+    # check if UserLogin already exists
     my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        Search => $User->{UserEmail},
+        Search => $User->{UserLogin},
     );
     if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
         return $Self->_Error(
             Code    => 'UserUpdate.LoginExists',
-            Message => 'Can not update user. User with same login already exists.',
+            Message => 'Can not update user. Another user with same login already exists.',
+        );
+    }
+
+    # check UserEmail exists
+    %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+        PostMasterSearch => $User->{UserEmail},
+    );
+    if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+        return $Self->_Error(
+            Code    => 'UserUpdate.EmailExists',
+            Message => 'Can not update user. Another user with same email address already exists.',
         );
     }
     
