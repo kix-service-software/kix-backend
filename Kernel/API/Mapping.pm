@@ -18,6 +18,10 @@ use Kernel::System::VariableCheck qw(IsHashRefWithData IsStringWithData);
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
 
+use base qw(
+    Kernel::API::Common
+);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -76,10 +80,10 @@ sub new {
     for my $Needed (qw(DebuggerObject MappingConfig)) {
         if ( !$Param{$Needed} ) {
 
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Mapping.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -96,14 +100,16 @@ sub new {
     # check config - we need at least a config type
     if ( !IsHashRefWithData( $Param{MappingConfig} ) ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got no MappingConfig as hash ref with content!',
+        return $Self->_Error(
+            Code    => 'Mapping.InternalError',
+            Message => 'Got no MappingConfig as hash ref with content!',
         );
     }
     if ( !IsStringWithData( $Param{MappingConfig}->{Type} ) ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got no MappingConfig with Type as string with value!',
+        return $Self->_Error(
+            Code    => 'Mapping.InternalError',
+            Message => 'Got no MappingConfig with Type as string with value!',
         );
     }
 
@@ -114,8 +120,9 @@ sub new {
         )
     {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got MappingConfig with Data, but Data is no hash ref with content!',
+        return $Self->_Error(
+            Code    => 'Mapping.InvalidData',
+            Message => 'Got MappingConfig with Data, but Data is no hash ref with content!',
         );
     }
 
@@ -123,7 +130,10 @@ sub new {
     my $GenericModule = 'Kernel::API::Mapping::' . $Param{MappingConfig}->{Type};
     if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
 
-        return $Self->{DebuggerObject}->Error( Summary => "Can't load mapping backend module!" );
+        return $Self->_Error(
+            Code    => 'Mapping.InternalError',
+            Message => "Can't load mapping backend module!" 
+        );
     }
     $Self->{BackendObject} = $GenericModule->new( %{$Self} );
 
@@ -159,18 +169,18 @@ sub Map {
     # check data - only accept undef or hash ref
     if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Mapping handler!'
+        return $Self->_Error(
+            Code    => 'Mapping.InvalidData',
+            Message => 'Got Data but it is not a hash ref in Mapping handler!'
         );
     }
 
     # return if data is empty
     if ( !defined $Param{Data} || !%{ $Param{Data} } ) {
 
-        return {
-            Success => 1,
+        return $Self->_Success(
             Data    => {},
-        };
+        );
     }
 
     # start map on backend

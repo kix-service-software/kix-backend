@@ -41,7 +41,7 @@ initialize the operation by checking the webservice configuration
 
     $Return = {
         Success => 1,                       # or 0 in case of failure,
-        ErrorMessage => 'Error Message',
+        Message => 'Error Message',
     }
 
 =cut
@@ -51,10 +51,10 @@ sub Init {
 
     # check needed
     if ( !$Param{WebserviceID} ) {
-        return {
-            Success      => 0,
-            ErrorMessage => "Got no WebserviceID!",
-        };
+        return $Self->_Error(
+            Code    => 'Webservice.InternalError',
+            Message => "Got no WebserviceID!",
+        );
     }
 
     # get webservice configuration
@@ -63,12 +63,12 @@ sub Init {
     );
 
     if ( !IsHashRefWithData($Webservice) ) {
-        return {
-            Success => 0,
-            ErrorMessage =>
+        return $Self->_Error(
+            Code    => 'Webservice.InternalError',
+            Message =>
                 'Could not determine Web service configuration'
                 . ' in Kernel::API::Operation::V1::Common::Init()',
-        };
+        );
     }
 
     return {
@@ -98,7 +98,7 @@ prepare data, check given parameters and parse them according to type
 
     $Return = {
         Success => 1,                       # or 0 in case of failure,
-        ErrorMessage => 'Error Message',
+        Message => 'Error Message',
     }
 
 =cut
@@ -112,9 +112,9 @@ sub PrepareData {
     # check needed stuff
     for my $Needed (qw(Data)) {
         if ( !$Param{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'PrepareData.MissingParameter',
-                ErrorMessage => "PrepareData: $Needed parameter is missing!",
+            return $Self->_Error(
+                Code    => 'PrepareData.MissingParameter',
+                Message => "$Needed parameter is missing!",
             );
         }
     }
@@ -134,10 +134,10 @@ sub PrepareData {
     if ( exists($Param{Data}->{Fields}) ) {
         foreach my $FieldSelector ( split(/,/, $Param{Data}->{Fields}) ) {
             my ($Object, $Field) = split(/\./, $FieldSelector, 2);
-            if ( !IsArrayRefWithData($Self->{FieldSelector}->{$Object}) ) {
-                $Self->{FieldSelector}->{$Object} = [];
+            if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
+                $Self->{Fields}->{$Object} = [];
             }
-            push @{$Self->{FieldSelector}->{$Object}}, $Field;
+            push @{$Self->{Fields}->{$Object}}, $Field;
         }
     }
 
@@ -177,16 +177,16 @@ sub PrepareData {
 
             # check if sort order is valid
             if ( $Direction !~ /(ASC|DESC)/g ) {
-                return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidSort',
-                    ErrorMessage => "PrepareData: unknown sort direction in $Sorter!",
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidSort',
+                    Message => "Unknown sort direction in $Sorter!",
                 );                
             }
             # check if sort type is valid
             if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
-                return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidSort',
-                    ErrorMessage => "PrepareData: unknown type $Type in $Sorter!",
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidSort',
+                    Message => "Unknown type $Type in $Sorter!",
                 );                
             }
             
@@ -224,7 +224,7 @@ sub PrepareData {
             # check requirement
             if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
-                $Result->{ErrorMessage} = "PrepareData: required parameter $Parameter is missing!",
+                $Result->{Message} = "Required parameter $Parameter is missing!",
                 last;
             }
             elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && ref($Param{Parameters}->{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
@@ -237,7 +237,7 @@ sub PrepareData {
                 }
                 if ( !exists($Data{$Parameter}) && !$AltParameterHasValue ) {
                     $Result->{Success} = 0;
-                    $Result->{ErrorMessage} = "PrepareData: required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
+                    $Result->{Message} = "Required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
                     last;
                 }
             }
@@ -264,7 +264,7 @@ sub PrepareData {
             if ( exists($Param{Parameters}->{$Parameter}->{OneOf}) && ref($Param{Parameters}->{$Parameter}->{OneOf}) eq 'ARRAY' ) {
                 if ( !grep(/^$Data{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
                     $Result->{Success} = 0;
-                    $Result->{ErrorMessage} = "PrepareData: parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
+                    $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
                     last;
                 }
             }
@@ -272,7 +272,7 @@ sub PrepareData {
             # check if we have an optional parameter that needs a value
             if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
-                $Result->{ErrorMessage} = "PrepareData: optional parameter $Parameter is used without a value!",
+                $Result->{Message} = "Optional parameter $Parameter is used without a value!",
                 last;
             }
         }
@@ -281,17 +281,17 @@ sub PrepareData {
     return $Result; 
 }
 
-=item ReturnSuccess()
+=item _Success()
 
 helper function to return a successful result.
 
-    my $Return = $CommonObject->ReturnSuccess(
+    my $Return = $CommonObject->_Success(
         ...
     );
 
 =cut
 
-sub ReturnSuccess {
+sub _Success {
     my ( $Self, %Param ) = @_;
 
     # honor a filter, if we have one
@@ -329,43 +329,48 @@ sub ReturnSuccess {
         );
     }
 
+    # prepare result
+    my $Code    = $Param{Code};
+    my $Message = $Param{Message};
+    delete $Param{Code};
+    delete $Param{Message};
+
     # return structure
     return {
         Success      => 1,
+        Code         => $Code,
+        Message      => $Message,
         Data         => {
             %Param
         },
     };
 }
 
-=item ReturnError()
+=item _Error()
 
 helper function to return an error message.
 
-    my $Return = $CommonObject->ReturnError(
-        ErrorCode    => Ticket.AccessDenied,
-        ErrorMessage => 'You don't have rights to access this ticket',
+    my $Return = $CommonObject->_Error(
+        Code    => Ticket.AccessDenied,
+        Message => 'You don't have rights to access this ticket',
     );
 
 =cut
 
-sub ReturnError {
+sub _Error {
     my ( $Self, %Param ) = @_;
 
     $Self->{DebuggerObject}->Error(
-        Summary => $Param{ErrorCode},
-        Data    => $Param{ErrorMessage},
+        Summary => $Param{Code},
+        Data    => $Param{Message},
     );
 
     # return structure
     return {
-        Success      => 0,
-        ErrorMessage => "$Param{ErrorCode}: $Param{ErrorMessage}",
-        Data         => {
-            Error => {
-                ErrorCode    => $Param{ErrorCode},
-                ErrorMessage => $Param{ErrorMessage},
-            },
+        Success => 0,
+        Code    => $Param{Code},
+        Message => $Param{Message},
+        Data    => {
         },
     };
 }
@@ -389,9 +394,9 @@ sub ExecOperation {
     # check needed stuff
     for my $Needed (qw(Operation Data)) {
         if ( !$Param{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'ExecOperation.MissingParameter',
-                ErrorMessage => "ExecOperation: $Needed parameter is missing!",
+            return $Self->_Error(
+                Code    => 'ExecOperation.MissingParameter',
+                Message => "$Needed parameter is missing!",
             );
         }
     }
@@ -399,9 +404,9 @@ sub ExecOperation {
     my $Operation = 'Kernel::API::Operation::'.$Param{Operation};
 
     if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Operation) ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'ExecOperation.OperationNotFound',
-            ErrorMessage => "ExecOperation: $Operation not found!",
+        return $Self->_Error(
+            Code    => 'ExecOperation.OperationNotFound',
+            Message => "$Operation not found!",
         );
     }
     my $OperationObject = $Operation->new( %{$Self} );
@@ -448,9 +453,9 @@ sub _ValidateFilter {
     foreach my $Object ( keys %{$FilterDef} ) {
         # do we have a object definition ?
         if ( !IsArrayRefWithData($FilterDef->{$Object}) ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'PrepareData.InvalidFilter',
-                ErrorMessage => "PrepareData: invalid filter for object $Object!",
+            return $Self->_Error(
+                Code    => 'PrepareData.InvalidFilter',
+                Message => "Invalid filter for object $Object!",
             );                
         }     
         # iterate filters
@@ -460,39 +465,39 @@ sub _ValidateFilter {
 
             # check if filter field is valid
             if ( !$Filter->{Field} ) {
-                return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidFilter',
-                    ErrorMessage => "PrepareData: no field in $Object.$Filter->{Field}!",
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidFilter',
+                    Message => "No field in $Object.$Filter->{Field}!",
                 );
             }
             # check if filter operation is valid
             if ( $Filter->{Operation} !~ /^($ValidOperations)$/g ) {
-                return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidFilter',
-                    ErrorMessage => "PrepareData: unknown filter operation $Filter->{Operation} in $Object.$Filter->{Field}!",
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidFilter',
+                    Message => "Unknown filter operation $Filter->{Operation} in $Object.$Filter->{Field}!",
                 );
             }
             # check if type is valid
             if ( !$ValidTypes{$Filter->{Type}} ) {
-                return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidFilter',
-                    ErrorMessage => "PrepareData: unknown type $Filter->{Type} in $Object.$Filter->{Field}!",
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidFilter',
+                    Message => "Unknown type $Filter->{Type} in $Object.$Filter->{Field}!",
                 );                
             }
             # check if combination of filter operation and type is valid
             if ( !$OperationTypeMapping{$Filter->{Operation}}->{$Filter->{Type}} ) {
-                return $Self->ReturnError(
-                    ErrorCode    => 'PrepareData.InvalidFilter',
-                    ErrorMessage => "PrepareData: type $Filter->{Type} not valid for operation $Filter->{Operation} in $Object.$Filter->{Field}!",
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidFilter',
+                    Message => "Type $Filter->{Type} not valid for operation $Filter->{Operation} in $Object.$Filter->{Field}!",
                 );                                
             }
 
             # prepare value if it is a DATE type
             if ( $Filter->{Type} eq 'DATE' ) {
                 if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
-                    return $Self->ReturnError(
-                        ErrorCode    => 'PrepareData.InvalidFilter',
-                        ErrorMessage => "PrepareData: invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
+                    return $Self->_Error(
+                        Code    => 'PrepareData.InvalidFilter',
+                        Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
                     );
                 }
                 my ($DatePart, $TimePart) = split(/T/, $Filter->{Value});
@@ -505,9 +510,9 @@ sub _ValidateFilter {
 
             if ( $Filter->{Type} eq 'DATETIME' ) {
                 if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
-                    return $Self->ReturnError(
-                        ErrorCode    => 'PrepareData.InvalidFilter',
-                        ErrorMessage => "PrepareData: invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
+                    return $Self->_Error(
+                        Code    => 'PrepareData.InvalidFilter',
+                        Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
                     );
                 }
                 my ($DatePart, $TimePart) = split(/T/, $Filter->{Value});
@@ -712,10 +717,10 @@ sub _ApplyStartIndex {
         if ( $Object eq '__COMMON' ) {
             foreach my $DataObject ( keys %{$Param{Data}} ) {
                 # ignore the object if we have a specific start index for it
-                next if exists($Self->{StartIndex}->{$Object});
+                next if exists($Self->{StartIndex}->{$DataObject});
 
                 if ( ref($Param{Data}->{$DataObject}) eq 'ARRAY' ) {
-                    my @ResultArray = splice @{$Param{Data}->{$DataObject}}, $Self->{StartIndex}->{$DataObject};
+                    my @ResultArray = splice @{$Param{Data}->{$DataObject}}, $Self->{StartIndex}->{$Object};
                     $Param{Data}->{$DataObject} = \@ResultArray;
                 }
             }
@@ -739,10 +744,10 @@ sub _ApplyLimit {
         if ( $Object eq '__COMMON' ) {
             foreach my $DataObject ( keys %{$Param{Data}} ) {
                 # ignore the object if we have a specific limiter for it
-                next if exists($Self->{Limit}->{$Object});
+                next if exists($Self->{Limit}->{$DataObject});
 
                 if ( ref($Param{Data}->{$DataObject}) eq 'ARRAY' ) {
-                    my @LimitedArray = splice @{$Param{Data}->{$DataObject}}, 0, $Self->{Limit}->{$DataObject};
+                    my @LimitedArray = splice @{$Param{Data}->{$DataObject}}, 0, $Self->{Limit}->{$Object};
                     $Param{Data}->{$DataObject} = \@LimitedArray;
                 }
             }
@@ -847,9 +852,9 @@ sub _SetParameter {
     # check needed stuff
     for my $Needed (qw(Data Attribute)) {
         if ( !$Param{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => '_SetParameter.MissingParameter',
-                ErrorMessage => "_SetParameter: $Needed parameter is missing!",
+            return $Self->_Error(
+                Code    => '_SetParameter.MissingParameter',
+                Message => "$Needed parameter is missing!",
             );
         }
     }

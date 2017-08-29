@@ -52,16 +52,16 @@ sub new {
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserUpdate');
 
     return $Self;
 }
@@ -91,12 +91,12 @@ perform UserUpdate Operation. This will return the updated UserID.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        ErrorMessage    => '',                      # in case of error
+        Message    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             UserID  => '',                          # UserID 
             Error => {                              # should not return errors
-                    ErrorCode    => 'User.Create.ErrorCode'
-                    ErrorMessage => 'Error Description'
+                    Code    => 'User.Create.Code'
+                    Message => 'Error Description'
             },
         },
     };
@@ -112,9 +112,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -143,9 +143,9 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
@@ -169,9 +169,9 @@ sub Run {
         User => $User->{UserLogin},
     );
     if ( !%UserData ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.NoUser',
-            ErrorMessage => "Can not update user. No user with ID '$User->{UserID}' found.",
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Can not update user. No user with ID '$User->{UserID}' found.",
         );
     }
 
@@ -180,9 +180,9 @@ sub Run {
         Search => $User->{UserEmail},
     );
     if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
-        return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.LoginExists',
-            ErrorMessage => 'Can not update user. User with same login already exists.',
+        return $Self->_Error(
+            Code    => 'UserUpdate.LoginExists',
+            Message => 'Can not update user. User with same login already exists.',
         );
     }
     
@@ -193,13 +193,13 @@ sub Run {
         ChangeUserID  => $Param{Data}->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserUpdate.UnknownError',
-            ErrorMessage => 'Could not update user, please contact the system administrator',
+        return $Self->_Error(
+            Code    => 'Object.UnableToUpdate',
+            Message => 'Could not update user, please contact the system administrator',
         );
     }
     
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
         UserID => $UserData{UserID},
     );   
 }

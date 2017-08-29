@@ -76,7 +76,8 @@ In case of an error, the resulting http error code and message are remembered fo
 
     $Result = {
         Success      => 1,                  # 0 or 1
-        ErrorMessage => '',                 # in case of error
+        Code         => '',                 # in case of error
+        Message      => '',                 # in case of error
         Operation    => 'DesiredOperation', # name of the operation to perform
         Data         => {                   # data payload of request
             ...
@@ -91,14 +92,14 @@ sub ProviderProcessRequest {
     # check transport config
     if ( !IsHashRefWithData( $Self->{TransportConfig} ) ) {
         return $Self->_Error(
-            Summary   => 'REST Transport: Have no TransportConfig',
-            HTTPError => 500,
+            Code    => 'Transport.REST.NoTransportConfig',
+            Message => 'REST Transport: Have no TransportConfig',
         );
     }
     if ( !IsHashRefWithData( $Self->{TransportConfig}->{Config} ) ) {
         return $Self->_Error(
-            Summary   => 'Rest Transport: Have no Config',
-            HTTPError => 500,
+            Code    => 'Transport.REST.NoTransportConfig',
+            Message => 'REST Transport: Have no Config',
         );
     }
 
@@ -107,11 +108,10 @@ sub ProviderProcessRequest {
 
     if ( !IsHashRefWithData( $Config->{RouteOperationMapping} ) ) {
         return $Self->_Error(
-            Summary   => "HTTP::REST Can't find RouteOperationMapping in Config",
-            HTTPError => 500,
+            Code    => 'Transport.REST.NoRouteOperationMapping',
+            Message => "HTTP::REST Can't find RouteOperationMapping in Config",
         );
     }
-
 
     # get Encode object
     my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
@@ -226,8 +226,8 @@ sub ProviderProcessRequest {
 
     if ( !$Operation ) {
         return $Self->_Error(
-            Summary   => "HTTP::REST Error while determine Operation for request URI '$RequestURI'.",
-            HTTPError => 500,
+            Code    => 'Transport.REST.OperationNotFound',
+            Message => "HTTP::REST Error while determine Operation for request URI '$RequestURI'.",
         );
     }
 
@@ -235,21 +235,20 @@ sub ProviderProcessRequest {
 
     # no length provided, return the information we have
     if ( !$Length ) {
-        return {
-            Success   => 1,
+        return $Self->_Success(
             Operation => $Operation,
             Data      => {
                 %URIData,
                 RequestMethod => $RequestMethod,
             },
-        };
+        );
     }
 
     # request bigger than allowed
     if ( IsInteger( $Config->{MaxLength} ) && $Length > $Config->{MaxLength} ) {
         return $Self->_Error(
-            Summary   => HTTP::Status::status_message(413),
-            HTTPError => 413,
+            Code    => 'Transport.REST.RequestTooBig',
+            Message => HTTP::Status::status_message(413),
         );
     }
 
@@ -260,8 +259,8 @@ sub ProviderProcessRequest {
     # check if we have content
     if ( !IsStringWithData($Content) ) {
         return $Self->_Error(
-            Summary   => 'Could not read input data',
-            HTTPError => 500,
+            Code    => 'Transport.REST.NoContent',
+            Message => 'Could not read input data',
         );
     }
 
@@ -292,8 +291,8 @@ sub ProviderProcessRequest {
 
     if ( !$ContentDecoded ) {
         return $Self->_Error(
-            Summary   => 'Error while decoding request content.',
-            HTTPError => 500,
+            Code    => 'Transport.REST.InvalidJSON',
+            Message => 'Error while decoding request content.',
         );
     }
 
@@ -317,17 +316,16 @@ sub ProviderProcessRequest {
     }
     else {
         return $Self->_Error(
-            Summary   => 'Unsupported request content structure.',
-            HTTPError => 500,
+            Code    => 'Transport.REST.InvalidRequest',
+            Message => 'Unsupported request content structure.',
         );
     }
 
     # all ok - return data
-    return {
-        Success   => 1,
+    return $Self->_Success(
         Operation => $Operation,
         Data      => $ReturnData,
-    };
+    );
 }
 
 =item ProviderGenerateResponse()
@@ -344,8 +342,9 @@ The HTTP code is set accordingly
 
     my $Result = $TransportObject->ProviderGenerateResponse(
         Success  => 1
-        HTTPCode => ...     # optional
-        Data     => { # data payload for response, optional
+        Code     => ...     # optional
+        Message  => ...     # optional
+        Data     => {       # data payload for response, optional
             ...
         },
     );
@@ -356,12 +355,33 @@ The HTTP code is set accordingly
 
 sub ProviderGenerateResponse {
     my ( $Self, %Param ) = @_;
+    my $MappedCode;
 
-    # do we have a http error message to return
-    if ( IsStringWithData( $Self->{HTTPError} ) && IsStringWithData( $Self->{HTTPMessage} ) ) {
+    # do we have to return an http error code
+    if ( IsStringWithData( $Param{Code} ) ) {
+        # map error code to HTTP code
+        my $Result = $Self->_MapReturnCode(
+            Transport    => 'HTTP::REST',
+            Code         => $Param{Code},
+        );
+
+        if ( IsHashRefWithData($Result) ) {
+            return $Self->_Output(
+                HTTPCode => 500,
+                Content  => $Result->{Message},
+            );            
+        }
+        else {
+            $MappedCode = $Result;
+        }
+    }
+
+    # do we have to return an error message
+    if ( IsStringWithData( $Param{Message} ) ) {
+        # return message directly
         return $Self->_Output(
-            HTTPCode => $Self->{HTTPError},
-            Content  => $Self->{HTTPMessage},
+            HTTPCode => $MappedCode,
+            Content  => $Param{Message},
         );
     }
 
@@ -374,18 +394,15 @@ sub ProviderGenerateResponse {
     }
 
     # check success param
-    my $HTTPCode = $Param{HTTPCode} || 200;
+    my $HTTPCode = $MappedCode || 200;
     if ( !$Param{Success} ) {
 
         # create Fault structure
-        my $FaultString = $Param{ErrorMessage} || 'Unknown';
+        my $FaultString = $Param{Message} || 'Unknown';
         $Param{Data} = {
             faultcode   => 'Server',
             faultstring => $FaultString,
         };
-
-        # override HTTPCode to 500
-        $HTTPCode =  500;
     }
 
     # prepare data
@@ -421,7 +438,7 @@ receive the response and return its data.
 
     $Result = {
         Success      => 1,        # 0 or 1
-        ErrorMessage => '',       # in case of error
+        Message => '',       # in case of error
         Data         => {
             ...
         },
@@ -434,16 +451,16 @@ sub RequesterPerformRequest {
 
     # check transport config
     if ( !IsHashRefWithData( $Self->{TransportConfig} ) ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'REST Transport: Have no TransportConfig',
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.NoTransportConfig',
+            Message => 'REST Transport: Have no TransportConfig',
+        );
     }
     if ( !IsHashRefWithData( $Self->{TransportConfig}->{Config} ) ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'REST Transport: Have no Config',
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.NoTransportConfig',
+            Message => 'REST Transport: Have no Config',
+        );
     }
     my $Config = $Self->{TransportConfig}->{Config};
 
@@ -451,26 +468,26 @@ sub RequesterPerformRequest {
     for my $Needed (qw(Host DefaultCommand)) {
         next NEEDED if IsStringWithData( $Config->{$Needed} );
 
-        return {
-            Success      => 0,
-            ErrorMessage => "REST Transport: Have no $Needed in config",
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.TransportConfigInvalid',
+            Message => "REST Transport: Have no $Needed in config",
+        );
     }
 
     # check data param
     if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'REST Transport: Invalid Data',
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.DataMissing',
+            Message => 'REST Transport: Invalid Data',
+        );
     }
 
     # check operation param
     if ( !IsStringWithData( $Param{Operation} ) ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'REST Transport: Need Operation',
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.DataMissing',
+            Message => 'REST Transport: Need Operation',
+        );
     }
 
     # create header container
@@ -504,16 +521,16 @@ sub RequesterPerformRequest {
 
     if ( !$RestClient ) {
 
-        my $ErrorMessage = "Error while creating REST client from 'REST::Client'.";
+        my $Message = "Error while creating REST client from 'REST::Client'.";
 
         # log to debugger
         $Self->{DebuggerObject}->Error(
-            Summary => $ErrorMessage,
+            Summary => $Message,
         );
-        return {
-            Success      => 0,
-            ErrorMessage => $ErrorMessage,
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.InternalError',
+            Message => $Message,
+        );
     }
 
     # add X509 options if configured
@@ -546,16 +563,16 @@ sub RequesterPerformRequest {
 
     if ( !grep { $_ eq $RestCommand } qw(GET POST PUT PATCH DELETE HEAD OPTIONS CONNECT TRACE) ) {
 
-        my $ErrorMessage = "'$RestCommand' is not a valid REST command.";
+        my $Message = "'$RestCommand' is not a valid REST command.";
 
         # log to debugger
         $Self->{DebuggerObject}->Error(
-            Summary => $ErrorMessage,
+            Summary => $Message,
         );
-        return {
-            Success      => 0,
-            ErrorMessage => $ErrorMessage,
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.InvalidMethod',
+            Message => $Message,
+        );
     }
 
     if (
@@ -566,16 +583,16 @@ sub RequesterPerformRequest {
         )
         )
     {
-        my $ErrorMessage = "REST Transport: Have no Invoker <-> Controller mapping for Invoker '$Param{Operation}'.";
+        my $Message = "REST Transport: Have no Invoker <-> Controller mapping for Invoker '$Param{Operation}'.";
 
         # log to debugger
         $Self->{DebuggerObject}->Error(
-            Summary => $ErrorMessage,
+            Summary => $Message,
         );
-        return {
-            Success      => 0,
-            ErrorMessage => $ErrorMessage,
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.NoInvokerControllerMapping',
+            Message => $Message,
+        );
     }
 
     my @RequestParam;
@@ -709,15 +726,15 @@ sub RequesterPerformRequest {
 
     my $ResponseCode = $RestClient->responseCode();
     my $ResponseError;
-    my $ErrorMessage = "Error while performing REST '$RestCommand' request to Controller '$Controller' on Host '"
+    my $Message = "Error while performing REST '$RestCommand' request to Controller '$Controller' on Host '"
         . $Config->{Host} . "'.";
 
     if ( !IsStringWithData($ResponseCode) ) {
-        $ResponseError = $ErrorMessage;
+        $ResponseError = $Message;
     }
 
     if ( $ResponseCode !~ m{ \A 20 \d \z }xms ) {
-        $ResponseError = $ErrorMessage . " Response code '$ResponseCode'.";
+        $ResponseError = $Message . " Response code '$ResponseCode'.";
     }
 
     if ($ResponseError) {
@@ -726,25 +743,25 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return {
-            Success      => 0,
-            ErrorMessage => $ResponseError,
-        };
+        return $Self->ReturnError(
+            Code    => $ResponseCode,
+            Message => $ResponseError,
+        );
     }
 
     my $ResponseContent = $RestClient->responseContent();
     if ( !IsStringWithData($ResponseContent) ) {
 
-        my $ResponseError = $ErrorMessage . ' No content provided.';
+        my $ResponseError = $Message . ' No content provided.';
 
         # log to debugger
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return {
-            Success      => 0,
-            ErrorMessage => $ResponseError,
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.NoContent',
+            Message => $ResponseError,
+        );
     }
 
     my $SizeExeeded = 0;
@@ -789,24 +806,23 @@ sub RequesterPerformRequest {
     );
 
     if ( !$Result ) {
-        my $ResponseError = $ErrorMessage . ' Error while parsing JSON data.';
+        my $ResponseError = $Message . ' Error while parsing JSON data.';
 
         # log to debugger
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return {
-            Success      => 0,
-            ErrorMessage => $ResponseError,
-        };
+        return $Self->ReturnError(
+            Code    => 'Transport.REST.InvalidJSON',
+            Message => $ResponseError,
+        );
     }
 
     # all OK - return result
-    return {
-        Success     => 1,
+    return $Self->_Success(
         Data        => $Result || undef,
         SizeExeeded => $SizeExeeded,
-    };
+    );
 }
 
 =begin Internal:
@@ -823,9 +839,16 @@ Returns structure to be passed to provider.
     );
 
     $Result = {
-        Success      => 0,
-        ErrorMessage => 'Message', # error message from given summary
+        Success      => 1,
     };
+
+    or 
+
+    $Result = {
+        Success      => 0,
+        Code    => <code>
+        Message => '...'
+    };    
 
 =cut
 
@@ -834,18 +857,18 @@ sub _Output {
 
     # check params
     my $Success = 1;
-    my $ErrorMessage;
+    my $Message;
     if ( defined $Param{HTTPCode} && !IsInteger( $Param{HTTPCode} ) ) {
         $Param{HTTPCode} = 500;
         $Param{Content}  = 'Invalid internal HTTPCode';
         $Success         = 0;
-        $ErrorMessage    = 'Invalid internal HTTPCode';
+        $Message    = 'Invalid internal HTTPCode';
     }
     elsif ( defined $Param{Content} && !IsString( $Param{Content} ) ) {
         $Param{HTTPCode} = 500;
         $Param{Content}  = 'Invalid Content';
         $Success         = 0;
-        $ErrorMessage    = 'Invalid Content';
+        $Message    = 'Invalid Content';
     }
 
     # prepare protocol
@@ -873,7 +896,7 @@ sub _Output {
 
     # log to debugger
     my $DebugLevel;
-    if ( $Param{HTTPCode} eq 200 ) {
+    if ( $Param{HTTPCode} =~ /^2/ ) {
         $DebugLevel = 'debug';
     }
     else {
@@ -900,66 +923,27 @@ sub _Output {
     # reproducible, and not tested in this solution).
     binmode STDOUT, ':utf8';    ## no critic
 
+
+
     # print data to http - '\r' is required according to HTTP RFCs
     my $StatusMessage = HTTP::Status::status_message( $Param{HTTPCode} );
-    print STDOUT "$Protocol $Param{HTTPCode} $StatusMessage\r\n";
+    print STDOUT "Status: $Param{HTTPCode} $StatusMessage\r\n";
     print STDOUT "Content-Type: $ContentType; charset=UTF-8\r\n";
     print STDOUT "Content-Length: $ContentLength\r\n";
     print STDOUT "Connection: $Connection\r\n";
     print STDOUT "\r\n";
     print STDOUT $Param{Content};
 
-    return {
-        Success      => $Success,
-        ErrorMessage => $ErrorMessage,
-    };
-}
-
-=item _Error()
-
-Take error parameters from request processing.
-Error message is written to debugger, written to environment for response.
-Error is generated to be passed to provider/requester.
-
-    my $Result = $TransportObject->_Error(
-        Summary   => 'Message',    # error message
-        HTTPError => 500,          # http error code, optional
-    );
-
-    $Result = {
-        Success      => 0,
-        ErrorMessage => 'Message', # error message from given summary
-    };
-
-=cut
-
-sub _Error {
-    my ( $Self, %Param ) = @_;
-
-    # check needed params
-    if ( !IsString( $Param{Summary} ) ) {
-        return $Self->_Error(
-            Summary   => 'Need Summary!',
-            HTTPError => 500,
+    if ($Success) {
+        return $Self->_Success(
+            Success => $Success,
         );
     }
 
-    # log to debugger
-    $Self->{DebuggerObject}->Error(
-        Summary => $Param{Summary},
+    return $Self->_Error(
+        Code    => $Param{HTTPCode},
+        Message => $Message,
     );
-
-    # remember data for response
-    if ( IsStringWithData( $Param{HTTPError} ) ) {
-        $Self->{HTTPError}   = $Param{HTTPError};
-        $Self->{HTTPMessage} = $Param{Summary};
-    }
-
-    # return to provider/requester
-    return {
-        Success      => 0,
-        ErrorMessage => $Param{Summary},
-    };
 }
 
 1;

@@ -62,10 +62,10 @@ sub new {
     bless( $Self, $Type );
 
     for my $Needed (qw( DebuggerObject)) {
-        $Self->{$Needed} = $Param{$Needed} || return {
-            Success => 0,
-            Summary => "Got no $Needed!",
-        };
+        $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
+            Code    => 'Validator.InternalError',
+            Message => "Got no $Needed!",
+        );
     }
 
     return $Self;
@@ -94,14 +94,14 @@ sub Validate {
 
     # check params
     if ( !$Param{Attribute} ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'Got no Attribute!',
-        }
+        return $Self->_Error(
+            Code    => 'Validator.InternalError',
+            Message => 'Got no Attribute!',
+        );
     }
 
 # TODO
-    return $Result;
+    return $Self->_Success();
 }
 
 1;

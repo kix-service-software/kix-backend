@@ -14,6 +14,10 @@ use warnings;
 use Kernel::Config;
 use Kernel::System::VariableCheck qw(:all);
 
+use base qw(
+    Kernel::API::Common
+);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -46,6 +50,66 @@ sub ProviderCheckAuthorization {
     return {
         Success => 1,
     };    
+}
+
+=item _MapReturnCode()
+
+Take return code from request processing.
+Map the internal return code to transport specific response
+
+    my $MappedCode = $TransportObject->_MapReturnCode(
+        Transport => 'REST'        # the specific transport to map to
+        Code      => 'Code'        # texttual return code
+    );
+
+    $Result = {
+        Code    => ...
+    };
+
+=cut
+
+sub _MapReturnCode {
+    my ( $Self, %Param ) = @_;
+
+    # check needed params
+    if ( !IsString( $Param{Code} ) ) {
+        return $Self->_Error(
+            Code      => 'Transport.InternalError',
+            Message   => 'Need Code!',
+        );
+    }
+    if ( !IsString( $Param{Transport} ) ) {
+        return $Self->_Error(
+            Code      => 'Transport.InternalError',
+            Message   => 'Need Transport!',
+        );
+    }
+
+    # get mapping
+    my $Mapping = $Kernel::OM->Get('Kernel::Config')->Get('API::Transport::ReturnCodeMapping');
+    if ( !IsHashRefWithData($Mapping) ) {
+        return $Self->_Error(
+            Code      => 'Transport.InternalError',
+            Message   => 'No ReturnCodeMapping config!',
+        );        
+    }
+
+    if ( !IsHashRefWithData($Mapping->{$Param{Transport}}) ) {
+        # we don't have a mapping for the given transport, so just return the given code without mapping
+        return $Param{Code};
+    }
+    my $TransportMapping = $Mapping->{$Param{Transport}};
+
+    # map code
+    my $MappedCode = $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'};
+
+    # log to debugger
+    $Self->{DebuggerObject}->Error(
+        Summary => $MappedCode.': '.($Param{Message} || ''),
+    );
+
+    # return
+    return $MappedCode;
 }
 
 1;

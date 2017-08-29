@@ -54,12 +54,12 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
+    for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -86,7 +86,7 @@ one or more ticket entries in one call.
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Message => '',                               # In case of an error
         Data         => {
             User => {
                 ...
@@ -105,9 +105,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -118,13 +118,13 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserGet.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    my $ErrorMessage = '';
+    my $Message = '';
 
     # get the user data
     my %UserData;
@@ -139,23 +139,23 @@ sub Run {
         );        
     }
     else {
-        $ErrorMessage = 'Unknown UserType $Param{Data}->{Authorization}->{UserType} '
+        $Message = 'Unknown UserType $Param{Data}->{Authorization}->{UserType} '
             . ' in Kernel::API::Operation::V1::Own::UserGet::Run()';
 
-        return $Self->ReturnError(
-            ErrorCode    => 'UserGet.NotValidUserType',
-            ErrorMessage => "UserGet: $ErrorMessage",
+        return $Self->_Error(
+            Code    => 'UserGet.InvalidUserType',
+            Message => "UserGet: $Message",
         );        
     }
 
     if ( !IsHashRefWithData( \%UserData ) ) {
 
-        $ErrorMessage = 'Could not get user data'
+        $Message = 'Could not get user data'
             . ' in Kernel::API::Operation::V1::Own::UserGet::Run()';
 
-        return $Self->ReturnError(
-            ErrorCode    => 'UserGet.NotValidUserID',
-            ErrorMessage => "UserGet: $ErrorMessage",
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "UserGet: $Message",
         );
     }
 
@@ -173,7 +173,7 @@ sub Run {
         }
     }
 
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
         User => \%UserData,
     );    
 }

@@ -302,6 +302,7 @@ passes data to DebugLog with debug level 'error'
 then returns data structure to be used as return value in calling function
 
     $DebuggerObject->Error(
+        Code    => 'some internal return code'  # optional
         Summary => 'Short summary, one line',
         Data    => $Data, # optional, $Data can be a string or a scalar reference
     );
@@ -317,8 +318,9 @@ sub Error {
     );
 
     return {
-        Success      => 0,
-        ErrorMessage => $Param{Summary},
+        Success => 0,
+        Code    => $Param{Code},
+        Message => $Param{Summary},
     };
 }
 

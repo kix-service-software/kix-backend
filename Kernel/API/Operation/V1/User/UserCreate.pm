@@ -52,16 +52,14 @@ sub new {
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
-
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserCreate');
 
     return $Self;
 }
@@ -90,12 +88,12 @@ perform UserCreate Operation. This will return the created UserLogin.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        ErrorMessage    => '',                      # in case of error
+        Message    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             UserID  => '',                          # UserID 
             Error => {                              # should not return errors
-                    ErrorCode    => 'User.Create.ErrorCode'
-                    ErrorMessage => 'Error Description'
+                    Code    => 'User.Create.Code'
+                    Message => 'Error Description'
             },
         },
     };
@@ -111,9 +109,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -142,9 +140,9 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserCreate.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
@@ -168,9 +166,9 @@ sub Run {
         User => $User->{UserLogin},
     );
     if ( %UserData ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserCreate.LoginExists',
-            ErrorMessage => "Can not create user. User with same login '$User->{UserLogin}' already exists.",
+        return $Self->_Error(
+            Code    => 'UserCreate.LoginExists',
+            Message => "Can not create user. User with same login '$User->{UserLogin}' already exists.",
         );
     }
 
@@ -179,9 +177,9 @@ sub Run {
         Search => $User->{UserEmail},
     );
     if ( %UserList ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserCreate.EmailExists',
-            ErrorMessage => 'Can not create user. User with same email address already exists.',
+        return $Self->_Error(
+            Code    => 'UserCreate.EmailExists',
+            Message => 'Can not create user. User with same email address already exists.',
         );
     }
     
@@ -192,13 +190,14 @@ sub Run {
         ValidID          => 1,
     );    
     if ( !$UserID ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserCreate.UnknownError',
-            ErrorMessage => 'Could not create user, please contact the system administrator',
+        return $Self->_Error(
+            Code    => 'UserCreate.UnableToCreate',
+            Message => 'Could not create user, please contact the system administrator',
         );
     }
     
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
+        Code   => 'Object.Created',
         UserID => $UserID,
     );    
 }

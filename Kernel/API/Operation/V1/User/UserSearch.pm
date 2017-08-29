@@ -49,10 +49,10 @@ sub new {
     # check needed objects
     for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -78,7 +78,7 @@ perform UserSearch Operation. This will return a User ID list.
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Message => '',                               # In case of an error
         Data         => {
             UserID => [ 1, 2, 3, 4 ],
         },
@@ -94,30 +94,22 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
-        Parameters => {
-            'Limit' => {
-                Default => 500,
-            },
-            'Order' => {
-                Default => 'Up'    
-            }
-        }
     );
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserSearch.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
@@ -145,34 +137,17 @@ sub Run {
             return $UserGetResult;
         }
 
-        my @UserDataList = IsArrayRefWithData($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
+        my @ResultList = IsArrayRefWithData($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
         
-        # filter list
-        my @ResultList;
-        foreach my $User ( @UserDataList ) {
-            if ( $Param{Data}->{ChangedAfter} ) {
-                # filter change time
-                my $ChangeTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                    String => $User->{ChangeTime},
-                );
-                next if $ChangeTimeUnix < $Param{Data}->{ChangedAfterUnixtime};
-            }
-            
-            # limit list
-            last if scalar(@ResultList) > $Param{Data}->{Limit};
-            
-            push(@ResultList, $User);                                
-        }  
-
         if ( IsArrayRefWithData(\@ResultList) ) {
-            return $Self->ReturnSuccess(
+            return $Self->_Success(
                 User => \@ResultList,
             )
         }
     }
 
     # return result
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
         User => {},
     );
 }

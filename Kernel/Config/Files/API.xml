@@ -182,6 +182,58 @@
             <String Regex="">200</String>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
+        <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code</Description>
+        <Setting>
+            <Hash>
+                <Item Key="DEFAULT">200</Item>
+                <Item Key="Authorization.NoHeader">403</Item>
+                <Item Key="Authorization.NoToken">403</Item>
+                <Item Key="BadRequest">400</Item>
+                <Item Key="ExecOperation.MissingParameter">500</Item>
+                <Item Key="ExecOperation.OperationNotFound">500</Item>
+                <Item Key="Forbidden">403</Item>
+                <Item Key="Mapping.InternalError">500</Item>
+                <Item Key="Mapping.InvalidData">400</Item>
+                <Item Key="Object.Created">201</Item>
+                <Item Key="Object.NotFound">404</Item>
+                <Item Key="Object.UnableToCreate">400</Item>
+                <Item Key="Object.UnableToUpdate">400</Item>
+                <Item Key="Operation.InternalError">500</Item>
+                <Item Key="Operation.PrepareDataError">400</Item>
+                <Item Key="PrepareData.InvalidFilter">400</Item>
+                <Item Key="Provider.InternalError">500</Item>
+                <Item Key="SessionCreate.AuthFail">401</Item>
+                <Item Key="SessionDelete.DeleteError">404</Item>
+                <Item Key="SessionGet.TokenError">404</Item>
+                <Item Key="OK">200</Item>
+                <Item Key="Transport.InternalError">500</Item>
+                <Item Key="Transport.OperationNotFound">501</Item>
+                <Item Key="Transport.REST.DataMissing">400</Item>
+                <Item Key="Transport.REST.InternalError">500</Item>
+                <Item Key="Transport.REST.InvalidJSON">400</Item>
+                <Item Key="Transport.REST.InvalidMethod">400</Item>
+                <Item Key="Transport.REST.InvalidRequest">400</Item>
+                <Item Key="Transport.REST.NoContent">400</Item>
+                <Item Key="Transport.REST.NoInvokerControllerMapping">500</Item>
+                <Item Key="Transport.REST.NoRouteOperationMapping">500</Item>
+                <Item Key="Transport.REST.NoTransportConfig">500</Item>
+                <Item Key="Transport.REST.OperationNotFound">501</Item>
+                <Item Key="Transport.REST.RequestTooBig">413</Item>
+                <Item Key="Transport.REST.TransportConfigInvalid">500</Item>
+                <Item Key="Unauthorized">401</Item>
+                <Item Key="UserCreate.EmailExists">409</Item>
+                <Item Key="UserCreate.LoginExists">409</Item>
+                <Item Key="UserGet.NoUserData">400</Item>
+                <Item Key="UserGet.InvalidUserID">400</Item>
+                <Item Key="UserGet.InalidUserType">400</Item>
+                <Item Key="UserUpdate.LoginExists">409</Item>
+                <Item Key="Validator.InternalError">500</Item>
+                <Item Key="Webservice.InvalidConfiguration">500</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     
 </kix_config>
     

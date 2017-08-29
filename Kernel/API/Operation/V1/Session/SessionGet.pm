@@ -46,16 +46,12 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (
-        qw(DebuggerObject WebserviceID)
-        )
-    {
+    for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -82,7 +78,7 @@ remove token (invalidate)
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Message => '',                               # In case of an error
         Data         => {
             Session => {
                 ...
@@ -102,9 +98,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -120,9 +116,9 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionGet.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
@@ -132,13 +128,13 @@ sub Run {
 
     # check result
     if ( !$Result ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionGet.TokenError',
-            ErrorMessage => 'SessionGet: unable to extract token!',
+        return $Self->_Error(
+            Code    => 'SessionGet.TokenError',
+            Message => 'SessionGet: unable to extract token!',
         );
     }
 
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
         Session => $Payload,
     );
 }

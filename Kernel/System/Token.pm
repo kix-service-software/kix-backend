@@ -119,12 +119,12 @@ sub ValidateToken {
     # remote ip check
     if (
         $ConfigObject->Get('TokenCheckRemoteIP') && 
-        $Payload->{UserRemoteAddr} ne $RemoteAddr
+        $Payload->{RemoteIP} ne $RemoteAddr
         )
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
-            Message  => "RemoteIP ($Payload->{UserRemoteAddr}) of request is "
+            Message  => "RemoteIP ($Payload->{RemoteIP}) of request is "
                 . "different from registered IP ($RemoteAddr). Invalidating token! "
                 . "Disable config 'TokenCheckRemoteIP' if you don't want this!",
         );

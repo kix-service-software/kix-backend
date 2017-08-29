@@ -18,6 +18,10 @@ use Kernel::System::VariableCheck qw(IsStringWithData);
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
 
+use base qw(
+    Kernel::API::Common
+);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -73,10 +77,10 @@ sub new {
     for my $Needed (qw(DebuggerObject Operation OperationType WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -85,8 +89,9 @@ sub new {
     # check operation
     if ( !IsStringWithData( $Param{OperationType} ) ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got no Operation with content!',
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => 'Got no Operation with content!',
         );
     }
 
@@ -94,8 +99,9 @@ sub new {
     my $GenericModule = 'Kernel::API::Operation::' . $Param{OperationType};
     if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => "Can't load operation backend module $GenericModule!"
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "Can't load operation backend module $GenericModule!"
         );
     }
     $Self->{BackendObject} = $GenericModule->new(
