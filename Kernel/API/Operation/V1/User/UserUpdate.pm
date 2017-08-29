@@ -176,25 +176,30 @@ sub Run {
     }
 
     # check if UserLogin already exists
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        Search => $User->{UserLogin},
-    );
-    if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
-        return $Self->_Error(
-            Code    => 'UserUpdate.LoginExists',
-            Message => 'Can not update user. Another user with same login already exists.',
+    if ( IsStringWithData($User->{UserLogin}) ) {
+        my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+            Search => $User->{UserLogin},
         );
+        if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+            return $Self->_Error(
+                Code    => 'UserUpdate.LoginExists',
+                Message => 'Can not update user. Another user with same login already exists.',
+            );
+        }
     }
 
+
     # check UserEmail exists
-    %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        PostMasterSearch => $User->{UserEmail},
-    );
-    if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
-        return $Self->_Error(
-            Code    => 'UserUpdate.EmailExists',
-            Message => 'Can not update user. Another user with same email address already exists.',
+    if ( IsStringWithData($User->{UserEmail}) ) {
+        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+            PostMasterSearch => $User->{UserEmail},
         );
+        if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+            return $Self->_Error(
+                Code    => 'UserUpdate.EmailExists',
+                Message => 'Can not update user. Another user with same email address already exists.',
+            );
+        }
     }
     
     # update User
