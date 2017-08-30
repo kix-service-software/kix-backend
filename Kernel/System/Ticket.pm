@@ -5858,7 +5858,9 @@ sub HistoryTicketGet {
 
 =item HistoryTypeLookup()
 
-returns the id of the requested history type.
+returns the id of the requested history type or the name of the type if id is given.
+
+    my $Type = $TicketObject->HistoryTypeLookup( TypeID => 123 );
 
     my $ID = $TicketObject->HistoryTypeLookup( Type => 'Move' );
 
@@ -5866,18 +5868,19 @@ returns the id of the requested history type.
 
 sub HistoryTypeLookup {
     my ( $Self, %Param ) = @_;
+    my $Result;
 
     # check needed stuff
-    if ( !$Param{Type} ) {
+    if ( !$Param{Type} && !$Param{TypeID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need Type!'
+            Message  => 'Need TypeID or Type!'
         );
         return;
     }
 
     # check if we ask the same request?
-    my $CacheKey = 'Ticket::History::HistoryTypeLookup::' . $Param{Type};
+    my $CacheKey = 'Ticket::History::HistoryTypeLookup::' . ($Param{Type} || $Param{TypeID});
     my $Cached   = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -5890,24 +5893,45 @@ sub HistoryTypeLookup {
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # db query
-    return if !$DBObject->Prepare(
-        SQL  => 'SELECT id FROM ticket_history_type WHERE name = ?',
-        Bind => [ \$Param{Type} ],
-    );
-
-    my $HistoryTypeID;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $HistoryTypeID = $Row[0];
-    }
-
-    # check if data exists
-    if ( !$HistoryTypeID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "No TypeID for $Param{Type} found!",
+    if ( $Param{Type} ) {
+        # db query
+        return if !$DBObject->Prepare(
+            SQL  => 'SELECT id FROM ticket_history_type WHERE name = ?',
+            Bind => [ \$Param{Type} ],
         );
-        return;
+
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $Result = $Row[0];
+        }
+
+        # check if data exists
+        if ( !$Result ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "No TypeID for $Param{Type} found!",
+            );
+            return;
+        }
+    }
+    elsif ( $Param{TypeID} ) {
+        # db query
+        return if !$DBObject->Prepare(
+            SQL  => 'SELECT name FROM ticket_history_type WHERE id = ?',
+            Bind => [ \$Param{TypeID} ],
+        );
+
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $Result = $Row[0];
+        }
+
+        # check if data exists
+        if ( !$Result ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "No Type for $Param{TypeID} found!",
+            );
+            return;
+        }
     }
 
     # set cache
@@ -5915,12 +5939,12 @@ sub HistoryTypeLookup {
         Type           => $Self->{CacheType},
         TTL            => $Self->{CacheTTL},
         Key            => $CacheKey,
-        Value          => $HistoryTypeID,
+        Value          => $Result,
         CacheInMemory  => 1,
         CacheInBackend => 0,
     );
 
-    return $HistoryTypeID;
+    return $Result;
 }
 
 =item HistoryAdd()

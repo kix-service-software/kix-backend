@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::QueueValidator;
+package Kernel::API::Validator::SLAValidator;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::QueueValidator - validator module
+Kernel::API::Validator::SLAValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -45,11 +45,11 @@ create an object.
             TestMode        => 0,           # optional, in testing mode the data will not be written to the DB
             # ...
         },
-        WebserviceID      => 12,
+        WebServiceID      => 12,
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::QueueValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::SLAValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -101,20 +101,20 @@ sub Validate {
     }
 
     my $Found;
-    if ( $Param{Attribute} eq 'QueueID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            QueueID => $Param{Data}->{$Param{Attribute}},
+    if ( $Param{Attribute} eq 'SLAID' ) {
+        $Found = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+            SLAID => $Param{Data}->{$Param{Attribute}},
         );        
     }
-    elsif ( $Param{Attribute} eq 'Queue' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            Queue => $Param{Data}->{$Param{Attribute}},
+    elsif ( $Param{Attribute} eq 'SLA' ) {
+        $Found = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+            Name => $Param{Data}->{$Param{Attribute}},
         );        
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'QueueValidator: cannot validate attribute $Param{Attribute}!',
+            Message => 'SLAValidator: cannot validate attribute $Param{Attribute}!',
         );
     }
 

@@ -6,10 +6,11 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::QueueValidator;
+package Kernel::API::Validator::EmailAddressValidator;
 
 use strict;
 use warnings;
+use Mail::Address;
 
 use base qw(
     Kernel::API::Validator::Common
@@ -22,7 +23,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::QueueValidator - validator module
+Kernel::API::Validator::EmailAddressValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -49,7 +50,7 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::QueueValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::EmailAddressValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -100,25 +101,24 @@ sub Validate {
         );
     }
 
-    my $Found;
-    if ( $Param{Attribute} eq 'QueueID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            QueueID => $Param{Data}->{$Param{Attribute}},
-        );        
-    }
-    elsif ( $Param{Attribute} eq 'Queue' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            Queue => $Param{Data}->{$Param{Attribute}},
-        );        
+    my $Valid;
+    if ( $Param{Attribute} =~ /^(From|Cc|Bcc|To)$/g ) {
+        $Found = 1;
+        for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
+            if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
+                $Found = 0;
+                last;
+            }
+        }
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'QueueValidator: cannot validate attribute $Param{Attribute}!',
+            Message => 'EmailAddressValidator: cannot validate attribute $Param{Attribute}!',
         );
     }
 
-    if ( !$Found ) {
+    if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => 'Validation of attribute $Param{Attribute} failed!',

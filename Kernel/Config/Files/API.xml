@@ -230,6 +230,8 @@
                 <Item Key="UserGet.InalidUserType">400</Item>
                 <Item Key="UserUpdate.LoginExists">409</Item>
                 <Item Key="Validator.InternalError">500</Item>
+                <Item Key="Validator.UnknownAttribute">500</Item>
+                <Item Key="Validator.Failed">400</Item>
                 <Item Key="Webservice.InvalidConfiguration">500</Item>
             </Hash>
         </Setting>

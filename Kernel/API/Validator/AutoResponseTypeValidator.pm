@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::QueueValidator;
+package Kernel::API::Validator::AutoResponseTypeValidator;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::QueueValidator - validator module
+Kernel::API::Validator::AutoResponseTypeValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::QueueValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::AutoResponseTypeValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -100,21 +100,20 @@ sub Validate {
         );
     }
 
+    my %AutoResponseTypeList = $Kernel::OM->Get('Kernel::System::AutoResponse')->AutoResponseTypeList();
+    my %AutoResponseTypeListReverse = reverse %AutoResponseTypeList;
+
     my $Found;
-    if ( $Param{Attribute} eq 'QueueID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            QueueID => $Param{Data}->{$Param{Attribute}},
-        );        
+    if ( $Param{Attribute} eq 'AutoResponseTypeID' ) {  
+        $Found = $AutoResponseTypeList{$Param{Data}->{$Param{Attribute}}};
     }
-    elsif ( $Param{Attribute} eq 'Queue' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            Queue => $Param{Data}->{$Param{Attribute}},
-        );        
+    elsif ( $Param{Attribute} eq 'AutoResponseType' ) {  
+        $Found = $AutoResponseTypeListReverse{$Param{Data}->{$Param{Attribute}}};
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'QueueValidator: cannot validate attribute $Param{Attribute}!',
+            Message => 'AutoResponseTypeValidator: cannot validate attribute $Param{Attribute}!',
         );
     }
 
