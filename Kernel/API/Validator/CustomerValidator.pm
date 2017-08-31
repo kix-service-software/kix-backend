@@ -108,8 +108,9 @@ sub Validate {
         );
         if ( !$Found ) {
             # customer contact is not in database, check if email is valid
-            $Found = 1;
-            for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
+            $Found = 0;            
+            for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {                
+                $Found = 1;
                 if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                     $Found = 0;
                     last;
@@ -120,14 +121,14 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'CustomerValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "CustomerValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

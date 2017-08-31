@@ -103,10 +103,11 @@ sub Validate {
 
     my $Valid;
     if ( $Param{Attribute} =~ /^(From|Cc|Bcc|To)$/g ) {
-        $Found = 1;
+        $Valid = 0;
         for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
+            $Valid = 1;
             if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
-                $Found = 0;
+                $Valid = 0;
                 last;
             }
         }
@@ -114,14 +115,14 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'EmailAddressValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "EmailAddressValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

@@ -113,14 +113,14 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'AutoResponseTypeValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "AutoResponseTypeValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

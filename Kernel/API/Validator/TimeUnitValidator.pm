@@ -102,19 +102,19 @@ sub Validate {
 
     my $Valid;
     if ( $Param{Attribute} eq 'TimeUnit' ) {
-        $Valid = $Param{Data}->{$Param{Attribute}} !~ m{\A \d+([.,]\d+)? \z}xms;
+        $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A \d+([.,]\d+)? \z}xms;
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'TimeUnitValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "TimeUnitValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

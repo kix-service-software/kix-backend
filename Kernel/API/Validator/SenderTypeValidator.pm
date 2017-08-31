@@ -102,26 +102,26 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'SenderTypeID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->SenderTypeLookup(
+        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
             SenderTypeID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'SenderType' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->SenderTypeLookup(
+        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
             SenderType => $Param{Data}->{$Param{Attribute}},
         );      
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'SenderTypeValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "SenderTypeValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

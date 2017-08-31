@@ -107,21 +107,21 @@ sub Validate {
         );        
     }
     elsif ( $Param{Attribute} eq 'Lock' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Lock')->LookLookup(
+        $Found = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
             Lock => $Param{Data}->{$Param{Attribute}},
         );        
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'LockValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "LockValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

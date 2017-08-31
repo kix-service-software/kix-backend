@@ -103,19 +103,20 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'Charset' ) {
-        $Found = Encode->find_encoding($Param{Data}->{$Param{Attribute}});
+        my %EncodingList = map { $_ => 1 } Encode->encodings();
+        $Found = $EncodingList{$Param{Data}->{$Param{Attribute}}};
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'CharsetValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "CharsetValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

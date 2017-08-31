@@ -107,14 +107,14 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'MimeTypeValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "MimeTypeValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 

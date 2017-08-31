@@ -106,7 +106,7 @@ sub Validate {
             UserID => $Param{Data}->{$Param{Attribute}},
         );        
     }
-    if ( $Param{Attribute} =~ /^(Owner|Responsible)$/g ) {
+    elsif ( $Param{Attribute} =~ /^(Owner|Responsible)$/g ) {
         $Found = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
             UserLogin => $Param{Data}->{$Param{Attribute}},
         );        
@@ -114,14 +114,14 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => 'UserValidator: cannot validate attribute $Param{Attribute}!',
+            Message => "UserValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => 'Validation of attribute $Param{Attribute} failed!',
+            Message => "Validation of attribute $Param{Attribute} failed!",
         );        
     }
 
