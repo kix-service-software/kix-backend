@@ -7,6 +7,7 @@
             <Hash>
                 <Item Key="Module">ArticleTypeValidator</Item>
                 <Item Key="Validates">ArticleType,ArticleTypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -17,6 +18,7 @@
             <Hash>
                 <Item Key="Module">AutoResponseTypeValidator</Item>
                 <Item Key="Validates">AutoResponseType</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -27,6 +29,7 @@
             <Hash>
                 <Item Key="Module">CharsetValidator</Item>
                 <Item Key="Validates">Charset</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -37,6 +40,7 @@
             <Hash>
                 <Item Key="Module">CustomerValidator</Item>
                 <Item Key="Validates">CustomerContact</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -47,6 +51,7 @@
             <Hash>
                 <Item Key="Module">EmailAddressValidator</Item>
                 <Item Key="Validates">From,Cc,Bcc,To</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -57,6 +62,7 @@
             <Hash>
                 <Item Key="Module">HistoryTypeValidator</Item>
                 <Item Key="Validates">HistoryType,HistoryTypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -67,6 +73,7 @@
             <Hash>
                 <Item Key="Module">LockValidator</Item>
                 <Item Key="Validates">Lock,LockID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -77,6 +84,7 @@
             <Hash>
                 <Item Key="Module">MimeTypeValidator</Item>
                 <Item Key="Validates">MimeType</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -87,6 +95,7 @@
             <Hash>
                 <Item Key="Module">PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -97,6 +106,7 @@
             <Hash>
                 <Item Key="Module">QueueValidator</Item>
                 <Item Key="Validates">Queue,QueueID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -107,6 +117,7 @@
             <Hash>
                 <Item Key="Module">ServiceValidator</Item>
                 <Item Key="Validates">Service,ServiceID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -117,6 +128,7 @@
             <Hash>
                 <Item Key="Module">SenderTypeValidator</Item>
                 <Item Key="Validates">SenderType,SenderTypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -127,6 +139,7 @@
             <Hash>
                 <Item Key="Module">SLAValidator</Item>
                 <Item Key="Validates">SLA,SLAID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -137,6 +150,7 @@
             <Hash>
                 <Item Key="Module">StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -147,6 +161,7 @@
             <Hash>
                 <Item Key="Module">TimeUnitValidator</Item>
                 <Item Key="Validates">TimeUnit</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -157,6 +172,7 @@
             <Hash>
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
@@ -167,6 +183,7 @@
             <Hash>
                 <Item Key="Module">UserValidator</Item>
                 <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
