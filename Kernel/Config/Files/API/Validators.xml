@@ -184,7 +184,7 @@
                 <Item Key="Module">UserValidator</Item>
                 <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">UserGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>

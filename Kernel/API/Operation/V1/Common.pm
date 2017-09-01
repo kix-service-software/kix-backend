@@ -15,6 +15,7 @@ use warnings;
 use Hash::Flatten;
 use Data::Sorting qw(:arrays);
 
+use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -408,6 +409,31 @@ sub ExecOperation {
             Message => "$Operation not found!",
         );
     }
+
+    # Validate given data.
+    my $ValidatorObject = Kernel::API::Validator->new(
+        DebuggerObject => $Self->{DebuggerObject},
+        Operation      => $Param{Operation},
+    );
+
+    # if validator init failed, bail out
+    if ( ref $ValidatorObject ne 'Kernel::API::Validator' ) {
+        return $Self->_Error(
+            %{$ValidatorObject},
+        );
+    }
+
+    my $FunctionResult = $ValidatorObject->Validate(
+        Data => $Param{Data},
+    );
+
+    if ( !$FunctionResult->{Success} ) {
+
+        return $Self->_Error(
+            %{$FunctionResult},
+        );
+    }
+    
     my $OperationObject = $Operation->new( %{$Self} );
 
     return $OperationObject->Run(
