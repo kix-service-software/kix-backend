@@ -4,12 +4,13 @@
 /sessions                                                           |   POST            | V1::Session::SessionCreate                                        | NoAuthorizationNeeded: 1
 /sessions/:Token                                                    |   GET             | V1::Session::SessionGet
 /sessions/:Token                                                    |   DELETE          | V1::Session::SessionDelete
+/session                                                            |   GET             | V1::Own::SessionGet
 /users                                                              |   GET             | V1::User::UserSearch
 /users                                                              |   POST            | V1::User::UserCreate
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
-/tickettypes/:TypeID                                          |   GET             | V1::TicketType::TicketTypeGet
+/tickettypes/:TypeID                                                |   GET             | V1::TicketType::TicketTypeGet
 /tickettypes                                                        |   GET             | V1::TicketType::TicketTypeSearch
 /tickettypes                                                        |   POST            | V1::TicketType::TicketTypeCreate
-/tickettypes/:TypeID                                          |   PATCH           | V1::TicketType::TicketTypeUpdate
-/tickettypes/:TypeID                                          |   DELETE          | V1::TicketType::TicketTypeDelete
+/tickettypes/:TypeID                                                |   PATCH           | V1::TicketType::TicketTypeUpdate
+/tickettypes/:TypeID                                                |   DELETE          | V1::TicketType::TicketTypeDelete
