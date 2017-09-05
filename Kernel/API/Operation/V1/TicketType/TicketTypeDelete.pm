@@ -68,7 +68,7 @@ sub new {
 
 =item Run()
 
-perform TicketTypeDelete Operation. This will return the deleted TicketTypeID.
+perform TicketTypeDelete Operation. This will return the deleted TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -77,21 +77,15 @@ perform TicketTypeDelete Operation. This will return the deleted TicketTypeID.
             },
 
 			TicketTypeDelete {
-        		TicketTypeID    => '...',
-        		ValidID => 1,
+        		TypeID  => '...',
         		UserID  => 123,
         	},
         },		
     };
 
     $Result = {
-        Success         => 1,                       # 0 or 1
+        Success    => 1,                       # 0 or 1
         Message    => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            TicketTypeID  => '',                          # TicketTypeID 
-            Error => {                              # should not return errors
-                    Code    => 'TicketTypeDelete.Delete.ErrorCode'
-                    Message => 'Error Description'
             },
         },
     };
@@ -116,7 +110,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TicketTypeID' => {
+            'TypeID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -136,24 +130,12 @@ sub Run {
   
     # start type loop
     TYPE:    
-    foreach my $TicketTypeID ( @{$Param{Data}->{TicketTypeID}} ) {
-           	
-	    # check if tickettype exists
-	    my $TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
-	        TypeID => $TicketTypeID,
-	    );
-
-	    if ( !$TicketTypeData ) {
-	        next $Self->_Error(
-	            Code    => 'TicketTypeDelete.TicketTypeNotExists',
-	            Message => 'Can not delete TicketType. TicketType not exists.',
-	        );
-	    }
+    foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 	           
 	    my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-	        Result => 'COUNT',
-	        TypeIDs => [$TicketTypeID],
-	        UserID => $Param{Data}->{Authorization}->{UserID},
+	        Result  => 'COUNT',
+	        TypeIDs => [$TypeID],
+	        UserID  => $Param{Data}->{Authorization}->{UserID},
 	    );
      
 	    if ( $ResultTicketSearch ) {
@@ -164,8 +146,7 @@ sub Run {
 	    }
 	    
 	    my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
-	        TicketTypeID  => $TicketTypeID,
-	        ValidID => 1,
+	        TypeID  => $TypeID,
 	        UserID  => $Param{Data}->{Authorization}->{UserID},
 	    );
 
@@ -175,17 +156,7 @@ sub Run {
 	            Message => 'Could not delete TicketType, please contact the system administrator',
 	        );
 	    }
-	    else {
-	        push(@TicketTypeList, $TicketTypeID);	    	
-	    }
-    }
-    if ( scalar(@TicketTypeList) == 1 ) {
-        return $Self->_Success(
-            TicketType => $TicketTypeList[0],
-        );    
     }
 
-    return $Self->_Success(
-        TicketType => \@TicketTypeList,
-    );
+    return $Self->_Success();
 }

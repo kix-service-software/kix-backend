@@ -489,7 +489,7 @@ sub TicketTypeDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(TicketTypeID ValidID UserID)) {
+    for (qw(TypeID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -503,7 +503,7 @@ sub TicketTypeDelete {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM ticket_type WHERE id = ?',
-        Bind => [ \$Param{TicketTypeID} ],
+        Bind => [ \$Param{TypeID} ],
     );
 
     return 1;

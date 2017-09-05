@@ -79,7 +79,7 @@ one or more ticket entries in one call.
             Authorization => {
                 ...
             },
-            TicketTypeID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            TypeID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -119,7 +119,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TicketTypeID' => {
+            'TypeID' => {
                 Type     => 'ARRAY',
                 Required => 1
             }                
@@ -139,11 +139,11 @@ sub Run {
     
     # start type loop
     TYPE:    
-    foreach my $TicketTypeID ( @{$Param{Data}->{TicketTypeID}} ) {
+    foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
         # get the TicketType data
-        my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
-            ID => $TicketTypeID,
+        my %TypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
+            ID => $ypeID,
         );
 
         if ( !IsHashRefWithData( \%TicketTypeData ) ) {
@@ -152,7 +152,7 @@ sub Run {
                 . ' in Kernel::API::Operation::V1::TicketType::TicketTypeGet::Run()';
 
             return $Self->_Error(
-                Code    => 'TicketTypeGet.InvalidTicketTypeID',
+                Code    => 'TicketTypeGet.InvalidTypeID',
                 Message => "TicketTypeGet: $Message",
             );
         }

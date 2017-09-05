@@ -68,7 +68,7 @@ sub new {
 
 =item Run()
 
-perform TicketTypeUpdate Operation. This will return the updated TicketTypeID.
+perform TicketTypeUpdate Operation. This will return the updated TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -85,11 +85,11 @@ perform TicketTypeUpdate Operation. This will return the updated TicketTypeID.
     
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Message    => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            TicketTypeID  => '',                    # TicketTypeID 
-            Error => {                              # should not return errors
+        Success     => 1,                       # 0 or 1
+        Message     => '',                      # in case of error
+        Data        => {                        # result data payload after Operation
+            TypeID  => '',                      # TypeID 
+            Error   => {                        # should not return errors
                     Code    => 'TicketType.Update.ErrorCode'
                     Message => 'Error Description'
             },
@@ -116,10 +116,10 @@ sub Run {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketTypeID' => {
-                Type     => 'HASH',
+        Data         => $Param{Data},
+        Parameters   => {
+            'TypeID' => {
+                Type => 'HASH',
                 Required => 1
             },
         }
@@ -133,22 +133,22 @@ sub Run {
         );
     }
    
-    my $TicketTypeID;
+    my $TypeID;
     
     # check if tickettype exists
     my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
-        ID => $Param{Data}->{TicketTypeID},
+        ID => $Param{Data}->{TypeID},
     );
     
     if ( !%TicketTypeData ) {
         return $Self->_Error(
             Code    => 'TicketTypeUpdate.LoginExists',
-            Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{TicketTypeID}' not exists.",
+            Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{TypeID}' not exists.",
         );
     }
 
     my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeUpdate(
-        ID      => $Param{Data}->{TicketTypeID},
+        ID      => $Param{Data}->{TypeID},
         Name    => $Param{Data}->{Name},
         ValidID => 1,
         UserID  => $Param{Data}->{Authorization}->{UserID},
@@ -162,6 +162,6 @@ sub Run {
     }
     
     return $Self->_Success(
-        TicketTypeID => $TicketTypeData{ID},
+        TypeID => $TicketTypeData{ID},
     );    
 }

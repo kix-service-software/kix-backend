@@ -74,15 +74,15 @@ perform TicketTypeSearch Operation. This will return a TicketType ID list.
             },
             ChangedAfter => '2006-01-09 00:00:01',                        # (optional)            
             Order        => 'Down|Up',                                    # (optional) Default: Up                       
-            Limit        => 122,                                          # (optional) Default: 500
+            Limit        => '...',                                        # (optional) Default: 500
         }
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
+        Success => 1,                                # 0 or 1
         Message => '',                               # In case of an error
-        Data         => {
-            TicketTypeID => [ 1, 2, 3, 4 ],
+        Data    => {
+            TypeID => [ 1, 2, 3, 4 ],
         },
     };
 
@@ -105,6 +105,14 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+        Parameters => {
+            'Limit' => {
+                Default => 500,
+            },
+            'Order' => {
+                Default => 'Up'    
+            }
+        }        
     );
 
     # check result
@@ -124,7 +132,7 @@ sub Run {
         my $TicketTypeGetResult = $Self->ExecOperation(
             Operation => 'V1::TicketType::TicketTypeGet',
             Data      => {
-                TicketTypeID => join(',', sort keys %TicketTypeList),
+                TypeID => join(',', sort keys %TicketTypeList),
             }
         );
  
@@ -138,7 +146,7 @@ sub Run {
         my @ResultList;
         foreach my $TicketType ( @TicketTypeDataList ) {
             # limit list
-            last if scalar(@ResultList) > 50;
+            last if scalar(@ResultList) > $Param{Data}->{Limit};
             
             push(@ResultList, $TicketType);                                
         }  

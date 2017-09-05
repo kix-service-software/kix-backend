@@ -66,7 +66,7 @@ sub new {
 
 =item Run()
 
-perform TicketTypeCreate Operation. This will return the created TicketTypeID.
+perform TicketTypeCreate Operation. This will return the created TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -81,11 +81,11 @@ perform TicketTypeCreate Operation. This will return the created TicketTypeID.
     );
 
     $Result = {
-        Success         => 1,                       # 0 or 1
+        Success    => 1,                       # 0 or 1
         Message    => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            TicketTypeID  => '',                          # TicketTypeID 
-            Error => {                              # should not return errors
+        Data       => {                        # result data payload after Operation
+            TypeID => '',                      # TypeID 
+            Error => {                         # should not return errors
                     Code    => 'TicketType.Create.ErrorCode'
                     Message => 'Error Description'
             },
