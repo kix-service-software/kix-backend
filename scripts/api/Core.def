@@ -8,3 +8,8 @@
 /users                                                              |   POST            | V1::User::UserCreate
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
+/tickettypes/:TicketTypeID                                          |   GET             | V1::TicketType::TicketTypeGet
+/tickettypes                                                        |   GET             | V1::TicketType::TicketTypeSearch
+/tickettypes                                                        |   POST            | V1::TicketType::TicketTypeCreate
+/tickettypes/:TicketTypeID                                          |   PATCH           | V1::TicketType::TicketTypeUpdate
+/tickettypes/:TicketTypeID                                          |   DELETE          | V1::TicketType::TicketTypeDelete
