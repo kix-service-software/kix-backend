@@ -10,3 +10,17 @@
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
 /user                                                               |   GET             | V1::Own::UserGet
+/tickets                                                            |   GET             | V1::Ticket::TicketSearch
+/tickets                                                            |   POST            | V1::Ticket::TicketCreate
+/tickets/:TicketID                                                  |   GET             | V1::Ticket::TicketGet
+/tickets/:TicketID                                                  |   PATCH           | V1::Ticket::TicketUpdate
+/tickets/:TicketID/articles                                         |   GET             | V1::Ticket::ArticleSearch
+/tickets/:TicketID/articles                                         |   POST            | V1::Ticket::ArticleCreate
+/tickets/:TicketID/articles/:ArticleID                              |   GET             | V1::Ticket::ArticleGet
+/tickets/:TicketID/articles/:ArticleID                              |   PATCH           | V1::Ticket::ArticleUpdate
+/tickets/:TicketID/articles/:ArticleID                              |   DELETE          | V1::Ticket::ArticleDelete
+/tickets/:TicketID/articles/:ArticleID/attachments                  |   GET             | V1::Ticket::ArticleAttachmentSearch
+/tickets/:TicketID/articles/:ArticleID/attachments                  |   POST            | V1::Ticket::ArticleAttachmentCreate
+/tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   GET             | V1::Ticket::ArticleAttachmentGet
+/tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   PATCH           | V1::Ticket::ArticleAttachmentUpdate
+/tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   DELETE          | V1::Ticket::ArticleAttachmentDelete

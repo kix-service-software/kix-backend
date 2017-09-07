@@ -240,6 +240,7 @@ sub Run {
     }
 
     # check authorization if needed
+    my $Authorization;
     if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
         $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
 
@@ -250,39 +251,8 @@ sub Run {
             );
         }
         else {
-            # add Authorization info to Data hash
-            $DataIn->{Authorization} = $FunctionResult->{Data}->{Authorization};
+            $Authorization = $FunctionResult->{Data}->{Authorization};
         }
-    }
-
-    #
-    # Validate given data.
-    #
-
-    my $ValidatorObject = Kernel::API::Validator->new(
-        DebuggerObject          => $Self->{DebuggerObject},
-        APIVersion              => $Webservice->{Config}->{APIVersion},
-        Operation               => $Operation,
-        OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
-        WebserviceID            => $WebserviceID,
-    );
-
-    # if validator init failed, bail out
-    if ( ref $ValidatorObject ne 'Kernel::API::Validator' ) {
-        return $Self->_GenerateErrorResponse(
-            %{$ValidatorObject},
-        );
-    }
-
-    $FunctionResult = $ValidatorObject->Validate(
-        Data => $DataIn,
-    );
-
-    if ( !$FunctionResult->{Success} ) {
-
-        return $Self->_GenerateErrorResponse(
-            %{$FunctionResult},
-        );
     }
 
     #
@@ -295,6 +265,7 @@ sub Run {
         Operation               => $Operation,
         OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
         WebserviceID            => $WebserviceID,
+        Authorization           => $Authorization,
     );
 
     # if operation init failed, bail out

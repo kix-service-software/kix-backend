@@ -67,12 +67,6 @@ perform UserSearch Operation. This will return a User ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-            ChangedAfter => '2006-01-09 00:00:01',                        # (optional)            
-            Order        => 'Down|Up',                                    # (optional) Default: Up                       
-            Limit        => 122,                                          # (optional) Default: 500
         }
     );
 
@@ -122,8 +116,8 @@ sub Run {
 
         # get already prepared user data from UserGet operation
         my $UserGetResult = $Self->ExecOperation(
-            Operation => 'V1::User::UserGet',
-            Data      => {
+            OperationType => 'V1::User::UserGet',
+            Data          => {
                 UserID => join(',', sort keys %UserList),
             }
         );

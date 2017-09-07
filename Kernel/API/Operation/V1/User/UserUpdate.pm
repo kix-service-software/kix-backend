@@ -72,10 +72,6 @@ perform UserUpdate Operation. This will return the updated UserID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-
             User => {
                 UserLogin       => '...'                                        # requires a value if given
                 UserFirstname   => '...'                                        # requires a value if given
@@ -206,7 +202,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
         %UserData,
         %{$User},
-        ChangeUserID  => $Param{Data}->{Authorization}->{UserID},
+        ChangeUserID  => $Self->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
         return $Self->_Error(

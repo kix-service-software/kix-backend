@@ -77,6 +77,104 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Own::UserGet
+    TicketSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::TicketSearch
+    TicketCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::TicketCreate
+    TicketGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::TicketGet
+    TicketUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::TicketUpdate
+    ArticleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleSearch
+    ArticleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleCreate
+    ArticleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleGet
+    ArticleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleUpdate
+    ArticleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleDelete
+    ArticleAttachmentSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleAttachmentSearch
+    ArticleAttachmentCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleAttachmentCreate
+    ArticleAttachmentGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleAttachmentGet
+    ArticleAttachmentUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleAttachmentUpdate
+    ArticleAttachmentDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleAttachmentDelete
 
   Transport:
     Config:
@@ -123,6 +221,62 @@ Provider:
           RequestMethod:
           - GET
           Route: /user
+        TicketSearch:
+          RequestMethod:
+          - GET
+          Route: /tickets
+        TicketCreate:
+          RequestMethod:
+          - POST
+          Route: /tickets
+        TicketGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID
+        TicketUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /tickets/:TicketID
+        ArticleSearch:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles
+        ArticleCreate:
+          RequestMethod:
+          - POST
+          Route: /tickets/:TicketID/articles
+        ArticleGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles/:ArticleID
+        ArticleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /tickets/:TicketID/articles/:ArticleID
+        ArticleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /tickets/:TicketID/articles/:ArticleID
+        ArticleAttachmentSearch:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles/:ArticleID/attachments
+        ArticleAttachmentCreate:
+          RequestMethod:
+          - POST
+          Route: /tickets/:TicketID/articles/:ArticleID/attachments
+        ArticleAttachmentGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
+        ArticleAttachmentUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
+        ArticleAttachmentDelete:
+          RequestMethod:
+          - DELETE
+          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
 
     Type: HTTP::REST
 RemoteSystem: ''

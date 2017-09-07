@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::MimeTypeValidator;
+package Kernel::API::Validator::TicketValidator;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::MimeTypeValidator - validator module
+Kernel::API::Validator::TicketValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -46,20 +46,20 @@ create an object.
             # ...
         },
         WebserviceID      => 12,
-        CommunicationType => Requester, # Requester or Provider
+        CommunicationTicket => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::MimeTypeValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::TicketValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
 =cut
 
 sub new {
-    my ( $Type, %Param ) = @_;
+    my ( $Ticket, %Param ) = @_;
 
     my $Self = {};
-    bless( $Self, $Type );
+    bless( $Self, $Ticket );
 
     for my $Needed (qw( DebuggerObject)) {
         $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
@@ -100,18 +100,23 @@ sub Validate {
         );
     }
 
-    my $Valid;
-    if ( $Param{Attribute} eq 'MimeType' ) {
-        $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A\w+\/\w+\z};
+    my $Found;
+    if ( $Param{Attribute} eq 'TicketID' ) {
+        if ( $Param{Data}->{$Param{Attribute}} =~ /\d+/ ) {
+            $Found = $Kernel::OM->Get('Kernel::System::Ticket')->TicketNumberLookup(
+                TicketID => $Param{Data}->{$Param{Attribute}},
+                UserID   => 1,
+            );        
+        }
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => "MimeTypeValidator: cannot validate attribute $Param{Attribute}!",
+            Message => "TicketValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
-    if ( !$Valid ) {
+    if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed!",

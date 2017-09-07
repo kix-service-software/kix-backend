@@ -65,7 +65,7 @@ sub new {
 
 =item Run()
 
-perform TicketSearch Operation. This will return a Ticket ID list.
+perform TicketSearch Operation. This will return a ticket list.
 
     my $Result = $OperationObject->Run(
         # ticket number (optional) as STRING or as ARRAYREF
@@ -274,25 +274,51 @@ perform TicketSearch Operation. This will return a Ticket ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
+    # prepare data
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'Ticket' => {
+                Type     => 'HASH',
+                Required => 1
+            },
+            'Ticket::Title' => {
+                Required => 1
+            },
+            'Ticket::CustomerContact' => {
+                Required => 1
+            },
+            'Ticket::State' => {
+                RequiredIfNot => [ 'Ticket::StateID' ],
+            },
+            'Ticket::Priority' => {
+                RequiredIfNot => [ 'Ticket::PriorityID' ],
+            },
+            'Ticket::Queue' => {
+                RequiredIfNot => [ 'Ticket::QueueID' ],
+            },
+        }
     );
 
-    return $Self->ReturnError(
-        ErrorCode    => 'TicketSearch.AuthFail',
-        ErrorMessage => "TicketSearch: Authorization failing!",
-    ) if !$UserID;
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
+        );
+    }
 
     # all needed variables
     $Self->{SearchLimit} = $Param{Data}->{Limit}

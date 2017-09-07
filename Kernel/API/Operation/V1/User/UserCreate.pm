@@ -70,10 +70,6 @@ perform UserCreate Operation. This will return the created UserLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-
             User => {
                 UserLogin       => '...'                                        # required
                 UserFirstname   => '...'                                        # required
@@ -88,13 +84,10 @@ perform UserCreate Operation. This will return the created UserLogin.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Message    => '',                      # in case of error
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             UserID  => '',                          # UserID 
-            Error => {                              # should not return errors
-                    Code    => 'User.Create.Code'
-                    Message => 'Error Description'
-            },
         },
     };
 

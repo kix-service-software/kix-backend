@@ -71,32 +71,19 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserLogin            => 'some agent login',                            # UserLogin or CustomerUserLogin or SessionID is
-                                                                                   #   required
-            CustomerUserLogin    => 'some customer login',
-            SessionID            => 123,
-
-            Password             => 'some password',                               # if UserLogin or customerUserLogin is sent then
-                                                                                   #   Password is required
             TicketID             => '32,33',                                       # required, could be coma separated IDs or an Array
-            DynamicFields        => 0,                                             # Optional, 0 as default. Indicate if Dynamic Fields
-                                                                                   #     should be included or not on the ticket content.
-            Extended             => 1,                                             # Optional, 0 as default
-            AllArticles          => 1,                                             # Optional, 0 as default. Set as 1 will include articles
-                                                                                   #     for tickets.
-            ArticleSenderType    => [ $ArticleSenderType1, $ArticleSenderType2 ],  # Optional, only requested article sender types
-            ArticleOrder         => 'DESC',                                        # Optional, DESC,ASC - default is ASC
-            ArticleLimit         => 5,                                             # Optional
-            Attachments          => 1,                                             # Optional, 1 as default. If it's set with the value 1,
-                                                                                   # attachments for articles will be included on ticket data
-            HTMLBodyAsAttachment => 1                                              # Optional, If enabled the HTML body version of each article
-                                                                                   #    is added to the attachments list
+            Extended             => 0,                                             # Optional, 0 as default. Add extended data (escalation data, ...)
+            include              => '...',                                         # Optional, 0 as default. Include additional objects
+                                                                                   # (supported: DynamicFields, Articles)
+            expand               => 0,                                             # Optional, 0 as default. Expand referenced objects
+                                                                                   # (supported: Articles)
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Code         => '',                               # In case of an error
+        Message      => '',                               # In case of an error
         Data         => {
             Ticket => [
                 {
@@ -132,8 +119,8 @@ one or more ticket entries in one call.
                     ChangeBy           => 123,
                     ArchiveFlag        => 'y',
 
-                    # If DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
-                    DynamicField => [
+                    # If Include=DynamicFields was passed, you'll get an entry like this for each dynamic field:
+                    DynamicFields => [
                         {
                             Name  => 'some name',
                             Value => 'some value',
@@ -185,7 +172,14 @@ one or more ticket entries in one call.
 
                     FirstLock                       (timestamp of first lock)
 
-                    Article => [
+                    # If Include=Articles was passed, you'll get an entry like this for each article:
+                    Articles => [
+                        <ArticleID>
+                        # . . .
+                    ]
+
+                    # If Include=Articles AND Expand=Articles was passed, you'll the article data will be expanded (see ArticleGet for details):
+                    Articles => [
                         {
                             ArticleID
                             From
@@ -206,15 +200,21 @@ one or more ticket entries in one call.
                             MimeType
                             IncomingTime
 
-                            # If DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
-                            DynamicField => [
+                            # If include=DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
+                            DynamicFields => [
                                 {
                                     Name  => 'some name',
                                     Value => 'some value',
                                 },
                             ],
 
-                            Attachment => [
+                            # If include=Attachments => 1 was passed, you'll get an entry like this for each attachment:
+                            Attachments => [
+                                <AttachmentID>
+                                # . . .
+                            ]                            
+                            # If include=Attachments => 1 AND expand=Attachments => 1 was passed, you'll get an entry like this for each attachment:
+                            Attachments => [
                                 {
                                     Content            => "xxxx",     # actual attachment contents, base64 enconded
                                     ContentAlternative => "",
@@ -246,272 +246,134 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
-    );
-
-    return $Self->ReturnError(
-        ErrorCode    => 'TicketGet.AuthFail',
-        ErrorMessage => "TicketGet: Authorization failing!",
-    ) if !$UserID;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID)) {
-        if ( !$Param{Data}->{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'TicketGet.MissingParameter',
-                ErrorMessage => "TicketGet: $Needed parameter is missing!",
-            );
+    # prepare data
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'TicketID' => {
+                Type     => 'ARRAY',
+                Required => 1
+            },
+            'include' => {
+                Type     => 'ARRAYtoHASH',
+            },
         }
-    }
-    my $ErrorMessage = '';
-
-    # all needed variables
-    my @TicketIDs;
-    if ( IsStringWithData( $Param{Data}->{TicketID} ) ) {
-        @TicketIDs = split( /,/, $Param{Data}->{TicketID} );
-    }
-    elsif ( IsArrayRefWithData( $Param{Data}->{TicketID} ) ) {
-        @TicketIDs = @{ $Param{Data}->{TicketID} };
-    }
-    else {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketGet.WrongStructure',
-            ErrorMessage => "TicketGet: Structure for TicketID is not correct!",
-        );
-    }
-
-    # Get the list of dynamic fields for object article.
-    my $ArticleDynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(
-        ObjectType => 'Article',
-        ResultType => 'HASH',
     );
 
-    # Crate a lookup list for easy search
-    my %ArticleDynamicFieldLookup = reverse %{$ArticleDynamicFieldList};
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
+        );
+    }
 
+    # check ticket permission
     TICKET:
-    for my $TicketID (@TicketIDs) {
+    for my $TicketID ( @{$Param{Data}->{TicketID}} ) {
 
-        my $Access = $Self->CheckAccessPermissions(
+        my $Permission = $Self->CheckAccessPermission(
             TicketID => $TicketID,
-            UserID   => $UserID,
-            UserType => $UserType,
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
         );
 
-        next TICKET if $Access;
+        next TICKET if $Permission;
 
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketGet.AccessDenied',
-            ErrorMessage => 'TicketGet: User does not have access to the ticket!',
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to access ticket $TicketID.",
         );
     }
 
-    my $DynamicFields = $Param{Data}->{DynamicFields} || 0;
-    my $Extended      = $Param{Data}->{Extended}      || 0;
-    my $AllArticles   = $Param{Data}->{AllArticles}   || 0;
-    my $ArticleOrder  = $Param{Data}->{ArticleOrder}  || 'ASC';
-    my $ArticleLimit  = $Param{Data}->{ArticleLimit}  || 0;
-    my $Attachments   = $Param{Data}->{Attachments}   || 0;
-    my $ReturnData    = {
-        Success => 1,
-    };
-    my @Item;
+    # get ticket object
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    my $ArticleSenderType = '';
-    if ( IsArrayRefWithData( $Param{Data}->{ArticleSenderType} ) ) {
-        $ArticleSenderType = $Param{Data}->{ArticleSenderType};
-    }
-    elsif ( IsStringWithData( $Param{Data}->{ArticleSenderType} ) ) {
-        $ArticleSenderType = [ $Param{Data}->{ArticleSenderType} ]
-    }
-
-    # By default does not include HYML body as attachment (3) unless is explicitly requested (2).
-    my $StripPlainBodyAsAttachment = $Param{Data}->{HTMLBodyAsAttachment} ? 2 : 3;
+    my @TicketList;
 
     # start ticket loop
     TICKET:
-    for my $TicketID (@TicketIDs) {
+    for my $TicketID ( @{$Param{Data}->{TicketID}} ) {
 
-        # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-        # get the Ticket entry
-        my %TicketEntryRaw = $TicketObject->TicketGet(
+        # get the Ticket
+        my %TicketRaw = $TicketObject->TicketGet(
             TicketID      => $TicketID,
-            DynamicFields => $DynamicFields,
-            Extended      => $Extended,
-            UserID        => $UserID,
+            DynamicFields => $Param{Data}->{include}->{DynamicFields},
+            Extended      => $Param{Data}->{Extended},
+            UserID        => $Self->{Authorization}->{UserID},
         );
 
-        if ( !IsHashRefWithData( \%TicketEntryRaw ) ) {
+        if ( !IsHashRefWithData( \%TicketRaw ) ) {
 
-            $ErrorMessage = 'Could not get Ticket data'
-                . ' in Kernel::API::Operation::V1::Ticket::TicketGet::Run()';
-
-            return $Self->ReturnError(
-                ErrorCode    => 'TicketGet.NotValidTicketID',
-                ErrorMessage => "TicketGet: $ErrorMessage",
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "Could not get data for ticket $TicketID",
             );
         }
 
-        my %TicketEntry;
+        my %TicketData;
         my @DynamicFields;
 
-        # remove all dynamic fields form main ticket hash and set them into an array.
+        # remove all dynamic fields from main ticket hash and set them into an array.
         ATTRIBUTE:
-        for my $Attribute ( sort keys %TicketEntryRaw ) {
+        for my $Attribute ( sort keys %TicketRaw ) {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 push @DynamicFields, {
                     Name  => $1,
-                    Value => $TicketEntryRaw{$Attribute},
+                    Value => $TicketRaw{$Attribute},
                 };
                 next ATTRIBUTE;
             }
 
-            $TicketEntry{$Attribute} = $TicketEntryRaw{$Attribute};
+            $TicketData{$Attribute} = $TicketRaw{$Attribute};
         }
 
-        # add dynamic fields array into 'DynamicField' hash key if any
+        # add dynamic fields array into 'DynamicFields' hash key if any
         if (@DynamicFields) {
-            $TicketEntry{DynamicField} = \@DynamicFields;
+            $TicketData{DynamicFields} = \@DynamicFields;
         }
 
-        # set Ticket entry data
-        my $TicketBundle = {
-            %TicketEntry,
-        };
+        if ( $Param{Data}->{include}->{Articles} ) {
+            my $ArticleTypes;
+            if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
+                $ArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
+            }
 
-        if ( !$AllArticles ) {
-            push @Item, $TicketBundle;
-            next TICKET;
-        }
-
-        my $ArticleTypes;
-        if ( $UserType eq 'Customer' ) {
-            $ArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
-        }
-
-        my @ArticleBoxRaw = $TicketObject->ArticleGet(
-            TicketID          => $TicketID,
-            ArticleSenderType => $ArticleSenderType,
-            ArticleType       => $ArticleTypes,
-            DynamicFields     => $DynamicFields,
-            Extended          => $Extended,
-            Order             => $ArticleOrder,
-            Limit             => $ArticleLimit,
-            UserID            => $UserID,
-        );
-
-        # start article loop
-        ARTICLE:
-        for my $Article (@ArticleBoxRaw) {
-
-            next ARTICLE if !$Attachments;
-
-            # get attachment index (without attachments)
-            my %AtmIndex = $TicketObject->ArticleAttachmentIndex(
-                ContentPath                => $Article->{ContentPath},
-                ArticleID                  => $Article->{ArticleID},
-                StripPlainBodyAsAttachment => $StripPlainBodyAsAttachment,
-                Article                    => $Article,
-                UserID                     => $UserID,
+            my @ArticleIndex = $TicketObject->ArticleIndex(
+                TicketID   => $TicketID,
+                SenderType => $ArticleTypes,
+                UserID     => $Self->{Authorization}->{UserID},
             );
 
-            next ARTICLE if !IsHashRefWithData( \%AtmIndex );
-
-            my @Attachments;
-            ATTACHMENT:
-            for my $FileID ( sort keys %AtmIndex ) {
-                next ATTACHMENT if !$FileID;
-                my %Attachment = $TicketObject->ArticleAttachment(
-                    ArticleID => $Article->{ArticleID},
-                    FileID    => $FileID,                 # as returned by ArticleAttachmentIndex
-                    UserID    => $UserID,
-                );
-
-                next ATTACHMENT if !IsHashRefWithData( \%Attachment );
-
-                # convert content to base64
-                $Attachment{Content} = encode_base64( $Attachment{Content} );
-                push @Attachments, {%Attachment};
-            }
-
-            # set Attachments data
-            $Article->{Attachment} = \@Attachments;
-
-        }    # finish article loop
-
-        # set Ticket entry data
-        if (@ArticleBoxRaw) {
-
-            my @ArticleBox;
-
-            for my $ArticleRaw (@ArticleBoxRaw) {
-                my %Article;
-                my @ArticleDynamicFields;
-
-                # remove all dynamic fields form main article hash and set them into an array.
-                ATTRIBUTE:
-                for my $Attribute ( sort keys %{$ArticleRaw} ) {
-
-                    if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
-
-                        # Skip dynamic fields that are not for article object
-                        next ATTRIBUTE if ( !$ArticleDynamicFieldLookup{$1} );
-
-                        push @ArticleDynamicFields, {
-                            Name  => $1,
-                            Value => $ArticleRaw->{$Attribute},
-                        };
-                        next ATTRIBUTE;
-                    }
-
-                    $Article{$Attribute} = $ArticleRaw->{$Attribute};
-                }
-
-                # add dynamic fields array into 'DynamicField' hash key if any
-                if (@ArticleDynamicFields) {
-                    $Article{DynamicField} = \@ArticleDynamicFields;
-                }
-
-                push @ArticleBox, \%Article;
-            }
-            $TicketBundle->{Article} = \@ArticleBox;
+            $TicketData{Articles} = \@ArticleIndex;
         }
-
+            
         # add
-        push @Item, $TicketBundle;
-    }    # finish ticket loop
-
-    if ( !scalar @Item ) {
-        $ErrorMessage = 'Could not get Ticket data'
-            . ' in Kernel::API::Operation::V1::Ticket::TicketGet::Run()';
-
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketGet.NotTicketData',
-            ErrorMessage => "TicketGet: $ErrorMessage",
-        );
-
+        push(@TicketList, \%TicketData);
     }
 
-    # set ticket data into return structure
-    $ReturnData->{Data}->{Ticket} = \@Item;
+    if ( scalar(@TicketList) == 1 ) {
+        return $Self->_Success(
+            Ticket => $TicketList[0],
+        );    
+    }
 
-    # return result
-    return $ReturnData;
+    return $Self->_Success(
+        Ticket => \@TicketList,
+    );
 }
 
 1;

@@ -629,11 +629,11 @@ sub CheckCreatePermissions {
     return 1;
 }
 
-=item CheckAccessPermissions()
+=item CheckWritePermission()
 
-Tests if the user have access permissions over a ticket
+Tests if the user have write permission for a ticket
 
-    my $Result = $CommonObject->CheckAccessPermissions(
+    my $Result = $CommonObject->CheckWritePermission(
         TicketID   => 123,
         UserID     => 123,                      # or 'CustomerLogin'
         UserType   => 'Agent',                  # or 'Customer'
@@ -644,7 +644,46 @@ returns:
 
 =cut
 
-sub CheckAccessPermissions {
+sub CheckWritePermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID UserID UserType)) {
+        if ( !$Param{$Needed} ) {
+            return;
+        }
+    }
+
+    my $TicketPermissionFunction = 'TicketPermission';
+    if ( $Param{UserType} eq 'Customer' ) {
+        $TicketPermissionFunction = 'TicketCustomerPermission';
+    }
+
+    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
+        Type     => 'ro',
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+    );
+
+    return $Access;
+}
+
+=item CheckAccessPermission()
+
+Tests if the user have access permission for a ticket
+
+    my $Result = $CommonObject->CheckAccessPermission(
+        TicketID   => 123,
+        UserID     => 123,                      # or 'CustomerLogin'
+        UserType   => 'Agent',                  # or 'Customer'
+    );
+
+returns:
+    $Success = 1                                # if everything is OK
+
+=cut
+
+sub CheckAccessPermission {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -670,41 +709,251 @@ sub CheckAccessPermissions {
 
 =begin Internal:
 
-=item _CharsetList()
+=item _CheckArticle()
 
-returns a list of all available charsets.
+checks if the given article parameter is valid.
 
-    my $CharsetList = $CommonObject->_CharsetList(
-        UserID => 123,
+    my $ArticleCheck = $OperationObject->_CheckArticle(
+        Article => $Article,                        # all article parameters
     );
 
-    returns
-    $Success = {
-        #...
-        iso-8859-1  => 1,
-        iso-8859-15 => 1,
-        MacRoman    => 1,
-        utf8        => 1,
-        #...
+    returns:
+
+    $ArticleCheck = {
+        Success => 1,                               # if everething is OK
+    }
+
+    $ArticleCheck = {
+        Code    => 'Function.Error',           # if error
+        Message => 'Error description',
     }
 
 =cut
 
-sub _CharsetList {
+sub _CheckArticle {
     my ( $Self, %Param ) = @_;
 
-    # get charset array
-    use Encode;
-    my @CharsetList = Encode->encodings(":all");
+    my $Article = $Param{Article};
 
-    my %CharsetHash;
-
-    # create a charset lookup table
-    for my $Charset (@CharsetList) {
-        $CharsetHash{$Charset} = 1;
+    # check ticket internally
+    for my $Needed (qw(Subject Body AutoResponseType)) {
+        if ( !$Article->{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Required parameter $Needed is missing!",
+            );
+        }
     }
 
-    return \%CharsetHash;
+    # get config object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    # check Article->TimeUnit
+    # TimeUnit could be required or not depending on sysconfig option
+    if (
+        ( !defined $Article->{TimeUnit} || !IsStringWithData( $Article->{TimeUnit} ) )
+        && $ConfigObject->{'Ticket::Frontend::AccountTime'}
+        && $ConfigObject->{'Ticket::Frontend::NeedAccountedTime'}
+        )
+    {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Required parameter TimeUnit is missing!",
+        );
+    }
+    if ( $Article->{TimeUnit} ) {
+        if ( !$Self->ValidateTimeUnit( %{$Article} ) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter TimeUnit is invalid!",
+            );
+        }
+    }
+
+    # check Article->NoAgentNotify
+    if ( $Article->{NoAgentNotify} && $Article->{NoAgentNotify} ne '1' ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter NoAgentNotify is invalid!",
+        );
+    }
+
+    # check Article array parameters
+    for my $Attribute (
+        qw( ForceNotificationToUserID ExcludeNotificationToUserID ExcludeMuteNotificationToUserID )
+        )
+    {
+        if ( defined $Article->{$Attribute} ) {
+
+            # check structure
+            if ( IsHashRefWithData( $Article->{$Attribute} ) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Parameter $Attribute is invalid!",
+                );
+            }
+            else {
+                if ( !IsArrayRefWithData( $Article->{$Attribute} ) ) {
+                    $Article->{$Attribute} = [ $Article->{$Attribute} ];
+                }
+                for my $UserID ( @{ $Article->{$Attribute} } ) {
+                    if ( !$Self->ValidateUserID( UserID => $UserID ) ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Parameter UserID $UserID in parameter $Attribute is invalid!",
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    if ( defined $Param{Attachments} ) {
+
+        # check Attachment internal structure
+        foreach my $AttachmentItem (@{$Param{Attachments}}) {
+            if ( !IsHashRefWithData($AttachmentItem) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Article::Attachments parameter is invalid!",
+                );
+            }
+
+            # check Attachment attribute values
+            my $AttachmentCheck = $Self->_CheckAttachment( Attachment => $AttachmentItem );
+
+            if ( !$AttachmentCheck->{Success} ) {
+                return $Self->_Error( 
+                    %{$AttachmentCheck} 
+                );
+            }
+        }
+    }
+
+    if ( defined $Param{Data}->{DynamicField} ) {
+
+        # check DynamicField internal structure
+        foreach my $DynamicFieldItem (@{$Param{DynamicField}}) {
+            if ( !IsHashRefWithData($DynamicFieldItem) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Article::DynamicFields parameter is invalid!",
+                );
+            }
+
+            # check DynamicField attribute values
+            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
+
+            if ( !$DynamicFieldCheck->{Success} ) {
+                return $Self->_Error( 
+                    %{$DynamicFieldCheck} 
+                );
+            }
+        }
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
+
+=item _CheckDynamicField()
+
+checks if the given dynamic field parameter is valid.
+
+    my $DynamicFieldCheck = $OperationObject->_CheckDynamicField(
+        DynamicField => $DynamicField,              # all dynamic field parameters
+    );
+
+    returns:
+
+    $DynamicFieldCheck = {
+        Success => 1,                               # if everething is OK
+    }
+
+    $DynamicFieldCheck = {
+        Code    => 'Function.Error',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckDynamicField {
+    my ( $Self, %Param ) = @_;
+
+    my $DynamicField = $Param{DynamicField};
+
+    # check DynamicField item internally
+    for my $Needed (qw(Name Value)) {
+        if (
+            !defined $DynamicField->{$Needed}
+            || ( !IsString( $DynamicField->{$Needed} ) && ref $DynamicField->{$Needed} ne 'ARRAY' )
+            )
+        {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter DynamicField::$Needed is missing!",
+            );
+        }
+    }
+
+    # check DynamicField->Name
+    if ( !$Self->ValidateDynamicFieldName( %{$DynamicField} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField::Name is invalid!",
+        );
+    }
+
+    # check DynamicField->Value
+    if ( !$Self->ValidateDynamicFieldValue( %{$DynamicField} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField::Value is invalid!",
+        );
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
+
+=item _CheckAttachment()
+
+checks if the given attachment parameter is valid.
+
+    my $AttachmentCheck = $OperationObject->_CheckAttachment(
+        Attachment => $Attachment,                  # all attachment parameters
+    );
+
+    returns:
+
+    $AttachmentCheck = {
+        Success => 1,                               # if everething is OK
+    }
+
+    $AttachmentCheck = {
+        Code    => 'Function.Error',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckAttachment {
+    my ( $Self, %Param ) = @_;
+
+    my $Attachment = $Param{Attachment};
+
+    # check attachment item internally
+    for my $Needed (qw(ContentType Filename Content)) {
+        if ( !$Attachment->{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Attachment::$Needed is missing!",
+            );
+        }
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
 }
 
 1;

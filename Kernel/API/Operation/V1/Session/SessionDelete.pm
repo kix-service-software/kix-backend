@@ -66,12 +66,6 @@ remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                Token    => '...',
-                UserID   => '123',
-                UserType => 'User' | 'Customer'
-                ...
-            },
             Token => '...'                                # required
         },
     );

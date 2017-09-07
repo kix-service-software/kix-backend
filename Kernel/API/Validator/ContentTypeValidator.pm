@@ -6,10 +6,14 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::MimeTypeValidator;
+package Kernel::API::Validator::ContentTypeValidator;
 
 use strict;
 use warnings;
+use Encode;
+
+use Kernel::API::Validator::CharsetValidator;
+use Kernel::API::Validator::MimeTypeValidator;
 
 use base qw(
     Kernel::API::Validator::Common
@@ -22,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::MimeTypeValidator - validator module
+Kernel::API::Validator::ContentTypeValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -49,7 +53,7 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::MimeTypeValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::ContentTypeValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -101,13 +105,49 @@ sub Validate {
     }
 
     my $Valid;
-    if ( $Param{Attribute} eq 'MimeType' ) {
-        $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A\w+\/\w+\z};
+    if ( $Param{Attribute} eq 'ContentType' ) {
+        my $ContentType = lc($Param{Data}->{$Param{Attribute}});
+
+        # check Charset part
+        my $Charset = '';
+        if ( $ContentType =~ /charset=/i ) {
+            $Charset = $ContentType;
+            $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+            $Charset =~ s/"|'//g;
+            $Charset =~ s/(.+?);.*/$1/g;
+        }
+        my $Result = Kernel::API::Validator::CharsetValidator::Validate(
+            $Self, 
+            Attribute => 'Charset',
+            Data      => {
+                Charset => $Charset,
+            }
+        );
+
+        if ($Result->{Success}) {
+            # check MimeType part
+            my $MimeType = '';
+            if ( $ContentType =~ /^(\w+\/\w+)/i ) {
+                $MimeType = $1;
+                $MimeType =~ s/"|'//g;
+            }            
+        print STDERR "MimeType: $MimeType\n";
+            my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(
+                $Self, 
+                Attribute => 'MimeType',
+                Data      => {
+                    MimeType => $MimeType,
+                }
+            );            
+            if ($Result->{Success}) {
+                $Valid = 1;
+            }
+        }
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => "MimeTypeValidator: cannot validate attribute $Param{Attribute}!",
+            Message => "ContentTypeValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 

@@ -190,6 +190,7 @@
                 <Item Key="DEFAULT">200</Item>
                 <Item Key="Authorization.NoHeader">403</Item>
                 <Item Key="Authorization.NoToken">403</Item>
+                <Item Key="ArticleAttachmentCreate.UnableToCreate">500</Item>
                 <Item Key="BadRequest">400</Item>
                 <Item Key="ExecOperation.MissingParameter">500</Item>
                 <Item Key="ExecOperation.OperationNotFound">500</Item>
@@ -197,12 +198,15 @@
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
                 <Item Key="Object.Created">201</Item>
+                <Item Key="Object.NoPermission">403</Item>
                 <Item Key="Object.NotFound">404</Item>
                 <Item Key="Object.UnableToCreate">400</Item>
                 <Item Key="Object.UnableToUpdate">400</Item>
                 <Item Key="Operation.InternalError">500</Item>
                 <Item Key="Operation.PrepareDataError">400</Item>
                 <Item Key="PrepareData.InvalidFilter">400</Item>
+                <Item Key="PrepareData.InvalidSort">400</Item>
+                <Item Key="PrepareData.InvalidExpand">400</Item>
                 <Item Key="Provider.InternalError">500</Item>
                 <Item Key="SessionCreate.AuthFail">401</Item>
                 <Item Key="SessionDelete.DeleteError">404</Item>

@@ -66,12 +66,6 @@ remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                Token    => '...',
-                UserID   => '123',
-                UserType => 'User' | 'Customer'
-                ...
-            },
         },
     );
 
@@ -116,7 +110,7 @@ sub Run {
     }
 
     my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
-        Token => $Param{Data}->{Authorization}->{Token}
+        Token => $Self->{Authorization}->{Token}
     );
 
     # check result

@@ -6,10 +6,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::MimeTypeValidator;
+package Kernel::API::Validator::AttachmentsValidator;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Validator::Common
@@ -22,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::MimeTypeValidator - validator module
+Kernel::API::Validator::AttachmentsValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -49,7 +51,7 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::MimeTypeValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::AttachmentsValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -100,18 +102,35 @@ sub Validate {
         );
     }
 
-    my $Valid;
-    if ( $Param{Attribute} eq 'MimeType' ) {
-        $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A\w+\/\w+\z};
+    my $Found;
+    if ( $Param{Attribute} eq 'Attachments' ) {
+        # check if array ref
+        if ( IsArrayRefWithData($Param{Data}->{$Param{Attribute}}) ) {
+            $Found = 1;
+            # check each attachment
+            ATTACHMENT:
+            foreach my $Attachment ( @{$Param{Data}->{$Param{Attribute}}} ) {
+                if ( !IsHashRefWithData($Attachment) ) {
+                    $Found = 0;
+                    last ATTACHMENT;    
+                }
+                foreach my $Needed ( qw(ContentType Filename) ) {
+                    if ( !$Attachment->{$Needed} ) {
+                        $Found = 0;
+                        last ATTACHMENT;
+                    }
+                }
+            }
+        }
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => "MimeTypeValidator: cannot validate attribute $Param{Attribute}!",
+            Message => "AttachmentsValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
-    if ( !$Valid ) {
+    if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed!",

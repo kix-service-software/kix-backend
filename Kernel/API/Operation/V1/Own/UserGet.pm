@@ -78,9 +78,6 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
         },
     );
 
@@ -128,46 +125,39 @@ sub Run {
 
     # get the user data
     my %UserData;
-    if ( $Param{Data}->{Authorization}->{UserType} eq 'Agent' ) {
+    if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
         %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $Param{Data}->{Authorization}->{UserID},
+            UserID => $Self->{Authorization}->{UserID},
         );
     }
-    elsif ( $Param{Data}->{Authorization}->{UserType} eq 'Customer' ) {
+    elsif ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         %UserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $Param{Data}->{Authorization}->{UserID},
+            User => $Self->{Authorization}->{UserID},
         );        
     }
     else {
-        $Message = 'Unknown UserType $Param{Data}->{Authorization}->{UserType} '
-            . ' in Kernel::API::Operation::V1::Own::UserGet::Run()';
-
         return $Self->_Error(
             Code    => 'UserGet.InvalidUserType',
-            Message => "UserGet: $Message",
+            Message => "Unknown UserType $Self->{Authorization}->{UserType}",
         );        
     }
-
     if ( !IsHashRefWithData( \%UserData ) ) {
-
-        $Message = 'Could not get user data'
-            . ' in Kernel::API::Operation::V1::Own::UserGet::Run()';
 
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "UserGet: $Message",
+            Message => "No user data found.",
         );
     }
 
     # filter valid attributes
-    if ($Self->{Config}->{AttributeWhitelist}) {
+    if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
         foreach my $Attr (sort keys %UserData) {
             delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
         }
     }
 
     # filter valid attributes
-    if ($Self->{Config}->{AttributeBacklist}) {
+    if ( IsHashRefWithData($Self->{Config}->{AttributeBacklist}) ) {
         foreach my $Attr (sort keys %UserData) {
             delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
         }

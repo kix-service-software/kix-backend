@@ -15,6 +15,7 @@ use warnings;
 use Hash::Flatten;
 use Data::Sorting qw(:arrays);
 
+use Kernel::API::Operation;
 use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
 
@@ -87,9 +88,10 @@ prepare data, check given parameters and parse them according to type
         },
         Parameters => {
             <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
-                Type                => 'ARRAY',                         # optional, use this to parse a comma separated string into an array
+                Type                => 'ARRAY' | 'ARRAYtoHASH',         # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values
                 Required            => 1,                               # optional
                 RequiredIfNot       => [ '<AltParameter>', ... ]        # optional, specify the alternate parameters to be checked, if one of them has a value
+                RequiredIf          => [ '<Parameter>', ... ]           # optional, specify the parameters that should be checked for values
                 RequiresValueIfUsed => 1                                # optional
                 Default             => ...                              # optional
                 OneOf               => [...]                            # optional
@@ -201,7 +203,37 @@ sub PrepareData {
         }
     }
 
+    # prepare expander
+    if ( exists($Param{Data}->{expand}) ) {
+        foreach my $Expander ( split(/,/, $Param{Data}->{expand}) ) {            
+            my ($Object, $Attribute) = split(/\./, $Expander, 2);
+
+            # ignore this expander if it isn't possible in this operation
+            next if ( !$Self->{OperationConfig}->{'Expandable::'.$Attribute} );
+
+            my %ExpanderDef = (
+                Attribute => $Attribute,
+            );
+            foreach my $DefPart ( split(/,/, $Self->{OperationConfig}->{'Expandable::'.$Attribute})) {
+                my ($Key, $Value) = split(/=/, $DefPart, 2);
+                $ExpanderDef{$Key} = $Value;
+            }
+
+            if ( IsStringWithData($ExpanderDef{Add}) ) {
+                $ExpanderDef{Add} = [ split(/;/, $ExpanderDef{Add}) ];
+            }
+
+            if ( !IsArrayRefWithData($Self->{Expand}->{$Object}) ) {
+                $Self->{Expand}->{$Object} = [];
+            }
+            push @{$Self->{Expand}->{$Object}}, \%ExpanderDef;
+        }
+    }
+
     my %Data = %{$Param{Data}};
+
+    # store data for later use
+    $Self->{RequestData} = \%Data;
 
     # if needed flatten hash structure for easier access to sub structures
     if ( ref($Param{Parameters}) eq 'HASH' ) {
@@ -242,14 +274,40 @@ sub PrepareData {
                 }
             }
 
+            # check complex requirement (required if another parameter has value)
+            if ( $Param{Parameters}->{$Parameter}->{RequiredIf} && ref($Param{Parameters}->{$Parameter}->{RequiredIf}) eq 'ARRAY' ) {
+                my $OtherParameterHasValue = 0;
+                foreach my $OtherParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIf}} ) {
+                    if ( exists($Data{$OtherParameter}) && defined($Data{$OtherParameter}) ) {
+                        $OtherParameterHasValue = 1;
+                        last;
+                    }
+                }
+                if ( !exists($Data{$Parameter}) && $OtherParameterHasValue ) {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Required parameter $Parameter is missing!",
+                    last;
+                }
+            }
+
             # parse into arrayref if parameter value is scalar and ARRAY type is needed
-            if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAY' && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
+            if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} =~ /(ARRAY|ARRAYtoHASH)/ && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
                 $Self->_SetParameter(
                     Data      => $Param{Data},
                     Attribute => $Parameter,
-                Value     => [ split('\s*,\s*', $Data{$Parameter}) ],
+                    Value     => [ split('\s*,\s*', $Data{$Parameter}) ],
                 );
             }
+
+            # convert array to hash if we have to 
+            if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAYtoHASH' && $Data{$Parameter} && ref($Param{Data}->{$Parameter}) eq 'ARRAY' ) {
+                my %NewHash = map { $_ => 1 } @{$Param{Data}->{$Parameter}};
+                $Self->_SetParameter(
+                    Data      => $Param{Data},
+                    Attribute => $Parameter,
+                    Value     => \%NewHash,
+                );
+            }            
 
             # set default value
             if ( !$Data{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
@@ -329,6 +387,13 @@ sub _Success {
         );
     }
 
+    # honor an expander, if we have one
+    if ( IsHashRefWithData($Self->{Expand}) ) {
+        $Self->_ApplyExpand(
+            Data => \%Param,
+        );
+    }
+
     # prepare result
     my $Code    = $Param{Code};
     my $Message = $Param{Message};
@@ -380,8 +445,8 @@ sub _Error {
 helper function to execute another operation to work with its result.
 
     my $Return = $CommonObject->ExecOperation(
-        Operation => '...'                              # required
-        Data      => {
+        OperationType => '...'                              # required
+        Data          => {
 
         }
     );
@@ -392,7 +457,7 @@ sub ExecOperation {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Operation Data)) {
+    for my $Needed (qw(OperationType Data)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'ExecOperation.MissingParameter',
@@ -401,40 +466,21 @@ sub ExecOperation {
         }
     }
 
-    my $Operation = 'Kernel::API::Operation::'.$Param{Operation};
-
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Operation) ) {
-        return $Self->_Error(
-            Code    => 'ExecOperation.OperationNotFound',
-            Message => "$Operation not found!",
-        );
-    }
-
-    # Validate given data.
-    my $ValidatorObject = Kernel::API::Validator->new(
-        DebuggerObject => $Self->{DebuggerObject},
-        Operation      => $Param{Operation},
+    # init new Operation object
+    my $OperationObject = Kernel::API::Operation->new(
+        DebuggerObject          => $Self->{DebuggerObject},
+        Operation               => (split(/::/, $Param{OperationType}))[-1],
+        OperationType           => $Param{OperationType},
+        WebserviceID            => $Self->{WebserviceID},
+        Authorization           => $Self->{Authorization},
     );
 
-    # if validator init failed, bail out
-    if ( ref $ValidatorObject ne 'Kernel::API::Validator' ) {
+    # if operation init failed, bail out
+    if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
         return $Self->_Error(
-            %{$ValidatorObject},
+            %{$OperationObject},
         );
     }
-
-    my $FunctionResult = $ValidatorObject->Validate(
-        Data => $Param{Data},
-    );
-
-    if ( !$FunctionResult->{Success} ) {
-
-        return $Self->_Error(
-            %{$FunctionResult},
-        );
-    }
-    
-    my $OperationObject = $Operation->new( %{$Self} );
 
     return $OperationObject->Run(
         Data => $Param{Data},
@@ -863,6 +909,106 @@ sub _ApplySort {
     } 
 }
 
+sub _ApplyExpand {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
+        # nothing to do
+        return;
+    }    
+
+    foreach my $Object ( keys %{$Self->{Expand}} ) {
+        # which elements should be expanded
+        foreach my $Expander ( @{$Self->{Expand}->{$Object}} ) {
+            if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
+                foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
+                    my $Result = $Self->_ExpandAttribute(
+                        Expander => $Expander,
+                        Data     => $ObjectItem,
+                    );
+                    if ( !$Result->{Success} ) {
+                        return $Result;
+                    }
+                }
+            } 
+            elsif ( ref($Param{Data}->{$Object}) eq 'HASH' ) {
+                my $Result = $Self->_ExpandObject(
+                    Expander => $Expander,
+                    Data     => $Param{Data}->{$Object},
+                );
+
+                if ( !$Result->{Success} ) {
+                    return $Result;
+                }
+            }
+        }
+    }
+}
+
+sub _ExpandObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Expander Data)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => '_ExpandObject.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    my @Data;
+    if ( ref($Param{Data}->{$Param{Expander}->{Attribute}}) eq 'ARRAY' ) {
+        @Data = @{$Param{Data}->{$Param{Expander}->{Attribute}}};
+    }
+    elsif ( ref($Param{Data}->{$Param{Expander}->{Attribute}}) eq 'HASH' ) {
+        # hashref isn't possible
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Expanding a hash is not possible!",
+        );
+    }
+    else {
+        # convert scalar into our data array for further use
+        @Data = ( $Param{Data}->{$Param{Expander}->{Attribute}} );
+    }
+
+    my %ExecData = (
+        include     => $Self->{RequestData}->{include},
+        expand      => $Self->{RequestData}->{expand},
+    );
+    $ExecData{$Param{Expander}->{ID}} = join(',', sort @Data);
+
+    if ( $Param{Expander}->{Add} && ref($Param{Expander}->{Add}) eq 'ARRAY' ) {
+        foreach my $AddParam ( @{$Param{Expander}->{Add}} ) {
+            $ExecData{$AddParam} = $Self->{RequestData}->{$AddParam},
+        }
+    }
+
+    my $Result = $Self->ExecOperation(
+        OperationType => $Param{Expander}->{Operation},
+        Data          => \%ExecData,
+    );
+    if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
+        return $Result;
+    }
+
+    if ( ref($Param{Data}->{$Param{Expander}->{Attribute}}) eq 'ARRAY' ) {
+        if ( IsArrayRefWithData($Result->{Data}->{$Param{Expander}->{Return}}) ) {
+            $Param{Data}->{$Param{Expander}->{Attribute}} = $Result->{Data}->{$Param{Expander}->{Return}};
+        }
+        else {
+            $Param{Data}->{$Param{Expander}->{Attribute}} = [ $Result->{Data}->{$Param{Expander}->{Return}} ];
+        }
+    }
+    else {
+        $Param{Data}->{$Param{Expander}->{Attribute}} = $Result->{Data}->{$Param{Expander}->{Return}};
+    }
+
+    return $Self->_Success();
+}
+
 sub _SetParameter {
     my ( $Self, %Param ) = @_;
     
@@ -894,6 +1040,37 @@ sub _SetParameter {
     }
     
     return 1;
+}
+
+sub _Trim {
+    my ( $Self, %Param ) = @_;
+
+    return if ( !$Param{Data} );
+
+    # remove leading and trailing spaces
+    if ( ref($Param{Data}) eq 'HASH' ) {
+        foreach my $Attribute ( sort keys %{$Param{Data}} ) {
+            $Param{Data}->{$Attribute} = $Self->_Trim(
+                Data => $Param{Data}->{$Attribute}
+            );
+        }
+    }
+    elsif ( ref($Param{Data}) eq 'ARRAY' ) {
+        foreach my $Attribute ( @{$Param{Data}} ) {
+            $Param{Data}->{$Attribute} = $Self->_Trim(
+                Data => $Param{Data}->{$Attribute}
+            );
+        }
+    }
+    else {
+        #remove leading spaces
+        $Param{Data} =~ s{\A\s+}{};
+
+        #remove trailing spaces
+        $Param{Data} =~ s{\s+\z}{};
+    }
+
+    return $Param{Data};
 }
 
 1;

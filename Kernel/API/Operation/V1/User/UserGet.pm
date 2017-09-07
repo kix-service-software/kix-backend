@@ -78,16 +78,14 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
             UserID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        Message => '',                               # In case of an error
+        Code         => '...'
+        Message      => '',                               # In case of an error
         Data         => {
             User => [
                 {
@@ -151,12 +149,9 @@ sub Run {
 
         if ( !IsHashRefWithData( \%UserData ) ) {
 
-            $Message = 'Could not get user data'
-                . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
-
             return $Self->_Error(
-                Code    => 'UserGet.InvalidUserID',
-                Message => "UserGet: $Message",
+                Code    => 'Object.NotFound',
+                Message => "No user data found for UserID $UserID.",
             );
         }
 
@@ -176,17 +171,6 @@ sub Run {
                 
         # add
         push(@UserList, \%UserData);
-    }
-
-    if ( !scalar(@UserList) ) {
-        $Message = 'Could not get user data'
-            . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
-
-        return $Self->_Error(
-            Code    => 'UserGet.NoUserData',
-            Message => "UserGet: $Message",
-        );
-
     }
 
     if ( scalar(@UserList) == 1 ) {

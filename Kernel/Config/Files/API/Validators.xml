@@ -23,6 +23,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###AttachmentsValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">AttachmentsValidator</Item>
+                <Item Key="Validates">Attachments</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Validator::Module###CharsetValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
@@ -40,6 +51,17 @@
             <Hash>
                 <Item Key="Module">CustomerValidator</Item>
                 <Item Key="Validates">CustomerContact</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###DynamicFieldsValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">DynamicFieldsValidator</Item>
+                <Item Key="Validates">DynamicFields</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
@@ -161,6 +183,17 @@
             <Hash>
                 <Item Key="Module">TimeUnitValidator</Item>
                 <Item Key="Validates">TimeUnit</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###TicketValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">TicketValidator</Item>
+                <Item Key="Validates">TicketID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
