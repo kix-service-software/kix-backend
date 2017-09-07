@@ -128,7 +128,7 @@ sub Run {
         Valid => 1,
     );
 
-    if (IsHashRefWithData(\%TicketTypeList)) {
+    if ( IsHashRefWithData(\%TicketTypeList) ) {
         my $TicketTypeGetResult = $Self->ExecOperation(
             Operation => 'V1::TicketType::TicketTypeGet',
             Data      => {

@@ -163,3 +163,5 @@ sub Run {
         TypeID => $TicketTypeData{ID},
     );    
 }
+
+1;

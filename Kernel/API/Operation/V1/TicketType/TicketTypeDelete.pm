@@ -154,3 +154,5 @@ sub Run {
 
     return $Self->_Success();
 }
+
+1;
