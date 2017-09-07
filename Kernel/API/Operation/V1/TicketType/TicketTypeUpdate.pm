@@ -132,8 +132,6 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-   
-    my $TypeID;
     
     # check if tickettype exists
     my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(

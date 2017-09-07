@@ -141,15 +141,6 @@ sub Run {
         }
 
         my @TicketTypeDataList = IsArrayRefWithData($TicketTypeGetResult->{Data}->{TicketType}) ? @{$TicketTypeGetResult->{Data}->{TicketType}} : ( $TicketTypeGetResult->{Data}->{TicketType} );
-        
-        # filter list
-        my @ResultList;
-        foreach my $TicketType ( @TicketTypeDataList ) {
-            # limit list
-            last if scalar(@ResultList) > $Param{Data}->{Limit};
-            
-            push(@ResultList, $TicketType);                                
-        }  
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

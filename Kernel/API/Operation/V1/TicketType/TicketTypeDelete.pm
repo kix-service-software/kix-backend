@@ -75,16 +75,11 @@ perform TicketTypeDelete Operation. This will return the deleted TypeID.
             Authorization => {
                 ...
             },
-
-			TicketTypeDelete {
-        		TypeID  => '...',
-        		UserID  => 123,
-        	},
+        	TypeID  => '...',
         },		
     };
 
     $Result = {
-        Success    => 1,                       # 0 or 1
         Message    => '',                      # in case of error
             },
         },
@@ -126,22 +121,21 @@ sub Run {
     }
   
     my $Message = '';
-    my @TicketTypeList;
   
     # start type loop
     TYPE:    
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 	           
-	    my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
 	        Result  => 'COUNT',
-	        TypeIDs => [$TypeID],
+            TypeIDs => [$TypeID],
 	        UserID  => $Param{Data}->{Authorization}->{UserID},
 	    );
      
 	    if ( $ResultTicketSearch ) {
-	        next $Self->_Error(
+	        return $Self->_Error(
 	            Code    => 'TicketTypeDelete.TicketExists',
-	            Message => 'Can not delete TicketType. A Ticket with same TicketType already exists.',
+	            Message => 'Can not delete TicketType. A Ticket with this TicketType already exists.',
 	        );
 	    }
 	    

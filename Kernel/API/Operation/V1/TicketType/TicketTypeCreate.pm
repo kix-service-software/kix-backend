@@ -145,10 +145,7 @@ sub Run {
             #remove trailing spaces
             $TicketType->{$Attribute} =~ s{\s+\z}{};
         }
-    }
-
-    # get relevant function	
-    my $TicketTypeID;
+    }   
         	
     # check if tickettype exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
@@ -158,12 +155,12 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'TicketTypeCreate.TicketTypeExists',
-            Message => "Can not create TicketType. TicketType with same name '$Param{Data}->{Name}' already exists.",
+            Message => "Can not create TicketType. TicketType with same name '$TicketType->{Name}' already exists.",
         );
     }
 
     # create TicketType
-    $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
+    my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
         Name    => $TicketType->{Name},
         ValidID => 1,
         UserID  => $Param{Data}->{Authorization}->{UserID},
