@@ -159,7 +159,7 @@ sub Run {
         );
     }
 
-    # create TicketType
+    # create tickettype
     my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
         Name    => $TicketType->{Name},
         ValidID => 1,
@@ -172,7 +172,7 @@ sub Run {
             Message => 'Could not create type, please contact the system administrator',
         );
     }
-    
+    # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
         TicketTypeID => $TicketTypeID,

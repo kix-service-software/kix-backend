@@ -123,11 +123,12 @@ sub Run {
         );
     }
 
-    # perform Tickettype search
+    # get tickettype list 
     my %TicketTypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
         Valid => 1,
     );
 
+    # get already prepared tickettype data from TicketTypeGet operation
     if ( IsHashRefWithData(\%TicketTypeList) ) {
         my $TicketTypeGetResult = $Self->ExecOperation(
             Operation => 'V1::TicketType::TicketTypeGet',

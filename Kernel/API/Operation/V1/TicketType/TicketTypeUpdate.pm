@@ -145,6 +145,7 @@ sub Run {
         );
     }
 
+    # update tickettype
     my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeUpdate(
         ID      => $Param{Data}->{TypeID},
         Name    => $Param{Data}->{Name},
@@ -158,7 +159,8 @@ sub Run {
             Message => 'Could not update TicketType, please contact the system administrator',
         );
     }
-    
+
+    # return result    
     return $Self->_Success(
         TypeID => $TicketTypeData{ID},
     );    

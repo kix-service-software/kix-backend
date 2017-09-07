@@ -125,7 +125,8 @@ sub Run {
     # start type loop
     TYPE:    
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
-	           
+
+        # search ticket       
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
             Result  => 'COUNT',
             TypeIDs => [$TypeID],
@@ -138,7 +139,8 @@ sub Run {
                 Message => 'Can not delete TicketType. A Ticket with this TicketType already exists.',
             );
         }
-	    
+
+        # delete tickettype	    
         my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
             TypeID  => $TypeID,
             UserID  => $Param{Data}->{Authorization}->{UserID},
@@ -152,6 +154,7 @@ sub Run {
         }
     }
 
+    # return result
     return $Self->_Success();
 }
 
