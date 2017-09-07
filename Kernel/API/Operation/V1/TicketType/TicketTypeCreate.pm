@@ -172,6 +172,7 @@ sub Run {
             Message => 'Could not create type, please contact the system administrator',
         );
     }
+    
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
