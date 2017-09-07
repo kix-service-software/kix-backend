@@ -127,29 +127,29 @@ sub Run {
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 	           
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-	        Result  => 'COUNT',
+            Result  => 'COUNT',
             TypeIDs => [$TypeID],
-	        UserID  => $Param{Data}->{Authorization}->{UserID},
-	    );
+            UserID  => $Param{Data}->{Authorization}->{UserID},
+        );
      
-	    if ( $ResultTicketSearch ) {
-	        return $Self->_Error(
-	            Code    => 'TicketTypeDelete.TicketExists',
-	            Message => 'Can not delete TicketType. A Ticket with this TicketType already exists.',
-	        );
-	    }
+        if ( $ResultTicketSearch ) {
+            return $Self->_Error(
+                Code    => 'TicketTypeDelete.TicketExists',
+                Message => 'Can not delete TicketType. A Ticket with this TicketType already exists.',
+            );
+        }
 	    
-	    my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
-	        TypeID  => $TypeID,
-	        UserID  => $Param{Data}->{Authorization}->{UserID},
-	    );
+        my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
+            TypeID  => $TypeID,
+            UserID  => $Param{Data}->{Authorization}->{UserID},
+        );
 
-	    if ( !$Success ) {
-	        return $Self->_Error(
-	            Code    => 'Object.UnableToDelete',
-	            Message => 'Could not delete TicketType, please contact the system administrator',
-	        );
-	    }
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete TicketType, please contact the system administrator',
+            );
+        }
     }
 
     return $Self->_Success();
