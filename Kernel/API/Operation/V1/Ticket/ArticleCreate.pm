@@ -175,27 +175,29 @@ sub Run {
         );
     }
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
+   my $PermissionUserID = $Self->{Authorization}->{UserID};
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
     }
 
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermissions(
-        Ticket   => $Param{Data}->{TicketID},
-        UserID   => $PermissionUserID,
+    # check write permission
+    my $Permission = $Self->CheckWritePermission(
+        TicketID => $Param{Data}->{TicketID},
+        UserID   => $Self->{Authorization}->{UserID},
         UserType => $Self->{Authorization}->{UserType},
     );
 
     if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "Can not create tickets in given Queue or QueueID!",
+            Message => "No permission to create article for ticket $Param{Data}->{TicketID}!",
         );
     }
 
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
     # get ticket data
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{Data}->{TicketID},
     );
 
@@ -255,27 +257,24 @@ sub Run {
 creates a ticket with its article and sets dynamic fields and attachments if specified.
 
     my $Response = $OperationObject->_ArticleCreate(
-        Ticket       => $Ticket,                  # all ticket parameters
-        Article      => $Article,                 # all attachment parameters
-        DynamicField => $DynamicField,            # all dynamic field parameters
-        Attachment   => $Attachment,             # all attachment parameters
+        Ticket       => $Ticket,                  
+        Article      => $Article,                 
         UserID       => 123,
     );
 
     returns:
 
     $Response = {
-        Success => 1,                               # if everething is OK
+        Success => 1,                               # if everything is OK
         Data => {
-            TicketID     => 123,
-            TicketNumber => 'TN3422332',
-            ArticleID    => 123,
+            ArticleID  => 123,
         }
     }
 
     $Response = {
-        Success      => 0,                         # if unexpected error
-        Message => "$Param{Code}: $Param{Message}",
+        Success => 0,                         # if unexpected error
+        Code    => '...',  
+        Message => '...'
     }
 
 =cut
@@ -285,8 +284,6 @@ sub _ArticleCreate {
 
     my $Ticket           = $Param{Ticket};
     my $Article          = $Param{Article};
-    my $DynamicFieldList = $Param{DynamicFieldList};
-    my $AttachmentList   = $Param{AttachmentList};
 
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
@@ -302,7 +299,7 @@ sub _ArticleCreate {
         $CustomerID = $Ticket->{CustomerID};
     }
 
-    # get database object
+    # get user object
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
     my $OwnerID;
@@ -330,115 +327,6 @@ sub _ArticleCreate {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    # create new ticket
-    my $TicketID = $TicketObject->ArticleCreate(
-        Title        => $Ticket->{Title},
-        QueueID      => $Ticket->{QueueID} || '',
-        Queue        => $Ticket->{Queue} || '',
-        Lock         => 'unlock',
-        TypeID       => $Ticket->{TypeID} || '',
-        Type         => $Ticket->{Type} || '',
-        ServiceID    => $Ticket->{ServiceID} || '',
-        Service      => $Ticket->{Service} || '',
-        SLAID        => $Ticket->{SLAID} || '',
-        SLA          => $Ticket->{SLA} || '',
-        StateID      => $Ticket->{StateID} || '',
-        State        => $Ticket->{State} || '',
-        PriorityID   => $Ticket->{PriorityID} || '',
-        Priority     => $Ticket->{Priority} || '',
-        OwnerID      => 1,
-        CustomerNo   => $CustomerID,
-        CustomerUser => $CustomerUserData{UserLogin} || '',
-        UserID       => $Param{UserID},
-    );
-
-    if ( !$TicketID ) {
-        return {
-            Success      => 0,
-            Message => 'Ticket could not be created, please contact the system administrator',
-        };
-    }
-
-    # set lock if specified
-    if ( $Ticket->{Lock} || $Ticket->{LockID} ) {
-        $TicketObject->TicketLockSet(
-            TicketID => $TicketID,
-            LockID   => $Ticket->{LockID} || '',
-            Lock     => $Ticket->{Lock} || '',
-            UserID   => $Param{UserID},
-        );
-    }
-
-    # get State Data
-    my %StateData;
-    my $StateID;
-
-    # get state object
-    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
-
-    if ( $Ticket->{StateID} ) {
-        $StateID = $Ticket->{StateID};
-    }
-    else {
-        $StateID = $StateObject->StateLookup(
-            State => $Ticket->{State},
-        );
-    }
-
-    %StateData = $StateObject->StateGet(
-        ID => $StateID,
-    );
-
-    # force unlock if state type is close
-    if ( $StateData{TypeName} =~ /^close/i ) {
-
-        # set lock
-        $TicketObject->TicketLockSet(
-            TicketID => $TicketID,
-            Lock     => 'unlock',
-            UserID   => $Param{UserID},
-        );
-    }
-
-    # set pending time
-    elsif ( $StateData{TypeName} =~ /^pending/i ) {
-
-        # set pending time
-        if ( defined $Ticket->{PendingTime} ) {
-            $TicketObject->TicketPendingTimeSet(
-                UserID   => $Param{UserID},
-                TicketID => $TicketID,
-                %{ $Ticket->{PendingTime} },
-            );
-        }
-    }
-
-    # set dynamic fields (only for object type 'ticket')
-    if ( IsArrayRefWithData($DynamicFieldList) ) {
-
-        DYNAMICFIELD:
-        for my $DynamicField ( @{$DynamicFieldList} ) {
-            next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
-
-            my $Result = $Self->SetDynamicFieldValue(
-                %{$DynamicField},
-                TicketID => $TicketID,
-                UserID   => $Param{UserID},
-            );
-
-            if ( !$Result->{Success} ) {
-                my $Message =
-                    $Result->{Message} || "Dynamic Field $DynamicField->{Name} could not be"
-                    . " set, please contact the system administrator";
-
-                return {
-                    Success      => 0,
-                    Message => $Message,
-                };
-            }
-        }
-    }
-
     if ( !defined $Article->{NoAgentNotify} ) {
 
         # check if new owner is given (then send no agent notify)
@@ -453,13 +341,11 @@ sub _ArticleCreate {
     if ( $Article->{From} ) {
         $From = $Article->{From};
     }
-
     # use data from customer user (if customer user is in database)
     elsif ( IsHashRefWithData( \%CustomerUserData ) ) {
         $From = '"' . $CustomerUserData{UserFirstname} . ' ' . $CustomerUserData{UserLastname} . '"'
             . ' <' . $CustomerUserData{UserEmail} . '>';
     }
-
     # otherwise use customer user as sent from the request (it should be an email)
     else {
         $From = $Ticket->{CustomerUser};
@@ -479,7 +365,7 @@ sub _ArticleCreate {
     # create article
     my $ArticleID = $TicketObject->ArticleCreate(
         NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
-        TicketID       => $TicketID,
+        TicketID       => $Ticket->{TicketID},
         ArticleTypeID  => $Article->{ArticleTypeID}  || '',
         ArticleType    => $Article->{ArticleType}    || '',
         SenderTypeID   => $Article->{SenderTypeID}   || '',
@@ -505,64 +391,27 @@ sub _ArticleCreate {
     );
 
     if ( !$ArticleID ) {
-        return {
-            Success      => 0,
-            Message => 'Article could not be created, please contact the system administrator'
-            }
-    }
-
-    # set owner (if owner or owner id is given)
-    if ($OwnerID) {
-        $TicketObject->TicketOwnerSet(
-            TicketID  => $TicketID,
-            NewUserID => $OwnerID,
-            UserID    => $Param{UserID},
-        );
-
-        # set lock if no lock was defined
-        if ( !$Ticket->{Lock} && !$Ticket->{LockID} ) {
-            $TicketObject->TicketLockSet(
-                TicketID => $TicketID,
-                Lock     => 'lock',
-                UserID   => $Param{UserID},
-            );
-        }
-    }
-
-    # else set owner to current agent but do not lock it
-    else {
-        $TicketObject->TicketOwnerSet(
-            TicketID           => $TicketID,
-            NewUserID          => $Param{UserID},
-            SendNoNotification => 1,
-            UserID             => $Param{UserID},
-        );
-    }
-
-    # set responsible
-    if ($ResponsibleID) {
-        $TicketObject->TicketResponsibleSet(
-            TicketID  => $TicketID,
-            NewUserID => $ResponsibleID,
-            UserID    => $Param{UserID},
+        return $Self->_Error(
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create article, please contact the system administrator',
         );
     }
 
     # time accounting
     if ( $Article->{TimeUnit} ) {
         $TicketObject->TicketAccountTime(
-            TicketID  => $TicketID,
+            TicketID  => $Ticket->{TicketID},
             ArticleID => $ArticleID,
             TimeUnit  => $Article->{TimeUnit},
             UserID    => $Param{UserID},
         );
     }
 
-    # set dynamic fields (only for object type 'article')
-    if ( IsArrayRefWithData($DynamicFieldList) ) {
+    # set dynamic fields
+    if ( IsArrayRefWithData($Article->{DynamicFields}) ) {
 
         DYNAMICFIELD:
-        for my $DynamicField ( @{$DynamicFieldList} ) {
+        foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
 
             my $IsArticleDynamicField = $Self->ValidateDynamicFieldObjectType(
                 %{$DynamicField},
@@ -572,60 +421,39 @@ sub _ArticleCreate {
 
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
-                TicketID  => $TicketID,
+                TicketID  => $Ticket->{TicketID},
                 ArticleID => $ArticleID,
                 UserID    => $Param{UserID},
             );
 
             if ( !$Result->{Success} ) {
-                my $Message =
-                    $Result->{Message} || "Dynamic Field $DynamicField->{Name} could not be"
-                    . " set, please contact the system administrator";
-
-                return {
-                    Success      => 0,
-                    Message => $Message,
-                };
+                return $Self->_Error(
+                    Code    => 'Operation.InternalError',
+                    Message => "Dynamic Field $DynamicField->{Name} could not be set, please contact the system administrator",
+                );
             }
         }
     }
 
     # set attachments
-    if ( IsArrayRefWithData($AttachmentList) ) {
+    if ( IsArrayRefWithData($Article->{Attachments}) ) {
 
-        for my $Attachment ( @{$AttachmentList} ) {
-            my $Result = $Self->CreateAttachment(
-                Attachment => $Attachment,
-                ArticleID  => $ArticleID,
-                UserID     => $Param{UserID}
+        foreach my $Attachment ( @{$Article->{Attachments}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Ticket::ArticleAttachmentCreate',
+                Data          => {
+                    TicketID   => $Ticket->{TicketID},
+                    ArticleID  => $ArticleID,
+                    Attachment => $Attachment,
+                }
             );
-
+            
             if ( !$Result->{Success} ) {
-                my $Message =
-                    $Result->{Message} || "Attachment could not be created, please contact"
-                    . " the system administrator";
-
-                return {
-                    Success      => 0,
-                    Message => $Message,
-                };
+                return $Self->_Error(
+                    ${$Result},
+                )
             }
         }
-    }
-
-    # get ticket data
-    my %TicketData = $TicketObject->TicketGet(
-        TicketID      => $TicketID,
-        DynamicFields => 0,
-        UserID        => $Param{UserID},
-    );
-
-    if ( !IsHashRefWithData( \%TicketData ) ) {
-        return {
-            Success      => 0,
-            Message => 'Could not get new ticket information, please contact the system'
-                . ' administrator',
-            }
     }
 
     return $Self->_Success(

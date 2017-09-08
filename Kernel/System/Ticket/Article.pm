@@ -1471,19 +1471,27 @@ sub ArticleGet {
     # sql query
     my @Content;
     my @Bind;
+    # my $SQL = '
+    #     SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_subject,
+    #         sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
+    #         st.create_time_unix, st.ticket_state_id, st.queue_id, sa.create_time,
+    #         sa.a_content_type, sa.create_by, st.tn, article_sender_type_id, st.customer_id,
+    #         st.until_time, st.ticket_priority_id, st.customer_user_id, st.user_id,
+    #         st.responsible_user_id, sa.article_type_id,
+    #         sa.incoming_time, sa.id,
+    #         st.ticket_lock_id, st.title, st.escalation_update_time,
+    #         st.type_id, st.service_id, st.sla_id, st.escalation_response_time,
+    #         st.escalation_solution_time, st.escalation_time, st.change_time
+    #     FROM article sa
+    #     JOIN ticket st ON sa.ticket_id = st.id
+    #     WHERE ';
+
     my $SQL = '
         SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_subject,
             sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
-            st.create_time_unix, st.ticket_state_id, st.queue_id, sa.create_time,
-            sa.a_content_type, sa.create_by, st.tn, article_sender_type_id, st.customer_id,
-            st.until_time, st.ticket_priority_id, st.customer_user_id, st.user_id,
-            st.responsible_user_id, sa.article_type_id,
-            sa.incoming_time, sa.id,
-            st.ticket_lock_id, st.title, st.escalation_update_time,
-            st.type_id, st.service_id, st.sla_id, st.escalation_response_time,
-            st.escalation_solution_time, st.escalation_time, st.change_time
+            sa.create_time, sa.a_content_type, sa.create_by, article_sender_type_id,
+            sa.article_type_id, sa.incoming_time, sa.id
         FROM article sa
-        JOIN ticket st ON sa.ticket_id = st.id
         WHERE ';
 
     if ( $Param{ArticleID} ) {
@@ -1537,71 +1545,27 @@ sub ArticleGet {
 
     my %Ticket;
     while ( my @Row = $DBObject->FetchrowArray() ) {
+
         my %Data;
-        $Data{TicketID}   = $Row[0];
-        $Ticket{TicketID} = $Data{TicketID};
-        $Data{From}       = $Row[1];
-        $Data{To}         = $Row[2];
-        $Data{Cc}         = $Row[3];
-        $Data{Subject}    = $Row[4];
-
-        $Data{ReplyTo}    = $Row[5];
-        $Data{MessageID}  = $Row[6];
-        $Data{InReplyTo}  = $Row[7];
-        $Data{References} = $Row[8];
-        $Data{Body}       = $Row[9];
-
-        $Ticket{CreateTimeUnix} = $Row[10];
-        $Data{StateID}          = $Row[11];
-        $Ticket{StateID}        = $Row[11];
-        $Data{QueueID}          = $Row[12];
-        $Ticket{QueueID}        = $Row[12];
-        $Ticket{AgeTimeUnix}    = $TimeObject->SystemTime()
-            - $TimeObject->TimeStamp2SystemTime( String => $Row[13] );
-        $Ticket{Created} = $TimeObject->SystemTime2TimeStamp( SystemTime => $Ticket{CreateTimeUnix} );
-        $Data{ContentType} = $Row[14];
-
-        $Data{CreatedBy}           = $Row[15];
-        $Data{TicketNumber}        = $Row[16];
-        $Data{SenderTypeID}        = $Row[17];
-        $Data{CustomerID}          = $Row[18];
-        $Ticket{CustomerID}        = $Row[18];
-        $Data{RealTillTimeNotUsed} = $Row[19];
-
-        $Data{PriorityID}       = $Row[20];
-        $Ticket{PriorityID}     = $Row[20];
-        $Data{CustomerUserID}   = $Row[21];
-        $Ticket{CustomerUserID} = $Row[21];
-        $Data{OwnerID}          = $Row[22];
-        $Ticket{OwnerID}        = $Row[22];
-        $Data{ResponsibleID}    = $Row[23] || 1;
-        $Ticket{ResponsibleID}  = $Row[23] || 1;
-        $Data{ArticleTypeID}    = $Row[24];
-
-        $Data{IncomingTime} = $Row[25];
-        $Data{Created}      = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $Row[25],
-        );
-        $Data{ArticleID}              = $Row[26];
-        $Ticket{LockID}               = $Row[27];
-        $Data{Title}                  = $Row[28];
-        $Ticket{Title}                = $Data{Title};
-        $Data{EscalationUpdateTime}   = $Row[29];
-        $Ticket{EscalationUpdateTime} = $Data{EscalationUpdateTime};
-
-        $Data{TypeID}                   = $Row[30];
-        $Ticket{TypeID}                 = $Row[30];
-        $Data{ServiceID}                = $Row[31];
-        $Ticket{ServiceID}              = $Row[31];
-        $Data{SLAID}                    = $Row[32];
-        $Ticket{SLAID}                  = $Row[32];
-        $Data{EscalationResponseTime}   = $Row[33];
-        $Ticket{EscalationResponseTime} = $Data{EscalationResponseTime};
-        $Data{EscalationSolutionTime}   = $Row[34];
-        $Ticket{EscalationSolutionTime} = $Data{EscalationSolutionTime};
-        $Data{EscalationTime}           = $Row[35];
-        $Ticket{EscalationTime}         = $Data{EscalationTime};
-        $Ticket{Changed}                = $Row[36];
+        $Data{TicketID}         = $Row[0];
+        $Data{From}             = $Row[1];
+        $Data{To}               = $Row[2];
+        $Data{Cc}               = $Row[3];
+        $Data{Subject}          = $Row[4];
+        $Data{ReplyTo}          = $Row[5];
+        $Data{MessageID}        = $Row[6];
+        $Data{InReplyTo}        = $Row[7];
+        $Data{References}       = $Row[8];
+        $Data{Body}             = $Row[9];
+        $Data{CreateTime}       = $Row[10];
+        $Data{ContentType}      = $Row[11];
+        $Data{CreatedBy}        = $Row[12];
+        $Data{SenderTypeID}     = $Row[13];
+        $Data{ArticleTypeID}    = $Row[14];
+        $Data{IncomingTime}     = $Row[15];
+        $Data{ArticleID}        = $Row[16];
+        $Data{ChangeTime}       = $Row[17];
+        $Data{ChangedBy}        = $Row[18];
 
         if ( $Data{ContentType} && $Data{ContentType} =~ /charset=/i ) {
             $Data{Charset} = $Data{ContentType};
@@ -1625,9 +1589,6 @@ sub ArticleGet {
             $Data{MimeType} = '';
         }
 
-        # fill up dynamic variables
-        $Data{Age} = $TimeObject->SystemTime() - $Ticket{CreateTimeUnix};
-
         # strip not wanted stuff
         RECIPIENT:
         for my $Key (qw(From To Cc Subject)) {
@@ -1649,10 +1610,6 @@ sub ArticleGet {
             ObjectType => 'Article'
         );
 
-        my $DynamicFieldTicketList = $DynamicFieldObject->DynamicFieldListGet(
-            ObjectType => 'Ticket'
-        );
-
         for my $Article (@Content) {
             DYNAMICFIELD:
             for my $DynamicFieldConfig ( @{$DynamicFieldArticleList} ) {
@@ -1672,48 +1629,6 @@ sub ArticleGet {
                 # set the dynamic field name and value into the ticket hash
                 $Article->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
             }
-
-            DYNAMICFIELD:
-            for my $DynamicFieldConfig ( @{$DynamicFieldTicketList} ) {
-
-                # validate each dynamic field
-                next DYNAMICFIELD if !$DynamicFieldConfig;
-                next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
-                next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
-                next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
-
-                # get the current value for each dynamic field
-                my $Value = $DynamicFieldBackendObject->ValueGet(
-                    DynamicFieldConfig => $DynamicFieldConfig,
-                    ObjectID           => $Article->{TicketID},
-                );
-
-                # set the dynamic field name and value into the ticket hash
-                $Article->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
-
-                # check if field is TicketFreeKey[1-16], TicketFreeText[1-6] or TicketFreeTime[1-6]
-                # Compatibility feature can be removed on further versions
-                if (
-                    $DynamicFieldConfig->{Name} =~ m{
-                        \A
-                        (
-                            TicketFree
-                            (?:
-                                (?:Text|Key)
-                                (?:1[0-6]|[1-9])
-                                |
-                                (?:Time [1-6])
-                            )
-                        )
-                        \z
-                    }smxi
-                    )
-                {
-
-                    # Set field for 3.0 and 2.4 compatibility
-                    $Article->{ $DynamicFieldConfig->{Name} } = $Value;
-                }
-            }
         }
     }
 
@@ -1731,107 +1646,6 @@ sub ArticleGet {
         return;
     }
 
-    # get type object
-    my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
-
-    # get default ticket type
-    my $DefaultTicketType = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type::Default');
-
-    # check if default ticket type exists
-    my %AllTicketTypes = reverse $TypeObject->TypeList();
-
-    # get type
-    if ( defined $Ticket{TypeID} ) {
-        $Ticket{Type} = $TypeObject->TypeLookup(
-            TypeID => $Ticket{TypeID}
-        );
-    }
-    elsif ( $AllTicketTypes{$DefaultTicketType} ) {
-        $Ticket{Type} = $DefaultTicketType;
-    }
-    else {
-        $Ticket{Type} = $TypeObject->TypeLookup(
-            TypeID => 1
-        );
-    }
-
-    # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-
-    # get owner
-    $Ticket{Owner} = $UserObject->UserLookup(
-        UserID => $Ticket{OwnerID},
-    );
-
-    # get responsible
-    $Ticket{Responsible} = $UserObject->UserLookup(
-        UserID => $Ticket{ResponsibleID},
-    );
-
-    # get priority
-    $Ticket{Priority} = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
-        PriorityID => $Ticket{PriorityID},
-    );
-
-    # get lock
-    $Ticket{Lock} = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
-        LockID => $Ticket{LockID},
-    );
-
-    # get service
-    if ( $Ticket{ServiceID} ) {
-        $Ticket{Service} = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
-            ServiceID => $Ticket{ServiceID},
-        );
-    }
-
-    # get sla
-    if ( $Ticket{SLAID} ) {
-        $Ticket{SLA} = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
-            SLAID => $Ticket{SLAID},
-        );
-    }
-
-    # get queue name and other stuff
-    my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
-        ID => $Ticket{QueueID},
-    );
-
-    # get state info
-    my %StateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
-        ID => $Ticket{StateID},
-    );
-
-    $Ticket{StateType} = $StateData{TypeName};
-    $Ticket{State}     = $StateData{Name};
-
-    # get escalation attributes
-    my %Escalation = $Self->TicketEscalationDateCalculation(
-        Ticket => \%Ticket,
-        UserID => $Param{UserID} || 1,
-    );
-    for my $Part (@Content) {
-        for ( sort keys %Escalation ) {
-            $Part->{$_} = $Escalation{$_};
-        }
-    }
-
-    # do extended lookups
-    if ( $Param{Extended} ) {
-        my %TicketExtended = $Self->_TicketGetExtended(
-            TicketID => $Ticket{TicketID},
-            Ticket   => \%Ticket,
-        );
-        for my $Key ( sort keys %TicketExtended ) {
-            $Ticket{$Key} = $TicketExtended{$Key};
-        }
-        for my $Part (@Content) {
-            for ( sort keys %TicketExtended ) {
-                $Part->{$_} = $TicketExtended{$_};
-            }
-        }
-    }
-
     # create email parser object
     my $EmailParser = Kernel::System::EmailParser->new(
         Mode => 'Standalone',
@@ -1839,15 +1653,6 @@ sub ArticleGet {
 
     # article stuff
     for my $Part (@Content) {
-
-        # get type
-        $Part->{Type} = $Ticket{Type};
-
-        # get owner
-        $Part->{Owner} = $Ticket{Owner};
-
-        # get responsible
-        $Part->{Responsible} = $Ticket{Responsible};
 
         # get sender type
         $Part->{SenderType} = $Self->ArticleSenderTypeLookup(
@@ -1858,22 +1663,6 @@ sub ArticleGet {
         $Part->{ArticleType} = $Self->ArticleTypeLookup(
             ArticleTypeID => $Part->{ArticleTypeID},
         );
-
-        # get priority name
-        $Part->{Priority} = $Ticket{Priority};
-        $Part->{LockID}   = $Ticket{LockID};
-        $Part->{Lock}     = $Ticket{Lock};
-        $Part->{Queue}    = $Queue{Name};
-        $Part->{Service}  = $Ticket{Service} || '';
-        $Part->{SLA}      = $Ticket{SLA} || '';
-        if ( !$Part->{RealTillTimeNotUsed} || $StateData{TypeName} !~ /^pending/i ) {
-            $Part->{UntilTime} = 0;
-        }
-        else {
-            $Part->{UntilTime} = $Part->{RealTillTimeNotUsed} - $TimeObject->SystemTime();
-        }
-        $Part->{StateType} = $StateData{TypeName};
-        $Part->{State}     = $StateData{Name};
 
         # add real name lines
         RECIPIENT:

@@ -186,13 +186,13 @@ sub Run {
     }
 
     # check ticket permission
-    my $Access = $Self->CheckAccessPermissions(
+    my $Permission = $Self->CheckAccessPermission(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
         UserType => $Self->{Authorization}->{UserType},
     );
 
-    if ( !$Access ) {
+    if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
             Message => "No permission to access ticket $Param{Data}->{TicketID}.",

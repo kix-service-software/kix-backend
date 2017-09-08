@@ -118,8 +118,8 @@ sub Validate {
 
     if ( !$Found ) {
         return $Self->_Error(
-            Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
+            Code    => 'Object.NotFound',
+            Message => "Ticket not found!",
         );        
     }
 

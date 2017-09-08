@@ -147,13 +147,13 @@ sub Run {
     }
 
     # check ticket permission
-    my $Access = $Self->CheckAccessPermissions(
+    my $Permission = $Self->CheckAccessPermission(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
         UserType => $Self->{Authorization}->{UserType},
     );
 
-    if ( !$Access ) {
+    if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
             Message => "No permission to access ticket $Param{Data}->{TicketID}.",
@@ -167,7 +167,7 @@ sub Run {
 
     # start attachment loop
     ATTACHMENT:
-    for my $AttachmentID ( sort @{$Param{Data}->{AttachmentID}} ) {
+    foreach my $AttachmentID ( sort @{$Param{Data}->{AttachmentID}} ) {
         
         my %Attachment = $TicketObject->ArticleAttachment(
             ArticleID          => $Param{Data}->{ArticleID},

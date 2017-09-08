@@ -59,8 +59,6 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ArticleAttachmentCreate');
-
     return $Self;
 }
 
@@ -145,7 +143,7 @@ sub Run {
         $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
     }
 
-    # check create permissions
+    # check write permission
     my $Permission = $Self->CheckWritePermission(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
@@ -205,7 +203,7 @@ sub Run {
 
     if ( !$AttachmentID ) {
         return $Self->_Error(
-            Code    => 'ArticleAttachmentCreate.UnableToCreate',
+            Code    => 'Object.UnableToCreate',
             Message => 'Could not create attachment, please contact the system administrator',
         );
     }

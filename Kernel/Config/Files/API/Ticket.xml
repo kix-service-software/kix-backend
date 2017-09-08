@@ -46,54 +46,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketCreate###ArticleType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
-        <Setting>
-            <String Regex="">webrequest</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketCreate###HistoryType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
-        <Setting>
-            <String Regex="">NewTicket</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketCreate###HistoryComment" Required="1" Valid="1">
-        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
-        <Setting>
-            <String Regex="">%%API Create</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketCreate###AutoResponseType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
-        <Setting>
-            <String Regex="">auto reply</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketUpdate###ArticleType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
-        <Setting>
-            <String Regex="">webrequest</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketUpdate###HistoryType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
-        <Setting>
-            <String Regex="">AddNote</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketUpdate###HistoryComment" Required="1" Valid="1">
-        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
-        <Setting>
-            <String Regex="">%%API Note</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketUpdate###AutoResponseType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
-        <Setting>
-            <String Regex="">auto follow up</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="API::Operation::V1::TicketSearch###SearchLimit" Required="1" Valid="1">
         <Description Translatable="1">Maximum number of tickets to be displayed in the result of this operation.</Description>
         <Setting>
@@ -135,12 +87,82 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">NewTicket</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryComment" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">%%API Create</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleCreate###ArticleType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">webrequest</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleCreate###AutoResponseType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">auto reply</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleUpdate###ArticleType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">webrequest</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleUpdate###AutoResponseType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
+        <Setting>
+            <String Regex="">auto follow up</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleUpdate###HistoryType" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">AddNote</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::V1::ArticleUpdate###HistoryComment" Required="1" Valid="1">
+        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
+        <Setting>
+            <String Regex="">%%API Note</String>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleAttachmentCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

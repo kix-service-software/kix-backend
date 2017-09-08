@@ -573,22 +573,22 @@ sub CreateAttachment {
         }
 }
 
-=item CheckCreatePermissions ()
+=item CheckCreatePermission ()
 
-Tests if the user have the permissions to create a ticket on a determined queue
+Tests if the user have the permission to create a ticket on a determined queue
 
-    my $Result = $CommonObject->CheckCreatePermissions(
+    my $Result = $CommonObject->CheckCreatePermission(
         Ticket     => $TicketHashReference,
         UserID     => 123,                      # or 'CustomerLogin'
         UserType   => 'Agent',                  # or 'Customer'
     );
 
 returns:
-    $Success = 1                                # if everything is OK
+    $Result = 1                                 # if everything is OK
 
 =cut
 
-sub CheckCreatePermissions {
+sub CheckCreatePermission {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -640,7 +640,7 @@ Tests if the user have write permission for a ticket
     );
 
 returns:
-    $Success = 1                                # if everything is OK
+    $Result = 1                                # if everything is OK
 
 =cut
 
@@ -660,7 +660,7 @@ sub CheckWritePermission {
     }
 
     my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
-        Type     => 'ro',
+        Type     => 'rw',
         TicketID => $Param{TicketID},
         UserID   => $Param{UserID},
     );
@@ -679,7 +679,7 @@ Tests if the user have access permission for a ticket
     );
 
 returns:
-    $Success = 1                                # if everything is OK
+    $Result = 1                                 # if everything is OK
 
 =cut
 
@@ -709,6 +709,107 @@ sub CheckAccessPermission {
 
 =begin Internal:
 
+=item _CheckTicket()
+
+checks if the given ticket parameter is valid.
+
+    my $TicketCheck = $OperationObject->_CheckTicket(
+        Ticket => $Ticket,                        # all ticket parameters
+    );
+
+    returns:
+
+    $TicketCheck = {
+        Success => 1,                               # if everything is OK
+    }
+
+    $TicketCheck = {
+        Code    => 'Function.Error',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckTicket {
+    my ( $Self, %Param ) = @_;
+
+    my $Ticket = $Param{Ticket};
+
+    # check ticket internally
+    for my $Needed (qw(Title)) {
+        if ( !$Ticket->{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Required parameter $Needed is missing!",
+            );
+        }
+    }
+
+    # get config object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    if ( defined $Ticket->{Articles} ) {
+
+        if ( !IsArrayRefWithData($Ticket->{Articles}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Ticket::Articles is invalid!",
+            );            
+        }
+
+        # check Article internal structure
+        foreach my $ArticleItem (@{$Ticket->{Articles}}) {
+            if ( !IsHashRefWithData($ArticleItem) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Parameter Ticket::Articles is invalid!",
+                );
+            }
+
+            # check article attribute values
+            my $ArticleCheck = $Self->_CheckArticle( Article => $ArticleItem );
+
+            if ( !$ArticleCheck->{Success} ) {
+                return $Self->_Error( 
+                    %{$ArticleCheck} 
+                );
+            }
+        }
+    }
+
+    if ( defined $Ticket->{DynamicField} ) {
+
+        if ( !IsArrayRefWithData($Ticket->{DynamicFields}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Ticket::DynamicFields is invalid!",
+            );            
+        }
+
+        # check DynamicField internal structure
+        foreach my $DynamicFieldItem (@{$Ticket->{DynamicFields}}) {
+            if ( !IsHashRefWithData($DynamicFieldItem) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Parameter Ticket::DynamicFields is invalid!",
+                );
+            }
+
+            # check DynamicField attribute values
+            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
+
+            if ( !$DynamicFieldCheck->{Success} ) {
+                return $Self->_Error( 
+                    %{$DynamicFieldCheck} 
+                );
+            }
+        }
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
+
 =item _CheckArticle()
 
 checks if the given article parameter is valid.
@@ -720,7 +821,7 @@ checks if the given article parameter is valid.
     returns:
 
     $ArticleCheck = {
-        Success => 1,                               # if everething is OK
+        Success => 1,                               # if everything is OK
     }
 
     $ArticleCheck = {
@@ -736,7 +837,7 @@ sub _CheckArticle {
     my $Article = $Param{Article};
 
     # check ticket internally
-    for my $Needed (qw(Subject Body AutoResponseType)) {
+    for my $Needed (qw(Subject Body)) {
         if ( !$Article->{$Needed} ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
@@ -808,14 +909,21 @@ sub _CheckArticle {
         }
     }
 
-    if ( defined $Param{Attachments} ) {
+    if ( defined $Article->{Attachments} ) {
+
+        if ( !IsArrayRefWithData($Article->{Attachments}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Article::Attachments is invalid!",
+            );            
+        }
 
         # check Attachment internal structure
-        foreach my $AttachmentItem (@{$Param{Attachments}}) {
+        foreach my $AttachmentItem (@{$Article->{Attachments}}) {
             if ( !IsHashRefWithData($AttachmentItem) ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => "Article::Attachments parameter is invalid!",
+                    Message => "Parameter Article::Attachments is invalid!",
                 );
             }
 
@@ -830,14 +938,21 @@ sub _CheckArticle {
         }
     }
 
-    if ( defined $Param{Data}->{DynamicField} ) {
+    if ( defined $Article->{DynamicField} ) {
+
+        if ( !IsArrayRefWithData($Article->{DynamicFields}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Article::DynamicFields is invalid!",
+            );            
+        }
 
         # check DynamicField internal structure
-        foreach my $DynamicFieldItem (@{$Param{DynamicField}}) {
+        foreach my $DynamicFieldItem (@{$Article->{DynamicFields}}) {
             if ( !IsHashRefWithData($DynamicFieldItem) ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => "Article::DynamicFields parameter is invalid!",
+                    Message => "Parameter Article::DynamicFields is invalid!",
                 );
             }
 
@@ -867,7 +982,7 @@ checks if the given dynamic field parameter is valid.
     returns:
 
     $DynamicFieldCheck = {
-        Success => 1,                               # if everething is OK
+        Success => 1,                               # if everything is OK
     }
 
     $DynamicFieldCheck = {
@@ -927,7 +1042,7 @@ checks if the given attachment parameter is valid.
     returns:
 
     $AttachmentCheck = {
-        Success => 1,                               # if everething is OK
+        Success => 1,                               # if everything is OK
     }
 
     $AttachmentCheck = {

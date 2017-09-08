@@ -72,7 +72,7 @@ perform TicketCreate Operation. This will return the created TicketID.
         Data => {
             Ticket => {
                 Title           => 'some ticket title',
-                CustomerContact => 'some customer user login',
+                CustomerUser    => 'some customer user login',
                 StateID         => 123,                                           # StateID or State is required
                 State           => 'some state name',
                 PriorityID      => 123,                                           # PriorityID or Priority is required
@@ -179,7 +179,7 @@ sub Run {
             'Ticket::Title' => {
                 Required => 1
             },
-            'Ticket::CustomerContact' => {
+            'Ticket::CustomerUser' => {
                 Required => 1
             },
             'Ticket::State' => {
@@ -210,20 +210,8 @@ sub Run {
     # isolate ticket hash
     my $Ticket = $Param{Data}->{Ticket};
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Ticket} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Ticket->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Ticket->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
-
     # check create permissions
-    my $Permission = $Self->CheckCreatePermissions(
+    my $Permission = $Self->CheckCreatePermission(
         Ticket   => $Ticket,
         UserID   => $PermissionUserID,
         UserType => $Self->{Authorization}->{UserType},
@@ -231,116 +219,34 @@ sub Run {
 
     if ( !$Permission ) {
         return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => "TicketCreate: Can not create tickets in given Queue or QueueID!",
+            Code    => 'Object.NoPermission',
+            Message => "No permission to create tickets in given queue!",
         );
     }
 
-    if ( IsArrayRefWithData($Ticket->{DynamicField}) ) {
+    # check Ticket attribute values
+    my $TicketCheck = $Self->_CheckTicket( 
+        Ticket => $Ticket 
+    );
 
-        # check DynamicField internal structure
-        for my $DynamicFieldItem ( @{$Ticket->{DynamicField}} ) {
-            if ( !IsHashRefWithData($DynamicFieldItem) ) {
-                return $Self->_Error(
-                    Code    => 'BadRequest',
-                    Message => "TicketCreate: Ticket->DynamicField parameter is invalid!",
-                );
-            }
-
-            # remove leading and trailing spaces
-            for my $Attribute ( sort keys %{$DynamicFieldItem} ) {
-                if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-                    #remove leading spaces
-                    $DynamicFieldItem->{$Attribute} =~ s{\A\s+}{};
-
-                    #remove trailing spaces
-                    $DynamicFieldItem->{$Attribute} =~ s{\s+\z}{};
-                }
-            }
-
-            # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
-
-            if ( !$DynamicFieldCheck->{Success} ) {
-                return $DynamicFieldCheck;
-            }
-        }
+    if ( !$TicketCheck->{Success} ) {
+        return $Self->_Error(
+            %{$TicketCheck},
+        );
     }
 
+    # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
         Ticket => $Ticket,
-        UserID => $UserID,
+        UserID => $PermissionUserID,
     );
 }
 
 =begin Internal:
 
-=item _CheckDynamicField()
-
-checks if the given dynamic field parameter is valid.
-
-    my $DynamicFieldCheck = $OperationObject->_CheckDynamicField(
-        DynamicField => $DynamicField,              # all dynamic field parameters
-    );
-
-    returns:
-
-    $DynamicFieldCheck = {
-        Success => 1,                               # if everething is OK
-    }
-
-    $DynamicFieldCheck = {
-        ErrorCode    => 'Function.Error',           # if error
-        ErrorMessage => 'Error description',
-    }
-
-=cut
-
-sub _CheckDynamicField {
-    my ( $Self, %Param ) = @_;
-
-    my $DynamicField = $Param{DynamicField};
-
-    # check DynamicField item internally
-    for my $Needed (qw(Name Value)) {
-        if (
-            !defined $DynamicField->{$Needed}
-            || ( !IsString( $DynamicField->{$Needed} ) && ref $DynamicField->{$Needed} ne 'ARRAY' )
-            )
-        {
-            return $Self->_Error(
-                Code    => 'TicketCreate.MissingParameter',
-                Message => "TicketCreate: DynamicField->$Needed  parameter is missing!",
-            );
-        }
-    }
-
-    # check DynamicField->Name
-    if ( !$Self->ValidateDynamicFieldName( %{$DynamicField} ) ) {
-        return $Self->_Error(
-            Code    => 'TicketCreate.InvalidParameter',
-            Message => "TicketCreate: DynamicField->Name parameter is invalid!",
-        );
-    }
-
-    # check DynamicField->Value
-    if ( !$Self->ValidateDynamicFieldValue( %{$DynamicField} ) ) {
-        return $Self->_Error(
-            Code    => 'TicketCreate.InvalidParameter',
-            Message => "TicketCreate: DynamicField->Value parameter is invalid!",
-        };
-    }
-
-    # if everything is OK then return Success
-    return {
-        Success => 1,
-    };
-}
-
 =item _TicketCreate()
 
-creates a ticket with its article and sets dynamic fields and attachments if specified.
+creates a ticket with its articles and dynamic fields and attachments if specified.
 
     my $Response = $OperationObject->_TicketCreate(
         Ticket           => { },                # all ticket parameters
@@ -368,7 +274,6 @@ sub _TicketCreate {
     my ( $Self, %Param ) = @_;
 
     my $Ticket           = $Param{Ticket};
-    my $DynamicFieldList = $Param{DynamicFieldList};
 
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
@@ -436,7 +341,7 @@ sub _TicketCreate {
 
     if ( !$TicketID ) {
         return $Self->_Error(
-            Code         => 'TicketCreate.UnableToCreate',
+            Code         => 'Object.UnableToCreate',
             Message      => 'Ticket could not be created, please contact the system administrator',
         );
     }
@@ -496,28 +401,6 @@ sub _TicketCreate {
         }
     }
 
-    # set dynamic fields (only for object type 'ticket')
-    if ( IsArrayRefWithData($DynamicFieldList) ) {
-
-        DYNAMICFIELD:
-        for my $DynamicField ( @{$DynamicFieldList} ) {
-            next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
-
-            my $Result = $Self->SetDynamicFieldValue(
-                %{$DynamicField},
-                TicketID => $TicketID,
-                UserID   => $Param{UserID},
-            );
-
-            if ( !$Result->{Success} ) {
-                return $Self->_Error(
-                    Code         => 'TicketCreate.UnableToCreate',
-                    Message      => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
-                );
-            }
-        }
-    }
-
     # set owner (if owner or owner id is given)
     if ($OwnerID) {
         $TicketObject->TicketOwnerSet(
@@ -555,28 +438,46 @@ sub _TicketCreate {
         );
     }
 
-    # time accounting
-    if ( $Article->{TimeUnit} ) {
-        $TicketObject->TicketAccountTime(
-            TicketID  => $TicketID,
-            ArticleID => $ArticleID,
-            TimeUnit  => $Article->{TimeUnit},
-            UserID    => $Param{UserID},
-        );
+    # set dynamic fields
+    if ( IsArrayRefWithData($Ticket->{DynamicFields}) ) {
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{$Ticket->{DynamicFields}} ) {
+            next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
+
+            my $Result = $Self->SetDynamicFieldValue(
+                %{$DynamicField},
+                TicketID => $TicketID,
+                UserID   => $Param{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    Code         => 'Operation.InternalError',
+                    Message      => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                );
+            }
+        }
     }
 
-    # get ticket data
-    my %TicketData = $TicketObject->TicketGet(
-        TicketID      => $TicketID,
-        DynamicFields => 0,
-        UserID        => $Param{UserID},
-    );
+    # set attachments
+    if ( IsArrayRefWithData($Ticket->{Articles}) ) {
 
-    if ( !IsHashRefWithData( \%TicketData ) ) {
-        return $Self->_Error(
-            Code         => 'TicketCreate.UnableToCreate',
-            Message      => 'Could not get new ticket information, please contact the system administrator',
-        );
+        foreach my $Article ( @{$Ticket->{Articles}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Ticket::ArticleCreate',
+                Data          => {
+                    TicketID => $TicketID,
+                    Article  => $Article,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    ${$Result},
+                )
+            }
+        }
     }
 
     return $Self->_Success(
