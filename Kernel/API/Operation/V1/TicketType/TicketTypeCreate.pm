@@ -77,7 +77,7 @@ perform TicketTypeCreate Operation. This will return the created TypeID.
     TicketType(
         Name    => '...',
         ValidID => '...',
-        UserID  => '...',
+
     );
 
     $Result = {
@@ -149,7 +149,7 @@ sub Run {
         	
     # check if tickettype exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
-        Name => $TicketType->{Name},
+        Name => $Param{Data}->{TicketType}->{Name},
     );
     
     if ( $Exists ) {
@@ -162,7 +162,7 @@ sub Run {
     # create tickettype
     my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
         Name    => $TicketType->{Name},
-        ValidID => 1,
+        ValidID => $TicketType->{ValidID},
         UserID  => $Param{Data}->{Authorization}->{UserID},
     );
 

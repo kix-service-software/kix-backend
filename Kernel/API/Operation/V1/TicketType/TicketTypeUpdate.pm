@@ -75,12 +75,11 @@ perform TicketTypeUpdate Operation. This will return the updated TypeID.
             Authorization => {
                 ...
             },
-
+            ID      => '...',
+        }
     TicketType => (
-        ID      => '...',
-        Name    => ''...',
-        ValidID => 1,
-        UserID  => 123,
+        Name    => '...',
+        ValidID => '...',
     );
     
 
@@ -132,24 +131,41 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
+
+    # isolate TicketType parameter
+    my $TicketType = $Param{Data}->{TicketType}->{Name};
+
+    # remove leading and trailing spaces
+    for my $Attribute ( sort keys %{$TicketType} ) {
+        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
+
+            #remove leading spaces
+            $TicketType->{$Attribute} =~ s{\A\s+}{};
+
+            #remove trailing spaces
+            $TicketType->{$Attribute} =~ s{\s+\z}{};
+        }
+    }
+
     # check if tickettype exists
-    my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
-        ID => $Param{Data}->{TypeID},
-    );
-    
+    if ( IsStringWithData($TicketType->{ID}) ) {    
+        my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
+            ID => $Param{Data}->{ID},
+        );
+    }
+
     if ( !%TicketTypeData ) {
         return $Self->_Error(
             Code    => 'TicketTypeUpdate.LoginExists',
-            Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{TypeID}' not exists.",
+            Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{ID}' not exists.",
         );
     }
 
     # update tickettype
     my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeUpdate(
-        ID      => $Param{Data}->{TypeID},
-        Name    => $Param{Data}->{Name},
-        ValidID => 1,
+        ID      => $Param{Data}->{ID},
+        Name    => $Param{Data}->{TicketType}->{Name},
+        ValidID => $Param{Data}->{TicketType}->{ValidID},
         UserID  => $Param{Data}->{Authorization}->{UserID},
     );
 
