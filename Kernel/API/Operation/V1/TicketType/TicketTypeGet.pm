@@ -142,8 +142,8 @@ sub Run {
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
         # get the TicketType data
-        my %TypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
-            ID => $ypeID,
+        my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
+            ID => $TypeID,
         );
 
         if ( !IsHashRefWithData( \%TicketTypeData ) ) {

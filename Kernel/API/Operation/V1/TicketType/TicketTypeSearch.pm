@@ -141,7 +141,7 @@ sub Run {
             return $TicketTypeGetResult;
         }
 
-        my @TicketTypeDataList = IsArrayRefWithData($TicketTypeGetResult->{Data}->{TicketType}) ? @{$TicketTypeGetResult->{Data}->{TicketType}} : ( $TicketTypeGetResult->{Data}->{TicketType} );
+        my @ResultList = IsArrayRefWithData($TicketTypeGetResult->{Data}->{TicketType}) ? @{$TicketTypeGetResult->{Data}->{TicketType}} : ( $TicketTypeGetResult->{Data}->{TicketType} );
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

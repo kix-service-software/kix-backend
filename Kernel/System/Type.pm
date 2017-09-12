@@ -503,7 +503,7 @@ sub TicketTypeDelete {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM ticket_type WHERE id = ?',
-        Bind => [ \$Param{TypeID} ],
+        Bind => [ \$Param{TicketTypeID} ],
     );
 
     return 1;

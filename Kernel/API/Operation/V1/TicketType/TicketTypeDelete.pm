@@ -18,8 +18,6 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
-use Kernel::System::Ticket::TicketSearch;
-
 use base qw(
     Kernel::API::Operation::V1::Common
 );

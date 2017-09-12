@@ -109,7 +109,6 @@ sub Run {
         );
     }
 
-
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -120,7 +119,10 @@ sub Run {
             },
             'TicketType::Name' => {
                 Required => 1
-            },                   
+            },
+            'TicketType::ValidID' => {
+                Required => 1
+            },            
         }
     );
 
