@@ -56,17 +56,17 @@ sub new {
     # check needed objects
     for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserGet');
 
     return $Self;
 }
@@ -78,16 +78,14 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
             UserID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Code         => '...'
+        Message      => '',                               # In case of an error
         Data         => {
             User => [
                 {
@@ -111,9 +109,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -130,13 +128,13 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'UserGet.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    my $ErrorMessage = '';
+    my $Message = '';
 
     my @UserList;
 
@@ -151,51 +149,37 @@ sub Run {
 
         if ( !IsHashRefWithData( \%UserData ) ) {
 
-            $ErrorMessage = 'Could not get user data'
-                . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
-
-            return $Self->ReturnError(
-                ErrorCode    => 'UserGet.NotValidUserID',
-                ErrorMessage => "UserGet: $ErrorMessage",
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "No user data found for UserID $UserID.",
             );
         }
 
         # filter valid attributes
-        if ($Self->{Config}->{AttributeWhitelist}) {
+        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
             foreach my $Attr (sort keys %UserData) {
                 delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
             }
         }
 
         # filter valid attributes
-        if ($Self->{Config}->{AttributeBacklist}) {
+        if ( IsHashRefWithData($Self->{Config}->{AttributeBacklist}) ) {
             foreach my $Attr (sort keys %UserData) {
                 delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
-        
+                
         # add
         push(@UserList, \%UserData);
     }
 
-    if ( !scalar(@UserList) ) {
-        $ErrorMessage = 'Could not get user data'
-            . ' in Kernel::API::Operation::V1::User::UserGet::Run()';
-
-        return $Self->ReturnError(
-            ErrorCode    => 'UserGet.NotUserData',
-            ErrorMessage => "UserGet: $ErrorMessage",
-        );
-
-    }
-
     if ( scalar(@UserList) == 1 ) {
-        return $Self->ReturnSuccess(
+        return $Self->_Success(
             User => $UserList[0],
         );    
     }
 
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
         User => \@UserList,
     );
 }

@@ -69,9 +69,6 @@ perform TicketTypeSearch Operation. This will return a TicketType ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },          
         }
     );
 

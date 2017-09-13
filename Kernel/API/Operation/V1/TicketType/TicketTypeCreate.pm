@@ -70,26 +70,18 @@ perform TicketTypeCreate Operation. This will return the created TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-            
-	    TicketType{
+	    TicketType  => {
 	        Name    => '...',
-	        ValidID => '...',
-	
+	        ValidID => '...',	
 	    },
     );
 
     $Result = {
-        Success    => 1,                       # 0 or 1
-        Message    => '',                      # in case of error
-        Data       => {                        # result data payload after Operation
-            TypeID => '',                      # TypeID 
-            Error => {                         # should not return errors
-                    Code    => 'TicketType.Create.ErrorCode'
-                    Message => 'Error Description'
-            },
+        Success         => 1,                       # 0 or 1
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
+        Data            => {                        # result data payload after Operation
+            TypeID  => '',                          # TypeID 
         },
     };
 
@@ -152,7 +144,7 @@ sub Run {
         	
     # check if tickettype exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
-        Name => $Param{Data}->{TicketType}->{Name},
+        Name => $TicketType->{Name},
     );
     
     if ( $Exists ) {

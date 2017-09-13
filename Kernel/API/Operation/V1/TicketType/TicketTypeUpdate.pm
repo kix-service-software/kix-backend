@@ -72,9 +72,6 @@ perform TicketTypeUpdate Operation. This will return the updated TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
             ID      => '...',
         }
 	    TicketType => {
@@ -146,7 +143,7 @@ sub Run {
     
     if ( !%TicketTypeData ) {
         return $Self->_Error(
-            Code    => 'TicketTypeUpdate.TypeExists',
+            Code    => 'Object.NotFound',
             Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{TypeID}' not exists.",
         );
     }

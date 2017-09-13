@@ -70,10 +70,7 @@ perform TicketTypeDelete Operation. This will return the deleted TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-        	TypeID  => '...',
+            TypeID  => '...',
         },		
     );
 

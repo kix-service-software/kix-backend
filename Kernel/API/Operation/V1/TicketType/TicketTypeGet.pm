@@ -76,9 +76,6 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
             TypeID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
@@ -107,7 +104,7 @@ sub Run {
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
-    
+
     if ( !$Result->{Success} ) {
         $Self->_Error(
             Code    => 'Webservice.InvalidConfiguration',
