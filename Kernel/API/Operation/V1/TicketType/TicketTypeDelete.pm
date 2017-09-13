@@ -75,12 +75,10 @@ perform TicketTypeDelete Operation. This will return the deleted TypeID.
             },
         	TypeID  => '...',
         },		
-    };
+    );
 
     $Result = {
         Message    => '',                      # in case of error
-            },
-        },
     };
 
 =cut

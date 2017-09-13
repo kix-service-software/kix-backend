@@ -74,10 +74,11 @@ perform TicketTypeCreate Operation. This will return the created TypeID.
                 ...
             },
             
-    TicketType(
-        Name    => '...',
-        ValidID => '...',
-
+	    TicketType{
+	        Name    => '...',
+	        ValidID => '...',
+	
+	    },
     );
 
     $Result = {

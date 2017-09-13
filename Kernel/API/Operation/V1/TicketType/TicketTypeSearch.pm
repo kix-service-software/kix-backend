@@ -71,10 +71,7 @@ perform TicketTypeSearch Operation. This will return a TicketType ID list.
         Data => {
             Authorization => {
                 ...
-            },
-            ChangedAfter => '2006-01-09 00:00:01',                        # (optional)            
-            Order        => 'Down|Up',                                    # (optional) Default: Up                       
-            Limit        => '...',                                        # (optional) Default: 500
+            },          
         }
     );
 
@@ -105,14 +102,6 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
-        Parameters => {
-            'Limit' => {
-                Default => 500,
-            },
-            'Order' => {
-                Default => 'Up'    
-            }
-        }        
     );
 
     # check result
@@ -131,7 +120,7 @@ sub Run {
     # get already prepared tickettype data from TicketTypeGet operation
     if ( IsHashRefWithData(\%TicketTypeList) ) {
         my $TicketTypeGetResult = $Self->ExecOperation(
-            Operation => 'V1::TicketType::TicketTypeGet',
+            OperationType => 'V1::TicketType::TicketTypeGet',
             Data      => {
                 TypeID => join(',', sort keys %TicketTypeList),
             }

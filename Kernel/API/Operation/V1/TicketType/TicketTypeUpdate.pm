@@ -77,10 +77,11 @@ perform TicketTypeUpdate Operation. This will return the updated TypeID.
             },
             ID      => '...',
         }
-    TicketType => (
-        Name    => '...',
-        ValidID => '...',
-    );
+	    TicketType => {
+	        Name    => '...',
+	        ValidID => '...',
+	    },
+	);
     
 
     $Result = {
@@ -145,7 +146,7 @@ sub Run {
     
     if ( !%TicketTypeData ) {
         return $Self->_Error(
-            Code    => 'TicketTypeUpdate.LoginExists',
+            Code    => 'TicketTypeUpdate.TypeExists',
             Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{TypeID}' not exists.",
         );
     }
