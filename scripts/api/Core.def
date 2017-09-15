@@ -24,3 +24,14 @@
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   GET             | V1::Ticket::ArticleAttachmentGet
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   PATCH           | V1::Ticket::ArticleAttachmentUpdate
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   DELETE          | V1::Ticket::ArticleAttachmentDelete
+/tickettypes/:TypeID                                                |   GET             | V1::TicketType::TicketTypeGet
+/tickettypes                                                        |   GET             | V1::TicketType::TicketTypeSearch
+/tickettypes                                                        |   POST            | V1::TicketType::TicketTypeCreate
+/tickettypes/:TypeID                                                |   PATCH           | V1::TicketType::TicketTypeUpdate
+/tickettypes/:TypeID                                                |   DELETE          | V1::TicketType::TicketTypeDelete
+/ticketstates/:StateID                                              |   GET             | V1::TicketState::TicketStateGet
+/ticketstates                                                       |   GET             | V1::TicketState::TicketStateSearch
+/ticketstates                                                       |   POST            | V1::TicketState::TicketStateCreate
+/ticketstates/:StateID                                              |   PATCH           | V1::TicketState::TicketStateUpdate
+/ticketstates/:StateID                                              |   DELETE          | V1::TicketState::TicketStateDelete
+
