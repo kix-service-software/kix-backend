@@ -328,6 +328,10 @@ sub PriorityLookup {
         return;
     }
 
+	if ( ref($Param{Priority}) eq 'HASH') {
+		$Param{Priority} = $Param{Priority}->{Priority};
+	}
+
     # get (already cached) priority list
     my %PriorityList = $Self->PriorityList(
         Valid => 0,
@@ -346,6 +350,7 @@ sub PriorityLookup {
         $Value = $Param{Priority};
         my %PriorityListReverse = reverse %PriorityList;
         $ReturnData = $PriorityListReverse{ $Param{Priority} };
+       
     }
 
     # check if data exists
@@ -359,6 +364,31 @@ sub PriorityLookup {
 
     return $ReturnData;
 }
+
+sub PriorityDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(PriorityID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM ticket_priority WHERE id = ?',
+        Bind => [ \$Param{PriorityID} ],
+    );
+
+    return 1;
+}
+
 
 1;
 

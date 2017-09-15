@@ -118,7 +118,7 @@
                 <Item Key="Module">PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">PriorityGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -173,7 +173,7 @@
                 <Item Key="Module">StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">TicketStateGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -206,7 +206,7 @@
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">TicketTypeGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
