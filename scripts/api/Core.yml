@@ -70,125 +70,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::User::UserUpdate
-    UserGet:
+    TicketTypeGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Own::UserGet
-    TicketSearch:
+        Type: V1::TicketType::TicketTypeGet
+    TicketTypeSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::TicketSearch
-    TicketCreate:
+        Type: V1::TicketType::TicketTypeSearch
+    TicketTypeCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::TicketCreate
-    TicketGet:
+        Type: V1::TicketType::TicketTypeCreate
+    TicketTypeUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::TicketGet
-    TicketUpdate:
+        Type: V1::TicketType::TicketTypeUpdate
+    TicketTypeDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::TicketUpdate
-    ArticleSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleSearch
-    ArticleCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleCreate
-    ArticleGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleGet
-    ArticleUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleUpdate
-    ArticleDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleDelete
-    ArticleAttachmentSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentSearch
-    ArticleAttachmentCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentCreate
-    ArticleAttachmentGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentGet
-    ArticleAttachmentUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentUpdate
-    ArticleAttachmentDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentDelete
-    HistorySearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::HistorySearch
-    HistoryGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::HistoryGet
+        Type: V1::TicketType::TicketTypeDelete
 
   Transport:
     Config:
@@ -231,74 +147,26 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /users/:UserID
-        UserGet:
+        TicketTypeGet:
           RequestMethod:
           - GET
-          Route: /user
-        TicketSearch:
+          Route: /tickettypes/:TypeID
+        TicketTypeSearch:
           RequestMethod:
           - GET
-          Route: /tickets
-        TicketCreate:
+          Route: /tickettypes
+        TicketTypeCreate:
           RequestMethod:
           - POST
-          Route: /tickets
-        TicketGet:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID
-        TicketUpdate:
+          Route: /tickettypes
+        TicketTypeUpdate:
           RequestMethod:
           - PATCH
-          Route: /tickets/:TicketID
-        ArticleSearch:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/articles
-        ArticleCreate:
-          RequestMethod:
-          - POST
-          Route: /tickets/:TicketID/articles
-        ArticleGet:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/articles/:ArticleID
-        ArticleUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /tickets/:TicketID/articles/:ArticleID
-        ArticleDelete:
+          Route: /tickettypes/:TypeID
+        TicketTypeDelete:
           RequestMethod:
           - DELETE
-          Route: /tickets/:TicketID/articles/:ArticleID
-        ArticleAttachmentSearch:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments
-        ArticleAttachmentCreate:
-          RequestMethod:
-          - POST
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments
-        ArticleAttachmentGet:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
-        ArticleAttachmentUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
-        ArticleAttachmentDelete:
-          RequestMethod:
-          - DELETE
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
-        HistorySearch:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/history
-        HistoryGet:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/history/:HistoryID
+          Route: /tickettypes/:TypeID
 
     Type: HTTP::REST
 RemoteSystem: ''

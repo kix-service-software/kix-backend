@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::TicketType::TicketTypeCreate - GenericInterface TicketType TicketTypeCreate Operation backend
+Kernel::API::Operation::V1::TicketType::TicketTypeCreate - API TicketType TicketTypeCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -52,45 +52,37 @@ sub new {
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketTypeCreate');
-
     return $Self;
 }
 
-=item TicketTypeCreate()
+=item Run()
 
-create a new ticket Tickettype
+perform TicketTypeCreate Operation. This will return the created TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-            
-    TicketType(
-        Name    => '...',
-        ValidID => '...',
-        UserID  => '...',
+	    	TicketType  => {
+	        	Name    => '...',
+	        	ValidID => '...',	
+	    	},
+	    },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        ErrorMessage    => '',                      # in case of error
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            TicketTypeID  => '',                          # TicketTypeID 
-            Error => {                              # should not return errors
-                    ErrorCode    => 'TicketType.Create.ErrorCode'
-                    ErrorMessage => 'Error Description'
-            },
+            TypeID  => '',                          # TypeID 
         },
     };
 
@@ -105,9 +97,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -115,51 +107,73 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TicketTypeID' => {
+            'TicketType' => {
                 Type     => 'HASH',
                 Required => 1
             },
+            'TicketType::Name' => {
+                Required => 1
+            },
+            'TicketType::ValidID' => {
+                Required => 1
+            },            
         }
     );
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeCreate.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    # get relevant function	
-    my $TicketTypeID;
-    my %TicketTypeData ={};
+    # isolate TicketType parameter
+    my $TicketType = $Param{Data}->{TicketType};
+
+    # remove leading and trailing spaces
+    for my $Attribute ( sort keys %{$TicketType} ) {
+        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
+
+            #remove leading spaces
+            $TicketType->{$Attribute} =~ s{\A\s+}{};
+
+            #remove trailing spaces
+            $TicketType->{$Attribute} =~ s{\s+\z}{};
+        }
+    }   
         	
     # check if tickettype exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
-        Name => $Param{Data}->{Name},
+        Name => $TicketType->{Name},
     );
     
     if ( $Exists ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeCreate.LoginExists',
-            ErrorMessage => "Can not create user. TicketType with same name '$Param{Data}->{Name}' already exists.",
+        return $Self->_Error(
+            Code    => 'TicketTypeCreate.TicketTypeExists',
+            Message => "Can not create TicketType. TicketType with same name '$TicketType->{Name}' already exists.",
         );
     }
 
-    $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
-        Name    => $Param{Data}->{Name},
-        ValidID => 1,
-        UserID  => $Param{Data}->{Authorization}->{UserID},
+    # create tickettype
+    my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
+        Name    => $TicketType->{Name},
+        ValidID => $TicketType->{ValidID},
+        UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$TicketTypeID ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeCreate.UnknownError',
-            ErrorMessage => 'Could not create type, please contact the system administrator',
+        return $Self->_Error(
+            Code    => 'TicketTypeCreate.UnableToCreate',
+            Message => 'Could not create type, please contact the system administrator',
         );
     }
     
-    return $Self->ReturnSuccess(
+    # return result    
+    return $Self->_Success(
+        Code   => 'Object.Created',
         TicketTypeID => $TicketTypeID,
     );    
 }
+
+1;

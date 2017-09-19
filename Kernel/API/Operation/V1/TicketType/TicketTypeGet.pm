@@ -26,6 +26,18 @@ use base qw(
 
 our $ObjectManagerDisabled = 1;
 
+=head1 NAME
+
+Kernel::API::Operation::V1::TicketType::TicketTypeGet - API TicketType Get Operation backend
+
+=head1 SYNOPSIS
+
+=head1 PUBLIC INTERFACE
+
+=over 4
+
+=cut
+
 =item new()
 
 usually, you want to create an instance of this
@@ -42,10 +54,10 @@ sub new {
     # check needed objects
     for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -59,23 +71,20 @@ sub new {
 
 =item Run()
 
-perform event get operation. This will return an event.
-get Tickettypes attributes
+perform TicketTypeGet Operation. This function is able to return
+one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-            TicketTypeID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            TypeID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Message => '',                               # In case of an error
         Data         => {
-            User => [
+            TicketType => [
                 {
                     ...
                 },
@@ -88,7 +97,6 @@ get Tickettypes attributes
 
 =cut
 
-
 sub Run {
     my ( $Self, %Param ) = @_;
 
@@ -96,11 +104,11 @@ sub Run {
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
-    
+
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -108,7 +116,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TicketTypeID' => {
+            'TypeID' => {
                 Type     => 'ARRAY',
                 Required => 1
             }                
@@ -117,32 +125,32 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeGet.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    my $ErrorMessage = '';
     my @TicketTypeList;
-
+    my $Message ='';
+    
     # start type loop
     TYPE:    
-    foreach my $TicketTypeID ( @{$Param{Data}->{TicketTypeID}} ) {
+    foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
-        # get the user data
+        # get the TicketType data
         my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
-            ID => $TicketTypeID,
+            ID => $TypeID,
         );
 
         if ( !IsHashRefWithData( \%TicketTypeData ) ) {
 
-            $ErrorMessage = 'Could not get TicketType data'
+            $Message = 'Could not get TicketType data'
                 . ' in Kernel::API::Operation::V1::TicketType::TicketTypeGet::Run()';
 
-            return $Self->ReturnError(
-                ErrorCode    => 'TicketTypeGet.NotValidUserID',
-                ErrorMessage => "TicketTypeGet: $ErrorMessage",
+            return $Self->_Error(
+                Code    => 'TicketTypeGet.InvalidTypeID',
+                Message => "TicketTypeGet: $Message",
             );
         }
         
@@ -151,28 +159,26 @@ sub Run {
     }
 
     if ( !scalar(@TicketTypeList) ) {
-        $ErrorMessage = 'Could not get TicketType data'
+        $Message = 'Could not get TicketType data'
             . ' in Kernel::API::Operation::V1::TicketType::TicketTypeGet::Run()';
 
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeGet.NotUserData',
-            ErrorMessage => "TicketTypeGet: $ErrorMessage",
+        return $Self->_Error(
+            Code    => 'TicketTypeGet.NotTicketTypeData',
+            Message => "TicketTypeGet: $Message",
         );
 
     }
 
     if ( scalar(@TicketTypeList) == 1 ) {
-        return $Self->ReturnSuccess(
+        return $Self->_Success(
             TicketType => $TicketTypeList[0],
         );    
     }
 
-    return $Self->ReturnSuccess(
+    # return result
+    return $Self->_Success(
         TicketType => \@TicketTypeList,
     );
 }
 
 1;
-
-
-
