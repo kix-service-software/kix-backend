@@ -76,13 +76,13 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            PriorityID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            PriorityID => '...'       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
-        Message => '',                               # In case of an error
+        Success => 1,            # 0 or 1
+        Message => '',           # In case of an error
         Data         => {
             Priority => [
                 {

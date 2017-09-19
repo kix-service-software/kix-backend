@@ -18,8 +18,6 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
-use Kernel::System::Ticket::TicketSearch;
-
 use base qw(
     Kernel::API::Operation::V1::Common
 );
@@ -28,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::TicketType::TicketypeDelete - GenericInterface TicketType TicketTypeDelete Operation backend
+Kernel::API::Operation::V1::TicketType::TicketypeDelete - API TicketType TicketTypeDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -41,7 +39,7 @@ Kernel::API::Operation::V1::TicketType::TicketypeDelete - GenericInterface Ticke
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::GenericInterface::Operation->new();
+by using Kernel::API::Operation->new();
 
 =cut
 
@@ -54,29 +52,31 @@ sub new {
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketTypeDelete');
-
     return $Self;
 }
 
-=item TicketTypeDelete()
+=item Run()
 
-delete a Tickettype
+perform TicketTypeDelete Operation. This will return the deleted TypeID.
 
-    my $ID = $TicketTypeObject->TypeDelete(
-        TypeID    => 'New TicketType',
-        ValidID => 1,
-        UserID  => 123,
+    my $Result = $OperationObject->Run(
+        Data => {
+            TypeID  => '...',
+        },		
     );
+
+    $Result = {
+        Message    => '',                      # in case of error
+    };
 
 =cut
 
@@ -88,9 +88,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -98,7 +98,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TicketType' => {
+            'TypeID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -107,76 +107,48 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeCreate.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
-
-    my $ErrorMessage = '';
-    my @TicketTypeList;
-
+  
+    my $Message = '';
+  
     # start type loop
     TYPE:    
-    foreach my $TicketTypeID ( @{$Param{Data}->{TicketTypeID}} ) {
-         	
-	    # check if tickettype exists
-	    my $TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
-	        TypeID => $TicketTypeID,
-	    );
-	  
-	    if ( !$TicketTypeData ) {
-	    	$ErrorMessage = 'Could not exist TicketType $TicketTypeID'
-	            . ' in Kernel::API::Operation::V1::TicketType::TicketTypeDelete::Run()';
-	
-	        return $Self->ReturnError(
-	            ErrorCode    => 'TicketTypeDelete.NotTypeLookup',
-	            ErrorMessage => "TicketTypeDelete: $ErrorMessage",
-	        );
-	    }
-	           
-	    my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-	        Result => 'COUNT',
-	        TypeIDs => [$TicketTypeID],
-	        UserID => $Param{Data}->{Authorization}->{UserID},
-	    );
-	    
-	    if ( $ResultTicketSearch ) {
-	    	$ErrorMessage = 'Ticket with TicketType $TicketTypeID exist'
-	            . ' in Kernel::API::Operation::V1::TicketType::TicketTypeDelete::Run()';
-	
-	        return $Self->ReturnError(
-	            ErrorCode    => 'TicketTypeDelete.NotTicketSearch',
-	            ErrorMessage => "TicketTypeDelete: $ErrorMessage",
-	    } 
+    foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
-	    my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeDelete(
-	        TypeID  => $TicketTypeID,
-	        ValidID => 1,
-	        UserID  => $Param{Data}->{Authorization}->{UserID},
-	    );
+        # search ticket       
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            Result  => 'COUNT',
+            TypeIDs => [$TypeID],
+            UserID  => $Param{Data}->{Authorization}->{UserID},
+        );
+     
+        if ( $ResultTicketSearch ) {
+            return $Self->_Error(
+                Code    => 'TicketTypeDelete.TicketExists',
+                Message => 'Can not delete TicketType. A Ticket with this TicketType already exists.',
+            );
+        }
 
-	    if ( !$Success ) {
-	        $ErrorMessage = 'Could not delete TicketType $TicketTypeID'
-	            . ' in Kernel::API::Operation::V1::TicketType::TicketTypeGet::Run()';
-	
-	        return $Self->ReturnError(
-	            ErrorCode    => 'TicketTypeDelete.NotTypeDelete',
-	            ErrorMessage => "TicketTypeDelete: $ErrorMessage",
-	        );
-	    }
-	    else {
-	        push(@TicketTypeList, $TicketTypeID);	    	
-	    }
+        # delete tickettype	    
+        my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
+            TypeID  => $TypeID,
+            UserID  => $Param{Data}->{Authorization}->{UserID},
+        );
+
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete TicketType, please contact the system administrator',
+            );
+        }
     }
 
-    if ( scalar(@TicketTypeList) == 1 ) {
-        return $Self->ReturnSuccess(
-            TicketType => $TicketTypeList[0],
-        );    
-    }
-
-    return $Self->ReturnSuccess(
-        TicketType => \@TicketTypeList,
-    );
+    # return result
+    return $Self->_Success();
 }
+
+1;

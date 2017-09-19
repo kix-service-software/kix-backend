@@ -74,7 +74,7 @@ perform PrioritySearch Operation. This will return a Priority ID list.
 
     $Result = {
         Success => 1,                           # 0 or 1
-        Message => '',                               # In case of an error
+        Message => '',                          # In case of an error
         Data    => {
             PriorityID => [ 1, 2, 3, 4 ],
         },
@@ -95,7 +95,8 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-
+use Data::Dumper;
+print STDERR "Param".Dumper(\%Param);
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -113,7 +114,8 @@ sub Run {
     my %PriorityList = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList(
         Valid => 1,
     );
-
+use Data::Dumper;
+print STDERR "PrioList".Dumper(\%PriorityList);
     if (IsHashRefWithData(\%PriorityList)) {
         my $PriorityGetResult = $Self->ExecOperation(
             OperationType => 'V1::Priority::PriorityGet',

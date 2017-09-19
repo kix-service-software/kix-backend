@@ -90,8 +90,6 @@ perform PriorityCreate Operation. This will return the created PriorityID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-use Data::Dumper;
-print STDERR "prioparam".Dumper(\%Param);
 
     # init webservice
     my $Result = $Self->Init(

@@ -110,8 +110,7 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
+
     # prepare data
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
@@ -137,6 +136,21 @@ print STDERR "param".Dumper(\%Param);
         );
     }
 
+    # isolate TicketState parameter
+    my $Priority = $Param{Data}->{Priority};
+
+    # remove leading and trailing spaces
+    for my $Attribute ( sort keys %{$Priority} ) {
+        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
+
+            #remove leading spaces
+            $Priority->{$Attribute} =~ s{\A\s+}{};
+
+            #remove trailing spaces
+            $Priority->{$Attribute} =~ s{\s+\z}{};
+        }
+    }   
+
     # check if Priority exists 
     my %PriorityData = $Kernel::OM->Get('Kernel::System::Priority')->PriorityGet(
         PriorityID => $Param{Data}->{PriorityID},
@@ -152,9 +166,8 @@ print STDERR "param".Dumper(\%Param);
 
     # update Priority
     my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityUpdate(
-        PriorityID      => $Param{Data}->{PriorityID},
-        Name    => $Param{Data}->{Priority}->{Priority},
-        ValidID => $Param{Data}->{Priority}->{ValidID},
+        %{$Priority},
+        PriorityID => $Param{Data}->{PriorityID},
         UserID  => $Self->{Authorization}->{UserID},
     );
 
