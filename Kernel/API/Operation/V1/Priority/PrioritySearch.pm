@@ -95,11 +95,10 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-use Data::Dumper;
-print STDERR "Param".Dumper(\%Param);
+
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
+        Data => $Param{Data},
     );
 
     # check result
@@ -112,10 +111,9 @@ print STDERR "Param".Dumper(\%Param);
 
     # perform Priority search
     my %PriorityList = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList(
-        Valid => 1,
+        ValidID => 1,
     );
-use Data::Dumper;
-print STDERR "PrioList".Dumper(\%PriorityList);
+
     if (IsHashRefWithData(\%PriorityList)) {
         my $PriorityGetResult = $Self->ExecOperation(
             OperationType => 'V1::Priority::PriorityGet',

@@ -64,7 +64,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::PriorityGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Priority::PriorityGet');
 
     return $Self;
 }
@@ -150,7 +150,7 @@ sub Run {
                 . ' in Kernel::API::Operation::V1::Priority::PriorityGet::Run()';
 
             return $Self->_Error(
-                Code    => 'PriorityGet.InvalidPriorityID',
+                Code    => 'PriorityGet.NotValidPriorityID',
                 Message => "PriorityGet: $Message",
             );
         }

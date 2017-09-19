@@ -75,7 +75,7 @@ perform PriorityUpdate Operation. This will return the updated TypeID.
             ID      => '...',
         }
 	    Priority => {
-	        Name    => '...',
+	        Priority    => '...',
 	        ValidID => '...',
 	    },
 	);
@@ -119,7 +119,7 @@ sub Run {
                 Type => 'HASH',
                 Required => 1
             },
-            'Priority::Priority' => {
+            'Priority::Name' => {
                 Required => 1
             },
             'Priority::ValidID' => {
