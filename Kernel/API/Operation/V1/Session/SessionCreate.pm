@@ -46,12 +46,12 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
+    for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -74,7 +74,7 @@ Authenticate user.
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Message => '',                               # In case of an error
         Data         => {
             Token => '..., 
         },
@@ -91,9 +91,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -119,9 +119,9 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionCreate.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
@@ -157,9 +157,9 @@ sub Run {
     # not authenticated
     if ( !$User ) {
 
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionCreate.AuthFail',
-            ErrorMessage => "SessionCreate: Authorization failing!",
+        return $Self->_Error(
+            Code    => 'SessionCreate.AuthFail',
+            Message => "SessionCreate: Authorization failing!",
         );
     }
 
@@ -173,13 +173,14 @@ sub Run {
 
     if ( !$Token ) {
 
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionCreate.AuthFail',
-            ErrorMessage => "SessionCreate: Authorization failing!",
+        return $Self->_Error(
+            Code    => 'SessionCreate.AuthFail',
+            Message => "SessionCreate: Authorization failing!",
         );
     }
 
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
+        Code  => 'Object.Created',
         Token => $Token,
     );
 }

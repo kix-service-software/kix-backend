@@ -119,12 +119,12 @@ sub ValidateToken {
     # remote ip check
     if (
         $ConfigObject->Get('TokenCheckRemoteIP') && 
-        $Payload->{UserRemoteAddr} ne $RemoteAddr
+        $Payload->{RemoteIP} ne $RemoteAddr
         )
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
-            Message  => "RemoteIP ($Payload->{UserRemoteAddr}) of request is "
+            Message  => "RemoteIP ($Payload->{RemoteIP}) of request is "
                 . "different from registered IP ($RemoteAddr). Invalidating token! "
                 . "Disable config 'TokenCheckRemoteIP' if you don't want this!",
         );
@@ -137,7 +137,7 @@ sub ValidateToken {
     # check time validity
     my $TimeNow = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
 
-    if ( $TimeNow > $Payload->{ValidUntil} ) {
+    if ( $TimeNow > $Payload->{ValidUntilTimeUnix} ) {
 
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
@@ -235,24 +235,24 @@ sub CreateToken {
     # enrich payload and create token
     my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
 
-    my $ValidUntil;
+    my $ValidUntilTimeUnix;
     if ( $Param{Payload}->{ValidUntil} ) {
-        $ValidUntil = $TimeObject->TimeStamp2SystemTime(
+        $ValidUntilTimeUnix = $TimeObject->TimeStamp2SystemTime(
             String => $Param{Payload}->{ValidUntil},
         );
     }
 
-    if ( !$ValidUntil ) {
-        $ValidUntil = $TimeObject->SystemTime() + $Kernel::OM->Get('Kernel::Config')->Get('TokenMaxTime');
+    if ( !$ValidUntilTimeUnix ) {
+        $ValidUntilTimeUnix = $TimeObject->SystemTime() + $Kernel::OM->Get('Kernel::Config')->Get('TokenMaxTime');
     } 
     
     my %Payload = %{$Param{Payload}};
-    my $CreateTimeString     = $TimeObject->CurrentTimestamp();
-    $Payload{CreateTimeUnix} = $TimeObject->SystemTime();
-    $Payload{ValidUntilUnix} = $ValidUntil;
-    $Payload{RemoteIP}       = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
-    $Payload{Description}    = $Param{Payload}->{Description} || '';
-    $Payload{TokenType}      = $Param{Payload}->{TokenType} || 'Normal';
+    my $CreateTimeString         = $TimeObject->CurrentTimestamp();
+    $Payload{CreateTimeUnix}     = $TimeObject->SystemTime();
+    $Payload{ValidUntilTimeUnix} = $ValidUntilTimeUnix;
+    $Payload{RemoteIP}           = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
+    $Payload{Description}        = $Param{Payload}->{Description} || '';
+    $Payload{TokenType}          = $Param{Payload}->{TokenType} || 'Normal';
 
     my $Token = encode_jwt(
         \%Payload, 
@@ -351,9 +351,11 @@ sub ExtractToken {
         }
     }
 
-    # nothing found, this token is invalid
     if ( !$TokenFound ) {
-        return;
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'notice',
+            Message  => 'Token not found in database!'
+        );
     }
 
     # decode token
@@ -378,8 +380,8 @@ sub ExtractToken {
     $Payload->{CreateTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
         SystemTime => $Payload->{CreateTimeUnix},
     );
-    $Payload->{ValidUntil} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
-        SystemTime => $Payload->{ValidUntilUnix},
+    $Payload->{ValidUntilTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        SystemTime => $Payload->{ValidUntilTimeUnix},
     );
 
     return $Payload;

@@ -46,16 +46,12 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (
-        qw(DebuggerObject WebserviceID)
-        )
-    {
+    for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -70,19 +66,13 @@ remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                Token    => '...',
-                UserID   => '123',
-                UserType => 'User' | 'Customer'
-                ...
-            },
             Token => '...'                                # required
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Message => '',                               # In case of an error
     };
 
 =cut
@@ -96,9 +86,9 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
@@ -114,25 +104,25 @@ sub Run {
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionDelete.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
+    $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
         Token => $Param{Data}->{Token}
     );
 
     # check result
     if ( !$Result ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'SessionDelete.DeleteError',
-            ErrorMessage => 'SessionDelete: unable to remove token!',
+        return $Self->_Error(
+            Code    => 'SessionDelete.DeleteError',
+            Message => 'SessionDelete: unable to remove token!',
         );
     }
 
-    return $Self->ReturnSuccess();
+    return $Self->_Success();
 }
 
 1;

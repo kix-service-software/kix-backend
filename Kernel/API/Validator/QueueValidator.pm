@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::QueueValidator - queue validator
+Kernel::API::Validator::QueueValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $QueueValidatorObject = Kernel::API::Validator::QueueValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::QueueValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -62,10 +62,10 @@ sub new {
     bless( $Self, $Type );
 
     for my $Needed (qw( DebuggerObject)) {
-        $Self->{$Needed} = $Param{$Needed} || return {
-            Success => 0,
-            Summary => "Got no $Needed!",
-        };
+        $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
+            Code    => 'Validator.InternalError',
+            Message => "Got no $Needed!",
+        );
     }
 
     return $Self;
@@ -94,14 +94,38 @@ sub Validate {
 
     # check params
     if ( !$Param{Attribute} ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'Got no Attribute!',
-        }
+        return $Self->_Error(
+            Code    => 'Validator.InternalError',
+            Message => 'Got no Attribute!',
+        );
     }
 
-# TODO
-    return $Result;
+    my $Found;
+    if ( $Param{Attribute} eq 'QueueID' ) {
+        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            QueueID => $Param{Data}->{$Param{Attribute}},
+        );        
+    }
+    elsif ( $Param{Attribute} eq 'Queue' ) {
+        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            Queue => $Param{Data}->{$Param{Attribute}},
+        );        
+    }
+    else {
+        return $Self->_Error(
+            Code    => 'Validator.UnknownAttribute',
+            Message => "QueueValidator: cannot validate attribute $Param{Attribute}!",
+        );
+    }
+
+    if ( !$Found ) {
+        return $Self->_Error(
+            Code    => 'Validator.Failed',
+            Message => "Validation of attribute $Param{Attribute} failed!",
+        );        
+    }
+
+    return $Self->_Success();        
 }
 
 1;

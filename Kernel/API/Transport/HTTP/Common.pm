@@ -59,8 +59,8 @@ sub ProviderCheckAuthorization {
     
     if (!$Headers{HTTP_AUTHORIZATION}) {
         return $Self->_Error(
-            Summary   => 'No authorization header given!',
-            HTTPError => 500,
+            Code    => 'Authorization.NoHeader',
+            Summary => 'No authorization header given!',
         );
     }
 
@@ -68,8 +68,8 @@ sub ProviderCheckAuthorization {
 
     if (!$Authorization{Token}) {
         return $Self->_Error(
-            Summary   => 'No token in authorization header found!',
-            HTTPError => 500,
+            Code    => 'Authorization.NoToken',
+            Message => 'No token in authorization header found!',
         );
     }
 
@@ -78,22 +78,20 @@ sub ProviderCheckAuthorization {
     );
 
     if ( !IsHashRefWithData($ValidatedToken) ) {
-        return {
-            Success      => 0,
-            HTTPError    => 403,
-            ErrorMessage => "Not authorized!"
-        };
+        return $Self->_Error(
+            Code    => 'Unauthorized',
+            Message => "Not authorized!"
+        );
     }
 
-    return {
-        Success => 1,
+    return $Self->_Success(
         Data    => {
             Authorization => {
                 Token => $Authorization{Token},
                 %{$ValidatedToken},
             }
         }
-    };    
+    );    
 }
 
 1;

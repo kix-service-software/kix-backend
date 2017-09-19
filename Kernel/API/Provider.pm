@@ -28,6 +28,10 @@ our @ObjectDependencies = (
     'Kernel::System::API::Webservice',
 );
 
+use base qw(
+    Kernel::API::Common
+);
+
 =head1 NAME
 
 Kernel::API::Provider - handler for incoming webservice requests.
@@ -92,7 +96,7 @@ sub Run {
             Message  => "Could not determine WebserviceName from query string $RequestURI",
         );
 
-        return;    # bail out without Transport, Apache will generate 500 Error
+        return;    # bail out without Transport, plack will generate 500 Error
     }
 
     $WebserviceName = URI::Escape::uri_unescape($WebserviceName);
@@ -108,7 +112,7 @@ sub Run {
                 "Could not load web service configuration for web service at $RequestURI",
         );
 
-        return;    # bail out without Transport, Apache will generate 500 Error
+        return;    # bail out without Transport, plack will generate 500 Error
     }
 
     my $WebserviceID = $Webservice->{ID};
@@ -118,19 +122,19 @@ sub Run {
     #   communication entry.
     #
 
-    my $DebuggerObject = Kernel::API::Debugger->new(
+    $Self->{DebuggerObject} = Kernel::API::Debugger->new(
         DebuggerConfig    => $Webservice->{Config}->{Debugger},
         WebserviceID      => $WebserviceID,
         CommunicationType => 'Provider',
         RemoteIP          => $ENV{REMOTE_ADDR},
     );
 
-    if ( ref $DebuggerObject ne 'Kernel::API::Debugger' ) {
+    if ( ref $Self->{DebuggerObject} ne 'Kernel::API::Debugger' ) {
 
-        return;    # bail out without Transport, Apache will generate 500 Error
+        return;    # bail out without Transport, plack will generate 500 Error
     }
 
-    $DebuggerObject->Debug(
+    $Self->{DebuggerObject}->Debug(
         Summary => 'Communication sequence started',
         Data    => \%ENV,
     );
@@ -142,15 +146,16 @@ sub Run {
     my $ProviderConfig = $Webservice->{Config}->{Provider};
 
     $Self->{TransportObject} = Kernel::API::Transport->new(
-        DebuggerObject  => $DebuggerObject,
+        DebuggerObject  => $Self->{DebuggerObject},
         TransportConfig => $ProviderConfig->{Transport},
     );
 
     # bail out if transport init failed
     if ( ref $Self->{TransportObject} ne 'Kernel::API::Transport' ) {
 
-        return $DebuggerObject->Error(
-            Summary => 'TransportObject could not be initialized',
+        return $Self->Error(
+            Code    => 'Provider.InternalError',
+            Message => 'TransportObject could not be initialized',
             Data    => $Self->{TransportObject},
         );
     }
@@ -160,20 +165,21 @@ sub Run {
 
     # If the request was not processed correctly, send error to client.
     if ( !$FunctionResult->{Success} ) {
-        $DebuggerObject->Error(
-            Summary => 'Request could not be processed',
-            Data    => $FunctionResult->{ErrorMessage},
+
+        # # don't tell something about the interna of the API
+        my $ErrorResponse = $Self->_Error(
+            Code    => 'BadRequest',
+            Message => 'Request could not be processed',
         );
 
         return $Self->_GenerateErrorResponse(
-            DebuggerObject => $DebuggerObject,
-            ErrorMessage   => $FunctionResult->{ErrorMessage},
+            %{$ErrorResponse},
         );
     }
 
     my $Operation = $FunctionResult->{Operation};
 
-    $DebuggerObject->Debug(
+    $Self->{DebuggerObject}->Debug(
         Summary => "Detected operation '$Operation'",
     );
 
@@ -183,7 +189,7 @@ sub Run {
 
     my $DataIn = $FunctionResult->{Data};
 
-    $DebuggerObject->Debug(
+    $Self->{DebuggerObject}->Debug(
         Summary => "Incoming data before mapping",
         Data    => $DataIn,
     );
@@ -194,7 +200,7 @@ sub Run {
         )
     {
         my $MappingInObject = Kernel::API::Mapping->new(
-            DebuggerObject => $DebuggerObject,
+            DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,
             OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
             MappingConfig =>
@@ -203,14 +209,14 @@ sub Run {
 
         # if mapping init failed, bail out
         if ( ref $MappingInObject ne 'Kernel::API::Mapping' ) {
-            $DebuggerObject->Error(
-                Summary => 'MappingIn could not be initialized',
+            my $ErrorResponse = $Self->_Error(
+                Code    => 'Provider.InternalError',
+                Message => 'MappingIn could not be initialized',
                 Data    => $MappingInObject,
             );
 
             return $Self->_GenerateErrorResponse(
-                DebuggerObject => $DebuggerObject,
-                ErrorMessage   => $FunctionResult->{ErrorMessage},
+                %{$ErrorResponse},
             );
         }
 
@@ -221,79 +227,32 @@ sub Run {
         if ( !$FunctionResult->{Success} ) {
 
             return $Self->_GenerateErrorResponse(
-                DebuggerObject => $DebuggerObject,
-                ErrorMessage   => $FunctionResult->{ErrorMessage},
+                %{$FunctionResult},
             );
         }
 
         $DataIn = $FunctionResult->{Data};
 
-        $DebuggerObject->Debug(
+        $Self->{DebuggerObject}->Debug(
             Summary => "Incoming data after mapping",
             Data    => $DataIn,
         );
     }
 
     # check authorization if needed
+    my $Authorization;
     if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
         $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
 
         if ( !$FunctionResult->{Success} ) {
 
             return $Self->_GenerateErrorResponse(
-                DebuggerObject => $DebuggerObject,
                 %{$FunctionResult},
             );
         }
         else {
-            # add Authorization info to Data hash
-            $DataIn->{Authorization} = $FunctionResult->{Data}->{Authorization};
+            $Authorization = $FunctionResult->{Data}->{Authorization};
         }
-    }
-
-    #
-    # Validate given data.
-    #
-
-    my $ValidatorObject = Kernel::API::Validator->new(
-        DebuggerObject          => $DebuggerObject,
-        APIVersion              => $Webservice->{Config}->{APIVersion},
-        Operation               => $Operation,
-        OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
-        WebserviceID            => $WebserviceID,
-    );
-
-    # if validator init failed, bail out
-    if ( ref $ValidatorObject ne 'Kernel::API::Validator' ) {
-        $DebuggerObject->Error(
-            Summary => 'Validator could not be initialized',
-            Data    => $ValidatorObject,
-        );
-
-        # set default error message
-        my $ErrorMessage = 'Unknown error in Validator initialization';
-
-        # check if we got an error message from the validator and overwrite it
-        if ( IsHashRefWithData($ValidatorObject) && $ValidatorObject->{ErrorMessage} ) {
-            $ErrorMessage = $ValidatorObject->{ErrorMessage};
-        }
-
-        return $Self->_GenerateErrorResponse(
-            DebuggerObject => $DebuggerObject,
-            ErrorMessage   => $ErrorMessage,
-        );
-    }
-
-    $FunctionResult = $ValidatorObject->Validate(
-        Data => $DataIn,
-    );
-
-    if ( !$FunctionResult->{Success} ) {
-
-        return $Self->_GenerateErrorResponse(
-            DebuggerObject => $DebuggerObject,
-            ErrorMessage   => $FunctionResult->{ErrorMessage},
-        );
     }
 
     #
@@ -301,43 +260,29 @@ sub Run {
     #
 
     my $OperationObject = Kernel::API::Operation->new(
-        DebuggerObject          => $DebuggerObject,
+        DebuggerObject          => $Self->{DebuggerObject},
         APIVersion              => $Webservice->{Config}->{APIVersion},
         Operation               => $Operation,
         OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
         WebserviceID            => $WebserviceID,
+        Authorization           => $Authorization,
     );
 
     # if operation init failed, bail out
     if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
-        $DebuggerObject->Error(
-            Summary => 'Operation could not be initialized',
-            Data    => $OperationObject,
-        );
-
-        # set default error message
-        my $ErrorMessage = 'Unknown error in Operation initialization';
-
-        # check if we got an error message from the operation and overwrite it
-        if ( IsHashRefWithData($OperationObject) && $OperationObject->{ErrorMessage} ) {
-            $ErrorMessage = $OperationObject->{ErrorMessage};
-        }
-
         return $Self->_GenerateErrorResponse(
-            DebuggerObject => $DebuggerObject,
-            ErrorMessage   => $ErrorMessage,
+            %{$OperationObject},
         );
     }
 
-    $FunctionResult = $OperationObject->Run(
+    my $FunctionResultOperation = $OperationObject->Run(
         Data => $DataIn,
     );
 
-    if ( !$FunctionResult->{Success} ) {
+    if ( !$FunctionResultOperation->{Success} ) {
 
         return $Self->_GenerateErrorResponse(
-            DebuggerObject => $DebuggerObject,
-            ErrorMessage   => $FunctionResult->{ErrorMessage},
+            %{$FunctionResultOperation},
         );
     }
 
@@ -345,9 +290,9 @@ sub Run {
     # Map the outgoing data based on configured mapping.
     #
 
-    my $DataOut = $FunctionResult->{Data};
+    my $DataOut = $FunctionResultOperation->{Data};
 
-    $DebuggerObject->Debug(
+    $Self->{DebuggerObject}->Debug(
         Summary => "Outgoing data before mapping",
         Data    => $DataOut,
     );
@@ -360,7 +305,7 @@ sub Run {
         )
     {
         my $MappingOutObject = Kernel::API::Mapping->new(
-            DebuggerObject => $DebuggerObject,
+            DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,
             OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
             MappingConfig =>
@@ -369,14 +314,14 @@ sub Run {
 
         # if mapping init failed, bail out
         if ( ref $MappingOutObject ne 'Kernel::API::Mapping' ) {
-            $DebuggerObject->Error(
-                Summary => 'MappingOut could not be initialized',
+            my $ErrorResponse = $Self->_Error(
+                Code    => 'Provider.InternalError',
+                Message => 'MappingOut could not be initialized',
                 Data    => $MappingOutObject,
             );
 
             return $Self->_GenerateErrorResponse(
-                DebuggerObject => $DebuggerObject,
-                ErrorMessage   => $FunctionResult->{ErrorMessage},
+                %{$ErrorResponse}
             );
         }
 
@@ -387,14 +332,13 @@ sub Run {
         if ( !$FunctionResult->{Success} ) {
 
             return $Self->_GenerateErrorResponse(
-                DebuggerObject => $DebuggerObject,
-                ErrorMessage   => $FunctionResult->{ErrorMessage},
+                %{$FunctionResult},
             );
         }
 
         $DataOut = $FunctionResult->{Data};
 
-        $DebuggerObject->Debug(
+        $Self->{DebuggerObject}->Debug(
             Summary => "Outgoing data after mapping",
             Data    => $DataOut,
         );
@@ -406,12 +350,13 @@ sub Run {
 
     $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
         Success => 1,
-        Data    => $DataOut,
+        %{$FunctionResultOperation},
     );
 
     if ( !$FunctionResult->{Success} ) {
-        $DebuggerObject->Error(
-            Summary => 'Response could not be sent',
+        $Self->_Error(
+            Code    => 'Provider.InternalError',
+            Message => 'Response could not be sent',
             Data    => $FunctionResult->{ErrorMessage},
         );
     }
@@ -424,7 +369,8 @@ sub Run {
 returns an error message to the client.
 
     $ProviderObject->_GenerateErrorResponse(
-        ErrorMessage => $ErrorMessage,
+        Code    => $ReturnCode,
+        Message => $ErrorMessage,
     );
 
 =cut
@@ -436,13 +382,6 @@ sub _GenerateErrorResponse {
         %Param,
         Success      => 0,
     );
-
-    if ( !$FunctionResult->{Success} ) {
-        $Param{DebuggerObject}->Error(
-            Summary => 'Error response could not be sent',
-            Data    => $FunctionResult->{ErrorMessage},
-        );
-    }
 
     return;
 }

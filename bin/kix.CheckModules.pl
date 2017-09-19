@@ -125,26 +125,6 @@ if ( $ENV{nocolors} || $Options =~ m{\A nocolors}msxi ) {
 # config
 my @NeededModules = (
     {
-        Module    => 'Apache::DBI',
-        Required  => 0,
-        Comment   => 'Improves Performance on Apache webservers with mod_perl enabled.',
-        InstTypes => {
-            aptget => 'libapache-dbi-perl',
-            emerge => 'dev-perl/Apache-DBI',
-            zypper => 'perl-Apache-DBI',
-        },
-    },
-    {
-        Module    => 'Apache2::Reload',
-        Required  => 0,
-        Comment   => 'Avoids web server restarts on mod_perl.',
-        InstTypes => {
-            aptget => 'libapache2-mod-perl2',
-            emerge => 'dev-perl/Apache-Reload',
-            zypper => 'apache2-mod_perl',
-        },
-    },
-    {
         Module    => 'Archive::Tar',
         Required  => 1,
         Comment   => 'Required for compressed file generation (in perlcore).',
@@ -362,26 +342,6 @@ my @NeededModules = (
         },
     },
     {
-        Module    => 'Template',
-        Required  => 1,
-        Comment   => 'Template::Toolkit, the rendering engine of OTRS.',
-        InstTypes => {
-            aptget => 'libtemplate-perl',
-            emerge => 'dev-perl/Template-Toolkit',
-            zypper => 'perl-Template-Toolkit',
-        },
-    },
-    {
-        Module    => 'Template::Stash::XS',
-        Required  => 1,
-        Comment   => 'The fast data stash for Template::Toolkit.',
-        InstTypes => {
-            aptget => 'libtemplate-perl',
-            emerge => 'dev-perl/Template-Toolkit',
-            zypper => 'perl-Template-Toolkit',
-        },
-    },
-    {
         Module    => 'Text::CSV_XS',
         Required  => 0,
         Comment   => 'Recommended for faster CSV handling.',
@@ -445,13 +405,56 @@ my @NeededModules = (
             zypper => 'perl-YAML-LibYAML',
         },
     },
-    # kix4otrs
     {
         Module   => 'Data::Compare',
         Required => 0,
         Comment  => 'Required to track SysConfig changes.',
+        InstTypes => {
+            aptget => 'libdata-compare-perl',
+            emerge => '',
+            zypper => '',
+        },
     },
-
+    {
+        Module   => 'Plack',
+        Required => 1,
+        Comment  => 'Required to run the application.',
+        InstTypes => {
+            aptget => 'libperl-plack',
+            emerge => '',
+            zypper => '',
+        },
+    },
+    {
+        Module   => 'Data::Sorting',
+        Required => 1,
+        Comment  => 'Required for core API.',
+        InstTypes => {
+            aptget => 'libdata-sorting-perl',
+            emerge => '',
+            zypper => '',
+        },
+    },
+    {
+        Module   => 'Hash::Flatten',
+        Required => 1,
+        Comment  => 'Required for core API.',
+        InstTypes => {
+            aptget => 'libhash-flatten-perl',
+            emerge => '',
+            zypper => '',
+        },
+    },
+    {
+        Module   => 'Module::Runtime',
+        Required => 1,
+        Comment  => 'Required for core API.',
+        InstTypes => {
+            aptget => 'libmodule-runtime-perl',
+            emerge => '',
+            zypper => '',
+        },
+    },
 );
 
 if ($PackageList) {

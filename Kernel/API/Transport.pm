@@ -13,6 +13,10 @@ package Kernel::API::Transport;
 use strict;
 use warnings;
 
+use base qw(
+    Kernel::API::Common
+);
+
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
 
@@ -66,17 +70,20 @@ sub new {
     bless( $Self, $Type );
 
     for my $Needed (qw( DebuggerObject TransportConfig)) {
-        $Self->{$Needed} = $Param{$Needed} || return {
-            Success => 0,
-            Summary => "Got no $Needed!",
-        };
+        $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => "Got no $Needed!",
+        );
     }
 
     # select and instantiate the backend
     my $Backend = 'Kernel::API::Transport::' . $Self->{TransportConfig}->{Type};
 
     if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-        return $Self->{DebuggerObject}->Error( Summary => "Backend $Backend not found." );
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',            
+            Message => "Backend $Backend not found." 
+        );
     }
     $Self->{BackendObject} = $Backend->new( %{$Self} );
 
@@ -112,8 +119,9 @@ sub ProviderProcessRequest {
     # make sure an operation is provided in success case
     if ( $Result->{Success} && !$Result->{Operation} ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'TransportObject backend did not return an operation',
+        return $Self->_Error(
+            Code    => 'Transport.OperationNotFound',
+            Message => 'TransportObject backend did not return an operation',
         );
     }
 
@@ -144,7 +152,8 @@ generate response for an incoming web service request.
 
     my $Result = $TransportObject->ProviderGenerateResponse(
         Success         => 1,       # 1 or 0
-        ErrorMessage    => '',      # in case of an error, optional
+        Code            => '...'    # optional
+        Message         => '',      # in case of an error, optional
         Data            => {        # data payload for response, optional
             ...
         },
@@ -152,8 +161,9 @@ generate response for an incoming web service request.
     );
 
     $Result = {
-        Success         => 1,                   # 0 or 1
-        ErrorMessage    => '',                  # in case of error
+        Success    => 1,                   # 0 or 1
+        Code       => '...'                # optional
+        Message    => '',                  # in case of error
     };
 
 =cut
@@ -163,15 +173,17 @@ sub ProviderGenerateResponse {
 
     if ( !defined $Param{Success} ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Missing parameter Success.',
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'Missing parameter Success.',
         );
     }
 
     if ( $Param{Data} && ref $Param{Data} ne 'HASH' ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Data is not a hash reference.',
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'Data is not a hash reference.',
         );
     }
 
@@ -204,15 +216,17 @@ sub RequesterPerformRequest {
 
     if ( !$Param{Operation} ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Missing parameter Operation.',
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'Missing parameter Operation.',
         );
     }
 
     if ( $Param{Data} && ref $Param{Data} ne 'HASH' ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Data is not a hash reference.',
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'Data is not a hash reference.',
         );
     }
 

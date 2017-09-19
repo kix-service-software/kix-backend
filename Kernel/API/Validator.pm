@@ -11,6 +11,10 @@ package Kernel::API::Validator;
 use strict;
 use warnings;
 
+use base qw(
+    Kernel::API::Common
+);
+
 use Kernel::System::VariableCheck qw(:all);
 
 # prevent 'Used once' warning for Kernel::OM
@@ -60,28 +64,39 @@ sub new {
     bless( $Self, $Type );
 
     for my $Needed (qw( DebuggerObject)) {
-        $Self->{$Needed} = $Param{$Needed} || return {
-            Success => 0,
-            Summary => "Got no $Needed!",
-        };
+        $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
+            Code    => 'Validator.InternalError',
+            Message => "Got no $Needed!",
+        );
     }
 
     # init all validators
     my $ValidatorList = $Kernel::OM->Get('Kernel::Config')->Get('API::Validator::Module');
     
     foreach my $Validator (sort keys %{$ValidatorList}) {
-        # next validator if this one ignores our current operation
-        next if ( $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/g );
+        if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/g ) {
+            # next validator if this one doesn't consider our current operation
+            next;
+        }
+        elsif ( $ValidatorList->{$Validator}->{IgnoreOperationRegEx} && $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/g ) {
+            # next validator if this one ignores our current operation
+            next;
+        }
 
         my $Backend = 'Kernel::API::Validator::' . $ValidatorList->{$Validator}->{Module};
 
         if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            return $Self->{DebuggerObject}->Error( Summary => "Validator $Backend not found." );
+            return $Self->_Error( 
+                Code    => 'Validator.InternalError',
+                Message => "Validator $Backend not found." 
+            );
         }
         my $BackendObject = $Backend->new( %{$Self} );
 
         # if the backend constructor failed, it returns an error hash, pass it on in this case
-        return $BackendObject if ref $Self->{Validators}->{$Validator} ne $Backend;
+        if ( ref $BackendObject ne $Backend ) {
+            return $BackendObject;
+        }
 
         # register backend for each validated attribute
         foreach my $ValidatedAttribute ( sort split(/\s*,\s*/, $ValidatorList->{$Validator}->{Validates}) ) {
@@ -120,9 +135,7 @@ sub Validate {
 
     # if no Data is given to validate, then return successful
     if ( !IsHashRefWithData($Param{Data}) ) {
-        return {
-            Success => 1,
-        }
+        return $Self->_Success();
     }
 
     # validate attributes

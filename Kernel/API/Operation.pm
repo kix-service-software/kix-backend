@@ -13,10 +13,15 @@ package Kernel::API::Operation;
 use strict;
 use warnings;
 
+use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(IsStringWithData);
 
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
+
+use base qw(
+    Kernel::API::Common
+);
 
 our $ObjectManagerDisabled = 1;
 
@@ -54,11 +59,11 @@ create an object.
     );
 
     my $OperationObject = Kernel::API::Operation->new(
-        DebuggerObject => $DebuggerObject,
-        Operation      => 'TicketCreate',                # the name of the operation in the web service
-        OperationType  => 'V1::Ticket::TicketCreate',    # the local operation backend to use
-        WebserviceID   => $WebserviceID,                 # ID of the currently used web service
-        NoAuthorizationNeeded => 1                       # optional
+        DebuggerObject  => $DebuggerObject,
+        Operation       => 'TicketCreate',                # the name of the operation in the web service
+        OperationType   => 'V1::Ticket::TicketCreate',    # the local operation backend to use
+        WebserviceID    => $WebserviceID,                 # ID of the currently used web service
+        NoAuthorizationNeeded => 1                        # optional
     );
 
 =cut
@@ -73,10 +78,10 @@ sub new {
     for my $Needed (qw(DebuggerObject Operation OperationType WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -85,8 +90,21 @@ sub new {
     # check operation
     if ( !IsStringWithData( $Param{OperationType} ) ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got no Operation with content!',
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => 'Got no Operation with content!',
+        );
+    }
+
+    # create validator
+    $Self->{ValidatorObject} = Kernel::API::Validator->new(
+        %{$Self},
+    );
+
+    # if validator init failed, bail out
+    if ( ref $Self->{ValidatorObject} ne 'Kernel::API::Validator' ) {
+        return $Self->_GenerateErrorResponse(
+            %{$Self->{ValidatorObject}},
         );
     }
 
@@ -94,8 +112,9 @@ sub new {
     my $GenericModule = 'Kernel::API::Operation::' . $Param{OperationType};
     if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
 
-        return $Self->{DebuggerObject}->Error(
-            Summary => "Can't load operation backend module $GenericModule!"
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "Can't load operation backend module $GenericModule!"
         );
     }
     $Self->{BackendObject} = $GenericModule->new(
@@ -104,6 +123,14 @@ sub new {
 
     # pass back error message from backend if backend module could not be executed
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
+
+    # pass authorization information to backend
+    $Self->{BackendObject}->{Authorization}   = $Param{Authorization};
+
+    # pass operation information to backend
+    $Self->{BackendObject}->{Operation}       = $Param{Operation};
+    $Self->{BackendObject}->{OperationType}   = $Param{OperationType};
+    $Self->{BackendObject}->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
 
     return $Self;
 }
@@ -130,6 +157,18 @@ perform the selected Operation.
 
 sub Run {
     my ( $Self, %Param ) = @_;    
+
+    # validate data
+    my $ValidatorResult = $Self->{ValidatorObject}->Validate(
+        %Param
+    );
+
+    if ( !$ValidatorResult->{Success} ) {
+
+        return $Self->_Error(
+            %{$ValidatorResult},
+        );
+    }
 
     # start map on backend
     return $Self->{BackendObject}->Run(%Param);
