@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="Ticket::EventModulePost###999-API" Required="0" Valid="1">
+        <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item><!-- run on all events -->
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Package::EventModulePost###1000-API" Required="0" Valid="1">
+        <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item><!-- run on all events -->
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="CustomerCompany::EventModulePost###1000-API" Required="0" Valid="1">
+        <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item><!-- run on all events -->
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="CustomerUser::EventModulePost###1000-API" Required="0" Valid="1">
+        <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item><!-- run on all events -->
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Queue::EventModulePost###1000-API" Required="0" Valid="1">
+        <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item><!-- run on all events -->
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="DynamicField::EventModulePost###1000-API" Required="0" Valid="1">
+        <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item><!-- run on all events -->
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::WebserviceConfig::CacheTTL" Required="1" Valid="1">
+        <Description Translatable="1">Cache time in seconds for the web service config backend.</Description>
+        <Setting>
+            <String Regex="">86400</String><!-- default 1 day -->
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Common::CachedAuth::AgentCacheTTL" Required="1" Valid="1">
+        <Description Translatable="1">Cache time in seconds for agent authentication in the API.</Description>
+        <Setting>
+            <String Regex="">300</String><!-- default 5 min -->
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Common::CachedAuth::CustomerCacheTTL" Required="1" Valid="1">
+        <Description Translatable="1">Cache time in seconds for customer authentication in the API.</Description>
+        <Setting>
+            <String Regex="">300</String><!-- default 5 min -->
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Transport::Module###HTTP::SOAP" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the transport layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SOAP</Item>
+                <Item Key="Protocol">HTTP</Item>
+                <Item Key="ConfigDialog">AdminAPITransportHTTPSOAP</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Transport::Module###HTTP::REST" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the transport layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">REST</Item>
+                <Item Key="Protocol">HTTP</Item>
+                <Item Key="ConfigDialog">AdminAPITransportHTTPREST</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Transport::Module###HTTP::Test" Required="0" Valid="0">
+        <Description Translatable="1">API module registration for the transport layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">Test</Item>
+                <Item Key="Protocol">HTTP</Item>
+                <Item Key="ConfigDialog">AdminAPITransportHTTPTest</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###Test::Test" Required="0" Valid="0">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">Test</Item>
+                <Item Key="Controller">Test</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Invoker::Module###Test::Test" Required="0" Valid="0">
+        <Description Translatable="1">API module registration for the invoker layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">Test</Item>
+                <Item Key="Controller">Test</Item>
+                <Item Key="ConfigDialog">AdminAPIInvokerDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Invoker::Module###Test::TestSimple" Required="0" Valid="0">
+        <Description Translatable="1">API module registration for the invoker layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TestSimple</Item>
+                <Item Key="Controller">Test</Item>
+                <Item Key="ConfigDialog">AdminAPIInvokerDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Mapping::Module###Test" Required="0" Valid="0">
+        <Description Translatable="1">API module registration for the mapping layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="ConfigDialog"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Mapping::Module###Simple" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the mapping layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="ConfigDialog">AdminAPIMappingSimple</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Frontend::Module###AdminAPIMappingXSLT" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        <Setting>
+            <FrontendModuleReg>
+                <Group>admin</Group>
+                <Description>Admin</Description>
+                <Title Translatable="1">API Webservice Mapping GUI</Title>
+                <Loader>
+                    <CSS>Core.Agent.Admin.API.css</CSS>
+                </Loader>
+            </FrontendModuleReg>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Mapping::Module###XSLT" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the mapping layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="ConfigDialog">AdminAPIMappingXSLT</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::ResponseLoggingMaxSize" Required="1" Valid="1">
+        <Description Translatable="1">Defines the maximum size in KiloByte of API responses that get logged to the gi_debugger_entry_content table.</Description>
+        <Setting>
+            <String Regex="">200</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
+        <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code</Description>
+        <Setting>
+            <Hash>
+                <Item Key="DEFAULT">200</Item>
+                <Item Key="Authorization.NoHeader">403</Item>
+                <Item Key="Authorization.NoToken">403</Item>
+                <Item Key="BadRequest">400</Item>
+                <Item Key="ExecOperation.MissingParameter">500</Item>
+                <Item Key="ExecOperation.OperationNotFound">500</Item>
+                <Item Key="Forbidden">403</Item>
+                <Item Key="Mapping.InternalError">500</Item>
+                <Item Key="Mapping.InvalidData">400</Item>
+                <Item Key="Object.Created">201</Item>
+                <Item Key="Object.NoPermission">403</Item>
+                <Item Key="Object.NotFound">404</Item>
+                <Item Key="Object.UnableToCreate">400</Item>
+                <Item Key="Object.UnableToUpdate">400</Item>
+                <Item Key="Operation.InternalError">500</Item>
+                <Item Key="Operation.PrepareDataError">400</Item>
+                <Item Key="PrepareData.InvalidFilter">400</Item>
+                <Item Key="PrepareData.InvalidSort">400</Item>
+                <Item Key="PrepareData.InvalidExpand">400</Item>
+                <Item Key="Provider.InternalError">500</Item>
+                <Item Key="SessionCreate.AuthFail">401</Item>
+                <Item Key="SessionDelete.DeleteError">404</Item>
+                <Item Key="SessionGet.TokenError">404</Item>
+                <Item Key="OK">200</Item>
+                <Item Key="Transport.InternalError">500</Item>
+                <Item Key="Transport.OperationNotFound">501</Item>
+                <Item Key="Transport.REST.DataMissing">400</Item>
+                <Item Key="Transport.REST.InternalError">500</Item>
+                <Item Key="Transport.REST.InvalidJSON">400</Item>
+                <Item Key="Transport.REST.InvalidMethod">400</Item>
+                <Item Key="Transport.REST.InvalidRequest">400</Item>
+                <Item Key="Transport.REST.NoContent">400</Item>
+                <Item Key="Transport.REST.NoInvokerControllerMapping">500</Item>
+                <Item Key="Transport.REST.NoRouteOperationMapping">500</Item>
+                <Item Key="Transport.REST.NoTransportConfig">500</Item>
+                <Item Key="Transport.REST.OperationNotFound">501</Item>
+                <Item Key="Transport.REST.RequestTooBig">413</Item>
+                <Item Key="Transport.REST.TransportConfigInvalid">500</Item>
+                <Item Key="Unauthorized">401</Item>
+                <Item Key="UserCreate.EmailExists">409</Item>
+                <Item Key="UserCreate.LoginExists">409</Item>
+                <Item Key="UserGet.NoUserData">400</Item>
+                <Item Key="UserGet.InvalidUserID">400</Item>
+                <Item Key="UserGet.InalidUserType">400</Item>
+                <Item Key="UserUpdate.LoginExists">409</Item>                
+                <Item Key="TicketTypeCreate.TicketTypeExists">409</Item>
+                <Item Key="TicketTypeCreate.UnableToCreate">409</Item>
+                <Item Key="TicketTypeGet.InvalidTypeID">400</Item>
+                <Item Key="TicketTypeGet.NotTicketTypeData">400</Item>
+                <Item Key="TicketTypeUpdate.TypeExists">400</Item>
+                <Item Key="TicketStateDelete.TicketExists">409</Item>
+                <Item Key="TicketStateCreate.TicketStateExists">409</Item>
+                <Item Key="TicketStateCreate.UnableToCreate">409</Item>
+                <Item Key="TicketStateGet.InvalidStateID">400</Item>
+                <Item Key="TicketStateGet.NotTicketStateData">400</Item>
+                <Item Key="TicketStateUpdate.StatExists">400</Item>
+                <Item Key="TicketStateDelete.TicketExists">409</Item>                 
+                <Item Key="PriorityDelete.TicketExists">409</Item>
+                <Item Key="PriorityCreate.PriorityExists">409</Item>
+                <Item Key="PriorityCreate.UnableToCreate">409</Item>
+                <Item Key="PriorityGet.InvalidPriorityID">400</Item>
+                <Item Key="PriorityGet.NotPriorityData">400</Item>
+                <Item Key="PriorityUpdate.PriorityExists">400</Item>
+                <Item Key="PriorityDelete.TicketExists">409</Item>                                                                        
+                <Item Key="Validator.InternalError">500</Item>
+                <Item Key="Validator.UnknownAttribute">500</Item>
+                <Item Key="Validator.Failed">400</Item>
+                <Item Key="Webservice.InvalidConfiguration">500</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+ 
+   
+</kix_config>
+    
