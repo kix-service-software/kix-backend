@@ -73,9 +73,7 @@ sub Init {
         );
     }
 
-    return {
-        Success => 1,
-    };
+    return $Self->_Success();
 }
 
 =item PrepareData()
@@ -123,7 +121,7 @@ sub PrepareData {
     }
 
     # prepare field filter
-    if ( exists($Param{Data}->{filter}) ) {
+    if ( exists($Param{Data}->{filter}) && IsStringWithData($Param{Data}->{filter}) ) {
         my $Result = $Self->_ValidateFilter(
             Filter => $Param{Data}->{filter},
         );
@@ -134,7 +132,7 @@ sub PrepareData {
     }
 
     # prepare field selector
-    if ( exists($Param{Data}->{fields}) ) {
+    if ( exists($Param{Data}->{fields}) && IsStringWithData($Param{Data}->{fields}) ) {
         foreach my $FieldSelector ( split(/,/, $Param{Data}->{fields}) ) {
             my ($Object, $Field) = split(/\./, $FieldSelector, 2);
             if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
@@ -145,7 +143,7 @@ sub PrepareData {
     }
 
     # prepare limiter
-    if ( exists($Param{Data}->{limit}) ) {
+    if ( exists($Param{Data}->{limit}) && IsStringWithData($Param{Data}->{limit}) ) {
         foreach my $Limiter ( split(/,/, $Param{Data}->{limit}) ) {
             my ($Object, $Limit) = split(/\:/, $Limiter, 2);
             if ( $Limit && $Limit =~ /\d+/ ) {
@@ -158,7 +156,7 @@ sub PrepareData {
     }
 
     # prepare offset
-    if ( exists($Param{Data}->{offset}) ) {
+    if ( exists($Param{Data}->{offset}) && IsStringWithData($Param{Data}->{offset}) ) {
         foreach my $Offset ( split(/,/, $Param{Data}->{offset}) ) {
             my ($Object, $Index) = split(/\:/, $Offset, 2);
             if ( $Index && $Index =~ /\d+/ ) {
@@ -171,7 +169,7 @@ sub PrepareData {
     }
 
     # prepare sorter
-    if ( exists($Param{Data}->{sort}) ) {
+    if ( exists($Param{Data}->{sort}) && IsStringWithData($Param{Data}->{sort}) ) {
         foreach my $Sorter ( split(/,/, $Param{Data}->{sort}) ) {
             my ($Object, $FieldSort) = split(/\./, $Sorter, 2);
             my ($Field, $Type) = split(/\:/, $FieldSort);
@@ -204,7 +202,7 @@ sub PrepareData {
     }
 
     # prepare expander
-    if ( exists($Param{Data}->{expand}) ) {
+    if ( exists($Param{Data}->{expand}) && IsStringWithData($Param{Data}->{expand}) ) {
         foreach my $Expander ( split(/,/, $Param{Data}->{expand}) ) {            
             my ($Object, $Attribute) = split(/\./, $Expander, 2);
 

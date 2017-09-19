@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserSearch.pm - API User Search operation backend
+# Kernel/API/Operation/User/ArticleSearch.pm - API User Search operation backend
 # based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -9,7 +9,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserSearch;
+package Kernel::API::Operation::V1::Ticket::ArticleSearch;
 
 use strict;
 use warnings;
@@ -17,14 +17,14 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::Ticket::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::User::UserSearch - API User Search Operation backend
+Kernel::API::Operation::Ticket::ArticleSearch - API Ticket Article Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,7 +62,7 @@ sub new {
 
 =item Run()
 
-perform UserSearch Operation. This will return a User ID list.
+perform ArticleSearch Operation. This will return a article list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -73,12 +73,12 @@ perform UserSearch Operation. This will return a User ID list.
         Success      => 1,                                # 0 or 1
         Message => '',                               # In case of an error
         Data         => {
-            User => [
+            Article => [
                 {
                 },
-                {                    
+                {
                 }
-            ],
+            ]
         },
     };
 
@@ -87,6 +87,7 @@ perform UserSearch Operation. This will return a User ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -101,6 +102,11 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+        Parameters => {
+            'TicketID' => {
+                Required => 1
+            },
+        }
     );
 
     # check result
@@ -111,36 +117,61 @@ sub Run {
         );
     }
 
-    # perform user search
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
-        Type => 'Short',
+    # check ticket permission
+    my $Permission = $Self->CheckAccessPermission(
+        TicketID => $Param{Data}->{TicketID},
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
     );
 
-    if (IsHashRefWithData(\%UserList)) {
+    if ( !$Permission ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
+        );
+    }
 
-        # get already prepared user data from UserGet operation
-        my $UserGetResult = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    my $ArticleTypes;
+    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
+        $ArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
+    }
+
+    my @ArticleIndex = $TicketObject->ArticleIndex(
+        TicketID   => $Param{Data}->{TicketID},
+        SenderType => $ArticleTypes,
+        UserID     => $Self->{Authorization}->{UserID},
+    );
+
+    if ( @ArticleIndex ) {
+
+        # get already prepared Article data from ArticleGet operation
+        my $ArticleGetResult = $Self->ExecOperation(
+            OperationType => 'V1::Ticket::ArticleGet',
             Data          => {
-                UserID => join(',', sort keys %UserList),
+                TicketID  => $Param{Data}->{TicketID},
+                ArticleID => join(',', @ArticleIndex),
+                include   => $Param{Data}->{include},
+                expand    => $Param{Data}->{expand},
             }
         );
-        if ( !IsHashRefWithData($UserGetResult) || !$UserGetResult->{Success} ) {
-            return $UserGetResult;
+        if ( !IsHashRefWithData($ArticleGetResult) || !$ArticleGetResult->{Success} ) {
+            return $ArticleGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
+        my @ResultList = IsArrayRefWithData($ArticleGetResult->{Data}->{Article}) ? @{$ArticleGetResult->{Data}->{Article}} : ( $ArticleGetResult->{Data}->{Article} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                User => \@ResultList,
+                Article => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        User => {},
+        Article => {},
     );
 }
 

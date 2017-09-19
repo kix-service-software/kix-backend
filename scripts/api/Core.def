@@ -24,3 +24,5 @@
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   GET             | V1::Ticket::ArticleAttachmentGet
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   PATCH           | V1::Ticket::ArticleAttachmentUpdate
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   DELETE          | V1::Ticket::ArticleAttachmentDelete
+/tickets/:TicketID/history                                          |   GET             | V1::Ticket::HistorySearch
+/tickets/:TicketID/history/:HistoryID                               |   GET             | V1::Ticket::HistoryGet

@@ -16,7 +16,6 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
     Kernel::API::Operation::V1::Ticket::Common
 );
 
@@ -147,7 +146,7 @@ perform TicketCreate Operation. This will return the created TicketID.
         Code            => '',                      #
         ErrorMessage    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            TicketID    => 123,                     # Ticket  ID number in OTRS (help desk system)
+            TicketID    => 123,                     # ID of new ticket
         },
     };
 

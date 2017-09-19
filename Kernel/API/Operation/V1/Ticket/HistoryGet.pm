@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Ticket::ArticleAttachmentGet;
+package Kernel::API::Operation::V1::Ticket::HistoryGet;
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::ArticleAttachmentGet - API Ticket Get Operation backend
+Kernel::API::Operation::V1::Ticket::HistoryGet - API Ticket Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -65,16 +65,13 @@ sub new {
 
 =item Run()
 
-perform ArticleAttachmentGet Operation. This function is able to return
+perform HistoryGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
             TicketID             => '1',                                           # required 
-            ArticleID            => '32',                                          # required, could be coma separated IDs or an Array
-            AttachmentID         => 'Article::32::1',                              # required, could be coma separated IDs or an Array
-            include              => '...',                                         # Optional, 0 as default. Include additional objects
-                                                                                   # (supported: Content)
+            HistoryID            => '32,33',                                       # required, could be coma separated IDs or an Array
         },
     );
 
@@ -83,15 +80,21 @@ one or more ticket entries in one call.
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
         Data         => {
-            Attachment => [
+            History => [
                 {
-                    AttachmentID      => 123
-                    ContentAlternative => "",
-                    ContentID          => "",
-                    ContentType        => "application/pdf",
-                    Filename           => "StdAttachment-Test1.pdf",
-                    Filesize           => "4.6 KBytes",
-                    FilesizeRaw        => 4722,
+                    HistoryID
+                    TicketID
+                    ArticleID
+                    Name
+                    CreateBy
+                    CreateTime
+                    HistoryType
+                    QueueID
+                    OwnerID
+                    PriorityID
+                    StateID
+                    HistoryTypeID
+                    TypeID
                 },
                 {
                     #. . .
@@ -124,10 +127,7 @@ sub Run {
             'TicketID' => {
                 Required => 1
             },
-            'ArticleID' => {
-                Required => 1
-            },
-            'AttachmentID' => {
+            'HistoryID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -162,34 +162,29 @@ sub Run {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    my @AttachmentList;
+    my @HistoryList = $TicketObject->HistoryGet(
+        TicketID => $Param{Data}->{TicketID},
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+    my %HistoryHash = map { $_->{HistoryID} => $_ } @HistoryList;
 
-    # start attachment loop
-    ATTACHMENT:
-    foreach my $AttachmentID ( sort @{$Param{Data}->{AttachmentID}} ) {
-        
-        my %Attachment = $TicketObject->ArticleAttachment(
-            ArticleID          => $Param{Data}->{ArticleID},
-            FileID             => $AttachmentID,
-            UserID             => $Self->{Authorization}->{UserID},
-        );
+    my @HistoryItemList;
 
-        if ( !$Param{Data}->{include}->{Content} ) {
-            delete $Attachment{Content};
-        }
-
+    # start item loop
+    HISTORY:
+    for my $HistoryID ( sort @{$Param{Data}->{HistoryID}} ) {
         # add
-        push(@AttachmentList, \%Attachment);
+        push(@HistoryItemList, $HistoryHash{$HistoryID});
     }
 
-    if ( scalar(@AttachmentList) == 1 ) {
+    if ( scalar(@HistoryItemList) == 1 ) {
         return $Self->_Success(
-            Attachment => $AttachmentList[0],
+            History => $HistoryItemList[0],
         );    
     }
 
     return $Self->_Success(
-        Attachment => \@AttachmentList,
+        History => \@HistoryItemList,
     );
 }
 

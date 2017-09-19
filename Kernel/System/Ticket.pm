@@ -6079,8 +6079,8 @@ get ticket history as array with hashes
 OwnerID, PriorityID, StateID, HistoryTypeID and TypeID)
 
     my @HistoryLines = $TicketObject->HistoryGet(
-        TicketID => 123,
-        UserID   => 123,
+        TicketID  => 123,
+        UserID    => 123,
     );
 
 =cut
@@ -6106,7 +6106,7 @@ sub HistoryGet {
 
     return if !$DBObject->Prepare(
         SQL => 'SELECT sh.name, sh.article_id, sh.create_time, sh.create_by, ht.name, '
-            . ' sh.queue_id, sh.owner_id, sh.priority_id, sh.state_id, sh.history_type_id, sh.type_id '
+            . ' sh.queue_id, sh.owner_id, sh.priority_id, sh.state_id, sh.history_type_id, sh.type_id, sh.id '
             . ' FROM ticket_history sh, ticket_history_type ht WHERE '
             . ' sh.ticket_id = ? AND ht.id = sh.history_type_id'
             . ' ORDER BY sh.create_time, sh.id',
@@ -6115,6 +6115,7 @@ sub HistoryGet {
 
     while ( my @Row = $DBObject->FetchrowArray() ) {
         my %Data;
+        $Data{HistoryID}     = $Row[11];
         $Data{TicketID}      = $Param{TicketID};
         $Data{ArticleID}     = $Row[1] || 0;
         $Data{Name}          = $Row[0];
@@ -6128,20 +6129,6 @@ sub HistoryGet {
         $Data{HistoryTypeID} = $Row[9];
         $Data{TypeID}        = $Row[10];
         push @Lines, \%Data;
-    }
-
-    # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-
-    # get user data
-    for my $Data (@Lines) {
-
-        my %UserInfo = $UserObject->GetUserData(
-            UserID => $Data->{CreateBy},
-        );
-
-        # merge result, put %Data last so that it "wins"
-        %{$Data} = ( %UserInfo, %{$Data} );
     }
 
     return @Lines;

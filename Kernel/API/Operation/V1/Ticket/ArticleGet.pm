@@ -18,7 +18,6 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
     Kernel::API::Operation::V1::Ticket::Common
 );
 
@@ -248,10 +247,12 @@ sub Run {
         for my $Attribute ( sort keys %ArticleRaw ) {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
-                push @DynamicFields, {
-                    Name  => $1,
-                    Value => $ArticleRaw{$Attribute},
-                };
+                if ( $ArticleRaw{$Attribute} ) {
+                    push @DynamicFields, {
+                        Name  => $1,
+                        Value => $ArticleRaw{$Attribute},
+                    };
+                }
                 next ATTRIBUTE;
             }
 
@@ -261,6 +262,9 @@ sub Run {
         # add dynamic fields array into 'DynamicFields' hash key if any
         if (@DynamicFields) {
             $ArticleData{DynamicFields} = \@DynamicFields;
+        }
+        else {
+            $ArticleData{DynamicFields} = [];
         }
             
         # add

@@ -175,6 +175,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleAttachmentDelete
+    HistorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::HistorySearch
+    HistoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::HistoryGet
 
   Transport:
     Config:
@@ -277,6 +291,14 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
+        HistorySearch:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/history
+        HistoryGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/history/:HistoryID
 
     Type: HTTP::REST
 RemoteSystem: ''

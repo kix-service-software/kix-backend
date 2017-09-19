@@ -16,7 +16,6 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
-    Kernel::API::Operation::V1::Common
     Kernel::API::Operation::V1::Ticket::Common
 );
 

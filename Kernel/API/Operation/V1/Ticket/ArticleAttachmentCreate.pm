@@ -13,10 +13,11 @@ package Kernel::API::Operation::V1::Ticket::ArticleAttachmentCreate;
 use strict;
 use warnings;
 
+use MIME::Base64();
+
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
     Kernel::API::Operation::V1::Ticket::Common
 );
 
@@ -197,6 +198,7 @@ sub Run {
     # create the new attachment
     my $AttachmentID = $TicketObject->ArticleWriteAttachment(
         %{$Param{Data}->{Attachment}},
+        Content    => MIME::Base64::decode_base64( $Param{Data}->{Attachment}->{Content} ),
         ArticleID  => $Param{Data}->{ArticleID},
         UserID     => $PermissionUserID,
     );
