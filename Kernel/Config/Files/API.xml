@@ -232,10 +232,7 @@
                 <Item Key="UserGet.InvalidUserID">400</Item>
                 <Item Key="UserGet.InalidUserType">400</Item>
                 <Item Key="UserUpdate.LoginExists">409</Item>                
-                <Item Key="TicketTypeCreate.TicketTypeExists">409</Item>
-                <Item Key="TicketTypeCreate.UnableToCreate">409</Item>
-                <Item Key="TicketTypeGet.InvalidTypeID">400</Item>
-                <Item Key="TicketTypeGet.NotTicketTypeData">400</Item>
+                <Item Key="TicketTypeCreate.TypeExists">409</Item>
                 <Item Key="TicketTypeUpdate.TypeExists">400</Item>
                 <Item Key="TicketTypeDelete.TicketExists">409</Item>                                
                 <Item Key="Validator.InternalError">500</Item>

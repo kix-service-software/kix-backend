@@ -119,12 +119,6 @@ sub Run {
                 Type => 'HASH',
                 Required => 1
             },
-            'TicketType::Name' => {
-                Required => 1
-            },
-            'TicketType::ValidID' => {
-                Required => 1
-            },                    
         }        
     );
 
@@ -144,15 +138,15 @@ sub Run {
     if ( !%TicketTypeData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Can not patch tickettype. TicketType with this ID '$Param{Data}->{TypeID}' not exists.",
+            Message => "Can not update TicketType. No TicketType with ID '$Param{Data}->{TypeID}' found.",
         );
     }
 
     # update tickettype
     my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeUpdate(
         ID      => $Param{Data}->{TypeID},
-        Name    => $Param{Data}->{TicketType}->{Name},
-        ValidID => $Param{Data}->{TicketType}->{ValidID},
+        Name    => $Param{Data}->{TicketType}->{Name} || $TicketTypeData{Name},
+        ValidID => $Param{Data}->{TicketType}->{ValidID} || $TicketTypeData{ValidID},
         UserID  => $Self->{Authorization}->{UserID},
     );
 

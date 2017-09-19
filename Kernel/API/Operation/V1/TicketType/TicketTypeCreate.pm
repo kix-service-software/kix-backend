@@ -114,9 +114,6 @@ sub Run {
             'TicketType::Name' => {
                 Required => 1
             },
-            'TicketType::ValidID' => {
-                Required => 1
-            },            
         }
     );
 
@@ -150,7 +147,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'TicketTypeCreate.TicketTypeExists',
+            Code    => 'TicketTypeCreate.TypeExists',
             Message => "Can not create TicketType. TicketType with same name '$TicketType->{Name}' already exists.",
         );
     }
@@ -158,13 +155,13 @@ sub Run {
     # create tickettype
     my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
         Name    => $TicketType->{Name},
-        ValidID => $TicketType->{ValidID},
+        ValidID => $TicketType->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$TicketTypeID ) {
         return $Self->_Error(
-            Code    => 'TicketTypeCreate.UnableToCreate',
+            Code    => 'Object.UnableToCreate',
             Message => 'Could not create type, please contact the system administrator',
         );
     }
@@ -172,7 +169,7 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        TicketTypeID => $TicketTypeID,
+        TypeID => $TicketTypeID,
     );    
 }
 

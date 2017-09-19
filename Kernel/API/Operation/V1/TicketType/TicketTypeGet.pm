@@ -132,7 +132,6 @@ sub Run {
     }
 
     my @TicketTypeList;
-    my $Message ='';
     
     # start type loop
     TYPE:    
@@ -144,29 +143,14 @@ sub Run {
         );
 
         if ( !IsHashRefWithData( \%TicketTypeData ) ) {
-
-            $Message = 'Could not get TicketType data'
-                . ' in Kernel::API::Operation::V1::TicketType::TicketTypeGet::Run()';
-
             return $Self->_Error(
-                Code    => 'TicketTypeGet.InvalidTypeID',
-                Message => "TicketTypeGet: $Message",
+                Code    => 'Object.NotFound',
+                Message => "No data found for TypeID $TypeID.",
             );
         }
         
         # add
         push(@TicketTypeList, \%TicketTypeData);
-    }
-
-    if ( !scalar(@TicketTypeList) ) {
-        $Message = 'Could not get TicketType data'
-            . ' in Kernel::API::Operation::V1::TicketType::TicketTypeGet::Run()';
-
-        return $Self->_Error(
-            Code    => 'TicketTypeGet.NotTicketTypeData',
-            Message => "TicketTypeGet: $Message",
-        );
-
     }
 
     if ( scalar(@TicketTypeList) == 1 ) {
