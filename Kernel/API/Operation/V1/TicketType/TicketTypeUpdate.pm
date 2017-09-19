@@ -153,7 +153,7 @@ sub Run {
         ID      => $Param{Data}->{TypeID},
         Name    => $Param{Data}->{TicketType}->{Name},
         ValidID => $Param{Data}->{TicketType}->{ValidID},
-        UserID  => $Param{Data}->{Authorization}->{UserID},
+        UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {

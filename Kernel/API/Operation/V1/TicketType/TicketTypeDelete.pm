@@ -123,7 +123,7 @@ sub Run {
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
             Result  => 'COUNT',
             TypeIDs => [$TypeID],
-            UserID  => $Param{Data}->{Authorization}->{UserID},
+            UserID  => $Self->{Authorization}->{UserID},
         );
      
         if ( $ResultTicketSearch ) {
@@ -136,7 +136,7 @@ sub Run {
         # delete tickettype	    
         my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
             TypeID  => $TypeID,
-            UserID  => $Param{Data}->{Authorization}->{UserID},
+            UserID  => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {
