@@ -129,7 +129,7 @@ sub Run {
     }
 
 
-    # isolate TicketType parameter
+    # isolate TicketState parameter
     my $TicketState = $Param{Data}->{TicketState};
 
     # remove leading and trailing spaces

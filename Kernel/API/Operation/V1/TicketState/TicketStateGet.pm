@@ -145,7 +145,7 @@ sub Run {
         if ( !IsHashRefWithData( \%TicketStateData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for StateeID $StateID.",
+                Message => "No data found for StateID $StateID.",
             );
         }
         
@@ -153,7 +153,7 @@ sub Run {
         push(@TicketStateList, \%TicketStateData);
     }
 
-    if ( scalar(@TicketTypeList) == 1 ) {
+    if ( scalar(@TicketStateList) == 1 ) {
         return $Self->_Success(
             TicketState => $TicketStateList[0],
         );    

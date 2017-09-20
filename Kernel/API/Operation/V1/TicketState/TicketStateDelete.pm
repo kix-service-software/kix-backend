@@ -129,8 +129,8 @@ sub Run {
 	    
 	    if ( $ResultTicketSearch ) {
             return $Self->_Error(
-                Code    => 'TicketTypeDelete.TicketExists',
-                Message => 'Can not delete TicketType. A Ticket with this TicketType already exists.',
+                Code    => 'TicketStateDelete.TicketExists',
+                Message => 'Can not delete TicketState. A Ticket with this TicketState already exists.',
             );
 	    }
 	    
