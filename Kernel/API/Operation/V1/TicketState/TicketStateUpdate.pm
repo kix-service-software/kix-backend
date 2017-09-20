@@ -72,7 +72,7 @@ perform TicketStateUpdate Operation. This will return the updated TicketStateID.
 
     my $Result = $OperationObject->Run(
         Data => {
-        	ID      => '...',
+        	StateID => '...',
         }        
     	TicketState => (
         	Name    => ''...',
@@ -82,12 +82,11 @@ perform TicketStateUpdate Operation. This will return the updated TicketStateID.
     	),
     );
     
-
     $Result = {
         Success      => 1,                  # 0 or 1
-        Message      => '',                      # in case of error
+        Message      => '',                 # in case of error
         Data         => {                   # result data payload after Operation
-            StateID  => '',                    #StateID 
+            StateID  => '',                 #StateID 
             Error    => {                         # should not return errors
                     Code    => 'TicketState.Update.ErrorCode'
                     Message => 'Error Description'

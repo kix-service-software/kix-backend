@@ -121,7 +121,7 @@ sub Run {
     State:    
     foreach my $TicketStateID ( @{$Param{Data}->{StateID}} ) {
 	           
-	    my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
 	        Result => 'COUNT',
 	        StateIDs => [$TicketStateID],
 	        UserID => $Self->{Authorization}->{UserID},
