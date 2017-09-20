@@ -646,11 +646,11 @@ sub CheckAccessPermission {
     return $Access;
 }
 
-=item CheckUpdatePermissions()
+=item CheckUpdatePermission()
 
 check if user has permissions to update ticket attributes.
 
-    my $Response = $OperationObject->CheckUpdatePermissions(
+    my $Response = $OperationObject->CheckUpdatePermission(
         TicketID     => 123,
         Ticket       => $Ticket,                    # all ticket parameters
         UserID       => 123,
@@ -670,7 +670,7 @@ check if user has permissions to update ticket attributes.
 
 =cut
 
-sub CheckUpdatePermissions {
+sub CheckUpdatePermission {
     my ( $Self, %Param ) = @_;
 
     my %NeededPermissions = (
@@ -755,6 +755,45 @@ sub CheckUpdatePermissions {
     }
 
     return $Self->_Success();
+}
+
+=item CheckDeletePermission()
+
+Tests if the user have delete permission for a ticket
+
+    my $Result = $CommonObject->CheckDeletePermission(
+        TicketID   => 123,
+        UserID     => 123,                      # or 'CustomerLogin'
+        UserType   => 'Agent',                  # or 'Customer'
+    );
+
+returns:
+    $Result = 1                                 # if everything is OK
+
+=cut
+
+sub CheckDeletePermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID UserID UserType)) {
+        if ( !$Param{$Needed} ) {
+            return;
+        }
+    }
+
+    my $TicketPermissionFunction = 'TicketPermission';
+    if ( $Param{UserType} eq 'Customer' ) {
+        $TicketPermissionFunction = 'TicketCustomerPermission';
+    }
+
+    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
+        Type     => 'delete',
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+    );
+
+    return $Access;
 }
 
 

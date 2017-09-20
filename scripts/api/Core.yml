@@ -70,13 +70,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::User::UserUpdate
-    TicketTypeGet:
+    UserGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::TicketType::TicketTypeGet
+        Type: V1::Own::UserGet
     TicketTypeSearch:
         Description: ''
         MappingInbound:
@@ -91,6 +91,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::TicketType::TicketTypeCreate
+    TicketTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeGet
     TicketTypeUpdate:
         Description: ''
         MappingInbound:
@@ -133,6 +140,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::TicketUpdate
+    TicketDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::TicketDelete
     ArticleSearch:
         Description: ''
         MappingInbound:
@@ -259,10 +273,10 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /users/:UserID
-        TicketTypeGet:
+        UserGet:
           RequestMethod:
           - GET
-          Route: /tickettypes/:TypeID
+          Route: /user
         TicketTypeSearch:
           RequestMethod:
           - GET
@@ -271,6 +285,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /tickettypes
+        TicketTypeGet:
+          RequestMethod:
+          - GET
+          Route: /tickettypes/:TypeID
         TicketTypeUpdate:
           RequestMethod:
           - PATCH
@@ -294,6 +312,10 @@ Provider:
         TicketUpdate:
           RequestMethod:
           - PATCH
+          Route: /tickets/:TicketID
+        TicketDelete:
+          RequestMethod:
+          - DELETE
           Route: /tickets/:TicketID
         ArticleSearch:
           RequestMethod:

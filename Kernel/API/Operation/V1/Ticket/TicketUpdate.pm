@@ -159,16 +159,16 @@ sub Run {
     # isolate ticket hash
     my $Ticket = $Param{Data}->{Ticket};
 
-    # check update permissions
-    my $CheckResult = $Self->CheckUpdatePermissions(
+    # check update permission
+    my $Permission = $Self->CheckUpdatePermission(
         TicketID => $Param{Data}->{TicketID},
         Ticket   => $Ticket,
         UserID   => $PermissionUserID,
         UserType => $Self->{Authorization}->{UserType},
     );
 
-    if ( !$CheckResult->{Success} ) {
-        return $CheckResult;
+    if ( !$Permission->{Success} ) {
+        return $Permission;
     }
 
     # check Ticket attribute values

@@ -19,6 +19,7 @@
 /tickets                                                            |   POST            | V1::Ticket::TicketCreate
 /tickets/:TicketID                                                  |   GET             | V1::Ticket::TicketGet
 /tickets/:TicketID                                                  |   PATCH           | V1::Ticket::TicketUpdate
+/tickets/:TicketID                                                  |   DELETE          | V1::Ticket::TicketDelete
 /tickets/:TicketID/articles                                         |   GET             | V1::Ticket::ArticleSearch
 /tickets/:TicketID/articles                                         |   POST            | V1::Ticket::ArticleCreate
 /tickets/:TicketID/articles/:ArticleID                              |   GET             | V1::Ticket::ArticleGet
