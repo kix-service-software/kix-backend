@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Priority::PriorityUpdate - API Priority Create Operation backend
+Kernel::API::Operation::V1::Priority::PriorityUpdate - API Priority Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ Kernel::API::Operation::V1::Priority::PriorityUpdate - API Priority Create Opera
 
 =item new()
 
-usually, you want to create an instance of this
+usually, you want to update an instance of this
 by using Kernel::API::Operation->new();
 
 =cut

@@ -71,7 +71,7 @@ perform PriorityCreate Operation. This will return the created PriorityID.
     my $Result = $OperationObject->Run(
         Data => {
     		Priority(
-        		Priority    => '...',
+        		Name    => '...',
         		ValidID => '...',
         	},
         },	
@@ -111,7 +111,7 @@ sub Run {
                 Type     => 'HASH',
                 Required => 1
             },
-            'Priority::Priority' => {
+            'Priority::Name' => {
                 Required => 1
             },
         }
@@ -145,7 +145,7 @@ sub Run {
      	
     # check if Priority exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
-        Priority => $Priority->{Priority},
+        Priority => $Priority->{Name},
     );
     
     if ( $Exists ) {
@@ -157,7 +157,7 @@ sub Run {
 
     # create Priority
     $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityAdd(
-        Name    => $Priority->{Priority},
+        Name    => $Priority->{Name},
         ValidID => $Priority->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
