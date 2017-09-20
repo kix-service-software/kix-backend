@@ -9,6 +9,7 @@
 /users                                                              |   POST            | V1::User::UserCreate
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
+/user                                                               |   GET             | V1::Own::UserGet
 /tickettypes                                                        |   GET             | V1::TicketType::TicketTypeSearch
 /tickettypes                                                        |   POST            | V1::TicketType::TicketTypeCreate
 /tickettypes/:TypeID                                                |   GET             | V1::TicketType::TicketTypeGet
