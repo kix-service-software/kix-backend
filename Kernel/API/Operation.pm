@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 use Kernel::API::Validator;
-use Kernel::System::VariableCheck qw(IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
@@ -96,6 +96,28 @@ sub new {
         );
     }
 
+    my $OperationConfig = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
+    if ( !IsHashRefWithData($OperationConfig) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => 'No OperationConfig found!',
+        );
+    }
+
+    # check permission
+    if ( $OperationConfig->{Permission} && IsHashRefWithData($Param{Authorization}) ) {
+        my $Permission = $Self->_CheckOperationPermission(
+            OperationConfig => $OperationConfig,
+            UserID          => $Param{Authorization}->{UserID},
+        );
+        if ( !$Permission ) {
+            return $Self->_Error(
+                Code    => 'Forbidden',
+                Message => 'No permission to execute this operation!',
+            );
+        }
+    }
+
     # create validator
     $Self->{ValidatorObject} = Kernel::API::Validator->new(
         %{$Self},
@@ -130,7 +152,7 @@ sub new {
     # pass operation information to backend
     $Self->{BackendObject}->{Operation}       = $Param{Operation};
     $Self->{BackendObject}->{OperationType}   = $Param{OperationType};
-    $Self->{BackendObject}->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
+    $Self->{BackendObject}->{OperationConfig} = $OperationConfig;
 
     return $Self;
 }
@@ -174,9 +196,83 @@ sub Run {
     return $Self->{BackendObject}->Run(%Param);
 }
 
+=begin Internal:
+
+=item _CheckOperationPermission()
+
+checks whether the user is allowed to execute this operation
+
+    my $Permission = $OperationObject->_CheckOperationPermission(
+        OperationConfig  => { },
+        UserID           => 123,
+    );
+
+=cut
+
+sub _CheckOperationPermission {
+    my ( $Self, %Param ) = @_;    
+
+    return 1 if !$Param{OperationConfig}->{Permission};
+
+    # parse permissions
+    my $Result = 0;
+    PERMISSION:
+    foreach my $PermissionDef ( split(/\s*,\s*/, $Param{OperationConfig}->{Permission}) ) {
+
+        my ($ObjectType, $Rest)   = split(/=/, $PermissionDef);
+        my ($Object, $Permission) = split(/:/, $Rest);
+        my @UserIDs;
+
+        # check roles, groups and users
+        if ( uc($ObjectType) eq 'ROLE' ) {
+            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+            my $RoleID = $GroupObject->RoleLookup( 
+                Role => $Object
+            );
+            if ( $RoleID ) {
+                @UserIDs = $GroupObject->GroupUserRoleMemberList(
+                    RoleID => $RoleID,
+                    Result => 'ID',
+                );
+            }
+        }
+        elsif ( uc($ObjectType) eq 'GROUP' ) {
+            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+            my $GroupID = $GroupObject->GroupLookup( 
+                Group => $Object
+            );
+            if ( $GroupID ) {
+                @UserIDs = $GroupObject->GroupGroupMemberList(
+                    GroupID => $GroupID,
+                    Type    => $Permission,
+                    Result  => 'ID',
+                );
+            }
+        }
+        elsif ( uc($ObjectType) eq 'USER' ) {
+            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+            my $UserID = $UserObject->UserLookup( 
+                UserLogin => $Object 
+            );
+            if ( $UserID ) {
+                push(@UserIDs, $UserID);
+            }
+        }
+
+        my %UserHash = map { $_ => 1 } @UserIDs;
+        if ( $UserHash{$Param{UserID}} ) {
+            # user has permission, abort loop
+            $Result = 1;
+            last PERMISSION;
+        }
+    }
+
+    return $Result;
+}
+
 1;
 
-
+=end Internal:
 
 
 =back
