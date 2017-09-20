@@ -114,9 +114,6 @@ sub Run {
             'Priority::Priority' => {
                 Required => 1
             },
-            'Priority::ValidID' => {
-                Required => 1
-            },            
         }
     );
 
@@ -161,15 +158,15 @@ sub Run {
     # create Priority
     $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityAdd(
         Name    => $Priority->{Priority},
-        ValidID => $Priority->{ValidID},
+        ValidID => $Priority->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$PriorityID ) {
-        return 0; # $Self->_Error(
-            #Code    => 'PriorityCreate.UnableToCreate',
-            #Message => 'Could not create type, please contact the system administrator',
-        #);
+        return $Self->_Error(
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create priority, please contact the system administrator',
+        );
     }
     
     # return result    
@@ -178,3 +175,5 @@ sub Run {
         PriorityID => $PriorityID,
     );    
 }
+
+1;

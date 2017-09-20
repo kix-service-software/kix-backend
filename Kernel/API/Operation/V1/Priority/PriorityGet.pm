@@ -132,7 +132,6 @@ sub Run {
     }
 
     my @PriorityList;
-    my $Message ='';
     
     # start type loop
     TYPE:    
@@ -145,29 +144,14 @@ sub Run {
         );
 
         if ( !IsHashRefWithData( \%PriorityData ) ) {
-
-            $Message = 'Could not get Priority data'
-                . ' in Kernel::API::Operation::V1::Priority::PriorityGet::Run()';
-
             return $Self->_Error(
-                Code    => 'PriorityGet.NotValidPriorityID',
-                Message => "PriorityGet: $Message",
+                Code    => 'Object.NotFound',
+                Message => "No data found for PriorityID $PriorityID.",
             );
         }
         
         # add
         push(@PriorityList, \%PriorityData);
-    }
-
-    if ( !scalar(@PriorityList) ) {
-        $Message = 'Could not get Priority data'
-            . ' in Kernel::API::Operation::V1::Priority::PriorityGet::Run()';
-
-        return $Self->_Error(
-            Code    => 'PriorityGet.NotPriorityData',
-            Message => "PriorityGet: $Message",
-        );
-
     }
 
     if ( scalar(@PriorityList) == 1 ) {
