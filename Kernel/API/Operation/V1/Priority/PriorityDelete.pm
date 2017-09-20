@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform PriorityDelete Operation. This will return the deleted TypeID.
+perform PriorityDelete Operation. This will return the deleted PriorityID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TypeID  => '...',
+            PriorityID  => '...',
         },		
     );
 

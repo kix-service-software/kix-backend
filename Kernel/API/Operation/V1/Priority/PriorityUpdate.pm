@@ -75,7 +75,7 @@ perform PriorityUpdate Operation. This will return the updated TypeID.
             ID      => '...',
         }
 	    Priority => {
-	        Priority    => '...',
+	        Name    => '...',
 	        ValidID => '...',
 	    },
 	);
