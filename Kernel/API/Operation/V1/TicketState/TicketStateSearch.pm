@@ -75,7 +75,7 @@ perform TicketStateSearch Operation. This will return a TicketState ID list.
     $Result = {
         Success => 1,                                # 0 or 1
         Message => '',                               # In case of an error
-        Data         => {
+        Data    => {
             StateID => [ 1, 2, 3, 4 ],
         },
     };

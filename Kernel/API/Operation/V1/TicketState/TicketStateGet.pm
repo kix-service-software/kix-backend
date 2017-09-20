@@ -131,7 +131,6 @@ sub Run {
         );
     }
 
-    my $Message = '';
     my @TicketStateList;
 
     # start state loop
@@ -144,13 +143,9 @@ sub Run {
         );
 
         if ( !IsHashRefWithData( \%TicketStateData ) ) {
-
-            $Message = 'Could not get TicketState data'
-                . ' in Kernel::API::Operation::V1::TicketState::TicketStateGet::Run()';
-
             return $Self->_Error(
-                Code    => 'TicketStateGet.NotValidTicketStateID',
-                Message => "TicketStateGet: $Message",
+                Code    => 'Object.NotFound',
+                Message => "No data found for StateeID $StateID.",
             );
         }
         
@@ -158,18 +153,7 @@ sub Run {
         push(@TicketStateList, \%TicketStateData);
     }
 
-    if ( !scalar(@TicketStateList) ) {
-        $Message = 'Could not get TicketState data'
-            . ' in Kernel::API::Operation::V1::TicketState::TicketStateGet::Run()';
-
-        return $Self->_Error(
-            Code    => 'TicketStateGet.NotTicketStateData',
-            Message => "TicketStateGet: $Message",
-        );
-
-    }
-
-    if ( scalar(@TicketStateList) == 1 ) {
+    if ( scalar(@TicketTypeList) == 1 ) {
         return $Self->_Success(
             TicketState => $TicketStateList[0],
         );    
@@ -182,6 +166,3 @@ sub Run {
 }
 
 1;
-
-
-

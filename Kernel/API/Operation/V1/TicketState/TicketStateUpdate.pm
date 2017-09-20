@@ -89,7 +89,7 @@ perform TicketStateUpdate Operation. This will return the updated TicketStateID.
         Data         => {                   # result data payload after Operation
             StateID  => '',                    #StateID 
             Error    => {                         # should not return errors
-                    Code    => 'TicketState.Update.Code'
+                    Code    => 'TicketState.Update.ErrorCode'
                     Message => 'Error Description'
             },
         },
@@ -126,13 +126,7 @@ sub Run {
             },
             'TicketState::TypeID' => {
                Required => 1
-            },
-            'TicketState::Comment' => {
-               Required => 1
-            }, 
-            'TicketState::ValidID' => {
-               Required => 1
-            },                                                                       
+            },                                              
         }
     );
 
@@ -191,3 +185,5 @@ sub Run {
         TicketStateID => $TicketStateData{ID},
     );    
 }
+
+1;

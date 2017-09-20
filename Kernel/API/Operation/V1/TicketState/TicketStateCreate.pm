@@ -73,7 +73,6 @@ perform TicketStateCreate Operation. This will return the created TicketStateID.
 			TicketState(
         		Name    => '...',
         		ValidID => '...',
-        		UserID  => '...',
     		},
     	},
     );
@@ -109,7 +108,7 @@ sub Run {
         Data       => $Param{Data},
         Parameters => {
             'TicketState' => {
-                State     => 'HASH',
+                Type     => 'HASH',
                 Required => 1
             },
             'TicketState::Name' => {
@@ -117,10 +116,7 @@ sub Run {
             },
             'TicketState::TypeID' => {
                Required => 1
-            },
-            'TicketState::ValidID' => {
-                Required => 1
-            },                                                
+            },                                        
         }
     );
 
@@ -152,9 +148,10 @@ sub Run {
     my $Exists = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
         State => $TicketState->{Name},
     );
+    
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'TicketStateCreate.TicketStateExists',
+            Code    => 'TicketStateCreate.StateExists',
             Message => "Can not create TicketState. TicketState already exists.",
         );
     }
@@ -162,13 +159,14 @@ sub Run {
     # create ticketstate
     my $TicketStateID = $Kernel::OM->Get('Kernel::System::State')->StateAdd(
         %{$TicketState},
+        ValidID => $TicketState->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$TicketStateID ) {
         return $Self->_Error(
-            Code    => 'TicketStateCreate.UnableToCreate',
-            Message => 'Could not create TicketState, please contact the system administrator',
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create state, please contact the system administrator',
         );
     }
     
@@ -178,3 +176,5 @@ sub Run {
         TicketStateID => $TicketStateID,
     );    
 }
+
+1;
