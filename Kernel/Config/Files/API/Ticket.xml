@@ -31,6 +31,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="FieldSet::Default">Ticket.TicketNumber,Ticket.Title,Ticket.TicketID,Ticket.StateID,Ticket.PriorityID,Ticket.LockID,Ticket.QueueID,Ticket.CustomerID,Ticket.CustomerUserID,Ticket.OwnerID,Ticket.ResponsibleID,Ticket.TypeID,Ticket.ServiceID,Ticket.SLAID,Ticket.Age,Ticket.Created,Ticket.CreateBy,Ticket.Changed,Ticket.ChangedBy</Item>
+                <Item Key="FieldSet::Short">Ticket.TicketNumber,Ticket.TicketID</Item>
                 <Item Key="Expandable::Articles">Operation=V1::Ticket::ArticleGet,ID=ArticleID,Return=Article,Add=TicketID</Item>
                 <Item Key="Expandable::History">Operation=V1::Ticket::HistoryGet,ID=HistoryID,Return=History,Add=TicketID</Item>
             </Hash>
