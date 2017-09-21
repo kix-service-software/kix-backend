@@ -143,17 +143,55 @@ sub Validate {
     foreach my $Attribute ( sort keys %{$Param{Data}} ) {
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
-            foreach my $Validator ( @{$Self->{Validators}->{$Attribute}} ) {
-                my $ValidatorResult = $Validator->Validate(
-                    Attribute => $Attribute,
-                    Data      => $Param{Data},
-                );
-
-                if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {
-                    $Result = $ValidatorResult;
-                    last ATTRIBUTE;
+            $Result = $Self->_ValidateAttribute(
+                Attribute => $Attribute,
+                Data      => $Param{Data},
+            );
+        }
+        else {
+            # we don't have a valdator for this attribute itself, just traverse if necessary
+            if ( IsArrayRefWithData($Param{Data}->{$Attribute}) ) {
+                foreach my $Item ( @{$Param{Data}->{$Attribute}} ) {
+                    my $ValidationResult = $Self->Validate(
+                        Data => $Item,
+                    );
+                    if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
+                        $Result = $ValidationResult;
+                        last ATTRIBUTE;
+                    }
                 }
             }
+            elsif ( IsHashRefWithData($Param{Data}->{$Attribute}) ) {
+                my $ValidationResult = $Self->Validate(
+                    Data => $Param{Data}->{$Attribute},
+                );
+                if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
+                    $Result = $ValidationResult;
+                    last ATTRIBUTE;
+                }                
+            }
+        }
+    }
+
+    return $Result;
+}
+
+sub _ValidateAttribute {
+    my ( $Self, %Param ) = @_;
+    my $Result = {
+        Success => 1,
+    };
+
+    VALIDATOR:
+    foreach my $Validator ( @{$Self->{Validators}->{$Param{Attribute}}} ) {
+        my $ValidatorResult = $Validator->Validate(
+            Attribute => $Param{Attribute},
+            Data      => $Param{Data},
+        );
+
+        if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {
+            $Result = $ValidatorResult;
+            last VALIDATOR;
         }
     }
 
