@@ -217,25 +217,35 @@ sub PrepareData {
         foreach my $Expander ( split(/,/, $Param{Data}->{expand}) ) {            
             my ($Object, $Attribute) = split(/\./, $Expander, 2);
 
-            # ignore this expander if it isn't possible in this operation
-            next if ( !$Self->{OperationConfig}->{'Expandable::'.$Attribute} );
-
-            my %ExpanderDef = (
-                Attribute => $Attribute,
-            );
-            foreach my $DefPart ( split(/,/, $Self->{OperationConfig}->{'Expandable::'.$Attribute})) {
-                my ($Key, $Value) = split(/=/, $DefPart, 2);
-                $ExpanderDef{$Key} = $Value;
+            my @Attributes;
+            if ($Attribute =~ /^\[(.*?)\]$/g ) {
+               @Attributes = split(/\s*;\s*/, $1);
+            }
+            else {
+               push(@Attributes, $Attribute);
             }
 
-            if ( IsStringWithData($ExpanderDef{Add}) ) {
-                $ExpanderDef{Add} = [ split(/;/, $ExpanderDef{Add}) ];
-            }
+            foreach $Attribute ( @Attributes ) {
+                # ignore this expander if it isn't possible in this operation
+                next if ( !$Self->{OperationConfig}->{'Expandable::'.$Attribute} );
 
-            if ( !IsArrayRefWithData($Self->{Expand}->{$Object}) ) {
-                $Self->{Expand}->{$Object} = [];
+                my %ExpanderDef = (
+                    Attribute => $Attribute,
+                );
+                foreach my $DefPart ( split(/,/, $Self->{OperationConfig}->{'Expandable::'.$Attribute})) {
+                    my ($Key, $Value) = split(/=/, $DefPart, 2);
+                    $ExpanderDef{$Key} = $Value;
+                }
+
+                if ( IsStringWithData($ExpanderDef{Add}) ) {
+                    $ExpanderDef{Add} = [ split(/;/, $ExpanderDef{Add}) ];
+                }
+
+                if ( !IsArrayRefWithData($Self->{Expand}->{$Object}) ) {
+                    $Self->{Expand}->{$Object} = [];
+                }
+                push @{$Self->{Expand}->{$Object}}, \%ExpanderDef;
             }
-            push @{$Self->{Expand}->{$Object}}, \%ExpanderDef;
         }
     }
 
