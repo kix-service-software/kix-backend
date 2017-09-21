@@ -132,8 +132,13 @@ sub PrepareData {
     }
 
     # prepare field selector
-    if ( exists($Param{Data}->{fields}) && IsStringWithData($Param{Data}->{fields}) ) {
-        foreach my $FieldSelector ( split(/,/, $Param{Data}->{fields}) ) {
+    if ( (exists($Param{Data}->{fields}) && IsStringWithData($Param{Data}->{fields})) || IsStringWithData($Self->{OperationConfig}->{'FieldSet::Default'}) ) {
+        my $FieldSet = $Param{Data}->{fields} || ':Default';
+        if ($FieldSet =~ /^:(.*?)/ ) {
+            # get pre-defined FieldSet
+            $FieldSet = $Self->{OperationConfig}->{'FieldSet:'.$FieldSet};
+        }
+        foreach my $FieldSelector ( split(/,/, $FieldSet) ) {
             my ($Object, $Field) = split(/\./, $FieldSelector, 2);
             if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
                 $Self->{Fields}->{$Object} = [];
@@ -753,7 +758,14 @@ sub _ApplyFieldSelector {
             # extract filtered fields from hash
             my %NewObject;
             foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
-                $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                if ( $Field eq '*' ) {
+                    # include all fields
+                    %NewObject = %{$Param{Data}->{$Object}};
+                    last;
+                }
+                else {                    
+                    $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                }
             }
             $Param{Data}->{$Object} = \%NewObject;
         }
@@ -763,7 +775,14 @@ sub _ApplyFieldSelector {
                 if ( ref($ObjectItem) eq 'HASH' ) {
                     my %NewObjectItem;
                     foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
-                        $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                        if ( $Field eq '*' ) {
+                            # include all fields
+                            %NewObjectItem = %{$ObjectItem};
+                            last;
+                        }
+                        else {                    
+                            $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                        }
                     }
                     $ObjectItem = \%NewObjectItem;
                 }
