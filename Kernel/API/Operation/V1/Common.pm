@@ -140,13 +140,19 @@ sub PrepareData {
         }
         foreach my $FieldSelector ( split(/,/, $FieldSet) ) {
             my ($Object, $Field) = split(/\./, $FieldSelector, 2);
-            if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
-                $Self->{Fields}->{$Object} = [];
+            if ($Field =~ /^\[(.*?)\]$/g ) {
+                my @Fields = split(/\s*;\s*/, $1);
+                $Self->{Fields}->{$Object} = \@Fields;
             }
-            push @{$Self->{Fields}->{$Object}}, $Field;
+            else {
+                if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
+                    $Self->{Fields}->{$Object} = [];
+                }
+                push @{$Self->{Fields}->{$Object}}, $Field;
+            }
         }
     }
-
+    
     # prepare limiter
     if ( exists($Param{Data}->{limit}) && IsStringWithData($Param{Data}->{limit}) ) {
         foreach my $Limiter ( split(/,/, $Param{Data}->{limit}) ) {
