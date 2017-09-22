@@ -127,18 +127,18 @@ sub Run {
             UserID => $Self->{Authorization}->{UserID},
         );
 	    
-	    if ( $ResultTicketSearch ) {
+        if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'TicketStateDelete.TicketExists',
                 Message => 'Can not delete TicketState. A Ticket with this TicketState already exists.',
             );
-	    }
+        }
 	    
         # delete ticketstate	    
-	    my $Success = $Kernel::OM->Get('Kernel::System::State')->TicketStateDelete(
-	        StateID  => $TicketStateID,
-	        UserID  => $Self->{Authorization}->{UserID},
-	    );
+        my $Success = $Kernel::OM->Get('Kernel::System::State')->TicketStateDelete(
+            StateID  => $TicketStateID,
+            UserID  => $Self->{Authorization}->{UserID},
+        );
 
         if ( !$Success ) {
             return $Self->_Error(
