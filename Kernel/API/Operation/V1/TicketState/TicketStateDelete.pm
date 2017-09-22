@@ -122,10 +122,10 @@ sub Run {
     foreach my $TicketStateID ( @{$Param{Data}->{StateID}} ) {
 	           
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-	        Result => 'COUNT',
-	        StateIDs => [$TicketStateID],
-	        UserID => $Self->{Authorization}->{UserID},
-	    );
+            Result => 'COUNT',
+            StateIDs => [$TicketStateID],
+            UserID => $Self->{Authorization}->{UserID},
+        );
 	    
 	    if ( $ResultTicketSearch ) {
             return $Self->_Error(
