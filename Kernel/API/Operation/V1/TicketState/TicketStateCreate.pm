@@ -70,10 +70,10 @@ perform TicketStateCreate Operation. This will return the created TicketStateID.
 
     my $Result = $OperationObject->Run(
         Data => {
-			TicketState => (
-        		Name    => '...',
-        		ValidID => '...',
-    		},
+            TicketState => (
+                Name    => '...',
+                ValidID => '...',
+            },
     	},
     );
 
