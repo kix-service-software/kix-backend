@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Priority::TicketypeDelete - API Priority PriorityDelete Operation backend
+Kernel::API::Operation::V1::Priority::PriorityDelete - API Priority PriorityDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,9 @@ perform PriorityDelete Operation. This will return the deleted PriorityID.
     );
 
     $Result = {
-        Message    => '',                      # in case of error
+        Success    => 1,
+        Code       => '',                       # in case of error    
+        Message    => '',                       # in case of error
     };
 
 =cut
