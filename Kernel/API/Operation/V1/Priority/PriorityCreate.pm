@@ -70,10 +70,10 @@ perform PriorityCreate Operation. This will return the created PriorityID.
 
     my $Result = $OperationObject->Run(
         Data => {
-    		Priority => (
-        		Name    => '...',
-        		ValidID => '...',
-        	},
+            Priority => (
+                Name    => '...',
+                ValidID => 1,                   # optional
+            },
         },	
     );
 
