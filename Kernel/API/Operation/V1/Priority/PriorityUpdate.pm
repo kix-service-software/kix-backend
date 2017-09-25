@@ -68,28 +68,25 @@ sub new {
 
 =item Run()
 
-perform PriorityUpdate Operation. This will return the updated TypeID.
+perform PriorityUpdate Operation. This will return the updated Priority.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ID      => '...',
+            PriorityID => 123,
+    	    Priority   => {
+    	        Name    => '...',
+    	        ValidID => '...',       # optional
+    	    },
         }
-	    Priority => {
-	        Name    => '...',
-	        ValidID => '...',
-	    },
 	);
     
 
     $Result = {
         Success     => 1,                       # 0 or 1
+        Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
             PriorityID  => '',                  # PriorityID 
-            Error   => {                        # should not return errors
-                    Code    => 'Priority.Update.ErrorCode'
-                    Message => 'Error Description'
-            },
         },
     };
    
@@ -116,6 +113,9 @@ sub Run {
         Data         => $Param{Data},
         Parameters   => {
             'PriorityID' => {
+                Required => 1
+            },
+            'Priority' => {
                 Type => 'HASH',
                 Required => 1
             },
@@ -164,9 +164,9 @@ sub Run {
     # update Priority
     my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityUpdate(
         %{$Priority},
-        ValidID => $PriorityData{ValidID} || 1,
+        ValidID    => $Priority{ValidID} ||$PriorityData{ValidID} || 1,
         PriorityID => $Param{Data}->{PriorityID},
-        UserID  => $Self->{Authorization}->{UserID},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -178,7 +178,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        TypeID => $PriorityData{ID},
+        PriorityID => $Param{Data}->{PriorityID},
     );    
 }
 
