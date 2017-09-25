@@ -18,6 +18,10 @@ use Mail::Address;
 
 use Kernel::System::VariableCheck qw(:all);
 
+use base qw(
+    Kernel::API::Operation::V1::Common
+);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -50,26 +54,10 @@ initialize the operation by checking the webservice configuration and gather of 
 sub Init {
     my ( $Self, %Param ) = @_;
 
-    # check needed
-    if ( !$Param{WebserviceID} ) {
-        return {
-            Success      => 0,
-            ErrorMessage => "Got no WebserviceID!",
-        };
-    }
+    my $InitResult = $Self->SUPER::Init(%Param);
 
-    # get webservice configuration
-    my $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
-        ID => $Param{WebserviceID},
-    );
-
-    if ( !IsHashRefWithData($Webservice) ) {
-        return {
-            Success => 0,
-            ErrorMessage =>
-                'Could not determine Web service configuration'
-                . ' in Kernel::API::Operation::V1::Ticket::Common::new()',
-        };
+    if ( !$InitResult->{Success} ) {
+        return $InitResult;
     }
 
     # get the dynamic fields
@@ -87,9 +75,7 @@ sub Init {
         $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
     }
 
-    return {
-        Success => 1,
-    };
+    return $Self->_Success();
 }
 
 =item ValidateCustomerService()
@@ -476,22 +462,27 @@ sub SetDynamicFieldValue {
     # check needed stuff
     for my $Needed (qw(Name UserID)) {
         if ( !IsString( $Param{$Needed} ) ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "SetDynamicFieldValue() Invalid value for $Needed, just string is allowed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "SetDynamicFieldValue() Invalid value for $Needed, just string is allowed!"
+            );
         }
     }
 
     # check value structure
     if ( !IsString( $Param{Value} ) && ref $Param{Value} ne 'ARRAY' ) {
-        return {
-            Success      => 0,
-            ErrorMessage => "SetDynamicFieldValue() Invalid value for Value, just string and array are allowed!"
-        };
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "SetDynamicFieldValue() Invalid value for Value, just string and array is allowed!"
+        );
     }
 
-    return if !IsHashRefWithData( $Self->{DynamicFieldLookup} );
+    if ( !IsHashRefWithData( $Self->{DynamicFieldLookup} ) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "SetDynamicFieldValue() No DynamicFieldLookup!"
+        );
+    }
 
     # get dynamic field config
     my $DynamicFieldConfig = $Self->{DynamicFieldLookup}->{ $Param{Name} };
@@ -505,10 +496,10 @@ sub SetDynamicFieldValue {
     }
 
     if ( !$ObjectID ) {
-        return {
-            Success      => 0,
-            ErrorMessage => "SetDynamicFieldValue() Could not set $ObjectID!",
-        };
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "SetDynamicFieldValue() missing ObjectID!"
+        );
     }
 
     my $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueSet(
@@ -518,59 +509,7 @@ sub SetDynamicFieldValue {
         UserID             => $Param{UserID},
     );
 
-    return {
-        Success => $Success,
-        }
-}
-
-=item CreateAttachment()
-
-cretes a new attachment for the given article.
-
-    my $Result = $CommonObject->CreateAttachment(
-        Content     => $Data,                   # file content (Base64 encoded)
-        ContentType => 'some content type',
-        Filename    => 'some filename',
-        ArticleID   => 456,
-        UserID      => 123.
-    );
-
-    returns
-    $Result = {
-        Success => 1,                        # if everything is ok
-    }
-
-    $Result = {
-        Success      => 0,
-        ErrorMessage => 'Error description'
-    }
-
-=cut
-
-sub CreateAttachment {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Attachment ArticleID UserID)) {
-        if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "CreateAttachment() Got no $Needed!"
-            };
-        }
-    }
-
-    # write attachment
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleWriteAttachment(
-        %{ $Param{Attachment} },
-        Content   => MIME::Base64::decode_base64( $Param{Attachment}->{Content} ),
-        ArticleID => $Param{ArticleID},
-        UserID    => $Param{UserID},
-    );
-
-    return {
-        Success => $Success,
-        }
+    return $Self->_Success();
 }
 
 =item CheckCreatePermission ()
@@ -706,6 +645,157 @@ sub CheckAccessPermission {
 
     return $Access;
 }
+
+=item CheckUpdatePermission()
+
+check if user has permissions to update ticket attributes.
+
+    my $Response = $OperationObject->CheckUpdatePermission(
+        TicketID     => 123,
+        Ticket       => $Ticket,                    # all ticket parameters
+        UserID       => 123,
+    );
+
+    returns:
+
+    $Response = {
+        Success => 1,                               # if everything is OK
+    }
+
+    $Response = {
+        Success => 0,
+        Code    => "function.error",                # if error
+        Message => "Error description"
+    }
+
+=cut
+
+sub CheckUpdatePermission {
+    my ( $Self, %Param ) = @_;
+
+    my %NeededPermissions = (
+        'Queue'             => 'move',
+        'QueueID'           => 'move',
+        'Owner'             => 'owner',
+        'OwnerID'           => 'owner',
+        'Responsible'       => 'responsible',
+        'ResponsibleID'     => 'responsible',
+        'Priority'          => 'priority',
+        'PriorityID'        => 'priority',
+    );
+
+    my $Ticket = $Param{Ticket};
+
+    # get ticket object
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    # check permissions for each attribute
+    foreach my $Attribute ( sort keys %{$Ticket} ) {    
+        if ( $Ticket->{$Attribute} ) {
+            my $Permission = $TicketObject->TicketPermission(
+                Type     => $NeededPermissions{$Attribute} || 'rw',
+                TicketID => $Param{TicketID},
+                UserID   => $Param{UserID},
+            );
+            if ( !$Permission ) {
+                return $Self->_Error(
+                    Code    => 'Object.NoPermission',
+                    Message => "No permission to update $Attribute!",
+                );
+            }
+        }
+    }
+
+    # check state permissions separately since they are something special to handle
+    if ( $Ticket->{State} || $Ticket->{StateID} ) {
+
+        # get State Data
+        my %StateData;
+        my $StateID;
+
+        # get state object
+        my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+
+        if ( $Ticket->{StateID} ) {
+            $StateID = $Ticket->{StateID};
+        }
+        else {
+            $StateID = $StateObject->StateLookup(
+                State => $Ticket->{State},
+            );
+        }
+
+        %StateData = $StateObject->StateGet(
+            ID => $StateID,
+        );
+
+        my $Permission = 1;
+
+        if ( $StateData{TypeName} =~ /^close/i ) {
+            $Permission = $TicketObject->TicketPermission(
+                Type     => 'close',
+                TicketID => $Param{TicketID},
+                UserID   => $Param{UserID},
+            );
+        }
+        else {
+            $Permission = $TicketObject->TicketPermission(
+                Type     => 'rw',
+                TicketID => $Param{TicketID},
+                UserID   => $Param{UserID},
+            );
+        }
+
+        if ( !$Permission ) {
+            return $Self->_Error(
+                Code    => 'Object.NoPermission',
+                Message => "No permission to update state!",
+            );
+        }
+    }
+
+    return $Self->_Success();
+}
+
+=item CheckDeletePermission()
+
+Tests if the user have delete permission for a ticket
+
+    my $Result = $CommonObject->CheckDeletePermission(
+        TicketID   => 123,
+        UserID     => 123,                      # or 'CustomerLogin'
+        UserType   => 'Agent',                  # or 'Customer'
+    );
+
+returns:
+    $Result = 1                                 # if everything is OK
+
+=cut
+
+sub CheckDeletePermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID UserID UserType)) {
+        if ( !$Param{$Needed} ) {
+            return;
+        }
+    }
+
+    my $TicketPermissionFunction = 'TicketPermission';
+    if ( $Param{UserType} eq 'Customer' ) {
+        $TicketPermissionFunction = 'TicketCustomerPermission';
+    }
+
+    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
+        Type     => 'delete',
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+    );
+
+    return $Access;
+}
+
 
 =begin Internal:
 

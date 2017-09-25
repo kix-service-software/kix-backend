@@ -14,7 +14,6 @@ package Kernel::API::Operation::V1::User::UserSearch;
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::User::UserGet;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
@@ -74,7 +73,12 @@ perform UserSearch Operation. This will return a User ID list.
         Success      => 1,                                # 0 or 1
         Message => '',                               # In case of an error
         Data         => {
-            UserID => [ 1, 2, 3, 4 ],
+            User => [
+                {
+                },
+                {                    
+                }
+            ],
         },
     };
 
