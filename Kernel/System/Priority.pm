@@ -346,7 +346,6 @@ sub PriorityLookup {
         $Value = $Param{Priority};
         my %PriorityListReverse = reverse %PriorityList;
         $ReturnData = $PriorityListReverse{ $Param{Priority} };
-       
     }
 
     # check if data exists
