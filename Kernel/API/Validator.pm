@@ -147,6 +147,9 @@ sub Validate {
                 Attribute => $Attribute,
                 Data      => $Param{Data},
             );
+            if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
+                last ATTRIBUTE;
+            }   
         }
         else {
             # we don't have a valdator for this attribute itself, just traverse if necessary

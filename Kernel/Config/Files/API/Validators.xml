@@ -177,6 +177,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###StateTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">StateTypeValidator</Item>
+                <Item Key="Validates">Type,TypeID</Item>
+                <Item Key="ConsiderOperationRegEx">(TicketStateCreate|TicketStateUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Validator::Module###TimeUnitValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
@@ -206,7 +217,7 @@
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">TicketTypeGet</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketTypeGet|TicketStateCreate|TicketStateUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
