@@ -201,7 +201,6 @@
                 <Item Key="Object.NotFound">404</Item>
                 <Item Key="Object.UnableToCreate">400</Item>
                 <Item Key="Object.UnableToUpdate">400</Item>
-                <Item Key="Object.UnableToDelete">400</Item>
                 <Item Key="Operation.InternalError">500</Item>
                 <Item Key="Operation.PrepareDataError">400</Item>
                 <Item Key="PrepareData.InvalidFilter">400</Item>
@@ -239,12 +238,7 @@
                 <Item Key="TicketTypeGet.NotTicketTypeData">400</Item>
                 <Item Key="TicketTypeUpdate.TypeExists">400</Item>
                 <Item Key="TicketStateDelete.TicketExists">409</Item>
-                <Item Key="TicketStateCreate.TicketTypeExists">409</Item>
-                <Item Key="TicketStateCreate.UnableToCreate">409</Item>
-                <Item Key="TicketStateGet.InvalidTypeID">400</Item>
-                <Item Key="TicketStateGet.NotTicketTypeData">400</Item>
-                <Item Key="TicketStateUpdate.TypeExists">400</Item>
-                <Item Key="TicketStateDelete.TicketExists">409</Item>                                
+                <Item Key="TicketStateCreate.TicketStateExists">409</Item>                                                   
                 <Item Key="Validator.InternalError">500</Item>
                 <Item Key="Validator.UnknownAttribute">500</Item>
                 <Item Key="Validator.Failed">400</Item>

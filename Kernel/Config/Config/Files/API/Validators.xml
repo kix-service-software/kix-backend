@@ -118,7 +118,7 @@
                 <Item Key="Module">PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">PriorityGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -218,17 +218,6 @@
                 <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">UserGet</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###ValidValidator" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the validator layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">ValidValidator</Item>
-                <Item Key="Validates">Valid,ValidID</Item>
-                <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
     </ConfigItem>
