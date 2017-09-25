@@ -231,41 +231,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::HistoryGet
-    TicketStateSearch:
+    PrioritySearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::TicketState::TicketStateSearch
-    TicketStateCreate:
+        Type: V1::Priority::PrioritySearch
+    PriorityCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::TicketState::TicketStateCreate
-    TicketStateGet:
+        Type: V1::Priority::PriorityCreate
+    PriorityGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::TicketState::TicketStateGet
-    TicketStateUpdate:
+        Type: V1::Priority::PriorityGet
+    PriorityUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::TicketState::TicketStateUpdate
-    TicketStateDelete:
+        Type: V1::Priority::PriorityUpdate
+    PriorityDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::TicketState::TicketStateDelete
+        Type: V1::Priority::PriorityDelete
 
   Transport:
     Config:
@@ -400,26 +400,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /tickets/:TicketID/history/:HistoryID
-        TicketStateSearch:
+        PrioritySearch:
           RequestMethod:
           - GET
-          Route: /ticketstates
-        TicketStateCreate:
+          Route: /priority
+        PriorityCreate:
           RequestMethod:
           - POST
-          Route: /ticketstates
-        TicketStateGet:
+          Route: /priority
+        PriorityGet:
           RequestMethod:
           - GET
-          Route: /ticketstates/:StateID
-        TicketStateUpdate:
+          Route: /priority/:PriorityID
+        PriorityUpdate:
           RequestMethod:
           - PATCH
-          Route: /ticketstates/:StateID
-        TicketStateDelete:
+          Route: /priority/:PriorityID
+        PriorityDelete:
           RequestMethod:
           - DELETE
-          Route: /ticketstates/:StateID
+          Route: /priority/:PriorityID
 
     Type: HTTP::REST
 RemoteSystem: ''
