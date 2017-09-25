@@ -266,6 +266,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::TicketState::TicketStateDelete
+    PrioritySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PrioritySearch
+    PriorityCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityCreate
+    PriorityGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityGet
+    PriorityUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityUpdate
+    PriorityDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityDelete
 
   Transport:
     Config:
@@ -420,6 +455,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /ticketstates/:StateID
+        PrioritySearch:
+          RequestMethod:
+          - GET
+          Route: /priority
+        PriorityCreate:
+          RequestMethod:
+          - POST
+          Route: /priority
+        PriorityGet:
+          RequestMethod:
+          - GET
+          Route: /priority/:PriorityID
+        PriorityUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /priority/:PriorityID
+        PriorityDelete:
+          RequestMethod:
+          - DELETE
+          Route: /priority/:PriorityID
 
     Type: HTTP::REST
 RemoteSystem: ''
