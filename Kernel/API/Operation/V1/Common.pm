@@ -132,16 +132,27 @@ sub PrepareData {
     }
 
     # prepare field selector
-    if ( exists($Param{Data}->{fields}) && IsStringWithData($Param{Data}->{fields}) ) {
-        foreach my $FieldSelector ( split(/,/, $Param{Data}->{fields}) ) {
+    if ( (exists($Param{Data}->{fields}) && IsStringWithData($Param{Data}->{fields})) || IsStringWithData($Self->{OperationConfig}->{'FieldSet::Default'}) ) {
+        my $FieldSet = $Param{Data}->{fields} || ':Default';
+        if ($FieldSet =~ /^:(.*?)/ ) {
+            # get pre-defined FieldSet
+            $FieldSet = $Self->{OperationConfig}->{'FieldSet:'.$FieldSet};
+        }
+        foreach my $FieldSelector ( split(/,/, $FieldSet) ) {
             my ($Object, $Field) = split(/\./, $FieldSelector, 2);
-            if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
-                $Self->{Fields}->{$Object} = [];
+            if ($Field =~ /^\[(.*?)\]$/g ) {
+                my @Fields = split(/\s*;\s*/, $1);
+                $Self->{Fields}->{$Object} = \@Fields;
             }
-            push @{$Self->{Fields}->{$Object}}, $Field;
+            else {
+                if ( !IsArrayRefWithData($Self->{Fields}->{$Object}) ) {
+                    $Self->{Fields}->{$Object} = [];
+                }
+                push @{$Self->{Fields}->{$Object}}, $Field;
+            }
         }
     }
-
+    
     # prepare limiter
     if ( exists($Param{Data}->{limit}) && IsStringWithData($Param{Data}->{limit}) ) {
         foreach my $Limiter ( split(/,/, $Param{Data}->{limit}) ) {
@@ -206,25 +217,35 @@ sub PrepareData {
         foreach my $Expander ( split(/,/, $Param{Data}->{expand}) ) {            
             my ($Object, $Attribute) = split(/\./, $Expander, 2);
 
-            # ignore this expander if it isn't possible in this operation
-            next if ( !$Self->{OperationConfig}->{'Expandable::'.$Attribute} );
-
-            my %ExpanderDef = (
-                Attribute => $Attribute,
-            );
-            foreach my $DefPart ( split(/,/, $Self->{OperationConfig}->{'Expandable::'.$Attribute})) {
-                my ($Key, $Value) = split(/=/, $DefPart, 2);
-                $ExpanderDef{$Key} = $Value;
+            my @Attributes;
+            if ($Attribute =~ /^\[(.*?)\]$/g ) {
+               @Attributes = split(/\s*;\s*/, $1);
+            }
+            else {
+               push(@Attributes, $Attribute);
             }
 
-            if ( IsStringWithData($ExpanderDef{Add}) ) {
-                $ExpanderDef{Add} = [ split(/;/, $ExpanderDef{Add}) ];
-            }
+            foreach $Attribute ( @Attributes ) {
+                # ignore this expander if it isn't possible in this operation
+                next if ( !$Self->{OperationConfig}->{'Expandable::'.$Attribute} );
 
-            if ( !IsArrayRefWithData($Self->{Expand}->{$Object}) ) {
-                $Self->{Expand}->{$Object} = [];
+                my %ExpanderDef = (
+                    Attribute => $Attribute,
+                );
+                foreach my $DefPart ( split(/,/, $Self->{OperationConfig}->{'Expandable::'.$Attribute})) {
+                    my ($Key, $Value) = split(/=/, $DefPart, 2);
+                    $ExpanderDef{$Key} = $Value;
+                }
+
+                if ( IsStringWithData($ExpanderDef{Add}) ) {
+                    $ExpanderDef{Add} = [ split(/;/, $ExpanderDef{Add}) ];
+                }
+
+                if ( !IsArrayRefWithData($Self->{Expand}->{$Object}) ) {
+                    $Self->{Expand}->{$Object} = [];
+                }
+                push @{$Self->{Expand}->{$Object}}, \%ExpanderDef;
             }
-            push @{$Self->{Expand}->{$Object}}, \%ExpanderDef;
         }
     }
 
@@ -753,7 +774,14 @@ sub _ApplyFieldSelector {
             # extract filtered fields from hash
             my %NewObject;
             foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
-                $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                if ( $Field eq '*' ) {
+                    # include all fields
+                    %NewObject = %{$Param{Data}->{$Object}};
+                    last;
+                }
+                else {                    
+                    $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                }
             }
             $Param{Data}->{$Object} = \%NewObject;
         }
@@ -763,7 +791,14 @@ sub _ApplyFieldSelector {
                 if ( ref($ObjectItem) eq 'HASH' ) {
                     my %NewObjectItem;
                     foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
-                        $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                        if ( $Field eq '*' ) {
+                            # include all fields
+                            %NewObjectItem = %{$ObjectItem};
+                            last;
+                        }
+                        else {                    
+                            $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                        }
                     }
                     $ObjectItem = \%NewObjectItem;
                 }

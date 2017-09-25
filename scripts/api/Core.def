@@ -10,10 +10,16 @@
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
 /user                                                               |   GET             | V1::Own::UserGet
+/tickettypes                                                        |   GET             | V1::TicketType::TicketTypeSearch
+/tickettypes                                                        |   POST            | V1::TicketType::TicketTypeCreate
+/tickettypes/:TypeID                                                |   GET             | V1::TicketType::TicketTypeGet
+/tickettypes/:TypeID                                                |   PATCH           | V1::TicketType::TicketTypeUpdate
+/tickettypes/:TypeID                                                |   DELETE          | V1::TicketType::TicketTypeDelete
 /tickets                                                            |   GET             | V1::Ticket::TicketSearch
 /tickets                                                            |   POST            | V1::Ticket::TicketCreate
 /tickets/:TicketID                                                  |   GET             | V1::Ticket::TicketGet
 /tickets/:TicketID                                                  |   PATCH           | V1::Ticket::TicketUpdate
+/tickets/:TicketID                                                  |   DELETE          | V1::Ticket::TicketDelete
 /tickets/:TicketID/articles                                         |   GET             | V1::Ticket::ArticleSearch
 /tickets/:TicketID/articles                                         |   POST            | V1::Ticket::ArticleCreate
 /tickets/:TicketID/articles/:ArticleID                              |   GET             | V1::Ticket::ArticleGet
@@ -24,3 +30,11 @@
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   GET             | V1::Ticket::ArticleAttachmentGet
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   PATCH           | V1::Ticket::ArticleAttachmentUpdate
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   DELETE          | V1::Ticket::ArticleAttachmentDelete
+/tickets/:TicketID/history                                          |   GET             | V1::Ticket::HistorySearch
+/tickets/:TicketID/history/:HistoryID                               |   GET             | V1::Ticket::HistoryGet
+/ticketstates                                                       |   GET             | V1::TicketState::TicketStateSearch
+/ticketstates                                                       |   POST            | V1::TicketState::TicketStateCreate
+/ticketstates/:StateID                                              |   GET             | V1::TicketState::TicketStateGet
+/ticketstates/:StateID                                              |   PATCH           | V1::TicketState::TicketStateUpdate
+/ticketstates/:StateID                                              |   DELETE          | V1::TicketState::TicketStateDelete
+
