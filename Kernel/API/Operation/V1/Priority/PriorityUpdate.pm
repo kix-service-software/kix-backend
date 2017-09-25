@@ -78,7 +78,7 @@ perform PriorityUpdate Operation. This will return the updated Priority.
     	        ValidID => '...',       # optional
     	    },
         }
-	);
+    );
     
 
     $Result = {
@@ -157,7 +157,7 @@ sub Run {
     if ( !%PriorityData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Can not patch Priority. Priority with this ID '$Param{Data}->{PriorityID}' not exists.",
+            Message => "Can not update Priority. Priority with ID '$Param{Data}->{PriorityID}' does not exist.",
         );
     }
 
