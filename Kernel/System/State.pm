@@ -746,6 +746,11 @@ sub TicketStateDelete {
         Bind => [ \$Param{StateID} ],
     );
 
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     return 1;
 }
 
