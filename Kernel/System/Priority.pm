@@ -381,6 +381,12 @@ sub PriorityDelete {
         Bind => [ \$Param{PriorityID} ],
     );
 
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+
     return 1;
 }
 
