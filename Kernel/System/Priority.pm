@@ -328,10 +328,6 @@ sub PriorityLookup {
         return;
     }
 
-	if ( ref($Param{Priority}) eq 'HASH') {
-		$Param{Priority} = $Param{Priority}->{Priority};
-	}
-
     # get (already cached) priority list
     my %PriorityList = $Self->PriorityList(
         Valid => 0,
