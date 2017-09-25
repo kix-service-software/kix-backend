@@ -31,7 +31,6 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">TicketState</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="DefaultSource">TicketState</Item>
             </Hash>
         </Setting>
     </ConfigItem>
