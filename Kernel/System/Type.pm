@@ -506,6 +506,11 @@ sub TicketTypeDelete {
         Bind => [ \$Param{TypeID} ],
     );
 
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     return 1;
 }
 

@@ -221,6 +221,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###ValidValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ValidValidator</Item>
+                <Item Key="Validates">Valid,ValidID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
 </kix_config>
     

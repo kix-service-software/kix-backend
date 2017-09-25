@@ -18,7 +18,6 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
     Kernel::API::Operation::V1::Ticket::Common
 );
 
@@ -311,7 +310,7 @@ sub Run {
         my %TicketRaw = $TicketObject->TicketGet(
             TicketID      => $TicketID,
             DynamicFields => $Param{Data}->{include}->{DynamicFields},
-            Extended      => $Param{Data}->{Extended},
+            Extended      => $Param{Data}->{extended},
             UserID        => $Self->{Authorization}->{UserID},
         );
 
@@ -331,10 +330,12 @@ sub Run {
         for my $Attribute ( sort keys %TicketRaw ) {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
-                push @DynamicFields, {
-                    Name  => $1,
-                    Value => $TicketRaw{$Attribute},
-                };
+                if ( $TicketRaw{$Attribute} ) {
+                    push @DynamicFields, {
+                        Name  => $1,
+                        Value => $TicketRaw{$Attribute},
+                    };
+                }
                 next ATTRIBUTE;
             }
 
@@ -345,7 +346,11 @@ sub Run {
         if (@DynamicFields) {
             $TicketData{DynamicFields} = \@DynamicFields;
         }
+        else {
+            $TicketData{DynamicFields} = [];
+        }
 
+        # include articles if requestes
         if ( $Param{Data}->{include}->{Articles} ) {
             my $ArticleTypes;
             if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
@@ -359,6 +364,20 @@ sub Run {
             );
 
             $TicketData{Articles} = \@ArticleIndex;
+        }
+
+        # include history if requestes
+        if ( $Param{Data}->{include}->{History} ) {
+            my @HistoryItems = $TicketObject->HistoryGet(
+                TicketID   => $TicketID,
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            my @HistoryIDs;
+            foreach my $HistoryItem ( @HistoryItems ) {
+                push(@HistoryIDs, $HistoryItem->{HistoryID});
+            }
+            $TicketData{History} = \@HistoryIDs;
         }
             
         # add

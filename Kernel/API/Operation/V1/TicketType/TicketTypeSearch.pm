@@ -27,7 +27,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::TicketType::TicketTypeSearch - API TicketType Search Operation backend
+Kernel::API::Operation::V1::TicketType::TicketTypeSearch - API TicketType Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -51,10 +51,10 @@ sub new {
     # check needed objects
     for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
@@ -69,20 +69,14 @@ perform TicketTypeSearch Operation. This will return a TicketType ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Authorization => {
-                ...
-            },
-            ChangedAfter => '2006-01-09 00:00:01',                        # (optional)            
-            Order        => 'Down|Up',                                    # (optional) Default: Up                       
-            Limit        => 122,                                          # (optional) Default: 500
         }
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
-        Data         => {
-            TicketTypeID => [ 1, 2, 3, 4 ],
+        Success => 1,                                # 0 or 1
+        Message => '',                               # In case of an error
+        Data    => {
+            TypeID => [ 1, 2, 3, 4 ],
         },
     };
 
@@ -96,43 +90,36 @@ sub Run {
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
-        Parameters => {
-            'Limit' => {
-                Default => 500,
-            },
-            'Order' => {
-                Default => 'Up'    
-            }
-        }
     );
 
     # check result
     if ( !$Result->{Success} ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'TicketTypeSearch.PrepareDataError',
-            ErrorMessage => $Result->{ErrorMessage},
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    # perform Tickettype search
+    # get tickettype list 
     my %TicketTypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
         Valid => 1,
     );
 
-    if (IsHashRefWithData(\%TicketTypeList)) {
+    # get already prepared tickettype data from TicketTypeGet operation
+    if ( IsHashRefWithData(\%TicketTypeList) ) {
         my $TicketTypeGetResult = $Self->ExecOperation(
             OperationType => 'V1::TicketType::TicketTypeGet',
-            Data          => {
-                TicketTypeID => join(',', sort keys %TicketTypeList),
+            Data      => {
+                TypeID => join(',', sort keys %TicketTypeList),
             }
         );
  
@@ -140,26 +127,17 @@ sub Run {
             return $TicketTypeGetResult;
         }
 
-        my @TicketTypeDataList = IsArrayRefWithData($TicketTypeGetResult->{Data}->{TicketType}) ? @{$TicketTypeGetResult->{Data}->{TicketType}} : ( $TicketTypeGetResult->{Data}->{TicketType} );
-        
-        # filter list
-        my @ResultList;
-        foreach my $TicketType ( @TicketTypeDataList ) {
-            # limit list
-            last if scalar(@ResultList) > 50;
-            
-            push(@ResultList, $TicketType);                                
-        }  
+        my @ResultList = IsArrayRefWithData($TicketTypeGetResult->{Data}->{TicketType}) ? @{$TicketTypeGetResult->{Data}->{TicketType}} : ( $TicketTypeGetResult->{Data}->{TicketType} );
 
         if ( IsArrayRefWithData(\@ResultList) ) {
-            return $Self->ReturnSuccess(
+            return $Self->_Success(
                 TicketType => \@ResultList,
             )
         }
     }
 
     # return result
-    return $Self->ReturnSuccess(
+    return $Self->_Success(
         TicketType => {},
     );
 }

@@ -77,6 +77,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Own::UserGet
+    TicketTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeSearch
+    TicketTypeCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeCreate
+    TicketTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeGet
+    TicketTypeUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeUpdate
+    TicketTypeDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeDelete
     TicketSearch:
         Description: ''
         MappingInbound:
@@ -105,6 +140,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::TicketUpdate
+    TicketDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::TicketDelete
     ArticleSearch:
         Description: ''
         MappingInbound:
@@ -175,6 +217,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleAttachmentDelete
+    HistorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::HistorySearch
+    HistoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::HistoryGet
 
   Transport:
     Config:
@@ -221,6 +277,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /user
+        TicketTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /tickettypes
+        TicketTypeCreate:
+          RequestMethod:
+          - POST
+          Route: /tickettypes
+        TicketTypeGet:
+          RequestMethod:
+          - GET
+          Route: /tickettypes/:TypeID
+        TicketTypeUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /tickettypes/:TypeID
+        TicketTypeDelete:
+          RequestMethod:
+          - DELETE
+          Route: /tickettypes/:TypeID
         TicketSearch:
           RequestMethod:
           - GET
@@ -236,6 +312,10 @@ Provider:
         TicketUpdate:
           RequestMethod:
           - PATCH
+          Route: /tickets/:TicketID
+        TicketDelete:
+          RequestMethod:
+          - DELETE
           Route: /tickets/:TicketID
         ArticleSearch:
           RequestMethod:
@@ -277,6 +357,14 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
+        HistorySearch:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/history
+        HistoryGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/history/:HistoryID
 
     Type: HTTP::REST
 RemoteSystem: ''

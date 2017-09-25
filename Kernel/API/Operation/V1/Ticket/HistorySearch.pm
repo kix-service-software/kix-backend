@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserSearch.pm - API User Search operation backend
+# Kernel/API/Operation/User/HistorySearch.pm - API User Search operation backend
 # based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -9,7 +9,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserSearch;
+package Kernel::API::Operation::V1::Ticket::HistorySearch;
 
 use strict;
 use warnings;
@@ -17,14 +17,14 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::Ticket::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::User::UserSearch - API User Search Operation backend
+Kernel::API::Operation::Ticket::HistorySearch - API Ticket History Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,7 +62,7 @@ sub new {
 
 =item Run()
 
-perform UserSearch Operation. This will return a User ID list.
+perform HistorySearch Operation. This will return a history list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -73,12 +73,12 @@ perform UserSearch Operation. This will return a User ID list.
         Success      => 1,                                # 0 or 1
         Message => '',                               # In case of an error
         Data         => {
-            User => [
+            History => [
                 {
                 },
-                {                    
+                {
                 }
-            ],
+            ]
         },
     };
 
@@ -87,6 +87,7 @@ perform UserSearch Operation. This will return a User ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -101,6 +102,11 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+        Parameters => {
+            'TicketID' => {
+                Required => 1
+            },
+        }
     );
 
     # check result
@@ -111,36 +117,53 @@ sub Run {
         );
     }
 
-    # perform user search
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
-        Type => 'Short',
+    # check ticket permission
+    my $Permission = $Self->CheckAccessPermission(
+        TicketID => $Param{Data}->{TicketID},
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
     );
 
-    if (IsHashRefWithData(\%UserList)) {
+    if ( !$Permission ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
+        );
+    }
 
-        # get already prepared user data from UserGet operation
-        my $UserGetResult = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
+    # get history list
+    my @HistoryList = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryGet(
+        TicketID => $Param{Data}->{TicketID},
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+    my %HistoryHash = map { $_->{HistoryID} => $_ } @HistoryList;
+
+    if ( @HistoryList ) {
+
+        # get already prepared history data from HistoryGet operation
+        my $HistoryGetResult = $Self->ExecOperation(
+            OperationType => 'V1::Ticket::HistoryGet',
             Data          => {
-                UserID => join(',', sort keys %UserList),
+                TicketID  => $Param{Data}->{TicketID},
+                HistoryID => join(',', sort keys %HistoryHash),
             }
         );
-        if ( !IsHashRefWithData($UserGetResult) || !$UserGetResult->{Success} ) {
-            return $UserGetResult;
+        if ( !IsHashRefWithData($HistoryGetResult) || !$HistoryGetResult->{Success} ) {
+            return $HistoryGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
+        my @ResultList = IsArrayRefWithData($HistoryGetResult->{Data}->{History}) ? @{$HistoryGetResult->{Data}->{History}} : ( $HistoryGetResult->{Data}->{History} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                User => \@ResultList,
+                History => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        User => {},
+        History => {},
     );
 }
 
