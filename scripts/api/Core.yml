@@ -231,6 +231,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::HistoryGet
+    TicketStateSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateSearch
+    TicketStateCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateCreate
+    TicketStateGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateGet
+    TicketStateUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateUpdate
+    TicketStateDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateDelete
 
   Transport:
     Config:
@@ -365,6 +400,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /tickets/:TicketID/history/:HistoryID
+        TicketStateSearch:
+          RequestMethod:
+          - GET
+          Route: /ticketstates
+        TicketStateCreate:
+          RequestMethod:
+          - POST
+          Route: /ticketstates
+        TicketStateGet:
+          RequestMethod:
+          - GET
+          Route: /ticketstates/:StateID
+        TicketStateUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /ticketstates/:StateID
+        TicketStateDelete:
+          RequestMethod:
+          - DELETE
+          Route: /ticketstates/:StateID
 
     Type: HTTP::REST
 RemoteSystem: ''

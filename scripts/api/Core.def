@@ -30,9 +30,11 @@
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   GET             | V1::Ticket::ArticleAttachmentGet
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   PATCH           | V1::Ticket::ArticleAttachmentUpdate
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID    |   DELETE          | V1::Ticket::ArticleAttachmentDelete
-/ticketstates/:StateID                                              |   GET             | V1::TicketState::TicketStateGet
+/tickets/:TicketID/history                                          |   GET             | V1::Ticket::HistorySearch
+/tickets/:TicketID/history/:HistoryID                               |   GET             | V1::Ticket::HistoryGet
 /ticketstates                                                       |   GET             | V1::TicketState::TicketStateSearch
 /ticketstates                                                       |   POST            | V1::TicketState::TicketStateCreate
+/ticketstates/:StateID                                              |   GET             | V1::TicketState::TicketStateGet
 /ticketstates/:StateID                                              |   PATCH           | V1::TicketState::TicketStateUpdate
 /ticketstates/:StateID                                              |   DELETE          | V1::TicketState::TicketStateDelete
 
