@@ -82,7 +82,8 @@ one or more ticket entries in one call.
 
     $Result = {
         Success      => 1,                           # 0 or 1
-        Message => '',                               # In case of an error
+        Code         => '',                          # In case of an error
+        Message      => '',                          # In case of an error
         Data         => {
             StateType => [
                 {
