@@ -171,6 +171,9 @@ one or more ticket entries in one call.
 
                     FirstLock                       (timestamp of first lock)
 
+                    # if Include=TimeUnits was passed, the sum of all TimeUnits of all articles will be included
+                    TimeUnits
+
                     # If Include=Articles was passed, you'll get an entry like this for each article:
                     Articles => [
                         <ArticleID>
@@ -350,7 +353,7 @@ sub Run {
             $TicketData{DynamicFields} = [];
         }
 
-        # include articles if requestes
+        # include articles if requested
         if ( $Param{Data}->{include}->{Articles} ) {
             my $ArticleTypes;
             if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
@@ -366,18 +369,11 @@ sub Run {
             $TicketData{Articles} = \@ArticleIndex;
         }
 
-        # include history if requestes
-        if ( $Param{Data}->{include}->{History} ) {
-            my @HistoryItems = $TicketObject->HistoryGet(
-                TicketID   => $TicketID,
-                UserID     => $Self->{Authorization}->{UserID},
+        # include TimeUnits if requested
+        if ( $Param{Data}->{include}->{TimeUnits} ) {
+            $TicketData{TimeUnits} = $TicketObject->TicketAccountedTimeGet(
+                TicketID => $TicketID,
             );
-
-            my @HistoryIDs;
-            foreach my $HistoryItem ( @HistoryItems ) {
-                push(@HistoryIDs, $HistoryItem->{HistoryID});
-            }
-            $TicketData{History} = \@HistoryIDs;
         }
             
         # add

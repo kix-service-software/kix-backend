@@ -72,7 +72,7 @@ one or more ticket entries in one call.
         Data => {
             TicketID             => '1',                                           # required 
             ArticleID            => '32',                                          # required, could be coma separated IDs or an Array
-            AttachmentID         => 'Article::32::1',                              # required, could be coma separated IDs or an Array
+            AttachmentID         => ':1',                                          # required, could be coma separated IDs or an Array
             include              => '...',                                         # Optional, 0 as default. Include additional objects
                                                                                    # (supported: Content)
         },

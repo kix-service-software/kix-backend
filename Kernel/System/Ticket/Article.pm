@@ -49,12 +49,14 @@ create an article
         ReplyTo          => 'Some Customer B <customer-b@example.com>', # not required
         Subject          => 'some short description',               # required
         Body             => 'the message text',                     # required
+        IncomingTime     => 'YYYY-MM-DD HH24:MI:SS',                # optional
         MessageID        => '<asdasdasd.123@example.com>',          # not required but useful
         InReplyTo        => '<asdasdasd.12@example.com>',           # not required but useful
         References       => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
         ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
         HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
         HistoryComment   => 'Some free text!',
+        TimeUnits        => 123,                                    # optional
         UserID           => 123,
         Attachment => [
             {
@@ -90,12 +92,14 @@ example with "Charset & MimeType" and no "ContentType"
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
         Subject          => 'some short description',               # required
         Body             => 'the message text',                     # required
+        IncomingTime     => 'YYYY-MM-DD HH24:MI:SS',                # optional
         Charset          => 'ISO-8859-15',
         MimeType         => 'text/plain',
         HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
         HistoryComment   => 'Some free text!',
         UserID           => 123,
         UnlockOnAway     => 1,                                      # Unlock ticket if owner is away
+        TimeUnits        => 123,                                    # optional
     );
 
 Events:
@@ -257,6 +261,13 @@ sub ArticleCreate {
         $Param{$Attribute} = substr( $Param{$Attribute}, 0, 3800 );
     }
 
+    # prepare IncomingTime if given
+    if ( $Param{IncomingTime} ) {
+        $IncomingTime = $TimeObject->TimeStamp2SystemTime(
+            String => $Param{IncomingTime},
+        );
+    }
+
     # check if this is the first article (for notifications)
     my @Index = $Self->ArticleIndex( TicketID => $Param{TicketID} );
     my $FirstArticle = scalar @Index ? 0 : 1;
@@ -365,6 +376,17 @@ sub ArticleCreate {
             );
         }
     }
+
+    # add accounted time if needed
+    if ( $Param{TimeUnits} ) {
+        my $UpdateSuccess = $Self->TicketAccountTime(
+            TicketID  => $Param{TicketID},
+            ArticleID => $Param{ArticleID},
+            TimeUnit  => $Param{TimeUnits},
+            UserID    => $Param{UserID},
+        );
+    }
+    
 
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
@@ -1329,6 +1351,7 @@ Article:
     Charset
     MimeType
     IncomingTime
+    TimeUnits
 
     # If DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
     DynamicField_X     => 'value_x',
@@ -1692,6 +1715,11 @@ sub ArticleGet {
 
             $Part->{ $Key . 'Realname' } = $Realname;
         }
+
+        # add TimeUnits
+        $Part->{TimeUnits} = $Self->ArticleAccountedTimeGet(
+            ArticleID => $Part->{ArticleID},
+        );
     }
 
     if ( $Param{ArticleID} ) {
@@ -3114,6 +3142,44 @@ sub ArticleAttachmentIndex {
     }
 
     return %Attachments;
+}
+
+=item ArticleExists()
+
+check if article exists
+
+    my $Exists = $TicketObject->ArticleExists( ArticleID => $ArticleID );
+
+=cut
+
+sub ArticleExists {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{ArticleID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ArticleID!'
+        );
+        return;
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # db query
+    return if !$DBObject->Prepare(
+        SQL   => 'SELECT id FROM article WHERE id = ?',
+        Bind  => [ \$Param{ArticleID} ],
+        Limit => 1,
+    );
+
+    my $Exists = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Exists = 1;
+    }
+
+    return $Exists;
 }
 
 1;

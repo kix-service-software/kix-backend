@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Validator::TicketValidator;
+package Kernel::API::Validator::ArticleValidator;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Validator::TicketValidator - validator module
+Kernel::API::Validator::ArticleValidator - validator module
 
 =head1 SYNOPSIS
 
@@ -49,17 +49,17 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::TicketValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::ArticleValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
 =cut
 
 sub new {
-    my ( $Ticket, %Param ) = @_;
+    my ( $Article, %Param ) = @_;
 
     my $Self = {};
-    bless( $Self, $Ticket );
+    bless( $Self, $Article );
 
     for my $Needed (qw( DebuggerObject)) {
         $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
@@ -101,25 +101,24 @@ sub Validate {
     }
 
     my $Found;
-    if ( $Param{Attribute} eq 'TicketID' ) {
+    if ( $Param{Attribute} eq 'ArticleID' ) {
         if ( $Param{Data}->{$Param{Attribute}} =~ /\d+/ ) {
-            $Found = $Kernel::OM->Get('Kernel::System::Ticket')->TicketNumberLookup(
-                TicketID => $Param{Data}->{$Param{Attribute}},
-                UserID   => 1,
+            $Found = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleExists(
+                ArticleID => $Param{Data}->{$Param{Attribute}},
             );        
         }
     }
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => "TicketValidator: cannot validate attribute $Param{Attribute}!",
+            Message => "ArticleValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Ticket not found!",
+            Message => "Article not found!",
         );        
     }
 

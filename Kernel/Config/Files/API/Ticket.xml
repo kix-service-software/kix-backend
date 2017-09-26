@@ -31,7 +31,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; Created; CreateBy; Changed; ChangedBy]</Item>
+                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; Created; CreateBy; Changed; ChangedBy; TimeUnits]</Item>
                 <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
                 <Item Key="Expandable::Articles">Operation=V1::Ticket::ArticleGet,ID=ArticleID,Return=Article,Add=TicketID</Item>
                 <Item Key="Expandable::History">Operation=V1::Ticket::HistoryGet,ID=HistoryID,Return=History,Add=TicketID</Item>
@@ -112,6 +112,39 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryType" Required="1" Valid="1">
         <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
         <Setting>
@@ -136,30 +169,6 @@
             <String Regex="">auto reply</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleUpdate###ArticleType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default type of the article for this operation.</Description>
-        <Setting>
-            <String Regex="">webrequest</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleUpdate###AutoResponseType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
-        <Setting>
-            <String Regex="">auto follow up</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleUpdate###HistoryType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
-        <Setting>
-            <String Regex="">AddNote</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleUpdate###HistoryComment" Required="1" Valid="1">
-        <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
-        <Setting>
-            <String Regex="">%%API Note</String>
-        </Setting>
-    </ConfigItem>
 
     <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
@@ -177,17 +186,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentCreate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

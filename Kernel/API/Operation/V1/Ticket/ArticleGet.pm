@@ -259,12 +259,9 @@ sub Run {
             $ArticleData{$Attribute} = $ArticleRaw{$Attribute};
         }
 
-        # add dynamic fields array into 'DynamicFields' hash key if any
-        if (@DynamicFields) {
+        # add dynamic fields array into 'DynamicFields' hash key if included
+        if ( $Param{Data}->{include}->{DynamicFields} ) {
             $ArticleData{DynamicFields} = \@DynamicFields;
-        }
-        else {
-            $ArticleData{DynamicFields} = [];
         }
             
         # add

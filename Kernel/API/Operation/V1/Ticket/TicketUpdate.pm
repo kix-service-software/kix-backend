@@ -106,7 +106,7 @@ perform TicketUpdate Operation. This will return the updated TicketID
     $Result = {
         Success         => 1,                       # 0 or 1
         Code            => '',                      #
-        ErrorMessage    => '',                      # in case of error
+        Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             TicketID    => 123,                     # ID of changed ticket
         },
@@ -205,7 +205,7 @@ update a ticket with its dynamic fields
     returns:
 
     $Response = {
-        Success => 1,                           # if everething is OK
+        Success => 1,                           # if everything is OK
         Data => {
             TicketID     => 123,
         }
@@ -750,7 +750,7 @@ sub _TicketUpdate {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    Code         => 'Operation.InternalError',
+                    Code         => 'Object.UnableToUpdate',
                     Message      => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
                 );
             }
