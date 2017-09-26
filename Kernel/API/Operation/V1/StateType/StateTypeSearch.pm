@@ -74,9 +74,13 @@ perform StateTypeSearch Operation. This will return a StateType ID list.
 
     $Result = {
         Success => 1,                                # 0 or 1
-        Message => '',                               # In case of an error
+        Code    => '',                          # In case of an error
+        Message => '',                          # In case of an error
         Data    => {
-            StateTypeID => [ 1, 2, 3, 4 ],
+            StateType => [
+                {},
+                {}
+            ]
         },
     };
 
