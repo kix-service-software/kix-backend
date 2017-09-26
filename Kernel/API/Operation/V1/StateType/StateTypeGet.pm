@@ -147,12 +147,13 @@ sub Run {
                 Code    => 'Object.NotFound',
                 Message => "No data found for StateTypeID $StateTypeID.",
             );
-        }
-        
+        }	
+
         my %StateType;
         
-        $StateType{$StateTypeID} = $StateTypeName;
-        
+        $StateType{ID} = $StateTypeID;
+        $StateType{Name} = $StateTypeName;
+      
         # add
         push(@StateTypeList, \%StateType);
     }
