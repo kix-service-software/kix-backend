@@ -301,6 +301,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Priority::PriorityDelete
+    StateTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StateType::StateTypeSearch
+    StateTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StateType::StateTypeGet
 
   Transport:
     Config:
@@ -475,6 +489,14 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /priority/:PriorityID
+        StateTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /statetypes
+        StateTypeGet:
+          RequestMethod:
+          - GET
+          Route: /statetypes/:StateTypeID
 
     Type: HTTP::REST
 RemoteSystem: ''
