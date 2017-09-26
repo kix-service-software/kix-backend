@@ -77,12 +77,17 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 MimeType                        => 'some mime type',           
                 Charset                         => 'some charset',           
 
+                IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
                 ArticleTypeID                   => 123,                        # optional
                 ArticleType                     => 'some article type name',   # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 AutoResponseType                => 'some auto response type',  # optional
                 From                            => 'some from string',         # optional
+                To                              => 'some to string',           # optional
+                Cc                              => 'some Cc string',           # optional
+                Bcc                             => 'some Bcc string',          # optional
+                ReplyTo                         => 'some ReplyTo string',      # optional
                 HistoryType                     => 'some history type',        # optional
                 HistoryComment                  => 'Some  history comment',    # optional
                 TimeUnit                        => 123,                        # optional
@@ -352,13 +357,17 @@ sub _ArticleCreate {
 
     # set Article To
     my $To;
-    if ( $Ticket->{Queue} ) {
-        $To = $Ticket->{Queue};
-    }
+    if ( $Article->{To} ) { 
+        $To => $Article->{To}
     else {
-        $To = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            QueueID => $Ticket->{QueueID},
-        );
+        if ( $Ticket->{Queue} ) {
+            $To = $Ticket->{Queue};
+        }
+        else {
+            $To = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                QueueID => $Ticket->{QueueID},
+            );
+        }
     }
 
     # create article
@@ -371,8 +380,11 @@ sub _ArticleCreate {
         SenderType     => $Article->{SenderType}     || '',
         From           => $From,
         To             => $To,
+        Cc             => $Article->{Cc}             || '',
+        Bcc            => $Article->{Bcc}            || '',
         Subject        => $Article->{Subject},
         Body           => $Article->{Body},
+        IncomingTime   => $Article->{IncomingTime}   || '',
         MimeType       => $Article->{MimeType}       || '',
         Charset        => $Article->{Charset}        || '',
         ContentType    => $Article->{ContentType}    || '',
