@@ -44,4 +44,6 @@
 /priority/:PriorityID                                               |   DELETE          | V1::Priority::PriorityDelete
 /statetypes                                                         |   GET             | V1::StateType::StateTypeSearch
 /statetypes/:StateTypeID                                            |   GET             | V1::StateType::StateTypeGet
+/valid                                                              |   GET             | V1::Valid::ValidSearch
+/valid/:ValidID                                                     |   GET             | V1::Valid::ValidGet
 

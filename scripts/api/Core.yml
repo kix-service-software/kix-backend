@@ -315,6 +315,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::StateType::StateTypeGet
+    ValidSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Valid::ValidSearch
+    ValidGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Valid::ValidGet
 
   Transport:
     Config:
@@ -497,6 +511,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /statetypes/:StateTypeID
+        ValidSearch:
+          RequestMethod:
+          - GET
+          Route: /valid
+        ValidGet:
+          RequestMethod:
+          - GET
+          Route: /valid/:ValidID
 
     Type: HTTP::REST
 RemoteSystem: ''
