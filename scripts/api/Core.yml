@@ -329,6 +329,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Valid::ValidGet
+    ArticleTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ArticleType::ArticleTypeSearch
+    ArticleTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ArticleType::ArticleTypeGet
 
   Transport:
     Config:
@@ -519,6 +533,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /valid/:ValidID
+        ArticleTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /articletypes
+        ArticleTypeGet:
+          RequestMethod:
+          - GET
+          Route: /articletypes/:ArticleTypeID
 
     Type: HTTP::REST
 RemoteSystem: ''
