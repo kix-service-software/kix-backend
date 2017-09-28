@@ -46,4 +46,6 @@
 /statetypes/:StateTypeID                                            |   GET             | V1::StateType::StateTypeGet
 /valid                                                              |   GET             | V1::Valid::ValidSearch
 /valid/:ValidID                                                     |   GET             | V1::Valid::ValidGet
+/articletypes                                                       |   GET             | V1::ArticleType::ArticleTypeSearch
+/articletypes/:ArticleTypeID                                        |   GET             | V1::ArticleType::ArticleTypeGet
 
