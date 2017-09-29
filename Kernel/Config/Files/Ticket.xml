@@ -666,6 +666,15 @@
             <String Regex="">Kernel::System::Ticket::Custom</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="Ticket::SearchBackend" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Option Location="Kernel/System/Ticket/TicketSearch/*.pm" SelectedID="Kernel::System::Ticket::TicketSearch::Database">
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="Ticket::SearchIndexModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild".</Description>
         <Group>Ticket</Group>

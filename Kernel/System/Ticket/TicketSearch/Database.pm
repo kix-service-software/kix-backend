@@ -8,16 +8,22 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::TicketSearch;
+package Kernel::System::Ticket::TicketSearch::Database;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
+
+use base qw(
+    Kernel::System::PerfLog
+);
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketSearch - ticket search lib
+Kernel::System::Ticket::TicketSearch::Database - ticket search lib
 
 =head1 SYNOPSIS
 
@@ -26,6 +32,86 @@ All ticket search functions.
 =over 4
 
 =cut
+
+=item new()
+
+create an object. Do not use it directly, instead use:
+
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $SearchBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::TicketSearch::Database');
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    # allocate new hash for object
+    my $Self = {};
+    bless( $Self, $Type );
+
+    # 0=off; 1=on;
+    $Self->{Debug} = $Param{Debug} || 0;
+
+    # get needed objects
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    
+    my $Home = $ConfigObject->Get('Home');
+
+$Self->PerfLogStart('loading modules');
+    # load modules
+    my @Modules;
+
+    # load configs from registered custom packages
+    my @CustomPackages = $Kernel::OM->Get('Kernel::System::KIXUtils')->GetRegisteredCustomPackages(
+        Result => 'ARRAY',
+    );
+
+    # add our home
+    push(@CustomPackages, '');
+
+    for my $Dir (@CustomPackages) {
+        my $Directory = $Home.'/'.$Dir.'/Kernel/System/Ticket/TicketSearch/Database';
+        $Directory =~ s'\s'\\s'g;
+        if ( -e "$Directory" ) {
+            my @Files = $MainObject->DirectoryRead(
+                Directory => $Directory,
+                Filter    => "*.pm",
+                Recursive => 1,
+            );
+            foreach my $File ( @Files ) {
+                $File =~ s/$Directory\///g;
+                $File =~ s/\//::/g;
+                $File =~ s/\.pm$//g;
+                push(@Modules, $File);
+            }
+        }
+    }
+
+    foreach my $Module ( sort @Modules ) {
+        next if ( $Module =~ /^Common$/g);
+        
+        $Module = 'Kernel::System::Ticket::TicketSearch::Database::'.$Module;
+
+        my $Object = $Kernel::OM->Get($Module);
+        if ( !$Object ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create database search backend object $Module !",
+            );
+            return;
+        }
+
+        # register module for each supported attribute
+        foreach my $Attribute ( $Object->GetSupportedAttributes() ) {
+            $Self->{AttributeModules}->{$Attribute} = $Object;
+        }        
+    }
+$Self->PerfLogStop('loading modules');
+
+    return $Self;
+}
 
 =item TicketSearch()
 
@@ -312,42 +398,241 @@ Result: 'COUNT'
 sub TicketSearch {
     my ( $Self, %Param ) = @_;
 
-    if ( !$Self->{SearchBackendObject} ) {
-        my $Backend = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchBackend');
+$Self->PerfLogStart('TicketSearch');
 
-        # if the backend require failed we will exit
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to require search backend!",
-            );
-            return;
-        }
-        my $BackendObject = $Backend->new( %{$Self} );
+    # the parts or SQL is comprised of
+    my @SQLPartsDef = (
+        {
+            Name   => 'SQLAttrs',
+            JoinBy => ', ',
+        },
+        {
+            Name   => 'SQLFrom',
+            JoinBy => ', ',
+        },
+        {
+            Name   => 'SQLJoin',
+            JoinBy => ' ',
+        },
+        {
+            Name   => 'SQLWhere',
+            JoinBy => ' AND ',
+            BeginWith => 'WHERE'
+        },
+        {
+            Name   => 'SQLOrderBy',
+            JoinBy => ', ',
+            BeginWith => 'ORDER BY'
+        },
+    );
 
-        # if the backend constructor failed we will exit
-        if ( ref $BackendObject ne $Backend ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create search backend object!",
-            );
-            return;
-        }
-        
-        $Self->{SearchBackendObject} = $BackendObject;
+    # empty SQL definition
+    my %SQLDef = (
+        SQLAttrs   => '',
+        SQLFrom    => '',
+        SQLJoin    => '',
+        SQLWhere   => '',
+        SQLOrderBy => '',
+    );
+
+    # check required params
+    if ( !$Param{UserID} && !$Param{UserType} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID and UserType params for permission check!',
+        );
+        return;
     }
 
-    # execute ticket search in backend
-    return $Self->{SearchBackendObject}->TicketSearch(
-        %Param,
+    my $Result = $Param{Result} || 'HASH';
+
+    # create basic SQL
+    my $SQL;
+    if ( $Result eq 'COUNT' ) {
+        $SQL = 'SELECT COUNT(DISTINCT(st.id))';
+    }
+    else {
+        $SQL = 'SELECT DISTINCT st.id, st.tn';
+    }
+    $SQLDef{SQLFrom}  = 'FROM ticket st INNER JOIN queue sq ON sq.id = st.queue_id';
+
+    # check permission and prepare relevat part of SQL statement
+    my $PermissionSQL = $Self->_CreatePermissionSQL(
+        %Param
     );
+    if ( !$PermissionSQL ) {
+        return;                    
+    }
+    $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
+
+    # generate SQL from attribute modules
+    foreach my $Filter ( @{$Param{Filter}->{Ticket}} ) {
+        my $AttributeModule;
+
+        # check if we have a search module for this field
+        if ( !$Self->{AttributeModules}->{$Filter->{Field}} ) {
+            # we don't have any directly registered search module for this field, check if we have a search module matching a pattern
+            foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
+                next if $Filter->{Field} !~ /$SearchableAttribute/g;
+                $AttributeModule = $Self->{AttributeModules}->{$SearchableAttribute};
+                last;
+            }
+        }
+        else {
+            $AttributeModule = $Self->{AttributeModules}->{$Filter->{Field}};
+        }
+
+        # ignore this attribute if we don't have a module for it
+        if ( !$AttributeModule ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to search for attribute $Filter->{Field}. Don't know how to handle it!",
+            );
+            return;            
+        }
+
+        # execute filter module to prepare SQL
+        my $Result = $AttributeModule->Run(
+            Filter => $Filter,
+        );
+
+        if ( !IsHashRefWithData($Result) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Attribute module for $Filter->{Field} returned an error!",
+            );
+            return;
+        }
+
+        foreach my $SQLPart ( @SQLPartsDef ) {
+            next if !IsArrayRefWithData($Result->{$SQLPart->{Name}});
+
+            # add each entry to the corresponding SQL part
+            if ($SQLDef{$SQLPart->{Name}}) {
+                $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy};
+            }
+            $SQLDef{$SQLPart->{Name}} .= (join($SQLPart->{JoinBy}, @{$Result->{$SQLPart->{Name}}}));
+        }
+    }
+
+    # generate SQL
+    foreach my $SQLPart ( @SQLPartsDef ) {
+        next if !$SQLDef{$SQLPart->{Name}};
+        $SQL .= ' '.($SQLPart->{BeginWith} || '').' '.$SQLDef{$SQLPart->{Name}};
+    }
+
+$Self->PerfLogStop('TicketSearch');
+$Self->PerfLogOutput();
+    
+    print STDERR "SQL: $SQL\n";
+
+    return ();
+}
+
+=begin Internal:
+
+=cut
+
+=item _InConditionGet()
+
+internal function to create an
+
+    AND table.column IN (values)
+
+condition string from an array.
+
+    my $SQLWhere = $Object->_CreatePermissionSQL(
+        UserID    => ...,                    # required
+        UserType  => 'Agent' | 'Customer'    # required
+        Permisson => '...'                   # optional
+    );
+
+=cut
+
+sub _CreatePermissionSQL {
+    my ( $Self, %Param ) = @_;
+    my $SQLWhere = '1=1';
+
+    if ( !$Param{UserID} && !$Param{UserType} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'No user information for permission check!',
+        );
+        return;
+    }
+
+    # permission check and restrictions
+    my %GroupList;
+    if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
+
+        # get users groups
+        %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+            UserID => $Param{UserID},
+            Type   => $Param{Permission} || 'ro',
+        );
+
+        # return if we have no permissions
+        return if !%GroupList;
+    }
+    if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
+
+        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+        # get customer groups
+        %GroupList = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
+            UserID => $Param{UserID},
+            Type   => $Param{Permission} || 'ro',
+            Result => 'HASH',
+        );
+
+        # return if we have no permissions
+        return if !%GroupList;
+
+        # get all customer ids
+        $SQLWhere = '(';
+        my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
+            User => $Param{UserID},
+        );
+
+        if (@CustomerIDs) {
+
+            my $Lower = '';
+            if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
+                $Lower = 'LOWER';
+            }
+
+            $SQLWhere .= "$Lower(st.customer_id) IN (";
+            my $Exists = 0;
+
+            for (@CustomerIDs) {
+
+                if ($Exists) {
+                    $SQLWhere  .= ', ';
+                }
+                else {
+                    $Exists = 1;
+                }
+                $SQLWhere  .= "$Lower('" . $DBObject->Quote($_) . "')";
+            }
+            $SQLWhere  .= ') OR ';
+        }
+
+        # get all own tickets
+        my $UserIDQuoted = $DBObject->Quote( $Param{UserID} );
+        $SQLWhere  .= "st.customer_user_id = '$UserIDQuoted') ";
+    }
+
+    # add group ids to sql string
+    if (%GroupList) {
+        $SQLWhere = 'sq.group_id IN ('.(join(',', sort keys %GroupList)).')';
+    }
+
+    return $SQLWhere;
 }
 
 1;
 
 =end Internal:
-
-
 
 
 =back

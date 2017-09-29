@@ -1832,8 +1832,6 @@ sub _Init {
             next FILE;
         }
 
-print STDERR "File: $File\n";
-
         # Ok, cache was not used, parse the config files
         my @XMLHash = $Kernel::OM->Get('Kernel::System::XML')->XMLParse2XMLHash(
             String     => $ConfigFile,

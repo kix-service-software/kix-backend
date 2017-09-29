@@ -67,6 +67,8 @@ sub new {
 perform TicketSearch Operation. This will return a ticket list.
 
     my $Result = $OperationObject->Run(
+
+# Ticket properties
         # ticket number (optional) as STRING or as ARRAYREF
         TicketNumber => '%123546%',
         TicketNumber => ['%123546%', '%123666%'],
@@ -75,45 +77,26 @@ perform TicketSearch Operation. This will return a ticket list.
         Title => '%SomeText%',
         Title => ['%SomeTest1%', '%SomeTest2%'],
 
-        Queues   => ['system queue', 'other queue'],
-        QueueIDs => [1, 42, 512],
-
-        # use also sub queues of Queue|Queues in search
+        QueueID => [1, 42, 512],
         UseSubQueues => 0,
+        TypeID => [3, 4],
+        StateID => [3, 4],
 
-        # You can use types like normal, ...
-        Types   => ['normal', 'change', 'incident'],
-        TypeIDs => [3, 4],
+        StateTypeID => [1, 2, 3],
 
-        # You can use states like new, open, pending reminder, ...
-        States   => ['new', 'open'],
-        StateIDs => [3, 4],
+        PriorityID => [1, 2, 3],
 
-        # (Open|Closed) tickets for all closed or open tickets.
-        StateType => 'Open',
+        ServiceID => [1, 2, 3],
 
-        # You also can use real state types like new, open, closed,
-        # pending reminder, pending auto, removed and merged.
-        StateType    => ['open', 'new'],
-        StateTypeIDs => [1, 2, 3],
+        SLAID => [1, 2, 3],
 
-        Priorities  => ['1 very low', '2 low', '3 normal'],
-        PriorityIDs => [1, 2, 3],
+        LockID => [1, 2, 3],
 
-        Services   => ['Service A', 'Service B'],
-        ServiceIDs => [1, 2, 3],
+        OwnerID => [1, 12, 455, 32]
 
-        SLAs   => ['SLA A', 'SLA B'],
-        SLAIDs => [1, 2, 3],
+        ResponsibleID => [1, 12, 455, 32]
 
-        Locks   => ['unlock'],
-        LockIDs => [1, 2, 3],
-
-        OwnerIDs => [1, 12, 455, 32]
-
-        ResponsibleIDs => [1, 12, 455, 32]
-
-        WatchUserIDs => [1, 12, 455, 32]
+        WatchUserID => [1, 12, 455, 32]
 
         # CustomerID (optional) as STRING or as ARRAYREF
         CustomerID => '123',
@@ -124,15 +107,11 @@ perform TicketSearch Operation. This will return a ticket list.
         CustomerUserLogin => ['uid123', 'uid777'],
 
         # create ticket properties (optional)
-        CreatedUserIDs     => [1, 12, 455, 32]
-        CreatedTypes       => ['normal', 'change', 'incident'],
-        CreatedTypeIDs     => [1, 2, 3],
-        CreatedPriorities  => ['1 very low', '2 low', '3 normal'],
-        CreatedPriorityIDs => [1, 2, 3],
-        CreatedStates      => ['new', 'open'],
-        CreatedStateIDs    => [3, 4],
-        CreatedQueues      => ['system queue', 'other queue'],
-        CreatedQueueIDs    => [1, 42, 512],
+        CreatedBy     => [1, 12, 455, 32]
+        CreatedTypeID     => [1, 2, 3],
+        CreatedPriorityID => [1, 2, 3],
+        CreatedStateID    => [3, 4],
+        CreatedQueueID    => [1, 42, 512],
 
         # DynamicFields
         #   At least one operator must be specified. Operators will be connected with AND,
@@ -147,7 +126,7 @@ perform TicketSearch Operation. This will return a ticket list.
             SmallerThanEquals => '2002-02-02 02:02:02',
         }
 
-        # article stuff (optional)
+# Article properties
         From    => '%spam@example.com%',
         To      => '%service@example.com%',
         Cc      => '%client@example.com%',
@@ -287,28 +266,7 @@ sub Run {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Ticket' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Ticket::Title' => {
-                Required => 1
-            },
-            'Ticket::CustomerContact' => {
-                Required => 1
-            },
-            'Ticket::State' => {
-                RequiredIfNot => [ 'Ticket::StateID' ],
-            },
-            'Ticket::Priority' => {
-                RequiredIfNot => [ 'Ticket::PriorityID' ],
-            },
-            'Ticket::Queue' => {
-                RequiredIfNot => [ 'Ticket::QueueID' ],
-            },
-        }
+        Data => $Param{Data},
     );
 
     # check result
@@ -319,26 +277,10 @@ sub Run {
         );
     }
 
-    # all needed variables
-    $Self->{SearchLimit} = $Param{Data}->{Limit}
-        || $Self->{Config}->{SearchLimit}
-        || 500;
-    $Self->{SortBy} = $Param{Data}->{SortBy}
-        || $Self->{Config}->{'SortBy::Default'}
-        || 'Age';
-    $Self->{OrderBy} = $Param{Data}->{OrderBy}
-        || $Self->{Config}->{'Order::Default'}
-        || 'Down';
-    $Self->{FullTextIndex} = $Param{Data}->{FullTextIndex} || 0;
-
-    # get parameter from data
-    my %GetParam = $Self->_GetParams( %{ $Param{Data} } );
-
-    # create time settings
-    %GetParam = $Self->_CreateTimeSettings(%GetParam);
-
-    # get dynamic fields
-    my %DynamicFieldSearchParameters = $Self->_GetDynamicFields( %{ $Param{Data} } );
+    # convert given filter, sort and limit to search parameters
+    my $SearchParams = $Self->_PrepareSearchParams(
+        Data => $Param{Data},
+    );
 
     # perform ticket search
     $UserType = ( $UserType eq 'Customer' ) ? 'CustomerUserID' : 'UserID';
@@ -374,6 +316,40 @@ sub Run {
 }
 
 =begin Internal:
+
+=item _PrepareSearchParams()
+
+prepare search parameters for ticket search.
+
+    my $SearchParams = _PrepareSearchParams(
+        Data => {}
+    )
+
+    returns:
+
+    $SearchParams = {
+        ...
+    }
+
+=cut
+
+sub _PrepareSearchParams {
+    my ( $Self, %Param ) = @_;
+    my %SearchParams;
+
+    $SearchParams{SearchLimit} = $Self->_GetLimit('Ticket');
+        || $Self->{Config}->{SearchLimit};
+    $SearchParams{FullTextIndex} = $Param{Data}->{FullTextIndex} || 0;
+
+    # get parameter from data
+    my %GetParam = $Self->_GetParams( %{ $Param{Data} } );
+
+    # create time settings
+    %GetParam = $Self->_CreateTimeSettings(%GetParam);
+
+    # get dynamic fields
+    my %DynamicFieldSearchParameters = $Self->_GetDynamicFields( %{ $Param{Data} } );
+
 
 =item _GetParams()
 
