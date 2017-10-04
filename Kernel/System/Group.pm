@@ -1294,8 +1294,7 @@ sub PermissionGroupUserGet {
             return;
         }
     }
-use Data::Dumper;
-print STDERR "param2".Dumper(\%Param);  
+
     # get permission type list
     my %PermissionTypeList = $Self->_PermissionTypeList(
         Type => $Param{Type},
