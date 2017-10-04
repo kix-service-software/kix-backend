@@ -48,7 +48,13 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return (
-        '',
+        'CreateTime',
+        'PendingTime',
+        'LastChangeTime',
+        'EscalationTime',
+        'EscalationUpdateTime',
+        'EscalationResponseTime',
+        'EscalationSolutionTime',
     );
 }
 
@@ -95,38 +101,32 @@ sub Run {
     # prepare value
     if ( $Param{Filter}->{Field} =~ /^(Pending|Escalation)/ ) {
         # convert to unix time
-        $Value = $TimeObject->TimeStamp2SystemTime(
+        $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
             String => $Param{Filter}->{Value},
         );
     }
     else {
         # handle value as string
-        $Value = "'".Param{Filter}->{Value}."'";
+        $Value = "'".$Param{Filter}->{Value}."'";
     }
 
-    # change and close time
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' = '.$Value );
-    }
-    elsif ( $Param{Filter}->{Operation} eq 'LT' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' < '.$Value );
-    }
-    elsif ( $Param{Filter}->{Operation} eq 'GT' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' > '.$Value );
-    }
-    elsif ( $Param{Filter}->{Operation} eq 'LTE' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' <= '.$Value );
-    }
-    elsif ( $Param{Filter}->{Operation} eq 'GTE' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' >= '.$Value );
-    }
-    else {
+    my %OperatorMap = (
+        'EQ'  => '=',
+        'LT'  => '<',
+        'GT'  => '>',
+        'LTE' => '<=',
+        'GTE' => '>='
+    );
+
+    if ( !$OperatorMap{$Param{Filter}->{Operation}} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "Unsupported operation $Param{Filter}->{Operation}!",
         );
         return;
     }
+
+    push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' '.$OperatorMap{$Param{Filter}->{Operation}}.' '.$Value );
 
     # some special handling
     if ( $Param{Filter}->{Field} =~ /^Escalation/ ) {

@@ -89,7 +89,7 @@ sub Run {
         push( @SQLWhere, 'st.archive_flag='.$Param{Filter}->{Value} );
     }
     elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
-        push( @SQLWhere, 'st.archive_flag IN ('.(join(',', @{$Param{Filter}->{Value}}).')' );
+        push( @SQLWhere, 'st.archive_flag IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(

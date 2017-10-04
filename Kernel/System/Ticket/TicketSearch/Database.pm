@@ -15,10 +15,6 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-use base qw(
-    Kernel::System::PerfLog
-);
-
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -59,7 +55,6 @@ sub new {
     
     my $Home = $ConfigObject->Get('Home');
 
-$Self->PerfLogStart('loading modules');
     # load modules
     my @Modules;
 
@@ -108,7 +103,6 @@ $Self->PerfLogStart('loading modules');
             $Self->{AttributeModules}->{$Attribute} = $Object;
         }        
     }
-$Self->PerfLogStop('loading modules');
 
     return $Self;
 }
@@ -398,8 +392,6 @@ Result: 'COUNT'
 sub TicketSearch {
     my ( $Self, %Param ) = @_;
 
-$Self->PerfLogStart('TicketSearch');
-
     # the parts or SQL is comprised of
     my @SQLPartsDef = (
         {
@@ -456,6 +448,8 @@ $Self->PerfLogStart('TicketSearch');
     }
     $SQLDef{SQLFrom}  = 'FROM ticket st INNER JOIN queue sq ON sq.id = st.queue_id';
 
+print STDERR "here!!!\n";
+
     # check permission and prepare relevat part of SQL statement
     my $PermissionSQL = $Self->_CreatePermissionSQL(
         %Param
@@ -465,6 +459,7 @@ $Self->PerfLogStart('TicketSearch');
     }
     $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
 
+print STDERR "Here!!!\n";
     # generate SQL from attribute modules
     foreach my $Filter ( @{$Param{Filter}->{Ticket}} ) {
         my $AttributeModule;
@@ -504,6 +499,8 @@ $Self->PerfLogStart('TicketSearch');
             return;
         }
 
+use Data::Dumper;
+print STDERR "$Filter->{Field}: ".Dumper($Result);
         foreach my $SQLPart ( @SQLPartsDef ) {
             next if !IsArrayRefWithData($Result->{$SQLPart->{Name}});
 
@@ -520,9 +517,6 @@ $Self->PerfLogStart('TicketSearch');
         next if !$SQLDef{$SQLPart->{Name}};
         $SQL .= ' '.($SQLPart->{BeginWith} || '').' '.$SQLDef{$SQLPart->{Name}};
     }
-
-$Self->PerfLogStop('TicketSearch');
-$Self->PerfLogOutput();
     
     print STDERR "SQL: $SQL\n";
 

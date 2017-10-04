@@ -101,29 +101,23 @@ sub Run {
     }
 
     if ( $Param{Filter}->{Field} =~ /(Change|Close)Time/ ) {
-        # change and close time
-        if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-            push( @SQLWhere, "th.create_time='".$Param{Filter}->{Value}."'" );
-        }
-        elsif ( $Param{Filter}->{Operation} eq 'LT' ) {
-            push( @SQLWhere, "th.create_time < '".$Param{Filter}->{Value}."'" );
-        }
-        elsif ( $Param{Filter}->{Operation} eq 'GT' ) {
-            push( @SQLWhere, "th.create_time > '".$Param{Filter}->{Value}."'" );
-        }
-        elsif ( $Param{Filter}->{Operation} eq 'LTE' ) {
-            push( @SQLWhere, "th.create_time <= '".$Param{Filter}->{Value}."'" );
-        }
-        elsif ( $Param{Filter}->{Operation} eq 'GTE' ) {
-            push( @SQLWhere, "th.create_time >= '".$Param{Filter}->{Value}."'" );
-        }
-        else {
+        my %OperatorMap = (
+            'EQ'  => '=',
+            'LT'  => '<',
+            'GT'  => '>',
+            'LTE' => '<=',
+            'GTE' => '>='
+        );
+
+        if ( !$OperatorMap{$Param{Filter}->{Operation}} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "Unsupported operation $Param{Filter}->{Operation}!",
             );
             return;
         }
+
+        push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Filter}->{Operation}}." '".$Param{Filter}->{Value}."'" );
 
         if ( $Param{Filter}->{Field} eq 'CloseTime' ) {
             # get close state ids

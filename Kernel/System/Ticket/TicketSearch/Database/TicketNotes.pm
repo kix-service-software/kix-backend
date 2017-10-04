@@ -88,17 +88,20 @@ sub Run {
         $Self->{AlreadyJoined} = 1;
     }
 
+    my $Field      = 'ktn.note';
+    my $FieldValue = $Param{Filter}->{Value};
+
     if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, "LOWER(ktn.note)='".$Param{Filter}->{Value}."'" );
+        # no special handling
     }
     elsif ( $Param{Filter}->{Operation} eq 'STARTSWITH' ) {
-        push( @SQLWhere, "LOWER(ktn.note) LIKE '".$Param{Filter}->{Value}."%'" );
+        $FieldValue = $FieldValue.'%';
     }
     elsif ( $Param{Filter}->{Operation} eq 'ENDSWITH' ) {
-        push( @SQLWhere, "LOWER(ktn.note) LIKE '%".$Param{Filter}->{Value}."'" );
+        $FieldValue = '%'.$FieldValue;
     }
     elsif ( $Param{Filter}->{Operation} eq 'CONTAINS' ) {
-        push( @SQLWhere, "LOWER(ktn.note) LIKE '%".$Param{Filter}->{Value}."%'" );
+        $FieldValue = '%'.$FieldValue.'%';
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -107,6 +110,23 @@ sub Run {
         );
         return;
     }
+
+    # check if database supports LIKE in large text types (in this case for body)
+    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+        if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+            $Field      = "LCASE($Field)";
+            $FieldValue = "LCASE('$FieldValue')";
+        }
+        else {
+            $Field      = "LOWER($Field)";
+            $FieldValue = "LOWER('$FieldValue')";
+        }
+    }
+    else {
+        $FieldValue = "'$FieldValue'";
+    }
+
+    push( @SQLWhere, $Field.' LIKE '.$FieldValue );
 
     return {
         SQLJoin  => \@SQLJoin,

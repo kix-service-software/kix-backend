@@ -48,9 +48,13 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return (
-        '',
-        '',
-        '',
+        'From',
+        'To',
+        'Cc',
+        'Subject',
+        'Body',
+        'AttachmentName',
+        'ArticleCreateTime'
     );
 }
 
@@ -64,6 +68,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
+        SQLJoin    => [ ],
         SQLWhere   => [ ],
     };
 
@@ -85,39 +90,89 @@ sub Run {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        'CreatedTypeID'     => 'type_id',
-        'CreatedStateID'    => 'state_id',
-        'CreatedUserID'     => 'create_by',
-        'CreatedQueueID'    => 'queue_id',
-        'CreatedPriorityID' => 'priority_id',
+        'From'              => 'art.a_from',
+        'To'                => 'art.a_to',
+        'Cc'                => 'art.a_cc',
+        'Subject'           => 'art.a_subject',
+        'Body'              => 'art.a_body',
     );
 
     # check if we have to add a join
     if ( !$Self->{AlreadyJoined} ) {
-        push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
+        my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
+        my $ArticleSearchTable = 'article';
+        if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+            $ArticleSearchTable = 'article_search';
+        }
+        push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
         $Self->{AlreadyJoined} = 1;
     }
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Filter}->{Field}}.'='.$Param{Filter}->{Value} );
-    }
-    elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
-        push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Filter}->{Field}}.' IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+    if ( $Param{Filter}->{Field} =~ /ArticleCreateTime/ ) {
+        my %OperatorMap = (
+            'EQ'  => '=',
+            'LT'  => '<',
+            'GT'  => '>',
+            'LTE' => '<=',
+            'GTE' => '>='
+        );
+
+        if ( !$OperatorMap{$Param{Filter}->{Operation}} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            );
+            return;
+        }
+
+        # convert to unix time
+        my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            String => $Param{Filter}->{Value},
+        );
+
+        push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Filter}->{Operation}}.' '.$Value );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
-        );
-        return;
+        my $Field      = $AttributeMapping{$Param{Filter}->{Field}};
+        my $FieldValue = $Param{Filter}->{Value};
+
+        if ( $Param{Filter}->{Operation} eq 'EQ' ) {
+            # no special handling
+        }
+        elsif ( $Param{Filter}->{Operation} eq 'STARTSWITH' ) {
+            $FieldValue = $FieldValue.'%';
+        }
+        elsif ( $Param{Filter}->{Operation} eq 'ENDSWITH' ) {
+            $FieldValue = '%'.$FieldValue;
+        }
+        elsif ( $Param{Filter}->{Operation} eq 'CONTAINS' ) {
+            $FieldValue = '%'.$FieldValue.'%';
+        }
+        else {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            );
+            return;
+        }
+
+        # check if database supports LIKE in large text types (in this case for body)
+        if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+            if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+                $Field      = "LCASE($Field)";
+                $FieldValue = "LCASE('$FieldValue')";
+            }
+            else {
+                $Field      = "LOWER($Field)";
+                $FieldValue = "LOWER('$FieldValue')";
+            }
+        }
+        else {
+            $FieldValue = "'$FieldValue'";
+        }
+
+        push( @SQLWhere, $Field.' LIKE '.$FieldValue );
     }
-
-    # lookup history type id
-    my $HistoryTypeID = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
-        Type => 'NewTicket',
-    );
-
-    push( @SQLWhere, "th.history_type_id = $HistoryTypeID" );
     
     return {
         SQLJoin  => \@SQLJoin,
