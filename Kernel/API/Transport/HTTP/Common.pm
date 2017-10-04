@@ -60,7 +60,7 @@ sub ProviderCheckAuthorization {
     if (!$Headers{HTTP_AUTHORIZATION}) {
         return $Self->_Error(
             Code    => 'Authorization.NoHeader',
-            Summary => 'No authorization header given!',
+            Message => 'No authorization header given!',
         );
     }
 
