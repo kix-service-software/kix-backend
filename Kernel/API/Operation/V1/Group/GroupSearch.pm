@@ -116,7 +116,6 @@ sub Run {
     # perform Group search
     my %GroupList = $Kernel::OM->Get('Kernel::System::Group')->GroupList(
         Result => 'HASH',
-#        Type   => 'Customer', # optional to get only customer viewable article types
     );
 
 	# get already prepared Group data from GroupGet operation
