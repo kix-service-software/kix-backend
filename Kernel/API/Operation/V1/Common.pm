@@ -517,7 +517,7 @@ sub _ValidateFilter {
         return;
     }    
 
-    my %OperationTypeMapping = (
+    my %OperatorTypeMapping = (
         'EQ'         => { 'NUMERIC' => 1, 'STRING'  => 1, 'DATE' => 1, 'DATETIME' => 1 },
         'NE'         => { 'NUMERIC' => 1, 'STRING'  => 1, 'DATE' => 1, 'DATETIME' => 1 },
         'LT'         => { 'NUMERIC' => 1, 'DATE' => 1, 'DATETIME' => 1 },
@@ -528,10 +528,11 @@ sub _ValidateFilter {
         'CONTAINS'   => { 'STRING'  => 1 },
         'STARTSWITH' => { 'STRING'  => 1 },
         'ENDSWITH'   => { 'STRING'  => 1 },
+        'LIKE'       => { 'STRING'  => 1 },
     );
-    my $ValidOperations = join('|', keys %OperationTypeMapping);
+    my $ValidOperators = join('|', keys %OperatorTypeMapping);
     my %ValidTypes;
-    foreach my $Tmp ( values %OperationTypeMapping ) {
+    foreach my $Tmp ( values %OperatorTypeMapping ) {
         foreach my $Type ( keys %{$Tmp} ) { 
             $ValidTypes{$Type} = 1;
         } 
@@ -540,81 +541,100 @@ sub _ValidateFilter {
     my $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
         Data => $Param{Filter}
     );
+
     foreach my $Object ( keys %{$FilterDef} ) {
         # do we have a object definition ?
-        if ( !IsArrayRefWithData($FilterDef->{$Object}) ) {
+        if ( !IsHashRefWithData($FilterDef->{$Object}) ) {
             return $Self->_Error(
                 Code    => 'PrepareData.InvalidFilter',
                 Message => "Invalid filter for object $Object!",
             );                
-        }     
-        # iterate filters
-        foreach my $Filter ( @{$FilterDef->{$Object}} ) {           
-            $Filter->{Operation} = uc($Filter->{Operation} || '');
-            $Filter->{Type} = uc($Filter->{Type} || 'STRING');
+        }
 
-            # check if filter field is valid
-            if ( !$Filter->{Field} ) {
+        foreach my $BoolOperator ( keys %{$FilterDef->{$Object}} ) {
+            if ( $BoolOperator !~ /^(AND|OR)$/g ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidFilter',
-                    Message => "No field in $Object.$Filter->{Field}!",
-                );
-            }
-            # check if filter operation is valid
-            if ( $Filter->{Operation} !~ /^($ValidOperations)$/g ) {
-                return $Self->_Error(
-                    Code    => 'PrepareData.InvalidFilter',
-                    Message => "Unknown filter operation $Filter->{Operation} in $Object.$Filter->{Field}!",
-                );
-            }
-            # check if type is valid
-            if ( !$ValidTypes{$Filter->{Type}} ) {
-                return $Self->_Error(
-                    Code    => 'PrepareData.InvalidFilter',
-                    Message => "Unknown type $Filter->{Type} in $Object.$Filter->{Field}!",
+                    Message => "Invalid filter for object $Object!",
                 );                
             }
-            # check if combination of filter operation and type is valid
-            if ( !$OperationTypeMapping{$Filter->{Operation}}->{$Filter->{Type}} ) {
+
+            # do we have a valid boolean operator
+            if ( !IsArrayRefWithData($FilterDef->{$Object}->{$BoolOperator}) ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidFilter',
-                    Message => "Type $Filter->{Type} not valid for operation $Filter->{Operation} in $Object.$Filter->{Field}!",
-                );                                
+                    Message => "Invalid filter for object $Object!, operator $BoolOperator",
+                );                
             }
 
-            # prepare value if it is a DATE type
-            if ( $Filter->{Type} eq 'DATE' ) {
-                if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
+            # iterate filters
+            foreach my $Filter ( @{$FilterDef->{$Object}->{$BoolOperator}} ) {
+                $Filter->{Operator} = uc($Filter->{Operator} || '');
+                $Filter->{Type} = uc($Filter->{Type} || 'STRING');
+
+                # check if filter field is valid
+                if ( !$Filter->{Field} ) {
                     return $Self->_Error(
                         Code    => 'PrepareData.InvalidFilter',
-                        Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        Message => "No field in $Object.$Filter->{Field}!",
                     );
                 }
-                my ($DatePart, $TimePart) = split(/T/, $Filter->{Value});
-
-                # convert Value to unixtime to later compares
-                $Filter->{Value} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                    String => $DatePart.' 12:00:00',
-                );
-            }
-
-            if ( $Filter->{Type} eq 'DATETIME' ) {
-                if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
+                # check if filter Operator is valid
+                if ( $Filter->{Operator} !~ /^($ValidOperators)$/g ) {
                     return $Self->_Error(
                         Code    => 'PrepareData.InvalidFilter',
-                        Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        Message => "Unknown filter operator $Filter->{Operator} in $Object.$Filter->{Field}!",
                     );
                 }
-                my ($DatePart, $TimePart) = split(/T/, $Filter->{Value});
-                $TimePart =~ s/-/:/g;
+                # check if type is valid
+                if ( !$ValidTypes{$Filter->{Type}} ) {
+                    return $Self->_Error(
+                        Code    => 'PrepareData.InvalidFilter',
+                        Message => "Unknown type $Filter->{Type} in $Object.$Filter->{Field}!",
+                    );                
+                }
+                # check if combination of filter Operator and type is valid
+                if ( !$OperatorTypeMapping{$Filter->{Operator}}->{$Filter->{Type}} ) {
+                    return $Self->_Error(
+                        Code    => 'PrepareData.InvalidFilter',
+                        Message => "Type $Filter->{Type} not valid for operator $Filter->{Operator} in $Object.$Filter->{Field}!",
+                    );                                
+                }
 
-                # convert Value to unixtime to later compares
-                $Filter->{Value} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                    String => $DatePart.' '.$TimePart,
-                );
+                # prepare value if it is a DATE type
+                if ( $Filter->{Type} eq 'DATE' ) {
+                    if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
+                        return $Self->_Error(
+                            Code    => 'PrepareData.InvalidFilter',
+                            Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
+                    my ($DatePart, $TimePart) = split(/T/, $Filter->{Value});
+
+                    # convert Value to unixtime to later compares
+                    $Filter->{Value} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                        String => $DatePart.' 12:00:00',
+                    );
+                }
+
+                if ( $Filter->{Type} eq 'DATETIME' ) {
+                    if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/ ) {
+                        return $Self->_Error(
+                            Code    => 'PrepareData.InvalidFilter',
+                            Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
+                    my ($DatePart, $TimePart) = split(/T/, $Filter->{Value});
+                    $TimePart =~ s/-/:/g;
+
+                    # convert Value to unixtime to later compares
+                    $Filter->{Value} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                        String => $DatePart.' '.$TimePart,
+                    );
+                }
             }
         }
-        
+
         # filter is ok
         $Self->{Filter} = $FilterDef;
     }
@@ -632,7 +652,7 @@ sub _ApplyFilter {
 
     OBJECT:
     foreach my $Object ( keys %{$Self->{Filter}} ) {
-        if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
+        if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
             # filter each contained hash
             my @FilteredResult;
             
@@ -641,111 +661,145 @@ sub _ApplyFilter {
                 if ( ref($ObjectItem) eq 'HASH' ) {
                     my $Match = 1;
 
-                    FILTER:
-                    foreach my $Filter ( @{$Self->{Filter}->{$Object}} ) {
-                        my $FieldValue = $ObjectItem->{$Filter->{Field}};
-                        my $FilterValue = $Filter->{Value};
-                        my $Type = $Filter->{Type};
+                    BOOLOPERATOR:
+                    foreach my $BoolOperator ( keys %{$Self->{Filter}->{$Object}} ) {
+                        my $BoolOperatorMatch = 1;
 
-                        # check if the value references a field in our hash and take its value in this case
-                        if ( $FilterValue =~ /^\$(.*?)$/ ) {
-                            $FilterValue =  exists($ObjectItem->{$1}) ? $ObjectItem->{$1} : undef;
+                        FILTER:
+                        foreach my $Filter ( @{$Self->{Filter}->{$Object}->{$BoolOperator}} ) {
+                            my $FilterMatch = 1;
+
+                            my $FieldValue = $ObjectItem->{$Filter->{Field}};
+                            my $FilterValue = $Filter->{Value};
+                            my $Type = $Filter->{Type};
+
+                            # check if the value references a field in our hash and take its value in this case
+                            if ( $FilterValue =~ /^\$(.*?)$/ ) {
+                                $FilterValue =  exists($ObjectItem->{$1}) ? $ObjectItem->{$1} : undef;
+                            }
+
+                            # replace wildcards with valid RegEx in FilterValue
+                            $FilterValue =~ s/\*/.*?/g;
+
+                            # prepare date compare
+                            if ( $Type eq 'DATE' ) {
+                                # convert values to unixtime
+                                my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
+                                $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                    String => $DatePart.' 12:00:00',
+                                );
+                                # handle this as a numeric compare
+                                $Type = 'NUMERIC';
+                            }
+                            # prepare datetime compare
+                            elsif ( $Type eq 'DATETIME' ) {
+                                # convert values to unixtime
+                                $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                    String => $FieldValue,
+                                );
+                                # handle this as a numeric compare
+                                $Type = 'NUMERIC';
+                            }
+
+                            # equal (=)
+                            if ( $Filter->{Operator} eq 'EQ' ) {
+                                if ( $Type eq 'STRING' && $FieldValue ne $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }
+                                elsif ( $Type eq 'NUMERIC' && $FieldValue != $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }                                
+                            }
+                            # not equal (!=)
+                            elsif ( $Filter->{Operator} eq 'NE' ) {                        
+                                if ( $Type eq 'STRING' && $FieldValue eq $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }
+                                elsif ( $Type eq 'NUMERIC' && $FieldValue == $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }                                
+                            }
+                            # less than (<)
+                            elsif ( $Filter->{Operator} eq 'LT' ) {                        
+                                if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }                                
+                            }
+                            # greater than (>)
+                            elsif ( $Filter->{Operator} eq 'GT' ) {                        
+                                if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }                                
+                            }
+                            # less than or equal (<=)
+                            elsif ( $Filter->{Operator} eq 'LTE' ) {                        
+                                if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }                                
+                            }
+                            # greater than or equal (>=)
+                            elsif ( $Filter->{Operator} eq 'GTE' ) {                        
+                                if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                    $FilterMatch = 0;
+                                }                                
+                            }
+                            # value is contained in an array or values
+                            elsif ( $Filter->{Operator} eq 'IN' ) {
+                                if ( !grep(/^$FieldValue$/g, @{$FilterValue}) ) {
+                                    $FilterMatch = 0;
+                                }
+                            }
+                            # the string contains a part
+                            elsif ( $Filter->{Operator} eq 'CONTAINS' ) {                        
+                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                    $FilterMatch = 0;
+                                }
+                            }
+                            # the string starts with the part
+                            elsif ( $Filter->{Operator} eq 'STARTSWITH' ) {                        
+                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
+                                    $FilterMatch = 0;
+                                }
+                            }
+                            # the string ends with the part
+                            elsif ( $Filter->{Operator} eq 'ENDSWITH' ) {                        
+                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
+                                    $FilterMatch = 0;
+                                }
+                            }
+                            # the string matches the pattern
+                            elsif ( $Filter->{Operator} eq 'LIKE' ) {                        
+                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/g ) {
+                                    $FilterMatch = 0;
+                                }
+                            }                            
+
+                            if ( $Filter->{Not} ) {
+                                # negate match result
+                                $FilterMatch = !$FilterMatch;
+                            }
+
+                            # abort filters for this bool operator, if we have a non-match
+                            if ( $BoolOperator eq 'AND' && !$FilterMatch ) {
+                                # signal the operator that it didn't match
+                                $BoolOperatorMatch = 0;
+                                last FILTER;
+                            }
+                            elsif ( $BoolOperator eq 'OR' && $FilterMatch ) {
+                                # we don't need to check more filters in this case
+                                $BoolOperatorMatch = 1;
+                                last FILTER; 
+                            }
+                            elsif ( $BoolOperator eq 'OR' && !$FilterMatch ) {
+                                $BoolOperatorMatch = 0;
+                            }                            
                         }
 
-                        # prepare date compare
-                        if ( $Type eq 'DATE' ) {
-                            # convert values to unixtime
-                            my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
-                            $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                                String => $DatePart.' 12:00:00',
-                            );
-                            # handle this as a numeric compare
-                            $Type = 'NUMERIC';
+                        # abort filters for this object, if we have a non-match in the operator filters
+                        if ( !$BoolOperatorMatch ) {
+                            $Match = 0;
+                            last BOOLOPERATOR;
                         }
-                        # prepare datetime compare
-                        elsif ( $Type eq 'DATETIME' ) {
-                            # convert values to unixtime
-                            $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                                String => $FieldValue,
-                            );
-                            # handle this as a numeric compare
-                            $Type = 'NUMERIC';
-                        }
-
-                        # equal (=)
-                        if ( $Filter->{Operation} eq 'EQ' ) {
-                            if ( $Type eq 'STRING' && $FieldValue ne $FilterValue ) {
-                                $Match = 0;
-                            }
-                            elsif ( $Type eq 'NUMERIC' && $FieldValue != $FilterValue ) {
-                                $Match = 0;
-                            }                                
-                        }
-                        # not equal (!=)
-                        elsif ( $Filter->{Operation} eq 'NE' ) {                        
-                            if ( $Type eq 'STRING' && $FieldValue eq $FilterValue ) {
-                                $Match = 0;
-                            }
-                            elsif ( $Type eq 'NUMERIC' && $FieldValue == $FilterValue ) {
-                                $Match = 0;
-                            }                                
-                        }
-                        # less than (<)
-                        elsif ( $Filter->{Operation} eq 'LT' ) {                        
-                            if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
-                                $Match = 0;
-                            }                                
-                        }
-                        # greater than (>)
-                        elsif ( $Filter->{Operation} eq 'GT' ) {                        
-                            if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
-                                $Match = 0;
-                            }                                
-                        }
-                        # less than or equal (<=)
-                        elsif ( $Filter->{Operation} eq 'LTE' ) {                        
-                            if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
-                                $Match = 0;
-                            }                                
-                        }
-                        # greater than or equal (>=)
-                        elsif ( $Filter->{Operation} eq 'GTE' ) {                        
-                            if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
-                                $Match = 0;
-                            }                                
-                        }
-                        # value is contained in an array or values
-                        elsif ( $Filter->{Operation} eq 'IN' ) {
-                            if ( !grep(/^$FieldValue$/g, @{$FilterValue}) ) {
-                                $Match = 0;
-                            }
-                        }
-                        # the string contains a part
-                        elsif ( $Filter->{Operation} eq 'CONTAINS' ) {                        
-                            if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
-                                $Match = 0;
-                            }
-                        }
-                        # the string starts with the part
-                        elsif ( $Filter->{Operation} eq 'STARTSWITH' ) {                        
-                            if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
-                                $Match = 0;
-                            }
-                        }
-                        # the string ends with the part
-                        elsif ( $Filter->{Operation} eq 'ENDSWITH' ) {                        
-                            if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
-                                $Match = 0;
-                            }
-                        }
-
-                        if ( $Filter->{Not} ) {
-                            # negate match result
-                            $Match = !$Match;
-                        }
-
-                        # abort filters for this object, if we have a non-match
-                        last FILTER if !$Match;
                     }
 
                     # all filter criteria match, add to result
