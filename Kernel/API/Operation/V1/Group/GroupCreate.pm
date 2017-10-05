@@ -73,7 +73,7 @@ perform GroupCreate Operation. This will return the created GroupID.
 	    	Group  => {
 	        	Name    => '...',
 	        	Comment => '...',                 # optional
-	        	ValidID => '...',	
+	        	ValidID => '...',                 # optional
 	    	},
 	    },
     );
@@ -83,7 +83,7 @@ perform GroupCreate Operation. This will return the created GroupID.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            GroupID  => '',                   # GroupID
+            GroupID  => '',                         # ID of the created group
         },
     };
 
