@@ -72,24 +72,22 @@ perform GroupUpdate Operation. This will return the updated TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ID      => '...',
-        }
-	    Group => {
-	        Name    => '...',
-	        ValidID => '...',
+            GroupID => 123,
+            Group   => {
+	            Name    => '...',
+	            Comment => '...',
+	            ValidID => 1,
+            }
 	    },
 	);
     
 
     $Result = {
         Success     => 1,                       # 0 or 1
+        Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            GroupID  => '',               # GroupID 
-            Error   => {                        # should not return errors
-                    Code    => 'Group.Update.ErrorCode'
-                    Message => 'Error Description'
-            },
+            GroupID  => 123,                     # ID of the updated group 
         },
     };
    
@@ -116,6 +114,9 @@ sub Run {
         Data         => $Param{Data},
         Parameters   => {
             'GroupID' => {
+                Required => 1
+            },
+            'Group' => {
                 Type => 'HASH',
                 Required => 1
             },
@@ -153,7 +154,7 @@ sub Run {
     if ( !$GroupData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Can not update Group. No Group with ID '$Param{Data}->{GroupID}' found.",
+            Message => "Cannot update group. No group with ID '$Param{Data}->{GroupID}' found.",
         );
     }
 
@@ -161,7 +162,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::Group')->GroupUpdate(
         ID      => $Param{Data}->{GroupID},
         Name    => $Param{Data}->{Group}->{Name} || $Group->{Name},
-        Comment => $Group->{Comment} || '',
+        Comment => $Param{Data}->{Group}->{Name} || $Group->{Comment},
         ValidID => $Param{Data}->{Group}->{ValidID} || $Group->{ValidID},
         UserID  => $Self->{Authorization}->{UserID},
     );
@@ -169,7 +170,7 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Group, please contact the system administrator',
+            Message => 'Could not update group, please contact the system administrator',
         );
     }
 
