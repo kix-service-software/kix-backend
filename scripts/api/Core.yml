@@ -315,6 +315,69 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::StateType::StateTypeGet
+    ValidSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Valid::ValidSearch
+    ValidGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Valid::ValidGet
+    ArticleTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ArticleType::ArticleTypeSearch
+    ArticleTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ArticleType::ArticleTypeGet
+    GroupSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupSearch
+    GroupCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupCreate
+    GroupGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupGet
+    GroupUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupUpdate
+    GroupDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupDelete
 
   Transport:
     Config:
@@ -497,6 +560,42 @@ Provider:
           RequestMethod:
           - GET
           Route: /statetypes/:StateTypeID
+        ValidSearch:
+          RequestMethod:
+          - GET
+          Route: /valid
+        ValidGet:
+          RequestMethod:
+          - GET
+          Route: /valid/:ValidID
+        ArticleTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /articletypes
+        ArticleTypeGet:
+          RequestMethod:
+          - GET
+          Route: /articletypes/:ArticleTypeID
+        GroupSearch:
+          RequestMethod:
+          - GET
+          Route: /groups
+        GroupCreate:
+          RequestMethod:
+          - POST
+          Route: /groups
+        GroupGet:
+          RequestMethod:
+          - GET
+          Route: /groups/:GroupID
+        GroupUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /groups/:GroupID
+        GroupDelete:
+          RequestMethod:
+          - DELETE
+          Route: /groups/:GroupID
 
     Type: HTTP::REST
 RemoteSystem: ''

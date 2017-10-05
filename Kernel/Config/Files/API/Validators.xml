@@ -19,7 +19,7 @@
                 <Item Key="Module">ArticleTypeValidator</Item>
                 <Item Key="Validates">ArticleType,ArticleTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ArticleTypeGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -250,7 +250,7 @@
                 <Item Key="Module">ValidValidator</Item>
                 <Item Key="Validates">Valid,ValidID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ValidGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
