@@ -119,30 +119,29 @@ sub Run {
     TYPE:    
     foreach my $GroupID ( @{$Param{Data}->{GroupID}} ) {
 
-        my %ResultUserList = {};
         # search group user       
-        %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserGet(
-            Type  => 'move_into',
+        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserGet(
+            Type    => 'move_into',
             GroupID => $GroupID,
         );
    
         if ( IsHashRefWithData(\%ResultUserList) ) {
             return $Self->_Error(
                 Code    => 'GroupDelete.UserExists',
-                Message => 'Can not delete Group. A user with this Group already exists.',
+                Message => 'Cannot delete group. At least one user is assigned to this group.',
             );
         }
-        my %ResultRoleList ={};
+
         # search group role       
-        %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupRoleGet(
-            Type  => 'move_into',
+        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupRoleGet(
+            Type    => 'move_into',
             GroupID => $GroupID,
         );
   
         if ( IsHashRefWithData(\%ResultRoleList) ) {
             return $Self->_Error(
                 Code    => 'GroupDelete.RolesExists',
-                Message => 'Can not delete Group. A roles with this Group already exists.',
+                Message => 'Cannot delete group. This group is assgined to at least one role.',
             );
         }
         
