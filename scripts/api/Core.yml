@@ -343,6 +343,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::ArticleType::ArticleTypeGet
+    GroupSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupSearch
+    GroupCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupCreate
+    GroupGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupGet
+    GroupUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupUpdate
+    GroupDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Group::GroupDelete
 
   Transport:
     Config:
@@ -541,6 +576,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /articletypes/:ArticleTypeID
+        GroupSearch:
+          RequestMethod:
+          - GET
+          Route: /groups
+        GroupCreate:
+          RequestMethod:
+          - POST
+          Route: /groups
+        GroupGet:
+          RequestMethod:
+          - GET
+          Route: /groups/:GroupID
+        GroupUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /groups/:GroupID
+        GroupDelete:
+          RequestMethod:
+          - DELETE
+          Route: /groups/:GroupID
 
     Type: HTTP::REST
 RemoteSystem: ''

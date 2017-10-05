@@ -2868,6 +2868,36 @@ sub _PermissionTypeList {
     return %TypeList;
 }
 
+sub GroupDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(GroupID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM groups WHERE id = ?',
+        Bind => [ \$Param{GroupID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+}
+
+
 1;
 
 =end Internal:

@@ -48,4 +48,8 @@
 /valid/:ValidID                                                     |   GET             | V1::Valid::ValidGet
 /articletypes                                                       |   GET             | V1::ArticleType::ArticleTypeSearch
 /articletypes/:ArticleTypeID                                        |   GET             | V1::ArticleType::ArticleTypeGet
-
+/groups                                                             |   GET             | V1::Group::GroupSearch
+/groups                                                             |   POST            | V1::Group::GroupCreate
+/groups/:GroupID                                                    |   GET             | V1::Group::GroupGet
+/groups/:GroupID                                                    |   PATCH           | V1::Group::GroupUpdate
+/groups/:GroupID                                                    |   DELETE          | V1::Group::GroupDelete
