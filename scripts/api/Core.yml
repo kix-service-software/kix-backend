@@ -378,6 +378,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Group::GroupDelete
+    AddressBookSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressBookSearch
+    AddressBookCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressBookCreate
+    AddressBookGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressBookGet
+    AddressBookUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressBookUpdate
+    AddressBookDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressBookDelete
 
   Transport:
     Config:
@@ -596,6 +631,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /groups/:GroupID
+        AddressBookSearch:
+          RequestMethod:
+          - GET
+          Route: /addressbook
+        AddressBookCreate:
+          RequestMethod:
+          - POST
+          Route: /addressbook
+        AddressBookGet:
+          RequestMethod:
+          - GET
+          Route: /addressbook/:AddressBookID
+        AddressBookUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /addressbook/:AddressBookID
+        AddressBookDelete:
+          RequestMethod:
+          - DELETE
+          Route: /addressbook/:AddressBookID
 
     Type: HTTP::REST
 RemoteSystem: ''

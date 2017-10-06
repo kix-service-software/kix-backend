@@ -53,3 +53,8 @@
 /groups/:GroupID                                                    |   GET             | V1::Group::GroupGet
 /groups/:GroupID                                                    |   PATCH           | V1::Group::GroupUpdate
 /groups/:GroupID                                                    |   DELETE          | V1::Group::GroupDelete
+/addressbook                                                        |   GET             | V1::AddressBook::AddressBookSearch
+/addressbook                                                        |   POST            | V1::AddressBook::AddressBookCreate
+/addressbook/:AddressBookID                                         |   GET             | V1::AddressBook::AddressBookGet
+/addressbook/:AddressBookID                                         |   PATCH           | V1::AddressBook::AddressBookUpdate
+/addressbook/:AddressBookID                                         |   DELETE          | V1::AddressBook::AddressBookDelete

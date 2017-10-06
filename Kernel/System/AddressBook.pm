@@ -61,6 +61,45 @@ sub new {
     return $Self;
 }
 
+=item GetAddress()
+
+Get a email address.
+
+    my $Result = $AddressBookObject->GetAddress(
+        ID      => '...',
+    );
+
+=cut
+
+sub GetAddress {
+    my ( $Self, %Param ) = @_;
+    
+    my %Result;
+
+    # check required params...
+    if ( !$Param{ID} ) {
+        $Self->{LogObject}->Log( 
+            Priority => 'error', 
+            Message  => 'DeleteAddress: Need ID!' );
+        return;
+    }
+   
+
+    return if !$Self->{DBObject}->Prepare( 
+        SQL   => "SELECT id, email FROM addressbook WHERE id=$Param{ID}",
+        Limit => 50, 
+    );
+
+    my $Count = 0;
+    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+        $Result{ $Data[0] } = $Data[1];
+    }
+
+    return %Result;   
+
+}
+
+
 =item AddAddress()
 
 Adds a new email address
@@ -83,7 +122,7 @@ sub AddAddress {
     }
 
     my $EmailLower = lc($Param{Email});
-    
+  
     # do the db insert...
     my $DBInsert = $Self->{DBObject}->Do(
         SQL  => "INSERT INTO addressbook (email, email_lower) VALUES (?, ?)",
@@ -121,6 +160,38 @@ sub AddAddress {
 
     return 0;
 }
+
+sub AddressUpdate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ID Email)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+    
+    my $EmailLower = $Param{Email};
+    
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # update group in database
+    return if !$DBObject->Do(
+        SQL => 'UPDATE addressbook SET email = ?, email_lower = ? WHERE id = ?',
+        Bind => [
+            \$Param{Email}, \$EmailLower, \$Param{AddressBookID},
+        ],
+    );
+
+
+    return 1;
+}
+
 
 =item DeleteAddress()
 
@@ -199,7 +270,7 @@ sub AddressList {
         Key  => $CacheKey
     );
     return %{$CacheResult} if (IsHashRefWithData($CacheResult));
-
+  
     if ( $Param{Search} ) {
         my $Email = $Param{Search};
         $Email =~ s/\*/%/g;
@@ -232,6 +303,35 @@ sub AddressList {
     );
 
     return %Result;
+}
+
+sub AddressBookDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(AddressBookID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM addressbook WHERE id = ?',
+        Bind => [ \$Param{AddressbookID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 1;
