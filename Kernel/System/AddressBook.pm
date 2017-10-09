@@ -301,7 +301,7 @@ sub AddressBookDelete {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM addressbook WHERE id = ?',
-        Bind => [ \$Param{AddressbookID} ],
+        Bind => [ \$Param{AddressBookID} ],
     );
 
     # reset cache
