@@ -73,10 +73,7 @@ perform AddressBookUpdate Operation. This will return the updated AddressBookID.
     my $Result = $OperationObject->Run(
         Data => {
             AddressBookID => 123,
-            AddressBook   => {
-	            Email  => '...',
-	            ID     => '...',
-            }
+            EmailAddress  => '...',
 	    },
 	);
     
@@ -115,8 +112,7 @@ sub Run {
             'AddressBookID' => {
                 Required => 1
             },
-            'AddressBook' => {
-                Type => 'HASH',
+            'EmailAddress' => {
                 Required => 1
             },
         }        
@@ -130,43 +126,45 @@ sub Run {
         );
     }
 
-    # isolate AddressBook parameter
-    my $AddressBook = $Param{Data}->{AddressBook};
+    # trim 
+    my $EmailAddress = $Self->_Trim(
+        Data => $Param{Data}->{EmailAddress},
+    );  
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$AddressBook} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $AddressBook->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $AddressBook->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-
-    # check if AddressBook exists
+    # check if AddressBook entry exists
+    my %AddressBookEntry = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
+        ID => $Param{Data}->{AddressBookID},
+    );
+  
+    if ( !%AddressBookEntry ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Cannot update addressbook entry. No entry with AddressBookID $Param{Data}->{AddressBookID} found",
+        );
+    }
+    
+    # check if EmailAddress exists
     my $AddressBookListResult = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
-        Search => $AddressBook->{Email},
+        Search => $EmailAddress,
     );
   
     if ( IsHashRefWithData($AddressBookListResult) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update AddressBook. No AddressBook with email '$Param{Data}->{Email}' found.",
+            Code    => 'AddressBookCreate.EmailAddressExists',
+            Message => "Cannot update addressbook entry. Email address '$EmailAddress' already exists in addressbook.",
         );
     }
 
     # update AddressBook
     my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressUpdate(
         ID      => $Param{Data}->{AddressBookID},
-        Email    => $Param{Data}->{AddressBook}->{Email} || $AddressBook->{Email},
+        Email   => $EmailAddress,
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update AddressBook, please contact the system administrator',
+            Message => 'Could not update addressbook entry, please contact the system administrator',
         );
     }
 
