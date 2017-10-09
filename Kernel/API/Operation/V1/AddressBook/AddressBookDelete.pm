@@ -120,8 +120,8 @@ sub Run {
     foreach my $AddressBookID ( @{$Param{Data}->{AddressBookID}} ) {
 
         # delete AddressBook	    
-        my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressBookDelete(
-            AddressBookID  => $AddressBookID,
+        my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressDelete(
+            AddressID  => $AddressBookID,
             UserID  => $Self->{Authorization}->{UserID},
         );
 

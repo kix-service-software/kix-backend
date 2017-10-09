@@ -139,7 +139,7 @@ sub Run {
     foreach my $AddressBookID ( @{$Param{Data}->{AddressBookID}} ) {
 
         # get the AddressBook data
-        my %AddressBookData = $Kernel::OM->Get('Kernel::System::AddressBook')->GetAddress(
+        my %AddressBookData = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
             ID => $AddressBookID,             
         );
 

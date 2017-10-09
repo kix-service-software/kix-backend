@@ -61,17 +61,17 @@ sub new {
     return $Self;
 }
 
-=item GetAddress()
+=item AddressGet()
 
 Get a email address.
 
-    my $Result = $AddressBookObject->GetAddress(
+    my $Result = $AddressBookObject->AddressGet(
         ID      => '...',
     );
 
 =cut
 
-sub GetAddress {
+sub AddressGet {
     my ( $Self, %Param ) = @_;
     
     my %Result;
@@ -100,17 +100,17 @@ sub GetAddress {
 }
 
 
-=item AddAddress()
+=item AddressAdd()
 
 Adds a new email address
 
-    my $Result = $AddressBookObject->AddAddress(
+    my $Result = $AddressBookObject->AddressAdd(
         Email => 'some email address',
     );
 
 =cut
 
-sub AddAddress {
+sub AddressAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -176,7 +176,7 @@ sub AddressUpdate {
     }
     
     my $EmailLower = $Param{Email};
-    
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -184,7 +184,7 @@ sub AddressUpdate {
     return if !$DBObject->Do(
         SQL => 'UPDATE addressbook SET email = ?, email_lower = ? WHERE id = ?',
         Bind => [
-            \$Param{Email}, \$EmailLower, \$Param{AddressBookID},
+            \$Param{Email}, \$EmailLower, \$Param{ID},
         ],
     );
 
@@ -273,21 +273,21 @@ sub AddressList {
     return %Result;
 }
 
-=item DeleteAddress()
+=item AddressDelete()
 
 Delete a email addresses.
 
-    my $Result = $AddressBookObject->DeleteAddress(
-        ID      => '...',
+    my $Result = $AddressBookObject->AddressDelete(
+        AddressBookID      => '...',
     );
 
 =cut
 
-sub AddressBookDelete {
+sub AddressDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(AddressBookID UserID)) {
+    for (qw(AddressID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -301,7 +301,7 @@ sub AddressBookDelete {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM addressbook WHERE id = ?',
-        Bind => [ \$Param{AddressBookID} ],
+        Bind => [ \$Param{AddressID} ],
     );
 
     # reset cache

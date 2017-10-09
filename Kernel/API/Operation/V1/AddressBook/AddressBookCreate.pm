@@ -93,6 +93,7 @@ sub Run {
         WebserviceID => $Self->{WebserviceID},
     );
 
+    # trim 
     if ( !$Result->{Success} ) {
         $Self->_Error(
             Code    => 'Webservice.InvalidConfiguration',
@@ -122,7 +123,7 @@ sub Run {
     my $EmailAddress = $Self->_Trim(
         Data => $Param{Data}->{EmailAddress},
     );        
-    
+   
     # check if AddressBook exists
     my $AddressBookListResult = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
         Search => $EmailAddress,
@@ -131,12 +132,12 @@ sub Run {
     if ( IsHashRefWithData($AddressBookListResult) ) {
         return $Self->_Error(
             Code    => 'AddressBookCreate.EmailAddressExists',
-            Message => "Can not create addressbook entry. Email address '$AddressBook->{Email}' already exists in address book.",
+            Message => "Can not create addressbook entry. Email address '$Param{Data}->{EmailAddress}' already exists in address book.",
         );
     }
 
     # create AddressBook
-    my $AddressBookID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddAddress(
+    my $AddressBookID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
         Email => $EmailAddress,
     );
 
