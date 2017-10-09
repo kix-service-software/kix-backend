@@ -144,7 +144,7 @@ sub AddressAdd {
 
         # delete cache
         $Self->{CacheObject}->CleanUp(
-            Type => 'AddressBook'
+            Type => $Self->{CacheType}
         );
 
         return 0 if !$Self->{DBObject}->Prepare(
@@ -212,7 +212,7 @@ sub Empty {
 
     # delete cache
     $Self->{CacheObject}->CleanUp(
-        Type => 'AddressBook'
+        Type => $Self->{CacheType}
     );
 
     return $Self->{DBObject}->Do(
@@ -241,7 +241,7 @@ sub AddressList {
     my $CacheTTL = 60 * 60 * 24 * 30;   # 30 days
     my $CacheKey = 'AddressList::'.$Param{Search};
     my $CacheResult = $Self->{CacheObject}->Get(
-        Type => 'AddressBook',
+        Type => $Self->{CacheType},
         Key  => $CacheKey
     );
     return %{$CacheResult} if (IsHashRefWithData($CacheResult));
@@ -271,7 +271,7 @@ sub AddressList {
 
     # set cache
     $Self->{CacheObject}->Set(
-        Type           => 'AddressBook',
+        Type           => $Self->{CacheType},
         Key            => $CacheKey,
         Value          => \%Result,
         TTL            => $CacheTTL,
