@@ -70,9 +70,7 @@ perform AddressBookCreate Operation. This will return the created AddressBookID.
 
     my $Result = $OperationObject->Run(
         Data => {
-	    	AddressBook  => {
-	        	Email    => '...',
-	    	},
+        	EmailAddress => '...',
 	    },
     );
 
@@ -106,11 +104,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'AddressBook' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'AddressBook::Email' => {
+            'EmailAddress' => {
                 Required => 1
             },
         }
@@ -124,42 +118,32 @@ sub Run {
         );
     }
 
-    # isolate AddressBook parameter
-    my $AddressBook = $Param{Data}->{AddressBook};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$AddressBook} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $AddressBook->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $AddressBook->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-      	
+    # trim 
+    my $EmailAddress = $Self->_Trim(
+        Data => $Param{Data}->{EmailAddress},
+    );        
+    
     # check if AddressBook exists
     my $AddressBookListResult = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
-        Search => $AddressBook->{Email},
+        Search => $EmailAddress,
     );
     
     if ( IsHashRefWithData($AddressBookListResult) ) {
         return $Self->_Error(
-            Code    => 'AddressBookCreate.AddressBookExists',
-            Message => "Can not create AddressBook. AddressBook with same email '$AddressBook->{Email}' already exists.",
+            Code    => 'AddressBookCreate.EmailAddressExists',
+            Message => "Can not create addressbook entry. Email address '$AddressBook->{Email}' already exists in address book.",
         );
     }
 
     # create AddressBook
     my $AddressBookID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddAddress(
-        Email => $AddressBook->{Email},
+        Email => $EmailAddress,
     );
 
     if ( !$AddressBookID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create address, please contact the system administrator',
+            Message => 'Could not create addressbook entry, please contact the system administrator',
         );
     }
     
