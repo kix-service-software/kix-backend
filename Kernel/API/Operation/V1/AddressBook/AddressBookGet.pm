@@ -151,8 +151,8 @@ sub Run {
         }
         my %AddressBook;
         
-        $AddressBook{ID} = $AddressBookID;
-        $AddressBook{Email} = $AddressBookData{$AddressBookID};
+        $AddressBook{ID}           = $AddressBookID;
+        $AddressBook{EmailAddress} = $AddressBookData{$AddressBookID};
         
         # add
         push(@AddressBookList, \%AddressBook);
