@@ -37,11 +37,11 @@
 /ticketstates/:StateID                                              |   GET             | V1::TicketState::TicketStateGet
 /ticketstates/:StateID                                              |   PATCH           | V1::TicketState::TicketStateUpdate
 /ticketstates/:StateID                                              |   DELETE          | V1::TicketState::TicketStateDelete
-/priority                                                           |   GET             | V1::Priority::PrioritySearch
-/priority                                                           |   POST            | V1::Priority::PriorityCreate
-/priority/:PriorityID                                               |   GET             | V1::Priority::PriorityGet
-/priority/:PriorityID                                               |   PATCH           | V1::Priority::PriorityUpdate
-/priority/:PriorityID                                               |   DELETE          | V1::Priority::PriorityDelete
+/priorities                                                         |   GET             | V1::Priority::PrioritySearch
+/priorities                                                         |   POST            | V1::Priority::PriorityCreate
+/priorities/:PriorityID                                             |   GET             | V1::Priority::PriorityGet
+/priorities/:PriorityID                                             |   PATCH           | V1::Priority::PriorityUpdate
+/priorities/:PriorityID                                             |   DELETE          | V1::Priority::PriorityDelete
 /statetypes                                                         |   GET             | V1::StateType::StateTypeSearch
 /statetypes/:StateTypeID                                            |   GET             | V1::StateType::StateTypeGet
 /valid                                                              |   GET             | V1::Valid::ValidSearch

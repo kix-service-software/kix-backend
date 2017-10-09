@@ -535,23 +535,23 @@ Provider:
         PrioritySearch:
           RequestMethod:
           - GET
-          Route: /priority
+          Route: /priorities
         PriorityCreate:
           RequestMethod:
           - POST
-          Route: /priority
+          Route: /priorities
         PriorityGet:
           RequestMethod:
           - GET
-          Route: /priority/:PriorityID
+          Route: /priorities/:PriorityID
         PriorityUpdate:
           RequestMethod:
           - PATCH
-          Route: /priority/:PriorityID
+          Route: /priorities/:PriorityID
         PriorityDelete:
           RequestMethod:
           - DELETE
-          Route: /priority/:PriorityID
+          Route: /priorities/:PriorityID
         StateTypeSearch:
           RequestMethod:
           - GET
