@@ -68,15 +68,14 @@ sub new {
 
 =item Run()
 
-perform AddressBookUpdate Operation. This will return the updated TypeID.
+perform AddressBookUpdate Operation. This will return the updated AddressBookID.
 
     my $Result = $OperationObject->Run(
         Data => {
             AddressBookID => 123,
             AddressBook   => {
-	            Name    => '...',
-	            Comment => '...',
-	            ValidID => 1,
+	            Email  => '...',
+	            ID     => '...',
             }
 	    },
 	);
@@ -87,7 +86,7 @@ perform AddressBookUpdate Operation. This will return the updated TypeID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            AddressBookID  => 123,                     # ID of the updated AddressBook 
+            AddressBookID  => 123,              # ID of the updated AddressBook 
         },
     };
    

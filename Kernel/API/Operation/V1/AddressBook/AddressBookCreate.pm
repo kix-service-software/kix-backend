@@ -71,9 +71,7 @@ perform AddressBookCreate Operation. This will return the created AddressBookID.
     my $Result = $OperationObject->Run(
         Data => {
 	    	AddressBook  => {
-	        	Name    => '...',
-	        	Comment => '...',                 # optional
-	        	ValidID => '...',                 # optional
+	        	Email    => '...',
 	    	},
 	    },
     );
@@ -91,8 +89,7 @@ perform AddressBookCreate Operation. This will return the created AddressBookID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
+
     # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
@@ -141,8 +138,7 @@ print STDERR "param".Dumper(\%Param);
             $AddressBook->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);        	
+      	
     # check if AddressBook exists
     my $AddressBookListResult = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
         Search => $AddressBook->{Email},
@@ -150,7 +146,7 @@ print STDERR "param".Dumper(\%Param);
     
     if ( IsHashRefWithData($AddressBookListResult) ) {
         return $Self->_Error(
-            Code    => 'AddressBookCreate.TypeExists',
+            Code    => 'AddressBookCreate.AddressBookExists',
             Message => "Can not create AddressBook. AddressBook with same email '$AddressBook->{Email}' already exists.",
         );
     }

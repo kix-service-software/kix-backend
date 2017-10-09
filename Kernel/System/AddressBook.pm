@@ -192,38 +192,6 @@ sub AddressUpdate {
     return 1;
 }
 
-
-=item DeleteAddress()
-
-Deletes a list of email addresses.
-
-    my $Result = $AddressBookObject->DeleteAddress(
-        IDs      => [...],
-    );
-
-=cut
-
-sub DeleteAddress {
-    my ( $Self, %Param ) = @_;
-
-    # check required params...
-    if ( !$Param{IDs} ) {
-        $Self->{LogObject}->Log( 
-            Priority => 'error', 
-            Message  => 'DeleteAddress: Need IDs!' );
-        return;
-    }
-
-    # delete cache
-    $Self->{CacheObject}->CleanUp(
-        Type => 'AddressBook'
-    );
-
-    return $Self->{DBObject}->Do(
-        SQL  => 'DELETE FROM addressbook WHERE id in ('.join(',', @{$Param{IDs}}).')',
-    );
-}
-
 =item Empty()
 
 Deletes all entries.
@@ -304,6 +272,16 @@ sub AddressList {
 
     return %Result;
 }
+
+=item DeleteAddress()
+
+Delete a email addresses.
+
+    my $Result = $AddressBookObject->DeleteAddress(
+        ID      => '...',
+    );
+
+=cut
 
 sub AddressBookDelete {
     my ( $Self, %Param ) = @_;
