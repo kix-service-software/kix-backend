@@ -58,6 +58,7 @@ sub new {
     $Self->{CacheObject}  = $Kernel::OM->Get('Kernel::System::Cache');
     $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{CacheType} = 'AddressBook';
+    
     return $Self;
 }
 
