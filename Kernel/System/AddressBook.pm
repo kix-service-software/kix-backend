@@ -84,7 +84,14 @@ sub AddressGet {
         return;
     }
    
-
+    # check cache
+    my $CacheKey = 'AddressGet::ID::' . $Param{ID};
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+    
     return if !$Self->{DBObject}->Prepare( 
         SQL   => "SELECT id, email FROM addressbook WHERE id=$Param{ID}",
         Limit => 50, 
