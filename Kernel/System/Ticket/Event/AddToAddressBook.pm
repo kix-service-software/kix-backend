@@ -104,7 +104,7 @@ sub Run {
             
             # nothing found => add this email address to the address book
             my $Result = $Self->{AddressBookObject}->AddressAdd(
-                Email => $CurrEmailAddress,
+                EmailAddress => $CurrEmailAddress,
             );
             if ( !$Result ) {
                 $Self->{LogObject}->Log(
