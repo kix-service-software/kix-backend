@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Group/GroupCreate.pm - API Group Create operation backend
+# Kernel/API/Operation/Role/RoleCreate.pm - API Role Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Group::GroupCreate;
+package Kernel::API::Operation::V1::Role::RoleCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Group::GroupCreate - API Group GroupCreate Operation backend
+Kernel::API::Operation::V1::Role::RoleCreate - API Role RoleCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform GroupCreate Operation. This will return the created GroupID.
+perform RoleCreate Operation. This will return the created RoleID.
 
     my $Result = $OperationObject->Run(
         Data => {
-	    	Group  => {
+	    	Role  => {
 	        	Name    => '...',
 	        	Comment => '...',                 # optional
 	        	ValidID => '...',                 # optional
@@ -83,7 +83,7 @@ perform GroupCreate Operation. This will return the created GroupID.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            GroupID  => '',                         # ID of the created group
+            RoleID  => '',                         # ID of the created Role
         },
     };
 
@@ -108,11 +108,11 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'Group' => {
+            'Role' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'Group::Name' => {
+            'Role::Name' => {
                 Required => 1
             },
         }
@@ -126,52 +126,52 @@ sub Run {
         );
     }
 
-    # isolate Group parameter
-    my $Group = $Param{Data}->{Group};
+    # isolate Role parameter
+    my $Role = $Param{Data}->{Role};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Group} ) {
+    for my $Attribute ( sort keys %{$Role} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $Group->{$Attribute} =~ s{\A\s+}{};
+            $Role->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $Group->{$Attribute} =~ s{\s+\z}{};
+            $Role->{$Attribute} =~ s{\s+\z}{};
         }
     }   
         	
-    # check if Group exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
-        Group => $Group->{Name},
+    # check if Role exists
+    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+        Role => $Role->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'GroupCreate.TypeExists',
-            Message => "Can not create Group. Group with same name '$Group->{Name}' already exists.",
+            Code    => 'RoleCreate.TypeExists',
+            Message => "Can not create Role. Role with same name '$Role->{Name}' already exists.",
         );
     }
 
-    # create Group
-    my $GroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupAdd(
-        Name    => $Group->{Name},
-        Comment => $Group->{Comment} || '',
-        ValidID => $Group->{ValidID} || 1,
+    # create Role
+    my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleAdd(
+        Name    => $Role->{Name},
+        Comment => $Role->{Comment} || '',
+        ValidID => $Role->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$GroupID ) {
+    if ( !$RoleID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create group, please contact the system administrator',
+            Message => 'Could not create Role, please contact the system administrator',
         );
     }
     
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        GroupID => $GroupID,
+        RoleID => $RoleID,
     );    
 }
 

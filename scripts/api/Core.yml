@@ -413,6 +413,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::AddressBook::AddressBookDelete
+    RoleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleSearch
+    RoleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleCreate
+    RoleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleGet
+    RoleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUpdate
+    RoleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleDelete
 
   Transport:
     Config:
@@ -651,6 +686,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /addressbook/:AddressID
+        RoleSearch:
+          RequestMethod:
+          - GET
+          Route: /roles
+        RoleCreate:
+          RequestMethod:
+          - POST
+          Route: /roles
+        RoleGet:
+          RequestMethod:
+          - GET
+          Route: /roles/:RoleID
+        RoleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /roles/:RoleID
+        RoleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /roles/:RoleID
 
     Type: HTTP::REST
 RemoteSystem: ''

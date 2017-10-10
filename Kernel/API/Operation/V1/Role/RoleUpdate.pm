@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Group/GroupCreate.pm - API Group Create operation backend
+# Kernel/API/Operation/Role/RoleUpdate.pm - API Role Update operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Group::GroupCreate;
+package Kernel::API::Operation::V1::Role::RoleUpdate;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Group::GroupCreate - API Group GroupCreate Operation backend
+Kernel::API::Operation::V1::Role::RoleUpdate - API Role Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,33 +61,38 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::RoleUpdate');
+
     return $Self;
 }
 
 =item Run()
 
-perform GroupCreate Operation. This will return the created GroupID.
+perform RoleUpdate Operation. This will return the updated TypeID.
 
     my $Result = $OperationObject->Run(
         Data => {
-	    	Group  => {
-	        	Name    => '...',
-	        	Comment => '...',                 # optional
-	        	ValidID => '...',                 # optional
-	    	},
+            RoleID => 123,
+            Role   => {
+	            Name    => '...',
+	            Comment => '...',
+	            ValidID => 1,
+            }
 	    },
-    );
+	);
+    
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            GroupID  => '',                         # ID of the created group
+        Success     => 1,                       # 0 or 1
+        Code        => '',                      # in case of error
+        Message     => '',                      # in case of error
+        Data        => {                        # result data payload after Operation
+            RoleID  => 123,                     # ID of the updated Role 
         },
     };
-
+   
 =cut
+
 
 sub Run {
     my ( $Self, %Param ) = @_;
@@ -106,16 +111,16 @@ sub Run {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Group' => {
-                Type     => 'HASH',
+        Data         => $Param{Data},
+        Parameters   => {
+            'RoleID' => {
                 Required => 1
             },
-            'Group::Name' => {
+            'Role' => {
+                Type => 'HASH',
                 Required => 1
             },
-        }
+        }        
     );
 
     # check result
@@ -126,53 +131,53 @@ sub Run {
         );
     }
 
-    # isolate Group parameter
-    my $Group = $Param{Data}->{Group};
+    # isolate Role parameter
+    my $Role = $Param{Data}->{Role};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Group} ) {
+    for my $Attribute ( sort keys %{$Role} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $Group->{$Attribute} =~ s{\A\s+}{};
+            $Role->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $Group->{$Attribute} =~ s{\s+\z}{};
+            $Role->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-        	
-    # check if Group exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
-        Group => $Group->{Name},
+
+    # check if Role exists 
+    my $RoleData = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+        RoleID => $Param{Data}->{RoleID},
     );
-    
-    if ( $Exists ) {
+  
+    if ( !$RoleData ) {
         return $Self->_Error(
-            Code    => 'GroupCreate.TypeExists',
-            Message => "Can not create Group. Group with same name '$Group->{Name}' already exists.",
+            Code    => 'Object.NotFound',
+            Message => "Cannot update Role. No Role with ID '$Param{Data}->{RoleID}' found.",
         );
     }
 
-    # create Group
-    my $GroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupAdd(
-        Name    => $Group->{Name},
-        Comment => $Group->{Comment} || '',
-        ValidID => $Group->{ValidID} || 1,
+    # update Role
+    my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleUpdate(
+        ID      => $Param{Data}->{RoleID},
+        Name    => $Param{Data}->{Role}->{Name} || $Role->{Name},
+        Comment => $Param{Data}->{Role}->{Comment} || $Role->{Comment},
+        ValidID => $Param{Data}->{Role}->{ValidID} || $Role->{ValidID},
         UserID  => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$GroupID ) {
+    if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create group, please contact the system administrator',
+            Code    => 'Object.UnableToUpdate',
+            Message => 'Could not update Role, please contact the system administrator',
         );
     }
-    
+
     # return result    
     return $Self->_Success(
-        Code   => 'Object.Created',
-        GroupID => $GroupID,
+        RoleID => $Param{Data}->{RoleID},
     );    
 }
 
-1;
+

@@ -2897,6 +2897,35 @@ sub GroupDelete {
     return 1;
 }
 
+sub RoleDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(RoleID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM Roles WHERE id = ?',
+        Bind => [ \$Param{RoleID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+
+}
 
 1;
 
