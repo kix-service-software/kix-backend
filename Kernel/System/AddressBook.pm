@@ -98,12 +98,34 @@ sub AddressGet {
         Limit => 50, 
     );
 
-    my $Count = 0;
+    my %Data;
+    
+    # fetch the result
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        $Result{ $Data[0] } = $Data[1];
+        %Data = (
+            ID    => $Data[0],
+            Email => $Data[1],
+        );
     }
 
-    return %Result;   
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Data,
+    );
+    
+    # no data found...
+    if ( !%Data ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "AddressBook '$Param{Email}' not found!",
+        );
+        return;
+    }
+    
+    return %Data;   
 
 }
 

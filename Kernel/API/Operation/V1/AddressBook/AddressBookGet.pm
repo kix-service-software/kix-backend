@@ -157,7 +157,7 @@ sub Run {
         # add
         push(@AddressBookList, \%AddressBook);
     }
-
+  
     if ( scalar(@AddressBookList) == 1 ) {
         return $Self->_Success(
             AddressBook => $AddressBookList[0],
