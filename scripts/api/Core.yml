@@ -642,15 +642,15 @@ Provider:
         AddressBookGet:
           RequestMethod:
           - GET
-          Route: /addressbook/:AddressBookID
+          Route: /addressbook/:AddressID
         AddressBookUpdate:
           RequestMethod:
           - PATCH
-          Route: /addressbook/:AddressBookID
+          Route: /addressbook/:AddressID
         AddressBookDelete:
           RequestMethod:
           - DELETE
-          Route: /addressbook/:AddressBookID
+          Route: /addressbook/:AddressID
 
     Type: HTTP::REST
 RemoteSystem: ''

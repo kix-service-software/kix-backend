@@ -76,7 +76,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            AddressBookID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            AddressID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -117,7 +117,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'AddressBookID' => {
+            'AddressID' => {
                 Type     => 'ARRAY',
                 Required => 1
             }                
@@ -136,26 +136,22 @@ sub Run {
 
     # start state loop
     State:    
-    foreach my $AddressBookID ( @{$Param{Data}->{AddressBookID}} ) {
+    foreach my $AddressID ( @{$Param{Data}->{AddressID}} ) {
 
         # get the AddressBook data
         my %AddressBookData = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
-            ID => $AddressBookID,             
+            AddressID => $AddressID,             
         );
 
         if ( !IsHashRefWithData( \%AddressBookData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for AddressBookID $AddressBookID.",
+                Message => "No data found for AddressID $AddressID.",
             );
         }
-        my %AddressBook;
-        
-        $AddressBook{ID}           = $AddressBookID;
-        $AddressBook{EmailAddress} = $AddressBookData{$AddressBookID};
         
         # add
-        push(@AddressBookList, \%AddressBook);
+        push(@AddressBookList, \%AddressBookData);
     }
   
     if ( scalar(@AddressBookList) == 1 ) {

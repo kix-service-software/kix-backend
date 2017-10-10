@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform AddressBookDelete Operation. This will return the deleted AddressBookID.
+perform AddressBookDelete Operation. This will return the deleted AddressID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            AddressBookID  => '...',
+            AddressID  => '...',
         },		
     );
 
@@ -98,7 +98,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'AddressBookID' => {
+            'AddressID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -117,11 +117,11 @@ sub Run {
   
     # start type loop
     TYPE:    
-    foreach my $AddressBookID ( @{$Param{Data}->{AddressBookID}} ) {
+    foreach my $AddressID ( @{$Param{Data}->{AddressID}} ) {
 
         # delete AddressBook	    
         my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressDelete(
-            AddressID  => $AddressBookID,
+            AddressID  => $AddressID,
             UserID  => $Self->{Authorization}->{UserID},
         );
 

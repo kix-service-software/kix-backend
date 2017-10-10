@@ -68,11 +68,11 @@ sub new {
 
 =item Run()
 
-perform AddressBookUpdate Operation. This will return the updated AddressBookID.
+perform AddressBookUpdate Operation. This will return the updated AddressID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            AddressBookID => 123,
+            AddressID => 123,
             EmailAddress  => '...',
 	    },
 	);
@@ -83,7 +83,7 @@ perform AddressBookUpdate Operation. This will return the updated AddressBookID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            AddressBookID  => 123,              # ID of the updated AddressBook 
+            AddressID  => 123,                  # ID of the updated AddressBook 
         },
     };
    
@@ -109,7 +109,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
         Parameters   => {
-            'AddressBookID' => {
+            'AddressID' => {
                 Required => 1
             },
             'EmailAddress' => {
@@ -133,13 +133,13 @@ sub Run {
 
     # check if AddressBook entry exists
     my %AddressBookEntry = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
-        ID => $Param{Data}->{AddressBookID},
+        AddressID => $Param{Data}->{AddressID},
     );
   
     if ( !%AddressBookEntry ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Cannot update addressbook entry. No entry with AddressBookID $Param{Data}->{AddressBookID} found",
+            Message => "Cannot update addressbook entry. No entry with AddressID $Param{Data}->{AddressID} found",
         );
     }
     
@@ -157,7 +157,7 @@ sub Run {
 
     # update AddressBook
     my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressUpdate(
-        ID      => $Param{Data}->{AddressBookID},
+        AddressID      => $Param{Data}->{AddressID},
         Email   => $EmailAddress,
     );
 
@@ -170,7 +170,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        AddressBookID => $Param{Data}->{AddressBookID},
+        AddressID => $Param{Data}->{AddressID},
     );    
 }
 

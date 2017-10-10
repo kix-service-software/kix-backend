@@ -65,7 +65,7 @@ sub new {
 
 =item Run()
 
-perform AddressBookSearch Operation. This will return a AddressBook ID list.
+perform AddressBookSearch Operation. This will return a Address ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -123,7 +123,7 @@ sub Run {
         my $AddressBookGetResult = $Self->ExecOperation(
             OperationType => 'V1::AddressBook::AddressBookGet',
             Data      => {
-                AddressBookID => join(',', sort keys %AddressBookList),
+                AddressID => join(',', sort keys %AddressBookList),
             }
         );    
 

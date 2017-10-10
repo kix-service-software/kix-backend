@@ -66,7 +66,7 @@ sub new {
 
 =item Run()
 
-perform AddressBookCreate Operation. This will return the created AddressBookID.
+perform AddressBookCreate Operation. This will return the created AddressID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -79,7 +79,7 @@ perform AddressBookCreate Operation. This will return the created AddressBookID.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            AddressBookID  => '',                   # ID of the created AddressBook
+            AddressID  => '',                       # ID of the created AddressBook
         },
     };
 
@@ -137,11 +137,11 @@ sub Run {
     }
 
     # create AddressBook
-    my $AddressBookID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
+    my $AddressID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
         Email => $EmailAddress,
     );
 
-    if ( !$AddressBookID ) {
+    if ( !$AddressID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create addressbook entry, please contact the system administrator',
@@ -151,7 +151,7 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        AddressBookID => $AddressBookID,
+        AddressID => $AddressID,
     );    
 }
 

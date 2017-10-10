@@ -67,7 +67,7 @@ sub new {
 Get a email address.
 
     my $Result = $AddressBookObject->AddressGet(
-        ID      => '...',
+        AddressID      => '...',
     );
 
 =cut
@@ -78,15 +78,15 @@ sub AddressGet {
     my %Result;
 
     # check required params...
-    if ( !$Param{ID} ) {
+    if ( !$Param{AddressID} ) {
         $Self->{LogObject}->Log( 
             Priority => 'error', 
-            Message  => 'DeleteAddress: Need ID!' );
+            Message  => 'DeleteAddress: Need AddressID!' );
         return;
     }
    
     # check cache
-    my $CacheKey = 'AddressGet::ID::' . $Param{ID};
+    my $CacheKey = 'AddressGet::' . $Param{AddressID};
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -94,7 +94,7 @@ sub AddressGet {
     return %{$Cache} if $Cache;
     
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT id, email FROM addressbook WHERE id=$Param{ID}",
+        SQL   => "SELECT id, email FROM addressbook WHERE id=$Param{AddressID}",
         Limit => 50, 
     );
 
@@ -103,7 +103,7 @@ sub AddressGet {
     # fetch the result
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
         %Data = (
-            ID    => $Data[0],
+            AddressID    => $Data[0],
             Email => $Data[1],
         );
     }
@@ -195,7 +195,7 @@ sub AddressUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(ID Email)) {
+    for my $Needed (qw(AddressID Email)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -214,7 +214,7 @@ sub AddressUpdate {
     return if !$DBObject->Do(
         SQL => 'UPDATE addressbook SET email = ?, email_lower = ? WHERE id = ?',
         Bind => [
-            \$Param{Email}, \$EmailLower, \$Param{ID},
+            \$Param{Email}, \$EmailLower, \$Param{AddressID},
         ],
     );
 
@@ -308,7 +308,7 @@ sub AddressList {
 Delete a email addresses.
 
     my $Result = $AddressBookObject->AddressDelete(
-        AddressBookID      => '...',
+        AddressID      => '...',
     );
 
 =cut
