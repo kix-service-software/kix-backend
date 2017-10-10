@@ -103,8 +103,8 @@ sub Run {
             next MAILADDRESS if (%AddressList);
             
             # nothing found => add this email address to the address book
-            my $Result = $Self->{AddressBookObject}->AddAddress(
-                Email => $CurrEmailAddress,
+            my $Result = $Self->{AddressBookObject}->AddressAdd(
+                EmailAddress => $CurrEmailAddress,
             );
             if ( !$Result ) {
                 $Self->{LogObject}->Log(
