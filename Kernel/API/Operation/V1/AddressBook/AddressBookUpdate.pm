@@ -158,7 +158,7 @@ sub Run {
     # update AddressBook
     my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressUpdate(
         AddressID      => $Param{Data}->{AddressID},
-        Email   => $EmailAddress,
+        EmailAddress   => $EmailAddress,
     );
 
     if ( !$Success ) {

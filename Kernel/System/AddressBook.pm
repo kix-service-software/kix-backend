@@ -94,7 +94,8 @@ sub AddressGet {
     return %{$Cache} if $Cache;
     
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT id, email FROM addressbook WHERE id=$Param{AddressID}",
+        SQL   => "SELECT id, email FROM addressbook WHERE id = ?",
+        Bind => [ \$Param{AddressID} ],
         Limit => 50, 
     );
 
@@ -104,27 +105,27 @@ sub AddressGet {
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
         %Data = (
             AddressID    => $Data[0],
-            Email => $Data[1],
+            EmailAddress => $Data[1],
         );
     }
-
+    
+    # no data found...
+    if ( !%Data ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "AddressBook '$Param{AddressID}' not found!",
+        );
+        return;
+    }
+    
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Data,
-    );
-    
-    # no data found...
-    if ( !%Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "AddressBook '$Param{Email}' not found!",
-        );
-        return;
-    }
-    
+    ); 
+       
     return %Data;   
 
 }
@@ -135,7 +136,7 @@ sub AddressGet {
 Adds a new email address
 
     my $Result = $AddressBookObject->AddressAdd(
-        Email => 'some email address',
+        EmailAddress => 'some email address',
     );
 
 =cut
@@ -144,20 +145,20 @@ sub AddressAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Email)) {
+    for (qw(EmailAddress)) {
         if ( !defined( $Param{$_} ) ) {
             $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
-    my $EmailLower = lc($Param{Email});
+    my $EmailLower = lc($Param{EmailAddress});
   
     # do the db insert...
     my $DBInsert = $Self->{DBObject}->Do(
         SQL  => "INSERT INTO addressbook (email, email_lower) VALUES (?, ?)",
         Bind => [
-            \$Param{Email},
+            \$Param{EmailAddress},
             \$EmailLower
         ],
     );
@@ -173,7 +174,7 @@ sub AddressAdd {
         return 0 if !$Self->{DBObject}->Prepare(
             SQL  => 'SELECT max(id) FROM addressbook WHERE email = ?',
             Bind => [ 
-                \$Param{Email}
+                \$Param{EmailAddress}
             ],
         );
 
@@ -195,7 +196,7 @@ sub AddressUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(AddressID Email)) {
+    for my $Needed (qw(AddressID EmailAddress)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -205,7 +206,7 @@ sub AddressUpdate {
         }
     }
     
-    my $EmailLower = $Param{Email};
+    my $EmailLower = $Param{EmailAddress};
 
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
@@ -214,7 +215,7 @@ sub AddressUpdate {
     return if !$DBObject->Do(
         SQL => 'UPDATE addressbook SET email = ?, email_lower = ? WHERE id = ?',
         Bind => [
-            \$Param{Email}, \$EmailLower, \$Param{AddressID},
+            \$Param{EmailAddress}, \$EmailLower, \$Param{AddressID},
         ],
     );
 

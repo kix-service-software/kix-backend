@@ -138,7 +138,7 @@ sub Run {
 
     # create AddressBook
     my $AddressID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
-        Email => $EmailAddress,
+        EmailAddress => $EmailAddress,
     );
 
     if ( !$AddressID ) {
