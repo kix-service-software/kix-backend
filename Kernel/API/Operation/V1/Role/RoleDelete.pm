@@ -114,14 +114,16 @@ sub Run {
     }
     
     my $Message = '';
-  
-    # start type loop
-    TYPE:    
+    
+    # get permission type list
+    my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Group')->_PermissionTypeList();
+
+    # start Role loop
+    ROLE:    
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
         # search Role user       
         my %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserGet(
-            Type    => 'move_into',
             RoleID => $RoleID,
         );
    
@@ -132,17 +134,19 @@ sub Run {
             );
         }
 
-        # search Role role       
-        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleGroupGet(
-            Type    => 'move_into',
-            RoleID => $RoleID,
-        );
-  
-        if ( IsHashRefWithData(\%ResultRoleList) ) {
-            return $Self->_Error(
-                Code    => 'RoleDelete.RolesExists',
-                Message => 'Cannot delete Role. This Role is assgined to at least one role.',
-            );
+        foreach my $Type ( @{\%PermissionTypeList}} ) {
+	        # search Role role       
+	        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleGroupGet(
+	            Type    => $Type,
+	            RoleID => $RoleID,
+	        );
+	  
+	        if ( IsHashRefWithData(\%ResultRoleList) ) {
+	            return $Self->_Error(
+	                Code    => 'RoleDelete.GroupExists',
+	                Message => 'Cannot delete Role. This Role is assgined to at least one group.',
+	            );
+	        }
         }
         
         # delete Role	    

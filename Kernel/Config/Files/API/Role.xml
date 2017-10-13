@@ -53,7 +53,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Role</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Role=admin:rw</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

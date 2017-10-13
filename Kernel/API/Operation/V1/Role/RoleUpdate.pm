@@ -161,9 +161,9 @@ sub Run {
     # update Role
     my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleUpdate(
         ID      => $Param{Data}->{RoleID},
-        Name    => $Param{Data}->{Role}->{Name} || $Role->{Name},
-        Comment => $Param{Data}->{Role}->{Comment} || $Role->{Comment},
-        ValidID => $Param{Data}->{Role}->{ValidID} || $Role->{ValidID},
+        Name    => $Role->{Name},
+        Comment => $Role->{Comment} || '',
+        ValidID => $Role->{ValidID}  || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
 
