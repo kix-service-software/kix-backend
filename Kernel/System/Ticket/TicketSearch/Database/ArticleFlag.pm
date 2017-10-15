@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::TicketSearch::Database::TicketFlag;
+package Kernel::System::Ticket::TicketSearch::Database::ArticleFlag;
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketSearch::Database::TicketFlag - attribute module for database ticket search
+Kernel::System::Ticket::TicketSearch::Database::ArticleFlag - attribute module for database ticket search
 
 =head1 SYNOPSIS
 
@@ -51,10 +51,8 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
-            'TicketFlag',
-        ],
-        Sort => []
+        Filter => [ 'ArticleFlag' ],
+        Sort   => []
     };
 }
 
@@ -108,31 +106,33 @@ sub Filter {
             }
             
             if ( !$Param{Filter}->{Not} ) {
-                push( @SQLJoin, "INNER JOIN ticket_flag tf$Index ON st.id = tf$Index.ticket_id" );
-                push( @SQLWhere, "tf$Index.ticket_key = '$FilterValue->{Flag}'" );
+                push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
+                push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag$Index.id = af$Index.article_id" );
+                push( @SQLWhere, "af$Index.article_key = '$FilterValue->{Flag}'" );
             }
             else {
-                push( @SQLJoin, "LEFT JOIN ticket_flag ntf$Index ON st.id = ntf$Index.ticket_id" );
-                push( @SQLWhere, "ntf$Index.ticket_key = '$FilterValue->{Flag}'" );
+                push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
+                push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag$Index.id = af$Index.article_id" );
+                push( @SQLWhere, "naf$Index.article_key = '$FilterValue->{Flag}'" );
             }
 
             # add value restriction if given
             if ( $FilterValue->{Value} ) {
                 if ( !$Param{Filter}->{Not} ) {
-                    push( @SQLWhere, "tf$Index.ticket_value = '$FilterValue->{Value}'" );
+                    push( @SQLWhere, "af$Index.article_value = '$FilterValue->{Value}'" );
                 }
                 else {
-                    push( @SQLWhere, "(ntf$Index.ticket_value IS NULL OR ntf$Index.ticket_value <> '$FilterValue->{Value}')" );
+                    push( @SQLWhere, "(naf$Index.article_value IS NULL OR naf$Index.article_value <> '$FilterValue->{Value}')" );
                 }
             }
 
             # add user restriction if given
             if ( $FilterValue->{UserID} ) {
                 if ( !$Param{Filter}->{Not} ) {
-                    push( @SQLWhere, "tf$Index.create_by = $FilterValue->{UserID}" );
+                    push( @SQLWhere, "af$Index.create_by = $FilterValue->{UserID}" );
                 }
                 else {
-                    push( @SQLWhere, "ntf$Index.create_by = $FilterValue->{UserID}" );                    
+                    push( @SQLWhere, "naf$Index.create_by = $FilterValue->{UserID}" );                    
                 }
             }
             $Index++;

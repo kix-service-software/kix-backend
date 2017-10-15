@@ -36,32 +36,42 @@ Kernel::System::Ticket::TicketSearch::Database::History - attribute module for d
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'CreatedTypeID',
-        'CreatedUserID',
-        'CreatedStateID',
-        'CloseDate',
-        'ChangeDate',
-    );
+    return {
+        Filter => [
+            'CreatedTypeID',
+            'CreatedUserID',
+            'CreatedStateID',
+            'CloseTime',
+            'ChangeTime',
+        ],
+        Sort => [
+            'CreatedTypeID',
+            'CreatedUserID',
+            'CreatedStateID',
+            'CloseTime',
+            'ChangeTime',            
+        ]
+    };
 }
 
 
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -71,7 +81,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
@@ -101,6 +111,17 @@ sub Run {
     }
 
     if ( $Param{Filter}->{Field} =~ /(Change|Close)Time/ ) {
+
+        # convert to unix time
+        my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            String => $Param{Filter}->{Value},
+        );
+
+        if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
+            # return in case of some format error or if the date is in the future
+            return;
+        }
+
         my %OperatorMap = (
             'EQ'  => '=',
             'LT'  => '<',
@@ -109,15 +130,15 @@ sub Run {
             'GTE' => '>='
         );
 
-        if ( !$OperatorMap{$Param{Filter}->{Operation}} ) {
+        if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
             );
             return;
         }
 
-        push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Filter}->{Operation}}." '".$Param{Filter}->{Value}."'" );
+        push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Filter}->{Operator}}." '".$Param{Filter}->{Value}."'" );
 
         if ( $Param{Filter}->{Field} eq 'CloseTime' ) {
             # get close state ids
@@ -125,26 +146,26 @@ sub Run {
                 StateType => ['closed'],
                 Result    => 'ID',
             );
-            my @StateID = ( $Self->HistoryTypeLookup( Type => 'NewTicket' ) );
-            push( @StateID, $Self->HistoryTypeLookup( Type => 'StateUpdate' ) );
+            my @StateID = ( $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'NewTicket' ) );
+            push( @StateID, $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'StateUpdate' ) );
             if (@StateID) {
-                push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)) );
-                push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)) );
+                push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
+                push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
             }
         }
     }
     else {
         # all other attributes
-        if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-            push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.'='.$Param{Filter}->{Value} );
+        if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+            push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' = '.$Param{Filter}->{Value} );
         }
-        elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
+        elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
             push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
             );
             return;
         }
@@ -160,6 +181,45 @@ sub Run {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        'ChangeTime'        => 'st.change_time',
+        'CloseTime'         => 'th.create_time',
+        'CreatedTypeID'     => 'th.type_id',
+        'CreatedStateID'    => 'th.state_id',
+        'CreatedUserID'     => 'th.create_by',
+        'CreatedQueueID'    => 'th.queue_id',
+        'CreatedPriorityID' => 'th.priority_id',
+    );
+
+    return {
+        SQLAttrs => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+        SQLOrderBy => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+    };       
 }
 
 1;

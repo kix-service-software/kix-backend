@@ -36,29 +36,36 @@ Kernel::System::Ticket::TicketSearch::Database::Customer - attribute module for 
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'CustomerID',
-        'CustomerUserID',
-    );
+    return {
+        Filter => [ 
+            'CustomerID',
+            'CustomerUserID',
+        ],
+        Sort => [
+            'CustomerID',
+            'CustomerUserID',
+        ]
+    }
 }
 
 
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -68,7 +75,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
@@ -86,31 +93,65 @@ sub Run {
         'CustomerUserID' => 'st.customer_user_id',
     );
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Attribute}}."='".$Param{Filter}->{Value}."'" );
+    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." = '".$Param{Filter}->{Value}."'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'STARTSWITH' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Attribute}}." LIKE '".$Param{Filter}->{Value}."%'" );
+    elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." LIKE '".$Param{Filter}->{Value}."%'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'ENDSWITH' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Attribute}}." LIKE '%".$Param{Filter}->{Value}."'" );
+    elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." LIKE '%".$Param{Filter}->{Value}."'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'CONTAINS' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Attribute}}." LIKE '%".$Param{Filter}->{Value}."%'" );
+    elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." LIKE '%".$Param{Filter}->{Value}."%'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Attribute}}." IN ('".(join("','", @{$Param{Filter}->{Value}}))."')" );
+    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." IN ('".(join("','", @{$Param{Filter}->{Value}}))."')" );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }
 
     return {
         SQLWhere => \@SQLWhere,
+    };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        'CustomerID'     => 'st.customer_id',
+        'CustomerUserID' => 'st.customer_user_id',
+    );
+
+    return {
+        SQLAttrs => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+        SQLOrderBy => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
     };        
 }
 

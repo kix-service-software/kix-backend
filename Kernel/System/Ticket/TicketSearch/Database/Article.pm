@@ -22,7 +22,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketSearch::Database::History - attribute module for database ticket search
+Kernel::System::Ticket::TicketSearch::Database::Article - attribute module for database ticket search
 
 =head1 SYNOPSIS
 
@@ -36,34 +36,36 @@ Kernel::System::Ticket::TicketSearch::Database::History - attribute module for d
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'From',
-        'To',
-        'Cc',
-        'Subject',
-        'Body',
-        'AttachmentName',
-        'ArticleCreateTime'
-    );
+    return {
+        Filter => [
+            'From',
+            'To',
+            'Cc',
+            'Subject',
+            'Body',
+            'ArticleCreateTime'
+        ],
+        Sort => []
+    }
 }
 
-
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -74,7 +76,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
@@ -109,6 +111,16 @@ sub Run {
     }
 
     if ( $Param{Filter}->{Field} =~ /ArticleCreateTime/ ) {
+        # convert to unix time
+        my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            String => $Param{Filter}->{Value},
+        );
+
+        if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
+            # return in case of some format error or if the date is in the future
+            return;
+        }
+
         my %OperatorMap = (
             'EQ'  => '=',
             'LT'  => '<',
@@ -117,41 +129,39 @@ sub Run {
             'GTE' => '>='
         );
 
-        if ( !$OperatorMap{$Param{Filter}->{Operation}} ) {
+        if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
             );
             return;
         }
 
-        # convert to unix time
-        my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-            String => $Param{Filter}->{Value},
-        );
-
-        push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Filter}->{Operation}}.' '.$Value );
+        push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Filter}->{Operator}}.' '.$Value );
     }
     else {
         my $Field      = $AttributeMapping{$Param{Filter}->{Field}};
         my $FieldValue = $Param{Filter}->{Value};
 
-        if ( $Param{Filter}->{Operation} eq 'EQ' ) {
+        if ( $Param{Filter}->{Operator} eq 'EQ' ) {
             # no special handling
         }
-        elsif ( $Param{Filter}->{Operation} eq 'STARTSWITH' ) {
+        elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
             $FieldValue = $FieldValue.'%';
         }
-        elsif ( $Param{Filter}->{Operation} eq 'ENDSWITH' ) {
+        elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
             $FieldValue = '%'.$FieldValue;
         }
-        elsif ( $Param{Filter}->{Operation} eq 'CONTAINS' ) {
+        elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
             $FieldValue = '%'.$FieldValue.'%';
+        }
+        elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+            $FieldValue =~ s/\*/%/g;
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
             );
             return;
         }
@@ -174,6 +184,19 @@ sub Run {
         push( @SQLWhere, $Field.' LIKE '.$FieldValue );
     }
     
+    # restrict search from customers to only customer articles
+    if ( $Param{UserType} eq 'Customer' ) {
+        my %CustomerArticleTypes = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeList(
+            Result => 'HASH',
+            Type   => 'Customer',
+        );
+        my @CustomerArticleTypeIDs = keys %CustomerArticleTypes;
+
+        if ( @CustomerArticleTypeIDs ) {
+            push( @SQLWhere, 'art.article_type_id IN ('.(join(', ', sort @CustomerArticleTypeIDs)).')' );
+        }
+    }
+
     return {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,

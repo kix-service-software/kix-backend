@@ -36,29 +36,36 @@ Kernel::System::Ticket::TicketSearch::Database::OwnerResponsible - attribute mod
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'OwnerID',
-        'ResponsibleID',
-    );
+    return {
+        Filter => [
+            'OwnerID',
+            'ResponsibleID',
+        ],
+        Sort => [
+            'OwnerID',
+            'ResponsibleID',            
+        ]
+    };
 }
 
 
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -68,7 +75,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
@@ -86,16 +93,16 @@ sub Run {
         'ResponsibleID' => 'st.responsible_user_id',
     );
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.'='.$Param{Filter}->{Value} );
+    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' = '.$Param{Filter}->{Value} );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
         push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }
@@ -103,6 +110,40 @@ sub Run {
     return {
         SQLWhere => \@SQLWhere,
     };        
+}
+
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    my %AttributeMapping = (
+        'OwnerID'       => 'st.user_id',
+        'ResponsibleID' => 'st.responsible_user_id',
+    );
+
+    return {
+        SQLAttrs => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+        SQLOrderBy => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+    };       
 }
 
 1;

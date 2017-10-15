@@ -11,6 +11,8 @@ package Kernel::System::Ticket::TicketSearch::Database::State;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
 );
@@ -36,28 +38,36 @@ Kernel::System::Ticket::TicketSearch::Database::State - attribute module for dat
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'StateID',
-    );
+    return {
+        Filter => [
+            'StateID',
+            'StateType'
+        ],
+        Sort => [
+            'StateID',
+            'StateType',
+        ]
+    };
 }
 
 
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -67,7 +77,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
@@ -80,16 +90,104 @@ sub Run {
         return;
     }
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, 'st.ticket_state_id='.$Param{Filter}->{Value} );
+    my $Operator = $Param{Filter}->{Operator};
+    my $Value    = $Param{Filter}->{Value};
+
+    # special handling for StateType
+    if ( $Param{Filter}->{Field} eq 'StateType' ) {
+
+        # get all StateIDs for the given StateTypes
+        my @StateTypes = ( $Value );
+        if ( IsArrayRefWithData($Value) ) {
+            @StateTypes = @{$Value};
+        }
+
+        my @StateIDs;
+        foreach my $StateType ( @StateTypes ) {
+            
+            if ( $StateType eq 'Open' ) {
+                # get all viewable states
+                my @ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                    Type   => 'Viewable',
+                    Result => 'ID',
+                );
+                push(@StateIDs, @ViewableStateIDs);
+            }
+            elsif ( $StateType eq 'Closed' ) {
+                # get all non-viewable states
+                my %AllStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateList(
+                    UserID => 1,
+                );
+                my %ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                    Type   => 'Viewable',
+                    Result => 'HASH',
+                );
+                foreach my $StateID ( sort keys %AllStateIDs ) {
+                    next if $ViewableStateIDs{$StateID};
+                    push(@StateIDs, $StateID);
+                }
+            }
+            else {
+                my @StateTypeStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                    StateType => $StateType,
+                    Result    => 'ID',
+                );
+                if ( !@StateTypeStateIDs ) {
+                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        Priority => 'error',
+                        Message  => "No states found for StateType $StateType!",
+                    );
+                    return;
+                }                
+                push(@StateIDs, @StateTypeStateIDs);
+            }
+        }
+
+        $Value = \@StateIDs;
+        $Operator = 'IN';
     }
-    elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
-        push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+    elsif ( $Param{Filter}->{Field} eq 'StateTypeID' ) {
+
+        # get all StateIDs for the given StateTypeIDs
+        my @StateTypeIDs = ( $Value );
+        if ( IsArrayRefWithData($Value) ) {
+            @StateTypeIDs = @{$Value};
+        }
+
+        my @StateIDs;
+        foreach my $StateTypeID ( @StateTypeIDs ) {       
+            my $StateType = $Kernel::OM->Get('Kernel::System::State')->StateTypeLookup(
+                StateTypeID => $StateTypeID,
+            );
+            if ( !$StateType ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "No StateType with ID $StateTypeID!",
+                );
+                return;
+            }
+            my @StateTypeStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                StateType => $StateType,
+                Result    => 'ID',
+            );
+            push(@StateIDs, @StateTypeStateIDs);
+        }
+
+        $Value = \@StateIDs;
+        $Operator = 'IN';
+    }
+
+
+    if ( $Operator eq 'EQ' ) {
+        push( @SQLWhere, 'st.ticket_state_id = '.$Value );
+    }
+    elsif ( $Operator eq 'IN' ) {
+        push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @{$Value})).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }

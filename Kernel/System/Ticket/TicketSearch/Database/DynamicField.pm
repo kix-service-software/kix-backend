@@ -36,38 +36,41 @@ Kernel::System::Ticket::TicketSearch::Database::DynamicField - attribute module 
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'DynamicField_\w+',
-    );
+    return {
+        Filter => [ 'DynamicField_\w+' ],
+        Sort   => []
+    };
 }
 
 
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
     $Result = {
+        SQLJoin    => [ ],
         SQLWhere   => [ ],
     };
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
@@ -80,21 +83,18 @@ sub Run {
         return;
     }
 
-    # init DF lists
     if ( !$Self->{DynamicFields} ) {
 
         # get dynamic field object
         my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
 
-        # Check all configured ticket dynamic fields
+        # get all configured dynamic fields
         $Self->{DynamicFields} = $DynamicFieldObject->DynamicFieldListGet();
     }
-    
 
     # get dynamic field backend object
     my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
 
-    #         my $SQLExtSub = ' AND (';
     #         my $Counter   = 0;
     #         TEXT:
     #         for my $Text (@SearchParams) {
@@ -172,22 +172,27 @@ sub Run {
     #     }
     # }
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
+    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, "st.title='".$Param{Filter}->{Value}."'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'STARTSWITH' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
         push( @SQLWhere, "st.title LIKE '".$Param{Filter}->{Value}."%'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'ENDSWITH' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
         push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'CONTAINS' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
         push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."%'" );
+    }
+    elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+        my $Value = $Param{Filter}->{Value};
+        $Value =~ s/\*/%/g;
+        push( @SQLWhere, "st.title LIKE '".$Value."'" );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }

@@ -44,29 +44,50 @@ sub new {
     return $Self;
 }
 
+=item Init()
+
+empty method to be overridden by specific attribute module if necessary
+
+    $Object->Init();
+
+=cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    # reset join marker
+    $Self->{AlreadyJoined} = 0;
+
+    return;
+}
+
 =item GetSupportedAttributes()
 
 empty method to be overridden by specific attribute module
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return ();
+    return {
+        Filter => [],
+        Sort   => []
+    };
 }
 
-=item Run()
+=item Filter()
 
 empty method to be overridden by specific attribute module
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -80,7 +101,28 @@ empty method to be overridden by specific attribute module
 
 =cut
 
-sub Run {
+sub Filter {
+    my ( $Self, %Param ) = @_;
+
+    return;        
+}
+
+=item Sort()
+
+empty method to be overridden by specific attribute module
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
     my ( $Self, %Param ) = @_;
 
     return;        

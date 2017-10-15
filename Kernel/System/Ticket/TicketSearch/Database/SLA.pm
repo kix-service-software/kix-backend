@@ -36,28 +36,34 @@ Kernel::System::Ticket::TicketSearch::Database::SLA - attribute module for datab
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'SLAID',
-    );
+    return {
+        Filter => [
+            'SLAID',
+        ],
+        Sort => [
+            'SLAID',
+        ]
+    };
 }
 
 
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -67,7 +73,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
@@ -80,16 +86,16 @@ sub Run {
         return;
     }
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, 'st.sla_id='.$Param{Filter}->{Value} );
+    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, 'st.sla_id = '.$Param{Filter}->{Value} );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'IN' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.sla_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }
@@ -97,6 +103,34 @@ sub Run {
     return {
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        SQLAttrs => [
+            'st.sla_id'
+        ],
+        SQLOrderBy => [
+            'st.sla_id'
+        ],
+    };       
 }
 
 1;

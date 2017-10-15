@@ -36,34 +36,47 @@ Kernel::System::Ticket::TicketSearch::Database::TicketTimes - attribute module f
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'CreateTime',
-        'PendingTime',
-        'LastChangeTime',
-        'EscalationTime',
-        'EscalationUpdateTime',
-        'EscalationResponseTime',
-        'EscalationSolutionTime',
-    );
+    return {
+        Filter => [
+            'Age',
+            'CreateTime',
+            'PendingTime',
+            'LastChangeTime',
+            'EscalationTime',
+            'EscalationUpdateTime',
+            'EscalationResponseTime',
+            'EscalationSolutionTime',
+        ],
+        Sort => [
+            'Age',
+            'CreateTime',
+            'PendingTime',
+            'LastChangeTime',
+            'EscalationTime',
+            'EscalationUpdateTime',
+            'EscalationResponseTime',
+            'EscalationSolutionTime',            
+        ]
+    }
 }
 
-
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -73,7 +86,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my $Value;
     my @SQLWhere;
@@ -89,6 +102,7 @@ sub Run {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
+        Age                    => 'st.create_time_unix',        
         CreateTime             => 'st.create_time_unix',
         PendingTime            => 'st.until_time',
         LastChangeTime         => 'st.change_time',
@@ -98,15 +112,17 @@ sub Run {
         EscalationSolutionTime => 'st.escalation_solution_time',
     );
 
-    # prepare value
-    if ( $Param{Filter}->{Field} =~ /^(Pending|Escalation)/ ) {
-        # convert to unix time
-        $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-            String => $Param{Filter}->{Value},
-        );
+    # convert to unix time and check
+    $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        String => $Param{Filter}->{Value},
+    );
+    if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
+        # return in case of some format error or if the date is in the future
+        return;
     }
-    else {
-        # handle value as string
+
+    if ( $Param{Filter}->{Field} !~ /^(Create|Pending|Escalation)/ ) {
+        # use original string value
         $Value = "'".$Param{Filter}->{Value}."'";
     }
 
@@ -118,15 +134,15 @@ sub Run {
         'GTE' => '>='
     );
 
-    if ( !$OperatorMap{$Param{Filter}->{Operation}} ) {
+    if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }
 
-    push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' '.$OperatorMap{$Param{Filter}->{Operation}}.' '.$Value );
+    push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' '.$OperatorMap{$Param{Filter}->{Operator}}.' '.$Value );
 
     # some special handling
     if ( $Param{Filter}->{Field} =~ /^Escalation/ ) {
@@ -147,6 +163,46 @@ sub Run {
     return {
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Age                    => 'st.create_time_unix',
+        CreateTime             => 'st.create_time_unix',
+        PendingTime            => 'st.until_time',
+        LastChangeTime         => 'st.change_time',
+        EscalationTime         => 'st.escalation_time',
+        EscalationUpdateTime   => 'st.escalation_update_time',
+        EscalationResponseTime => 'st.escalation_response_time',
+        EscalationSolutionTime => 'st.escalation_solution_time',
+    );
+
+    return {
+        SQLAttrs => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+        SQLOrderBy => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+    };       
 }
 
 1;

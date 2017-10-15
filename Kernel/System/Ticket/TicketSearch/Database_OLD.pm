@@ -626,114 +626,6 @@ sub TicketSearch {
         }
     }
 
-    my $ArticleJoinSQL = $Self->_ArticleIndexQuerySQL( Data => \%Param ) || '';
-
-    # sql, use also article table if needed
-    $SQLFrom .= $ArticleJoinSQL;
-
-    # only search for attachment name if Article Storage is set to DB
-    if (
-        $Param{AttachmentName}
-        && (
-            $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule') eq
-            'Kernel::System::Ticket::ArticleStorageDB'
-        )
-        )
-    {
-
-        # joins to article and article_attachments are needed, it can not use existing article joins
-        # otherwise the search will be limited to already matching articles
-        my $AttachmentJoinSQL = '
-        INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id
-        INNER JOIN article_attachment att ON att.article_id = art_for_att.id ';
-
-        # SQL, use also article_attachment table if needed
-        $SQLFrom .= $AttachmentJoinSQL;
-    }
-
-    # KIX4OTRS-capeIT
-    # add ticket flag table
-    if ( $Param{ArticleFlag} ) {
-        my $Index = 1;
-        if ( !$ArticleJoinSQL ) {
-            $ArticleJoinSQL = ' INNER JOIN article art ON st.id = art.ticket_id ';
-            $SQLFrom .= $ArticleJoinSQL;
-        }
-        $SQLFrom .= "INNER JOIN article_flag af ON art.id = af.article_id ";
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # KIX4OTRS-capeIT
-    # add article flag extension
-    if ( $Param{ArticleFlag} ) {
-
-        my $ArticleFlagUserID = $Param{ArticleFlagUserID} || $Param{UserID};
-        return if !defined $ArticleFlagUserID;
-
-        $SQLExt .=
-            " AND af.article_key = '" . $DBObject->Quote( $Param{ArticleFlag} ) . "'";
-        $SQLExt .=
-            " AND af.create_by = " . $DBObject->Quote($ArticleFlagUserID);
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # search article attributes
-    my $ArticleIndexSQLExt = $Self->_ArticleIndexQuerySQLExt( Data => \%Param );
-    $SQLExt .= $ArticleIndexSQLExt;
-
-    my %CustomerArticleTypes;
-    my @CustomerArticleTypeIDs;
-    if ( $Param{CustomerUserID} ) {
-        %CustomerArticleTypes = $Self->ArticleTypeList(
-            Result => 'HASH',
-            Type   => 'Customer',
-        );
-        @CustomerArticleTypeIDs = keys %CustomerArticleTypes;
-    }
-
-    # restrict search from customers to only customer articles
-    if ( $Param{CustomerUserID} && $ArticleIndexSQLExt ) {
-        $SQLExt .= $Self->_InConditionGet(
-            TableColumn => 'art.article_type_id',
-            IDRef       => \@CustomerArticleTypeIDs,
-        );
-    }
-
-    # only search for attachment name if Article Storage is set to DB
-    if (
-        $Param{AttachmentName}
-        && (
-            $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule') eq
-            'Kernel::System::Ticket::ArticleStorageDB'
-        )
-        )
-    {
-        $SQLExt .= ' AND ';
-
-        # replace wild card search
-        my $Key   = 'att.filename';
-        my $Value = $Param{AttachmentName};
-        $Value =~ s/\*/%/gi;
-
-        # use search condition extension
-        $SQLExt .= $DBObject->QueryCondition(
-            Key          => $Key,
-            Value        => $Value,
-            SearchPrefix => $Param{ContentSearchPrefix},
-            SearchSuffix => $Param{ContentSearchSuffix},
-        );
-
-        # restrict search from customers to only customer articles
-        if ( $Param{CustomerUserID} ) {
-            $SQLExt .= $Self->_InConditionGet(
-                TableColumn => 'art_for_att.article_type_id',
-                IDRef       => \@CustomerArticleTypeIDs,
-            );
-        }
-    }
-
     # Remember already joined tables for sorting.
     my %DynamicFieldJoinTables;
     my $DynamicFieldJoinCounter = 1;
@@ -834,121 +726,121 @@ sub TicketSearch {
         }
     }
 
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    # # get time object
+    # my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
 
-    # remember current time to prevent searches for future timestamps
-    my $CurrentSystemTime = $TimeObject->SystemTime();
+    # # remember current time to prevent searches for future timestamps
+    # my $CurrentSystemTime = $TimeObject->SystemTime();
 
-    # get articles created older/newer than x minutes or older/newer than a date
-    my %ArticleTime = (
-        ArticleCreateTime => 'art.incoming_time',
-    );
-    for my $Key ( sort keys %ArticleTime ) {
+    # # get articles created older/newer than x minutes or older/newer than a date
+    # my %ArticleTime = (
+    #     ArticleCreateTime => 'art.incoming_time',
+    # );
+    # for my $Key ( sort keys %ArticleTime ) {
 
-        # get articles created older than x minutes
-        if ( defined $Param{ $Key . 'OlderMinutes' } ) {
+    #     # get articles created older than x minutes
+    #     if ( defined $Param{ $Key . 'OlderMinutes' } ) {
 
-            $Param{ $Key . 'OlderMinutes' } ||= 0;
+    #         $Param{ $Key . 'OlderMinutes' } ||= 0;
 
-            my $Time = $TimeObject->SystemTime()
-                - ( $Param{ $Key . 'OlderMinutes' } * 60 );
+    #         my $Time = $TimeObject->SystemTime()
+    #             - ( $Param{ $Key . 'OlderMinutes' } * 60 );
 
-            $SQLExt .= " AND $ArticleTime{$Key} <= '$Time'";
-        }
+    #         $SQLExt .= " AND $ArticleTime{$Key} <= '$Time'";
+    #     }
 
-        # get articles created newer than x minutes
-        if ( defined $Param{ $Key . 'NewerMinutes' } ) {
+    #     # get articles created newer than x minutes
+    #     if ( defined $Param{ $Key . 'NewerMinutes' } ) {
 
-            $Param{ $Key . 'NewerMinutes' } ||= 0;
+    #         $Param{ $Key . 'NewerMinutes' } ||= 0;
 
-            my $Time = $TimeObject->SystemTime()
-                - ( $Param{ $Key . 'NewerMinutes' } * 60 );
+    #         my $Time = $TimeObject->SystemTime()
+    #             - ( $Param{ $Key . 'NewerMinutes' } * 60 );
 
-            $SQLExt .= " AND $ArticleTime{$Key} >= '$Time'";
-        }
+    #         $SQLExt .= " AND $ArticleTime{$Key} >= '$Time'";
+    #     }
 
-        # get articles created older than xxxx-xx-xx xx:xx date
-        my $CompareOlderNewerDate;
-        if ( $Param{ $Key . 'OlderDate' } ) {
-            if (
-                $Param{ $Key . 'OlderDate' }
-                !~ /(\d\d\d\d)-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
-                )
-            {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid time format '" . $Param{ $Key . 'OlderDate' } . "'!",
-                );
-                return;
-            }
+    #     # get articles created older than xxxx-xx-xx xx:xx date
+    #     my $CompareOlderNewerDate;
+    #     if ( $Param{ $Key . 'OlderDate' } ) {
+    #         if (
+    #             $Param{ $Key . 'OlderDate' }
+    #             !~ /(\d\d\d\d)-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
+    #             )
+    #         {
+    #             $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #                 Priority => 'error',
+    #                 Message  => "Invalid time format '" . $Param{ $Key . 'OlderDate' } . "'!",
+    #             );
+    #             return;
+    #         }
 
-            # convert param date to system time
-            my $SystemTime = $TimeObject->Date2SystemTime(
-                Year   => $1,
-                Month  => $2,
-                Day    => $3,
-                Hour   => $4,
-                Minute => $5,
-                Second => $6,
-            );
-            if ( !$SystemTime ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message =>
-                        "Search not executed due to invalid time '"
-                        . $Param{ $Key . 'OlderDate' } . "'!",
-                );
-                return;
-            }
-            $CompareOlderNewerDate = $SystemTime;
+    #         # convert param date to system time
+    #         my $SystemTime = $TimeObject->Date2SystemTime(
+    #             Year   => $1,
+    #             Month  => $2,
+    #             Day    => $3,
+    #             Hour   => $4,
+    #             Minute => $5,
+    #             Second => $6,
+    #         );
+    #         if ( !$SystemTime ) {
+    #             $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #                 Priority => 'error',
+    #                 Message =>
+    #                     "Search not executed due to invalid time '"
+    #                     . $Param{ $Key . 'OlderDate' } . "'!",
+    #             );
+    #             return;
+    #         }
+    #         $CompareOlderNewerDate = $SystemTime;
 
-            $SQLExt .= " AND $ArticleTime{$Key} <= '" . $SystemTime . "'";
+    #         $SQLExt .= " AND $ArticleTime{$Key} <= '" . $SystemTime . "'";
 
-        }
+    #     }
 
-        # get articles created newer than xxxx-xx-xx xx:xx date
-        if ( $Param{ $Key . 'NewerDate' } ) {
-            if (
-                $Param{ $Key . 'NewerDate' }
-                !~ /(\d\d\d\d)-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
-                )
-            {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid time format '" . $Param{ $Key . 'NewerDate' } . "'!",
-                );
-                return;
-            }
+    #     # get articles created newer than xxxx-xx-xx xx:xx date
+    #     if ( $Param{ $Key . 'NewerDate' } ) {
+    #         if (
+    #             $Param{ $Key . 'NewerDate' }
+    #             !~ /(\d\d\d\d)-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
+    #             )
+    #         {
+    #             $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #                 Priority => 'error',
+    #                 Message  => "Invalid time format '" . $Param{ $Key . 'NewerDate' } . "'!",
+    #             );
+    #             return;
+    #         }
 
-            # convert param date to system time
-            my $SystemTime = $TimeObject->Date2SystemTime(
-                Year   => $1,
-                Month  => $2,
-                Day    => $3,
-                Hour   => $4,
-                Minute => $5,
-                Second => $6,
-            );
-            if ( !$SystemTime ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message =>
-                        "Search not executed due to invalid time '"
-                        . $Param{ $Key . 'NewerDate' } . "'!",
-                );
-                return;
-            }
+    #         # convert param date to system time
+    #         my $SystemTime = $TimeObject->Date2SystemTime(
+    #             Year   => $1,
+    #             Month  => $2,
+    #             Day    => $3,
+    #             Hour   => $4,
+    #             Minute => $5,
+    #             Second => $6,
+    #         );
+    #         if ( !$SystemTime ) {
+    #             $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #                 Priority => 'error',
+    #                 Message =>
+    #                     "Search not executed due to invalid time '"
+    #                     . $Param{ $Key . 'NewerDate' } . "'!",
+    #             );
+    #             return;
+    #         }
 
-            # don't execute queries if newer date is after current date
-            return if $SystemTime > $CurrentSystemTime;
+    #         # don't execute queries if newer date is after current date
+    #         return if $SystemTime > $CurrentSystemTime;
 
-            # don't execute queries if older/newer date restriction show now valid timeframe
-            return if $CompareOlderNewerDate && $SystemTime > $CompareOlderNewerDate;
+    #         # don't execute queries if older/newer date restriction show now valid timeframe
+    #         return if $CompareOlderNewerDate && $SystemTime > $CompareOlderNewerDate;
 
-            $SQLExt .= " AND $ArticleTime{$Key} >= '" . $SystemTime . "'";
-        }
-    }
+    #         $SQLExt .= " AND $ArticleTime{$Key} >= '" . $SystemTime . "'";
+    #     }
+    # }
 
     # database query for sort/order by option
     if ( $Result ne 'COUNT' ) {

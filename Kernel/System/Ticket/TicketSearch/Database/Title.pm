@@ -36,28 +36,33 @@ Kernel::System::Ticket::TicketSearch::Database::Title - attribute module for dat
 
 defines the list of attributes this module is supporting
 
-    my @AttributeList = $Object->GetSupportedAttributes();
+    my $AttributeList = $Object->GetSupportedAttributes();
 
-    $Result = [
-        ...
-    ];
+    $Result = {
+        Filter => [ ],
+        Sort   => [ ],
+    };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return (
-        'Title',
-    );
+    return {
+        Filter => [
+            'Title',
+        ],
+        Sort => [
+            'Title',
+        ]
+    };
 }
 
-
-=item Run()
+=item Filter()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Run(
+    my $Result = $Object->Filter(
         Filter => {}
     );
 
@@ -67,7 +72,7 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Run {
+sub Filter {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
@@ -80,22 +85,30 @@ sub Run {
         return;
     }
 
-    if ( $Param{Filter}->{Operation} eq 'EQ' ) {
-        push( @SQLWhere, "st.title='".$Param{Filter}->{Value}."'" );
+    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, "st.title = '".$Param{Filter}->{Value}."'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'STARTSWITH' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
         push( @SQLWhere, "st.title LIKE '".$Param{Filter}->{Value}."%'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'ENDSWITH' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
         push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."'" );
     }
-    elsif ( $Param{Filter}->{Operation} eq 'CONTAINS' ) {
+    elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
         push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."%'" );
+    }
+    elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+        my $Value = $Param{Filter}->{Value};
+        $Value =~ s/\*/%/g;
+        push( @SQLWhere, "st.title LIKE '".$Value."'" );
+    }
+    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
+        push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Filter}->{Value}}))."')" );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported operation $Param{Filter}->{Operation}!",
+            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
         );
         return;
     }
@@ -103,6 +116,34 @@ sub Run {
     return {
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        SQLAttrs => [
+            'st.title'
+        ],
+        SQLOrderBy => [
+            'st.title'
+        ],
+    };       
 }
 
 1;

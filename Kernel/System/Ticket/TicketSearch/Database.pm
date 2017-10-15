@@ -50,8 +50,9 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
+    my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
+    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
     
     my $Home = $ConfigObject->Get('Home');
 
@@ -84,6 +85,7 @@ sub new {
         }
     }
 
+    MODULE:
     foreach my $Module ( sort @Modules ) {
         next if ( $Module =~ /^Common$/g);
         
@@ -99,9 +101,27 @@ sub new {
         }
 
         # register module for each supported attribute
-        foreach my $Attribute ( $Object->GetSupportedAttributes() ) {
-            $Self->{AttributeModules}->{$Attribute} = $Object;
-        }        
+        my $SupportedAttributes = $Object->GetSupportedAttributes();
+        if ( !IsHashRefWithData($SupportedAttributes) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "SupportedAttributes return by module $Module are not a HashRef!",
+            );
+            next MODULE;
+        }
+
+        foreach my $Type ( qw(Filter Sort) ) {
+            if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "SupportedAttributes->{$Type} return by module $Module is not an ArrayRef!",
+                );
+                next MODULE;
+            }            
+            foreach my $Attribute ( @{$SupportedAttributes->{$Type}} ) {
+                $Self->{AttributeModules}->{$Type}->{$Attribute} = $Object;
+            }        
+        }
     }
 
     return $Self;
@@ -395,26 +415,37 @@ sub TicketSearch {
     # the parts or SQL is comprised of
     my @SQLPartsDef = (
         {
-            Name   => 'SQLAttrs',
-            JoinBy => ', ',
+            Name        => 'SQLAttrs',
+            JoinBy      => ', ',
+            JoinPreFix  => '',
+            JoinPostFix => '',
+            BeginWith   => ','
         },
         {
-            Name   => 'SQLFrom',
-            JoinBy => ', ',
+            Name        => 'SQLFrom',
+            JoinBy      => ', ',
+            JoinPreFix  => '',
+            JoinPostFix => '',
         },
         {
-            Name   => 'SQLJoin',
-            JoinBy => ' ',
+            Name        => 'SQLJoin',
+            JoinBy      => ' ',
+            JoinPreFix  => '',
+            JoinPostFix => '',
         },
         {
-            Name   => 'SQLWhere',
-            JoinBy => ' AND ',
-            BeginWith => 'WHERE'
+            Name        => 'SQLWhere',
+            JoinBy      => ' AND ',
+            JoinPreFix  => '(',
+            JoinPostFix => ')',
+            BeginWith   => 'WHERE'
         },
         {
-            Name   => 'SQLOrderBy',
-            JoinBy => ', ',
-            BeginWith => 'ORDER BY'
+            Name        => 'SQLOrderBy',
+            JoinBy      => ', ',
+            JoinPreFix  => '',
+            JoinPostFix => '',
+            BeginWith   => 'ORDER BY'
         },
     );
 
@@ -427,6 +458,10 @@ sub TicketSearch {
         SQLOrderBy => '',
     );
 
+    if ( !$Param{UserType} ) {
+        $Param{UserType} = 'Agent';
+    }
+
     # check required params
     if ( !$Param{UserID} && !$Param{UserType} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -436,7 +471,20 @@ sub TicketSearch {
         return;
     }
 
+    if ( !IsHashRefWithData($Param{Filter}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid filter!",
+        );
+        return;            
+    }
+
     my $Result = $Param{Result} || 'HASH';
+
+    # init attribute backend modules
+    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Filter}} ) {
+        $Self->{AttributeModules}->{Filter}->{$SearchableAttribute}->Init();
+    }
 
     # create basic SQL
     my $SQL;
@@ -448,8 +496,6 @@ sub TicketSearch {
     }
     $SQLDef{SQLFrom}  = 'FROM ticket st INNER JOIN queue sq ON sq.id = st.queue_id';
 
-print STDERR "here!!!\n";
-
     # check permission and prepare relevat part of SQL statement
     my $PermissionSQL = $Self->_CreatePermissionSQL(
         %Param
@@ -459,57 +505,31 @@ print STDERR "here!!!\n";
     }
     $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
 
-print STDERR "Here!!!\n";
-    # generate SQL from attribute modules
-    foreach my $Filter ( @{$Param{Filter}->{Ticket}} ) {
-        my $AttributeModule;
+    # filter
+    my %Result = $Self->_CreateAttributeSQL(
+        SQLPartsDef => \@SQLPartsDef,
+        %Param,
+    );
+    if ( !%Result ) {
+        # return in case of error 
+        return;
+    }
+    foreach my $SQLPart ( @SQLPartsDef ) {
+        next if !$Result{$SQLPart->{Name}};
+        $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
+    }
 
-        # check if we have a search module for this field
-        if ( !$Self->{AttributeModules}->{$Filter->{Field}} ) {
-            # we don't have any directly registered search module for this field, check if we have a search module matching a pattern
-            foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
-                next if $Filter->{Field} !~ /$SearchableAttribute/g;
-                $AttributeModule = $Self->{AttributeModules}->{$SearchableAttribute};
-                last;
-            }
-        }
-        else {
-            $AttributeModule = $Self->{AttributeModules}->{$Filter->{Field}};
-        }
-
-        # ignore this attribute if we don't have a module for it
-        if ( !$AttributeModule ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to search for attribute $Filter->{Field}. Don't know how to handle it!",
-            );
-            return;            
-        }
-
-        # execute filter module to prepare SQL
-        my $Result = $AttributeModule->Run(
-            Filter => $Filter,
+    # sorting
+    if ( IsArrayRefWithData($Param{Sort}) ) {
+        my %Result = $Self->_CreateOrderBySQL(
+            Sort => $Param{Sort},
         );
-
-        if ( !IsHashRefWithData($Result) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Attribute module for $Filter->{Field} returned an error!",
-            );
+        if ( !%Result ) {
+            # return in case of error 
             return;
         }
-
-use Data::Dumper;
-print STDERR "$Filter->{Field}: ".Dumper($Result);
-        foreach my $SQLPart ( @SQLPartsDef ) {
-            next if !IsArrayRefWithData($Result->{$SQLPart->{Name}});
-
-            # add each entry to the corresponding SQL part
-            if ($SQLDef{$SQLPart->{Name}}) {
-                $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy};
-            }
-            $SQLDef{$SQLPart->{Name}} .= (join($SQLPart->{JoinBy}, @{$Result->{$SQLPart->{Name}}}));
-        }
+        $SQLDef{SQLOrderBy} .= join(', ', @{$Result{OrderBy}});
+        $SQLDef{SQLAttrs}   .= join(', ', @{$Result{Attrs}});
     }
 
     # generate SQL
@@ -518,22 +538,74 @@ print STDERR "$Filter->{Field}: ".Dumper($Result);
         $SQL .= ' '.($SQLPart->{BeginWith} || '').' '.$SQLDef{$SQLPart->{Name}};
     }
     
-    print STDERR "SQL: $SQL\n";
+    print STDOUT "SQL: $SQL\n";
 
-    return ();
+    # database query
+    my %Tickets;
+    my @TicketIDs;
+    my $Count;
+    my $PrepareResult = $Self->{DBObject}->Prepare(
+        SQL   => $SQL,
+        #Limit => $Limit
+    );
+    if ( !$PrepareResult ) {
+        # error
+        return;
+    } 
+
+    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+        $Count = $Row[0];
+        push( @TicketIDs, $Row[0] );
+        $Tickets{ $Row[0] } = $Row[1];
+    }
+
+    # return COUNT
+    if ( $Result eq 'COUNT' ) {
+        # if ($CacheObject) {
+        #     $CacheObject->Set(
+        #         Type  => 'TicketSearch',
+        #         Key   => $SQLSelect . $SQLFrom . $SQLExt . $Result . $Limit,
+        #         Value => $Count,
+        #         TTL   => $Param{CacheTTL} || 60 * 4,
+        #     );
+        # }
+        return $Count;
+    }
+
+    # return HASH
+    elsif ( $Result eq 'HASH' ) {
+        # if ($CacheObject) {
+        #     $CacheObject->Set(
+        #         Type  => 'TicketSearch',
+        #         Key   => $SQLSelect . $SQLFrom . $SQLExt . $Result . $Limit,
+        #         Value => \%Tickets,
+        #         TTL   => $Param{CacheTTL} || 60 * 4,
+        #     );
+        # }
+        return %Tickets;
+    }
+
+    # return ARRAY
+    else {
+        # if ($CacheObject) {
+        #     $CacheObject->Set(
+        #         Type  => 'TicketSearch',
+        #         Key   => $SQLSelect . $SQLFrom . $SQLExt . $Result . $Limit,
+        #         Value => \@TicketIDs,
+        #         TTL   => $Param{CacheTTL} || 60 * 4,
+        #     );
+        # }
+        return @TicketIDs;
+    }
 }
 
 =begin Internal:
 
 =cut
 
-=item _InConditionGet()
+=item _CreatePermissionSQL()
 
-internal function to create an
-
-    AND table.column IN (values)
-
-condition string from an array.
+generate SQL for permission restrictions
 
     my $SQLWhere = $Object->_CreatePermissionSQL(
         UserID    => ...,                    # required
@@ -624,6 +696,222 @@ sub _CreatePermissionSQL {
     return $SQLWhere;
 }
 
+=item _CreateAttributeSQL()
+
+generate SQL for attribute filtering
+
+    my $SQLWhere = $Object->_CreateAttributeSQL(
+        SQLPartsDef => []                      # required
+        Filter      => {},                     # required
+        UserID      => ...,                    # required
+        UserType    => 'Agent' | 'Customer'    # required       
+    );
+
+=cut
+
+sub _CreateAttributeSQL {
+    my ( $Self, %Param ) = @_;
+    my %SQLDef;
+
+    if ( !IsArrayRefWithData($Param{SQLPartsDef}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need SQLPartsDef!',
+        );
+        return;
+    }
+
+    if ( !IsHashRefWithData($Param{Filter}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'No Filter definition given!',
+        );
+        return;
+    }
+
+    if ( !$Param{UserID} && !$Param{UserType} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'No user information for attribute filters!',
+        );
+        return;
+    }    
+
+    # generate SQL from attribute modules
+    foreach my $BoolOperator ( keys %{$Param{Filter}} ) {
+        if ( !IsArrayRefWithData($Param{Filter}->{$BoolOperator}) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid filter for $BoolOperator!",
+            );
+            return;            
+        }
+
+        my %SQLDefBoolOperator;
+
+        foreach my $Filter ( @{$Param{Filter}->{$BoolOperator}} ) {
+            my $AttributeModule;
+
+            # check if we have a handling module for this field
+            if ( !$Self->{AttributeModules}->{Filter}->{$Filter->{Field}} ) {
+                # we don't have any directly registered handling module for this field, check if we have a handling module matching a pattern
+                foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Filter}} ) {
+                    next if $Filter->{Field} !~ /$SearchableAttribute/g;
+                    $AttributeModule = $Self->{AttributeModules}->{Filter}->{$SearchableAttribute};
+                    last;
+                }
+            }
+            else {
+                $AttributeModule = $Self->{AttributeModules}->{Filter}->{$Filter->{Field}};
+            }
+
+            # ignore this attribute if we don't have a module for it
+            if ( !$AttributeModule ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to search for attribute $Filter->{Field}. Don't know how to handle it!",
+                );
+                return;            
+            }
+
+            # execute attribute module to prepare SQL
+            my $Result = $AttributeModule->Filter(
+                UserID   => $Param{UserID},
+                UserType => $Param{UserType},            
+                Filter   => $Filter,
+            );
+
+            if ( !IsHashRefWithData($Result) ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Attribute module for $Filter->{Field} returned an error!",
+                );
+                return;
+            }
+
+            foreach my $SQLPart ( @{$Param{SQLPartsDef}} ) {
+                next if !IsArrayRefWithData($Result->{$SQLPart->{Name}});
+
+                # add each entry to the corresponding SQL part
+                if ( !IsArrayRefWithData($SQLDefBoolOperator{$SQLPart->{Name}}) ) {
+                    $SQLDefBoolOperator{$SQLPart->{Name}} = [];
+                }
+
+                # join the parts
+                $SQLDefBoolOperator{$SQLPart->{Name}} = [
+                    @{$SQLDefBoolOperator{$SQLPart->{Name}}},
+                    @{$Result->{$SQLPart->{Name}}},
+                ];
+            }
+        }
+
+        foreach my $SQLPart ( @{$Param{SQLPartsDef}} ) {
+            next if !IsArrayRefWithData($SQLDefBoolOperator{$SQLPart->{Name}});
+
+            # add each entry to the corresponding SQL part
+            if ( $SQLDef{$SQLPart->{Name}} ) {
+                $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy};
+            }
+            $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinPreFix}.(join(" $BoolOperator ", @{$SQLDefBoolOperator{$SQLPart->{Name}}})).$SQLPart->{JoinPostFix};
+        }        
+    }
+
+    return %SQLDef;
+}
+
+=item _CreateOrderBySQL()
+
+generate SQL for ordering
+
+    my $SQLWhere = $Object->_CreateOrderBySQL(
+        Sort => [],     # required
+    );
+
+=cut
+
+sub _CreateOrderBySQL {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsArrayRefWithData($Param{Sort}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'No Sort definition given!',
+        );
+        return;
+    }
+
+    my @OrderBy;
+    my @AttrList;
+    foreach my $SortDef ( @{$Param{Sort}} ) {
+
+        my $Attribute;
+        if ( $SortDef =~ /^-(.*?)$/g || $SortDef =~ /^(.*?)$/g ) {
+            $Attribute = $1;
+        }
+        else {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid sort option $SortDef!",
+            );
+            return;               
+        }
+
+        # check if we have a handling module for this field in case of sorting
+        my $AttributeModule;
+        if ( !$Self->{AttributeModules}->{Sort}->{$Attribute} ) {
+            # we don't have any directly registered search module for this field, check if we have a search module matching a pattern
+            foreach my $SortableAttribute ( sort keys %{$Self->{AttributeModules}->{Sort}} ) {
+                next if $Attribute !~ /$SortableAttribute/g;
+                $AttributeModule = $Self->{AttributeModules}->{Sort}->{$SortableAttribute};
+                last;
+            }
+        }
+        else {
+            $AttributeModule = $Self->{AttributeModules}->{Sort}->{$Attribute};
+        }
+
+        # ignore this attribute if we don't have a module for it
+        if ( !$AttributeModule ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to sort attribute $SortDef. Don't know how to handle it!",
+            );
+            return;            
+        }
+
+        # execute attribute module to prepare SQL
+        my $Result = $AttributeModule->Sort(            
+            Attribute => $Attribute,
+        );
+
+        if ( !IsHashRefWithData($Result) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Attribute module for sort $SortDef returned an error!",
+            );
+            return;
+        }
+
+        if ( IsArrayRefWithData($Result->{SQLAttrs}) ) {
+            push( @AttrList, @{$Result->{SQLAttrs}} )
+        }
+        if ( IsArrayRefWithData($Result->{SQLOrderBy}) ) {
+            my $Order = 'ASC';
+            if ( $SortDef =~ /^-/ ) {
+                $Order = 'DESC';
+            }
+
+            foreach my $Element ( @{$Result->{SQLOrderBy}} ) {
+                push(  @OrderBy, $Element.' '.$Order);
+            }
+        }        
+    }
+
+    return (
+        Attrs   => \@AttrList,
+        OrderBy => \@OrderBy
+    );
+}
 1;
 
 =end Internal:

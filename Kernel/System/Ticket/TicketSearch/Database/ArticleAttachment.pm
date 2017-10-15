@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::TicketSearch::Database::TicketNotes;
+package Kernel::System::Ticket::TicketSearch::Database::ArticleAttachment;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketSearch::Database::TicketNotes - attribute module for database ticket search
+Kernel::System::Ticket::TicketSearch::Database::ArticleAttachment - attribute module for database ticket search
 
 =head1 SYNOPSIS
 
@@ -49,11 +49,9 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
-            'TicketNotes',
-        ],
-        Sort => []
-    };
+        Filter => [ 'AttachmentName' ],
+        Sort   => []
+    }
 }
 
 
@@ -88,11 +86,21 @@ sub Filter {
 
     # check if we have to add a join
     if ( !$Self->{AlreadyJoined} ) {
-        push( @SQLJoin, 'INNER JOIN kix_ticket_notes ktn ON st.id = ktn.ticket_id' );
+        my $StorageModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule');
+        if ( $StorageModule !~ /::StorageDB$/ ) {
+            # we can only search article attachments if they are stored in the DB
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'notice',
+                Message  => "Attachments cannot be searched if articles are not stored in the database!",
+            );            
+            return;
+        }
+        push( @SQLJoin, 'INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
+        push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
         $Self->{AlreadyJoined} = 1;
     }
 
-    my $Field      = 'ktn.note';
+    my $Field      = 'att.filename';
     my $FieldValue = $Param{Filter}->{Value};
 
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
@@ -135,6 +143,19 @@ sub Filter {
 
     push( @SQLWhere, $Field.' LIKE '.$FieldValue );
 
+    # restrict search from customers to only customer articles
+    if ( $Param{UserType} eq 'Customer' ) {
+        my %CustomerArticleTypes = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeList(
+            Result => 'HASH',
+            Type   => 'Customer',
+        );
+        my @CustomerArticleTypeIDs = keys %CustomerArticleTypes;
+
+        if ( @CustomerArticleTypeIDs ) {
+            push( @SQLWhere, 'art_for_att.article_type_id IN ('.(join(', ', sort @CustomerArticleTypeIDs)).')' );
+        }
+    }
+    
     return {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
