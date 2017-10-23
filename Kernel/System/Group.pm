@@ -580,6 +580,8 @@ sub RoleGet {
     if ( $RoleList{ $Param{ID} } && ref $RoleList{ $Param{ID} } eq 'HASH' ) {
         %Role = %{ $RoleList{ $Param{ID} } };
     }
+    # get cache object
+    my $CacheObjects = $Kernel::OM->Get('Kernel::System::Cache');
 
     return %Role;
 }
@@ -2889,9 +2891,21 @@ sub GroupDelete {
         Bind => [ \$Param{GroupID} ],
     );
 
-    # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    
+    # delete caches
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupDataList',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupList::0',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupList::1',
     );
 
     return 1;
@@ -2917,10 +2931,22 @@ sub RoleDelete {
         SQL  => 'DELETE FROM Roles WHERE id = ?',
         Bind => [ \$Param{RoleID} ],
     );
+   
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
-    # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
+    # delete caches
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'RoleDataList',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'RoleList::0',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'RoleList::1',
     );
 
     return 1;
