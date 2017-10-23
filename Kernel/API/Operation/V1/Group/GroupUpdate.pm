@@ -162,8 +162,8 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::Group')->GroupUpdate(
         ID      => $Param{Data}->{GroupID},
         Name    => $Group->{Name} || $GroupData->{Name},
-        Comment => $Group->{Comment} || '',
-        ValidID => $Group->{ValidID} || 1,
+        Comment => $Group->{Comment} || $GroupData->{Comment},
+        ValidID => $Group->{ValidID} || $GroupData->{ValidID},
         UserID  => $Self->{Authorization}->{UserID},
     );
 
