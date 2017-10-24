@@ -580,6 +580,8 @@ sub RoleGet {
     if ( $RoleList{ $Param{ID} } && ref $RoleList{ $Param{ID} } eq 'HASH' ) {
         %Role = %{ $RoleList{ $Param{ID} } };
     }
+    # get cache object
+    my $CacheObjects = $Kernel::OM->Get('Kernel::System::Cache');
 
     return %Role;
 }
@@ -2909,6 +2911,47 @@ sub GroupDelete {
     return 1;
 }
 
+sub RoleDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(RoleID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM Roles WHERE id = ?',
+        Bind => [ \$Param{RoleID} ],
+    );
+   
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+
+    # delete caches
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'RoleDataList',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'RoleList::0',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'RoleList::1',
+    );
+
+    return 1;
+
+}
 
 1;
 
