@@ -2889,9 +2889,21 @@ sub GroupDelete {
         Bind => [ \$Param{GroupID} ],
     );
 
-    # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    
+    # delete caches
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupDataList',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupList::0',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupList::1',
     );
 
     return 1;
