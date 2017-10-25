@@ -448,6 +448,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Role::RoleDelete
+    LockSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Lock::LockSearch
+    LockGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Lock::LockGet
 
   Transport:
     Config:
@@ -706,6 +720,14 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /roles/:RoleID
+        LockSearch:
+          RequestMethod:
+          - GET
+          Route: /ticketlocks
+        LockGet:
+          RequestMethod:
+          - GET
+          Route: /ticketlocks/:LockID
 
     Type: HTTP::REST
 RemoteSystem: ''
