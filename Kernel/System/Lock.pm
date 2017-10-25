@@ -260,12 +260,13 @@ returns a hash with Lock data
 This returns something like:
 
     %LockData = (
-        'Name'       => 'admin',
+        'Name'       => '...',
         'ID'         => 2,
         'ValidID'    => '1',
-        'CreateTime' => '2010-04-07 15:41:15',
-        'ChangeTime' => '2010-04-07 15:41:15',
-        'Comment'    => 'Lock of all administrators.',
+        'CreateTime' => '2010-04-07 15:41:15',CreateBy
+        'CreateBy'   => 1,       
+        'ChangeTime' => '2010-04-07 15:41:15',ChangeBy
+        'ChangeBy'   => 1,
     );
 
 =cut
