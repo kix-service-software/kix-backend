@@ -290,7 +290,7 @@ sub LockGet {
     return if !$DBObject->Prepare(
         SQL => 'SELECT id, name, valid_id, '
             . 'create_time, create_by, change_time, change_by '
-            . 'FROM ticket_type WHERE id = ?',
+            . 'FROM ticket_lock_type WHERE id = ?',
         Bind  => [ \$Param{LockID} ],
     );
 
