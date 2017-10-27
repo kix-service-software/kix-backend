@@ -105,9 +105,9 @@ sub Filter {
     );
 
     # check if we have to add a join
-    if ( !$Self->{AlreadyJoined} ) {
+    if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
-        $Self->{AlreadyJoined} = 1;
+        $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
     if ( $Param{Filter}->{Field} =~ /(Change|Close)Time/ ) {

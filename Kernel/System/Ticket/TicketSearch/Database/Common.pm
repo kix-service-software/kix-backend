@@ -55,8 +55,8 @@ empty method to be overridden by specific attribute module if necessary
 sub Init {
     my ( $Self, %Param ) = @_;
 
-    # reset join marker
-    $Self->{AlreadyJoined} = 0;
+    # reset module data
+    $Self->{ModuleData} = {};
 
     return;
 }

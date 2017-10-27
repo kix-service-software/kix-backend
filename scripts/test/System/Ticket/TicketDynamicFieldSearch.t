@@ -212,12 +212,22 @@ for my $Value (@Values) {
 }
 
 my %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            }
+        ]
+    },    
     UserID     => 1,
     Permission => 'rw',
 );
@@ -229,12 +239,22 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Like => 'ticket1_field1',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'LIKE',
+            }
+        ]
+    },       
     UserID     => 1,
     Permission => 'rw',
 );
@@ -246,15 +266,27 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            }            
+        ]
+    },       
     UserID     => 1,
     Permission => 'rw',
 );
@@ -266,15 +298,27 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1_nonexisting',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1_nonexisting',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            }            
+        ]
+    },    
     UserID     => 1,
     Permission => 'rw',
 );
@@ -286,15 +330,27 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2_nonexisting',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2_nonexisting',
+                Operator => 'EQ',
+            }            
+        ]
+    },    
     UserID     => 1,
     Permission => 'rw',
 );
@@ -306,15 +362,27 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Like => 'ticket%_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket%_field1',
+                Operator => 'LIKE',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }            
+        ]
+    },    
     UserID     => 1,
     Permission => 'rw',
 );
@@ -330,24 +398,42 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" => {
-        Equals => '2001-01-01 01:01:01',
-    },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 0,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '0',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },   
     UserID     => 1,
     Permission => 'rw',
 );
@@ -359,25 +445,47 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" => {
-        GreaterThanEquals => '2001-01-01 01:01:01',
-        SmallerThanEquals => '2001-01-01 01:01:01',
-    },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 0,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'GTE',
+            },            
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'LTE',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '0',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },   
     UserID     => 1,
     Permission => 'rw',
 );
@@ -389,25 +497,47 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" => {
-        GreaterThan => '2001-01-01 01:01:00',
-        SmallerThan => '2001-01-01 01:01:02',
-    },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 0,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:00',
+                Operator => 'GT',
+            },            
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:02',
+                Operator => 'LT',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '0',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },   
     UserID     => 1,
     Permission => 'rw',
 );
@@ -419,25 +549,47 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" => {
-        GreaterThan => '2001-01-01 01:01:01',
-        SmallerThan => '2001-01-01 01:01:01',
-    },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 0,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'GT',
+            },            
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'LT',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '0',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
 );
@@ -449,25 +601,42 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" =>
-        {
-        Equals => '2002-02-02 01:01:01',
-        },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 0,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },        
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2002-01-01 01:01:01',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '0',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
 );
@@ -479,25 +648,42 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" =>
-        {
-        Equals => '2001-01-01 01:01:01',
-        },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 1,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },         
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
 );
@@ -509,25 +695,42 @@ $Self->IsDeeply(
 );
 
 %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Equals => 'ticket1_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Equals => 'ticket1_field2',
-    },
-    "DynamicField_DFT3$RandomID" =>
-        {
-        Equals => '2001-01-01 01:01:01',
-        },
-    "DynamicField_DFT4$RandomID" => {
-        Equals => 1,
-    },
-    "DynamicField_DFT5$RandomID" => {
-        Equals => 'ticket1000_field5',
-    },
+    Result  => 'HASH',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket1_field1',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket1_field2',
+                Operator => 'EQ',
+            },         
+            {
+                Field => "DynamicField_DFT3$RandomID",
+                Value => '2001-01-01 01:01:01',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT4$RandomID",
+                Value => '0',
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1000_field5',
+                Operator => 'EQ',
+            }                         
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
 );
@@ -539,19 +742,35 @@ $Self->IsDeeply(
 );
 
 my @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Like => 'ticket%_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket%_field1',
+                Operator => 'LIKE',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Up',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'ascending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -561,19 +780,35 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT1$RandomID" => {
-        Like => 'ticket%_field1',
-    },
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT1$RandomID",
+                Value => 'ticket%_field1',
+                Operator => 'LIKE',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'descending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -583,16 +818,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Up',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'ascending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -602,16 +851,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'descending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -621,16 +884,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT3$RandomID",
-    OrderBy    => 'Up',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT3$RandomID",
+            Direction => 'ascending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -640,16 +917,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT3$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT3$RandomID",
+            Direction => 'descending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -659,16 +950,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT4$RandomID",
-    OrderBy    => 'Up',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT4$RandomID",
+            Direction => 'ascending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -678,16 +983,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT2$RandomID" => {
-        Like => 'ticket%_field2',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT2$RandomID",
+                Value => 'ticket%_field2',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT4$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT4$RandomID",
+            Direction => 'descending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -697,13 +1016,25 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result     => 'ARRAY',
-    Limit      => 100,
-    Title      => "Ticket$RandomID",
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            }                  
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT4$RandomID",
-    OrderBy    => 'Up',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT4$RandomID",
+            Direction => 'ascending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -713,13 +1044,25 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result     => 'ARRAY',
-    Limit      => 100,
-    Title      => "Ticket$RandomID",
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            }                  
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT4$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT4$RandomID",
+            Direction => 'descending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -729,16 +1072,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT5$RandomID" => {
-        Like => 'ticket%_field5',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket%_field5',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Up',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'ascending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -748,16 +1105,30 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT5$RandomID" => {
-        Like => 'ticket1_field5',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => 'ticket1_field5',
+                Operator => 'LIKE',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'descending',
+        }
+    ]
 );
 
 $Self->IsDeeply(
@@ -767,42 +1138,36 @@ $Self->IsDeeply(
 );
 
 @TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT5$RandomID" => {
-        Like => 'ticket2_field5',
-        Like => 'ticket4_field5',
-    },
+    Result  => 'ARRAY',
+    Limit   => 100,
+    Filter  => {
+        AND => [ 
+            {
+                Field => 'Title',
+                Value => "Ticket$RandomID",
+                Operator => 'EQ',
+            },
+            {
+                Field => "DynamicField_DFT5$RandomID",
+                Value => ['ticket2_field5', 'ticket4_field5'],
+                Operator => 'IN',
+            }                      
+        ]
+    },  
     UserID     => 1,
     Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Down',
+    Sort       => [
+        {
+            Field => "DynamicField_DFT1$RandomID",
+            Direction => 'descending',
+        }
+    ],
 );
 
 $Self->IsDeeply(
     \@TicketResultSearch,
     [ $TicketData[1]{TicketID}, ],
-    'Search for two values in a same field, match one ticket using two operators',
-);
-
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result                       => 'ARRAY',
-    Limit                        => 100,
-    Title                        => "Ticket$RandomID",
-    "DynamicField_DFT5$RandomID" => {
-        Like => [ 'ticket2_field5', 'ticket4_field5' ],
-    },
-    UserID     => 1,
-    Permission => 'rw',
-    SortBy     => "DynamicField_DFT1$RandomID",
-    OrderBy    => 'Down',
-);
-
-$Self->IsDeeply(
-    \@TicketResultSearch,
-    [ $TicketData[1]{TicketID}, ],
-    'Search for two values in a same field, match one ticket using an array ',
+    'Search for two values in a same field, match one ticket using IN operator',
 );
 
 # cleanup is done by RestoreDatabase.

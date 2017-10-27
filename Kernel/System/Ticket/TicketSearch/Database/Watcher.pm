@@ -85,9 +85,9 @@ sub Filter {
     }
 
     # check if we have to add a join
-    if ( !$Self->{AlreadyJoined} ) {
+    if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         push( @SQLJoin, 'INNER JOIN ticket_watcher tw ON st.id = tw.ticket_id' );
-        $Self->{AlreadyJoined} = 1;
+        $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {

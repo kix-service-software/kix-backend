@@ -57,7 +57,14 @@ sub GetSupportedAttributes {
             'Body',
             'ArticleCreateTime'
         ],
-        Sort => []
+        Sort => [
+            'From',
+            'To',
+            'Cc',
+            'Subject',
+            'Body',
+            'ArticleCreateTime'
+        ]
     }
 }
 
@@ -100,14 +107,14 @@ sub Filter {
     );
 
     # check if we have to add a join
-    if ( !$Self->{AlreadyJoined} ) {
+    if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
         my $ArticleSearchTable = 'article';
         if ( $SearchIndexModule =~ /::StaticDB$/ ) {
             $ArticleSearchTable = 'article_search';
         }
         push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
-        $Self->{AlreadyJoined} = 1;
+        $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
     if ( $Param{Filter}->{Field} =~ /ArticleCreateTime/ ) {
@@ -201,6 +208,44 @@ sub Filter {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        'From'              => 'art.a_from',
+        'To'                => 'art.a_to',
+        'Cc'                => 'art.a_cc',
+        'Subject'           => 'art.a_subject',
+        'Body'              => 'art.a_body',
+        'ArticleCreateTime' => 'art.incoming_time',
+    );
+
+    return {
+        SQLAttrs => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+        SQLOrderBy => [
+            $AttributeMapping{$Param{Attribute}}
+        ],
+    };       
 }
 
 1;

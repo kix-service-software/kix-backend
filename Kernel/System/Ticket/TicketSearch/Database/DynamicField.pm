@@ -11,6 +11,8 @@ package Kernel::System::Ticket::TicketSearch::Database::DynamicField;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
 );
@@ -50,7 +52,7 @@ sub GetSupportedAttributes {
 
     return {
         Filter => [ 'DynamicField_\w+' ],
-        Sort   => []
+        Sort   => [ 'DynamicField_\w+' ]
     };
 }
 
@@ -72,6 +74,7 @@ run this module and return the SQL extensions
 
 sub Filter {
     my ( $Self, %Param ) = @_;
+    my @SQLJoin;
     my @SQLWhere;
 
     # check params
@@ -83,113 +86,17 @@ sub Filter {
         return;
     }
 
-    if ( !$Self->{DynamicFields} ) {
-
-        # get dynamic field object
-        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-
-        # get all configured dynamic fields
-        $Self->{DynamicFields} = $DynamicFieldObject->DynamicFieldListGet();
-    }
-
-    # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-
-    #         my $Counter   = 0;
-    #         TEXT:
-    #         for my $Text (@SearchParams) {
-    #             next TEXT if ( !defined $Text || $Text eq '' );
-
-    #             $Text =~ s/\*/%/gi;
-
-    #             # check search attribute, we do not need to search for *
-    #             next TEXT if $Text =~ /^\%{1,3}$/;
-
-    #             # validate data type
-    #             my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
-    #                 DynamicFieldConfig => $DynamicField,
-    #                 Value              => $Text,
-    #                 UserID             => $Param{UserID} || 1,
-    #             );
-    #             if ( !$ValidateSuccess ) {
-    #                 $Kernel::OM->Get('Kernel::System::Log')->Log(
-    #                     Priority => 'error',
-    #                     Message =>
-    #                         "Search not executed due to invalid value '"
-    #                         . $Text
-    #                         . "' on field '"
-    #                         . $DynamicField->{Name}
-    #                         . "'!",
-    #                 );
-    #                 return;
-    #             }
-
-    #             if ($Counter) {
-    #                 $SQLExtSub .= ' OR ';
-    #             }
-    #             $SQLExtSub .= $DynamicFieldBackendObject->SearchSQLGet(
-    #                 DynamicFieldConfig => $DynamicField,
-    #                 TableAlias         => "dfv$DynamicFieldJoinCounter",
-    #                 Operator           => $Operator,
-    #                 SearchTerm         => $Text,
-    #             );
-
-    #             $Counter++;
-    #         }
-    #         $SQLExtSub .= ')';
-    #         if ($Counter) {
-    #             $SQLExt .= $SQLExtSub;
-    #             $NeedJoin = 1;
-    #         }
-    #     }
-
-    #     if ($NeedJoin) {
-
-    #         if ( $DynamicField->{ObjectType} eq 'Ticket' ) {
-
-    #             # Join the table for this dynamic field
-    #             $SQLFrom .= "INNER JOIN dynamic_field_value dfv$DynamicFieldJoinCounter
-    #                 ON (st.id = dfv$DynamicFieldJoinCounter.object_id
-    #                     AND dfv$DynamicFieldJoinCounter.field_id = " .
-    #                 $DBObject->Quote( $DynamicField->{ID}, 'Integer' ) . ") ";
-    #         }
-    #         elsif ( $DynamicField->{ObjectType} eq 'Article' ) {
-    #             if ( !$ArticleJoinSQL ) {
-    #                 $ArticleJoinSQL = ' INNER JOIN article art ON st.id = art.ticket_id ';
-    #                 $SQLFrom .= $ArticleJoinSQL;
-    #             }
-
-    #             $SQLFrom .= "INNER JOIN dynamic_field_value dfv$DynamicFieldJoinCounter
-    #                 ON (art.id = dfv$DynamicFieldJoinCounter.object_id
-    #                     AND dfv$DynamicFieldJoinCounter.field_id = " .
-    #                 $DBObject->Quote( $DynamicField->{ID}, 'Integer' ) . ") ";
-
-    #         }
-
-    #         $DynamicFieldJoinTables{ $DynamicField->{Name} } = "dfv$DynamicFieldJoinCounter";
-
-    #         $DynamicFieldJoinCounter++;
-    #     }
-    # }
-
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, "st.title='".$Param{Filter}->{Value}."'" );
-    }
-    elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
-        push( @SQLWhere, "st.title LIKE '".$Param{Filter}->{Value}."%'" );
-    }
-    elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
-        push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."'" );
-    }
-    elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
-        push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."%'" );
-    }
-    elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
-        my $Value = $Param{Filter}->{Value};
-        $Value =~ s/\*/%/g;
-        push( @SQLWhere, "st.title LIKE '".$Value."'" );
-    }
-    else {
+    # validate operator
+    my %OperatorMap = (
+        'EQ'    => 'Equals',
+        'LIKE'  => 'Like',
+        'GT'    => 'GreaterThan',
+        'GTE'   => 'GreaterThanEquals',
+        'LT'    => 'SmallerThan',
+        'LTE'   => 'SmallerThanEquals',
+        'IN'    => 'Like'
+    );
+    if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
@@ -197,9 +104,164 @@ sub Filter {
         return;
     }
 
+    if ( !$Self->{DynamicFields} ) {
+
+        # get dynamic field object
+        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+
+        # get all configured dynamic fields
+        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet();
+        if ( !IsArrayRefWithData($DynamicFieldList) ) {
+            # we don't have any DFs
+            return;
+        }
+        $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
+    }
+
+    # get dynamic field backend object
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+
+    my $DFName = $Param{Filter}->{Field};
+    $DFName =~ s/DynamicField_//g;
+
+    my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
+
+    if ( !IsHashRefWithData($DynamicFieldConfig) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Unknown DynamicField '$DFName'!",
+        );
+        return;
+    }
+
+    my $Value = $Param{Filter}->{Value};
+    if ( !IsArrayRefWithData($Value) ) {
+        $Value = [ $Value ];
+    }
+    foreach my $ValueItem ( @{$Value} ) {
+        $Value =~ s/\*/%/g;
+    }
+
+    # increase count
+    my $Count = $Self->{ModuleData}->{JoinCounter}++;
+
+    my $DynamicFieldSQL;
+    foreach my $ValueItem ( @{$Value} ) {
+        # validate data type
+        my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $ValueItem,
+            UserID             => 1,
+        );
+        if ( !$ValidateSuccess ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  =>
+                    "Search not executed due to invalid value '"
+                    . $ValueItem
+                    . "' on field '"
+                    . $DFName
+                    . "'!",
+            );
+            return;
+        }
+
+        # get field specific SQL
+        my $SQL = $DynamicFieldBackendObject->SearchSQLGet(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            TableAlias         => "dfv$Count",
+            Operator           => $OperatorMap{$Param{Filter}->{Operator}},
+            SearchTerm         => $ValueItem,
+        );
+
+        if ( $DynamicFieldSQL ) {
+            $DynamicFieldSQL .= " OR ";
+        }
+        $DynamicFieldSQL .= $SQL;
+    }
+
+    # join tables
+    my $JoinTable = "dfv$Count";
+    $Self->{ModuleData}->{JoinTables}->{$DFName} = $JoinTable;
+
+    if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
+        push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+    } 
+    elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
+        if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+            push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
+            $Self->{ModuleData}->{ArticleTableJoined} = 1;
+        }
+        push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+    }
+
+    # add field specific SQL
+    push( @SQLWhere, "($DynamicFieldSQL)" );
+
     return {
+        SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLFrom    => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+    my @SQLJoin;
+
+    # get dynamic field backend object
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+
+    my $DFName = $Param{Attribute};
+    $DFName =~ s/DynamicField_//g;
+
+    my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
+
+    # increase count
+    my $Count = $Self->{ModuleData}->{SortJoinCounter}++;
+
+    # join tables
+    my $JoinTable = $Self->{ModuleData}->{JoinTables}->{$DFName};
+    if ( !$JoinTable ) {
+        $JoinTable = "dfvsort$Count";
+        if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
+            push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        } 
+        elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {         
+            push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        }
+    }
+
+    # get field specific SQL
+    my $SQLOrderField = $DynamicFieldBackendObject->SearchSQLOrderFieldGet(
+        DynamicFieldConfig => $DynamicFieldConfig,
+        TableAlias         => $JoinTable,
+    );
+
+    return {
+        SQLJoin  => \@SQLJoin,
+        SQLAttrs => [
+            $SQLOrderField,
+        ],
+        SQLOrderBy => [
+            $SQLOrderField
+        ],
+    };       
 }
 
 1;

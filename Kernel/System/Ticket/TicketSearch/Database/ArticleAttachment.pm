@@ -85,7 +85,7 @@ sub Filter {
     }
 
     # check if we have to add a join
-    if ( !$Self->{AlreadyJoined} ) {
+    if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         my $StorageModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule');
         if ( $StorageModule !~ /::StorageDB$/ ) {
             # we can only search article attachments if they are stored in the DB
@@ -97,7 +97,7 @@ sub Filter {
         }
         push( @SQLJoin, 'INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
         push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
-        $Self->{AlreadyJoined} = 1;
+        $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
     my $Field      = 'att.filename';

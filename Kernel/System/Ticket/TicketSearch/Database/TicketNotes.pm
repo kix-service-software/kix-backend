@@ -87,9 +87,9 @@ sub Filter {
     }
 
     # check if we have to add a join
-    if ( !$Self->{AlreadyJoined} ) {
+    if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         push( @SQLJoin, 'INNER JOIN kix_ticket_notes ktn ON st.id = ktn.ticket_id' );
-        $Self->{AlreadyJoined} = 1;
+        $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
     my $Field      = 'ktn.note';

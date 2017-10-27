@@ -1759,8 +1759,14 @@ my @TicketIDsSortOrder = $TicketObject->TicketSearch(
         ]
     },
     Sort => [
-        '-PriorityID',
-        'Age'
+        {
+            Field => "PriorityID",
+            Direction => 'descending',
+        },  
+        {
+            Field => "Age",
+            Direction => 'ascending',
+        }        
     ],      
     UserID       => 1,
     Limit        => 1,
@@ -1800,8 +1806,14 @@ $Self->Is(
         ]
     },
     Sort => [
-        '-PriorityID',
-        '-Age'
+        {
+            Field => "PriorityID",
+            Direction => 'descending',
+        },  
+        {
+            Field => "Age",
+            Direction => 'descending',
+        }
     ], 
     UserID       => 1,
     Limit        => 1,
@@ -1840,7 +1852,10 @@ $Self->Is(
         ]
     },
     Sort => [
-        '-ChangeTime',
+        {
+            Field => "ChangeTime",
+            Direction => 'descending',
+        },  
     ], 
     UserID       => 1,
     Limit        => 1,
@@ -1880,7 +1895,10 @@ $Self->Is(
         ]
     },
     Sort => [
-        'ChangeTime',
+        {
+            Field => "ChangeTime",
+            Direction => 'ascending',
+        },  
     ], 
     UserID       => 1,
     Limit        => 1,
@@ -1947,8 +1965,14 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
         ]
     },
     Sort => [
-        '-PriorityID',
-        '-Age',
+        {
+            Field => "PriorityID",
+            Direction => 'descending',
+        },  
+        {
+            Field => "Age",
+            Direction => 'descending',
+        }
     ],     
     UserID       => 1,
     Limit        => 1,
@@ -1987,8 +2011,14 @@ $Self->Is(
         ]
     },
     Sort => [
-        'PriorityID',
-        '-Age',
+        {
+            Field => "PriorityID",
+            Direction => 'ascending',
+        },  
+        {
+            Field => "Age",
+            Direction => 'descending',
+        }
     ],       
     UserID       => 1,
     Limit        => 1,
@@ -2027,7 +2057,10 @@ $Self->Is(
         ]
     },
     Sort => [
-        '-Age',
+        {
+            Field => "Age",
+            Direction => 'descending',
+        }
     ],       
     UserID       => 1,
     Limit        => 1,
@@ -2066,7 +2099,10 @@ $Self->Is(
         ]
     },
     Sort => [
-        'Age',
+        {
+            Field => "Age",
+            Direction => 'ascending',
+        }
     ],       
     UserID       => 1,
     Limit        => 1,

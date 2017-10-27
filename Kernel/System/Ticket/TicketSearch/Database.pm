@@ -471,14 +471,6 @@ sub TicketSearch {
         return;
     }
 
-    if ( !IsHashRefWithData($Param{Filter}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid filter!",
-        );
-        return;            
-    }
-
     my $Result = $Param{Result} || 'HASH';
 
     # init attribute backend modules
@@ -506,17 +498,19 @@ sub TicketSearch {
     $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
 
     # filter
-    my %Result = $Self->_CreateAttributeSQL(
-        SQLPartsDef => \@SQLPartsDef,
-        %Param,
-    );
-    if ( !%Result ) {
-        # return in case of error 
-        return;
-    }
-    foreach my $SQLPart ( @SQLPartsDef ) {
-        next if !$Result{$SQLPart->{Name}};
-        $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
+    if ( IsHashRefWithData($Param{Filter}) ) {
+        my %Result = $Self->_CreateAttributeSQL(
+            SQLPartsDef => \@SQLPartsDef,
+            %Param,
+        );
+        if ( !%Result ) {
+            # return in case of error 
+            return;
+        }
+        foreach my $SQLPart ( @SQLPartsDef ) {
+            next if !$Result{$SQLPart->{Name}};
+            $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
+        }
     }
 
     # sorting
@@ -530,6 +524,7 @@ sub TicketSearch {
         }
         $SQLDef{SQLOrderBy} .= join(', ', @{$Result{OrderBy}});
         $SQLDef{SQLAttrs}   .= join(', ', @{$Result{Attrs}});
+        $SQLDef{SQLJoin}    .= join(' ', @{$Result{Join}});
     }
 
     # generate SQL
@@ -537,8 +532,33 @@ sub TicketSearch {
         next if !$SQLDef{$SQLPart->{Name}};
         $SQL .= ' '.($SQLPart->{BeginWith} || '').' '.$SQLDef{$SQLPart->{Name}};
     }
-    
-    print STDOUT "SQL: $SQL\n";
+
+    # check cache
+    my $CacheObject;
+    if ( $Param{CacheTTL} ) {
+        $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        my $CacheData = $CacheObject->Get(
+            Type => 'TicketSearch',
+            Key  => $SQL . $Result . $Param{Limit},
+        );
+
+        if ( defined $CacheData ) {
+            if ( ref $CacheData eq 'HASH' ) {
+                return %{$CacheData};
+            }
+            elsif ( ref $CacheData eq 'ARRAY' ) {
+                return @{$CacheData};
+            }
+            elsif ( ref $CacheData eq '' ) {
+                return $CacheData;
+            }
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid ref ' . ref($CacheData) . '!'
+            );
+            return;
+        }
+    }
 
     # database query
     my %Tickets;
@@ -546,7 +566,7 @@ sub TicketSearch {
     my $Count;
     my $PrepareResult = $Self->{DBObject}->Prepare(
         SQL   => $SQL,
-        #Limit => $Limit
+        Limit => $Param{Limit}
     );
     if ( !$PrepareResult ) {
         # error
@@ -561,40 +581,40 @@ sub TicketSearch {
 
     # return COUNT
     if ( $Result eq 'COUNT' ) {
-        # if ($CacheObject) {
-        #     $CacheObject->Set(
-        #         Type  => 'TicketSearch',
-        #         Key   => $SQLSelect . $SQLFrom . $SQLExt . $Result . $Limit,
-        #         Value => $Count,
-        #         TTL   => $Param{CacheTTL} || 60 * 4,
-        #     );
-        # }
+        if ($CacheObject) {
+            $CacheObject->Set(
+                Type  => 'TicketSearch',
+                Key   => $SQL . $Result . $Param{Limit},
+                Value => $Count,
+                TTL   => $Param{CacheTTL} || 60 * 4,
+            );
+        }
         return $Count;
     }
 
     # return HASH
     elsif ( $Result eq 'HASH' ) {
-        # if ($CacheObject) {
-        #     $CacheObject->Set(
-        #         Type  => 'TicketSearch',
-        #         Key   => $SQLSelect . $SQLFrom . $SQLExt . $Result . $Limit,
-        #         Value => \%Tickets,
-        #         TTL   => $Param{CacheTTL} || 60 * 4,
-        #     );
-        # }
+        if ($CacheObject) {
+            $CacheObject->Set(
+                Type  => 'TicketSearch',
+                Key   => $SQL . $Result . $Param{Limit},
+                Value => \%Tickets,
+                TTL   => $Param{CacheTTL} || 60 * 4,
+            );
+        }
         return %Tickets;
     }
 
     # return ARRAY
     else {
-        # if ($CacheObject) {
-        #     $CacheObject->Set(
-        #         Type  => 'TicketSearch',
-        #         Key   => $SQLSelect . $SQLFrom . $SQLExt . $Result . $Limit,
-        #         Value => \@TicketIDs,
-        #         TTL   => $Param{CacheTTL} || 60 * 4,
-        #     );
-        # }
+        if ($CacheObject) {
+            $CacheObject->Set(
+                Type  => 'TicketSearch',
+                Key   => $SQL . $Result . $Param{Limit},
+                Value => \@TicketIDs,
+                TTL   => $Param{CacheTTL} || 60 * 4,
+            );
+        }
         return @TicketIDs;
     }
 }
@@ -812,7 +832,11 @@ sub _CreateAttributeSQL {
             if ( $SQLDef{$SQLPart->{Name}} ) {
                 $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy};
             }
-            $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinPreFix}.(join(" $BoolOperator ", @{$SQLDefBoolOperator{$SQLPart->{Name}}})).$SQLPart->{JoinPostFix};
+            my $JoinOperator = ' ';
+            if ( $SQLPart->{Name} eq 'SQLWhere' ) {
+                $JoinOperator = " $BoolOperator "
+            }
+            $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinPreFix}.(join($JoinOperator, @{$SQLDefBoolOperator{$SQLPart->{Name}}})).$SQLPart->{JoinPostFix};
         }        
     }
 
@@ -842,19 +866,10 @@ sub _CreateOrderBySQL {
 
     my @OrderBy;
     my @AttrList;
+    my @JoinList;
     foreach my $SortDef ( @{$Param{Sort}} ) {
 
-        my $Attribute;
-        if ( $SortDef =~ /^-(.*?)$/g || $SortDef =~ /^(.*?)$/g ) {
-            $Attribute = $1;
-        }
-        else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid sort option $SortDef!",
-            );
-            return;               
-        }
+        my $Attribute = $SortDef->{Field};
 
         # check if we have a handling module for this field in case of sorting
         my $AttributeModule;
@@ -895,9 +910,12 @@ sub _CreateOrderBySQL {
         if ( IsArrayRefWithData($Result->{SQLAttrs}) ) {
             push( @AttrList, @{$Result->{SQLAttrs}} )
         }
+        if ( IsArrayRefWithData($Result->{SQLJoin}) ) {
+            push( @JoinList, @{$Result->{SQLJoin}} )
+        }
         if ( IsArrayRefWithData($Result->{SQLOrderBy}) ) {
             my $Order = 'ASC';
-            if ( $SortDef =~ /^-/ ) {
+            if ( uc($SortDef->{Direction}) eq 'DESCENDING' ) {
                 $Order = 'DESC';
             }
 
@@ -909,6 +927,7 @@ sub _CreateOrderBySQL {
 
     return (
         Attrs   => \@AttrList,
+        Join    => \@JoinList,
         OrderBy => \@OrderBy
     );
 }

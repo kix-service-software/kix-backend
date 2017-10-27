@@ -259,12 +259,22 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     my %TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'HASH',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => 'fieldarticle1_ticket1_article1',
-        },
+        Result  => 'HASH',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => 'fieldarticle1_ticket1_article1',
+                    Operator => 'EQ',
+                }
+            ]
+        },   
         UserID     => 1,
         Permission => 'rw',
     );
@@ -276,15 +286,27 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     %TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'HASH',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => 'fieldarticle1_ticket1_article1',
-        },
-        "DynamicField_DFTArticle2$RandomID" => {
-            Equals => 'fieldarticle2_ticket1_article1',
-        },
+        Result  => 'HASH',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => 'fieldarticle1_ticket1_article1',
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle2$RandomID",
+                    Value => 'fieldarticle2_ticket1_article1',
+                    Operator => 'EQ',
+                }                
+            ]
+        },   
         UserID     => 1,
         Permission => 'rw',
     );
@@ -296,15 +318,27 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     %TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'HASH',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => 'fieldarticle1_ticket1_article1',
-        },
-        "DynamicField_DFTArticle2$RandomID" => {
-            Equals => 'fieldarticle2_ticket1_article2',
-        },
+        Result  => 'HASH',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => 'fieldarticle1_ticket1_article1',
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle2$RandomID",
+                    Value => 'fieldarticle2_ticket1_article2',
+                    Operator => 'EQ',
+                }                
+            ]
+        },   
         UserID     => 1,
         Permission => 'rw',
     );
@@ -316,15 +350,27 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     %TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'HASH',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Like => 'fieldarticle1_ticket*_article1',
-        },
-        "DynamicField_DFTArticle2$RandomID" => {
-            Like => 'fieldarticle2_ticket*_article1',
-        },
+        Result  => 'HASH',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => 'fieldarticle1_ticket*_article1',
+                    Operator => 'LIKE',
+                },
+                {
+                    Field => "DynamicField_DFTArticle2$RandomID",
+                    Value => 'fieldarticle2_ticket*_article1',
+                    Operator => 'LIKE',
+                }                
+            ]
+        },   
         UserID     => 1,
         Permission => 'rw',
     );
@@ -339,15 +385,27 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     %TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'HASH',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ]
-        },
-        "DynamicField_DFTArticle2$RandomID" => {
-            Equals => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ]
-        },
+        Result  => 'HASH',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
+                    Operator => 'IN',
+                },
+                {
+                    Field => "DynamicField_DFTArticle2$RandomID",
+                    Value => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ],
+                    Operator => 'IN',
+                }                
+            ]
+        },   
         UserID     => 1,
         Permission => 'rw',
     );
@@ -362,17 +420,33 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     my @TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'ARRAY',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ]
-        },
-        "DynamicField_DFTArticle2$RandomID" => {
-            Equals => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ]
-        },
-        SortBy     => "DynamicField_DFTArticle2$RandomID",
-        OrderBy    => 'Up',
+        Result  => 'ARRAY',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
+                    Operator => 'IN',
+                },
+                {
+                    Field => "DynamicField_DFTArticle2$RandomID",
+                    Value => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ],
+                    Operator => 'IN',
+                }                
+            ]
+        },   
+        Sort       => [
+            {
+                Field => "DynamicField_DFTArticle2$RandomID",
+                Direction => 'ascending',
+            }            
+        ],
         UserID     => 1,
         Permission => 'rw',
     );
@@ -384,17 +458,33 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     @TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'ARRAY',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ]
-        },
-        "DynamicField_DFTArticle2$RandomID" => {
-            Equals => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ]
-        },
-        SortBy     => "DynamicField_DFTArticle2$RandomID",
-        OrderBy    => 'Down',
+        Result  => 'ARRAY',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
+                    Operator => 'IN',
+                },
+                {
+                    Field => "DynamicField_DFTArticle2$RandomID",
+                    Value => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ],
+                    Operator => 'IN',
+                }                
+            ]
+        },   
+        Sort       => [
+            {
+                Field => "DynamicField_DFTArticle2$RandomID",
+                Direction => 'descending',
+            }     
+        ],
         UserID     => 1,
         Permission => 'rw',
     );
@@ -406,14 +496,28 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     @TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'ARRAY',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ]
-        },
-        SortBy     => "DynamicField_DFTArticle2$RandomID",
-        OrderBy    => 'Up',
+        Result  => 'ARRAY',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
+                    Operator => 'EQ',
+                },      
+            ]
+        },   
+        Sort       => [
+            {
+                Field => "DynamicField_DFTArticle2$RandomID",
+                Direction => 'ascending',
+            }     
+        ],
         UserID     => 1,
         Permission => 'rw',
     );
@@ -425,14 +529,28 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     );
 
     @TicketIDsSearch = $TicketObject->TicketSearch(
-        Result                              => 'ARRAY',
-        Limit                               => 100,
-        Title                               => "Ticket$RandomID",
-        "DynamicField_DFTArticle1$RandomID" => {
-            Equals => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ]
-        },
-        SortBy     => "DynamicField_DFTArticle2$RandomID",
-        OrderBy    => 'Down',
+        Result  => 'ARRAY',
+        Limit   => 100,
+        Filter  => {
+            AND => [ 
+                {
+                    Field => 'Title',
+                    Value => "Ticket$RandomID",
+                    Operator => 'EQ',
+                },
+                {
+                    Field => "DynamicField_DFTArticle1$RandomID",
+                    Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
+                    Operator => 'EQ',
+                },      
+            ]
+        },   
+        Sort       => [
+            {
+                Field => "DynamicField_DFTArticle2$RandomID",
+                Direction => 'descending',
+            }     
+        ],
         UserID     => 1,
         Permission => 'rw',
     );
