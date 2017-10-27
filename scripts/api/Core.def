@@ -63,3 +63,6 @@
 /roles/:RoleID                                                      |   GET             | V1::Role::RoleGet
 /roles/:RoleID                                                      |   PATCH           | V1::Role::RoleUpdate
 /roles/:RoleID                                                      |   DELETE          | V1::Role::RoleDelete
+/ticketlocks                                                        |   GET             | V1::Lock::LockSearch
+/ticketlocks/:LockID                                                |   GET             | V1::Lock::LockGet
+

@@ -107,7 +107,7 @@
                 <Item Key="Module">LockValidator</Item>
                 <Item Key="Validates">Lock,LockID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">LockGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>

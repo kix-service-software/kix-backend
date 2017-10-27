@@ -249,6 +249,76 @@ sub LockList {
     return %Data;
 }
 
+=item LockGet()
+
+returns a hash with Lock data
+
+    my %LockData = $LockObject->LockGet(
+        LockID => 2,
+    );
+
+This returns something like:
+
+    %LockData = (
+        'Name'       => '...',
+        'ID'         => 2,
+        'ValidID'    => '1',
+        'CreateTime' => '2010-04-07 15:41:15',CreateBy
+        'CreateBy'   => 1,       
+        'ChangeTime' => '2010-04-07 15:41:15',ChangeBy
+        'ChangeBy'   => 1,
+    );
+
+=cut
+
+sub LockGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{LockID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'LockID!'
+        );
+        return;
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # sql
+    return if !$DBObject->Prepare(
+        SQL => 'SELECT id, name, valid_id, '
+            . 'create_time, create_by, change_time, change_by '
+            . 'FROM ticket_lock_type WHERE id = ?',
+        Bind  => [ \$Param{LockID} ],
+    );
+
+    # fetch the result
+    my %Lock;
+    while ( my @Data = $DBObject->FetchrowArray() ) {
+        $Lock{ID}         = $Data[0];
+        $Lock{Name}       = $Data[1];
+        $Lock{ValidID}    = $Data[2];
+        $Lock{CreateTime} = $Data[3];
+        $Lock{CreateBy}   = $Data[4];
+        $Lock{ChangeTime} = $Data[5];
+        $Lock{ChangeBy}   = $Data[6];
+    }
+
+    # no data found...
+    if ( !%Lock ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Lock '$Param{LockID}' not found!",
+        );
+        return;
+    }
+
+    return %Lock;
+}
+
+
 1;
 
 
