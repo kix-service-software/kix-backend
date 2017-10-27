@@ -359,6 +359,7 @@ sub _ArticleCreate {
     my $To;
     if ( $Article->{To} ) { 
         $To => $Article->{To}
+    }
     else {
         if ( $Ticket->{Queue} ) {
             $To = $Ticket->{Queue};
