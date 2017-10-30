@@ -130,8 +130,7 @@ sub Run {
             },
         }
     );
-use Data::Dumper;
-print STDERR "Queueparam".Dumper(\%Param); 
+
     # check result
     if ( !$Result->{Success} ) {
         return $Self->_Error(
@@ -154,8 +153,7 @@ print STDERR "Queueparam".Dumper(\%Param);
             $Queue->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-use Data::Dumper;
-print STDERR "Queue".Dumper($Queue);        	
+      	
     # check if Queue exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
         Queue => $Queue->{Name},
@@ -167,8 +165,7 @@ print STDERR "Queue".Dumper($Queue);
             Message => "Can not create Queue. Queue with same name '$Queue->{Name}' already exists.",
         );
     }
-use Data::Dumper;
-print STDERR "Queue".Dumper($Queue);
+
     # create Queue
     my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
         Name                => $Queue->{Name},

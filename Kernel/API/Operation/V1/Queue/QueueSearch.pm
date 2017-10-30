@@ -112,11 +112,10 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
+
     # perform Queue search
     my %QueueList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
-print STDERR "paramlist".Dumper(\%QueueList);
+
 	# get already prepared Queue data from QueueGet operation
     if ( IsHashRefWithData(\%QueueList) ) {  	
         my $QueueGetResult = $Self->ExecOperation(
@@ -125,7 +124,7 @@ print STDERR "paramlist".Dumper(\%QueueList);
                 QueueID => join(',', sort keys %QueueList),
             }
         );    
-print STDERR "QueueGetResultparamlist".Dumper($QueueGetResult);
+
         if ( !IsHashRefWithData($QueueGetResult) || !$QueueGetResult->{Success} ) {
             return $QueueGetResult;
         }
