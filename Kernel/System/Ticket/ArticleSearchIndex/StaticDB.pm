@@ -134,122 +134,122 @@ sub ArticleIndexDeleteTicket {
     return 1;
 }
 
-sub _ArticleIndexQuerySQL {
-    my ( $Self, %Param ) = @_;
+# sub _ArticleIndexQuerySQL {
+#     my ( $Self, %Param ) = @_;
 
-    if ( !$Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need Data!"
-        );
-        return;
-    }
+#     if ( !$Param{Data} ) {
+#         $Kernel::OM->Get('Kernel::System::Log')->Log(
+#             Priority => 'error',
+#             Message  => "Need Data!"
+#         );
+#         return;
+#     }
 
-    # use also article table if required
-    for (
-        qw(
-        From To Cc Subject Body
-        ArticleCreateTimeOlderMinutes ArticleCreateTimeNewerMinutes
-        ArticleCreateTimeOlderDate ArticleCreateTimeNewerDate
-        )
-        )
-    {
-        if ( $Param{Data}->{$_} ) {
-            return ' INNER JOIN article_search art ON st.id = art.ticket_id ';
-        }
-    }
+#     # use also article table if required
+#     for (
+#         qw(
+#         From To Cc Subject Body
+#         ArticleCreateTimeOlderMinutes ArticleCreateTimeNewerMinutes
+#         ArticleCreateTimeOlderDate ArticleCreateTimeNewerDate
+#         )
+#         )
+#     {
+#         if ( $Param{Data}->{$_} ) {
+#             return ' INNER JOIN article_search art ON st.id = art.ticket_id ';
+#         }
+#     }
 
-    return '';
-}
+#     return '';
+# }
 
-sub _ArticleIndexQuerySQLExt {
-    my ( $Self, %Param ) = @_;
+# sub _ArticleIndexQuerySQLExt {
+#     my ( $Self, %Param ) = @_;
 
-    if ( !$Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need Data!"
-        );
-        return;
-    }
+#     if ( !$Param{Data} ) {
+#         $Kernel::OM->Get('Kernel::System::Log')->Log(
+#             Priority => 'error',
+#             Message  => "Need Data!"
+#         );
+#         return;
+#     }
 
-    my %FieldSQLMapFullText = (
-        From    => 'art.a_from',
-        To      => 'art.a_to',
-        Cc      => 'art.a_cc',
-        Subject => 'art.a_subject',
-        Body    => 'art.a_body',
-    );
+#     my %FieldSQLMapFullText = (
+#         From    => 'art.a_from',
+#         To      => 'art.a_to',
+#         Cc      => 'art.a_cc',
+#         Subject => 'art.a_subject',
+#         Body    => 'art.a_body',
+#     );
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+#     # get database object
+#     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    my $SQLExt      = '';
-    my $FullTextSQL = '';
-    KEY:
-    for my $Key ( sort keys %FieldSQLMapFullText ) {
+#     my $SQLExt      = '';
+#     my $FullTextSQL = '';
+#     KEY:
+#     for my $Key ( sort keys %FieldSQLMapFullText ) {
 
-        next KEY if !$Param{Data}->{$Key};
+#         next KEY if !$Param{Data}->{$Key};
 
-        # replace * by % for SQL like
-        $Param{Data}->{$Key} =~ s/\*/%/gi;
+#         # replace * by % for SQL like
+#         $Param{Data}->{$Key} =~ s/\*/%/gi;
 
-        # check search attribute, we do not need to search for *
-        next KEY if $Param{Data}->{$Key} =~ /^\%{1,3}$/;
+#         # check search attribute, we do not need to search for *
+#         next KEY if $Param{Data}->{$Key} =~ /^\%{1,3}$/;
 
-        if ($FullTextSQL) {
-            $FullTextSQL .= ' ' . $Param{Data}->{ContentSearch} . ' ';
-        }
+#         if ($FullTextSQL) {
+#             $FullTextSQL .= ' ' . $Param{Data}->{ContentSearch} . ' ';
+#         }
 
-        # check if search condition extension is used
-        if ( $Param{Data}->{ConditionInline} ) {
-            $FullTextSQL .= $DBObject->QueryCondition(
-                Key          => $FieldSQLMapFullText{$Key},
-                Value        => lc $Param{Data}->{$Key},
-                SearchPrefix => $Param{Data}->{ContentSearchPrefix},
-                SearchSuffix => $Param{Data}->{ContentSearchSuffix},
-                Extended     => 1,
-                CaseSensitive => 1,    # data in article_search are already stored in lower cases
+#         # check if search condition extension is used
+#         if ( $Param{Data}->{ConditionInline} ) {
+#             $FullTextSQL .= $DBObject->QueryCondition(
+#                 Key          => $FieldSQLMapFullText{$Key},
+#                 Value        => lc $Param{Data}->{$Key},
+#                 SearchPrefix => $Param{Data}->{ContentSearchPrefix},
+#                 SearchSuffix => $Param{Data}->{ContentSearchSuffix},
+#                 Extended     => 1,
+#                 CaseSensitive => 1,    # data in article_search are already stored in lower cases
 
-                # KIX4OTRS-capeIT
-                # tell QueryCondition method to regard StaticDB advantages
-                StaticDB => 1,
+#                 # KIX4OTRS-capeIT
+#                 # tell QueryCondition method to regard StaticDB advantages
+#                 StaticDB => 1,
 
-                # EO KIX4OTRS-capeIT
-            );
-        }
-        else {
+#                 # EO KIX4OTRS-capeIT
+#             );
+#         }
+#         else {
 
-            my $Field = $FieldSQLMapFullText{$Key};
-            my $Value = $Param{Data}->{$Key};
+#             my $Field = $FieldSQLMapFullText{$Key};
+#             my $Value = $Param{Data}->{$Key};
 
-            if ( $Param{Data}->{ContentSearchPrefix} ) {
-                $Value = $Param{Data}->{ContentSearchPrefix} . $Value;
-            }
-            if ( $Param{Data}->{ContentSearchSuffix} ) {
-                $Value .= $Param{Data}->{ContentSearchSuffix};
-            }
+#             if ( $Param{Data}->{ContentSearchPrefix} ) {
+#                 $Value = $Param{Data}->{ContentSearchPrefix} . $Value;
+#             }
+#             if ( $Param{Data}->{ContentSearchSuffix} ) {
+#                 $Value .= $Param{Data}->{ContentSearchSuffix};
+#             }
 
-            # replace %% by % for SQL
-            $Param{Data}->{$Key} =~ s/%%/%/gi;
+#             # replace %% by % for SQL
+#             $Param{Data}->{$Key} =~ s/%%/%/gi;
 
-            # replace * with % (for SQL)
-            $Value =~ s/\*/%/g;
+#             # replace * with % (for SQL)
+#             $Value =~ s/\*/%/g;
 
-            # db quote
-            $Value = lc $DBObject->Quote( $Value, 'Like' );
+#             # db quote
+#             $Value = lc $DBObject->Quote( $Value, 'Like' );
 
-            # Lower conversion is already done, don't use LOWER()/LCASE()
-            $FullTextSQL .= " $Field LIKE '$Value'";
-        }
-    }
+#             # Lower conversion is already done, don't use LOWER()/LCASE()
+#             $FullTextSQL .= " $Field LIKE '$Value'";
+#         }
+#     }
 
-    if ($FullTextSQL) {
-        $SQLExt = ' AND (' . $FullTextSQL . ')';
-    }
+#     if ($FullTextSQL) {
+#         $SQLExt = ' AND (' . $FullTextSQL . ')';
+#     }
 
-    return $SQLExt;
-}
+#     return $SQLExt;
+# }
 
 sub _ArticleIndexString {
     my ( $Self, %Param ) = @_;

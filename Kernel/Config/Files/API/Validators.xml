@@ -217,7 +217,7 @@
                 <Item Key="Module">TicketValidator</Item>
                 <Item Key="Validates">TicketID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">TicketGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
