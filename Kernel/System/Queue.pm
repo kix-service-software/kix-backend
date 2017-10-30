@@ -1416,6 +1416,39 @@ sub NameExistsCheck {
     return 0;
 }
 
+sub QueueDelete {
+    my ( $Self, %Param ) = @_;
+    
+use Data::Dumper;
+print STDERR "Del".Dumper(\%Param);
+
+    # check needed stuff
+    for (qw(QueueID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM queue WHERE id = ?',
+        Bind => [ \$Param{QueueID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+}
+
+
 1;
 
 
