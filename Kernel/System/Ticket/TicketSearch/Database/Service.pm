@@ -50,9 +50,10 @@ sub GetSupportedAttributes {
 
     return {
         Filter => [
+            'Service',
             'ServiceID',
         ],
-        Sort => [
+        Sort => [        
             'ServiceID',
         ]
     };
@@ -86,11 +87,39 @@ sub Filter {
         return;
     }
 
+    my @ServiceIDs;
+    if ( $Param{Filter}->{Field} eq 'Service' ) {
+        my @ServiceList = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @ServiceList = @{$Param{Filter}->{Value}}
+        }
+        foreach my $Service ( @ServiceList ) {
+            my $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+                Service => $Service,
+            );
+            if ( !$ServiceID ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown Service $Service!",
+                );
+                return;
+            }                
+
+            push( @ServiceIDs, $ServiceID );
+        }
+    }
+    else {
+        @ServiceIDs = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @ServiceIDs = @{$Param{Filter}->{Value}}
+        }
+    }
+
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.service_id = '.$Param{Filter}->{Value} );
+        push( @SQLWhere, 'st.service_id = '.$ServiceIDs[0] );
     }
     elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.service_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+        push( @SQLWhere, 'st.service_id IN ('.(join(',', @ServiceIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(

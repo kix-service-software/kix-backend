@@ -50,6 +50,7 @@ sub GetSupportedAttributes {
 
     return {
         Filter => [
+            'SLA',
             'SLAID',
         ],
         Sort => [
@@ -86,11 +87,39 @@ sub Filter {
         return;
     }
 
+    my @SLAIDs;
+    if ( $Param{Filter}->{Field} eq 'SLA' ) {
+        my @SLAList = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @SLAList = @{$Param{Filter}->{Value}}
+        }
+        foreach my $SLA ( @SLAList ) {
+            my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+                SLA => $SLA,
+            );
+            if ( !$SLAID ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown SLA $SLA!",
+                );
+                return;
+            }                
+
+            push( @SLAIDs, $SLAID );
+        }
+    }
+    else {
+        @SLAIDs = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @SLAIDs = @{$Param{Filter}->{Value}}
+        }
+    }
+
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.sla_id = '.$Param{Filter}->{Value} );
+        push( @SQLWhere, 'st.sla_id = '.$SLAIDs[0] );
     }
     elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.sla_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+        push( @SQLWhere, 'st.sla_id IN ('.(join(',', @SLAIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(

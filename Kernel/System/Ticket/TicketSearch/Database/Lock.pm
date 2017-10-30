@@ -49,8 +49,12 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [ 'LockID' ],
-        Sort   => [ 'LockID ']
+        Filter => [ 
+            'LockID' 
+        ],
+        Sort   => [ 
+            'LockID '
+        ]
     };
 }
 

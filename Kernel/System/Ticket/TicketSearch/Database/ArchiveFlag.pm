@@ -49,8 +49,12 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [ 'Archived' ],
-        Sort   => [ ]
+        Filter => [ 
+            'Archived' 
+        ],
+        Sort   => [ 
+            'Archived' 
+        ]
     };
 }
 
@@ -105,6 +109,35 @@ sub Filter {
         SQLWhere => \@SQLWhere,
     };        
 }
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        SQLAttrs => [
+            'st.archive_flag'
+        ],
+        SQLOrderBy => [
+            'st.archive_flag'
+        ],
+    };       
+}
+
 
 1;
 

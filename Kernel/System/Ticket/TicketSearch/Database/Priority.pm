@@ -49,8 +49,13 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [ 'PriorityID' ],
-        Sort   => [ 'PriorityID' ],
+        Filter => [
+            'Priority',
+            'PriorityID' 
+        ],
+        Sort   => [ 
+            'PriorityID' 
+        ],
     };
 }
 
@@ -82,11 +87,39 @@ sub Filter {
         return;
     }
 
+    my @PriorityIDs;
+    if ( $Param{Filter}->{Field} eq 'Priority' ) {
+        my @PriorityList = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @PriorityList = @{$Param{Filter}->{Value}}
+        }
+        foreach my $Priority ( @PriorityList ) {
+            my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+                Priority => $Priority,
+            );
+            if ( !$PriorityID ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown priority $Priority!",
+                );
+                return;
+            }                
+
+            push( @PriorityIDs, $PriorityID );
+        }
+    }
+    else {
+        @PriorityIDs = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @PriorityIDs = @{$Param{Filter}->{Value}}
+        }
+    }
+
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.ticket_priority_id = '.$Param{Filter}->{Value} );
+        push( @SQLWhere, 'st.ticket_priority_id = '.$PriorityIDs[0] );
     }
     elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.ticket_priority_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+        push( @SQLWhere, 'st.ticket_priority_id IN ('.(join(',', @PriorityIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(

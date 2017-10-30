@@ -105,6 +105,11 @@ sub Filter {
     elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
         push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." LIKE '%".$Param{Filter}->{Value}."%'" );
     }
+    elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+        my $Value = $Param{Filter}->{Value};
+        $Value =~ s/\*/%/g;
+        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." LIKE '".$Value."'" );
+    }    
     elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
         push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}." IN ('".(join("','", @{$Param{Filter}->{Value}}))."')" );
     }

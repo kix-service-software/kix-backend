@@ -53,11 +53,11 @@ sub GetSupportedAttributes {
     return {
         Filter => [
             'StateID',
-            'StateType'
+            'StateType',
+            'StateTypeID',
         ],
         Sort => [
             'StateID',
-            'StateType',
         ]
     };
 }
@@ -92,6 +92,7 @@ sub Filter {
 
     my $Operator = $Param{Filter}->{Operator};
     my $Value    = $Param{Filter}->{Value};
+    my @StateIDs;
 
     # special handling for StateType
     if ( $Param{Filter}->{Field} eq 'StateType' ) {
@@ -101,8 +102,7 @@ sub Filter {
         if ( IsArrayRefWithData($Value) ) {
             @StateTypes = @{$Value};
         }
-
-        my @StateIDs;
+       
         foreach my $StateType ( @StateTypes ) {
             
             if ( $StateType eq 'Open' ) {
@@ -143,7 +143,12 @@ sub Filter {
             }
         }
 
-        $Value = \@StateIDs;
+        if (!@StateIDs) {
+            # we need to restrict to something
+            push(@StateIDs, -1);
+        }
+
+        # we have to do an IN seasrch in this case
         $Operator = 'IN';
     }
     elsif ( $Param{Filter}->{Field} eq 'StateTypeID' ) {
@@ -154,7 +159,6 @@ sub Filter {
             @StateTypeIDs = @{$Value};
         }
 
-        my @StateIDs;
         foreach my $StateTypeID ( @StateTypeIDs ) {       
             my $StateType = $Kernel::OM->Get('Kernel::System::State')->StateTypeLookup(
                 StateTypeID => $StateTypeID,
@@ -170,19 +174,50 @@ sub Filter {
                 StateType => $StateType,
                 Result    => 'ID',
             );
+
             push(@StateIDs, @StateTypeStateIDs);
         }
 
-        $Value = \@StateIDs;
+        if (!@StateIDs) {
+            # we need to restrict to something
+            push(@StateIDs, -1);
+        }
+
+        # we have to do an IN seasrch in this case
         $Operator = 'IN';
     }
+    elsif ( $Param{Filter}->{Field} eq 'State' ) {
+        my @StateList = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @StateList = @{$Param{Filter}->{Value}}
+        }
+        foreach my $State ( @StateList ) {
+            my $StateID = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+                State => $State,
+            );
+            if ( !$StateID ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown state $State!",
+                );
+                return;
+            }                
 
+            push( @StateIDs, $StateID );
+        }
+    }
+    else {
+        @StateIDs = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @StateIDs = @{$Param{Filter}->{Value}}
+        }
+    }
 
     if ( $Operator eq 'EQ' ) {
-        push( @SQLWhere, 'st.ticket_state_id = '.$Value );
+        push( @SQLWhere, 'st.ticket_state_id = '.$StateIDs[0] );
     }
     elsif ( $Operator eq 'IN' ) {
-        push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @{$Value})).')' );
+        push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @StateIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -195,6 +230,34 @@ sub Filter {
     return {
         SQLWhere => \@SQLWhere,
     };        
+}
+
+=item Sort()
+
+run this module and return the SQL extensions
+
+    my $Result = $Object->Sort(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        SQLAttrs   => [ ],          # optional
+        SQLOrderBy => [ ]           # optional
+    };
+
+=cut
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        SQLAttrs => [
+            'st.ticket_state_id'
+        ],
+        SQLOrderBy => [
+            'st.ticket_state_id'
+        ],
+    };       
 }
 
 1;

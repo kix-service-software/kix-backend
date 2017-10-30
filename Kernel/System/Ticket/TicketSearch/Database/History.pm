@@ -53,6 +53,8 @@ sub GetSupportedAttributes {
             'CreatedTypeID',
             'CreatedUserID',
             'CreatedStateID',
+            'CreatedQueueID',
+            'CreatedPriorityID',
             'CloseTime',
             'ChangeTime',
         ],
@@ -60,6 +62,8 @@ sub GetSupportedAttributes {
             'CreatedTypeID',
             'CreatedUserID',
             'CreatedStateID',
+            'CreatedQueueID',
+            'CreatedPriorityID',
             'CloseTime',
             'ChangeTime',            
         ]

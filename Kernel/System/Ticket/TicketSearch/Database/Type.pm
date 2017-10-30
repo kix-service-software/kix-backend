@@ -85,11 +85,39 @@ sub Filter {
         return;
     }
 
+    my @TypeIDs;
+    if ( $Param{Filter}->{Field} eq 'Type' ) {
+        my @TypeList = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @TypeList = @{$Param{Filter}->{Value}}
+        }
+        foreach my $Type ( @TypeList ) {
+            my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+                Type => $Type,
+            );
+            if ( !$TypeID ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown Type $Type!",
+                );
+                return;
+            }                
+
+            push( @TypeIDs, $TypeID );
+        }
+    }
+    else {
+        @TypeIDs = ( $Param{Filter}->{Value} );
+        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
+            @TypeIDs = @{$Param{Filter}->{Value}}
+        }
+    }
+
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.type_id = '.$Param{Filter}->{Value} );
+        push( @SQLWhere, 'st.type_id = '.$TypeIDs[0] );
     }
     elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.type_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+        push( @SQLWhere, 'st.type_id IN ('.(join(',', @TypeIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
