@@ -186,7 +186,7 @@ sub Run {
         SystemAddressID     => $Queue->{SystemAddressID} || 1,
         SalutationID        => $Queue->{SalutationID} || 1,
         SignatureID         => $Queue->{SignatureID} || 1, 
-        UserID  => $Self->{Authorization}->{UserID},
+        UserID              => $Self->{Authorization}->{UserID},
     );
 
     if ( !$QueueID ) {
