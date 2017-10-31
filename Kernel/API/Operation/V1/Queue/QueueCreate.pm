@@ -183,9 +183,9 @@ sub Run {
         FollowUpID          => $Queue->{FollowUpID} || '',
         FollowUpLock        => $Queue->{FollowUpLock} || '',
         DefaultSignKey      => $Queue->{DefaultSignKey} || '',
-        SystemAddressID     => 1,
-        SalutationID        => 1,
-        SignatureID         => 1, 
+        SystemAddressID     => $Queue->{SystemAddressID} || 1,
+        SalutationID        => $Queue->{SalutationID} || 1,
+        SignatureID         => $Queue->{SignatureID} || 1, 
         UserID  => $Self->{Authorization}->{UserID},
     );
 

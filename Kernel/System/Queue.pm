@@ -1418,9 +1418,6 @@ sub NameExistsCheck {
 
 sub QueueDelete {
     my ( $Self, %Param ) = @_;
-    
-use Data::Dumper;
-print STDERR "Del".Dumper(\%Param);
 
     # check needed stuff
     for (qw(QueueID UserID)) {
