@@ -89,6 +89,9 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
                 FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
                 DefaultSignKey      => '...',     # (optional)
+                SystemAddressID     => '...',
+                SalutationID        => '...',
+                SignatureID         => '...',                       
                 UserID              => '...',               
             },
 	    },

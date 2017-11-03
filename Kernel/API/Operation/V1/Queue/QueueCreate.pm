@@ -89,13 +89,7 @@ perform QueueCreate Operation. This will return the created QueueID.
 		        SystemAddressID     => '...',
 		        SalutationID        => '...',
 		        SignatureID         => '...', 		        
-		        UserID              => '...',
-		        
-
-
-
-
-        UserID              => $Self->{Authorization}->{UserID},		        	        	
+		        UserID              => '...',        	        	
 	    	},
 	    },
     );
