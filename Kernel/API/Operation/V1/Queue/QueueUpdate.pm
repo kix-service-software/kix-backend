@@ -188,15 +188,15 @@ sub Run {
         SolutionTime        => $Queue->{SolutionTime} || $QueueData{SolutionTime},
         SolutionNotify      => $Queue->{SolutionNotify} || $QueueData{SolutionNotify},
         UnlockTimeout       => $Queue->{UnlockTimeout} || $QueueData{UnlockTimeout},
-        FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID} || 0,
+        FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID},
         FollowUpLock        => $Queue->{FollowUpLock} || $QueueData{FollowUpLock},
         DefaultSignKey      => $Queue->{DefaultSignKey} || $QueueData{DefaultSignKey},
-        SystemAddressID     => $Queue->{SystemAddressID} || $QueueData{SystemAddressID} || 1,
-        SalutationID        => $Queue->{SalutationID} || $QueueData{SalutationID} || 1,
-        SignatureID         => $Queue->{SignatureID} || $QueueData{SignatureID} || 1,            
-        Comment => $Queue->{Comment} || $QueueData{Comment},
-        ValidID => $Queue->{ValidID}  || $QueueData{ValidID} || 1,
-        UserID  => $Self->{Authorization}->{UserID},
+        SystemAddressID     => $Queue->{SystemAddressID} || $QueueData{SystemAddressID},
+        SalutationID        => $Queue->{SalutationID} || $QueueData{SalutationID},
+        SignatureID         => $Queue->{SignatureID} || $QueueData{SignatureID},            
+        Comment             => $Queue->{Comment} || $QueueData{Comment},
+        ValidID             => $Queue->{ValidID}  || $QueueData{ValidID},
+        UserID              => $Self->{Authorization}->{UserID},
     ); 
     
     if ( !$Success ) {

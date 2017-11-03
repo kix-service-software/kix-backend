@@ -86,7 +86,16 @@ perform QueueCreate Operation. This will return the created QueueID.
 		        FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
 		        FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
 		        DefaultSignKey      => '...',     # (optional)
-		        UserID              => '...',	        	
+		        SystemAddressID     => '...',
+		        SalutationID        => '...',
+		        SignatureID         => '...', 		        
+		        UserID              => '...',
+		        
+
+
+
+
+        UserID              => $Self->{Authorization}->{UserID},		        	        	
 	    	},
 	    },
     );
@@ -128,6 +137,9 @@ sub Run {
             'Queue::Name' => {
                 Required => 1
             },
+            'Queue::GroupID' => {
+                Required => 1
+            },            
         }
     );
 
@@ -171,7 +183,7 @@ sub Run {
         Name                => $Queue->{Name},
         Comment             => $Queue->{Comment} || '',
         ValidID             => $Queue->{ValidID} || 1,
-        GroupID             => $Queue->{GroupID} || '',
+        GroupID             => $Queue->{GroupID},
         Calendar            => $Queue->{Calendar} || '',
         FirstResponseTime   => $Queue->{FirstResponseTime} || '',
         FirstResponseNotify => $Queue->{FirstResponseNotify} || '',
