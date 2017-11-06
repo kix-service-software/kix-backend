@@ -73,7 +73,6 @@ perform QueueUpdate Operation. This will return the updated TypeID.
     my $Result = $OperationObject->Run(
         Data => {
             QueueID => 123,
-            UserID  => 123,
             Queue  => {
                 Name                => '...',
                 Comment             => '...',     # (optional)
