@@ -70,6 +70,7 @@ perform QueueCreate Operation. This will return the created QueueID.
 
     my $Result = $OperationObject->Run(
         Data => {
+        	UserID  => 123,
 	    	Queue  => {
 	        	Name                => '...',
 	        	Comment             => '...',     # (optional)
@@ -88,8 +89,7 @@ perform QueueCreate Operation. This will return the created QueueID.
 		        DefaultSignKey      => '...',     # (optional)
 		        SystemAddressID     => '...',
 		        SalutationID        => '...',
-		        SignatureID         => '...', 		        
-		        UserID              => '...',        	        	
+		        SignatureID         => '...', 		               	        	
 	    	},
 	    },
     );

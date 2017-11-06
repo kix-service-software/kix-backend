@@ -95,7 +95,7 @@ sub Run {
 
     if ( !$Result->{Success} ) {
         $Self->_Error(
-            Code    => 'Webservice.InAddressBookConfiguration',
+            Code    => 'Webservice.InInvalidConfiguration',
             Message => $Result->{Message},
         );
     }
