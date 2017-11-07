@@ -218,6 +218,7 @@
                 <Item Key="PriorityUpdate.PriorityExists">400</Item>
                 <Item Key="PriorityDelete.TicketExists">409</Item>   
                 <Item Key="Provider.InternalError">500</Item>
+                <Item Key="QueueCreate.QueueExists">409</Item>
                 <Item Key="SessionCreate.AuthFail">401</Item>
                 <Item Key="SessionDelete.DeleteError">404</Item>
                 <Item Key="SessionGet.TokenError">404</Item>

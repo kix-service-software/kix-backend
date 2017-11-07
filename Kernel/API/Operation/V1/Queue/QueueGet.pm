@@ -108,7 +108,7 @@ sub Run {
 
     if ( !$Result->{Success} ) {
         $Self->_Error(
-            Code    => 'Webservice.InQueueConfiguration',
+            Code    => 'Webservice.InvalidConfiguration',
             Message => $Result->{Message},
         );
     }
