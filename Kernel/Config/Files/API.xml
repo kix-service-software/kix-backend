@@ -198,7 +198,9 @@
                 <Item Key="Forbidden">403</Item>
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
+                <Item Key="Object.AlreadyExists">409</Item>
                 <Item Key="Object.Created">201</Item>
+                <Item Key="Object.DependingObjectExists">409</Item>
                 <Item Key="Object.NoPermission">403</Item>
                 <Item Key="Object.NotFound">404</Item>
                 <Item Key="Object.UnableToCreate">400</Item>
@@ -261,7 +263,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
- 
    
 </kix_config>
     

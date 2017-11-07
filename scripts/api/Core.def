@@ -65,4 +65,9 @@
 /roles/:RoleID                                                      |   DELETE          | V1::Role::RoleDelete
 /ticketlocks                                                        |   GET             | V1::Lock::LockSearch
 /ticketlocks/:LockID                                                |   GET             | V1::Lock::LockGet
+/queues                                                             |   GET             | V1::Queue::QueueSearch
+/queues                                                             |   POST            | V1::Queue::QueueCreate
+/queues/:QueueID                                                    |   GET             | V1::Queue::QueueGet
+/queues/:QueueID                                                    |   PATCH           | V1::Queue::QueueUpdate
+/queues/:QueueID                                                    |   DELETE          | V1::Queue::QueueDelete
 

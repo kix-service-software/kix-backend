@@ -462,6 +462,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Lock::LockGet
+    QueueSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueSearch
+    QueueCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueCreate
+    QueueGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueGet
+    QueueUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueUpdate
+    QueueDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueDelete
 
   Transport:
     Config:
@@ -728,6 +763,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /ticketlocks/:LockID
+        QueueSearch:
+          RequestMethod:
+          - GET
+          Route: /queues
+        QueueCreate:
+          RequestMethod:
+          - POST
+          Route: /queues
+        QueueGet:
+          RequestMethod:
+          - GET
+          Route: /queues/:QueueID
+        QueueUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /queues/:QueueID
+        QueueDelete:
+          RequestMethod:
+          - DELETE
+          Route: /queues/:QueueID
 
     Type: HTTP::REST
 RemoteSystem: ''
