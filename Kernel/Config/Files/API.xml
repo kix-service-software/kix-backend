@@ -198,6 +198,7 @@
                 <Item Key="Forbidden">403</Item>
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
+                <Item Key="Object.AlreadyExists">409</Item>
                 <Item Key="Object.Created">201</Item>
                 <Item Key="Object.NoPermission">403</Item>
                 <Item Key="Object.NotFound">404</Item>
@@ -218,7 +219,6 @@
                 <Item Key="PriorityUpdate.PriorityExists">400</Item>
                 <Item Key="PriorityDelete.TicketExists">409</Item>   
                 <Item Key="Provider.InternalError">500</Item>
-                <Item Key="QueueCreate.QueueExists">409</Item>
                 <Item Key="SessionCreate.AuthFail">401</Item>
                 <Item Key="SessionDelete.DeleteError">404</Item>
                 <Item Key="SessionGet.TokenError">404</Item>
