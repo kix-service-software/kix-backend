@@ -166,7 +166,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'QueueCreate.QueueExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create Queue. Queue with same name '$Queue->{Name}' already exists.",
         );
     }
