@@ -127,7 +127,7 @@ sub Run {
         
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
-                Code    => 'QueueDelete.TicketExists',
+                Code    => 'Object.DependingObjectExists',
                 Message => 'Can not delete Queue. A Ticket with this Queue already exists.',
             );
         }
