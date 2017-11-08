@@ -151,7 +151,7 @@
                 <Item Key="Module">ServiceValidator</Item>
                 <Item Key="Validates">Service,ServiceID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(ServiceGet|ServiceCreate|ServiceUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
