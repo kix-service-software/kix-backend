@@ -80,8 +80,8 @@ perform ServiceUpdate Operation. This will return the updated TypeID.
                 ParentID    => '...',
                 TypeID      => '...',
                 Criticality => '...',	            
-            }
-	    },
+            },
+        },
 	);
     
 

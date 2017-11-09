@@ -77,8 +77,8 @@ perform ServiceCreate Operation. This will return the created ServiceID.
                 ValidID     => 1,
                 TypeID      => 2,
                 Criticality => '...',
-	    	},
-	    },
+            },
+        },
     );
 
     $Result = {
