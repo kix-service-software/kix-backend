@@ -74,9 +74,9 @@ perform ServiceUpdate Operation. This will return the updated TypeID.
         Data => {
             ServiceID => 123,
             Service   => {
-	            Name    => '...',
-	            Comment => '...',
-	            ValidID => 1,
+                Name    => '...',
+                Comment => '...',
+                ValidID => 1,
                 ParentID    => '...',
                 TypeID      => '...',
                 Criticality => '...',	            
