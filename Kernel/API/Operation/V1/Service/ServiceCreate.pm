@@ -70,8 +70,7 @@ perform ServiceCreate Operation. This will return the created ServiceID.
 
     my $Result = $OperationObject->Run(
         Data => {
-        	UserID   => 1,
-	    	Service  => {
+            Service  => {
                 Name     => '...',
                 ParentID => 1,            # (optional)
                 Comment  => '...',        # (optional)
@@ -119,6 +118,9 @@ sub Run {
             'Service::Name' => {
                 Required => 1
             },
+            'Service::TypID' => {
+                Required => 1
+            },            
         }
     );
 
@@ -164,7 +166,7 @@ sub Run {
         Comment     => $Service->{Comment} || '',
         ValidID     => $Service->{ValidID} || 1,
         ParentID    => $Service->{ParentID} || '',
-        TypeID      => $Service->{TypeID} || 2,
+        TypeID      => $Service->{TypeID},
         Criticality => $Service->{Criticality} ||'3 normal',
         UserID      => $Self->{Authorization}->{UserID},
     );

@@ -127,7 +127,7 @@ sub Run {
         
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
-                Code    => 'ServiceDelete.TicketExists',
+                Code    => 'Object.DependingObjectExists',
                 Message => 'Can not delete Service. A Ticket with this Service already exists.',
             );
         }
