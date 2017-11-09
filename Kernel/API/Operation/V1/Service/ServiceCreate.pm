@@ -72,12 +72,12 @@ perform ServiceCreate Operation. This will return the created ServiceID.
         Data => {
         	UserID   => 1,
 	    	Service  => {
-		        Name     => '...',
-		        ParentID => 1,            # (optional)
-		        Comment  => '...',        # (optional)
-		        ValidID     => 1,
-		        TypeID      => 2,
-		        Criticality => '...',
+                Name     => '...',
+                ParentID => 1,            # (optional)
+                Comment  => '...',        # (optional)
+                ValidID     => 1,
+                TypeID      => 2,
+                Criticality => '...',
 	    	},
 	    },
     );
