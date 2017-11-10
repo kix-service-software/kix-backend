@@ -69,7 +69,7 @@ sub new {
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     # KIX4OTRS-capeIT
-    # load service extension modules
+    # load SLA extension modules
     my $CustomModule = $Kernel::OM->Get('Kernel::Config')->Get('SLA::CustomModule');
     if ($CustomModule) {
         my %ModuleList;
@@ -96,7 +96,7 @@ sub new {
 return a hash list of slas
 
     my %SLAList = $SLAObject->SLAList(
-        ServiceID => 1,  # (optional)
+        SLAID => 1,  # (optional)
         Valid     => 0,  # (optional) default 1 (0|1)
         UserID    => 1,
     );
@@ -123,17 +123,17 @@ sub SLAList {
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # add ServiceID
+    # add SLAID
     my %SQLTable;
     $SQLTable{sla} = 'sla s';
     my @SQLWhere;
-    if ( $Param{ServiceID} ) {
+    if ( $Param{SLAID} ) {
 
         # quote
-        $Param{ServiceID} = $DBObject->Quote( $Param{ServiceID}, 'Integer' );
+        $Param{SLAID} = $DBObject->Quote( $Param{SLAID}, 'Integer' );
 
-        $SQLTable{service} = 'service_sla r';
-        push @SQLWhere, "s.id = r.sla_id AND r.service_id = $Param{ServiceID}";
+        $SQLTable{SLA} = 'SLA_sla r';
+        push @SQLWhere, "s.id = r.sla_id AND r.SLA_id = $Param{SLAID}";
     }
 
     # add valid part
@@ -187,7 +187,7 @@ Returns:
           'UpdateNotify'        => '70',  # in percent
           'SolutionTime'        => '960', # in minutes according to business hours
           'SolutionNotify'      => '80',  # in percent
-          'ServiceIDs'          => [
+          'SLAIDs'          => [
                                      '4'
                                      '7'
                                      '8'
@@ -300,20 +300,20 @@ sub SLAGet {
     $SLAData{Type} = $SLATypeList->{ $SLAData{TypeID} } || '';
 # ---
 
-    # get all service ids
+    # get all SLA ids
     $DBObject->Prepare(
-        SQL  => 'SELECT service_id FROM service_sla WHERE sla_id = ? ORDER BY service_id ASC',
+        SQL  => 'SELECT SLA_id FROM SLA_sla WHERE sla_id = ? ORDER BY SLA_id ASC',
         Bind => [ \$SLAData{SLAID} ],
     );
 
     # fetch the result
-    my @ServiceIDs;
+    my @SLAIDs;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        push @ServiceIDs, $Row[0];
+        push @SLAIDs, $Row[0];
     }
 
     # add the ids
-    $SLAData{ServiceIDs} = \@ServiceIDs;
+    $SLAData{SLAIDs} = \@SLAIDs;
 
     # get sla preferences
     my %Preferences = $Self->SLAPreferencesGet( SLAID => $Param{SLAID} );
@@ -454,7 +454,7 @@ sub SLALookup {
 add a sla
 
     my $SLAID = $SLAObject->SLAAdd(
-        ServiceIDs          => [ 1, 5, 7 ],  # (optional)
+        SLAIDs          => [ 1, 5, 7 ],  # (optional)
         Name                => 'SLA Name',
         Calendar            => 'Calendar1',  # (optional)
         FirstResponseTime   => 120,          # (optional)
@@ -495,17 +495,17 @@ sub SLAAdd {
         }
     }
 
-    # check service ids
-    if ( defined $Param{ServiceIDs} && ref $Param{ServiceIDs} ne 'ARRAY' ) {
+    # check SLA ids
+    if ( defined $Param{SLAIDs} && ref $Param{SLAIDs} ne 'ARRAY' ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'ServiceIDs needs to be an array reference!',
+            Message  => 'SLAIDs needs to be an array reference!',
         );
         return;
     }
 
     # set default values
-    $Param{ServiceIDs}          ||= [];
+    $Param{SLAIDs}          ||= [];
     $Param{Calendar}            ||= '';
     $Param{Comment}             ||= '';
     $Param{FirstResponseTime}   ||= 0;
@@ -612,17 +612,17 @@ sub SLAAdd {
 
     # remove all existing allocations
     $DBObject->Do(
-        SQL  => 'DELETE FROM service_sla WHERE sla_id = ?',
+        SQL  => 'DELETE FROM SLA_sla WHERE sla_id = ?',
         Bind => [ \$SLAID ],
     );
 
     # add the new allocations
-    for my $ServiceID ( @{ $Param{ServiceIDs} } ) {
+    for my $SLAID ( @{ $Param{SLAIDs} } ) {
 
         # add one allocation
         $DBObject->Do(
-            SQL  => 'INSERT INTO service_sla (service_id, sla_id) VALUES (?, ?)',
-            Bind => [ \$ServiceID, \$SLAID ],
+            SQL  => 'INSERT INTO SLA_sla (SLA_id, sla_id) VALUES (?, ?)',
+            Bind => [ \$SLAID, \$SLAID ],
         );
     }
 
@@ -635,8 +635,8 @@ update a existing sla
 
     my $True = $SLAObject->SLAUpdate(
         SLAID               => 2,
-        ServiceIDs          => [ 1, 2, 3 ],  # (optional)
-        Name                => 'Service Name',
+        SLAIDs          => [ 1, 2, 3 ],  # (optional)
+        Name                => 'SLA Name',
         Calendar            => 'Calendar1',  # (optional)
         FirstResponseTime   => 120,          # (optional)
         FirstResponseNotify => 60,           # (optional) notify agent if first response escalation is 60% reached
@@ -676,17 +676,17 @@ sub SLAUpdate {
         }
     }
 
-    # check service ids
-    if ( defined $Param{ServiceIDs} && ref $Param{ServiceIDs} ne 'ARRAY' ) {
+    # check SLA ids
+    if ( defined $Param{SLAIDs} && ref $Param{SLAIDs} ne 'ARRAY' ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'ServiceIDs need to be an array reference!',
+            Message  => 'SLAIDs need to be an array reference!',
         );
         return;
     }
 
     # set default values
-    $Param{ServiceIDs}          ||= [];
+    $Param{SLAIDs}          ||= [];
     $Param{Calendar}            ||= '';
     $Param{Comment}             ||= '';
     $Param{FirstResponseTime}   ||= 0;
@@ -754,7 +754,7 @@ sub SLAUpdate {
         Key  => 'Cache::SLALookup::ID::' . $Param{SLAID},
     );
 
-    # update service
+    # update SLA
     return if !$DBObject->Do(
 # ---
 # GeneralCatalog
@@ -787,17 +787,17 @@ sub SLAUpdate {
 
     # remove all existing allocations
     return if !$DBObject->Do(
-        SQL  => 'DELETE FROM service_sla WHERE sla_id = ?',
+        SQL  => 'DELETE FROM SLA_sla WHERE sla_id = ?',
         Bind => [ \$Param{SLAID}, ]
     );
 
     # add the new allocations
-    for my $ServiceID ( @{ $Param{ServiceIDs} } ) {
+    for my $SLAID ( @{ $Param{SLAIDs} } ) {
 
         # add one allocation
         return if !$DBObject->Do(
-            SQL  => 'INSERT INTO service_sla (service_id, sla_id) VALUES (?, ?)',
-            Bind => [ \$ServiceID, \$Param{SLAID} ],
+            SQL  => 'INSERT INTO SLA_sla (SLA_id, sla_id) VALUES (?, ?)',
+            Bind => [ \$SLAID, \$Param{SLAID} ],
         );
     }
 
@@ -838,6 +838,35 @@ sub SLAPreferencesGet {
     my $Self = shift;
 
     return $Self->{PreferencesObject}->SLAPreferencesGet(@_);
+}
+
+sub SLADelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(SLAID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM SLA WHERE id = ?',
+        Bind => [ \$Param{SLAID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 1;
