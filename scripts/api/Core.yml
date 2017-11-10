@@ -497,6 +497,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Queue::QueueDelete
+    ServiceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceSearch
+    ServiceCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceCreate
+    ServiceGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceGet
+    ServiceUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceUpdate
+    ServiceDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceDelete
 
   Transport:
     Config:
@@ -783,6 +818,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /queues/:QueueID
+        ServiceSearch:
+          RequestMethod:
+          - GET
+          Route: /services
+        ServiceCreate:
+          RequestMethod:
+          - POST
+          Route: /services
+        ServiceGet:
+          RequestMethod:
+          - GET
+          Route: /services/:ServiceID
+        ServiceUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /services/:ServiceID
+        ServiceDelete:
+          RequestMethod:
+          - DELETE
+          Route: /services/:ServiceID
 
     Type: HTTP::REST
 RemoteSystem: ''

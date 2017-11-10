@@ -70,4 +70,9 @@
 /queues/:QueueID                                                    |   GET             | V1::Queue::QueueGet
 /queues/:QueueID                                                    |   PATCH           | V1::Queue::QueueUpdate
 /queues/:QueueID                                                    |   DELETE          | V1::Queue::QueueDelete
+/services                                                           |   GET             | V1::Service::ServiceSearch
+/services                                                           |   POST            | V1::Service::ServiceCreate
+/services/:ServiceID                                                |   GET             | V1::Service::ServiceGet
+/services/:ServiceID                                                |   PATCH           | V1::Service::ServiceUpdate
+/services/:ServiceID                                                |   DELETE          | V1::Service::ServiceDelete
 

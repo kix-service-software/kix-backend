@@ -1763,6 +1763,35 @@ sub _ServiceGetCurrentIncidentState {
 
 # ---
 
+sub ServiceDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ServiceID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM service WHERE id = ?',
+        Bind => [ \$Param{ServiceID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+}
+
 1;
 
 
