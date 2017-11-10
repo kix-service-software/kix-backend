@@ -87,8 +87,8 @@ perform SLAUpdate Operation. This will return the updated TypeID.
                 TypeID                  => 2,
                 MinTimeBetweenIncidents => 3443,     # (optional)
             },
-	    },
-	);
+        },
+    );
     
 
     $Result = {

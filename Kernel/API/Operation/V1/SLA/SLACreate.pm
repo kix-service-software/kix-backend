@@ -70,21 +70,21 @@ perform SLACreate Operation. This will return the created SLAID.
 
     my $Result = $OperationObject->Run(
         Data => {
-	    	SLA  => {
-		        Name                    => '...',
-		        Calendar                => '...',        # (optional)
-		        FirstResponseTime       => 120,          # (optional)
-		        FirstResponseNotify     => 60,           # (optional) notify agent if first response escalation is 60% reached
-		        UpdateTime              => 180,          # (optional)
-		        UpdateNotify            => 80,           # (optional) notify agent if update escalation is 80% reached
-		        SolutionTime            => 580,          # (optional)
-		        SolutionNotify          => 80,           # (optional) notify agent if solution escalation is 80% reached
-		        ValidID                 => 1,
-		        Comment                 => '...',        # (optional)
-		        TypeID                  => 2,
-		        MinTimeBetweenIncidents => 3443,     # (optional)
-	    	},
-	    },
+            SLA  => {
+                Name                    => '...',
+                Calendar                => '...',        # (optional)
+                FirstResponseTime       => 120,          # (optional)
+                FirstResponseNotify     => 60,           # (optional) notify agent if first response escalation is 60% reached
+                UpdateTime              => 180,          # (optional)
+                UpdateNotify            => 80,           # (optional) notify agent if update escalation is 80% reached
+                SolutionTime            => 580,          # (optional)
+                SolutionNotify          => 80,           # (optional) notify agent if solution escalation is 80% reached
+                ValidID                 => 1,
+                Comment                 => '...',        # (optional)
+                TypeID                  => 2,
+                MinTimeBetweenIncidents => 3443,     # (optional)
+            },
+        },
     );
 
     $Result = {
@@ -160,7 +160,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'SLACreate.SLAExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create SLA. SLA with same name '$SLA->{Name}' already exists.",
         );
     }

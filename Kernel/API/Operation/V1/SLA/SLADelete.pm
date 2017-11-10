@@ -128,7 +128,7 @@ sub Run {
         
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
-                Code    => 'SLADelete.TicketExists',
+                Code    => 'Object.DependingObjectExists',
                 Message => 'Can not delete SLA. A Ticket with this SLA already exists.',
             );
         }
