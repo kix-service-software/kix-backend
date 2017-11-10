@@ -118,7 +118,7 @@ sub Run {
             'Service::Name' => {
                 Required => 1
             },
-            'Service::TypID' => {
+            'Service::TypeID' => {
                 Required => 1
             },            
         }
@@ -155,7 +155,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'ServiceCreate.ServiceExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create Service. Service with same name '$Service->{Name}' already exists.",
         );
     }
