@@ -175,7 +175,7 @@ sub Run {
         Comment                 => $SLA->{Comment} || $SLAData{Comment},
         ValidID                 => $SLA->{ValidID} || $SLAData{ValidID},
         ParentID                => $SLA->{ParentID} || $SLAData{ParentID},
-        TypeID                  => $SLA->{TypeID} || $SLAData{TypeID},        
+        TypeID                  => $SLA->{TypeID},        
         Calendar                => $SLA->{CalendarComment} || $SLAData{Calendar},
         FirstResponseTime       => $SLA->{FirstResponseTimeComment} || $SLAData{FirstResponseTime},
         FirstResponseNotify     => $SLA->{FirstResponseNotifyComment} || $SLAData{FirstResponseNotify},
