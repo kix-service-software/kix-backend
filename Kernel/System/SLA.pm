@@ -68,6 +68,26 @@ sub new {
     $Self->{CacheType} = 'SLA';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
+    # KIX4OTRS-capeIT
+    # load service extension modules
+    my $CustomModule = $Kernel::OM->Get('Kernel::Config')->Get('SLA::CustomModule');
+    if ($CustomModule) {
+        my %ModuleList;
+        if ( ref $CustomModule eq 'HASH' ) {
+            %ModuleList = %{$CustomModule};
+        }
+        else {
+            $ModuleList{Init} = $CustomModule;
+        }
+        MODULEKEY:
+        for my $ModuleKey ( sort keys %ModuleList ) {
+            my $Module = $ModuleList{$ModuleKey};
+            next MODULEKEY if !$Module;
+            next MODULEKEY if !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass($Module);
+        }
+    }
+    # EO KIX4OTRS-capeIT
+
     return $Self;
 }
 
