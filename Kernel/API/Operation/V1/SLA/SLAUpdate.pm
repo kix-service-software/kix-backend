@@ -128,7 +128,7 @@ sub Run {
             'SLA' => {
                 Type => 'HASH',
                 Required => 1
-            },   
+            },
         }        
     );
 
@@ -174,8 +174,7 @@ sub Run {
         Name                    => $SLA->{Name} || $SLAData{Name},
         Comment                 => $SLA->{Comment} || $SLAData{Comment},
         ValidID                 => $SLA->{ValidID} || $SLAData{ValidID},
-        ParentID                => $SLA->{ParentID} || $SLAData{ParentID},
-        TypeID                  => $SLA->{TypeID},        
+        TypeID                  => $SLA->{TypeID} || $SLAData{TypeID},        
         Calendar                => $SLA->{Calendar} || $SLAData{Calendar},
         FirstResponseTime       => $SLA->{FirstResponseTime} || $SLAData{FirstResponseTime},
         FirstResponseNotify     => $SLA->{FirstResponseNotify} || $SLAData{FirstResponseNotify},
@@ -184,8 +183,7 @@ sub Run {
         SolutionTime            => $SLA->{SolutionTime} || $SLAData{SolutionTime},
         SolutionNotify          => $SLA->{SolutionNotify} || $SLAData{SolutionNotify},
         MinTimeBetweenIncidents => $SLA->{MinTimeBetweenIncidents} || $SLAData{MinTimeBetweenIncidents},
-        UserID                  => $Self->{Authorization}->{UserID},               
-    );
+        UserID                  => $Self->{Authorization}->{UserID},
 
     if ( !$Success ) {
         return $Self->_Error(

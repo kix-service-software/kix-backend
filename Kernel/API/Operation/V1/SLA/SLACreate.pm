@@ -170,7 +170,6 @@ sub Run {
         Name                    => $SLA->{Name},
         Comment                 => $SLA->{Comment} || '',
         ValidID                 => $SLA->{ValidID} || 1,
-        ParentID                => $SLA->{ParentID} || '',
         TypeID                  => $SLA->{TypeID},        
         Calendar                => $SLA->{Calendar} || '',
         FirstResponseTime       => $SLA->{FirstResponseTime} || '',
