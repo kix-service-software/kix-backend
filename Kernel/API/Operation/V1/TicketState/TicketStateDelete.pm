@@ -121,10 +121,20 @@ sub Run {
     State:    
     foreach my $TicketStateID ( @{$Param{Data}->{StateID}} ) {
 	           
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-            Result => 'COUNT',
-            StateIDs => [$TicketStateID],
-            UserID => $Self->{Authorization}->{UserID},
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+            Result       => 'COUNT',
+            Limit        => 1,
+            Filter       => {
+                AND => [ 
+                    {
+                        Field => 'TicketStateID',
+                        Value => $TicketStateID,
+                        Operator => 'EQ',
+                    },
+                ]
+            },
+            UserID       => 1,
+            Permission   => 'ro',         
         );
 	    
         if ( $ResultTicketSearch ) {

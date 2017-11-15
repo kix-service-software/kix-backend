@@ -119,10 +119,20 @@ sub Run {
     Service:    
     foreach my $ServiceID ( @{$Param{Data}->{ServiceID}} ) {
 
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-            Result     => 'COUNT',
-            ServiceIDs => [$ServiceID],
-            UserID     => $Self->{Authorization}->{UserID},
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+            Result       => 'COUNT',
+            Limit        => 1,
+            Filter       => {
+                AND => [ 
+                    {
+                        Field => 'ServiceID',
+                        Value => $ServiceID,
+                        Operator => 'EQ',
+                    },
+                ]
+            },
+            UserID       => 1,
+            Permission   => 'ro',         
         );
         
         if ( $ResultTicketSearch ) {

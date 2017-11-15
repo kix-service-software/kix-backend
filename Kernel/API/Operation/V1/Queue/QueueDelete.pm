@@ -119,10 +119,20 @@ sub Run {
     Queue:    
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
  
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-            Result => 'COUNT',
-            QueueIDs => [$QueueID],
-            UserID => $Self->{Authorization}->{UserID},
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+            Result       => 'COUNT',
+            Limit        => 1,
+            Filter       => {
+                AND => [ 
+                    {
+                        Field => 'QueueID',
+                        Value => $QueueID,
+                        Operator => 'EQ',
+                    },
+                ]
+            },
+            UserID       => 1,
+            Permission   => 'ro',         
         );
         
         if ( $ResultTicketSearch ) {
