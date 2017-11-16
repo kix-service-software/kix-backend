@@ -173,7 +173,7 @@
                 <Item Key="Module">SLAValidator</Item>
                 <Item Key="Validates">SLA,SLAID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(SLAGet|SLACreate|SLAUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -217,7 +217,7 @@
                 <Item Key="Module">TicketValidator</Item>
                 <Item Key="Validates">TicketID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">TicketGet</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
     </ConfigItem>

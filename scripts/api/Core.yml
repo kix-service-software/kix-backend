@@ -532,6 +532,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Service::ServiceDelete
+    SLASearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLASearch
+    SLACreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLACreate
+    SLAGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLAGet
+    SLAUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLAUpdate
+    SLADelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLADelete
 
   Transport:
     Config:
@@ -838,6 +873,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /services/:ServiceID
+        SLASearch:
+          RequestMethod:
+          - GET
+          Route: /slas
+        SLACreate:
+          RequestMethod:
+          - POST
+          Route: /slas
+        SLAGet:
+          RequestMethod:
+          - GET
+          Route: /slas/:SLAID
+        SLAUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /slas/:SLAID
+        SLADelete:
+          RequestMethod:
+          - DELETE
+          Route: /slas/:SLAID
 
     Type: HTTP::REST
 RemoteSystem: ''
