@@ -122,10 +122,20 @@ sub Run {
     foreach my $PriorityID ( @{$Param{Data}->{PriorityID}} ) {
 
         # search ticket       
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-            Result  => 'COUNT',
-            PriorityIDs => [$PriorityID],
-            UserID  => $Self->{Authorization}->{UserID},
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+            Result       => 'COUNT',
+            Limit        => 1,
+            Filter       => {
+                AND => [ 
+                    {
+                        Field => 'PriorityID',
+                        Value => $PriorityID,
+                        Operator => 'EQ',
+                    },
+                ]
+            },
+            UserID       => 1,
+            Permission   => 'ro',         
         );
     
         if ( $ResultTicketSearch ) {
