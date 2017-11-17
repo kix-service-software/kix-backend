@@ -75,4 +75,9 @@
 /services/:ServiceID                                                |   GET             | V1::Service::ServiceGet
 /services/:ServiceID                                                |   PATCH           | V1::Service::ServiceUpdate
 /services/:ServiceID                                                |   DELETE          | V1::Service::ServiceDelete
+/slas                                                               |   GET             | V1::SLA::SLASearch
+/slas                                                               |   POST            | V1::SLA::SLACreate
+/slas/:SLAID                                                        |   GET             | V1::SLA::SLAGet
+/slas/:SLAID                                                        |   PATCH           | V1::SLA::SLAUpdate
+/slas/:SLAID                                                        |   DELETE          | V1::SLA::SLADelete
 
