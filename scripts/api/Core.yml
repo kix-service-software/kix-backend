@@ -567,6 +567,55 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SLA::SLADelete
+    DynamicFieldTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldTypeSearch
+    DynamicFieldObjectTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldObjectTypeSearch
+    DynamicFieldSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldSearch
+    DynamicFieldCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldCreate
+    DynamicFieldGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldGet
+    DynamicFieldUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldUpdate
+    DynamicFieldDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldDelete
 
   Transport:
     Config:
@@ -893,6 +942,34 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /slas/:SLAID
+        DynamicFieldTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /dynamicfieldtypes
+        DynamicFieldObjectTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /dynamicfieldobjecttypes
+        DynamicFieldSearch:
+          RequestMethod:
+          - GET
+          Route: /dynamicfields
+        DynamicFieldCreate:
+          RequestMethod:
+          - POST
+          Route: /dynamicfields
+        DynamicFieldGet:
+          RequestMethod:
+          - GET
+          Route: /dynamicfields/:DynamicFieldID
+        DynamicFieldUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /dynamicfields/:DynamicFieldID
+        DynamicFieldDelete:
+          RequestMethod:
+          - DELETE
+          Route: /dynamicfields/:DynamicFieldID
 
     Type: HTTP::REST
 RemoteSystem: ''
