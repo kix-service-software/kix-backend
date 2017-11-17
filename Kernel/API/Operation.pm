@@ -105,10 +105,11 @@ sub new {
     }
 
     # check permission
-    if ( $OperationConfig->{Permission} && IsHashRefWithData($Param{Authorization}) ) {
+    if ( IsHashRefWithData($Param{Authorization}) ) {
         my $Permission = $Self->_CheckOperationPermission(
+            OperationType   => $Param{OperationType},
             OperationConfig => $OperationConfig,
-            UserID          => $Param{Authorization}->{UserID},
+            Authorization   => $Param{Authorization},
         );
         if ( !$Permission ) {
             return $Self->_Error(
@@ -203,14 +204,40 @@ sub Run {
 checks whether the user is allowed to execute this operation
 
     my $Permission = $OperationObject->_CheckOperationPermission(
+        OperationType    => 'V1::Own::UserGet',
         OperationConfig  => { },
-        UserID           => 123,
+        Authorization    => { },
     );
 
 =cut
 
 sub _CheckOperationPermission {
     my ( $Self, %Param ) = @_;    
+
+    # check if token allows access, first check denials
+    my $Access = 1;
+    foreach my $DeniedOp ( @{$Param{Authorization}->{DeniedOperations}} ) {
+        if ( $Param{OperationType} =~ /^$DeniedOp$/g ) {
+            $Access = 0;
+            last;
+        }
+    }
+
+    if ( !IsArrayRefWithData($Param{Authorization}->{DeniedOperations}) || !$Access ) {
+        if ( IsArrayRefWithData($Param{Authorization}->{AllowedOperations}) ) {
+            # clear access flag, we are restricted
+            $Access = 0;
+        }
+        # we don't have access, so check if the operation is explicitly allowed
+        foreach my $AllowedOp ( @{$Param{Authorization}->{AllowedOperations}} ) {
+            if ( $Param{OperationType} =~ /^$AllowedOp$/g ) {
+                $Access = 1;
+                last;
+            }
+        }        
+    }
+
+    return 0 if !$Access;
 
     return 1 if !$Param{OperationConfig}->{Permission};
 
@@ -260,7 +287,7 @@ sub _CheckOperationPermission {
         }
 
         my %UserHash = map { $_ => 1 } @UserIDs;
-        if ( $UserHash{$Param{UserID}} ) {
+        if ( $UserHash{$Param{Authorization}->{UserID}} ) {
             # user has permission, abort loop
             $Result = 1;
             last PERMISSION;

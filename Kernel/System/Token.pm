@@ -118,7 +118,8 @@ sub ValidateToken {
 
     # remote ip check
     if (
-        $ConfigObject->Get('TokenCheckRemoteIP') && 
+        $ConfigObject->Get('TokenCheckRemoteIP') &&
+        $Payload->{RemoteIP} ne '0.0.0.0' &&  
         $Payload->{RemoteIP} ne $RemoteAddr
         )
     {
@@ -191,6 +192,8 @@ create a new token with given data
             TokenType   => 'AccessToken',          # optional, used to create special AccessTokens
             ValidUntil  => 'YYYY-MM-YY HH24:MI:SS' # optional, used to create special AccessTokens
             RemoteIP    => '...'                   # optional, used to create special AccessTokens
+            PermittedOperations => {}              # optional, used to create special AccessTokens
+            DeniedOperations => {}                 # optional, used to create special AccessTokens                          
             Description => '...'                   # optional, used to create special AccessTokens
         }
     );
@@ -247,12 +250,14 @@ sub CreateToken {
     } 
     
     my %Payload = %{$Param{Payload}};
-    my $CreateTimeString         = $TimeObject->CurrentTimestamp();
-    $Payload{CreateTimeUnix}     = $TimeObject->SystemTime();
-    $Payload{ValidUntilTimeUnix} = $ValidUntilTimeUnix;
-    $Payload{RemoteIP}           = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
-    $Payload{Description}        = $Param{Payload}->{Description} || '';
-    $Payload{TokenType}          = $Param{Payload}->{TokenType} || 'Normal';
+    my $CreateTimeString           = $TimeObject->CurrentTimestamp();
+    $Payload{CreateTimeUnix}       = $TimeObject->SystemTime();
+    $Payload{ValidUntilTimeUnix}   = $ValidUntilTimeUnix;
+    $Payload{RemoteIP}             = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
+    $Payload{Description}          = $Param{Payload}->{Description} || '';
+    $Payload{TokenType}            = $Param{Payload}->{TokenType} || 'Normal';
+    $Payload{AllowedOperations}    = $Param{Payload}->{AllowedOperations} || [];
+    $Payload{DeniedOperations}     = $Param{Payload}->{DeniedOperations} || [];
 
     my $Token = encode_jwt(
         \%Payload, 
