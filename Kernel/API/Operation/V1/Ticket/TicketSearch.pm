@@ -76,7 +76,7 @@ perform TicketSearch Operation. This will return a ticket list.
         Code         => ''                                # In case of an error
         Message      => '',                               # In case of an error
         Data         => {
-            Article => [
+            Ticket => [
                 {
                 },
                 {
