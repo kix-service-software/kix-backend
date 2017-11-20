@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="dynamic_field">
+        <ColumnDrop Name="field_order"/>
+    </TableAlter>
     <TableAlter Name="kix_ticket_template">
         <ColumnAdd Name="customer_portal_group_id" Required="false" Type="INTEGER"/>
     </TableAlter>

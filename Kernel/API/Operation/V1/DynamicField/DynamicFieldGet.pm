@@ -21,7 +21,7 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::DynamicField::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -120,7 +120,10 @@ sub Run {
             'DynamicFieldID' => {
                 Type     => 'ARRAY',
                 Required => 1
-            }                
+            },           
+            'include' => {
+                Type     => 'ARRAYtoHASH',
+            },
         }
     );
 
@@ -147,6 +150,11 @@ sub Run {
                 Code    => 'Object.NotFound',
                 Message => "No data found for DynamicFieldID $DynamicFieldID.",
             );
+        }
+        
+        if ( !$Param{Data}->{include}->{Config} ) {
+            # remove Config if not included
+            delete $DynamicFieldData->{Config};
         }
         
         # add

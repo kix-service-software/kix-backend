@@ -264,6 +264,19 @@ sub PrepareData {
                     HashDelimiter => '::',
                 }
             );
+
+            # add pseudo entries for substructures for requirement checking
+            foreach my $Entry ( keys %{$FlatData} ) {
+                next if $Entry !~ /^.*?::.*?::/g;
+
+                my @Parts = split(/::/, $Entry);
+                pop(@Parts);
+                my $DummyKey = join('::', @Parts);
+
+                next if exists($FlatData->{$DummyKey});
+                $FlatData->{$DummyKey} = {};
+            }
+
             %Data = (
                 %Data,
                 %{$FlatData},

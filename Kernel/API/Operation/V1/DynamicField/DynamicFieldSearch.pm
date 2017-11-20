@@ -20,7 +20,7 @@ use Kernel::API::Operation::V1::DynamicField::DynamicFieldGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::DynamicField::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -122,6 +122,7 @@ sub Run {
             OperationType => 'V1::DynamicField::DynamicFieldGet',
             Data      => {
                 DynamicFieldID => join(',', sort @{$DynamicFieldList}),
+                include        => $Param{Data}->{include},
             }
         );    
 

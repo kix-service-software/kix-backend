@@ -87,4 +87,5 @@
 /dynamicfields/:DynamicFieldID                                      |   GET             | V1::DynamicField::DynamicFieldGet
 /dynamicfields/:DynamicFieldID                                      |   PATCH           | V1::DynamicField::DynamicFieldUpdate
 /dynamicfields/:DynamicFieldID                                      |   DELETE          | V1::DynamicField::DynamicFieldDelete
-
+/dynamicfields/:DynamicFieldID/config                               |   GET             | V1::DynamicField::DynamicFieldConfigGet
+/dynamicfields/:DynamicFieldID/config                               |   PATCH           | V1::DynamicField::DynamicFieldConfigUpdate

@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/DynamicField/DynamicFieldCreate.pm - API DynamicField Create operation backend
+# Kernel/API/Operation/V1/DynamicField/DynamicFieldConfigGet.pm - API DynamicField Get operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,12 +11,14 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::DynamicField::DynamicFieldObjectTypeSearch;
+package Kernel::API::Operation::V1::DynamicField::DynamicFieldConfigGet;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
+use MIME::Base64;
+
+use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
     Kernel::API::Operation::V1::DynamicField::Common
@@ -26,7 +28,9 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::DynamicField::DynamicObjectTypeTypeSearch - API DynamicField Search Operation backend
+Kernel::API::Operation::V1::DynamicField::DynamicFieldConfigGet - API DynamicField Get Operation backend
+
+=head1 SYNOPSIS
 
 =head1 PUBLIC INTERFACE
 
@@ -37,15 +41,15 @@ Kernel::API::Operation::DynamicField::DynamicObjectTypeTypeSearch - API DynamicF
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
+by using Kernel::API::Operation::V1::DynamicField::DynamicFieldConfigGet->new();
 
 =cut
 
 sub new {
-    my ( $ObjectType, %Param ) = @_;
+    my ( $Type, %Param ) = @_;
 
     my $Self = {};
-    bless( $Self, $ObjectType );
+    bless( $Self, $Type );
 
     # check needed objects
     for my $Needed (qw(DebuggerObject WebserviceID)) {
@@ -59,28 +63,30 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    # get config for this screen
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::DynamicField::DynamicFieldConfigGet');
+
     return $Self;
 }
 
 =item Run()
 
-perform DynamicFieldObjectTypeSearch Operation. This will return a list of DynamicField ObjectTypes.
+perform DynamicFieldConfigGet Operation. 
 
     my $Result = $OperationObject->Run(
         Data => {
-        }
+            DynamicFieldID => 123       
+        },
     );
 
     $Result = {
-        Success => 1,                                # 0 or 1
-        Code    => '',                          # In case of an error
-        Message => '',                          # In case of an error
-        Data    => {
-            DynamicFieldObjectType => [
-                { },
-                { },
+        Success      => 1,                           # 0 or 1
+        Code         => '',                          # In case of an error
+        Message      => '',                          # In case of an error
+        Data         => {
+            DynamicFieldConfig => {
                 ...
-            ]
+            },
         },
     };
 
@@ -89,6 +95,7 @@ perform DynamicFieldObjectTypeSearch Operation. This will return a list of Dynam
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -103,6 +110,11 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+        Parameters => {
+            'DynamicFieldID' => {
+                Required => 1
+            }                
+        }
     );
 
     # check result
@@ -113,32 +125,21 @@ sub Run {
         );
     }
 
-    my $ObjectTypeConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::ObjectType');
+    # get the DynamicField data
+    my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+        ID => $Param{Data}->{DynamicFieldID}
+    );
 
-    if ( !IsHashRefWithData($ObjectTypeConfig) ) {
+    if ( !IsHashRefWithData( $DynamicFieldData ) ) {
         return $Self->_Error(
-            Code    => 'Operation.InternalError',
-            Message => 'DynamicField::ObjectType config is not valid',
-        );
-    }
-
-    my @ObjectTypes;
-    for my $ObjectType ( sort keys %{$ObjectTypeConfig} ) {
-        push(@ObjectTypes, {
-            Name        => $ObjectType,
-            DisplayName => $ObjectTypeConfig->{$ObjectType}->{DisplayName},
-        });
-    }
-
-    if ( scalar(@ObjectTypes) == 1 ) {
-        return $Self->_Success(
-            DynamicFieldObjectType => $ObjectTypes[0],
+            Code    => 'Object.NotFound',
+            Message => "No data found for DynamicFieldID $Param{Data}->{DynamicFieldID}.",
         );
     }
 
     # return result
     return $Self->_Success(
-        DynamicFieldObjectType => \@ObjectTypes,
+        DynamicFieldConfig => $DynamicFieldData->{Config},
     );
 }
 

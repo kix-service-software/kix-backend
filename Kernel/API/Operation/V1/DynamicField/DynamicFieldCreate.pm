@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleCreate.pm - API Role Create operation backend
+# Kernel/API/Operation/DynamicField/DynamicFieldCreate.pm - API DynamicField Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,22 +11,22 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleCreate;
+package Kernel::API::Operation::V1::DynamicField::DynamicFieldCreate;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::DynamicField::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleCreate - API Role RoleCreate Operation backend
+Kernel::API::Operation::V1::DynamicField::DynamicFieldCreate - API DynamicField Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,33 +61,42 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::DynamicFieldCreate');
+
     return $Self;
 }
 
 =item Run()
 
-perform RoleCreate Operation. This will return the created RoleID.
+perform DynamicFieldCreate Operation. This will return the created DynamicFieldID.
 
     my $Result = $OperationObject->Run(
         Data => {
-	    	Role  => {
-	        	Name    => '...',
-	        	Comment => '...',                 # optional
-	        	ValidID => '...',                 # optional
-	    	},
+            DynamicFieldID => 123,
+            DynamicField   => {
+	            Name          => '...',            
+	            Label         => '...',            
+                FieldType     => '...',            
+                ObjectType    => '...',            
+                Config        => { }
+	            InternalField => 0|1,              # optional
+	            ValidID       => 1,                # optional
+            }
 	    },
-    );
+	);
+    
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            RoleID  => '',                         # ID of the created Role
+        Success     => 1,                       # 0 or 1
+        Code        => '',                      # in case of error
+        Message     => '',                      # in case of error
+        Data        => {                        # result data payload after Operation
+            DynamicFieldID  => 123,             # ID of the Created DynamicField 
         },
     };
-
+   
 =cut
+
 
 sub Run {
     my ( $Self, %Param ) = @_;
@@ -106,16 +115,29 @@ sub Run {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Role' => {
-                Type     => 'HASH',
+        Data         => $Param{Data},
+        Parameters   => {
+            'DynamicField' => {
+                Type => 'HASH',
                 Required => 1
             },
-            'Role::Name' => {
+            'DynamicField::Name' => {
                 Required => 1
             },
-        }
+            'DynamicField::Label' => {
+                Required => 1
+            },
+            'DynamicField::FieldType' => {
+                Required => 1
+            },
+            'DynamicField::ObjectType' => {
+                Required => 1
+            },
+            'DynamicField::Config' => {
+                Type => 'HASH',
+                Required => 1
+            },
+        }        
     );
 
     # check result
@@ -126,54 +148,73 @@ sub Run {
         );
     }
 
-    # isolate Role parameter
-    my $Role = $Param{Data}->{Role};
+    # isolate DynamicField parameter
+    my $DynamicField = $Param{Data}->{DynamicField};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Role} ) {
+    for my $Attribute ( sort keys %{$DynamicField} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $Role->{$Attribute} =~ s{\A\s+}{};
+            $DynamicField->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $Role->{$Attribute} =~ s{\s+\z}{};
+            $DynamicField->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-        	
-    # check if Role exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
-        Role => $Role->{Name},
+
+    # check attribute values
+    my $CheckResult = $Self->_CheckDynamicField( 
+        DynamicField => $DynamicField
     );
-    
-    if ( $Exists ) {
+
+    if ( !$CheckResult->{Success} ) {
         return $Self->_Error(
-            Code    => 'RoleCreate.RoleExists',
-            Message => "Can not create Role. Role with same name '$Role->{Name}' already exists.",
+            %{$CheckResult},
         );
     }
 
-    # create Role
-    my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleAdd(
-        Name    => $Role->{Name},
-        Comment => $Role->{Comment} || '',
-        ValidID => $Role->{ValidID} || 1,
-        UserID  => $Self->{Authorization}->{UserID},
+    # check if name is duplicated
+    my %DynamicFieldsList = %{
+        $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(
+            Valid      => 0,
+            ResultType => 'HASH',
+        )
+    };
+
+    %DynamicFieldsList = reverse %DynamicFieldsList;
+
+    if ( $DynamicFieldsList{ $DynamicField->{Name} } ) {
+
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => 'Can not create DynamicField. Another DynamicField with same name already exists.',
+        );
+    }
+
+    # create DynamicField
+    my $ID = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldAdd(
+        Name            => $DynamicField->{Name},
+        Label           => $DynamicField->{Label},
+        InternalField   => $DynamicField->{InternalField} || 0,
+        FieldType       => $DynamicField->{FieldType},
+        ObjectType      => $DynamicField->{ObjectType},
+        Config          => $DynamicField->{Config},
+        ValidID         => $DynamicField->{ValidID} || 1,
+        UserID          => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$RoleID ) {
+    if ( !$ID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Role, please contact the system administrator',
+            Message => 'Could not create DynamicField, please contact the system administrator',
         );
     }
-    
+
     # return result    
     return $Self->_Success(
-        Code   => 'Object.Created',
-        RoleID => $RoleID,
+        DynamicFieldID => $ID,
     );    
 }
 
 
-1;

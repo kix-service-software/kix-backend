@@ -616,6 +616,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::DynamicField::DynamicFieldDelete
+    DynamicFieldConfigGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldConfigGet
+    DynamicFieldConfigUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldConfigUpdate
 
   Transport:
     Config:
@@ -970,6 +984,14 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /dynamicfields/:DynamicFieldID
+        DynamicFieldConfigGet:
+          RequestMethod:
+          - GET
+          Route: /dynamicfields/:DynamicFieldID/config
+        DynamicFieldConfigUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /dynamicfields/:DynamicFieldID/config
 
     Type: HTTP::REST
 RemoteSystem: ''

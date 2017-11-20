@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleDelete.pm - API Role Delete operation backend
+# Kernel/API/Operation/DynamicField/DynamicFieldDelete.pm - API DynamicField Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleDelete;
+package Kernel::API::Operation::V1::DynamicField::DynamicFieldDelete;
 
 use strict;
 use warnings;
@@ -19,14 +19,14 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::DynamicField::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleDelete - API Role RoleDelete Operation backend
+Kernel::API::Operation::V1::DynamicField::DynamicFieldDelete - API DynamicField DynamicFieldDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform RoleDelete Operation. This will return the deleted RoleID.
+perform DynamicFieldDelete Operation. This will return the deleted DynamicFieldID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            RoleID  => '...',
+            DynamicFieldID  => '...',
         },		
     );
 
@@ -98,7 +98,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'RoleID' => {
+            'DynamicFieldID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -112,53 +112,35 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    my $Message = '';
-    
-    # get permission type list
-    my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Group')->_PermissionTypeList();
+        
+    # start DynamicField loop
+    DynamicField:    
+    foreach my $DynamicFieldID ( @{$Param{Data}->{DynamicFieldID}} ) {
 
-    # start Role loop
-    ROLE:    
-    foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
-
-        # search Role user       
-        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserGet(
-            RoleID => $RoleID,
-        );
-   
-        if ( IsHashRefWithData(\%ResultUserList) ) {
-            return $Self->_Error(
-                Code    => 'RoleDelete.UserExists',
-                Message => 'Cannot delete Role. At least one user is assigned to this Role.',
+        # check if there is an object with this dynamic field
+        foreach my $ValueType ( qw(Integer DateTime Text) ) {
+            my $ExistingValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+                FieldID   => $DynamicFieldID,
+                ValueType => $ValueType,
             );
-        }
-
-        foreach my $Type ( @{\%PermissionTypeList}} ) {
-	        # search Role role       
-	        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleGroupGet(
-	            Type    => $Type,
-	            RoleID => $RoleID,
-	        );
-	  
-	        if ( IsHashRefWithData(\%ResultRoleList) ) {
-	            return $Self->_Error(
-	                Code    => 'RoleDelete.GroupExists',
-	                Message => 'Cannot delete Role. This Role is assgined to at least one group.',
-	            );
-	        }
+            if ( IsHashRefWithData($ExistingValues) ) {
+                return $Self->_Error(
+                    Code    => 'Object.DependingObjectExists',
+                    Message => 'Cannot delete DynamicField. This DynamicField is used in at least one object.',
+                );
+            }
         }
         
-        # delete Role	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleDelete(
-            RoleID  => $RoleID,
+        # delete DynamicField	    
+        my $Success = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldDelete(
+            ID      => $DynamicFieldID,
             UserID  => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete Role, please contact the system administrator',
+                Message => 'Could not delete DynamicField, please contact the system administrator',
             );
         }
     }
