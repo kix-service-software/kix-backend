@@ -2944,10 +2944,4 @@
     </Index>
 </Table>    
 
-<!-- system_address - delete column queue_id -->
-<TableAlter Name="system_address">
-    <ColumnDrop Name="queue_id"/>
-</TableAlter>
-
-
 </database>
