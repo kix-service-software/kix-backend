@@ -284,7 +284,7 @@
             <IndexColumn Name="email_lower"/>
         </Index>
     </Table>
-    
+  
     <Insert Table="customer_portal_group">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote">Change Requests</Data>

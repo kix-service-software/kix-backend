@@ -80,4 +80,9 @@
 /slas/:SLAID                                                        |   GET             | V1::SLA::SLAGet
 /slas/:SLAID                                                        |   PATCH           | V1::SLA::SLAUpdate
 /slas/:SLAID                                                        |   DELETE          | V1::SLA::SLADelete
+/systemaddresses                                                    |   GET             | V1::SystemAddress::SystemAddressSearch
+/systemaddresses                                                    |   POST            | V1::SystemAddress::SystemAddressCreate
+/systemaddresses/:SystemAddressID                                   |   GET             | V1::SystemAddress::SystemAddressGet
+/systemaddresses/:SystemAddressID                                   |   PATCH           | V1::SystemAddress::SystemAddressUpdate
+/systemaddresses/:SystemAddressID                                   |   DELETE          | V1::SystemAddress::SystemAddressDelete
 
