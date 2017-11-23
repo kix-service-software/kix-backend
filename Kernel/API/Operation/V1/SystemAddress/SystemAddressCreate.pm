@@ -163,7 +163,7 @@ sub Run {
     # create SystemAddress
     my $SystemAddressID = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
         Name     => $SystemAddress->{Name},
-        Comment  => $SystemAddress->{Comment} || '',    # optional
+        Comment  => $SystemAddress->{Comment} || '',
         ValidID  => $SystemAddress->{ValidID},
         Realname => $SystemAddress->{Realname},
         UserID   => $Self->{Authorization}->{UserID},              
