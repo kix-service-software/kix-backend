@@ -88,17 +88,6 @@ sub SystemAddressAdd {
     }
 
     # insert new system address
-#    return if !$Self->{DBObject}->Do(
-#        SQL => 'INSERT INTO system_address (value0, value1, valid_id, comments, queue_id, '
-#            . ' create_time, create_by, change_time, change_by)'
-#            . ' VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
-#        Bind => [
-#            \$Param{Name}, \$Param{Realname}, \$Param{ValidID}, \$Param{Comment},
-#            \$Param{QueueID}, \$Param{UserID}, \$Param{UserID},
-#        ],
-#    );
-use Data::Dumper;
-print STDERR "paramSystemAddressDelete".Dumper(\%Param); 
     return if !$Self->{DBObject}->Do(
         SQL => 'INSERT INTO system_address (value0, value1, valid_id, comments, '
             . ' create_time, create_by, change_time, change_by)'
@@ -175,13 +164,6 @@ sub SystemAddressGet {
     }
 
     # get system address
-#    return if !$Self->{DBObject}->Prepare(
-#        SQL => 'SELECT value0, value1, comments, valid_id, queue_id, change_time, create_time '
-#            . ' FROM system_address WHERE id = ?',
-#        Bind  => [ \$Param{ID} ],
-#        Limit => 1,
-#    );
-
     return if !$Self->{DBObject}->Prepare(
         SQL => 'SELECT value0, value1, comments, valid_id, change_time, create_time '
             . ' FROM system_address WHERE id = ?',
@@ -241,16 +223,6 @@ sub SystemAddressUpdate {
             return;
         }
     }
-
-    # update system address
-#    return if !$Self->{DBObject}->Do(
-#        SQL => 'UPDATE system_address SET value0 = ?, value1 = ?, comments = ?, valid_id = ?, '
-#            . ' change_time = current_timestamp, change_by = ?, queue_id = ? WHERE id = ?',
-#        Bind => [
-#            \$Param{Name}, \$Param{Realname}, \$Param{Comment}, \$Param{ValidID},
-#            \$Param{UserID}, \$Param{QueueID}, \$Param{ID},
-#        ],
-#    );
 
     return if !$Self->{DBObject}->Do(
         SQL => 'UPDATE system_address SET value0 = ?, value1 = ?, comments = ?, valid_id = ?, '
@@ -334,107 +306,6 @@ sub SystemAddressList {
     );
 
     return %List;
-}
-
-=item SystemAddressIsLocalAddress()
-
-Checks if the given address is a local (system) address. Returns true
-for local addresses.
-
-    if ( $SystemAddressObject->SystemAddressIsLocalAddress( Address => 'info@example.com' ) ) {
-        # is local
-    }
-    else {
-        # is not local
-    }
-
-=cut
-
-sub SystemAddressIsLocalAddress {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Address)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    return $Self->SystemAddressQueueID(%Param);
-}
-
-=item SystemAddressQueueID()
-
-find dispatching queue id of email address
-
-    my $QueueID = $SystemAddressObject->SystemAddressQueueID( Address => 'info@example.com' );
-
-=cut
-
-sub SystemAddressQueueID {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Address)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # remove spaces
-    $Param{Address} =~ s/\s+//g;
-
-    my $CacheKey = 'SystemAddressQueueID::' . $Param{Address};
-    my $Cached   = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-
-    if ( ref $Cached eq 'SCALAR' ) {
-        return ${$Cached};
-    }
-
-    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
-        return if !$Self->{DBObject}->Prepare(
-            SQL => "SELECT queue_id FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
-                . "AND LOWER(value0) = LOWER(?)",
-            Bind  => [ \$Param{Address} ],
-            Limit => 1,
-        );
-    }
-    else {
-        return if !$Self->{DBObject}->Prepare(
-            SQL => "SELECT queue_id FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
-                . "AND value0 = ?",
-            Bind  => [ \$Param{Address} ],
-            Limit => 1,
-        );
-    }
-
-    # fetch the result
-    my $QueueID;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        $QueueID = $Row[0];
-    }
-
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \$QueueID,
-    );
-
-    return $QueueID;
 }
 
 =item SystemAddressLookup()
