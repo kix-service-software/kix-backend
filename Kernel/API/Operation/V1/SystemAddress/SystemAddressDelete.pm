@@ -117,8 +117,7 @@ sub Run {
     my $Message = '';
   
     # start SystemAddress loop
-    my %ResultQueueSearch = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
-             
+           
     SystemAddress:    
     foreach my $SystemAddressID ( @{$Param{Data}->{SystemAddressID}} ) {
     	
