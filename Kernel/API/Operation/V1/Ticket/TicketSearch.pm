@@ -120,7 +120,7 @@ sub Run {
     my @TicketIndex = $TicketObject->TicketSearch(
         Result     => 'ARRAY',
         Filter     => $Self->{Filter}->{Ticket},
-        Limit      => $Self->{Limit}->{Ticket} || $Self->{Filter}->{'__COMMON'},
+        Limit      => $Self->{Limit}->{Ticket} || $Self->{Limit}->{'__COMMON'},
         Sort       => $Self->{Sort}->{Ticket},
         UserType   => $Self->{Authorization}->{UserType},
         UserID     => $Self->{Authorization}->{UserID},
