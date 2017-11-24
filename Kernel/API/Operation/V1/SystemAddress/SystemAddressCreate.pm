@@ -75,7 +75,7 @@ perform SystemAddressCreate Operation. This will return the created SystemAddres
                 Realname => 'Hotline',
                 ValidID  => 1,
                 Comment  => 'some comment',
-	    	},
+            },
 	    },
     );
 
@@ -118,10 +118,7 @@ sub Run {
             },
             'SystemAddress::Realname' => {
                 Required => 1
-            },
-            'SystemAddress::ValidID' => {
-                Required => 1
-            },                                                
+            },                           
         }
     );
 
@@ -164,7 +161,7 @@ sub Run {
     my $SystemAddressID = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
         Name     => $SystemAddress->{Name},
         Comment  => $SystemAddress->{Comment} || '',
-        ValidID  => $SystemAddress->{ValidID},
+        ValidID  => $SystemAddress->{ValidID} || 1,
         Realname => $SystemAddress->{Realname},
         UserID   => $Self->{Authorization}->{UserID},              
     );

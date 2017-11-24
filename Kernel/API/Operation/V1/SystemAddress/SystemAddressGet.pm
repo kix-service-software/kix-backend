@@ -75,9 +75,7 @@ perform SystemAddressGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
-        Data => {
-            ID => 123       # comma separated in case of multiple or arrayref (depending on transport)
-        },
+            SystemAddressID => 123       # comma separated in case of multiple or arrayref (depending on transport)    
     );
 
     $Result = {
