@@ -310,12 +310,47 @@ sub SystemAddressList {
     return %List;
 }
 
+=item SystemAddressIsLocalAddress()
+
+Checks if the given address is a local (system) address. Returns true
+for local addresses.
+
+    if ( $SystemAddressObject->SystemAddressIsLocalAddress( Address => 'info@example.com' ) ) {
+        # is local
+    }
+    else {
+        # is not local
+    }
+
+=cut
+
+sub SystemAddressIsLocalAddress {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Address)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+    
+    $Param{Name} = $Param{Address};
+
+    return $Self->SystemAddressLookup(%Param);
+}
+
+
 =item SystemAddressLookup()
 
 returns the name or the SystemAddress id
 
     my $SystemAddressName = $SystemAddressObject->SystemAddressLookup(
         SystemAddressID => 123,
+        Valid           => 1,
     );
 
     or
@@ -345,7 +380,9 @@ sub SystemAddressLookup {
 
         # lookup
         $DBObject->Prepare(
-            SQL   => 'SELECT value0 FROM system_address WHERE id = ?',
+            SQL => "SELECT value0 FROM system_address WHERE "
+                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
+                . "AND id = ?",        
             Bind  => [ \$Param{SystemAddressID}, ],
             Limit => 1,
         );
@@ -367,7 +404,9 @@ sub SystemAddressLookup {
 
         # lookup
         $DBObject->Prepare(
-            SQL   => 'SELECT id FROM system_address WHERE value0 = ?',
+            SQL => "SELECT queue_id FROM system_address WHERE "
+                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
+                . "AND value0 = ?",        
             Bind  => [ \$Param{Name} ],
             Limit => 1,
         );
