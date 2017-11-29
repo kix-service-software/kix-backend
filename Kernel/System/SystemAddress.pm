@@ -350,7 +350,6 @@ returns the name or the SystemAddress id
 
     my $SystemAddressName = $SystemAddressObject->SystemAddressLookup(
         SystemAddressID => 123,
-        Valid           => 1,
     );
 
     or
