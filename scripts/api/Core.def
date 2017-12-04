@@ -89,3 +89,9 @@
 /dynamicfields/:DynamicFieldID                                      |   DELETE          | V1::DynamicField::DynamicFieldDelete
 /dynamicfields/:DynamicFieldID/config                               |   GET             | V1::DynamicField::DynamicFieldConfigGet
 /dynamicfields/:DynamicFieldID/config                               |   PATCH           | V1::DynamicField::DynamicFieldConfigUpdate
+/systemaddresses                                                    |   GET             | V1::SystemAddress::SystemAddressSearch
+/systemaddresses                                                    |   POST            | V1::SystemAddress::SystemAddressCreate
+/systemaddresses/:SystemAddressID                                   |   GET             | V1::SystemAddress::SystemAddressGet
+/systemaddresses/:SystemAddressID                                   |   PATCH           | V1::SystemAddress::SystemAddressUpdate
+/systemaddresses/:SystemAddressID                                   |   DELETE          | V1::SystemAddress::SystemAddressDelete
+

@@ -342,7 +342,6 @@
     <Column Name="value1" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="value2" Required="false" Size="200" Type="VARCHAR"/>
     <Column Name="value3" Required="false" Size="200" Type="VARCHAR"/>
-    <Column Name="queue_id" Required="true" Type="INTEGER"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
@@ -2941,6 +2940,6 @@
     <Index Name="customer_portal_group_valid_id">
         <IndexColumn Name="valid_id"/>
     </Index>
-</Table>
+</Table>    
 
 </database>

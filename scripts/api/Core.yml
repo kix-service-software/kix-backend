@@ -630,6 +630,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::DynamicField::DynamicFieldConfigUpdate
+    SystemAddressSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressSearch
+    SystemAddressCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressCreate
+    SystemAddressGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressGet
+    SystemAddressUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressUpdate
+    SystemAddressDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressDelete
 
   Transport:
     Config:
@@ -992,6 +1027,26 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /dynamicfields/:DynamicFieldID/config
+        SystemAddressSearch:
+          RequestMethod:
+          - GET
+          Route: /systemaddresses
+        SystemAddressCreate:
+          RequestMethod:
+          - POST
+          Route: /systemaddresses
+        SystemAddressGet:
+          RequestMethod:
+          - GET
+          Route: /systemaddresses/:SystemAddressID
+        SystemAddressUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /systemaddresses/:SystemAddressID
+        SystemAddressDelete:
+          RequestMethod:
+          - DELETE
+          Route: /systemaddresses/:SystemAddressID
 
     Type: HTTP::REST
 RemoteSystem: ''
