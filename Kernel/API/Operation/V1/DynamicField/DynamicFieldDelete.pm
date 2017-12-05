@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Queue/QueueDelete.pm - API Queue Delete operation backend
+# Kernel/API/Operation/DynamicField/DynamicFieldDelete.pm - API DynamicField Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Queue::QueueDelete;
+package Kernel::API::Operation::V1::DynamicField::DynamicFieldDelete;
 
 use strict;
 use warnings;
@@ -19,14 +19,14 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::DynamicField::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Queue::QueueDelete - API Queue QueueDelete Operation backend
+Kernel::API::Operation::V1::DynamicField::DynamicFieldDelete - API DynamicField DynamicFieldDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform QueueDelete Operation. This will return the deleted QueueID.
+perform DynamicFieldDelete Operation. This will return the deleted DynamicFieldID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            QueueID  => '...',
+            DynamicFieldID  => '...',
         },		
     );
 
@@ -98,7 +98,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'QueueID' => {
+            'DynamicFieldID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -112,46 +112,35 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-   
-    my $Message = '';
-
-    # start Queue loop
-    Queue:    
-    foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
- 
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
-            Result       => 'COUNT',
-            Limit        => 1,
-            Filter       => {
-                AND => [ 
-                    {
-                        Field => 'QueueID',
-                        Value => $QueueID,
-                        Operator => 'EQ',
-                    },
-                ]
-            },
-            UserID       => 1,
-            Permission   => 'ro',         
-        );
         
-        if ( $ResultTicketSearch ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete Queue. A Ticket with this Queue already exists.',
+    # start DynamicField loop
+    DynamicField:    
+    foreach my $DynamicFieldID ( @{$Param{Data}->{DynamicFieldID}} ) {
+
+        # check if there is an object with this dynamic field
+        foreach my $ValueType ( qw(Integer DateTime Text) ) {
+            my $ExistingValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+                FieldID   => $DynamicFieldID,
+                ValueType => $ValueType,
             );
+            if ( IsHashRefWithData($ExistingValues) ) {
+                return $Self->_Error(
+                    Code    => 'Object.DependingObjectExists',
+                    Message => 'Cannot delete DynamicField. This DynamicField is used in at least one object.',
+                );
+            }
         }
-         
-        # delete Queue	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueDelete(
-            QueueID  => $QueueID,
+        
+        # delete DynamicField	    
+        my $Success = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldDelete(
+            ID      => $DynamicFieldID,
             UserID  => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete Queue, please contact the system administrator',
+                Message => 'Could not delete DynamicField, please contact the system administrator',
             );
         }
     }

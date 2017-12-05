@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="dynamic_field">
+        <ColumnDrop Name="field_order"/>
+    </TableAlter>
     <TableAlter Name="kix_ticket_template">
         <ColumnAdd Name="customer_portal_group_id" Required="false" Type="INTEGER"/>
     </TableAlter>
+    <TableAlter Name="system_address">
+        <ColumnDrop Name="queue_id"/>
+    </TableAlter>    
     <Table Name="attachment_directory">
         <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
         <Column Name="storage_backend" Required="true" Size="64" Type="VARCHAR"/>
@@ -284,7 +290,7 @@
             <IndexColumn Name="email_lower"/>
         </Index>
     </Table>
-    
+  
     <Insert Table="customer_portal_group">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote">Change Requests</Data>

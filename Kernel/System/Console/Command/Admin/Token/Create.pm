@@ -39,7 +39,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'valid-until',
-        Description => "The token will be valid until the given daten+time. Format: YYYY-MM-DD HH24:MI:SS",
+        Description => "The token will be valid until the given date+time. Format: YYYY-MM-DD HH24:MI:SS",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/^\d{4}-\d{2}-\d{2}[ ]\d{2}:\d{2}:\d{2}$/smx,
@@ -48,6 +48,22 @@ sub Configure {
     $Self->AddOption(
         Name        => 'remote-ip',
         Description => "The the remote IP for which the token should be valid.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+
+    $Self->AddOption(
+        Name        => 'allowed-ops',
+        Description => "A comma separated list to allow specific API operation types. RegEx is supported.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+
+    $Self->AddOption(
+        Name        => 'denied-ops',
+        Description => "A comma separated list to deny specific API operation types. RegEx is supported.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -66,11 +82,15 @@ sub Configure {
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my @AllowedOperations;
+    my @DeniedOperations;
 
     $Self->Print("<yellow>Creating token...</yellow>\n");
 
     my $UserID;
-    my $UserType = $Self->GetOption('user-type');
+    my $UserType   = $Self->GetOption('user-type');
+    my $AllowedOps = $Self->GetOption('allowed-ops');
+    my $DeniedOps  = $Self->GetOption('denied-ops');
 
     if ( $UserType eq 'Agent' ) {
         # lookup UserID
@@ -88,6 +108,14 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
+    if ( $AllowedOps ) {
+        @AllowedOperations = split(/,/, $AllowedOps);
+    }
+
+    if ( $DeniedOps ) {
+        @DeniedOperations = split(/,/, $DeniedOps);
+    }
+
     my $Token = $Kernel::OM->Get('Kernel::System::Token')->CreateToken(
         Payload => {
             UserID      => $UserID,
@@ -95,6 +123,8 @@ sub Run {
             ValidUntil  => $Self->GetOption('valid-until'),
             RemoteIP    => $Self->GetOption('remote-ip'),
             Description => $Self->GetOption('description'),
+            AllowedOperations => \@AllowedOperations,
+            DeniedOperations  => \@DeniedOperations,
             TokenType   => 'AccessToken',
         },
     );

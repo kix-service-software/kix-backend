@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Queue/QueueDelete.pm - API Queue Delete operation backend
+# Kernel/API/Operation/SystemAddress/SystemAddressDelete.pm - API SystemAddress Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Queue::QueueDelete;
+package Kernel::API::Operation::V1::SystemAddress::SystemAddressDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Queue::QueueDelete - API Queue QueueDelete Operation backend
+Kernel::API::Operation::V1::SystemAddress::SystemAddressDelete - API SystemAddress SystemAddressDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform QueueDelete Operation. This will return the deleted QueueID.
+perform SystemAddressDelete Operation. This will return the deleted SystemAddressID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            QueueID  => '...',
+            SystemAddressID  => '...',
         },		
     );
 
@@ -82,14 +82,15 @@ perform QueueDelete Operation. This will return the deleted QueueID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    # init webservice
+    
+    # init webService
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
         $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
+            Code    => 'WebService.InvalidConfiguration',
             Message => $Result->{Message},
         );
     }
@@ -98,7 +99,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'QueueID' => {
+            'SystemAddressID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -112,46 +113,35 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-   
+  
     my $Message = '';
-
-    # start Queue loop
-    Queue:    
-    foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
- 
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
-            Result       => 'COUNT',
-            Limit        => 1,
-            Filter       => {
-                AND => [ 
-                    {
-                        Field => 'QueueID',
-                        Value => $QueueID,
-                        Operator => 'EQ',
-                    },
-                ]
-            },
-            UserID       => 1,
-            Permission   => 'ro',         
-        );
-        
-        if ( $ResultTicketSearch ) {
+  
+    # start SystemAddress loop
+           
+    SystemAddress:    
+    foreach my $SystemAddressID ( @{$Param{Data}->{SystemAddressID}} ) {
+    	
+	    my %QueueIDs = $Kernel::OM->Get('Kernel::System::Queue')->GetQueuesForEmailAddress(
+	        AddressID  => $SystemAddressID,
+	    );
+    		    	
+        if ( %QueueIDs ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete Queue. A Ticket with this Queue already exists.',
+                Message => 'Can not delete SystemAddress. A Queue with this SystemAddress already exists.',
             );
-        }
-         
-        # delete Queue	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueDelete(
-            QueueID  => $QueueID,
+        }	    
+	    
+        # delete SystemAddress	    
+        my $Success = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressDelete(
+            SystemAddressID  => $SystemAddressID,
             UserID  => $Self->{Authorization}->{UserID},
         );
-
+  
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete Queue, please contact the system administrator',
+                Message => 'Could not delete SystemAddress, please contact the system administrator',
             );
         }
     }

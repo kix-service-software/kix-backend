@@ -80,4 +80,18 @@
 /slas/:SLAID                                                        |   GET             | V1::SLA::SLAGet
 /slas/:SLAID                                                        |   PATCH           | V1::SLA::SLAUpdate
 /slas/:SLAID                                                        |   DELETE          | V1::SLA::SLADelete
+/dynamicfieldtypes                                                  |   GET             | V1::DynamicField::DynamicFieldTypeSearch
+/dynamicfieldobjecttypes                                            |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
+/dynamicfields                                                      |   GET             | V1::DynamicField::DynamicFieldSearch
+/dynamicfields                                                      |   POST            | V1::DynamicField::DynamicFieldCreate
+/dynamicfields/:DynamicFieldID                                      |   GET             | V1::DynamicField::DynamicFieldGet
+/dynamicfields/:DynamicFieldID                                      |   PATCH           | V1::DynamicField::DynamicFieldUpdate
+/dynamicfields/:DynamicFieldID                                      |   DELETE          | V1::DynamicField::DynamicFieldDelete
+/dynamicfields/:DynamicFieldID/config                               |   GET             | V1::DynamicField::DynamicFieldConfigGet
+/dynamicfields/:DynamicFieldID/config                               |   PATCH           | V1::DynamicField::DynamicFieldConfigUpdate
+/systemaddresses                                                    |   GET             | V1::SystemAddress::SystemAddressSearch
+/systemaddresses                                                    |   POST            | V1::SystemAddress::SystemAddressCreate
+/systemaddresses/:SystemAddressID                                   |   GET             | V1::SystemAddress::SystemAddressGet
+/systemaddresses/:SystemAddressID                                   |   PATCH           | V1::SystemAddress::SystemAddressUpdate
+/systemaddresses/:SystemAddressID                                   |   DELETE          | V1::SystemAddress::SystemAddressDelete
 

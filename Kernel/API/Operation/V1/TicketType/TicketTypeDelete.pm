@@ -120,10 +120,20 @@ sub Run {
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
         # search ticket       
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-            Result  => 'COUNT',
-            TypeIDs => [$TypeID],
-            UserID  => $Self->{Authorization}->{UserID},
+        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+            Result       => 'COUNT',
+            Limit        => 1,
+            Filter       => {
+                AND => [ 
+                    {
+                        Field => 'TypeID',
+                        Value => $TypeID,
+                        Operator => 'EQ',
+                    },
+                ]
+            },
+            UserID       => 1,
+            Permission   => 'ro',         
         );
      
         if ( $ResultTicketSearch ) {
