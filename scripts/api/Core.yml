@@ -994,11 +994,11 @@ Provider:
         DynamicFieldTypeSearch:
           RequestMethod:
           - GET
-          Route: /dynamicfieldtypes
+          Route: /dynamicfields/types
         DynamicFieldObjectTypeSearch:
           RequestMethod:
           - GET
-          Route: /dynamicfieldobjecttypes
+          Route: /dynamicfields/objects
         DynamicFieldSearch:
           RequestMethod:
           - GET
