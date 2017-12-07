@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::DynamicField::DynamicObjectTypeTypeSearch - API DynamicField Search Operation backend
+Kernel::API::Operation::DynamicField::DynamicFieldObjectTypeSearch - API DynamicField Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -76,7 +76,7 @@ perform DynamicFieldObjectTypeSearch Operation. This will return a list of Dynam
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            DynamicFieldObjectType => [
+            DynamicFieldObject => [
                 { },
                 { },
                 ...
@@ -132,13 +132,13 @@ sub Run {
 
     if ( scalar(@ObjectTypes) == 1 ) {
         return $Self->_Success(
-            DynamicFieldObjectType => $ObjectTypes[0],
+            DynamicFieldObject => $ObjectTypes[0],
         );
     }
 
     # return result
     return $Self->_Success(
-        DynamicFieldObjectType => \@ObjectTypes,
+        DynamicFieldObject => \@ObjectTypes,
     );
 }
 
