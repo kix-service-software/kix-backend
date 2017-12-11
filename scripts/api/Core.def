@@ -94,4 +94,9 @@
 /systemaddresses/:SystemAddressID                                   |   GET             | V1::SystemAddress::SystemAddressGet
 /systemaddresses/:SystemAddressID                                   |   PATCH           | V1::SystemAddress::SystemAddressUpdate
 /systemaddresses/:SystemAddressID                                   |   DELETE          | V1::SystemAddress::SystemAddressDelete
+/sysconfig/definitions                                              |   GET             | V1::SysConfig::SysConfigItemDefinitionSearch
+/sysconfig/definitions/:SysConfigItemDefinitionID                   |   GET             | V1::SysConfig::SysConfigItemDefinitionGet
+/sysconfig                                                          |   GET             | V1::SysConfig::SysConfigItemSearch
+/sysconfig/:SysConfigItemID                                         |   GET             | V1::SysConfig::SysConfigItemGet
+/sysconfig/:SysConfigItemID                                         |   PATCH           | V1::SysConfig::SysConfigItemUpdate
 

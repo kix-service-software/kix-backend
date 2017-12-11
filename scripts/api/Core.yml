@@ -665,6 +665,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
+    SysConfigItemDefinitionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigItemDefinitionSearch
+    SysConfigItemDefinitionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigItemDefinitionGet
+    SysConfigItemSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigItemSearch
+    SysConfigItemGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigItemGet
+    SysConfigItemUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigItemUpdate
 
   Transport:
     Config:
@@ -1047,6 +1082,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /systemaddresses/:SystemAddressID
+        SysConfigItemDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /sysconfig/definitions
+        SysConfigItemDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /sysconfig/definitions/:SysConfigItemDefinitionID
+        SysConfigItemSearch:
+          RequestMethod:
+          - GET
+          Route: /sysconfig
+        SysConfigItemGet:
+          RequestMethod:
+          - GET
+          Route: /sysconfig/:SysConfigItemID
+        SysConfigItemUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /sysconfig/:SysConfigItemID
 
     Type: HTTP::REST
 RemoteSystem: ''
