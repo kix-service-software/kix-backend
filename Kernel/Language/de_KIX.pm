@@ -4386,6 +4386,33 @@ sub Data {
     $Lang->{'The new email notification article to customers will already be marked as seen for agents.'}
         = 'Der neue E-Mail-Benachrichtigungs-Artikel an Kunden wird für Agenten schon als gesehen markiert.';
 
+    $Lang->{'Defines days and times to count as working time.
+Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
+Value: HH:MM-HH:MM[,HH:MM-HH:MM]
+Notes:
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+   If it is a vacation day and there is no entry for its key, there is no working time for this day
+ - If there is no valid definition, or config deactivated, default function of KIX is used.'} = 'Definiert Tage und Zeiten, welche als Arbeitzeit gelten.
+Schlüssel: Wochentag (Mon|Tue|Wed|Thu|Fri|Sat|Sun) oder Text von Feiertag
+Wert: HH:MM-HH:MM[,HH:MM-HH:MM]
+Anmerkungen:
+ - Verwendeter Schlüssel ist nach folgender Reihenfolge ausgewählt: TimeVacationDaysOneTime > TimeVacationDays > Wochentag
+   Wenn es ein Feiertag ist und es gibt kein Eintrag zum Schlüssel, gibt es keine Arbeitszeit an dem Tag
+ - Wenn es keine gültige Konfiguration gibt, oder diese deaktiviert ist, wird die Standardfunktion von KIX verwendet';
+
+    $Lang->{'Defines days and times of the indicated calendar, to count as working time.
+Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
+Value: HH:MM-HH:MM[,HH:MM-HH:MM]
+Notes:
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+   If it is a vacation day and there is no entry for its key, there is no working time for this day
+ - If there is no valid definition, or config deactivated, default function of KIX is used.'} = 'Definiert Tage und Zeiten fÃ¼r den angegebenen Kalender, welche als Arbeitzeit gelten.
+Schlüssel: Wochentag (Mon|Tue|Wed|Thu|Fri|Sat|Sun) oder Text von Feiertag
+Wert: HH:MM-HH:MM[,HH:MM-HH:MM]
+Anmerkungen:
+ - Verwendeter Schlüssel ist nach folgender Reihenfolge ausgewÃ¤hlt: TimeVacationDaysOneTime > TimeVacationDays > Wochentag
+   Wenn es ein Feiertag ist und es gibt kein Eintrag zum Schlüssel, gibt es keine Arbeitszeit an dem Tag
+ - Wenn es keine gültige Konfiguration gibt, oder diese deaktiviert ist, wird die Standardfunktion von KIX verwendet';
     return 0;
 }
 
