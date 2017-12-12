@@ -134,15 +134,25 @@ sub Run {
 
     my @SysConfigList;
 
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
-
     # start loop 
     foreach my $ItemID ( @{$Param{Data}->{SysConfigItemID}} ) {
+
+        my $SubItemID;
+        if ( $ItemID =~ /^(.*?)###(.*?)$/g ) {
+            $ItemID = $1;
+            $SubItemID = $2;
+        }
 
         # get the SysConfig data
         my $Data = $Kernel::OM->Get('Kernel::Config')->Get(
             $ItemID,
         );
+
+        # extract sub item if requested
+        if ( $SubItemID ) {
+            $ItemID = $SubItemID;
+            $Data   = $Data->{$SubItemID};
+        }
 
         # add
         push(@SysConfigList, { 

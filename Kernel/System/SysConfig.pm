@@ -416,10 +416,10 @@ sub CreateConfig {
 submit config settings and save it.
 
     $SysConfigObject->ConfigItemUpdate(
-        Valid        => 1,
         Key          => 'WebUploadCacheModule',
-        Value        => 'Kernel::System::Web::UploadCache::DB',
-        NoValidation => 1,    # (optional) no validation or auto-correction will be done, to prevent loops.
+        Value        => 'Kernel::System::Web::UploadCache::DB',  # (optional) needed if Valid = 1
+        Valid        => 1,                                       # (optional)
+        NoValidation => 1,                                       # (optional) no validation or auto-correction will be done, to prevent loops.
     );
 
 =cut
@@ -433,14 +433,19 @@ sub ConfigItemUpdate {
     $Self->{Update} = 1;
 
     # check needed stuff
-    for (qw(Valid Key Value)) {
-        if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if ( !defined( $Param{Key} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need Key!"
+        );
+        return;
+    }
+    if ( $Param{Valid} && !defined( $Param{Value} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need Value!"
+        );
+        return;
     }
 
     # check if we need to create config file

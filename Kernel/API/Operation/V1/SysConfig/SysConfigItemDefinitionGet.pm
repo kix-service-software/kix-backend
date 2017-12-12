@@ -172,7 +172,7 @@ sub _RestructureConfig {
     my %Result;
     
     # restructure for better use
-    foreach my $Key ( qw(Group SubGroup Description Required Name Valid) ) {
+    foreach my $Key ( qw(Group SubGroup Description Required Name) ) {
         if ( IsArrayRefWithData($Param{$Key}) ) {
             $Result{$Key} = $Param{$Key}->[1]->{Content};
         }
@@ -180,6 +180,9 @@ sub _RestructureConfig {
             $Result{$Key} = $Param{$Key};
         }
     }
+
+    # map Valid to Active
+    $Result{Active} = $Param{Valid};
 
     # handle Settings
     if ( IsArrayRefWithData($Param{Setting}) ) {
@@ -217,7 +220,7 @@ sub _RestructureConfig {
                 next if !$Item;
                 push(@{$Result{Config}->{Items}}, {
                     Key   => $Item->{Key},
-                    Label => $Item->{Content},
+                    Value => $Item->{Content},
                 });
             }
         }
@@ -245,11 +248,10 @@ sub _RestructureConfig {
             $Result{Type} = 'TimeWorkingHours';
             foreach my $Item (@{$Param{Setting}->[1]->{TimeWorkingHours}->[1]->{Item}}) {
                 next if !$Item;
-                foreach my $
-                push(@{$Result{Config}->{Items}}, {
-                    Day          => $Item->{Name},
-                    WorkingHours => join(',', @WorkingHours),
-                });
+                # push(@{$Result{Config}->{Items}}, {
+                #     Day          => $Item->{Name},
+                #     WorkingHours => join(',', @WorkingHours),
+                # });
             }            
         }
     }

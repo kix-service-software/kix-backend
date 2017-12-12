@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/DynamicField/DynamicFieldUpdate.pm - API DynamicField Update operation backend
+# Kernel/API/Operation/SysConfigItem/SysConfigItemUpdate.pm - API SysConfigItem Update operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::DynamicField::DynamicFieldUpdate;
+package Kernel::API::Operation::V1::SysConfig::SysConfigItemUpdate;
 
 use strict;
 use warnings;
@@ -19,14 +19,14 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::DynamicField::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::DynamicField::DynamicFieldUpdate - API DynamicField Update Operation backend
+Kernel::API::Operation::V1::SysConfig::SysConfigItemUpdate - API SysConfigItem Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,25 +61,21 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::DynamicFieldUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfigItemUpdate');
 
     return $Self;
 }
 
 =item Run()
 
-perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldID.
+perform SysConfigItemUpdate Operation. This will return the updated SysConfigItemID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            DynamicFieldID => 123,
-            DynamicField   => {
-	            Name       => '...',            # optional
-	            Label      => '...',            # optional
-                FieldType  => '...',            # optional
-                ObjectType => '...',            # optional
-                Config     => { }               # optional
-	            ValidID    => 1,                # optional
+            SysConfigItemID => 123,
+            SysConfigItem   => {
+                Data   => {}                # optional 
+	            Active => 1,                # optional
             }
 	    },
 	);
@@ -90,7 +86,7 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            DynamicFieldID  => 123,             # ID of the updated DynamicField 
+            SysConfigItemID  => 123,             # ID of the updated SysConfigItem 
         },
     };
    
@@ -116,10 +112,10 @@ sub Run {
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
         Parameters   => {
-            'DynamicFieldID' => {
+            'SysConfigItemID' => {
                 Required => 1
             },
-            'DynamicField' => {
+            'SysConfigItem' => {
                 Type => 'HASH',
                 Required => 1
             },
@@ -134,92 +130,33 @@ sub Run {
         );
     }
 
-    # isolate DynamicField parameter
-    my $DynamicField = $Param{Data}->{DynamicField};
+    # isolate SysConfigItem parameter
+    my $SysConfigItem = $Param{Data}->{SysConfigItem};    
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$DynamicField} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $DynamicField->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $DynamicField->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-
-    # check attribute values
-    my $CheckResult = $Self->_CheckDynamicField( 
-        DynamicField => $DynamicField
-    );
-
-    if ( !$CheckResult->{Success} ) {
-        return $Self->_Error(
-            %{$CheckResult},
-        );
-    }
-
-    # check if name is duplicated
-    my %DynamicFieldsList = %{
-        $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(
-            Valid      => 0,
-            ResultType => 'HASH',
-        )
-    };
-
-    %DynamicFieldsList = reverse %DynamicFieldsList;
-
-    if ( $DynamicField->{Name} && $DynamicFieldsList{ $DynamicField->{Name} } && $DynamicFieldsList{ $DynamicField->{Name} } ne $Param{Data}->{DynamicFieldID} ) {
-
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => 'Can not update DynamicField. Another DynamicField with same name already exists.',
-        );
-    }
-
-    # check if DynamicField exists 
-    my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
-        ID => $Param{Data}->{DynamicFieldID},
-    );
-  
-    if ( !IsHashRefWithData($DynamicFieldData) ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update DynamicField. No DynamicField with ID '$Param{Data}->{DynamicFieldID}' found.",
-        );
-    }
-
-    # if it's an internal field, it's name should not change
-    if ( $DynamicField->{Name} && $DynamicFieldData->{InternalField} && $DynamicField->{Name} ne $DynamicFieldData->{Name} ) {
+    if ( $SysConfigItem->{Active} && !defined($SysConfigItem->{Data}) ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Cannot update name of DynamicField, because it is an internal field.',
+            Message => 'Need a value if item should be active!',
         );
     }
 
-    # update DynamicField
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldUpdate(
-        ID         => $Param{Data}->{DynamicFieldID},
-        Name       => $DynamicField->{Name} || $DynamicFieldData->{Name},
-        Label      => $DynamicField->{Label} || $DynamicFieldData->{Label},
-        FieldType  => $DynamicField->{FieldType} || $DynamicFieldData->{FieldType},
-        ObjectType => $DynamicField->{ObjectType} || $DynamicFieldData->{ObjectType},
-        Config     => $DynamicField->{Config} || $DynamicFieldData->{Config},
-        ValidID    => $DynamicField->{ValidID} || $DynamicFieldData->{ValidID},
-        UserID     => $Self->{Authorization}->{UserID},
+    # update SysConfigItem
+    my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemUpdate(
+        Key   => $Param{Data}->{SysConfigItemID},
+        Value => $SysConfigItem->{Data},
+        Valid => $SysConfigItem->{Active},
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update DynamicField, please contact the system administrator',
+            Message => 'Could not update SysConfigItem, please contact the system administrator',
         );
     }
 
     # return result    
     return $Self->_Success(
-        DynamicFieldID => $Param{Data}->{DynamicFieldID},
+        SysConfigItemID => $Param{Data}->{SysConfigItemID},
     );    
 }
 
