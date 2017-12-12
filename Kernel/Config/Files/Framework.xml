@@ -5779,7 +5779,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Time</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -6094,7 +6094,7 @@
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -6244,7 +6244,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar1</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -6559,7 +6559,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -6678,7 +6678,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar2</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -6993,7 +6993,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -7112,7 +7112,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar3</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -7427,7 +7427,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -7546,7 +7546,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar4</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -7861,7 +7861,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -7980,7 +7980,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar5</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -8295,7 +8295,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -8414,7 +8414,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar6</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -8729,7 +8729,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -8848,7 +8848,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar7</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -9163,7 +9163,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -9282,7 +9282,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar8</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -9597,7 +9597,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
@@ -9716,7 +9716,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar9</SubGroup>
         <Setting>
-            <Option SelectedID="Local">
+            <Option SelectedID="local">
                 <Item Key="Africa/Abidjan" Translatable="0">Africa/Abidjan</Item>
                 <Item Key="Africa/Accra" Translatable="0">Africa/Accra</Item>
                 <Item Key="Africa/Algiers" Translatable="0">Africa/Algiers</Item>
@@ -10031,7 +10031,7 @@ Notes:
                 <Item Key="Indian/Maldives" Translatable="0">Indian/Maldives</Item>
                 <Item Key="Indian/Mauritius" Translatable="0">Indian/Mauritius</Item>
                 <Item Key="Indian/Reunion" Translatable="0">Indian/Reunion</Item>
-                <Item Key="Local" Translatable="0">Local</Item>
+                <Item Key="local" Translatable="0">Local</Item>
                 <Item Key="MET" Translatable="0">MET</Item>
                 <Item Key="MST" Translatable="0">MST</Item>
                 <Item Key="OffsetOnly" Translatable="0">OffsetOnly</Item>
