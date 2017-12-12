@@ -22,12 +22,12 @@ $ENV{TZ} = 'Europe/Berlin';
 
 $ConfigObject->Set(
     Key   => 'TimeZone::Calendar9',
-    Value => '-1',
+    Value => 'Atlantic/Azores',
 );
 
 $ConfigObject->Set(
     Key   => 'TimeZone::Calendar8',
-    Value => '+1',
+    Value => 'Europe/Berlin',
 );
 
 my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');

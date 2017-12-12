@@ -178,10 +178,10 @@ for my $Test (@Tests) {
         $TimeStart,
     );
 
-    # set OTRS time zone to arbitrary value to make sure it is ignored
+    # set time zone to arbitrary value to make sure it is ignored
     $ConfigObject->Set(
         Key   => 'TimeZone',
-        Value => -8,
+        Value => '',
     );
 
     $Kernel::OM->ObjectsDiscard(
