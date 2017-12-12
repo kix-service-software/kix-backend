@@ -172,7 +172,7 @@ sub _RestructureConfig {
     my %Result;
     
     # restructure for better use
-    foreach my $Key ( qw(Group SubGroup Description Required Name) ) {
+    foreach my $Key ( qw(Group SubGroup Description Required) ) {
         if ( IsArrayRefWithData($Param{$Key}) ) {
             $Result{$Key} = $Param{$Key}->[1]->{Content};
         }
@@ -180,6 +180,9 @@ sub _RestructureConfig {
             $Result{$Key} = $Param{$Key};
         }
     }
+
+    # map Name to ID
+    $Result{ID} = $Param{Name};
 
     # map Valid to Active
     $Result{Active} = $Param{Valid};
