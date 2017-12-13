@@ -71,20 +71,20 @@ perform GeneralCatalogCreate Operation. This will return the created GeneralCata
     my $Result = $OperationObject->Run(
         Data => {
             GeneralCatalog  => {                
-		        Class         => 'ITSM::Service::Type',
-		        Name          => 'Item Name',
-		        ValidID       => 1,
-		        Comment       => 'Comment',              # (optional)
-	    	},
-	    },
+                Class   => 'ITSM::Service::Type',
+                Name    => 'Item Name',
+                ValidID => 1,
+                Comment => 'Comment',              # (optional)
+            },
+        },
     );
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            GeneralCatalogID  => '',                         # ID of the created GeneralCatalog
+        Success => 1,                       # 0 or 1
+        Code    => '',                      # 
+        Message => '',                      # in case of error
+        Data    => {                        # result data payload after Operation
+            GeneralCatalogID  => '',        # ID of the created GeneralCatalog
         },
     };
 
