@@ -665,6 +665,48 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
+    GeneralCatalogSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogSearch
+    GeneralCatalogCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogCreate
+    GeneralCatalogGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogGet
+    GeneralCatalogUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogUpdate
+    GeneralCatalogDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogDelete
+    GeneralCatalogClasses:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClasses
 
   Transport:
     Config:
@@ -1047,6 +1089,30 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /systemaddresses/:SystemAddressID
+        GeneralCatalogSearch:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog
+        GeneralCatalogCreate:
+          RequestMethod:
+          - POST
+          Route: /generalcatalog
+        GeneralCatalogGet:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogDelete:
+          RequestMethod:
+          - DELETE
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogClasses:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/classes
 
     Type: HTTP::REST
 RemoteSystem: ''
