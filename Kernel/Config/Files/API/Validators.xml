@@ -140,7 +140,7 @@
                 <Item Key="Module">QueueValidator</Item>
                 <Item Key="Validates">Queue,QueueID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">QueueGet</Item>
+                <Item Key="IgnoreOperationRegEx">(QueueGet|QueueCreate|QueueUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
