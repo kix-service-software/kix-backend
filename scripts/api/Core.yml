@@ -665,6 +665,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
+    GeneralCatalogItemSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemSearch
+    GeneralCatalogItemCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemCreate
+    GeneralCatalogItemGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemGet
+    GeneralCatalogItemUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemUpdate
+    GeneralCatalogItemDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemDelete
     GeneralCatalogClassSearch:
         Description: ''
         MappingInbound:
@@ -672,41 +707,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::GeneralCatalog::GeneralCatalogClassSearch
-    GeneralCatalogClassCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClassCreate
-    GeneralCatalogClassGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClassGet
-    GeneralCatalogClassUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
-    GeneralCatalogClassDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClassDelete
-    GeneralCatalogClasses:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClasses
 
   Transport:
     Config:
@@ -1089,27 +1089,27 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /systemaddresses/:SystemAddressID
-        GeneralCatalogClassSearch:
+        GeneralCatalogItemSearch:
           RequestMethod:
           - GET
           Route: /generalcatalog
-        GeneralCatalogClassCreate:
+        GeneralCatalogItemCreate:
           RequestMethod:
           - POST
           Route: /generalcatalog
-        GeneralCatalogClassGet:
+        GeneralCatalogItemGet:
           RequestMethod:
           - GET
           Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogClassUpdate:
+        GeneralCatalogItemUpdate:
           RequestMethod:
           - PATCH
           Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogClassDelete:
+        GeneralCatalogItemDelete:
           RequestMethod:
           - DELETE
           Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogClasses:
+        GeneralCatalogClassSearch:
           RequestMethod:
           - GET
           Route: /generalcatalog/classes
