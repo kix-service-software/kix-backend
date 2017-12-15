@@ -16,9 +16,6 @@ package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassSearch;
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassGet;
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
     Kernel::API::Operation::V1::Common
 );
@@ -65,12 +62,10 @@ sub new {
 
 =item Run()
 
-perform GeneralCatalogClassSearch Operation. This will return a GeneralCatalogItem list.
+perform GeneralCatalogClassSearch Operation. This will return a GeneralCatalogClass search.
 
     my $Result = $OperationObject->Run(
-        Data => {
-        	Class = 'ITSM::ConfigItem::Location::Type';                         # optional
-        }
+        Data => {}
     );
 
     $Result = {
@@ -78,10 +73,7 @@ perform GeneralCatalogClassSearch Operation. This will return a GeneralCatalogIt
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            GeneralCatalog => [
-                {},
-                {}
-            ]
+            GeneralCatalogClass => [...]
         },
     };
 
@@ -113,42 +105,18 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    my @GeneralCatalogDataList;
 
     my $GeneralCatalogClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassList();
-    
-    foreach my $Class ( @$GeneralCatalogClassList ){
-     	
-	    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
-	        Class => $Class,
-	    );
-   
-	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
-	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {   
-	        my $GeneralCatalogGetResult = $Self->ExecOperation(
-	            OperationType => 'V1::GeneralCatalog::GeneralCatalogClassGet',
-	            Data      => {
-	                GeneralCatalogItemID => join(',', sort keys %$GeneralCatalogItemList),
-	            }
-	        );    
-	
-	        if ( !IsHashRefWithData($GeneralCatalogGetResult) || !$GeneralCatalogGetResult->{Success} ) {
-	            return $GeneralCatalogGetResult;
-	        }
-	        push @GeneralCatalogDataList,IsArrayRefWithData($GeneralCatalogGetResult->{Data}->{GeneralCatalog}) ? @{$GeneralCatalogGetResult->{Data}->{GeneralCatalog}} : ( $GeneralCatalogGetResult->{Data}->{GeneralCatalog} );
-	    }	            	
-    }
 
-    if ( IsArrayRefWithData(\@GeneralCatalogDataList) ) {
+    if ( $GeneralCatalogClassList ) {
         return $Self->_Success(
-            GeneralCatalog => \@GeneralCatalogDataList,
+            GeneralCatalogClass => $GeneralCatalogClassList,
         )
     }
-    
+   
     # return result
     return $Self->_Success(
-        GeneralCatalog => {},
+        GeneralCatalogClass => {},
     );
 }
 
