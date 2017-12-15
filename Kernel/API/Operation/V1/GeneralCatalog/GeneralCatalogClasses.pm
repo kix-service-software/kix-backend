@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClasses.pm - API GeneralCatalog Create operation backend
+# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassClasses.pm - API GeneralCatalog Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClasses;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassClasses;
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::GeneralCatalog::GeneralCatalogClasses - API GeneralCatalogClassName List Operation backend
+Kernel::API::Operation::GeneralCatalog::GeneralCatalogClassClasses - API GeneralCatalogClass List Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,7 +62,7 @@ sub new {
 
 =item Run()
 
-perform GeneralCatalogClasses Operation. This will return a GeneralCatalogClassName list.
+perform GeneralCatalogClassClasses Operation. This will return a GeneralCatalogClass list.
 
     my $Result = $OperationObject->Run(
         Data => {}
@@ -73,7 +73,7 @@ perform GeneralCatalogClasses Operation. This will return a GeneralCatalogClassN
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            GeneralCatalog => [...]
+            GeneralCatalogClass => [...]
         },
     };
 
@@ -110,13 +110,13 @@ sub Run {
 
     if ( $GeneralCatalogClassList ) {
         return $Self->_Success(
-            GeneralCatalog => $GeneralCatalogClassList,
+            GeneralCatalogClass => $GeneralCatalogClassList,
         )
     }
    
     # return result
     return $Self->_Success(
-        GeneralCatalog => {},
+        GeneralCatalogClass => {},
     );
 }
 

@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogDelete.pm - API GeneralCatalog Delete operation backend
+# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassDelete.pm - API GeneralCatalogClass Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogDelete;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogDelete - API GeneralCatalog GeneralCatalogDelete Operation backend
+Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassDelete - API GeneralCatalog GeneralCatalogClassDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ sub new {
 
 =item Run()
 
-perform GeneralCatalogDelete Operation. This will return the deleted GeneralCatalogID.
+perform GeneralCatalogClassDelete Operation. This will return {}.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -127,7 +127,7 @@ sub Run {
         if ( $ConfigItemID->[0] ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete GeneralCatalog. A ITSMConfigItem with this GeneralCatalog already exists.',
+                Message => 'Can not delete GeneralCatalogItem. A ITSMConfigItem with this GeneralCatalogItem already exists.',
             );
         } 
 
@@ -139,7 +139,7 @@ sub Run {
         if ( $ServiceList) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete GeneralCatalog. A Service with this GeneralCatalog already exists.',
+                Message => 'Can not delete GeneralCatalogItem. A Service with this GeneralCatalogItem already exists.',
             );
         }
          	    
@@ -148,11 +148,11 @@ sub Run {
             UserID  => $Self->{Authorization}->{UserID},
         );
                   
-        foreach my $ID (keys %SLAList) {    	
-            if ( $ID == $GeneralCatalogItemID) {
+        foreach (keys %SLAList) {    	
+            if ( $SLAList{TypeID} == $GeneralCatalogItemID) {
                 return $Self->_Error(
                     Code    => 'Object.DependingObjectExists',
-                    Message => 'Can not delete GeneralCatalog. A SLA with this GeneralCatalog already exists.',
+                    Message => 'Can not delete GeneralCatalogItem. A SLA with this GeneralCatalogItem already exists.',
                 );
             }    	
         }
@@ -166,7 +166,7 @@ sub Run {
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete GeneralCatalog, please contact the system administrator',
+                Message => 'Could not delete GeneralCatalogItem, please contact the system administrator',
             );
         }
     }

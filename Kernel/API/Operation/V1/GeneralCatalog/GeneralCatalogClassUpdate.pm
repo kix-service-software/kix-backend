@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogUpdate.pm - API GeneralCatalog Update operation backend
+# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassUpdate.pm - API GeneralCatalogClass Update operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogUpdate;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassUpdate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogUpdate - API GeneralCatalog Create Operation backend
+Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassUpdate - API GeneralCatalogClass Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,14 +61,14 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalogUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalogClassUpdate');
 
     return $Self;
 }
 
 =item Run()
 
-perform GeneralCatalogUpdate Operation. This will return the updated TypeID.
+perform GeneralCatalogClassUpdate Operation. This will return the updated GeneralCatalogItemID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -88,7 +88,7 @@ perform GeneralCatalogUpdate Operation. This will return the updated TypeID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            GeneralCatalogID  => 123,                     # ID of the updated GeneralCatalog 
+            GeneralCatalogItemID  => 123,       # ID of the updated GeneralCatalogItem 
         },
     };
    
@@ -178,7 +178,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        GeneralCatalogID => $Param{Data}->{GeneralCatalogID},
+        GeneralCatalogItemID => $Param{Data}->{GeneralCatalogID},
     );    
 }
 

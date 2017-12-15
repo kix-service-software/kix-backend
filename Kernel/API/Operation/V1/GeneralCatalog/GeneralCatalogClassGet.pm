@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/V1/GeneralCatalog/GeneralCatalogGet.pm - API GeneralCatalog Get operation backend
+# Kernel/API/Operation/V1/GeneralCatalog/GeneralCatalogClassGet.pm - API GeneralCatalogClass Get operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogGet;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogGet - API GeneralCatalog Get Operation backend
+Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassGet - API GeneralCatalogClass Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogGet - API GeneralCatal
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogGet->new();
+by using Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassGet->new();
 
 =cut
 
@@ -64,14 +64,14 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalog::GeneralCatalogGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalog::GeneralCatalogClassGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform GeneralCatalogGet Operation. This function is able to return
+perform GeneralCatalogClassGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(

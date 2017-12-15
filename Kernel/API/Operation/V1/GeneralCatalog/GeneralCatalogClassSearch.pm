@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogSearch.pm - API GeneralCatalog Create operation backend
+# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassSearch.pm - API GeneralCatalogClass Search operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogSearch;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassSearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogGet;
+use Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -27,7 +27,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::GeneralCatalog::GeneralCatalogSearch - API GeneralCatalog Search Operation backend
+Kernel::API::Operation::GeneralCatalog::GeneralCatalogClassSearch - API GeneralCatalogClass Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -65,7 +65,7 @@ sub new {
 
 =item Run()
 
-perform GeneralCatalogSearch Operation. This will return a GeneralCatalog ID list.
+perform GeneralCatalogClassSearch Operation. This will return a GeneralCatalogItem list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -127,7 +127,7 @@ sub Run {
 	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
 	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {   
 	        my $GeneralCatalogGetResult = $Self->ExecOperation(
-	            OperationType => 'V1::GeneralCatalog::GeneralCatalogGet',
+	            OperationType => 'V1::GeneralCatalog::GeneralCatalogClassGet',
 	            Data      => {
 	                GeneralCatalogItemID => join(',', sort keys %$GeneralCatalogItemList),
 	            }

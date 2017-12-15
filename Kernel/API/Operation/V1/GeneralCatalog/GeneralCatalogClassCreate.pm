@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogCreate.pm - API GeneralCatalog Create operation backend
+# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassCreate.pm - API GeneralCatalogClass Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogCreate;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogCreate - API GeneralCatalog GeneralCatalogCreate Operation backend
+Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassCreate - API GeneralCatalogClass Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ sub new {
 
 =item Run()
 
-perform GeneralCatalogCreate Operation. This will return the created GeneralCatalogID.
+perform GeneralCatalogClassCreate Operation. This will return the created GeneralCatalogClassItemID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -84,7 +84,7 @@ perform GeneralCatalogCreate Operation. This will return the created GeneralCata
         Code    => '',                      # 
         Message => '',                      # in case of error
         Data    => {                        # result data payload after Operation
-            GeneralCatalogID  => '',        # ID of the created GeneralCatalog
+            GeneralCatalogClassItemID  => '',        # ID of the created GeneralCatalog
         },
     };
 
@@ -162,7 +162,7 @@ sub Run {
     }
 
     # create GeneralCatalog
-    my $GeneralCatalogID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
+    my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
         Class    => $GeneralCatalog->{Class},
         Name     => $GeneralCatalog->{Name},
         Comment  => $GeneralCatalog->{Comment} || '',
@@ -170,7 +170,7 @@ sub Run {
         UserID   => $Self->{Authorization}->{UserID},              
     );
 
-    if ( !$GeneralCatalogID ) {
+    if ( !$GeneralCatalogItemID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create GeneralCatalog, please contact the system administrator',
@@ -180,7 +180,7 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        GeneralCatalogID => $GeneralCatalogID,
+        GeneralCatalogItemID => $GeneralCatalogItemID,
     );    
 }
 
