@@ -127,7 +127,7 @@ sub Run {
         if ( $ConfigItemID->[0] ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete GeneralCatalogItem. A ITSMConfigItem with this GeneralCatalogItem already exists.',
+                Message => 'Can not delete GeneralCatalogItem. A ConfigItem with this GeneralCatalogItem already exists.',
             );
         } 
 
