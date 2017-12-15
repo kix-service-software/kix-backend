@@ -94,9 +94,9 @@
 /systemaddresses/:SystemAddressID                                   |   GET             | V1::SystemAddress::SystemAddressGet
 /systemaddresses/:SystemAddressID                                   |   PATCH           | V1::SystemAddress::SystemAddressUpdate
 /systemaddresses/:SystemAddressID                                   |   DELETE          | V1::SystemAddress::SystemAddressDelete
-/generalcatalog                                                     |   GET             | V1::GeneralCatalog::GeneralCatalogSearch
-/generalcatalog                                                     |   POST            | V1::GeneralCatalog::GeneralCatalogCreate
-/generalcatalog/:GeneralCatalogItemID                               |   GET             | V1::GeneralCatalog::GeneralCatalogGet
-/generalcatalog/:GeneralCatalogItemID                               |   PATCH           | V1::GeneralCatalog::GeneralCatalogUpdate
-/generalcatalog/:GeneralCatalogItemID                               |   DELETE          | V1::GeneralCatalog::GeneralCatalogDelete
+/generalcatalog                                                     |   GET             | V1::GeneralCatalog::GeneralCatalogClassSearch
+/generalcatalog                                                     |   POST            | V1::GeneralCatalog::GeneralCatalogClassCreate
+/generalcatalog/:GeneralCatalogItemID                               |   GET             | V1::GeneralCatalog::GeneralCatalogClassGet
+/generalcatalog/:GeneralCatalogItemID                               |   PATCH           | V1::GeneralCatalog::GeneralCatalogClassUpdate
+/generalcatalog/:GeneralCatalogItemID                               |   DELETE          | V1::GeneralCatalog::GeneralCatalogClassDelete
 /generalcatalog/classes                                             |   GET             | V1::GeneralCatalog::GeneralCatalogClasses

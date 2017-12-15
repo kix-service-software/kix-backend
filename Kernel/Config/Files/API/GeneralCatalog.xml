@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogGet" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassGet" Required="0" Valid="1">
         <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">GeneralCatalogGet</Item>
+                <Item Key="Name">GeneralCatalogClassGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassSearch" Required="0" Valid="1">
         <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">GeneralCatalogSearch</Item>
+                <Item Key="Name">GeneralCatalogClassSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogCreate" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassCreate" Required="0" Valid="1">
         <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">GeneralCatalogCreate</Item>
+                <Item Key="Name">GeneralCatalogClassCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogUpdate" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassUpdate" Required="0" Valid="1">
         <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">GeneralCatalogUpdate</Item>
+                <Item Key="Name">GeneralCatalogClassUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogDelete" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassDelete" Required="0" Valid="1">
         <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">GeneralCatalogDelete</Item>
+                <Item Key="Name">GeneralCatalogClassDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

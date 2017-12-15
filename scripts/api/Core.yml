@@ -665,41 +665,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
-    GeneralCatalogSearch:
+    GeneralCatalogClassSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogSearch
-    GeneralCatalogCreate:
+        Type: V1::GeneralCatalog::GeneralCatalogClassSearch
+    GeneralCatalogClassCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogCreate
-    GeneralCatalogGet:
+        Type: V1::GeneralCatalog::GeneralCatalogClassCreate
+    GeneralCatalogClassGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogGet
-    GeneralCatalogUpdate:
+        Type: V1::GeneralCatalog::GeneralCatalogClassGet
+    GeneralCatalogClassUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogUpdate
-    GeneralCatalogDelete:
+        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
+    GeneralCatalogClassDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogDelete
+        Type: V1::GeneralCatalog::GeneralCatalogClassDelete
     GeneralCatalogClasses:
         Description: ''
         MappingInbound:
@@ -1089,23 +1089,23 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /systemaddresses/:SystemAddressID
-        GeneralCatalogSearch:
+        GeneralCatalogClassSearch:
           RequestMethod:
           - GET
           Route: /generalcatalog
-        GeneralCatalogCreate:
+        GeneralCatalogClassCreate:
           RequestMethod:
           - POST
           Route: /generalcatalog
-        GeneralCatalogGet:
+        GeneralCatalogClassGet:
           RequestMethod:
           - GET
           Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogUpdate:
+        GeneralCatalogClassUpdate:
           RequestMethod:
           - PATCH
           Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogDelete:
+        GeneralCatalogClassDelete:
           RequestMethod:
           - DELETE
           Route: /generalcatalog/:GeneralCatalogItemID
