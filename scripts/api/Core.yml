@@ -665,41 +665,83 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
-    SysConfigItemDefinitionSearch:
+    GeneralCatalogSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemDefinitionSearch
-    SysConfigItemDefinitionGet:
+        Type: V1::GeneralCatalog::GeneralCatalogSearch
+    GeneralCatalogCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemDefinitionGet
-    SysConfigItemSearch:
+        Type: V1::GeneralCatalog::GeneralCatalogCreate
+    GeneralCatalogGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemSearch
-    SysConfigItemGet:
+        Type: V1::GeneralCatalog::GeneralCatalogGet
+    GeneralCatalogUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemGet
-    SysConfigItemUpdate:
+        Type: V1::GeneralCatalog::GeneralCatalogUpdate
+    GeneralCatalogDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemUpdate
+        Type: V1::GeneralCatalog::GeneralCatalogDelete
+    GeneralCatalogClasses:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClasses
+    SalutationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationSearch
+    SalutationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationCreate
+    SalutationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationGet
+    SalutationUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationUpdate
+    SalutationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationDelete
 
   Transport:
     Config:
@@ -1029,11 +1071,11 @@ Provider:
         DynamicFieldTypeSearch:
           RequestMethod:
           - GET
-          Route: /dynamicfields/types
+          Route: /dynamicfieldtypes
         DynamicFieldObjectTypeSearch:
           RequestMethod:
           - GET
-          Route: /dynamicfields/objects
+          Route: /dynamicfieldobjecttypes
         DynamicFieldSearch:
           RequestMethod:
           - GET
@@ -1082,26 +1124,50 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /systemaddresses/:SystemAddressID
-        SysConfigItemDefinitionSearch:
+        GeneralCatalogSearch:
           RequestMethod:
           - GET
-          Route: /sysconfig/definitions
-        SysConfigItemDefinitionGet:
+          Route: /generalcatalog
+        GeneralCatalogCreate:
+          RequestMethod:
+          - POST
+          Route: /generalcatalog
+        GeneralCatalogGet:
           RequestMethod:
           - GET
-          Route: /sysconfig/definitions/:SysConfigItemDefinitionID
-        SysConfigItemSearch:
-          RequestMethod:
-          - GET
-          Route: /sysconfig
-        SysConfigItemGet:
-          RequestMethod:
-          - GET
-          Route: /sysconfig/:SysConfigItemID
-        SysConfigItemUpdate:
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogUpdate:
           RequestMethod:
           - PATCH
-          Route: /sysconfig/:SysConfigItemID
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogDelete:
+          RequestMethod:
+          - DELETE
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogClasses:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/classes
+        SalutationSearch:
+          RequestMethod:
+          - GET
+          Route: /salutation
+        SalutationCreate:
+          RequestMethod:
+          - POST
+          Route: /salutation
+        SalutationGet:
+          RequestMethod:
+          - GET
+          Route: /salutation/:SalutationID
+        SalutationUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /salutation/:SalutationID
+        SalutationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /salutation/:SalutationID
 
     Type: HTTP::REST
 RemoteSystem: ''

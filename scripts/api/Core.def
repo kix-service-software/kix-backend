@@ -80,8 +80,8 @@
 /slas/:SLAID                                                        |   GET             | V1::SLA::SLAGet
 /slas/:SLAID                                                        |   PATCH           | V1::SLA::SLAUpdate
 /slas/:SLAID                                                        |   DELETE          | V1::SLA::SLADelete
-/dynamicfields/types                                                |   GET             | V1::DynamicField::DynamicFieldTypeSearch
-/dynamicfields/objects                                              |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
+/dynamicfieldtypes                                                  |   GET             | V1::DynamicField::DynamicFieldTypeSearch
+/dynamicfieldobjecttypes                                            |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
 /dynamicfields                                                      |   GET             | V1::DynamicField::DynamicFieldSearch
 /dynamicfields                                                      |   POST            | V1::DynamicField::DynamicFieldCreate
 /dynamicfields/:DynamicFieldID                                      |   GET             | V1::DynamicField::DynamicFieldGet
@@ -94,9 +94,14 @@
 /systemaddresses/:SystemAddressID                                   |   GET             | V1::SystemAddress::SystemAddressGet
 /systemaddresses/:SystemAddressID                                   |   PATCH           | V1::SystemAddress::SystemAddressUpdate
 /systemaddresses/:SystemAddressID                                   |   DELETE          | V1::SystemAddress::SystemAddressDelete
-/sysconfig/definitions                                              |   GET             | V1::SysConfig::SysConfigItemDefinitionSearch
-/sysconfig/definitions/:SysConfigItemDefinitionID                   |   GET             | V1::SysConfig::SysConfigItemDefinitionGet
-/sysconfig                                                          |   GET             | V1::SysConfig::SysConfigItemSearch
-/sysconfig/:SysConfigItemID                                         |   GET             | V1::SysConfig::SysConfigItemGet
-/sysconfig/:SysConfigItemID                                         |   PATCH           | V1::SysConfig::SysConfigItemUpdate
-
+/generalcatalog                                                     |   GET             | V1::GeneralCatalog::GeneralCatalogSearch
+/generalcatalog                                                     |   POST            | V1::GeneralCatalog::GeneralCatalogCreate
+/generalcatalog/:GeneralCatalogItemID                               |   GET             | V1::GeneralCatalog::GeneralCatalogGet
+/generalcatalog/:GeneralCatalogItemID                               |   PATCH           | V1::GeneralCatalog::GeneralCatalogUpdate
+/generalcatalog/:GeneralCatalogItemID                               |   DELETE          | V1::GeneralCatalog::GeneralCatalogDelete
+/generalcatalog/classes                                             |   GET             | V1::GeneralCatalog::GeneralCatalogClasses
+/salutation                                                         |   GET             | V1::Salutation::SalutationSearch
+/salutation                                                         |   POST            | V1::Salutation::SalutationCreate
+/salutation/:SalutationID                                           |   GET             | V1::Salutation::SalutationGet
+/salutation/:SalutationID                                           |   PATCH           | V1::Salutation::SalutationUpdate
+/salutation/:SalutationID                                           |   DELETE          | V1::Salutation::SalutationDelete

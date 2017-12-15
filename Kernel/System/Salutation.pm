@@ -301,6 +301,45 @@ sub SalutationList {
     return %Data;
 }
 
+=item SalutationDelete()
+
+Delete a email Salutations.
+
+    my $Result = $SalutationObject->SalutationDelete(
+        SalutationID      => '...',
+    );
+
+=cut
+
+sub SalutationDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(SalutationID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM salutation WHERE id = ?',
+        Bind => [ \$Param{SalutationID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+}
+
 1;
 
 
