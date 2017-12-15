@@ -99,4 +99,9 @@
 /sysconfig                                                          |   GET             | V1::SysConfig::SysConfigItemSearch
 /sysconfig/:SysConfigItemID                                         |   GET             | V1::SysConfig::SysConfigItemGet
 /sysconfig/:SysConfigItemID                                         |   PATCH           | V1::SysConfig::SysConfigItemUpdate
+/contacts/sources                                                   |   GET             | V1::Contact::ContactSourceSearch
+/contacts                                                           |   GET             | V1::Contact::ContactSearch
+/contacts                                                           |   POST            | V1::Contact::ContactCreate
+/contacts/:ContactID                                                |   GET             | V1::Contact::ContactGet
+/contacts/:ContactID                                                |   PATCH           | V1::Contact::ContactUpdate
 

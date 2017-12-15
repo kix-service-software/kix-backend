@@ -700,6 +700,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemUpdate
+    ContactSourceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactSourceSearch
+    ContactSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactSearch
+    ContactCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactCreate
+    ContactGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactGet
+    ContactUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactUpdate
 
   Transport:
     Config:
@@ -1102,6 +1137,26 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /sysconfig/:SysConfigItemID
+        ContactSourceSearch:
+          RequestMethod:
+          - GET
+          Route: /contacts/sources
+        ContactSearch:
+          RequestMethod:
+          - GET
+          Route: /contacts
+        ContactCreate:
+          RequestMethod:
+          - POST
+          Route: /contacts
+        ContactGet:
+          RequestMethod:
+          - GET
+          Route: /contacts/:ContactID
+        ContactUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /contacts/:ContactID
 
     Type: HTTP::REST
 RemoteSystem: ''

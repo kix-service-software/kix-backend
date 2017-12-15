@@ -169,6 +169,8 @@ sub ProviderProcessRequest {
         }
     }
 
+    my %PossibleOperations;
+
     my $RequestMethod = $ENV{'REQUEST_METHOD'} || 'GET';
     ROUTE:
     for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
@@ -200,6 +202,7 @@ sub ProviderProcessRequest {
         next ROUTE if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
 
         # import URI params
+        my %URIParams;
         for my $URIKey ( sort keys %+ ) {
             my $URIValue = $+{$URIKey};
 
@@ -209,15 +212,21 @@ sub ProviderProcessRequest {
             # encode value
             $EncodeObject->EncodeInput( \$URIValue );
 
-            # add to URI data
-            $URIData{$URIKey} = $URIValue;
+            # add to URIParams
+            $URIParams{$URIKey} = $URIValue;
         }
 
-        $Operation = $CurrentOperation;
-
-        # leave with the first matching regexp
-        last ROUTE;
+        # store this possible operation
+        $PossibleOperations{$RouteMapping{Route}} = {
+            Operation => $CurrentOperation,
+            URIParams => \%URIParams,
+        }
     }
+
+    # use the most recent operation (prefer "hard" routes above parameterized routes)
+    my $CurrentRoute = (reverse sort keys %PossibleOperations)[0];
+    $Operation = $PossibleOperations{$CurrentRoute}->{Operation};
+    %URIData   = %{$PossibleOperations{$CurrentRoute}->{URIParams}};
 
     # combine query params with URIData params, URIData has more precedence
     if (%QueryParams) {
