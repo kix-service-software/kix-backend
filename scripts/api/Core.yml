@@ -700,6 +700,55 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemUpdate
+    GeneralCatalogClassSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClassSearch
+    GeneralCatalogClassUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
+    GeneralCatalogItemSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemSearch
+    GeneralCatalogItemCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemCreate
+    GeneralCatalogItemGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemGet
+    GeneralCatalogItemUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemUpdate
+    GeneralCatalogItemDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemDelete
 
   Transport:
     Config:
@@ -1102,6 +1151,34 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /sysconfig/:SysConfigItemID
+        GeneralCatalogClassSearch:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/classes
+        GeneralCatalogClassUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /generalcatalog/classes/:GeneralCatalogClass
+        GeneralCatalogItemSearch:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog
+        GeneralCatalogItemCreate:
+          RequestMethod:
+          - POST
+          Route: /generalcatalog
+        GeneralCatalogItemGet:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogItemUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogItemDelete:
+          RequestMethod:
+          - DELETE
+          Route: /generalcatalog/:GeneralCatalogItemID
 
     Type: HTTP::REST
 RemoteSystem: ''

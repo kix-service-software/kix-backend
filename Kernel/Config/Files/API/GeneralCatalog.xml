@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogItemGet" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogItemGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogItemSearch" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogItemSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogItemCreate" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogItemCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogItemUpdate" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogItemUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogItemDelete" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogItemDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassSearch" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogClassSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassUpdate" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogClassUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>
