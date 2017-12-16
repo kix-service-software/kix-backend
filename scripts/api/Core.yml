@@ -707,6 +707,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::GeneralCatalog::GeneralCatalogClassSearch
+    GeneralCatalogClassUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
 
   Transport:
     Config:
@@ -1113,6 +1120,10 @@ Provider:
           RequestMethod:
           - GET
           Route: /generalcatalog/classes
+        GeneralCatalogClassUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /generalcatalog/classes/:GeneralCatalogClass
 
     Type: HTTP::REST
 RemoteSystem: ''

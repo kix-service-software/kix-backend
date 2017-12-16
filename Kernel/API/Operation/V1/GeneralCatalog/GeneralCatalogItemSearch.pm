@@ -69,7 +69,6 @@ perform GeneralCatalogItemSearch Operation. This will return a GeneralCatalogIte
 
     my $Result = $OperationObject->Run(
         Data => {
-        	Class = 'ITSM::ConfigItem::Location::Type';                         # optional
         }
     );
 
@@ -78,7 +77,7 @@ perform GeneralCatalogItemSearch Operation. This will return a GeneralCatalogIte
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            GeneralCatalog => [
+            GeneralCatalogItem => [
                 {},
                 {}
             ]
@@ -136,19 +135,19 @@ sub Run {
 	        if ( !IsHashRefWithData($GeneralCatalogGetResult) || !$GeneralCatalogGetResult->{Success} ) {
 	            return $GeneralCatalogGetResult;
 	        }
-	        push @GeneralCatalogDataList,IsArrayRefWithData($GeneralCatalogGetResult->{Data}->{GeneralCatalog}) ? @{$GeneralCatalogGetResult->{Data}->{GeneralCatalog}} : ( $GeneralCatalogGetResult->{Data}->{GeneralCatalog} );
+	        push @GeneralCatalogDataList,IsArrayRefWithData($GeneralCatalogGetResult->{Data}->{GeneralCatalogItem}) ? @{$GeneralCatalogGetResult->{Data}->{GeneralCatalogItem}} : ( $GeneralCatalogGetResult->{Data}->{GeneralCatalogItem} );
 	    }	            	
     }
 
     if ( IsArrayRefWithData(\@GeneralCatalogDataList) ) {
         return $Self->_Success(
-            GeneralCatalog => \@GeneralCatalogDataList,
+            GeneralCatalogItem => \@GeneralCatalogDataList,
         )
     }
     
     # return result
     return $Self->_Success(
-        GeneralCatalog => {},
+        GeneralCatalogItem => {},
     );
 }
 

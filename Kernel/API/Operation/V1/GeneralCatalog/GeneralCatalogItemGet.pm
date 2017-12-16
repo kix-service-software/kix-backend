@@ -76,7 +76,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ItemID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            GeneralCatalogItemID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -85,7 +85,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            GeneralCatalog => [
+            GeneralCatalogItem => [
                 {
                     ...
                 },
@@ -146,7 +146,7 @@ sub Run {
         if ( !$ItemData ) {         
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for GeneralCatalogItemID $GeneralCatalogItemID.",
+                Message => "No data found for ItemID $GeneralCatalogItemID.",
             );
         }
 
@@ -156,13 +156,13 @@ sub Run {
 
     if ( scalar(@GeneralCatalogList) == 1 ) {
         return $Self->_Success(
-            GeneralCatalog => $GeneralCatalogList[0],
+            GeneralCatalogItem => $GeneralCatalogList[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        GeneralCatalog => \@GeneralCatalogList,
+        GeneralCatalogItem => \@GeneralCatalogList,
     );
 }
 

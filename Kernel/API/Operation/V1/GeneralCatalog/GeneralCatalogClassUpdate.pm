@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogItemUpdate.pm - API GeneralCatalogItem Update operation backend
+# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassUpdate.pm - API GeneralCatalogItem Update operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemUpdate;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassUpdate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemUpdate - API GeneralCatalogItem Update Operation backend
+Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassUpdate - API GeneralCatalogClass Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,24 +61,19 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalogItemUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalogClassUpdate');
 
     return $Self;
 }
 
 =item Run()
 
-perform GeneralCatalogItemUpdate Operation. This will return the updated GeneralCatalogItemID.
+perform GeneralCatalogClassUpdate Operation. This will return the updated GeneralCatalogItemID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            GeneralCatalogItemID => 123,
-            GeneralCatalogItem  => {
-                Class         => 'ITSM::Service::Type',     # (optional)
-                Name          => 'Item Name',               # (optional)
-                ValidID       => 1,                         # (optional)
-                Comment       => 'Comment',                 # (optional)
-            },
+            GeneralCatalogClass => 'ITSM::Service::Type',
+            NewClassName        => '...'
         },
     );
     
@@ -88,7 +83,7 @@ perform GeneralCatalogItemUpdate Operation. This will return the updated General
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            GeneralCatalogItemID  => 123,       # ID of the updated GeneralCatalogItem 
+            GeneralCatalogClass => '...',       # new class name 
         },
     };
    
@@ -114,11 +109,10 @@ sub Run {
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
         Parameters   => {
-            'GeneralCatalogItemID' => {
+            'GeneralCatalogClass' => {
                 Required => 1
             },
-            'GeneralCatalogItem' => {
-                Type => 'HASH',
+            'NewClassName' => {
                 Required => 1
             },   
         }        
@@ -132,53 +126,38 @@ sub Run {
         );
     }
 
-    # isolate GeneralCatalogItem parameter
-    my $GeneralCatalogItem = $Param{Data}->{GeneralCatalogItem};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$GeneralCatalogItem} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $GeneralCatalogItem->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $GeneralCatalogItem->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-
-    # check if GeneralCatalog exists 
-    my $GeneralCatalogData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
-        ItemID => $Param{Data}->{GeneralCatalogItemID},
+    # trim NewClassName parameter
+    my $NewClassName = $Self->_Trim( 
+        Data => $Param{Data}->{NewClassName},
     );
 
-    if ( !$GeneralCatalogData ) {
+    # check if Class exists 
+    my %ClassList = map { $_ => 1 } sort @{ $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassList() };
+
+    if ( !%ClassList || !$ClassList{$Param{Data}->{GeneralCatalogClass}} ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Cannot update GeneralCatalog. No GeneralCatalog item with ID '$Param{Data}->{GeneralCatalogID}' found.",
+            Message => "Cannot update GeneralCatalog class. No GeneralCatalog class '$Param{Data}->{GeneralCatalogClass}' found.",
         );
     }
 
     # update GeneralCatalog
-    my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemUpdate(
-        ItemID   => $Param{Data}->{GeneralCatalogItemID},    
-        Class    => $GeneralCatalogItem->{Class} || $GeneralCatalogData->{Class},
-        Name     => $GeneralCatalogItem->{Name} || $GeneralCatalogData->{Name},
-        Comment  => $GeneralCatalogItem->{Comment} || $GeneralCatalogData->{Comment},
-        ValidID  => $GeneralCatalogItem->{ValidID} || $GeneralCatalogData->{ValidID},
+    my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassRename(
+        ClassOld => $Param{Data}->{GeneralCatalogClass},
+        ClassNew => $NewClassName,
         UserID   => $Self->{Authorization}->{UserID},                        
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update GeneralCatalog, please contact the system administrator',
+            Message => 'Could not update GeneralCatalog class, please contact the system administrator',
         );
     }
 
     # return result    
     return $Self->_Success(
-        GeneralCatalogItemID => $Param{Data}->{GeneralCatalogID},
+        GeneralCatalogClass => $NewClassName,
     );    
 }
 

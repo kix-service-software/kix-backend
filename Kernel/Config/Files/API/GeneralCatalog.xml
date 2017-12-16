@@ -57,11 +57,23 @@
             </Hash>
         </Setting>
     </ConfigItem>
+
     <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassSearch" Required="0" Valid="1">
         <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogClassSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">GeneralCatalog</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::GeneralCatalog::GeneralCatalogClassUpdate" Required="0" Valid="1">
+        <Description TranGeneralCatalogtable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">GeneralCatalogClassUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

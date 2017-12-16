@@ -70,7 +70,7 @@ perform GeneralCatalogItemCreate Operation. This will return the created General
 
     my $Result = $OperationObject->Run(
         Data => {
-            GeneralCatalog  => {                
+            GeneralCatalogItem  => {                
                 Class   => 'ITSM::Service::Type',
                 Name    => 'Item Name',
                 ValidID => 1,
@@ -109,14 +109,14 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'GeneralCatalog' => {
+            'GeneralCatalogItem' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'GeneralCatalog::Class' => {
+            'GeneralCatalogItem::Class' => {
                 Required => 1
             },
-            'GeneralCatalog::Name' => {
+            'GeneralCatalogItem::Name' => {
                 Required => 1
             },                             
         }
@@ -130,50 +130,49 @@ sub Run {
         );
     }
 
-    # isolate GeneralCatalog parameter
-    my $GeneralCatalog = $Param{Data}->{GeneralCatalog};
+    # isolate GeneralCatalogItem parameter
+    my $GeneralCatalogItem = $Param{Data}->{GeneralCatalogItem};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$GeneralCatalog} ) {
+    for my $Attribute ( sort keys %{$GeneralCatalogItem} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $GeneralCatalog->{$Attribute} =~ s{\A\s+}{};
+            $GeneralCatalogItem->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $GeneralCatalog->{$Attribute} =~ s{\s+\z}{};
+            $GeneralCatalogItem->{$Attribute} =~ s{\s+\z}{};
         }
     }
 
  
 
     my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
-        Class => $GeneralCatalog->{Class},
-        Valid => $GeneralCatalog->{ValidID},
+        Class => $GeneralCatalogItem->{Class},
     );
 
     foreach my $Item ( keys %$ItemList ) {
-    	if ( $ItemList->{$Item} eq $GeneralCatalog->{Name} ) {
+    	if ( $ItemList->{$Item} eq $GeneralCatalogItem->{Name} ) {
 	        return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => "Can not create GeneralCatalog. GeneralCatalog with same name '$GeneralCatalog->{Name}' already exists.",
+                Message => "Can not create GeneralCatalog item. GeneralCatalog item with same name '$GeneralCatalogItem->{Name}' already exists.",
 	        );    		
     	}
     }
 
     # create GeneralCatalog
     my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
-        Class    => $GeneralCatalog->{Class},
-        Name     => $GeneralCatalog->{Name},
-        Comment  => $GeneralCatalog->{Comment} || '',
-        ValidID  => $GeneralCatalog->{ValidID} || 1,
+        Class    => $GeneralCatalogItem->{Class},
+        Name     => $GeneralCatalogItem->{Name},
+        Comment  => $GeneralCatalogItem->{Comment} || '',
+        ValidID  => $GeneralCatalogItem->{ValidID} || 1,
         UserID   => $Self->{Authorization}->{UserID},              
     );
 
     if ( !$GeneralCatalogItemID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create GeneralCatalog, please contact the system administrator',
+            Message => 'Could not create GeneralCatalog item, please contact the system administrator',
         );
     }
     
