@@ -72,10 +72,7 @@
         <Description Translatable="1">Defines which attributes of the contact data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
-                <Item Key="UserPw">1</Item>
-                <Item Key="CompanyConfig">1</Item>
-                <Item Key="Config">1</Item>
-                <Item Key="CustomerCompanyValidID">1</Item>
+                <Item Key="UserPassword">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>  

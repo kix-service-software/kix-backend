@@ -157,8 +157,24 @@ sub Run {
         $ContactData{ContactID} = $ContactData{UserID};
         delete $ContactData{UserID};
 
+        # map Source to SourceID
+        $ContactData{SourceID} = $ContactData{Source};
+        delete $ContactData{Source};
+
+        my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
+
+        # add attributes from Map to whitelist
+        foreach my $MapItem ( @{$ContactData{Config}->{Map}} ) {
+            $AttributeWhitelist->{$MapItem->[0]} = 1;
+        }
+
+        # add required attributes to whitelist
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
+            $AttributeWhitelist->{$Attr} = 1;
+        } 
+
         # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
+        if ( IsHashRefWithData($AttributeWhitelist) ) {
             foreach my $Attr (sort keys %ContactData) {
                 delete $ContactData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
             }
