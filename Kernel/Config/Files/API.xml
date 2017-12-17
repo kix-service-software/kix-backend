@@ -193,6 +193,7 @@
                 <Item Key="Authorization.NoHeader">403</Item>
                 <Item Key="Authorization.NoToken">403</Item>
                 <Item Key="BadRequest">400</Item>
+                <Item Key="Conflict">409</Item>                
                 <Item Key="ContactCreate.EmailExists">409</Item>
                 <Item Key="ContactCreate.LoginExists">409</Item>
                 <Item Key="ExecOperation.MissingParameter">500</Item>

@@ -784,6 +784,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Contact::ContactUpdate
+    CustomerSourceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerSourceSearch
+    CustomerSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerSearch
+    CustomerCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerCreate
+    CustomerGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerGet
+    CustomerUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerUpdate
 
   Transport:
     Config:
@@ -1234,6 +1269,26 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /contacts/:ContactID
+        CustomerSourceSearch:
+          RequestMethod:
+          - GET
+          Route: /customers/sources
+        CustomerSearch:
+          RequestMethod:
+          - GET
+          Route: /customers
+        CustomerCreate:
+          RequestMethod:
+          - POST
+          Route: /customers
+        CustomerGet:
+          RequestMethod:
+          - GET
+          Route: /customers/:CustomerID
+        CustomerUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /customers/:CustomerID
 
     Type: HTTP::REST
 RemoteSystem: ''

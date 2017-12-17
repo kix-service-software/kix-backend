@@ -184,7 +184,7 @@ sub Run {
     );
     if ( %ContactData ) {
         return $Self->_Error(
-            Code    => 'ContactCreate.LoginExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create Contact. Another Contact with same login already exists.",
         );
     }
@@ -195,7 +195,7 @@ sub Run {
     );
     if ( %ContactList ) {
         return $Self->_Error(
-            Code    => 'ContactCreate.EmailExists',
+            Code    => 'Object.AlreadyExists',
             Message => 'Can not create Contact. Another Contact with same email address already exists.',
         );
     }

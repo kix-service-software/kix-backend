@@ -183,7 +183,7 @@ sub Run {
         );
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
             return $Self->_Error(
-                Code    => 'ContactUpdate.LoginExists',
+                Code    => 'Object.AlreadyExists',
                 Message => 'Can not update Contact. Another Contact with same login already exists.',
             );
         }
@@ -197,7 +197,7 @@ sub Run {
         );
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
             return $Self->_Error(
-                Code    => 'ContactUpdate.EmailExists',
+                Code    => 'Object.AlreadyExists',
                 Message => 'Can not update Contact. Another Contact with same email address already exists.',
             );
         }
