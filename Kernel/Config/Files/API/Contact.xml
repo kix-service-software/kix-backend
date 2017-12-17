@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ContactGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Contact</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ContactSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Contact</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ContactCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Contact</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="DefaultSource">Contact</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ContactUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Contact</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactSourceSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ContactSourceSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Contact</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::V1::Contact::ContactGet###AttributeWhitelist" Required="0" Valid="1">
+        <Description Translatable="1">Defines which attributes of the contact data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
+        <Setting>
+            <Hash>
+            </Hash>
+        </Setting>
+    </ConfigItem>    
+    <ConfigItem Name="API::Operation::V1::Contact::ContactGet###AttributeBlacklist" Required="0" Valid="1">
+        <Description Translatable="1">Defines which attributes of the contact data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
+        <Setting>
+            <Hash>
+                <Item Key="UserPassword">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>  
+
+</kix_config>

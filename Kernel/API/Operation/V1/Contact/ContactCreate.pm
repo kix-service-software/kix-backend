@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserCreate.pm - API User Create operation backend
+# Kernel/API/Operation/Contact/ContactCreate.pm - API Contact Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserCreate;
+package Kernel::API::Operation::V1::Contact::ContactCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::User::V1::UserCreate - API User Create Operation backend
+Kernel::API::Operation::Contact::V1::ContactCreate - API Contact Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,15 +66,17 @@ sub new {
 
 =item Run()
 
-perform UserCreate Operation. This will return the created UserLogin.
+perform ContactCreate Operation. This will return the created ContactLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            User => {
+            SourceID => '...'                                                   # required (ID of backend to write to - backend must be writeable)
+            Contact => {
                 UserLogin       => '...'                                        # required
                 UserFirstname   => '...'                                        # required
                 UserLastname    => '...'                                        # required
                 UserEmail       => '...'                                        # required
+                UserCustomerID  => '...'                                        # required
                 UserPassword    => '...'                                        # optional                
                 UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
@@ -87,7 +89,7 @@ perform UserCreate Operation. This will return the created UserLogin.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            UserID  => '',                          # UserID 
+            ContactID  => '',                       # ContactID 
         },
     };
 
@@ -112,20 +114,23 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'User' => {
+            'Contact' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'User::UserLogin' => {
+            'Contact::UserLogin' => {
                 Required => 1
             },            
-            'User::UserFirstname' => {
+            'Contact::UserFirstname' => {
                 Required => 1
             },            
-            'User::UserLastname' => {
+            'Contact::UserLastname' => {
                 Required => 1
             },            
-            'User::UserEmail' => {
+            'Contact::UserEmail' => {
+                Required => 1
+            },            
+            'Contact::UserCustomerID' => {
                 Required => 1
             },            
         }
@@ -139,58 +144,70 @@ sub Run {
         );
     }
 
-    # isolate User parameter
-    my $User = $Param{Data}->{User};
+    # check if backend (Source) is writeable
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
+        ReadOnly => 0
+    );    
+    if ( !$SourceList{$Param{Data}->{SourceID}} ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not create Contact. Backend with given SourceID is not writable or does not exist.',
+        );        
+    }
+
+    # isolate Contact parameter
+    my $Contact = $Param{Data}->{Contact};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$User} ) {
+    for my $Attribute ( sort keys %{$Contact} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $User->{$Attribute} =~ s{\A\s+}{};
+            $Contact->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $User->{$Attribute} =~ s{\s+\z}{};
+            $Contact->{$Attribute} =~ s{\s+\z}{};
         }
     }
 
-    # check UserLogin exists
-    my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        User => $User->{UserLogin},
+    # check Userlogin exists
+    my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+        User => $Contact->{UserLogin},
     );
-    if ( %UserData ) {
+    if ( %ContactData ) {
         return $Self->_Error(
-            Code    => 'UserCreate.LoginExists',
-            Message => "Can not create user. Another user with same login already exists.",
+            Code    => 'ContactCreate.LoginExists',
+            Message => "Can not create Contact. Another Contact with same login already exists.",
         );
     }
 
     # check UserEmail exists
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        PostMasterSearch => $User->{UserEmail},
+    my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+        PostMasterSearch => $Contact->{UserEmail},
     );
-    if ( %UserList ) {
+    if ( %ContactList ) {
         return $Self->_Error(
-            Code    => 'UserCreate.EmailExists',
-            Message => 'Can not create user. Another user with same email address already exists.',
+            Code    => 'ContactCreate.EmailExists',
+            Message => 'Can not create Contact. Another Contact with same email address already exists.',
         );
     }
     
-    # create User
-    my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-        %{$User},
-        ChangeUserID     => $Self->{Authorization}->{UserID},
-        ValidID          => 1,
+    # create Contact
+    my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
+        %{$Contact},
+        Source  => $Param{Data}->{SourceID},
+        UserID  => $Self->{Authorization}->{UserID},
+        ValidID => 1,
     );    
-    if ( !$UserID ) {
+    if ( !$ContactID ) {
         return $Self->_Error(
-            Code    => 'UserCreate.UnableToCreate',
-            Message => 'Could not create user, please contact the system administrator',
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create Contact, please contact the system administrator',
         );
     }
     
     return $Self->_Success(
         Code   => 'Object.Created',
-        UserID => $UserID,
+        ContactID => $ContactID,
     );    
 }

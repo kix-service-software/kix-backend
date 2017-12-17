@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserGet.pm - API User Get operation backend
+# Kernel/API/Operation/Contact/ContactGet.pm - API Contact Get operation backend
 # based upon Kernel/API/Operation/Ticket/TicketGet.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -13,7 +13,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserGet;
+package Kernel::API::Operation::V1::Contact::ContactGet;
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
+Kernel::API::Operation::V1::Contact::ContactGet - API Contact Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::User::UserGet->new();
+by using Kernel::API::Operation::V1::Contact::ContactGet->new();
 
 =cut
 
@@ -66,19 +66,19 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Contact::ContactGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform UserGet Operation. This function is able to return
+perform ContactGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            ContactID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -87,7 +87,7 @@ one or more ticket entries in one call.
         Code         => '...'
         Message      => '',                               # In case of an error
         Data         => {
-            User => [
+            Contact => [
                 {
                     ...
                 },
@@ -119,7 +119,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'UserID' => {
+            'ContactID' => {
                 Type     => 'ARRAY',
                 Required => 1
             }                
@@ -134,53 +134,71 @@ sub Run {
         );
     }
 
-    my $Message = '';
+    my @ContactList;
 
-    my @UserList;
+    # start Contact loop
+    Contact:    
+    foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
 
-    # start user loop
-    USER:    
-    foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
-
-        # get the user data
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $UserID,
+        # get the Contact data
+        my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+            User => $ContactID,
         );
 
-        if ( !IsHashRefWithData( \%UserData ) ) {
+        if ( !IsHashRefWithData( \%ContactData ) ) {
 
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No user data found for UserID $UserID.",
+                Message => "No Contact data found for ContactID $ContactID.",
             );
         }
 
+        # map UserID to ContactID
+        $ContactData{ContactID} = $ContactData{UserID};
+        delete $ContactData{UserID};
+
+        # map Source to SourceID
+        $ContactData{SourceID} = $ContactData{Source};
+        delete $ContactData{Source};
+
+        my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
+
+        # add attributes from Map to whitelist
+        foreach my $MapItem ( @{$ContactData{Config}->{Map}} ) {
+            $AttributeWhitelist->{$MapItem->[0]} = 1;
+        }
+
+        # add required attributes to whitelist
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
+            $AttributeWhitelist->{$Attr} = 1;
+        } 
+
         # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+        if ( IsHashRefWithData($AttributeWhitelist) ) {
+            foreach my $Attr (sort keys %ContactData) {
+                delete $ContactData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
             }
         }
 
         # filter valid attributes
         if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
+            foreach my $Attr (sort keys %ContactData) {
+                delete $ContactData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
                 
         # add
-        push(@UserList, \%UserData);
+        push(@ContactList, \%ContactData);
     }
 
-    if ( scalar(@UserList) == 1 ) {
+    if ( scalar(@ContactList) == 1 ) {
         return $Self->_Success(
-            User => $UserList[0],
+            Contact => $ContactList[0],
         );    
     }
 
     return $Self->_Success(
-        User => \@UserList,
+        Contact => \@ContactList,
     );
 }
 
