@@ -164,6 +164,18 @@ sub Run {
         );
     }
 
+    # check if backend (Source) is writeable
+    
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
+        ReadOnly => 0
+    );    
+    if ( !$SourceList{$ContactData{Source}} ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not update Contact. Corresponding backend is not writable or does not exist.',
+        );        
+    }
+
     # check if ContactLogin already exists
     if ( IsStringWithData($Contact->{UserLogin}) ) {
         my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(

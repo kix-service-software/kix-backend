@@ -70,16 +70,9 @@ perform ContactCreate Operation. This will return the created ContactLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SourceID => '...'                                                   # required (ID of backend to write to - backend must be writeable)
+            SourceID => '...'       # required (ID of backend to write to - backend must be writeable)
             Contact => {
-                UserLogin       => '...'                                        # required
-                UserFirstname   => '...'                                        # required
-                UserLastname    => '...'                                        # required
-                UserEmail       => '...'                                        # required
-                UserCustomerID  => '...'                                        # required
-                UserPassword    => '...'                                        # optional                
-                UserPhone       => '...'                                        # optional                
-                UserTitle       => '...'                                        # optional
+                ...                 # attributes (required and optional) depend on Map config 
             },
         },
     );
@@ -110,29 +103,44 @@ sub Run {
         );
     }
 
-    # prepare data
+    # prepare data (first check)
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'SourceID' => {
+                Required => 1
+            },
+        }
+    );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
+        );
+    }
+
+    # determine required attributes from Map config
+    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
+    my %RequiredAttributes;
+    foreach my $MapItem ( @{$Config->{Map}} ) {
+        next if !$MapItem->[4] || $MapItem->[0] eq 'ValidID';
+
+        $RequiredAttributes{'Contact::'.$MapItem->[0]} = {
+            Required => 1
+        };
+    }
+
+    # prepare data (second check with more attributes)
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
             'Contact' => {
                 Type     => 'HASH',
                 Required => 1
-            },
-            'Contact::UserLogin' => {
-                Required => 1
-            },            
-            'Contact::UserFirstname' => {
-                Required => 1
-            },            
-            'Contact::UserLastname' => {
-                Required => 1
-            },            
-            'Contact::UserEmail' => {
-                Required => 1
-            },            
-            'Contact::UserCustomerID' => {
-                Required => 1
-            },            
+            },          
+            %RequiredAttributes,
         }
     );
 

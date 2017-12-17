@@ -700,13 +700,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemUpdate
-    :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: 
     GeneralCatalogClassSearch:
         Description: ''
         MappingInbound:
@@ -756,13 +749,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::GeneralCatalog::GeneralCatalogItemDelete
-    :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: 
     ContactSourceSearch:
         Description: ''
         MappingInbound:
@@ -798,13 +784,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Contact::ContactUpdate
-    :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: 
 
   Transport:
     Config:
@@ -1207,10 +1186,6 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /sysconfig/:SysConfigItemID
-        :
-          RequestMethod:
-          - 
-          Route: <<<<<<< HEAD
         GeneralCatalogClassSearch:
           RequestMethod:
           - GET
@@ -1239,10 +1214,6 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /generalcatalog/:GeneralCatalogItemID
-        :
-          RequestMethod:
-          - 
-          Route: =======
         ContactSourceSearch:
           RequestMethod:
           - GET
@@ -1263,10 +1234,6 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /contacts/:ContactID
-        :
-          RequestMethod:
-          - 
-          Route: >>>>>>> 58-contact-operations
 
     Type: HTTP::REST
 RemoteSystem: ''
