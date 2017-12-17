@@ -1,5 +1,5 @@
 # --
-# Kernel/GenericInterface/Operation/Customer/CustomerCreate.pm - GenericInterface Customer Create operation backend
+# Kernel/API/Operation/Customer/CustomerCreate.pm - API Customer Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -20,14 +20,13 @@ use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStri
 
 use base qw(
     Kernel::API::Operation::V1::Common
-    Kernel::API::Operation::V1::Customer::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Customer::CustomerCreate - GenericInterface Customer Create Operation backend
+Kernel::API::Operation::Customer::V1::CustomerCreate - API Customer Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -40,7 +39,7 @@ Kernel::API::Operation::V1::Customer::CustomerCreate - GenericInterface Customer
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
+by using Kernel::API::Operation->new();
 
 =cut
 
@@ -53,56 +52,37 @@ sub new {
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
-
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::CustomerCreate');
 
     return $Self;
 }
 
 =item Run()
 
-perform CustomerCreate Operation. This will return the created CompanyID.
+perform CustomerCreate Operation. This will return the created CustomerLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserLogin         => 'some agent login',                            # UserLogin or CustomerLogin or SessionID is
-                                                                                #   required
-            CustomerLogin => 'some customer login',
-            SessionID         => 123,
-
-            Password  => 'some password',                                       # if UserLogin or CustomerLogin is sent then
-                                                                                #   Password is required
-
+            SourceID => '...'       # required (ID of backend to write to - backend must be writeable)
             Customer => {
-                CustomerID             => '...'                                 # required                
-                CustomerName    => '...'                                 # required
-                CustomerStreet  => '...'                                 # optional
-                CustomerZIP     => '...'                                 # optional
-                CustomerCity    => '...'                                 # optional
-                CustomerCountry => '...'                                 # optional
-                CustomerComment => '...'                                 # optional
-                CustomerURL     => '...'                                 # optional
+                ...                 # attributes (required and optional) depend on Map config 
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        ErrorMessage    => '',                      # in case of error
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            CustomerID  => '',                     # CustomerID 
-            Error => {                              # should not return errors
-                    ErrorCode    => 'Customer.Create.ErrorCode'
-                    ErrorMessage => 'Error Description'
-            },
+            CustomerID  => '',                       # CustomerID 
         },
     };
 
@@ -111,66 +91,76 @@ perform CustomerCreate Operation. This will return the created CompanyID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
-    # check needed stuff
-    if (
-        !$Param{Data}->{UserLogin}
-        && !$Param{Data}->{CustomerLogin}
-        && !$Param{Data}->{SessionID}
-        )
-    {
-        return $Self->ReturnError(
-            ErrorCode    => 'CustomerCreate.MissingParameter',
-            ErrorMessage => "CustomerCreate: UserLogin, CustomerLogin or SessionID is required!",
-        );
-    }
-
-    if ( $Param{Data}->{UserLogin} || $Param{Data}->{CustomerLogin} ) {
-
-        if ( !$Param{Data}->{Password} )
-        {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerCreate.MissingParameter',
-                ErrorMessage => "CustomerCreate: Password or SessionID is required!",
-            );
+    # prepare data (first check)
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'SourceID' => {
+                Required => 1
+            },
         }
-    }
-
-    # authenticate user
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
     );
 
-    if ( !$UserID ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'CustomerCreate.AuthFail',
-            ErrorMessage => "CustomerCreate: User could not be authenticated!",
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    my $PermissionUserID = $UserID;
-    if ( $UserType eq 'Customer' ) {
-        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
+    # determine required attributes from Map config
+    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
+    my %RequiredAttributes;
+    foreach my $MapItem ( @{$Config->{Map}} ) {
+        next if !$MapItem->[4] || $MapItem->[0] eq 'ValidID';
+
+        $RequiredAttributes{'Customer::'.$MapItem->[0]} = {
+            Required => 1
+        };
     }
 
-    # check needed hashes
-    for my $Needed (qw(Customer)) {
-        if ( !IsHashRefWithData( $Param{Data}->{$Needed} ) ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerCreate.MissingParameter',
-                ErrorMessage => "CustomerCreate: $Needed parameter is missing or not valid!",
-            );
+    # prepare data (second check with more attributes)
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'Customer' => {
+                Type     => 'HASH',
+                Required => 1
+            },          
+            %RequiredAttributes,
         }
+    );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
+        );
+    }
+
+    # check if backend (Source) is writeable
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList(
+        ReadOnly => 0
+    );    
+    if ( !$SourceList{$Param{Data}->{SourceID}} ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not create Customer. Backend with given SourceID is not writable or does not exist.',
+        );        
     }
 
     # isolate Customer parameter
@@ -188,46 +178,33 @@ sub Run {
         }
     }
 
-    # check Customer attribute values
-    for my $Needed (qw(CustomerID CustomerName)) {
-        if ( !$Customer->{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerCreate.MissingParameter',
-                ErrorMessage => "CustomerCreate: Customer->$Needed parameter is missing!",
-            );
-        }
-    }
-    
-    # check CustomerID exists
-    my $CompanyExists = $Kernel::OM->Get('Kernel::System::Customer')->CustomerGet(
-        CustomerID => $Customer->{CustomerID},
+    # check CustomerCompanyName exists
+    my %CustomerList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList(
+        Search => $Customer->{CustomerCompanyName},
     );
-    if ( $CompanyExists ) {
-        return {
-            Success      => 0,
-            ErrorMessage => "Can not create customer company. Customer company '$Customer->{CustomerID}' already exists.",
-        }
+    if ( %CustomerList ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => 'Can not create Customer. Another Customer with same name already exists.',
+        );
     }
     
     # create Customer
-    my $CompanyID = $Kernel::OM->Get('Kernel::System::Customer')->CustomerAdd(
+    my $CustomerID = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyAdd(
         %{$Customer},
-        Source  => $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Module')->{'Customer::CustomerCreate'}->{DefaultSource},
-        UserID  => $UserID,
+        Source  => $Param{Data}->{SourceID},
+        UserID  => $Self->{Authorization}->{UserID},
         ValidID => 1,
     );    
-    if ( !$CompanyID ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'Could not create customer company, please contact the system administrator',
-        }
+    if ( !$CustomerID ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create Customer, please contact the system administrator',
+        );
     }
     
-    return {
-        Success => 1,
-        Data    => {
-            CustomerID => $CompanyID,
-        },
-    };
-    
+    return $Self->_Success(
+        Code   => 'Object.Created',
+        CustomerID => $CustomerID,
+    );    
 }

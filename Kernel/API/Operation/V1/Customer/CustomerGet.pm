@@ -1,6 +1,6 @@
 # --
-# Kernel/GenericInterface/Operation/Customer/CustomerGet.pm - GenericInterface Customer Get operation backend
-# based upon Kernel/GenericInterface/Operation/Ticket/TicketGet.pm
+# Kernel/API/Operation/Customer/CustomerGet.pm - API Customer Get operation backend
+# based upon Kernel/API/Operation/Ticket/TicketGet.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
@@ -24,14 +24,13 @@ use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStri
 
 use base qw(
     Kernel::API::Operation::V1::Common
-    Kernel::API::Operation::V1::Customer::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Customer::CustomerGet - GenericInterface Customer Get Operation backend
+Kernel::API::Operation::V1::Customer::CustomerGet - API Customer Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -44,7 +43,7 @@ Kernel::API::Operation::V1::Customer::CustomerGet - GenericInterface Customer Ge
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
+by using Kernel::API::Operation::V1::Customer::CustomerGet->new();
 
 =cut
 
@@ -57,17 +56,17 @@ sub new {
     # check needed objects
     for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::CustomerGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Customer::CustomerGet');
 
     return $Self;
 }
@@ -79,20 +78,14 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            CustomerLogin         => 'some agent login',                            # CustomerLogin or CustomerCustomerLogin or SessionID is
-                                                                                #   required
-            CustomerCustomerLogin => 'some customer login',
-            SessionID         => 123,
-
-            Password          => 'some password',                                       # if CustomerLogin or customerCustomerLogin is sent then
-                                                                                #   Password is required
-            CustomerID            => '32,33',                                       # required, could be coma separated IDs or an Array
+            CustomerID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        ErrorMessage => '',                               # In case of an error
+        Code         => '...'
+        Message      => '',                               # In case of an error
         Data         => {
             Customer => [
                 {
@@ -110,102 +103,99 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
-    my ( $CustomerID, $CustomerType ) = $Self->Auth(
-        %Param,
+    # prepare data
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'CustomerID' => {
+                Type     => 'ARRAY',
+                Required => 1
+            }                
+        }
     );
 
-    return $Self->ReturnError(
-        ErrorCode    => 'CustomerGet.AuthFail',
-        ErrorMessage => "CustomerGet: Authorization failing!",
-    ) if !$CustomerID;
-
-    # check needed stuff
-    for my $Needed (qw(CustomerID)) {
-        if ( !$Param{Data}->{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerGet.MissingParameter',
-                ErrorMessage => "CustomerGet: $Needed parameter is missing!",
-            );
-        }
-    }
-    my $ErrorMessage = '';
-
-    # all needed variables
-    my @CustomerIDs;
-    if ( IsStringWithData( $Param{Data}->{CustomerID} ) ) {
-        @CustomerIDs = split( /,/, $Param{Data}->{CustomerID} );
-    }
-    elsif ( IsArrayRefWithData( $Param{Data}->{CustomerID} ) ) {
-        @CustomerIDs = @{ $Param{Data}->{CustomerID} };
-    }
-    else {
-        return $Self->ReturnError(
-            ErrorCode    => 'CustomerGet.WrongStructure',
-            ErrorMessage => "CustomerGet: Structure for CustomerID is not correct!",
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
     }
 
-    my $ReturnData        = {
-        Success => 1,
-    };
-    my @Item;
+    my @CustomerList;
 
-    # start company loop
-    COMPANY:
-    for my $CustomerID (@CustomerIDs) {
+    # start Customer loop
+    Customer:    
+    foreach my $CustomerID ( @{$Param{Data}->{CustomerID}} ) {
 
-        # get the user entry
-        my %CompanyEntry = $Kernel::OM->Get('Kernel::System::Customer')->CustomerGet(
+        # get the Customer data
+        my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
             CustomerID => $CustomerID,
         );
 
-        if ( !IsHashRefWithData( \%CompanyEntry ) ) {
+        if ( !IsHashRefWithData( \%CustomerData ) ) {
 
-            $ErrorMessage = 'Could not get user data'
-                . ' in Kernel::API::Operation::V1::Customer::CustomerGet::Run()';
-
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerGet.NotValidCustomerID',
-                ErrorMessage => "CustomerGet: $ErrorMessage",
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "No Customer data found for CustomerID $CustomerID.",
             );
         }
 
-        # filter valid attributes
-        foreach my $Attr (sort keys %CompanyEntry) {
-            delete $CompanyEntry{$Attr} if !$Self->{Config}->{ExportedAttributes}->{$Attr};
+        # map Source to SourceID
+        $CustomerData{SourceID} = $CustomerData{Source};
+        delete $CustomerData{Source};
+
+        my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
+
+        # add attributes from Map to whitelist
+        foreach my $MapItem ( @{$CustomerData{Config}->{Map}} ) {
+            $AttributeWhitelist->{$MapItem->[0]} = 1;
         }
 
+        # add required attributes to whitelist
+        foreach my $Attr ( qw(SourceID CustomerID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
+            $AttributeWhitelist->{$Attr} = 1;
+        } 
+        
+        # filter valid attributes
+        if ( IsHashRefWithData($AttributeWhitelist) ) {
+            foreach my $Attr (sort keys %CustomerData) {
+                delete $CustomerData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+            }
+        }
+
+        # filter valid attributes
+        if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
+            foreach my $Attr (sort keys %CustomerData) {
+                delete $CustomerData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
+            }
+        }
+                
         # add
-        push(@Item, \%CompanyEntry);
+        push(@CustomerList, \%CustomerData);
     }
 
-    if ( !scalar(@Item) ) {
-        $ErrorMessage = 'Could not get user data'
-            . ' in Kernel::API::Operation::V1::Customer::CustomerGet::Run()';
-
-        return $Self->ReturnError(
-            ErrorCode    => 'CustomerGet.NotCustomerData',
-            ErrorMessage => "CustomerGet: $ErrorMessage",
-        );
-
+    if ( scalar(@CustomerList) == 1 ) {
+        return $Self->_Success(
+            Customer => $CustomerList[0],
+        );    
     }
 
-    # set user data into return structure
-    $ReturnData->{Data}->{Customer} = \@Item;
-
-    # return result
-    return $ReturnData;
+    return $Self->_Success(
+        Customer => \@CustomerList,
+    );
 }
 
 1;

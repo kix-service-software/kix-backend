@@ -1,5 +1,5 @@
 # --
-# Kernel/GenericInterface/Operation/Customer/CustomerUpdate.pm - GenericInterface Customer Update operation backend
+# Kernel/API/Operation/Customer/CustomerUpdate.pm - API Customer Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -20,14 +20,13 @@ use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStri
 
 use base qw(
     Kernel::API::Operation::V1::Common
-    Kernel::API::Operation::V1::Customer::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Customer::CustomerUpdate - GenericInterface Customer Update Operation backend
+Kernel::API::Operation::Customer::V1::CustomerUpdate - API Customer Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -40,7 +39,7 @@ Kernel::API::Operation::V1::Customer::CustomerUpdate - GenericInterface Customer
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
+by using Kernel::API::Operation->new();
 
 =cut
 
@@ -53,56 +52,40 @@ sub new {
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
         }
 
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::CustomerUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Customer::CustomerUpdate');
 
     return $Self;
 }
 
 =item Run()
 
-perform CustomerUpdate Operation. This will return the updated UserLogin.
+perform CustomerUpdate Operation. This will return the updated CustomerID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserLogin         => 'some agent login',                            # UserLogin or CustomerLogin or SessionID is
-                                                                                #   required
-            CustomerLogin => 'some customer login',
-            SessionID         => 123,
-
-            Password  => 'some password',                                       # if UserLogin or CustomerLogin is sent then
-                                                                                #   Password is required
-
+            CustomerID => '...'     # required
             Customer => {
-                CustomerID             => '...'                                 # required
-                CustomerName    => '...'                                 # required
-                CustomerStreet  => '...'                                 # optional
-                CustomerZIP     => '...'                                 # optional
-                CustomerCity    => '...'                                 # optional
-                CustomerCountry => '...'                                 # optional
-                CustomerComment => '...'                                 # optional
-                CustomerURL     => '...'                                 # optional
+                ...                 # attributes (required and optional) depend on Map config 
+                ...
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        ErrorMessage    => '',                      # in case of error
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            CustomerID  => '',                     # CustomerID 
-            Error => {                              # should not return errors
-                    ErrorCode    => 'Customer.Create.ErrorCode'
-                    ErrorMessage => 'Error Description'
-            },
+            CustomerID  => '',                      # CustomerID 
         },
     };
 
@@ -111,66 +94,38 @@ perform CustomerUpdate Operation. This will return the updated UserLogin.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
-        $Self->ReturnError(
-            ErrorCode    => 'Webservice.InvalidConfiguration',
-            ErrorMessage => $Result->{ErrorMessage},
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
         );
     }
 
-    # check needed stuff
-    if (
-        !$Param{Data}->{UserLogin}
-        && !$Param{Data}->{CustomerLogin}
-        && !$Param{Data}->{SessionID}
-        )
-    {
-        return $Self->ReturnError(
-            ErrorCode    => 'CustomerUpdate.MissingParameter',
-            ErrorMessage => "CustomerUpdate: UserLogin, CustomerLogin or SessionID is required!",
-        );
-    }
-
-    if ( $Param{Data}->{UserLogin} || $Param{Data}->{CustomerLogin} ) {
-
-        if ( !$Param{Data}->{Password} )
-        {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerUpdate.MissingParameter',
-                ErrorMessage => "CustomerUpdate: Password or SessionID is required!",
-            );
+    # prepare data
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => {
+            'CustomerID' => {
+                Required => 1
+            },
+            'Customer' => {
+                Type     => 'HASH',
+                Required => 1
+            },
         }
-    }
-
-    # authenticate user
-    my ( $UserID, $UserType ) = $Self->Auth(
-        %Param,
     );
 
-    if ( !$UserID ) {
-        return $Self->ReturnError(
-            ErrorCode    => 'CustomerUpdate.AuthFail',
-            ErrorMessage => "CustomerUpdate: User could not be authenticated!",
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
         );
-    }
-
-    my $PermissionUserID = $UserID;
-    if ( $UserType eq 'Customer' ) {
-        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check needed hashes
-    for my $Needed (qw(Customer)) {
-        if ( !IsHashRefWithData( $Param{Data}->{$Needed} ) ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerUpdate.MissingParameter',
-                ErrorMessage => "CustomerUpdate: $Needed parameter is missing or not valid!",
-            );
-        }
     }
 
     # isolate Customer parameter
@@ -188,69 +143,56 @@ sub Run {
         }
     }
 
-    # check Customer attribute values
-    for my $Needed (qw(CustomerID)) {
-        if ( !$Customer->{$Needed} ) {
-            return $Self->ReturnError(
-                ErrorCode    => 'CustomerUpdate.MissingParameter',
-                ErrorMessage => "CustomerUpdate: Customer->$Needed parameter is missing!",
-            );
-        }
-    }
-    
-    # check UserLogin exists
-    my %CompanyData = $Kernel::OM->Get('Kernel::System::Customer')->CustomerGet(
-        CustomerID => $Customer->{CustomerID},
+    # check Customer exists
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
+        CustomerID => $Param{Data}->{CustomerID},
     );
-    if ( !%CompanyData) {
-        return {
-            Success      => 0,
-            ErrorMessage => "Can not update customer company. No customer company with ID '$Customer->{CustomerID}' exists.",
-        }
+    if ( !%CustomerData ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Can not update Customer. No Customer with ID '$Param{Data}->{CustomerID}' found.",
+        );
     }
 
-    # check Name already exists
-    my %CompanyList = $Kernel::OM->Get('Kernel::System::Customer')->CustomerList(
-        Search => $Customer->{CustomerName},
-    );
-    if ( %CompanyList ) {
-        my $Found = 0;
-        foreach my $CustomerID (keys %CompanyList) {
-            my %Data = $Kernel::OM->Get('Kernel::System::Customer')->CustomerGet(
-                CustomerID => $CustomerID,
+    # check if backend (Source) is writeable
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList(
+        ReadOnly => 0
+    );    
+    if ( !$SourceList{$CustomerData{Source}} ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not update Customer. Corresponding backend is not writable or does not exist.',
+        );        
+    }
+
+    # check if CustomerCompanyName already exists
+    if ( IsStringWithData($Customer->{CustomerCompanyName}) ) {
+        my %CustomerList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList(
+            Search => $Customer->{CustomerCompanyName},
+        );
+        if ( %CustomerList && (scalar(keys %CustomerList) > 1 || !$CustomerList{$CustomerData{CustomerID}})) {        
+            return $Self->_Error(
+                Code    => 'Object.AlreadyExists',
+                Message => 'Can not update Customer. Another Customer with same name already exists.',
             );
-            if ($Data{CustomerName} eq $Customer->{CustomerName} && $CompanyData{CustomerID} ne $CustomerID) {
-                $Found = 1;
-                last;
-            }
-        }
-        if ($Found) {
-            return {
-                Success      => 0,
-                ErrorMessage => 'Can not update customer company. Another customer company with same name already exists.',
-            }
         }
     }
-        
+    
     # update Customer
-    my $Success = $Kernel::OM->Get('Kernel::System::Customer')->CustomerUpdate(
-        %CompanyData,
+    my $Success = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyUpdate(
+        %CustomerData,
         %{$Customer},
-        ValidID => $CompanyData{ValidID},
-        UserID  => $UserID,
+        CustomerCompanyID => $Param{Data}->{CustomerID},
+        UserID            => $Self->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'Could not update customer company, please contact the system administrator',
-        }
+        return $Self->_Error(
+            Code    => 'Object.UnableToUpdate',
+            Message => 'Could not update Customer, please contact the system administrator',
+        );
     }
     
-    return {
-        Success => 1,
-        Data    => {
-            CustomerID => $CompanyData{CustomerID},
-        },
-    };
-    
+    return $Self->_Success(
+        CustomerID => $Customer->{CustomerID} || $CustomerData{CustomerID},
+    );   
 }
