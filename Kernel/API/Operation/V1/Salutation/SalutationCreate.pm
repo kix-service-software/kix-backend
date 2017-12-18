@@ -73,11 +73,11 @@ perform SalutationCreate Operation. This will return the created SalutationID.
             Salutation  => {
                 Name        => 'New Salutation',
                 Text        => "--\nSome Salutation Infos",
-                ValidID     => 1,                   # (optional)               
-                Comment     => '...',               # (optional)
+                ValidID     => 1,                           # (optional)               
+                Comment     => '...',                       # (optional)
                 ContentType => 'text/plain; charset=utf-8',              
-	    	},
-	    },
+            },
+        },
     );
 
     $Result = {
