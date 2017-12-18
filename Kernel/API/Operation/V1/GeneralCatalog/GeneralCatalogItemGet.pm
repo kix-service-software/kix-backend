@@ -1,7 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserGet.pm - API User Get operation backend
-# based upon Kernel/API/Operation/Ticket/TicketGet.pm
-# original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
+# Kernel/API/Operation/V1/GeneralCatalog/GeneralCatalogItemGet.pm - API GeneralCatalogItem Get operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -13,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserGet;
+package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet;
 
 use strict;
 use warnings;
@@ -30,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
+Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet - API GeneralCatalogItem Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -43,7 +41,7 @@ Kernel::API::Operation::V1::User::UserGet - API User Get Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::User::UserGet->new();
+by using Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet->new();
 
 =cut
 
@@ -66,28 +64,28 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform UserGet Operation. This function is able to return
+perform GeneralCatalogItemGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            GeneralCatalogItemID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
-        Code         => '...'
-        Message      => '',                               # In case of an error
+        Success      => 1,                           # 0 or 1
+        Code         => '',                          # In case of an error
+        Message      => '',                          # In case of an error
         Data         => {
-            User => [
+            GeneralCatalogItem => [
                 {
                     ...
                 },
@@ -110,7 +108,7 @@ sub Run {
 
     if ( !$Result->{Success} ) {
         $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
+            Code    => 'WebService.InvalidConfiguration',
             Message => $Result->{Message},
         );
     }
@@ -119,7 +117,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'UserID' => {
+            'GeneralCatalogItemID' => {
                 Type     => 'ARRAY',
                 Required => 1
             }                
@@ -134,53 +132,37 @@ sub Run {
         );
     }
 
-    my $Message = '';
+    my @GeneralCatalogList;
 
-    my @UserList;
+    # start state loop
+    GeneralCatalog:    
+    foreach my $GeneralCatalogItemID ( @{$Param{Data}->{GeneralCatalogItemID}} ) {
 
-    # start user loop
-    USER:    
-    foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
+	    # get the GeneralCatalogItem data
+	    my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+	        ItemID => $GeneralCatalogItemID,
+	    );
 
-        # get the user data
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $UserID,
-        );
-
-        if ( !IsHashRefWithData( \%UserData ) ) {
-
+        if ( !$ItemData ) {         
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No user data found for UserID $UserID.",
+                Message => "No data found for ItemID $GeneralCatalogItemID.",
             );
         }
 
-        # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
-            }
-        }
-
-        # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
-            }
-        }
-                
         # add
-        push(@UserList, \%UserData);
+        push(@GeneralCatalogList, $ItemData);
     }
 
-    if ( scalar(@UserList) == 1 ) {
+    if ( scalar(@GeneralCatalogList) == 1 ) {
         return $Self->_Success(
-            User => $UserList[0],
+            GeneralCatalogItem => $GeneralCatalogList[0],
         );    
     }
 
+    # return result
     return $Self->_Success(
-        User => \@UserList,
+        GeneralCatalogItem => \@GeneralCatalogList,
     );
 }
 

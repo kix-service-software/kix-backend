@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Customer/CustomerCreate.pm - API Customer Create operation backend
+# Kernel/API/Operation/Contact/ContactCreate.pm - API Contact Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Customer::CustomerCreate;
+package Kernel::API::Operation::V1::Contact::ContactCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::Customer::V1::CustomerCreate - API Customer Create Operation backend
+Kernel::API::Operation::Contact::V1::ContactCreate - API Contact Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,12 +66,12 @@ sub new {
 
 =item Run()
 
-perform CustomerCreate Operation. This will return the created CustomerLogin.
+perform ContactCreate Operation. This will return the created ContactLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
             SourceID => '...'       # required (ID of backend to write to - backend must be writeable)
-            Customer => {
+            Contact => {
                 ...                 # attributes (required and optional) depend on Map config 
             },
         },
@@ -82,7 +82,7 @@ perform CustomerCreate Operation. This will return the created CustomerLogin.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            CustomerID  => '',                       # CustomerID 
+            ContactID  => '',                       # ContactID 
         },
     };
 
@@ -127,7 +127,7 @@ sub Run {
     foreach my $MapItem ( @{$Config->{Map}} ) {
         next if !$MapItem->[4] || $MapItem->[0] eq 'ValidID';
 
-        $RequiredAttributes{'Customer::'.$MapItem->[0]} = {
+        $RequiredAttributes{'Contact::'.$MapItem->[0]} = {
             Required => 1
         };
     }
@@ -136,7 +136,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'Customer' => {
+            'Contact' => {
                 Type     => 'HASH',
                 Required => 1
             },          
@@ -153,58 +153,69 @@ sub Run {
     }
 
     # check if backend (Source) is writeable
-    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList(
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
         ReadOnly => 0
     );    
     if ( !$SourceList{$Param{Data}->{SourceID}} ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => 'Can not create Customer. Backend with given SourceID is not writable or does not exist.',
+            Message => 'Can not create Contact. Backend with given SourceID is not writable or does not exist.',
         );        
     }
 
-    # isolate Customer parameter
-    my $Customer = $Param{Data}->{Customer};
+    # isolate Contact parameter
+    my $Contact = $Param{Data}->{Contact};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Customer} ) {
+    for my $Attribute ( sort keys %{$Contact} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $Customer->{$Attribute} =~ s{\A\s+}{};
+            $Contact->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $Customer->{$Attribute} =~ s{\s+\z}{};
+            $Contact->{$Attribute} =~ s{\s+\z}{};
         }
     }
 
-    # check CustomerCompanyName exists
-    my %CustomerList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList(
-        Search => $Customer->{CustomerCompanyName},
+    # check Userlogin exists
+    my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+        User => $Contact->{UserLogin},
     );
-    if ( %CustomerList ) {
+    if ( %ContactData ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Can not create Customer. Another Customer with same name already exists.',
+            Message => "Can not create Contact. Another Contact with same login already exists.",
+        );
+    }
+
+    # check UserEmail exists
+    my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+        PostMasterSearch => $Contact->{UserEmail},
+    );
+    if ( %ContactList ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => 'Can not create Contact. Another Contact with same email address already exists.',
         );
     }
     
-    # create Customer
-    my $CustomerID = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyAdd(
-        %{$Customer},
+    # create Contact
+    my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
+        %{$Contact},
         Source  => $Param{Data}->{SourceID},
         UserID  => $Self->{Authorization}->{UserID},
         ValidID => 1,
     );    
-    if ( !$CustomerID ) {
+    if ( !$ContactID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Customer, please contact the system administrator',
+            Message => 'Could not create Contact, please contact the system administrator',
         );
     }
     
     return $Self->_Success(
         Code   => 'Object.Created',
-        CustomerID => $CustomerID,
+        ContactID => $ContactID,
     );    
 }

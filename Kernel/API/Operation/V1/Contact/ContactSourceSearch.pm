@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Customer/CustomerSearch.pm - API Customer Search operation backend
+# Kernel/API/Operation/Contact/ContactSourceSearch.pm - API Contact Search operation backend
 # based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -9,7 +9,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Customer::CustomerSearch;
+package Kernel::API::Operation::V1::Contact::ContactSourceSearch;
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::Customer::CustomerSearch - API Customer Search Operation backend
+Kernel::API::Operation::Contact::ContactSourceSearch - API Contact Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,7 +62,7 @@ sub new {
 
 =item Run()
 
-perform CustomerSearch Operation. This will return a Customer list.
+perform ContactSourceSearch Operation. This will return a Contact ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -73,7 +73,7 @@ perform CustomerSearch Operation. This will return a Customer list.
         Success      => 1,                                # 0 or 1
         Message => '',                               # In case of an error
         Data         => {
-            Customer => [
+            ContactSource => [
                 {
                 },
                 {                    
@@ -111,39 +111,42 @@ sub Run {
         );
     }
 
-print STDERR "here!\n";
-    # perform Customer search
-    my %CustomerList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList(
-        Search => '*',          # search all customers
-        Valid  => 0,
+    # perform search
+    my %SourceListRW = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
+        ReadOnly => 0
+    );
+    my %SourceListRO = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
+        ReadOnly => 1
     );
 
-
-    if (IsHashRefWithData(\%CustomerList)) {
+    if (IsHashRefWithData(\%SourceListRO) || IsHashRefWithData(\%SourceListRW) ) {
         
-        # get already prepared Customer data from CustomerGet operation
-        my $CustomerGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Customer::CustomerGet',
-            Data          => {
-                CustomerID => join(',', sort keys %CustomerList),
-            }
-        );
-        if ( !IsHashRefWithData($CustomerGetResult) || !$CustomerGetResult->{Success} ) {
-            return $CustomerGetResult;
+        my @ResultList;
+        foreach my $Key (sort keys %SourceListRO) {
+            push(@ResultList, {
+                ID       => $Key,
+                Name     => $SourceListRO{$Key},
+                ReadOnly => 1,
+            });
+        }
+        foreach my $Key (sort keys %SourceListRW) {
+            push(@ResultList, {
+                ID       => $Key,
+                Name     => $SourceListRW{$Key},
+                ReadOnly => 0,
+            });
         }
 
-        my @ResultList = IsArrayRefWithData($CustomerGetResult->{Data}->{Customer}) ? @{$CustomerGetResult->{Data}->{Customer}} : ( $CustomerGetResult->{Data}->{Customer} );
-        
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Customer => \@ResultList,
+                ContactSource => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        Customer => {},
+        ContactSource => {},
     );
 }
 

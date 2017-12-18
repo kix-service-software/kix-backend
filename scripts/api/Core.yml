@@ -699,49 +699,126 @@ Provider:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogDelete
-    GeneralCatalogClasses:
+        Type: V1::SysConfig::SysConfigItemUpdate
+    GeneralCatalogClassSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClasses
-    SalutationSearch:
+        Type: V1::GeneralCatalog::GeneralCatalogClassSearch
+    GeneralCatalogClassUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Salutation::SalutationSearch
-    SalutationCreate:
+        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
+    GeneralCatalogItemSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Salutation::SalutationCreate
-    SalutationGet:
+        Type: V1::GeneralCatalog::GeneralCatalogItemSearch
+    GeneralCatalogItemCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Salutation::SalutationGet
-    SalutationUpdate:
+        Type: V1::GeneralCatalog::GeneralCatalogItemCreate
+    GeneralCatalogItemGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Salutation::SalutationUpdate
-    SalutationDelete:
+        Type: V1::GeneralCatalog::GeneralCatalogItemGet
+    GeneralCatalogItemUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Salutation::SalutationDelete
+        Type: V1::GeneralCatalog::GeneralCatalogItemUpdate
+    GeneralCatalogItemDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemDelete
+    ContactSourceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactSourceSearch
+    ContactSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactSearch
+    ContactCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactCreate
+    ContactGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactGet
+    ContactUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactUpdate
+    CustomerSourceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerSourceSearch
+    CustomerSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerSearch
+    CustomerCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerCreate
+    CustomerGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerGet
+    CustomerUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerUpdate
 
   Transport:
     Config:
@@ -1163,11 +1240,75 @@ Provider:
         SalutationUpdate:
           RequestMethod:
           - PATCH
-          Route: /salutation/:SalutationID
-        SalutationDelete:
+          Route: /sysconfig/:SysConfigItemID
+        GeneralCatalogClassSearch:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/classes
+        GeneralCatalogClassUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /generalcatalog/classes/:GeneralCatalogClass
+        GeneralCatalogItemSearch:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog
+        GeneralCatalogItemCreate:
+          RequestMethod:
+          - POST
+          Route: /generalcatalog
+        GeneralCatalogItemGet:
+          RequestMethod:
+          - GET
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogItemUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /generalcatalog/:GeneralCatalogItemID
+        GeneralCatalogItemDelete:
           RequestMethod:
           - DELETE
-          Route: /salutation/:SalutationID
+          Route: /generalcatalog/:GeneralCatalogItemID
+        ContactSourceSearch:
+          RequestMethod:
+          - GET
+          Route: /contacts/sources
+        ContactSearch:
+          RequestMethod:
+          - GET
+          Route: /contacts
+        ContactCreate:
+          RequestMethod:
+          - POST
+          Route: /contacts
+        ContactGet:
+          RequestMethod:
+          - GET
+          Route: /contacts/:ContactID
+        ContactUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /contacts/:ContactID
+        CustomerSourceSearch:
+          RequestMethod:
+          - GET
+          Route: /customers/sources
+        CustomerSearch:
+          RequestMethod:
+          - GET
+          Route: /customers
+        CustomerCreate:
+          RequestMethod:
+          - POST
+          Route: /customers
+        CustomerGet:
+          RequestMethod:
+          - GET
+          Route: /customers/:CustomerID
+        CustomerUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /customers/:CustomerID
 
     Type: HTTP::REST
 RemoteSystem: ''
