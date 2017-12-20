@@ -262,7 +262,7 @@ sub SignatureDelete {
             return;
         }
     }
-
+    
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
     return if !$DBObject->Prepare(
