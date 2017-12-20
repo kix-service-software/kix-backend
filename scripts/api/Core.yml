@@ -665,35 +665,35 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
-    GeneralCatalogSearch:
+    SysConfigItemDefinitionSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogSearch
-    GeneralCatalogCreate:
+        Type: V1::SysConfig::SysConfigItemDefinitionSearch
+    SysConfigItemDefinitionGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogCreate
-    GeneralCatalogGet:
+        Type: V1::SysConfig::SysConfigItemDefinitionGet
+    SysConfigItemSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogGet
-    GeneralCatalogUpdate:
+        Type: V1::SysConfig::SysConfigItemSearch
+    SysConfigItemGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogUpdate
-    GeneralCatalogDelete:
+        Type: V1::SysConfig::SysConfigItemGet
+    SysConfigItemUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
@@ -819,6 +819,76 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Customer::CustomerUpdate
+    SalutationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationSearch
+    SalutationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationCreate
+    SalutationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationGet
+    SalutationUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationUpdate
+    SalutationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationDelete
+    LinkTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkTypeSearch
+    LinkSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkSearch
+    LinkCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkCreate
+    LinkGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkGet
+    LinkDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkDelete
 
   Transport:
     Config:
@@ -1201,43 +1271,23 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /systemaddresses/:SystemAddressID
-        GeneralCatalogSearch:
+        SysConfigItemDefinitionSearch:
           RequestMethod:
           - GET
-          Route: /generalcatalog
-        GeneralCatalogCreate:
-          RequestMethod:
-          - POST
-          Route: /generalcatalog
-        GeneralCatalogGet:
+          Route: /sysconfig/definitions
+        SysConfigItemDefinitionGet:
           RequestMethod:
           - GET
-          Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogDelete:
-          RequestMethod:
-          - DELETE
-          Route: /generalcatalog/:GeneralCatalogItemID
-        GeneralCatalogClasses:
+          Route: /sysconfig/definitions/:SysConfigItemDefinitionID
+        SysConfigItemSearch:
           RequestMethod:
           - GET
-          Route: /generalcatalog/classes
-        SalutationSearch:
+          Route: /sysconfig
+        SysConfigItemGet:
           RequestMethod:
           - GET
-          Route: /salutation
-        SalutationCreate:
-          RequestMethod:
-          - POST
-          Route: /salutation
-        SalutationGet:
-          RequestMethod:
-          - GET
-          Route: /salutation/:SalutationID
-        SalutationUpdate:
+          Route: /sysconfig/:SysConfigItemID
+        SysConfigItemUpdate:
           RequestMethod:
           - PATCH
           Route: /sysconfig/:SysConfigItemID
@@ -1309,6 +1359,46 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /customers/:CustomerID
+        SalutationSearch:
+          RequestMethod:
+          - GET
+          Route: /salutation
+        SalutationCreate:
+          RequestMethod:
+          - POST
+          Route: /salutation
+        SalutationGet:
+          RequestMethod:
+          - GET
+          Route: /salutation/:SalutationID
+        SalutationUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /salutation/:SalutationID
+        SalutationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /salutation/:SalutationID
+        LinkTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /links/types
+        LinkSearch:
+          RequestMethod:
+          - GET
+          Route: /links
+        LinkCreate:
+          RequestMethod:
+          - POST
+          Route: /links
+        LinkGet:
+          RequestMethod:
+          - GET
+          Route: /links/:LinkID
+        LinkDelete:
+          RequestMethod:
+          - DELETE
+          Route: /links/:LinkID
 
     Type: HTTP::REST
 RemoteSystem: ''

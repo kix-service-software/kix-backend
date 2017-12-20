@@ -1305,6 +1305,166 @@ sub LinkListWithData {
     return $LinkList;
 }
 
+=item LinkListRaw()
+
+get all existing link IDs (only valid, without filtering - used for API)
+
+Return
+    $LinkList = [
+        1,
+        2,
+        3,
+        ...
+    ]
+
+    my $LinkList = $LinkObject->LinkListRaw(
+        UserID    => 1,
+    );
+
+=cut
+
+sub LinkListRaw {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # check cache
+    my $CacheKey = 'LinkGet';
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    # lookup state id
+    my $StateID = $Self->StateLookup(
+        Name => 'Valid',
+    );
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # get links where the given object is the source
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id
+            FROM link_relation
+            WHERE state_id = ? ',
+        Bind => [
+            \$StateID
+        ],
+    );
+
+    # fetch results
+    my @Links;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push(@Links, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Links,
+    );
+
+    return \@Links;
+}
+
+=item LinkGet()
+
+get link data(used for API)
+
+Return
+    $LinkData = {
+        ...
+    };
+
+    my %LinkData = $LinkObject->LinkGet(
+        LinkID    => 123        # required
+        UserID    => 1,         # required
+    );
+
+=cut
+
+sub LinkGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(LinkID UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # check cache
+    my $CacheKey = 'LinkGet::'.$Param{LinkID};
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # get links where the given object is the source
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id, source_key, target_key, create_by, create_time, source_object_id, target_object_id, type_id
+            FROM link_relation
+            WHERE id = ? ',
+        Bind => [
+            \$Param{LinkID}
+        ],
+    );
+
+    # fetch results
+    my %LinkData;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $LinkData{ID}             = $Row[0];
+        $LinkData{SourceKey}      = $Row[1];
+        $LinkData{TargetKey}      = $Row[2];
+        $LinkData{CreateBy}       = $Row[3]
+        $LinkData{CreateTime}     = $Row[4]
+
+        $LinkData{SourceObject} = $Self->ObjectLookup(
+            ObjectID => $Row[5]
+        );        
+        $LinkData{TargetObject} = $Self->ObjectLookup(
+            ObjectID => $Row[6]
+        );        
+        $LinkData{Type} = $Self->TypeLookup(
+            TypeID => $Row[7],
+            UserID => 1,
+        );        
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%LinkData,
+    );
+
+    return %LinkData;
+}
+
 =item LinkKeyList()
 
 return a hash with all existing links of a given object

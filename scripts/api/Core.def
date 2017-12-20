@@ -121,3 +121,8 @@
 /salutation/:SalutationID                                           |   GET             | V1::Salutation::SalutationGet
 /salutation/:SalutationID                                           |   PATCH           | V1::Salutation::SalutationUpdate
 /salutation/:SalutationID                                           |   DELETE          | V1::Salutation::SalutationDelete
+/links/types                                                        |   GET             | V1::Link::LinkTypeSearch
+/links                                                              |   GET             | V1::Link::LinkSearch
+/links                                                              |   POST            | V1::Link::LinkCreate
+/links/:LinkID                                                      |   GET             | V1::Link::LinkGet
+/links/:LinkID                                                      |   DELETE          | V1::Link::LinkDelete
