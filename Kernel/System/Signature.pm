@@ -239,6 +239,45 @@ sub SignatureList {
     );
 }
 
+=item SignatureDelete()
+
+Delete a Signatures.
+
+    my $Result = $SignatureObject->SignatureDelete(
+        SignatureID      => '...',
+    );
+
+=cut
+
+sub SignatureDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(SignatureID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM signature WHERE id = ?',
+        Bind => [ \$Param{SignatureID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+}
+
 1;
 
 
