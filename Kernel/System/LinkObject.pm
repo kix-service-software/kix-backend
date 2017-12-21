@@ -664,6 +664,7 @@ deletes a link
 return true
 
     $True = $LinkObject->LinkDelete(
+        LinkID  => 1234             # used by API
         Object1 => 'Ticket',
         Key1    => '321',
         Object2 => 'FAQ',
@@ -678,14 +679,43 @@ sub LinkDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Object1 Key1 Object2 Key2 Type UserID)) {
-        if ( !$Param{$Argument} ) {
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need UserID!",
+        );
+        return;
+    }
+    if ( !$Param{LinkID} ) {
+        for my $Argument (qw(Object1 Key1 Object2 Key2 Type)) {
+            if ( !$Param{$Argument} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+                return;
+            }
+        }
+    }
+    else {
+        # "convert" LinkID to old parameters for compatibility reasons
+        my %Link = $Self->LinkGet(
+            LinkID => $Param{LinkID},
+            UserID => $Param{UserID},
+        );
+
+        if ( !%Link ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Argument!",
+                Message  => "No link with ID $Param{LinkID} found!",
             );
-            return;
         }
+
+        $Param{Object1} = $Link{SourceObject};
+        $Param{Object2} = $Link{TargetObject};
+        $Param{Key1}    = $Link{SourceKey};
+        $Param{Key2}    = $Link{TargetKey};
+        $Param{Type}    = $Link{Type};
     }
 
     # lookup the object ids
@@ -845,6 +875,11 @@ sub LinkDelete {
         Type         => $Param{Type},
         State        => $Existing{State},
         UserID       => $Param{UserID},
+    );
+
+    # invalidate cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
     );
 
     return 1;
@@ -1499,16 +1534,18 @@ sub LinkGet {
         $LinkData{CreateTime}     = $Row[7];
     }
 
-    $LinkData{SourceObject} = $Self->ObjectLookup(
-        ObjectID => $LinkData{SourceObjectID}
-    );        
-    $LinkData{TargetObject} = $Self->ObjectLookup(
-        ObjectID => $LinkData{TargetObjectID}
-    );        
-    $LinkData{Type} = $Self->TypeLookup(
-        TypeID => $LinkData{TypeID},
-        UserID => 1,
-    );        
+    if ( $LinkData{ID} ) {
+        $LinkData{SourceObject} = $Self->ObjectLookup(
+            ObjectID => $LinkData{SourceObjectID}
+        );        
+        $LinkData{TargetObject} = $Self->ObjectLookup(
+            ObjectID => $LinkData{TargetObjectID}
+        );        
+        $LinkData{Type} = $Self->TypeLookup(
+            TypeID => $LinkData{TypeID},
+            UserID => 1,
+        );        
+    }
 
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(

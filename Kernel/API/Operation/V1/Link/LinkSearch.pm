@@ -121,7 +121,6 @@ sub Run {
             next if ($FilterItem->{Field} !~ /^(SourceObject|SourceKey|TargetObject|TargetKey|Type)$/g);
             next if ($FilterItem->{Operator} ne 'EQ');
 
-print STDERR "adding filter $FilterItem->{Field} = $FilterItem->{Value}\n";
             $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
         }
     }

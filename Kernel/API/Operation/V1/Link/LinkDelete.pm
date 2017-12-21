@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/SLA/SLADelete.pm - API SLA Delete operation backend
+# Kernel/API/Operation/Link/LinkDelete.pm - API Link Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SLA::SLADelete;
+package Kernel::API::Operation::V1::Link::LinkDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::SLA::SLADelete - API SLA SLADelete Operation backend
+Kernel::API::Operation::V1::Link::LinkDelete - API Link LinkDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform SLADelete Operation. This will return the deleted SLAID.
+perform LinkDelete Operation. This will return the deleted LinkID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SLAID  => '...',
+            LinkID  => '...',
         },		
     );
 
@@ -99,7 +99,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'SLAID' => {
+            'LinkID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -116,43 +116,20 @@ sub Run {
     
     my $Message = '';
   
-    # start SLA loop
-    SLA:    
-    foreach my $SLAID ( @{$Param{Data}->{SLAID}} ) {
-
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
-            Result       => 'COUNT',
-            Limit        => 1,
-            Filter       => {
-                AND => [ 
-                    {
-                        Field => 'SLAID',
-                        Value => $SLAID,
-                        Operator => 'EQ',
-                    },
-                ]
-            },
-            UserID      => 1,
-            Permission  => 'ro',         
-        );
-        
-        if ( $ResultTicketSearch ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete SLA. A Ticket with this SLA already exists.',
-            );
-        }
+    # start Link loop
+    Link:    
+    foreach my $LinkID ( @{$Param{Data}->{LinkID}} ) {
       
-        # delete SLA	    
-        my $Success = $Kernel::OM->Get('Kernel::System::SLA')->SLADelete(
-            SLAID  => $SLAID,
+        # delete Link	    
+        my $Success = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkDelete(
+            LinkID  => $LinkID,
             UserID  => $Self->{Authorization}->{UserID},
         );
  
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete SLA, please contact the system administrator',
+                Message => 'Could not delete Link, please contact the system administrator',
             );
         }
     }
