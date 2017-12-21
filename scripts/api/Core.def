@@ -121,11 +121,6 @@
 /salutation/:SalutationID                                           |   GET             | V1::Salutation::SalutationGet
 /salutation/:SalutationID                                           |   PATCH           | V1::Salutation::SalutationUpdate
 /salutation/:SalutationID                                           |   DELETE          | V1::Salutation::SalutationDelete
-/mailaccounts                                                       |   GET             | V1::MailAccount::MailAccountSearch
-/mailaccounts                                                       |   POST            | V1::MailAccount::MailAccountCreate
-/mailaccounts/:MailAccountID                                        |   GET             | V1::MailAccount::MailAccountGet
-/mailaccounts/:MailAccountID                                        |   PATCH           | V1::MailAccount::MailAccountUpdate
-/mailaccounts/:MailAccountID                                        |   DELETE          | V1::MailAccount::MailAccountDelete
 /signatures                                                         |   GET             | V1::Signature::SignatureSearch
 /signatures                                                         |   POST            | V1::Signature::SignatureCreate
 /signatures/:SignatureID                                            |   GET             | V1::Signature::SignatureGet

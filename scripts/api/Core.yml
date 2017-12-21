@@ -854,41 +854,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Salutation::SalutationDelete
-    MailAccountSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::MailAccount::MailAccountSearch
-    MailAccountCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::MailAccount::MailAccountCreate
-    MailAccountGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::MailAccount::MailAccountGet
-    MailAccountUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::MailAccount::MailAccountUpdate
-    MailAccountDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::MailAccount::MailAccountDelete
     SignatureSearch:
         Description: ''
         MappingInbound:
@@ -1414,26 +1379,6 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /salutation/:SalutationID
-        MailAccountSearch:
-          RequestMethod:
-          - GET
-          Route: /mailaccounts
-        MailAccountCreate:
-          RequestMethod:
-          - POST
-          Route: /mailaccounts
-        MailAccountGet:
-          RequestMethod:
-          - GET
-          Route: /mailaccounts/:MailAccountID
-        MailAccountUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /mailaccounts/:MailAccountID
-        MailAccountDelete:
-          RequestMethod:
-          - DELETE
-          Route: /mailaccounts/:MailAccountID
         SignatureSearch:
           RequestMethod:
           - GET
