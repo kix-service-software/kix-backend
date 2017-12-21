@@ -136,7 +136,7 @@ sub Run {
 
         # delete Signature	    
         my $Success = $Kernel::OM->Get('Kernel::System::Signature')->SignatureDelete(
-            SignatureID  => $SignatureID,
+            ID  => $SignatureID,
         );
 
         if ( !$Success ) {

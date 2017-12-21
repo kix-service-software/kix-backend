@@ -241,7 +241,7 @@ sub SignatureList {
 
 =item SignatureDelete()
 
-Delete a Signatures.
+Delete a Signature.
 
     my $Result = $SignatureObject->SignatureDelete(
         SignatureID      => '...',
@@ -253,7 +253,7 @@ sub SignatureDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(SignatureID)) {
+    for (qw(ID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -262,12 +262,12 @@ sub SignatureDelete {
             return;
         }
     }
-    
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM signature WHERE id = ?',
-        Bind => [ \$Param{SignatureID} ],
+        Bind => [ \$Param{ID} ],
     );
 
     # reset cache

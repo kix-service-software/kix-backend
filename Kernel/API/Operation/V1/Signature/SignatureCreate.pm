@@ -75,7 +75,7 @@ perform SignatureCreate Operation. This will return the created SignatureID.
                 Text        => "--\nSome Signature Infos",
                 ContentType => 'text/plain; charset=utf-8',
                 Comment     => 'some comment',                  # optional
-                ValidID     => 1,
+                ValidID     => 1,                               # 0|1 default 1
             },
         },
     );
