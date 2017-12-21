@@ -150,7 +150,7 @@ sub Run {
   
     if ( IsHashRefWithData($AddressBookListResult) ) {
         return $Self->_Error(
-            Code    => 'AddressBookCreate.EmailAddressExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Cannot update addressbook entry. Email address '$EmailAddress' already exists in addressbook.",
         );
     }
