@@ -1305,9 +1305,9 @@ sub LinkListWithData {
     return $LinkList;
 }
 
-=item LinkListRaw()
+=item LinkSearch()
 
-get all existing link IDs (only valid, without filtering - used for API)
+get all valid link IDs (used for API)
 
 Return
     $LinkList = [
@@ -1317,14 +1317,21 @@ Return
         ...
     ]
 
-    my $LinkList = $LinkObject->LinkListRaw(
-        UserID    => 1,
+    my $LinkList = $LinkObject->LinkSearch(
+        UserID        => 1,
+        SourceObject  => '...',     # optional
+        SourceKey     => '...',     # optional
+        TargetObject  => '...',     # optional
+        TargetKey     => '...',     # optional
+        Type          => '...'      # optional        
     );
 
 =cut
 
-sub LinkListRaw {
+sub LinkSearch {
     my ( $Self, %Param ) = @_;
+    my @BindVars;
+    my @SQLWhere;
 
     # check needed stuff
     for my $Argument (qw(UserID)) {
@@ -1338,7 +1345,13 @@ sub LinkListRaw {
     }
 
     # check cache
-    my $CacheKey = 'LinkGet';
+    my $CacheKey = 'LinkGet::'
+                 .$Param{UserID}.'::'
+                 .($Param{SourceObject}||'').'::'
+                 .($Param{SourceKey}||'').'::'
+                 .($Param{TargetObject}||'').'::'
+                 .($Param{TargetKey}||'').'::'
+                 .($Param{Type}||'');
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1349,19 +1362,58 @@ sub LinkListRaw {
     my $StateID = $Self->StateLookup(
         Name => 'Valid',
     );
+    push(@BindVars, \$StateID);
+    push(@SQLWhere, 'state_id = ?');
+
+    # lookup type id
+    if ( $Param{Type} ) {
+        my $TypeID = $Self->TypeLookup(
+            Name   => $Param{Type},
+            UserID => 1,
+        );
+        push(@BindVars, \$TypeID);
+        push(@SQLWhere, 'type_id = ?');
+    }
+
+    # lookup sourceobject id
+    if ( $Param{SourceObject} ) {
+        my $ObjectID = $Self->ObjectLookup(
+            Name   => $Param{SourceObject},
+        );
+        push(@BindVars, \$ObjectID);
+        push(@SQLWhere, 'source_object_id = ?');
+    }
+
+    # add source key
+    if ( $Param{SourceKey} ) {
+        push(@BindVars, \$Param{SourceKey});
+        push(@SQLWhere, 'source_key = ?');
+    }
+
+    # lookup targetobject id
+    if ( $Param{TargetObject} ) {
+        my $ObjectID = $Self->ObjectLookup(
+            Name   => $Param{TargetObject},
+        );
+        push(@BindVars, \$ObjectID);
+        push(@SQLWhere, 'target_object_id = ?');
+    }
+
+    # add target key
+    if ( $Param{TargetKey} ) {
+        push(@BindVars, \$Param{TargetKey});
+        push(@SQLWhere, 'target_key = ?');
+    }
 
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
+    my $SQL = 'SELECT id FROM link_relation WHERE '.join(' AND ', @SQLWhere);
+
     # get links where the given object is the source
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT id
-            FROM link_relation
-            WHERE state_id = ? ',
-        Bind => [
-            \$StateID
-        ],
+        SQL  => $SQL,
+        Bind => \@BindVars
     );
 
     # fetch results
@@ -1425,7 +1477,7 @@ sub LinkGet {
     # get links where the given object is the source
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT id, source_key, target_key, create_by, create_time, source_object_id, target_object_id, type_id
+            SELECT id, source_object_id, source_key, target_object_id, target_key, type_id, create_by, create_time
             FROM link_relation
             WHERE id = ? ',
         Bind => [
@@ -1433,26 +1485,30 @@ sub LinkGet {
         ],
     );
 
+
     # fetch results
     my %LinkData;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $LinkData{ID}             = $Row[0];
-        $LinkData{SourceKey}      = $Row[1];
-        $LinkData{TargetKey}      = $Row[2];
-        $LinkData{CreateBy}       = $Row[3]
-        $LinkData{CreateTime}     = $Row[4]
-
-        $LinkData{SourceObject} = $Self->ObjectLookup(
-            ObjectID => $Row[5]
-        );        
-        $LinkData{TargetObject} = $Self->ObjectLookup(
-            ObjectID => $Row[6]
-        );        
-        $LinkData{Type} = $Self->TypeLookup(
-            TypeID => $Row[7],
-            UserID => 1,
-        );        
+        $LinkData{SourceObjectID} = $Row[1];
+        $LinkData{SourceKey}      = $Row[2];
+        $LinkData{TargetObjectID} = $Row[3];
+        $LinkData{TargetKey}      = $Row[4];
+        $LinkData{TypeID}         = $Row[5];
+        $LinkData{CreateBy}       = $Row[6];
+        $LinkData{CreateTime}     = $Row[7];
     }
+
+    $LinkData{SourceObject} = $Self->ObjectLookup(
+        ObjectID => $LinkData{SourceObjectID}
+    );        
+    $LinkData{TargetObject} = $Self->ObjectLookup(
+        ObjectID => $LinkData{TargetObjectID}
+    );        
+    $LinkData{Type} = $Self->TypeLookup(
+        TypeID => $LinkData{TypeID},
+        UserID => 1,
+    );        
 
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(

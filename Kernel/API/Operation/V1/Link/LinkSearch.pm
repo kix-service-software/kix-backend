@@ -113,9 +113,23 @@ sub Run {
         );
     }
 
+    # prepare filter if given
+    my %SearchFilter;
+    if ( IsArrayRefWithData($Self->{Filter}->{Link}->{AND}) ) {
+        foreach my $FilterItem ( @{$Self->{Filter}->{Link}->{AND}} ) {
+            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
+            next if ($FilterItem->{Field} !~ /^(SourceObject|SourceKey|TargetObject|TargetKey|Type)$/g);
+            next if ($FilterItem->{Operator} ne 'EQ');
+
+print STDERR "adding filter $FilterItem->{Field} = $FilterItem->{Value}\n";
+            $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+        }
+    }
+
     # perform Link search
-    my $LinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkListRaw(
+    my $LinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
         UserID  => $Self->{Authorization}->{UserID},
+        %SearchFilter,
     );
 
 	# get already prepared Link data from LinkGet operation
