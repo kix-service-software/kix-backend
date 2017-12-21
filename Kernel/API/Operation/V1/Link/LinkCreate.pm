@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/SLA/SLACreate.pm - API SLA Create operation backend
+# Kernel/API/Operation/Link/LinkCreate.pm - API Link Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SLA::SLACreate;
+package Kernel::API::Operation::V1::Link::LinkCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::SLA::SLACreate - API SLA SLACreate Operation backend
+Kernel::API::Operation::V1::Link::LinkCreate - API Link LinkCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,23 +66,16 @@ sub new {
 
 =item Run()
 
-perform SLACreate Operation. This will return the created SLAID.
+perform LinkCreate Operation. This will return the created LinkID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SLA  => {
-                Name                    => '...',
-                Calendar                => '...',        # (optional)
-                FirstResponseTime       => 120,          # (optional)
-                FirstResponseNotify     => 60,           # (optional) notify agent if first response escalation is 60% reached
-                UpdateTime              => 180,          # (optional)
-                UpdateNotify            => 80,           # (optional) notify agent if update escalation is 80% reached
-                SolutionTime            => 580,          # (optional)
-                SolutionNotify          => 80,           # (optional) notify agent if solution escalation is 80% reached
-                ValidID                 => 1,
-                Comment                 => '...',        # (optional)
-                TypeID                  => 2,
-                MinTimeBetweenIncidents => 3443,     # (optional)
+            Link  => {
+                SourceObject => '...',
+                SourceKey    => '...',
+                TargetObject => '...',
+                TargetKey    => '...',
+                Type         => '...'
             },
         },
     );
@@ -92,7 +85,7 @@ perform SLACreate Operation. This will return the created SLAID.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            SLAID  => '',                         # ID of the created SLA
+            LinkID  => '',                         # ID of the created Link
         },
     };
 
@@ -101,7 +94,7 @@ perform SLACreate Operation. This will return the created SLAID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webSLA
+    # init webLink
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -117,14 +110,23 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'SLA' => {
+            'Link' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'SLA::Name' => {
+            'Link::SourceObject' => {
                 Required => 1
             },
-            'SLA::TypeID' => {
+            'Link::SourceKey' => {
+                Required => 1
+            },            
+            'Link::TargetObject' => {
+                Required => 1
+            },
+            'Link::TargetKey' => {
+                Required => 1
+            },            
+            'Link::Type' => {
                 Required => 1
             },            
         }
@@ -138,61 +140,66 @@ sub Run {
         );
     }
 
-    # isolate SLA parameter
-    my $SLA = $Param{Data}->{SLA};
+    # isolate Link parameter
+    my $Link = $Param{Data}->{Link};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$SLA} ) {
+    for my $Attribute ( sort keys %{$Link} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $SLA->{$Attribute} =~ s{\A\s+}{};
+            $Link->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $SLA->{$Attribute} =~ s{\s+\z}{};
+            $Link->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-        	
-    # check if SLA exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
-        Name => $SLA->{Name},
+
+    # check if this link type is allowed
+    my %PossibleTypesList = $Kernel::OM->Get('Kernel::System::LinkObject')->PossibleTypesList(
+        Object1 => $Link->{SourceObject},
+        Object2 => $Link->{TargetObject},
     );
-    
-    if ( $Exists ) {
+
+    # check if wanted link type is possible
+    if ( !$PossibleTypesList{ $Link->{Type} } ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Can not create Link. The given link type is not supported by the given objects.",
+        );
+    }
+        	
+    # check if Link exists
+    my $LinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
+        %{$Link},
+        UserID => $Self->{Authorization}->{UserID},
+    );
+
+    if ( IsArrayRefWithData($LinkList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create SLA. SLA with same name '$SLA->{Name}' already exists.",
+            Message => "Can not create Link. A link with these parameters already exists.",
         );
     }
 
-    # create sla
-    my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLAAdd(
-        Name                    => $SLA->{Name},
-        Comment                 => $SLA->{Comment} || '',
-        ValidID                 => $SLA->{ValidID} || 1,
-        TypeID                  => $SLA->{TypeID},        
-        Calendar                => $SLA->{Calendar} || '',
-        FirstResponseTime       => $SLA->{FirstResponseTime} || '',
-        FirstResponseNotify     => $SLA->{FirstResponseNotify} || '',
-        UpdateTime              => $SLA->{UpdateTime} || '',
-        UpdateNotify            => $SLA->{UpdateNotify} || '',
-        SolutionTime            => $SLA->{SolutionTime} || '',
-        SolutionNotify          => $SLA->{SolutionNotify} || '',
-        MinTimeBetweenIncidents => $SLA->{MinTimeBetweenIncidents} || '',
-        UserID                  => $Self->{Authorization}->{UserID},               
+    # create Link
+    my $LinkID = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
+        %{$Link},
+        State   => 'Valid',
+        UserID  => $Self->{Authorization}->{UserID},        
     );
 
-    if ( !$SLAID ) {
+    if ( !$LinkID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create SLA, please contact the system administrator',
+            Message => 'Could not create Link, please contact the system administrator',
         );
     }
     
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        SLAID => $SLAID,
+        LinkID => $LinkID,
     );    
 }
 
