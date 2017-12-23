@@ -188,8 +188,6 @@
         <Setting>
             <Hash>
                 <Item Key="DEFAULT">200</Item>
-                <Item Key="AddressBookCreate.EmailAddressExists">409</Item>
-                <Item Key="AddressBookUpdate.EmailAddressExists">409</Item>
                 <Item Key="Authorization.NoHeader">403</Item>
                 <Item Key="Authorization.NoToken">403</Item>
                 <Item Key="BadRequest">400</Item>
@@ -215,29 +213,10 @@
                 <Item Key="PrepareData.InvalidFilter">400</Item>
                 <Item Key="PrepareData.InvalidSort">400</Item>
                 <Item Key="PrepareData.InvalidExpand">400</Item>
-                <Item Key="PriorityDelete.TicketExists">409</Item>
-                <Item Key="PriorityCreate.PriorityExists">409</Item>
-                <Item Key="PriorityCreate.UnableToCreate">409</Item>
-                <Item Key="PriorityGet.InvalidPriorityID">400</Item>
-                <Item Key="PriorityGet.NotPriorityData">400</Item>
-                <Item Key="PriorityUpdate.PriorityExists">400</Item>
-                <Item Key="PriorityDelete.TicketExists">409</Item>   
                 <Item Key="Provider.InternalError">500</Item>
                 <Item Key="SessionCreate.AuthFail">401</Item>
                 <Item Key="SessionDelete.DeleteError">404</Item>
                 <Item Key="SessionGet.TokenError">404</Item>
-                <Item Key="TicketTypeCreate.TicketTypeExists">409</Item>
-                <Item Key="TicketTypeCreate.UnableToCreate">409</Item>
-                <Item Key="TicketTypeGet.InvalidTypeID">400</Item>
-                <Item Key="TicketTypeGet.NotTicketTypeData">400</Item>
-                <Item Key="TicketTypeUpdate.TypeExists">400</Item>
-                <Item Key="TicketStateDelete.TicketExists">409</Item>
-                <Item Key="TicketStateCreate.TicketStateExists">409</Item>
-                <Item Key="TicketStateCreate.UnableToCreate">409</Item>
-                <Item Key="TicketStateGet.InvalidStateID">400</Item>
-                <Item Key="TicketStateGet.NotTicketStateData">400</Item>
-                <Item Key="TicketStateUpdate.StatExists">400</Item>
-                <Item Key="TicketStateDelete.TicketExists">409</Item>                 
                 <Item Key="Transport.InternalError">500</Item>
                 <Item Key="Transport.OperationNotFound">501</Item>
                 <Item Key="Transport.REST.DataMissing">400</Item>
@@ -253,8 +232,6 @@
                 <Item Key="Transport.REST.RequestTooBig">413</Item>
                 <Item Key="Transport.REST.TransportConfigInvalid">500</Item>
                 <Item Key="Unauthorized">401</Item>
-                <Item Key="UserCreate.EmailExists">409</Item>
-                <Item Key="UserCreate.LoginExists">409</Item>
                 <Item Key="UserGet.NoUserData">400</Item>
                 <Item Key="UserGet.InvalidUserID">400</Item>
                 <Item Key="UserGet.InalidUserType">400</Item>

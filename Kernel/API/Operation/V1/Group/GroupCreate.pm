@@ -148,7 +148,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'GroupCreate.TypeExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create Group. Group with same name '$Group->{Name}' already exists.",
         );
     }
