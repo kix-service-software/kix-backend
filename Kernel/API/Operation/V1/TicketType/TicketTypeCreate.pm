@@ -147,7 +147,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'TicketTypeCreate.TypeExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create TicketType. TicketType with same name '$TicketType->{Name}' already exists.",
         );
     }
