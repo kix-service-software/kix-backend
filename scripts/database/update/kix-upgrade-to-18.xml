@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="link_relation">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <IndexAdd Name="link_relation_id">
+            <IndexColumn Name="id"/>
+        </IndexAdd>
+    </TableAlter>
     <TableAlter Name="dynamic_field">
         <ColumnDrop Name="field_order"/>
     </TableAlter>

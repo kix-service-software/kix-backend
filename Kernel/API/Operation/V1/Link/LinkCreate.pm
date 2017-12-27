@@ -19,7 +19,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::Link::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -155,17 +155,14 @@ sub Run {
         }
     }   
 
-    # check if this link type is allowed
-    my %PossibleTypesList = $Kernel::OM->Get('Kernel::System::LinkObject')->PossibleTypesList(
-        Object1 => $Link->{SourceObject},
-        Object2 => $Link->{TargetObject},
+    # check attribute values
+    my $CheckResult = $Self->_CheckLink( 
+        Link => $Link
     );
 
-    # check if wanted link type is possible
-    if ( !$PossibleTypesList{ $Link->{Type} } ) {
+    if ( !$CheckResult->{Success} ) {
         return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => "Can not create Link. The given link type is not supported by the given objects.",
+            %{$CheckResult},
         );
     }
         	

@@ -344,7 +344,7 @@ sub PossibleLinkList {
 
 add a new link between two elements
 
-    $True = $LinkObject->LinkAdd(
+    $LinkID = $LinkObject->LinkAdd(
         SourceObject => 'Ticket',
         SourceKey    => '321',
         TargetObject => 'FAQ',
@@ -478,8 +478,8 @@ sub LinkAdd {
             TypeID => $TypeID,
         );
 
-        return 1 if !$TypeData{Pointed};
-        return 1 if $Existing{SourceObjectID} eq $Param{SourceObjectID}
+        return if !$TypeData{Pointed};
+        return if $Existing{SourceObjectID} eq $Param{SourceObjectID}
             && $Existing{SourceKey} eq $Param{SourceKey};
 
         # log error
@@ -575,6 +575,27 @@ sub LinkAdd {
         ],
     );
 
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id FROM link_relation WHERE
+            source_object_id = ? AND source_key = ? AND 
+            target_object_id = ? AND target_key = ? AND 
+            type_id = ? AND state_id = ? AND create_by = ?',
+        Bind => [
+            \$Param{SourceObjectID}, \$Param{SourceKey},
+            \$Param{TargetObjectID}, \$Param{TargetKey},
+            \$TypeID, \$StateID, \$Param{UserID},
+        ],
+        Limit => 1,
+    );
+
+    # fetch results
+    my $LinkID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $LinkID = $Row[0];
+    }
+
+print STDERR "LinkID: $LinkID\n";
     # run post event module of source object
     $BackendSourceObject->LinkAddPost(
         Key          => $Param{SourceKey},
@@ -595,7 +616,7 @@ sub LinkAdd {
         UserID       => $Param{UserID},
     );
 
-    return 1;
+    return $LinkID;
 }
 
 =item LinkCleanup()

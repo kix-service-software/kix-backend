@@ -1734,6 +1734,7 @@
 
 <!-- link_relation - all links between objects -->
 <Table Name="link_relation">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="source_object_id" Required="true" Type="SMALLINT"/>
     <Column Name="source_key" Required="true" Size="50" Type="VARCHAR"/>
     <Column Name="target_object_id" Required="true" Type="SMALLINT"/>
@@ -1749,6 +1750,9 @@
         <UniqueColumn Name="target_key"/>
         <UniqueColumn Name="type_id"/>
     </Unique>
+    <Index Name="link_relation_id">
+        <IndexColumn Name="id"/>
+    </Index>
     <Index Name="link_relation_list_source">
         <IndexColumn Name="source_object_id"/>
         <IndexColumn Name="source_key"/>
