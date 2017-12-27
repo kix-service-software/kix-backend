@@ -854,6 +854,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Salutation::SalutationDelete
+    V1::Signature::SignatureSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Signature::SignatureSearch
+    V1::Signature::SignatureCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Signature::SignatureCreate
+    V1::Signature::SignatureGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Signature::SignatureGet
+    V1::Signature::SignatureUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Signature::SignatureUpdate
+    V1::Signature::SignatureDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Signature::SignatureDelete
 
   Transport:
     Config:
@@ -1344,6 +1379,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /salutation/:SalutationID
+        V1::Signature::SignatureSearch:
+          RequestMethod:
+          - GET
+          Route: /signatures
+        V1::Signature::SignatureCreate:
+          RequestMethod:
+          - POST
+          Route: /signatures
+        V1::Signature::SignatureGet:
+          RequestMethod:
+          - GET
+          Route: /signatures/:SignatureID
+        V1::Signature::SignatureUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /signatures/:SignatureID
+        V1::Signature::SignatureDelete:
+          RequestMethod:
+          - DELETE
+          Route: /signatures/:SignatureID
 
     Type: HTTP::REST
 RemoteSystem: ''

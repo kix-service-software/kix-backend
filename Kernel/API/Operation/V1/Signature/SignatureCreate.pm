@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Group/GroupCreate.pm - API Group Create operation backend
+# Kernel/API/Operation/Signature/SignatureCreate.pm - API Signature Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Group::GroupCreate;
+package Kernel::API::Operation::V1::Signature::SignatureCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Group::GroupCreate - API Group GroupCreate Operation backend
+Kernel::API::Operation::V1::Signature::SignatureCreate - API Signature SignatureCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,16 +66,18 @@ sub new {
 
 =item Run()
 
-perform GroupCreate Operation. This will return the created GroupID.
+perform SignatureCreate Operation. This will return the created SignatureID.
 
     my $Result = $OperationObject->Run(
         Data => {
-	    	Group  => {
-	        	Name    => '...',
-	        	Comment => '...',                 # optional
-	        	ValidID => '...',                 # optional
-	    	},
-	    },
+            Signature  => {
+                Name        => 'New Signature',
+                Text        => "--\nSome Signature Infos",
+                ContentType => 'text/plain; charset=utf-8',     # optional, default 'text/plain; charset=utf-8'
+                Comment     => 'some comment',                  # optional
+                ValidID     => 1,                               # 0|1 default 1
+            },
+        },
     );
 
     $Result = {
@@ -83,7 +85,7 @@ perform GroupCreate Operation. This will return the created GroupID.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            GroupID  => '',                         # ID of the created group
+            SignatureID  => '',                         # ID of the created Signature
         },
     };
 
@@ -92,14 +94,14 @@ perform GroupCreate Operation. This will return the created GroupID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
+    # init webSignature
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
         $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
+            Code    => 'WebService.InvalidConfiguration',
             Message => $Result->{Message},
         );
     }
@@ -108,11 +110,14 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'Group' => {
+            'Signature' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'Group::Name' => {
+            'Signature::Name' => {
+                Required => 1
+            },
+            'Signature::Text' => {
                 Required => 1
             },
         }
@@ -126,53 +131,60 @@ sub Run {
         );
     }
 
-    # isolate Group parameter
-    my $Group = $Param{Data}->{Group};
+    # isolate Signature parameter
+    my $Signature = $Param{Data}->{Signature};
 
     # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Group} ) {
+    for my $Attribute ( sort keys %{$Signature} ) {
         if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
 
             #remove leading spaces
-            $Group->{$Attribute} =~ s{\A\s+}{};
+            $Signature->{$Attribute} =~ s{\A\s+}{};
 
             #remove trailing spaces
-            $Group->{$Attribute} =~ s{\s+\z}{};
+            $Signature->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-        	
-    # check if Group exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
-        Group => $Group->{Name},
-    );
-    
-    if ( $Exists ) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not create Group. Group with same name '$Group->{Name}' already exists.",
+     	
+    # check if Signature exists
+    my %List = $Kernel::OM->Get('Kernel::System::Signature')->SignatureList();
+
+    foreach my $ID ( keys %List ) {                   
+        my %SignatureData = $Kernel::OM->Get('Kernel::System::Signature')->SignatureGet(
+            ID    => $ID,
         );
-    }
 
-    # create Group
-    my $GroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupAdd(
-        Name    => $Group->{Name},
-        Comment => $Group->{Comment} || '',
-        ValidID => $Group->{ValidID} || 1,
-        UserID  => $Self->{Authorization}->{UserID},
+        if ( $SignatureData{Name} eq $Signature->{Name} ) {
+            return $Self->_Error(
+                Code    => 'Object.AlreadyExists',
+                Message => "Can not create Signature. Signature with same name '$Signature->{Name}' already exists.",
+            );
+        }
+    }        
+
+    # create Signature
+    my $SignatureID = $Kernel::OM->Get('Kernel::System::Signature')->SignatureAdd(
+        Name        => $Signature->{Name},
+        Text        => $Signature->{Text},
+        ContentType => $Signature->{Login} || 'text/plain; charset=utf-8',
+        Comment     => $Signature->{Comment} || '',
+        ValidID     => $Signature->{ValidID} || 1,
+        UserID      => $Self->{Authorization}->{UserID},              
     );
 
-    if ( !$GroupID ) {
+    if ( !$SignatureID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create group, please contact the system administrator',
+            Message => 'Could not create Signature, please contact the system administrator',
         );
     }
     
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        GroupID => $GroupID,
+        SignatureID => $SignatureID,
     );    
 }
+
 
 1;
