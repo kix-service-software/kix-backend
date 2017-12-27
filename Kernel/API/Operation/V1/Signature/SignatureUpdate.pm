@@ -74,11 +74,11 @@ perform SignatureUpdate Operation. This will return the updated TypeID.
         Data => {
             SignatureID => 123,
             Signature  => {
-                Name        => 'New Signature',
-                Text        => "--\nSome Signature Infos",
-                ContentType => 'text/plain; charset=utf-8',
+                Name        => 'New Signature',                 # optional
+                Text        => "--\nSome Signature Infos",      # optional
+                ContentType => 'text/plain; charset=utf-8',     # optional
                 Comment     => 'some comment',                  # optional
-                ValidID     => 1,                               # 0|1 default 1
+                ValidID     => 1,                               # optional
             },
         },
     );
@@ -165,7 +165,7 @@ sub Run {
         ID          => $Param{Data}->{SignatureID},
         Name        => $Signature->{Name} || $SignatureData{Name},
         Text        => $Signature->{Text} || $SignatureData{Text},
-        ContentType => $Signature->{Login} || $SignatureData{ContentType},
+        ContentType => $Signature->{ContentType} || $SignatureData{ContentType},
         Comment     => $Signature->{Comment} || $SignatureData{Comment},
         ValidID     => $Signature->{ValidID} || $SignatureData{ValidID},
         UserID      => $Self->{Authorization}->{UserID},            

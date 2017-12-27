@@ -116,22 +116,25 @@ sub Run {
     
     my $Message = '';
     my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
+
+    my %AssignedSignatures;
+    foreach my $ID ( keys %Queues ) {                   
+        my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+            ID    => $ID,
+        );
+        next if !%Queue;
+        $AssignedSignatures{$Queue{SignatureID}} = 1;
+    }
          
     # start Signature loop
     Signature:    
     foreach my $SignatureID ( @{$Param{Data}->{SignatureID}} ) {
 
-        foreach my $ID ( keys %Queues ) {                   
-            my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
-                ID    => $ID,
+        if ( $AssignedSignatures{$SignatureID} ) {
+            return $Self->_Error(
+                Code    => 'Object.DependingObjectExists',
+                Message => 'Can not delete Signature. A Queue with this SignatureID already exists.',
             );
-
-            if ( $Queue{$SignatureID} == $SignatureID ) {
-                return $Self->_Error(
-                    Code    => 'Object.DependingObjectExists',
-                    Message => 'Can not delete Signature. A Queue with this SignatureID already exists.',
-                );
-            }
         }
 
         # delete Signature	    
