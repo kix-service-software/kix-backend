@@ -893,7 +893,7 @@ sub _Output {
     $Param{Content}  ||= '';
     $Param{HTTPCode} ||= 500;
     my $ContentType;
-    if ( $Param{HTTPCode} eq 200 ) {
+    if ( $Param{HTTPCode} =~ /^2/ ) {
         $ContentType = 'application/json';
     }
     else {
