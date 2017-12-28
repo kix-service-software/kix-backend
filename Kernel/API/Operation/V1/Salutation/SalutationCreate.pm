@@ -72,10 +72,10 @@ perform SalutationCreate Operation. This will return the created SalutationID.
         Data => {
             Salutation  => {
                 Name        => 'New Salutation',
-                Text        => "--\nSome Salutation Infos",
-                ValidID     => 1,                           # (optional)               
-                Comment     => '...',                       # (optional)
-                ContentType => 'text/plain; charset=utf-8',              
+                Text        => "Some Salutation Infos",
+                ValidID     => 1,                           # optional, default 1
+                Comment     => '...',                       # optional
+                ContentType => 'text/plain; charset=utf-8', # optional, default 'text/plain; charset=utf-8'
             },
         },
     );
@@ -120,9 +120,6 @@ sub Run {
             'Salutation::Text' => {
                 Required => 1
             },
-            'Salutation::ValidID' => {
-                Required => 1
-            },                                                
         }
     );
 
@@ -134,45 +131,29 @@ sub Run {
         );
     }
 
-    # isolate Salutation parameter
-    my $Salutation = $Param{Data}->{Salutation};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Salutation} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Salutation->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Salutation->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Salutation parameter
+    my $Salutation = $Self->_Trim(
+        Data => $Param{Data}->{Salutation}
+    );
      	
     # check if Salutation exists
-    my %List = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationList();
+    my %SalutationList = reverse ( $Kernel::OM->Get('Kernel::System::Salutation')->SalutationList() );
 
-    foreach my $ID ( keys %List ) {                   
-        my %SalutationData = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationGet(
-            ID    => $ID,
+    if ( $SalutationList{$Salutation->{Name}} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not create Salutation. Salutation with same name '$Salutation->{Name}' already exists.",
         );
-            
-        if ( $SalutationData{Name} eq $Salutation->{Name} ) {
-            return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Can not create Salutation. Salutation with same name '$Salutation->{Name}' already exists.",
-            );
-        }
     }        
 
     # create Salutation
     my $SalutationID = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationAdd(
-        Name     => $Salutation->{Name},
-        Comment  => $Salutation->{Comment} || '',
-        ValidID  => $Salutation->{ValidID},
-        Text     => $Salutation->{Text},
-        ContentType => 'text/plain; charset=utf-8',
-        UserID   => $Self->{Authorization}->{UserID},              
+        Name        => $Salutation->{Name},
+        Text        => $Salutation->{Text},
+        Comment     => $Salutation->{Comment} || '',
+        ValidID     => $Salutation->{ValidID} || 1,
+        ContentType => $Salutation->{ContentType} || 'text/plain; charset=utf-8',
+        UserID      => $Self->{Authorization}->{UserID},              
     );
 
     if ( !$SalutationID ) {

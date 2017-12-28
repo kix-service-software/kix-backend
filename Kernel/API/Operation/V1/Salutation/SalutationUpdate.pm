@@ -68,17 +68,17 @@ sub new {
 
 =item Run()
 
-perform SalutationUpdate Operation. This will return the updated TypeID.
+perform SalutationUpdate Operation. This will return the updated SalutationID.
 
     my $Result = $OperationObject->Run(
         Data => {
             SalutationID => 123,
             Salutation  => {
-                Name        => 'New Salutation',
-                Text        => "--\nSome Salutation Infos",
-                ValidID     => 1,                           # (optional)               
-                Comment     => '...',                       # (optional)
-                ContentType => 'text/plain; charset=utf-8',              
+                Name        => 'New Salutation',                # optional
+                Text        => "Some Salutation Infos",         # optional
+                ValidID     => 1,                               # optional               
+                Comment     => '...',                           # optional
+                ContentType => 'text/plain; charset=utf-8',     # optional             
             },
         },
     );
@@ -133,25 +133,15 @@ sub Run {
         );
     }
 
-    # isolate Salutation parameter
-    my $Salutation = $Param{Data}->{Salutation};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Salutation} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Salutation->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Salutation->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Salutation parameter
+    my $Salutation = $Self->_Trim(
+        Data => $Param{Data}->{Salutation}
+    );
 
     # check if Salutation exists 
     my %SalutationData = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationGet(
-        ID => $Param{Data}->{SalutationID},
-        UserID      => $Self->{Authorization}->{UserID},        
+        ID     => $Param{Data}->{SalutationID},
+        UserID => $Self->{Authorization}->{UserID},        
     );
  
     if ( !%SalutationData ) {
@@ -163,13 +153,13 @@ sub Run {
 
     # update Salutation
     my $Success = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationUpdate(
-        ID       => $Param{Data}->{SalutationID} || $SalutationData{SalutationID},
-        Name     => $Salutation->{Name} || $SalutationData{Name},
-        Comment  => $Salutation->{Comment} || $SalutationData{Comment},
-        ValidID  => $Salutation->{ValidID} || $SalutationData{ValidID},
-        Text     => $Salutation->{Text} || $SalutationData{Text},
-        ContentType => $Salutation->{ContentType} || 'text/plain; charset=utf-8',
-        UserID   => $Self->{Authorization}->{UserID},                      
+        ID          => $Param{Data}->{SalutationID},
+        Name        => $Salutation->{Name} || $SalutationData{Name},
+        Comment     => $Salutation->{Comment} || $SalutationData{Comment},
+        ValidID     => $Salutation->{ValidID} || $SalutationData{ValidID},
+        Text        => $Salutation->{Text} || $SalutationData{Text},
+        ContentType => $Salutation->{ContentType} || $SalutationData{ContentType},
+        UserID      => $Self->{Authorization}->{UserID},                      
     );
 
     if ( !$Success ) {
