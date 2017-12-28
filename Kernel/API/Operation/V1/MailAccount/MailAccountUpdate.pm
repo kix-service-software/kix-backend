@@ -152,8 +152,7 @@ sub Run {
             $MailAccount->{$Attribute} =~ s{\s+\z}{};
         }
     }   
-use Data::Dumper;
-print STDERR "Param".Dumper(\%Param);
+
     # check if MailAccount exists 
     my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
         ID => $Param{Data}->{MailAccountID},
@@ -166,7 +165,7 @@ print STDERR "Param".Dumper(\%Param);
             Message => "Cannot update MailAccount. No MailAccount with ID '$Param{Data}->{MailAccountID}' found.",
         );
     }
-print STDERR "Param".Dumper($MailAccount->{Trusted},$MailAccountData{Trusted});
+
     # update MailAccount
     my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountUpdate(
         ID       => $Param{Data}->{MailAccountID} || $MailAccountData{MailAccountID},

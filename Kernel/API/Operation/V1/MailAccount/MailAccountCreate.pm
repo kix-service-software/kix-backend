@@ -138,8 +138,7 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-use Data::Dumper;
-print STDERR "Param".Dumper(\%Param);
+
     # isolate MailAccount parameter
     my $MailAccount = $Param{Data}->{MailAccount};
 
@@ -162,7 +161,7 @@ print STDERR "Param".Dumper(\%Param);
         my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
             ID    => $ID,
         );
-print STDERR "MailAccountData".Dumper(\%MailAccountData);            
+
         if ( $MailAccountData{Login} eq $MailAccount->{Login} ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
