@@ -245,7 +245,9 @@ update a new mail account
 
 sub MailAccountUpdate {
     my ( $Self, %Param ) = @_;
-
+use Data::Dumper;
+print STDERR "maccParam".Dumper(\%Param);
+    # sql
     # check needed stuff
     for (qw(ID Login Password Host Type ValidID Trusted DispatchingBy QueueID UserID)) {
         if ( !defined $Param{$_} ) {
@@ -280,7 +282,6 @@ sub MailAccountUpdate {
         $Param{IMAPFolder} = '';
     }
 
-    # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE mail_account SET login = ?, pw = ?, host = ?, account_type = ?, '
             . ' comments = ?, imap_folder = ?, trusted = ?, valid_id = ?, change_time = current_timestamp, '
@@ -492,6 +493,45 @@ sub MailAccountCheck {
             Message    => $Check{Message}
         );
     }
+}
+
+=item MailAccountDelete()
+
+Delete a MailAccountes.
+
+    my $Result = $MailAccountObject->MailAccountDelete(
+        MailAccountID      => '...',
+    );
+
+=cut
+
+sub MailAccountDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(MID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM mail_account WHERE id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 1;

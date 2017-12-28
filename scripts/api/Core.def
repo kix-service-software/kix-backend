@@ -126,3 +126,9 @@
 /signatures/:SignatureID                                            |   GET             | V1::Signature::SignatureGet
 /signatures/:SignatureID                                            |   PATCH           | V1::Signature::SignatureUpdate
 /signatures/:SignatureID                                            |   DELETE          | V1::Signature::SignatureDelete
+/mailaccounts                                                       |   GET             | V1::MailAccount::MailAccountSearch
+/mailaccounts                                                       |   POST            | V1::MailAccount::MailAccountCreate
+/mailaccounts/:MailAccountID                                        |   GET             | V1::MailAccount::MailAccountGet
+/mailaccounts/:MailAccountID                                        |   PATCH           | V1::MailAccount::MailAccountUpdate
+/mailaccounts/:MailAccountID                                        |   DELETE          | V1::MailAccount::MailAccountDelete
+
