@@ -151,6 +151,16 @@ sub Run {
         );
     }
 
+    # check if Salutation with this name exists
+    my %SalutationList = reverse ( $Kernel::OM->Get('Kernel::System::Salutation')->SalutationList() );
+
+    if ( $SalutationList{$Salutation->{Name}} && $SalutationList{$Salutation->{Name}} ne $Param{Data}->{SalutationID} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not create Salutation. Salutation with same name '$Salutation->{Name}' already exists.",
+        );
+    }        
+
     # update Salutation
     my $Success = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationUpdate(
         ID          => $Param{Data}->{SalutationID},

@@ -133,8 +133,10 @@ sub Run {
         );
     }
 
-    # isolate Signature parameter
-    my $Signature = $Param{Data}->{Signature};
+    # isolate and trim Signature parameter
+    my $Signature = $Self->_Trim(
+        Data => $Param{Data}->{Signature},
+    );
 
     # remove leading and trailing spaces
     for my $Attribute ( sort keys %{$Signature} ) {
@@ -159,6 +161,16 @@ sub Run {
             Message => "Cannot update Signature. No Signature with ID '$Param{Data}->{SignatureID}' found.",
         );
     }
+
+    # check if Signature exists
+    my %SignatureList = reverse ( $Kernel::OM->Get('Kernel::System::Signature')->SignatureList() );
+
+    if ( $SignatureList{$Signature->{Name}} && $SignatureList{$Signature->{Name}} ne $Param{Data}->{SignatureID} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not create Signature. Signature with same name '$Signature->{Name}' already exists.",
+        );
+    }   
 
     # update Signature
     my $Success = $Kernel::OM->Get('Kernel::System::Signature')->SignatureUpdate(

@@ -131,35 +131,19 @@ sub Run {
         );
     }
 
-    # isolate Signature parameter
-    my $Signature = $Param{Data}->{Signature};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Signature} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Signature->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Signature->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Signature parameter
+    my $Signature = $Self->_Trim(
+        Data => $Param{Data}->{Signature},
+    );
      	
     # check if Signature exists
-    my %List = $Kernel::OM->Get('Kernel::System::Signature')->SignatureList();
+    my %SignatureList = reverse ( $Kernel::OM->Get('Kernel::System::Signature')->SignatureList() );
 
-    foreach my $ID ( keys %List ) {                   
-        my %SignatureData = $Kernel::OM->Get('Kernel::System::Signature')->SignatureGet(
-            ID    => $ID,
+    if ( $SignatureList{$Signature->{Name}} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not create Signature. Signature with same name '$Signature->{Name}' already exists.",
         );
-
-        if ( $SignatureData{Name} eq $Signature->{Name} ) {
-            return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Can not create Signature. Signature with same name '$Signature->{Name}' already exists.",
-            );
-        }
     }        
 
     # create Signature
