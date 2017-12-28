@@ -85,16 +85,15 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
                 Comment       => '...',             # optional
                 QueueID       => 12,
             },
-	    },
-	);
-    
+        },
+    );
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            MailAccountID  => 123,                     # ID of the updated MailAccount 
+            MailAccountID  => 123,              # ID of the updated MailAccount 
         },
     };
    
