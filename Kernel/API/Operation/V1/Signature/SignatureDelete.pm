@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Group/GroupDelete.pm - API Group Delete operation backend
+# Kernel/API/Operation/Signature/SignatureDelete.pm - API Signature Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Group::GroupDelete;
+package Kernel::API::Operation::V1::Signature::SignatureDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Group::GroupDelete - API Group GroupDelete Operation backend
+Kernel::API::Operation::V1::Signature::SignatureDelete - API Signature SignatureDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform GroupDelete Operation. This will return the deleted GroupID.
+perform SignatureDelete Operation. This will return {}.
 
     my $Result = $OperationObject->Run(
         Data => {
-            GroupID  => '...',
+            SignatureID  => '...',
         },		
     );
 
@@ -82,14 +82,15 @@ perform GroupDelete Operation. This will return the deleted GroupID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    # init webservice
+    
+    # init webService
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
 
     if ( !$Result->{Success} ) {
         $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
+            Code    => 'WebService.InvalidConfiguration',
             Message => $Result->{Message},
         );
     }
@@ -98,7 +99,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'GroupID' => {
+            'SignatureID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -114,47 +115,37 @@ sub Run {
     }
     
     my $Message = '';
-  
-    # start type loop
-    TYPE:    
-    foreach my $GroupID ( @{$Param{Data}->{GroupID}} ) {
+    my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
 
-        # search group user       
-        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserGet(
-            Type    => 'move_into',
-            GroupID => $GroupID,
+    my %AssignedSignatures;
+    foreach my $ID ( keys %Queues ) {                   
+        my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+            ID    => $ID,
         );
-   
-        if ( IsHashRefWithData(\%ResultUserList) ) {
+        next if !%Queue;
+        $AssignedSignatures{$Queue{SignatureID}} = 1;
+    }
+         
+    # start Signature loop
+    Signature:    
+    foreach my $SignatureID ( @{$Param{Data}->{SignatureID}} ) {
+
+        if ( $AssignedSignatures{$SignatureID} ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete group. At least one user is assigned to this group.',
+                Message => 'Can not delete Signature. A Queue with this SignatureID already exists.',
             );
         }
 
-        # search group role       
-        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupRoleGet(
-            Type    => 'move_into',
-            GroupID => $GroupID,
-        );
-  
-        if ( IsHashRefWithData(\%ResultRoleList) ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete group. This group is assgined to at least one role.',
-            );
-        }
-        
-        # delete Group	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Group')->GroupDelete(
-            GroupID  => $GroupID,
-            UserID  => $Self->{Authorization}->{UserID},
+        # delete Signature	    
+        my $Success = $Kernel::OM->Get('Kernel::System::Signature')->SignatureDelete(
+            ID  => $SignatureID,
         );
 
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete Group, please contact the system administrator',
+                Message => 'Could not delete Signature, please contact the system administrator',
             );
         }
     }
