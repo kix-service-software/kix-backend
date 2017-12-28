@@ -116,14 +116,13 @@
 /customers                                                          |   POST            | V1::Customer::CustomerCreate
 /customers/:CustomerID                                              |   GET             | V1::Customer::CustomerGet
 /customers/:CustomerID                                              |   PATCH           | V1::Customer::CustomerUpdate
-/salutation                                                         |   GET             | V1::Salutation::SalutationSearch
-/salutation                                                         |   POST            | V1::Salutation::SalutationCreate
-/salutation/:SalutationID                                           |   GET             | V1::Salutation::SalutationGet
-/salutation/:SalutationID                                           |   PATCH           | V1::Salutation::SalutationUpdate
-/salutation/:SalutationID                                           |   DELETE          | V1::Salutation::SalutationDelete
+/salutations                                                        |   GET             | V1::Salutation::SalutationSearch
+/salutations                                                        |   POST            | V1::Salutation::SalutationCreate
+/salutations/:SalutationID                                          |   GET             | V1::Salutation::SalutationGet
+/salutations/:SalutationID                                          |   PATCH           | V1::Salutation::SalutationUpdate
+/salutations/:SalutationID                                          |   DELETE          | V1::Salutation::SalutationDelete
 /signatures                                                         |   GET             | V1::Signature::SignatureSearch
 /signatures                                                         |   POST            | V1::Signature::SignatureCreate
 /signatures/:SignatureID                                            |   GET             | V1::Signature::SignatureGet
 /signatures/:SignatureID                                            |   PATCH           | V1::Signature::SignatureUpdate
 /signatures/:SignatureID                                            |   DELETE          | V1::Signature::SignatureDelete
-

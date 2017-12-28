@@ -121,20 +121,20 @@ sub Run {
     # start Salutation loop
     Salutation:    
     foreach my $SalutationID ( @{$Param{Data}->{SalutationID}} ) {
-    	        	
-	    foreach my $ID ( keys %Queues ) {	    	    	
-		    my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
-		        ID    => $ID,
-		    );
-	        
-	        if ( $Queue{SalutationID} == $SalutationID ) {
-	                return $Self->_Error(
-	                Code    => 'Object.DependingObjectExists',
-	                Message => 'Can not delete Salutation. A Queue with this SalutationID already exists.',
-	                );
-	        }
-	    }
-	          
+
+        foreach my $ID ( keys %Queues ) {	    	    	
+            my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+                ID    => $ID,
+            );
+
+            if ( $Queue{SalutationID} == $SalutationID ) {
+                return $Self->_Error(
+                    Code    => 'Object.DependingObjectExists',
+                    Message => 'Can not delete Salutation. A Queue with this SalutationID already exists.',
+                );
+            }
+        }
+
         # delete Salutation	    
         my $Success = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationDelete(
             SalutationID  => $SalutationID,

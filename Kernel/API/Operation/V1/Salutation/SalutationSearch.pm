@@ -118,7 +118,7 @@ sub Run {
         Valid => 1,
     );
 
-	# get already prepared Salutation data from SalutationGet operation
+    # get already prepared Salutation data from SalutationGet operation
     if ( IsHashRefWithData(\%SalutationList) ) {  	
         my $SalutationGetResult = $Self->ExecOperation(
             OperationType => 'V1::Salutation::SalutationGet',

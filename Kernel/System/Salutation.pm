@@ -151,7 +151,7 @@ sub SalutationGet {
 
     # get the salutation
     return if !$Self->{DBObject}->Prepare(
-        SQL => 'SELECT id, name, text, content_type, comments, valid_id, change_time, create_time '
+        SQL => 'SELECT id, name, text, content_type, comments, valid_id, change_by, change_time, create_by, create_time '
             . 'FROM salutation WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -166,8 +166,10 @@ sub SalutationGet {
             ContentType => $Data[3] || 'text/plain',
             Comment     => $Data[4],
             ValidID     => $Data[5],
-            ChangeTime  => $Data[6],
-            CreateTime  => $Data[7],
+            ChangeBy    => $Data[6],
+            ChangeTime  => $Data[7],
+            CreateBy    => $Data[8],
+            CreateTime  => $Data[9],
         );
     }
 
