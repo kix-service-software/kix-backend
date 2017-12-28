@@ -144,6 +144,11 @@ sub Run {
             UserID  => $Self->{Authorization}->{UserID},
         );
 
+        # remove unwanted attributes 
+        foreach my $Attr ( qw(SourceObjectID TargetObjectID TypeID) ) {
+            delete $LinkData{$Attr};
+        }
+
         if ( !IsHashRefWithData( \%LinkData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',

@@ -313,7 +313,6 @@ sub Run {
                                     TargetObject => 'ITSMConfigItem',
                                     TargetKey    => $ConfigItemID,
                                     Type         => $LinkType,
-                                    State        => 'Valid',
                                     UserID       => 1,
                                 );
                             }

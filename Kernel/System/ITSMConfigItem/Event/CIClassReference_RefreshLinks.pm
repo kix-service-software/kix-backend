@@ -193,7 +193,6 @@ sub Run {
                                 TargetKey    => $Param{ConfigItemID},
                                 Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
                                     ->{ReferencedCIClassLinkType},
-                                State  => 'Valid',
                                 UserID => 1,
                             );
 
@@ -206,7 +205,6 @@ sub Run {
                                 SourceKey    => $Param{ConfigItemID},
                                 Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
                                     ->{ReferencedCIClassLinkType},
-                                State  => 'Valid',
                                 UserID => 1,
                             );
                         }

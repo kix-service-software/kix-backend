@@ -1702,27 +1702,6 @@
     </ForeignKey>
 </Table>
 
-<!-- link_state - all link object states -->
-<Table Name="link_state">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
-    <Column Name="name" Required="true" Size="50" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="link_state_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- link_object - all link objects -->
 <Table Name="link_object">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
@@ -1740,7 +1719,6 @@
     <Column Name="target_object_id" Required="true" Type="SMALLINT"/>
     <Column Name="target_key" Required="true" Size="50" Type="VARCHAR"/>
     <Column Name="type_id" Required="true" Type="SMALLINT"/>
-    <Column Name="state_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Unique Name="link_relation_view">
@@ -1753,30 +1731,12 @@
     <Index Name="link_relation_id">
         <IndexColumn Name="id"/>
     </Index>
-    <Index Name="link_relation_list_source">
+    <Index Name="link_relation_source">
         <IndexColumn Name="source_object_id"/>
         <IndexColumn Name="source_key"/>
-        <IndexColumn Name="state_id"/>
     </Index>
-    <Index Name="link_relation_list_target">
+    <Index Name="link_relation_target">
         <IndexColumn Name="target_object_id"/>
-        <IndexColumn Name="target_key"/>
-        <IndexColumn Name="state_id"/>
-    </Index>
-    <Index Name="link_relation_src_key">
-        <IndexColumn Name="source_key"/>
-    </Index>
-    <Index Name="link_relation_target_key">
-        <IndexColumn Name="target_key"/>
-    </Index>
-    <Index Name="link_relation_src_obj_id">
-        <IndexColumn Name="source_object_id"/>
-    </Index>
-    <Index Name="link_relation_target_obj_id">
-        <IndexColumn Name="target_object_id"/>
-    </Index>
-    <Index Name="link_relation_src_key_trgt_key">
-        <IndexColumn Name="source_key"/>
         <IndexColumn Name="target_key"/>
     </Index>
     <ForeignKey ForeignTable="link_object">
@@ -1785,9 +1745,6 @@
     </ForeignKey>
     <ForeignKey ForeignTable="link_type">
         <Reference Local="type_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="link_state">
-        <Reference Local="state_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>

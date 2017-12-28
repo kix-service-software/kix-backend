@@ -264,23 +264,6 @@
         <Data Key="change_by">1</Data>
     </Insert>
 
-    <Insert Table="link_state">
-        <Data Key="name" Type="Quote" Translatable="1">Valid</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="link_state">
-        <Data Key="name" Type="Quote">Temporary</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-
     <Insert Table="link_object">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote">Person</Data>

@@ -182,7 +182,6 @@ sub Run {
     # create Link
     my $LinkID = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
         %{$Link},
-        State   => 'Valid',
         UserID  => $Self->{Authorization}->{UserID},        
     );
 
