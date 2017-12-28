@@ -665,55 +665,35 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressDelete
-<<<<<<< scripts/api/Core.yml
-    SysConfigItemDefinitionSearch:
-=======
     V1::SysConfig::SysConfigItemDefinitionSearch:
->>>>>>> scripts/api/Core.yml
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemDefinitionSearch
-<<<<<<< scripts/api/Core.yml
-    SysConfigItemDefinitionGet:
-=======
     V1::SysConfig::SysConfigItemDefinitionGet:
->>>>>>> scripts/api/Core.yml
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemDefinitionGet
-<<<<<<< scripts/api/Core.yml
-    SysConfigItemSearch:
-=======
     V1::SysConfig::SysConfigItemSearch:
->>>>>>> scripts/api/Core.yml
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemSearch
-<<<<<<< scripts/api/Core.yml
-    SysConfigItemGet:
-=======
     V1::SysConfig::SysConfigItemGet:
->>>>>>> scripts/api/Core.yml
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigItemGet
-<<<<<<< scripts/api/Core.yml
-    SysConfigItemUpdate:
-=======
     V1::SysConfig::SysConfigItemUpdate:
->>>>>>> scripts/api/Core.yml
         Description: ''
         MappingInbound:
             Type: Simple
@@ -909,6 +889,7 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Signature::SignatureDelete
+
   Transport:
     Config:
       KeepAlive: ''
