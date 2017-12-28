@@ -121,20 +121,7 @@ sub Run {
     # start MailAccount loop
     MailAccount:    
     foreach my $MailAccountID ( @{$Param{Data}->{MailAccountID}} ) {
-    	        	
-	    foreach my $ID ( keys %Queues ) {	    	    	
-		    my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
-		        ID    => $ID,
-		    );
-	        
-	        if ( $Queue{MailAccountID} == $MailAccountID ) {
-	                return $Self->_Error(
-	                Code    => 'Object.DependingObjectExists',
-	                Message => 'Can not delete MailAccount. A Queue with this MailAccountID already exists.',
-	                );
-	        }
-	    }
-	          
+
         # delete MailAccount	    
         my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountDelete(
             ID  => $MailAccountID,
