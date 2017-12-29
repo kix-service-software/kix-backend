@@ -463,7 +463,6 @@ sub Run {
             TargetObject => 'Ticket',
             TargetKey    => $TargetObjectID,
             Type         => $SelectedType,
-            State        => 'Valid',
             UserID       => $Param{UserID},
         );
 

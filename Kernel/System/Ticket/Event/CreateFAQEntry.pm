@@ -348,7 +348,6 @@ sub Run {
                     TargetObject => 'FAQ',
                     TargetKey    => $ItemID,
                     Type         => 'Normal',
-                    State        => 'Valid',
                     UserID       => $ThisArticle{CreatedBy},
                 );
             }

@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableDrop Name="link_state"/>
+    <TableAlter Name="link_relation">
+        <ColumnDrop Name="state_id"/>
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <IndexAdd Name="link_relation_id">
+            <IndexColumn Name="id"/>
+        </IndexAdd>
+        <IndexDrop Name="link_relation_list_source"/>
+        <IndexDrop Name="link_relation_list_target"/>
+        <IndexDrop Name="link_relation_src_key"/>
+        <IndexDrop Name="link_relation_target_key"/>
+        <IndexDrop Name="link_relation_src_obj_id"/>
+        <IndexDrop Name="link_relation_target_obj_id"/>
+        <IndexDrop Name="link_relation_src_key_trgt_key"/>
+        <IndexAdd Name="link_relation_source">
+            <IndexColumn Name="source_object_id"/>
+            <IndexColumn Name="source_key"/>
+        </IndexAdd>
+        <IndexAdd Name="link_relation_target">
+            <IndexColumn Name="target_object_id"/>
+            <IndexColumn Name="target_key"/>
+        </IndexAdd>        
+    </TableAlter>
     <TableAlter Name="dynamic_field">
         <ColumnDrop Name="field_order"/>
     </TableAlter>

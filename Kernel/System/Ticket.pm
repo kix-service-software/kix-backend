@@ -6462,7 +6462,6 @@ sub TicketMerge {
         TargetObject => 'Ticket',
         TargetKey    => $Param{MergeTicketID},
         Type         => 'ParentChild',
-        State        => 'Valid',
         UserID       => $Param{UserID},
     );
 

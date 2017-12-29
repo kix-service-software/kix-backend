@@ -105,7 +105,6 @@ sub AddLink {
         TargetObject => $TargetObject,
         TargetKey    => $TargetKey,
         Type         => $Param{LinkType},
-        State        => 'Valid',
         UserID       => $Param{UserID},
     );
 }

@@ -184,6 +184,7 @@ sub Run {
         SolutionNotify          => $SLA->{SolutionNotify} || $SLAData{SolutionNotify},
         MinTimeBetweenIncidents => $SLA->{MinTimeBetweenIncidents} || $SLAData{MinTimeBetweenIncidents},
         UserID                  => $Self->{Authorization}->{UserID},
+    );
 
     if ( !$Success ) {
         return $Self->_Error(

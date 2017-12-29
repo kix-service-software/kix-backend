@@ -889,6 +889,76 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Signature::SignatureDelete
+    V1::Salutation::SalutationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationSearch
+    V1::Salutation::SalutationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationCreate
+    V1::Salutation::SalutationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationGet
+    V1::Salutation::SalutationUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationUpdate
+    V1::Salutation::SalutationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Salutation::SalutationDelete
+    V1::Link::LinkTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkTypeSearch
+    V1::Link::LinkSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkSearch
+    V1::Link::LinkCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkCreate
+    V1::Link::LinkGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkGet
+    V1::Link::LinkDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Link::LinkDelete
 
   Transport:
     Config:
@@ -1399,6 +1469,46 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /signatures/:SignatureID
+        V1::Salutation::SalutationSearch:
+          RequestMethod:
+          - GET
+          Route: /salutation
+        V1::Salutation::SalutationCreate:
+          RequestMethod:
+          - POST
+          Route: /salutation
+        V1::Salutation::SalutationGet:
+          RequestMethod:
+          - GET
+          Route: /salutation/:SalutationID
+        V1::Salutation::SalutationUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /salutation/:SalutationID
+        V1::Salutation::SalutationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /salutation/:SalutationID
+        V1::Link::LinkTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /links/types
+        V1::Link::LinkSearch:
+          RequestMethod:
+          - GET
+          Route: /links
+        V1::Link::LinkCreate:
+          RequestMethod:
+          - POST
+          Route: /links
+        V1::Link::LinkGet:
+          RequestMethod:
+          - GET
+          Route: /links/:LinkID
+        V1::Link::LinkDelete:
+          RequestMethod:
+          - DELETE
+          Route: /links/:LinkID
 
     Type: HTTP::REST
 RemoteSystem: ''

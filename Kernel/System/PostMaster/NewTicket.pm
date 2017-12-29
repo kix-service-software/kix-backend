@@ -668,7 +668,6 @@ sub Run {
             TargetObject => 'Ticket',
             TargetKey    => $TargetKey,
             Type         => 'Normal',
-            State        => 'Valid',
             UserID       => $Param{InmailUserID},
         );
     }
