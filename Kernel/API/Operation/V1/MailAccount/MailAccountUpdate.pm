@@ -74,13 +74,13 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
         Data => {
             MailAccountID => 123,
             MailAccount  => {
-                Login         => 'mail',
-                Password      => 'SomePassword',
-                Host          => 'pop3.example.com',
-                Type          => 'POP3',
+                Login         => 'mail',            # optional
+                Password      => 'SomePassword',    # optional
+                Host          => 'pop3.example.com',# optional
+                Type          => 'POP3',            # optional
                 IMAPFolder    => 'Some Folder',     # optional, only valid for IMAP-type accounts
-                ValidID       => 1,
-                Trusted       => 0,
+                ValidID       => 1,                 # optional
+                Trusted       => 0,                 # optional
                 DispatchingBy => 'Queue',           # Queue|From
                 Comment       => '...',             # optional
                 QueueID       => 12,
@@ -137,25 +137,15 @@ sub Run {
         );
     }
 
-    # isolate MailAccount parameter
-    my $MailAccount = $Param{Data}->{MailAccount};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$MailAccount} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $MailAccount->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $MailAccount->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim User parameter
+    my $MailAccount = $Self->_Trim(
+        Data => $Param{Data}->{MailAccount}
+    );
 
     # check if MailAccount exists 
     my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
         ID => $Param{Data}->{MailAccountID},
-        UserID      => $Self->{Authorization}->{UserID},        
+        UserID      => $Self->{Authorization}->{UserID},
     );
  
     if ( !%MailAccountData ) {
@@ -167,7 +157,7 @@ sub Run {
 
     # update MailAccount
     my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountUpdate(
-        ID       => $Param{Data}->{MailAccountID} || $MailAccountData{MailAccountID},
+        ID       => $Param{Data}->{MailAccountID},
         Login         => $MailAccount->{Login} || $MailAccountData{Login},
         Password      => $MailAccount->{Password} || $MailAccountData{Password},
         Host          => $MailAccount->{Host} || $MailAccountData{Host},

@@ -115,8 +115,6 @@ sub Run {
     }
     
     my $Message = '';
-    
-    my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->QueueList(); 
      
     # start MailAccount loop
     MailAccount:    
@@ -124,8 +122,8 @@ sub Run {
 
         # delete MailAccount	    
         my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountDelete(
-            ID  => $MailAccountID,
-            UserID  => $Self->{Authorization}->{UserID},
+            ID     => $MailAccountID,
+            UserID => $Self->{Authorization}->{UserID},
         );
  
         if ( !$Success ) {

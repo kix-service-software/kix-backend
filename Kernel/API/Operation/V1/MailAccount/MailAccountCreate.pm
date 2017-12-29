@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::MailAccount::MailAccountCreate - API MailAccount MailAccountCreate Operation backend
+Kernel::API::Operation::V1::MailAccount::MailAccountCreate - API MailAccount Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -111,6 +111,8 @@ sub Run {
         );
     }
 
+    my %List = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -119,6 +121,9 @@ sub Run {
                 Type     => 'HASH',
                 Required => 1
             },
+           'MailAccount::Login' => {
+                Required => 1
+            },            
             'MailAccount::Password' => {
                 Required => 1
             },
@@ -126,8 +131,16 @@ sub Run {
                 Required => 1
             },
             'MailAccount::Type' => {
-                Required => 1
-            },                                                
+                Required => 1,
+                OneOf => [join(',', sort keys %List)]
+            },
+           'MailAccount::DispatchingBy' => {
+                Required => 1,
+                OneOf => [
+                    'Queue',
+                    'From'
+                ]
+            },            
         }
     );
 
@@ -139,36 +152,11 @@ sub Run {
         );
     }
 
-    # isolate MailAccount parameter
-    my $MailAccount = $Param{Data}->{MailAccount};
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$MailAccount} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $MailAccount->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $MailAccount->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-     	
-    # check if MailAccount exists
-    my %List = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList();
-
-    foreach my $ID ( keys %List ) {                   
-        my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
-            ID    => $ID,
-        );
-
-        if ( $MailAccountData{Login} eq $MailAccount->{Login} ) {
-            return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Can not create MailAccount. MailAccount with same login '$MailAccount->{Login}' already exists.",
-            );
-        }
-    }        
+    # isolate and trim User parameter
+    my $MailAccount = $Self->_Trim(
+        Data => $Param{Data}->{MailAccount}
+    );
 
     # create MailAccount
     my $MailAccountID = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountAdd(
@@ -179,10 +167,10 @@ sub Run {
         IMAPFolder    => $MailAccount->{IMAPFolder},
         ValidID       => $MailAccount->{ValidID} || 1,
         Trusted       => $MailAccount->{Trusted} || 0,
-        DispatchingBy => $MailAccount->{DispatchingBy} || 'Queue',
+        DispatchingBy => $MailAccount->{DispatchingBy},
         QueueID       => $MailAccount->{QueueID} || '',
         Comment       => $MailAccount->{Comment} || '',
-        UserID   => $Self->{Authorization}->{UserID},              
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$MailAccountID ) {
