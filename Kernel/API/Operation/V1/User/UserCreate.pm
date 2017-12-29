@@ -160,7 +160,7 @@ sub Run {
     );
     if ( %UserData ) {
         return $Self->_Error(
-            Code    => 'UserCreate.LoginExists',
+            Code    => 'Object.AlreadyExists',
             Message => "Can not create user. Another user with same login already exists.",
         );
     }
@@ -171,7 +171,7 @@ sub Run {
     );
     if ( %UserList ) {
         return $Self->_Error(
-            Code    => 'UserCreate.EmailExists',
+            Code    => 'Object.AlreadyExists',
             Message => 'Can not create user. Another user with same email address already exists.',
         );
     }
@@ -184,7 +184,7 @@ sub Run {
     );    
     if ( !$UserID ) {
         return $Self->_Error(
-            Code    => 'UserCreate.UnableToCreate',
+            Code    => 'Object.UnableToCreate',
             Message => 'Could not create user, please contact the system administrator',
         );
     }
