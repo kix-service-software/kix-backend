@@ -9,6 +9,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Lock</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">LockID</Item>
             </Hash>
         </Setting>
     </ConfigItem>

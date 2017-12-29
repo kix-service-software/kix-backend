@@ -9,6 +9,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Signature</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">SignatureID</Item>
             </Hash>
         </Setting>
     </ConfigItem>

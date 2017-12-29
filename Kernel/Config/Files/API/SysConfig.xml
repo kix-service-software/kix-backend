@@ -9,6 +9,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">SysConfig</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">SysConfigItemID</Item>
             </Hash>
         </Setting>
     </ConfigItem>

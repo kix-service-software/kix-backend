@@ -131,9 +131,6 @@ sub Run {
                 Type     => 'ARRAY',
                 Required => 1
             },
-            'include' => {
-                Type     => 'ARRAYtoHASH',
-            },
         }
     );
 

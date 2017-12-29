@@ -283,17 +283,24 @@ sub PrepareData {
             );
         }
 
-        foreach my $Parameter ( sort keys %{$Param{Parameters}} ) {
+        my %Parameters = %{$Param{Parameters}};
+
+        # always add include parameter
+        $Parameters{'include'} = {
+            Type => 'ARRAYtoHASH',
+        };
+
+        foreach my $Parameter ( sort keys %Parameters ) {
 
             # check requirement
-            if ( $Param{Parameters}->{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
+            if ( $Parameters{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
                 $Result->{Message} = "Required parameter $Parameter is missing!",
                 last;
             }
-            elsif ( $Param{Parameters}->{$Parameter}->{RequiredIfNot} && ref($Param{Parameters}->{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
+            elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref($Parameters{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
                 my $AltParameterHasValue = 0;
-                foreach my $AltParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}} ) {
+                foreach my $AltParameter ( @{$Parameters{$Parameter}->{RequiredIfNot}} ) {
                     if ( exists($Data{$AltParameter}) && defined($Data{$AltParameter}) ) {
                         $AltParameterHasValue = 1;
                         last;
@@ -301,15 +308,15 @@ sub PrepareData {
                 }
                 if ( !exists($Data{$Parameter}) && !$AltParameterHasValue ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter or ".( join(" or ", @{$Param{Parameters}->{$Parameter}->{RequiredIfNot}}) )." is missing!",
+                    $Result->{Message} = "Required parameter $Parameter or ".( join(" or ", @{$Parameters{$Parameter}->{RequiredIfNot}}) )." is missing!",
                     last;
                 }
             }
 
             # check complex requirement (required if another parameter has value)
-            if ( $Param{Parameters}->{$Parameter}->{RequiredIf} && ref($Param{Parameters}->{$Parameter}->{RequiredIf}) eq 'ARRAY' ) {
+            if ( $Parameters{$Parameter}->{RequiredIf} && ref($Parameters{$Parameter}->{RequiredIf}) eq 'ARRAY' ) {
                 my $OtherParameterHasValue = 0;
-                foreach my $OtherParameter ( @{$Param{Parameters}->{$Parameter}->{RequiredIf}} ) {
+                foreach my $OtherParameter ( @{$Parameters{$Parameter}->{RequiredIf}} ) {
                     if ( exists($Data{$OtherParameter}) && defined($Data{$OtherParameter}) ) {
                         $OtherParameterHasValue = 1;
                         last;
@@ -323,7 +330,7 @@ sub PrepareData {
             }
 
             # parse into arrayref if parameter value is scalar and ARRAY type is needed
-            if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} =~ /(ARRAY|ARRAYtoHASH)/ && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
+            if ( $Parameters{$Parameter}->{Type} && $Parameters{$Parameter}->{Type} =~ /(ARRAY|ARRAYtoHASH)/ && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
                 $Self->_SetParameter(
                     Data      => $Param{Data},
                     Attribute => $Parameter,
@@ -332,7 +339,7 @@ sub PrepareData {
             }
 
             # convert array to hash if we have to 
-            if ( $Param{Parameters}->{$Parameter}->{Type} && $Param{Parameters}->{$Parameter}->{Type} eq 'ARRAYtoHASH' && $Data{$Parameter} && ref($Param{Data}->{$Parameter}) eq 'ARRAY' ) {
+            if ( $Parameters{$Parameter}->{Type} && $Parameters{$Parameter}->{Type} eq 'ARRAYtoHASH' && $Data{$Parameter} && ref($Param{Data}->{$Parameter}) eq 'ARRAY' ) {
                 my %NewHash = map { $_ => 1 } @{$Param{Data}->{$Parameter}};
                 $Self->_SetParameter(
                     Data      => $Param{Data},
@@ -342,31 +349,34 @@ sub PrepareData {
             }            
 
             # set default value
-            if ( !$Data{$Parameter} && exists($Param{Parameters}->{$Parameter}->{Default}) ) {
+            if ( !$Data{$Parameter} && exists($Parameters{$Parameter}->{Default}) ) {
                 $Self->_SetParameter(
                     Data      => $Param{Data},
                     Attribute => $Parameter,
-                    Value     => $Param{Parameters}->{$Parameter}->{Default},
+                    Value     => $Parameters{$Parameter}->{Default},
                 );
             }
 
             # check valid values
-            if ( exists($Param{Parameters}->{$Parameter}->{OneOf}) && ref($Param{Parameters}->{$Parameter}->{OneOf}) eq 'ARRAY' ) {
-                if ( !grep(/^$Data{$Parameter}$/g, @{$Param{Parameters}->{$Parameter}->{OneOf}}) ) {
+            if ( exists($Parameters{$Parameter}->{OneOf}) && ref($Parameters{$Parameter}->{OneOf}) eq 'ARRAY' ) {
+                if ( !grep(/^$Data{$Parameter}$/g, @{$Parameters{$Parameter}->{OneOf}}) ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Param{Parameters}->{$Parameter}->{OneOf}}))."'!",
+                    $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Parameters{$Parameter}->{OneOf}}))."'!",
                     last;
                 }
             }
 
             # check if we have an optional parameter that needs a value
-            if ( $Param{Parameters}->{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
+            if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
                 $Result->{Message} = "Optional parameter $Parameter is used without a value!",
                 last;
             }
         }
     }
+
+    # store include for later
+    $Self->{Include} = $Param{Data}->{include};
     
     return $Result; 
 }
@@ -415,6 +425,13 @@ sub _Success {
     # honor a limiter, if we have one
     if ( IsHashRefWithData($Self->{Limit}) ) {
         $Self->_ApplyLimit(
+            Data => \%Param,
+        );
+    }
+
+    # honor a generic include, if we have one
+    if ( IsHashRefWithData($Self->{Include}) ) {
+        $Self->_ApplyInclude(
             Data => \%Param,
         );
     }
@@ -515,7 +532,11 @@ sub ExecOperation {
     }
 
     return $OperationObject->Run(
-        Data => $Param{Data},
+        Data    => {
+            %{$Param{Data}},
+            include => $Self->{RequestData}->{include},
+            expand  => $Self->{RequestData}->{expand},
+        }
     );
 }
 
@@ -1007,6 +1028,54 @@ sub _ApplySort {
             $Param{Data}->{$Object} = \@SortedArray;
         }
     } 
+}
+
+sub _ApplyInclude {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsHashRefWithData(\%Param) || !IsHashRefWithData($Param{Data}) ) {
+        # nothing to do
+        return;
+    }    
+
+    if ( $ENV{'REQUEST_METHOD'} ne 'GET' || !$Self->{OperationConfig}->{ObjectID} || !$Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}} ) {
+        # no GET request or no ObjectID configured or given
+        return;
+    }
+
+    my $GenericIncludes = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::GenericInclude');
+    if ( IsHashRefWithData($GenericIncludes) ) {
+        foreach my $Include ( keys %{$Self->{Include}} ) {
+            next if !$GenericIncludes->{$Include};
+
+            # we've found a requested generic include, now we have to handle it
+            my $IncludeHandler = 'Kernel::API::Operation::' . $GenericIncludes->{$Include}->{Module};
+
+            if ( !$Self->{IncludeHandler}->{$IncludeHandler} ) {
+                if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($IncludeHandler) ) {
+
+                    return $Self->_Error(
+                        Code    => 'Operation.InternalError',
+                        Message => "Can't load include handler $IncludeHandler!"
+                    );
+                }
+                $Self->{IncludeHandler}->{$IncludeHandler} = $IncludeHandler->new(
+                    %{$Self},
+                );
+            }
+
+            my $Result = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
+                Controller => $Self->{OperationConfig}->{Controller},
+                ObjectID   => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            # add result to response
+            $Param{Data}->{$Include} = $Result;
+        }
+    }
+
+    return 1;
 }
 
 sub _ApplyExpand {
