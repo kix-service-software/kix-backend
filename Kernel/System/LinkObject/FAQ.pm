@@ -356,7 +356,6 @@ link add pre event module
         SourceObject => 'FAQ',
         SourceKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -367,7 +366,6 @@ link add pre event module
         TargetObject => 'FAQ',
         TargetKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -377,7 +375,7 @@ sub LinkAddPre {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Key Type State UserID)) {
+    for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -387,8 +385,6 @@ sub LinkAddPre {
             return;
         }
     }
-
-    return 1 if $Param{State} eq 'Temporary';
 
     return 1;
 }
@@ -402,7 +398,6 @@ link add pre event module
         SourceObject => 'FAQ',
         SourceKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -413,7 +408,6 @@ link add pre event module
         TargetObject => 'FAQ',
         TargetKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -423,7 +417,7 @@ sub LinkAddPost {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Key Type State UserID)) {
+    for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -433,8 +427,6 @@ sub LinkAddPost {
             return;
         }
     }
-
-    return 1 if $Param{State} eq 'Temporary';
 
     return 1;
 }
@@ -448,7 +440,6 @@ link delete pre event module
         SourceObject => 'FAQ',
         SourceKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -459,7 +450,6 @@ link delete pre event module
         TargetObject => 'FAQ',
         TargetKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -469,7 +459,7 @@ sub LinkDeletePre {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Key Type State UserID)) {
+    for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -479,8 +469,6 @@ sub LinkDeletePre {
             return;
         }
     }
-
-    return 1 if $Param{State} eq 'Temporary';
 
     return 1;
 }
@@ -494,7 +482,6 @@ link delete post event module
         SourceObject => 'FAQ',
         SourceKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -505,7 +492,6 @@ link delete post event module
         TargetObject => 'FAQ',
         TargetKey    => 321,
         Type         => 'Normal',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -515,7 +501,7 @@ sub LinkDeletePost {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Key Type State UserID)) {
+    for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -525,8 +511,6 @@ sub LinkDeletePost {
             return;
         }
     }
-
-    return 1 if $Param{State} eq 'Temporary';
 
     return 1;
 }

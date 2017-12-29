@@ -135,7 +135,7 @@ sub SignatureGet {
 
     # sql
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, name, text, content_type, comments, valid_id, change_time, create_time '
+        SQL => 'SELECT id, name, text, content_type, comments, valid_id, change_by, change_time, create_by, create_time '
             . ' FROM signature WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -149,8 +149,10 @@ sub SignatureGet {
             ContentType => $Data[3] || 'text/plain',
             Comment     => $Data[4],
             ValidID     => $Data[5],
-            ChangeTime  => $Data[6],
-            CreateTime  => $Data[7],
+            ChangeBy    => $Data[6],
+            ChangeTime  => $Data[7],
+            CreateBy    => $Data[8],
+            CreateTime  => $Data[9],
         );
     }
 
@@ -237,6 +239,45 @@ sub SignatureList {
         Clamp => 1,
         Table => 'signature',
     );
+}
+
+=item SignatureDelete()
+
+Delete a Signature.
+
+    my $Result = $SignatureObject->SignatureDelete(
+        SignatureID      => '...',
+    );
+
+=cut
+
+sub SignatureDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM signature WHERE id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 1;

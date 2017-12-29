@@ -151,7 +151,6 @@ sub Run {
                         TargetObject => 'Ticket',
                         TargetKey    => $Data{TicketID},
                         Type         => $Type,
-                        State        => 'Valid',
                         UserID       => $Param{UserID},
                     );
 
@@ -223,7 +222,6 @@ sub Run {
                         TargetObject => 'Ticket',
                         TargetKey    => $Data{TicketID},
                         Type         => $Type,
-                        State        => 'Valid',
                         UserID       => $Param{UserID},
                     );
 
@@ -265,7 +263,6 @@ sub Run {
             TargetObject => 'Ticket',
             TargetKey    => $Data{TicketID},
             Type         => 'Agent',
-            State        => 'Valid',
             UserID       => $Param{UserID},
         );
 
@@ -316,7 +313,6 @@ sub Run {
             TargetObject => 'Ticket',
             TargetKey    => $Data{TicketID},
             Type         => 'Agent',
-            State        => 'Valid',
             UserID       => $Param{UserID},
         );
 
@@ -352,7 +348,6 @@ sub Run {
             TargetObject => 'Ticket',
             TargetKey    => $Data{TicketID},
             Type         => 'Customer',
-            State        => 'Valid',
             UserID       => $Param{UserID},
         );
 
@@ -402,7 +397,6 @@ sub Run {
                         TargetObject => 'Ticket',
                         TargetKey    => $Data{MainTicketID},
                         Type         => $LinkType,
-                        State        => 'Valid',
                         UserID       => $Param{UserID},
                     );
 

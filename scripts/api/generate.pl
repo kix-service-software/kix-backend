@@ -15,8 +15,7 @@ foreach my $Line (@Definition) {
     # ignore comments or empty lines
     next if ($Line =~ /^\s*#/ || $Line =~ /^\s*$/g);
 
-    my ($Route, $Method, $Module, $Additions) = split(/\s*\|\s*/, $Line);
-    my $Operation = (split(/::/, $Module))[-1];
+    my ($Route, $Method, $Operation, $Additions) = split(/\s*\|\s*/, $Line);
     my @AdditionList = $Additions ? split(/,/, $Additions) : ();
 
     $Operations .= <<EOT;
@@ -26,7 +25,7 @@ foreach my $Line (@Definition) {
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: $Module
+        Type: $Operation
 EOT
     if ($Additions) {
         foreach my $Addition (@AdditionList) {

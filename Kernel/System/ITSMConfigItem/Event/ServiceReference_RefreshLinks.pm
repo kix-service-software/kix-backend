@@ -188,7 +188,6 @@ sub Run {
                                 TargetObject => 'ITSMConfigItem',
                                 TargetKey    => $Param{ConfigItemID},
                                 Type   => $RelAttr{$CurrKeyname}->[0]->{ReferencedServiceLinkType},
-                                State  => 'Valid',
                                 UserID => 1,
                             );
 
@@ -200,7 +199,6 @@ sub Run {
                                 SourceObject => 'ITSMConfigItem',
                                 SourceKey    => $Param{ConfigItemID},
                                 Type   => $RelAttr{$CurrKeyname}->[0]->{ReferencedServiceLinkType},
-                                State  => 'Valid',
                                 UserID => 1,
                             );
                         }

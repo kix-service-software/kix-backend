@@ -77,7 +77,6 @@ sub Run {
                     TargetObject => 'ITSMConfigItem',
                     TargetKey    => $Value,
                     Type         => $Param{Config}->{LinkType},
-                    State        => 'Valid',
                     UserID       => $Param{UserID},
                 );
             }
@@ -91,7 +90,6 @@ sub Run {
                 TargetObject => 'ITSMConfigItem',
                 TargetKey    => $Param{Data}->{Value},
                 Type         => $Param{Config}->{LinkType},
-                State        => 'Valid',
                 UserID       => $Param{UserID},
             );
         }

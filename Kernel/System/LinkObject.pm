@@ -344,13 +344,12 @@ sub PossibleLinkList {
 
 add a new link between two elements
 
-    $True = $LinkObject->LinkAdd(
+    $LinkID = $LinkObject->LinkAdd(
         SourceObject => 'Ticket',
         SourceKey    => '321',
         TargetObject => 'FAQ',
         TargetKey    => '5',
         Type         => 'ParentChild',
-        State        => 'Valid',
         UserID       => 1,
     );
 
@@ -360,7 +359,7 @@ sub LinkAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(SourceObject SourceKey TargetObject TargetKey Type State UserID)) {
+    for my $Argument (qw(SourceObject SourceKey TargetObject TargetKey Type UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -414,11 +413,6 @@ sub LinkAdd {
         return;
     }
 
-    # lookup state id
-    my $StateID = $Self->StateLookup(
-        Name => $Param{State},
-    );
-
     # lookup type id
     my $TypeID = $Self->TypeLookup(
         Name   => $Param{Type},
@@ -431,7 +425,7 @@ sub LinkAdd {
     # check if link already exists in database
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT source_object_id, source_key, state_id
+            SELECT source_object_id, source_key
             FROM link_relation
             WHERE (
                     ( source_object_id = ? AND source_key = ?
@@ -456,30 +450,18 @@ sub LinkAdd {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Existing{SourceObjectID} = $Row[0];
         $Existing{SourceKey}      = $Row[1];
-        $Existing{StateID}        = $Row[2];
     }
 
     # link exists already
     if (%Existing) {
-
-        # existing link has a different StateID than the new link
-        if ( $Existing{StateID} ne $StateID ) {
-
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Link already exists between these two objects "
-                    . "with a different state id '$Existing{StateID}'!",
-            );
-            return;
-        }
 
         # get type data
         my %TypeData = $Self->TypeGet(
             TypeID => $TypeID,
         );
 
-        return 1 if !$TypeData{Pointed};
-        return 1 if $Existing{SourceObjectID} eq $Param{SourceObjectID}
+        return if !$TypeData{Pointed};
+        return if $Existing{SourceObjectID} eq $Param{SourceObjectID}
             && $Existing{SourceKey} eq $Param{SourceKey};
 
         # log error
@@ -494,7 +476,6 @@ sub LinkAdd {
     my $Links = $Self->LinkList(
         Object => $Param{SourceObject},
         Key    => $Param{SourceKey},
-        State  => $Param{State},
         UserID => $Param{UserID},
     );
 
@@ -548,7 +529,6 @@ sub LinkAdd {
         TargetObject => $Param{TargetObject},
         TargetKey    => $Param{TargetKey},
         Type         => $Param{Type},
-        State        => $Param{State},
         UserID       => $Param{UserID},
     );
 
@@ -558,7 +538,6 @@ sub LinkAdd {
         SourceObject => $Param{SourceObject},
         SourceKey    => $Param{SourceKey},
         Type         => $Param{Type},
-        State        => $Param{State},
         UserID       => $Param{UserID},
     );
 
@@ -566,14 +545,34 @@ sub LinkAdd {
         SQL => '
             INSERT INTO link_relation
             (source_object_id, source_key, target_object_id, target_key,
-            type_id, state_id, create_time, create_by)
-            VALUES (?, ?, ?, ?, ?, ?, current_timestamp, ?)',
+            type_id, create_time, create_by)
+            VALUES (?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
             \$Param{SourceObjectID}, \$Param{SourceKey},
             \$Param{TargetObjectID}, \$Param{TargetKey},
-            \$TypeID, \$StateID, \$Param{UserID},
+            \$TypeID, \$Param{UserID},
         ],
     );
+
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id FROM link_relation WHERE
+            source_object_id = ? AND source_key = ? AND 
+            target_object_id = ? AND target_key = ? AND 
+            type_id = ? AND create_by = ?',
+        Bind => [
+            \$Param{SourceObjectID}, \$Param{SourceKey},
+            \$Param{TargetObjectID}, \$Param{TargetKey},
+            \$TypeID, \$Param{UserID},
+        ],
+        Limit => 1,
+    );
+
+    # fetch results
+    my $LinkID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $LinkID = $Row[0];
+    }
 
     # run post event module of source object
     $BackendSourceObject->LinkAddPost(
@@ -581,7 +580,6 @@ sub LinkAdd {
         TargetObject => $Param{TargetObject},
         TargetKey    => $Param{TargetKey},
         Type         => $Param{Type},
-        State        => $Param{State},
         UserID       => $Param{UserID},
     );
 
@@ -591,11 +589,10 @@ sub LinkAdd {
         SourceObject => $Param{SourceObject},
         SourceKey    => $Param{SourceKey},
         Type         => $Param{Type},
-        State        => $Param{State},
         UserID       => $Param{UserID},
     );
 
-    return 1;
+    return $LinkID;
 }
 
 =item LinkCleanup()
@@ -605,7 +602,6 @@ deletes old links from database
 return true
 
     $True = $LinkObject->LinkCleanup(
-        State  => 'Temporary',
         Age    => ( 60 * 60 * 24 ),
     );
 
@@ -615,7 +611,7 @@ sub LinkCleanup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(State Age)) {
+    for my $Argument (qw(Age)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -624,13 +620,6 @@ sub LinkCleanup {
             return;
         }
     }
-
-    # lookup state id
-    my $StateID = $Self->StateLookup(
-        Name => $Param{State},
-    );
-
-    return if !$StateID;
 
     # get time object
     my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
@@ -647,10 +636,9 @@ sub LinkCleanup {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             DELETE FROM link_relation
-            WHERE state_id = ?
-            AND create_time < ?',
+            WHERE create_time < ?',
         Bind => [
-            \$StateID, \$DeleteTime,
+            \$DeleteTime,
         ],
     );
 
@@ -664,6 +652,7 @@ deletes a link
 return true
 
     $True = $LinkObject->LinkDelete(
+        LinkID  => 1234             # used by API
         Object1 => 'Ticket',
         Key1    => '321',
         Object2 => 'FAQ',
@@ -678,14 +667,43 @@ sub LinkDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Object1 Key1 Object2 Key2 Type UserID)) {
-        if ( !$Param{$Argument} ) {
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need UserID!",
+        );
+        return;
+    }
+    if ( !$Param{LinkID} ) {
+        for my $Argument (qw(Object1 Key1 Object2 Key2 Type)) {
+            if ( !$Param{$Argument} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+                return;
+            }
+        }
+    }
+    else {
+        # "convert" LinkID to old parameters for compatibility reasons
+        my %Link = $Self->LinkGet(
+            LinkID => $Param{LinkID},
+            UserID => $Param{UserID},
+        );
+
+        if ( !%Link ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Argument!",
+                Message  => "No link with ID $Param{LinkID} found!",
             );
-            return;
         }
+
+        $Param{Object1} = $Link{SourceObject};
+        $Param{Object2} = $Link{TargetObject};
+        $Param{Key1}    = $Link{SourceKey};
+        $Param{Key2}    = $Link{TargetKey};
+        $Param{Type}    = $Link{Type};
     }
 
     # lookup the object ids
@@ -719,7 +737,7 @@ sub LinkDelete {
     # get the existing link
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT source_object_id, source_key, target_object_id, target_key, state_id
+            SELECT source_object_id, source_key, target_object_id, target_key
             FROM link_relation
             WHERE (
                     (source_object_id = ? AND source_key = ?
@@ -747,7 +765,6 @@ sub LinkDelete {
         $Existing{SourceKey}      = $Row[1];
         $Existing{TargetObjectID} = $Row[2];
         $Existing{TargetKey}      = $Row[3];
-        $Existing{StateID}        = $Row[4];
     }
 
     return 1 if !%Existing;
@@ -771,11 +788,6 @@ sub LinkDelete {
         return;
     }
 
-    # lookup state
-    $Existing{State} = $Self->StateLookup(
-        StateID => $Existing{StateID},
-    );
-
     # get backend of source object
     my $BackendSourceObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Existing{SourceObject} );
 
@@ -792,7 +804,6 @@ sub LinkDelete {
         TargetObject => $Existing{TargetObject},
         TargetKey    => $Existing{TargetKey},
         Type         => $Param{Type},
-        State        => $Existing{State},
         UserID       => $Param{UserID},
     );
 
@@ -802,7 +813,6 @@ sub LinkDelete {
         SourceObject => $Existing{SourceObject},
         SourceKey    => $Existing{SourceKey},
         Type         => $Param{Type},
-        State        => $Existing{State},
         UserID       => $Param{UserID},
     );
 
@@ -833,7 +843,6 @@ sub LinkDelete {
         TargetObject => $Existing{TargetObject},
         TargetKey    => $Existing{TargetKey},
         Type         => $Param{Type},
-        State        => $Existing{State},
         UserID       => $Param{UserID},
     );
 
@@ -843,8 +852,12 @@ sub LinkDelete {
         SourceObject => $Existing{SourceObject},
         SourceKey    => $Existing{SourceKey},
         Type         => $Param{Type},
-        State        => $Existing{State},
         UserID       => $Param{UserID},
+    );
+
+    # invalidate cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
     );
 
     return 1;
@@ -876,50 +889,40 @@ sub LinkDeleteAll {
         }
     }
 
-    # get state list
-    my %StateList = $Self->StateList(
-        Valid => 0,
+
+    # get link list
+    my $LinkList = $Self->LinkList(
+        Object => $Param{Object},
+        Key    => $Param{Key},
+        UserID => $Param{UserID},
     );
 
-    # delete all links
-    STATE:
-    for my $State ( values %StateList ) {
+    return 1 if !$LinkList;
+    return 1 if !%{$LinkList};
 
-        # get link list
-        my $LinkList = $Self->LinkList(
-            Object => $Param{Object},
-            Key    => $Param{Key},
-            State  => $State,
-            UserID => $Param{UserID},
-        );
+    for my $Object ( sort keys %{$LinkList} ) {
 
-        next STATE if !$LinkList;
-        next STATE if !%{$LinkList};
+        for my $LinkType ( sort keys %{ $LinkList->{$Object} } ) {
 
-        for my $Object ( sort keys %{$LinkList} ) {
+            # extract link type List
+            my $LinkTypeList = $LinkList->{$Object}->{$LinkType};
 
-            for my $LinkType ( sort keys %{ $LinkList->{$Object} } ) {
+            for my $Direction ( sort keys %{$LinkTypeList} ) {
 
-                # extract link type List
-                my $LinkTypeList = $LinkList->{$Object}->{$LinkType};
+                # extract direction list
+                my $DirectionList = $LinkList->{$Object}->{$LinkType}->{$Direction};
 
-                for my $Direction ( sort keys %{$LinkTypeList} ) {
+                for my $ObjectKey ( sort keys %{$DirectionList} ) {
 
-                    # extract direction list
-                    my $DirectionList = $LinkList->{$Object}->{$LinkType}->{$Direction};
-
-                    for my $ObjectKey ( sort keys %{$DirectionList} ) {
-
-                        # delete the link
-                        $Self->LinkDelete(
-                            Object1 => $Param{Object},
-                            Key1    => $Param{Key},
-                            Object2 => $Object,
-                            Key2    => $ObjectKey,
-                            Type    => $LinkType,
-                            UserID  => $Param{UserID},
-                        );
-                    }
+                    # delete the link
+                    $Self->LinkDelete(
+                        Object1 => $Param{Object},
+                        Key1    => $Param{Key},
+                        Object2 => $Object,
+                        Key2    => $ObjectKey,
+                        Type    => $LinkType,
+                        UserID  => $Param{UserID},
+                    );
                 }
             }
         }
@@ -967,7 +970,6 @@ Return
         Object    => 'Ticket',
         Key       => '321',
         Object2   => 'FAQ',         # (optional)
-        State     => 'Valid',
         Type      => 'ParentChild', # (optional)
         Direction => 'Target',      # (optional) default Both (Source|Target|Both)
         UserID    => 1,
@@ -979,7 +981,7 @@ sub LinkList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Object Key State UserID)) {
+    for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -996,14 +998,9 @@ sub LinkList {
 
     return if !$ObjectID;
 
-    # lookup state id
-    my $StateID = $Self->StateLookup(
-        Name => $Param{State},
-    );
-
     # prepare SQL statement
     my $TypeSQL = '';
-    my @Bind = ( \$ObjectID, \$Param{Key}, \$StateID );
+    my @Bind = ( \$ObjectID, \$Param{Key} );
 
     # add type id to SQL statement
     if ( $Param{Type} ) {
@@ -1027,8 +1024,7 @@ sub LinkList {
             SELECT target_object_id, target_key, type_id
             FROM link_relation
             WHERE source_object_id = ?
-                AND source_key = ?
-                AND state_id = ? '
+                AND source_key = ? '
             . $TypeSQL,
         Bind => \@Bind,
     );
@@ -1070,8 +1066,7 @@ sub LinkList {
             SELECT source_object_id, source_key, type_id
             FROM link_relation
             WHERE target_object_id = ?
-                AND target_key = ?
-                AND state_id = ? '
+                AND target_key = ? '
             . $TypeSQL,
         Bind => \@Bind,
     );
@@ -1200,7 +1195,6 @@ Return
         Object                          => 'Ticket',
         Key                             => '321',
         Object2                         => 'FAQ',         # (optional)
-        State                           => 'Valid',
         Type                            => 'ParentChild', # (optional)
         Direction                       => 'Target',      # (optional) default Both (Source|Target|Both)
         UserID                          => 1,
@@ -1217,7 +1211,7 @@ sub LinkListWithData {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Object Key State UserID)) {
+    for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1305,6 +1299,217 @@ sub LinkListWithData {
     return $LinkList;
 }
 
+=item LinkSearch()
+
+get all valid link IDs (used for API)
+
+Return
+    $LinkList = [
+        1,
+        2,
+        3,
+        ...
+    ]
+
+    my $LinkList = $LinkObject->LinkSearch(
+        UserID        => 1,
+        SourceObject  => '...',     # optional
+        SourceKey     => '...',     # optional
+        TargetObject  => '...',     # optional
+        TargetKey     => '...',     # optional
+        Type          => '...'      # optional        
+    );
+
+=cut
+
+sub LinkSearch {
+    my ( $Self, %Param ) = @_;
+    my @BindVars;
+    my @SQLWhere;
+
+    # check needed stuff
+    for my $Argument (qw(UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # check cache
+    my $CacheKey = 'LinkGet::'
+                 .$Param{UserID}.'::'
+                 .($Param{SourceObject}||'').'::'
+                 .($Param{SourceKey}||'').'::'
+                 .($Param{TargetObject}||'').'::'
+                 .($Param{TargetKey}||'').'::'
+                 .($Param{Type}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    # lookup type id
+    if ( $Param{Type} ) {
+        my $TypeID = $Self->TypeLookup(
+            Name   => $Param{Type},
+            UserID => 1,
+        );
+        push(@BindVars, \$TypeID);
+        push(@SQLWhere, 'type_id = ?');
+    }
+
+    # lookup sourceobject id
+    if ( $Param{SourceObject} ) {
+        my $ObjectID = $Self->ObjectLookup(
+            Name   => $Param{SourceObject},
+        );
+        push(@BindVars, \$ObjectID);
+        push(@SQLWhere, 'source_object_id = ?');
+    }
+
+    # add source key
+    if ( $Param{SourceKey} ) {
+        push(@BindVars, \$Param{SourceKey});
+        push(@SQLWhere, 'source_key = ?');
+    }
+
+    # lookup targetobject id
+    if ( $Param{TargetObject} ) {
+        my $ObjectID = $Self->ObjectLookup(
+            Name   => $Param{TargetObject},
+        );
+        push(@BindVars, \$ObjectID);
+        push(@SQLWhere, 'target_object_id = ?');
+    }
+
+    # add target key
+    if ( $Param{TargetKey} ) {
+        push(@BindVars, \$Param{TargetKey});
+        push(@SQLWhere, 'target_key = ?');
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    my $SQL = 'SELECT id FROM link_relation WHERE '.join(' AND ', @SQLWhere);
+
+    # get links where the given object is the source
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => \@BindVars
+    );
+
+    # fetch results
+    my @Links;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push(@Links, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Links,
+    );
+
+    return \@Links;
+}
+
+=item LinkGet()
+
+get link data(used for API)
+
+Return
+    $LinkData = {
+        ...
+    };
+
+    my %LinkData = $LinkObject->LinkGet(
+        LinkID    => 123        # required
+        UserID    => 1,         # required
+    );
+
+=cut
+
+sub LinkGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(LinkID UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # check cache
+    my $CacheKey = 'LinkGet::'.$Param{LinkID};
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # get links where the given object is the source
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id, source_object_id, source_key, target_object_id, target_key, type_id, create_by, create_time
+            FROM link_relation
+            WHERE id = ? ',
+        Bind => [
+            \$Param{LinkID}
+        ],
+    );
+
+
+    # fetch results
+    my %LinkData;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $LinkData{ID}             = $Row[0];
+        $LinkData{SourceObjectID} = $Row[1];
+        $LinkData{SourceKey}      = $Row[2];
+        $LinkData{TargetObjectID} = $Row[3];
+        $LinkData{TargetKey}      = $Row[4];
+        $LinkData{TypeID}         = $Row[5];
+        $LinkData{CreateBy}       = $Row[6];
+        $LinkData{CreateTime}     = $Row[7];
+    }
+
+    if ( $LinkData{ID} ) {
+        $LinkData{SourceObject} = $Self->ObjectLookup(
+            ObjectID => $LinkData{SourceObjectID}
+        );        
+        $LinkData{TargetObject} = $Self->ObjectLookup(
+            ObjectID => $LinkData{TargetObjectID}
+        );        
+        $LinkData{Type} = $Self->TypeLookup(
+            TypeID => $LinkData{TypeID},
+            UserID => 1,
+        );        
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%LinkData,
+    );
+
+    return %LinkData;
+}
+
 =item LinkKeyList()
 
 return a hash with all existing links of a given object
@@ -1322,7 +1527,6 @@ Return
         Object1   => 'Ticket',
         Key1      => '321',
         Object2   => 'FAQ',
-        State     => 'Valid',
         Type      => 'ParentChild', # (optional)
         Direction => 'Target',      # (optional) default Both (Source|Target|Both)
         UserID    => 1,
@@ -1334,7 +1538,7 @@ sub LinkKeyList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Object1 Key1 Object2 State UserID)) {
+    for my $Argument (qw(Object1 Key1 Object2 UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1395,7 +1599,6 @@ Return
         Object1   => 'Ticket',
         Key1      => '321',
         Object2   => 'FAQ',
-        State     => 'Valid',
         Type      => 'ParentChild', # (optional)
         Direction => 'Target',      # (optional) default Both (Source|Target|Both)
         UserID    => 1,
@@ -1407,7 +1610,7 @@ sub LinkKeyListWithData {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Object1 Key1 Object2 State UserID)) {
+    for my $Argument (qw(Object1 Key1 Object2 UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -2079,183 +2282,6 @@ sub PossibleType {
     }
 
     return 1;
-}
-
-=item StateLookup()
-
-lookup a link state
-
-    $StateID = $LinkObject->StateLookup(
-        Name => 'Valid',
-    );
-
-    or
-
-    $Name = $LinkObject->StateLookup(
-        StateID => 56,
-    );
-
-=cut
-
-sub StateLookup {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{StateID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need StateID or Name!',
-        );
-        return;
-    }
-
-    if ( $Param{StateID} ) {
-
-        # check cache
-        my $CacheKey = 'StateLookup::StateID::' . $Param{StateID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-        return $Cache if $Cache;
-
-        # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-        # ask the database
-        return if !$DBObject->Prepare(
-            SQL => '
-                SELECT name
-                FROM link_state
-                WHERE id = ?',
-            Bind  => [ \$Param{StateID} ],
-            Limit => 1,
-        );
-
-        # fetch the result
-        my $Name;
-        while ( my @Row = $DBObject->FetchrowArray() ) {
-            $Name = $Row[0];
-        }
-
-        # check the name
-        if ( !$Name ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Link state id '$Param{StateID}' not found in the database!",
-            );
-            return;
-        }
-
-        # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
-            Type  => $Self->{CacheType},
-            TTL   => $Self->{CacheTTL},
-            Key   => $CacheKey,
-            Value => $Name,
-        );
-
-        return $Name;
-    }
-    else {
-
-        # check cache
-        my $CacheKey = 'StateLookup::Name::' . $Param{Name};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-        return $Cache if $Cache;
-
-        # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-        # ask the database
-        return if !$DBObject->Prepare(
-            SQL => '
-                SELECT id
-                FROM link_state
-                WHERE name = ?',
-            Bind  => [ \$Param{Name} ],
-            Limit => 1,
-        );
-
-        # fetch the result
-        my $StateID;
-        while ( my @Row = $DBObject->FetchrowArray() ) {
-            $StateID = $Row[0];
-        }
-
-        # check the state id
-        if ( !$StateID ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Link state '$Param{Name}' not found in the database!",
-            );
-            return;
-        }
-
-        # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
-            Type  => $Self->{CacheType},
-            TTL   => $Self->{CacheTTL},
-            Key   => $CacheKey,
-            Value => $StateID,
-        );
-
-        return $StateID;
-    }
-}
-
-=item StateList()
-
-return a hash list of all valid link states
-
-Return
-    $StateList{
-        4 => 'Valid',
-        8 => 'Temporary',
-    }
-
-    my %StateList = $LinkObject->StateList(
-        Valid => 0,   # (optional) default 1 (0|1)
-    );
-
-=cut
-
-sub StateList {
-    my ( $Self, %Param ) = @_;
-
-    # set valid param
-    if ( !defined $Param{Valid} ) {
-        $Param{Valid} = 1;
-    }
-
-    # add valid part
-    my $SQLWhere = '';
-    if ( $Param{Valid} ) {
-
-        # create the valid id string
-        my $ValidIDs = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
-
-        $SQLWhere = "WHERE valid_id IN ( $ValidIDs )";
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # ask database
-    return if !$DBObject->Prepare(
-        SQL => "SELECT id, name FROM link_state $SQLWhere",
-    );
-
-    # fetch the result
-    my %StateList;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $StateList{ $Row[0] } = $Row[1];
-    }
-
-    return %StateList;
 }
 
 =item ObjectPermission()

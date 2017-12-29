@@ -104,7 +104,6 @@ sub Run {
                 TargetObject => 'Ticket',
                 TargetKey    => $Ticket{TicketID},
                 Type         => 'Customer',
-                State        => 'Valid',
                 UserID       => $Param{UserID},
             );
 

@@ -127,7 +127,7 @@ sub Run {
    
         if ( IsHashRefWithData(\%ResultUserList) ) {
             return $Self->_Error(
-                Code    => 'GroupDelete.UserExists',
+                Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete group. At least one user is assigned to this group.',
             );
         }
@@ -140,7 +140,7 @@ sub Run {
   
         if ( IsHashRefWithData(\%ResultRoleList) ) {
             return $Self->_Error(
-                Code    => 'GroupDelete.RolesExists',
+                Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete group. This group is assgined to at least one role.',
             );
         }

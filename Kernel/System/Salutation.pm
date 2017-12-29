@@ -151,7 +151,7 @@ sub SalutationGet {
 
     # get the salutation
     return if !$Self->{DBObject}->Prepare(
-        SQL => 'SELECT id, name, text, content_type, comments, valid_id, change_time, create_time '
+        SQL => 'SELECT id, name, text, content_type, comments, valid_id, change_by, change_time, create_by, create_time '
             . 'FROM salutation WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -166,8 +166,10 @@ sub SalutationGet {
             ContentType => $Data[3] || 'text/plain',
             Comment     => $Data[4],
             ValidID     => $Data[5],
-            ChangeTime  => $Data[6],
-            CreateTime  => $Data[7],
+            ChangeBy    => $Data[6],
+            ChangeTime  => $Data[7],
+            CreateBy    => $Data[8],
+            CreateTime  => $Data[9],
         );
     }
 
@@ -299,6 +301,45 @@ sub SalutationList {
     );
 
     return %Data;
+}
+
+=item SalutationDelete()
+
+Delete a email Salutations.
+
+    my $Result = $SalutationObject->SalutationDelete(
+        SalutationID      => '...',
+    );
+
+=cut
+
+sub SalutationDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(SalutationID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    return if !$DBObject->Prepare(
+        SQL  => 'DELETE FROM salutation WHERE id = ?',
+        Bind => [ \$Param{SalutationID} ],
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 1;

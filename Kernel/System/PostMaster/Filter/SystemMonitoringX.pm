@@ -882,7 +882,6 @@ sub _LinkTicketWithCI {
         TargetObject => 'ITSMConfigItem',
         TargetKey    => $ConfigItemID,
         Type         => 'RelevantTo',
-        State        => 'Valid',
         UserID       => 1,
     );
 
