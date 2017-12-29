@@ -151,7 +151,9 @@ sub Run {
         }
         
         # add
-        push(@MailAccountList, \%MailAccountData);
+        if ( $MailAccountData{ID} ){
+            push(@MailAccountList, \%MailAccountData);
+        }
     }
 
     if ( scalar(@MailAccountList) == 1 ) {
