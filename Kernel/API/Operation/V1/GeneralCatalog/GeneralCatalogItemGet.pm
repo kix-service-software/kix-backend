@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'GeneralCatalogItemID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

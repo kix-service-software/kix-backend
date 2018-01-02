@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'AddressID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

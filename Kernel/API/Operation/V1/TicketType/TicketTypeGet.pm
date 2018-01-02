@@ -118,6 +118,7 @@ sub Run {
         Parameters => {
             'TypeID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

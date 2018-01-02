@@ -117,6 +117,7 @@ sub Run {
         Parameters => {
             'SystemAddressID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

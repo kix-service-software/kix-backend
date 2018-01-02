@@ -168,6 +168,7 @@ sub Run {
             },
             'ArticleID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },
         }

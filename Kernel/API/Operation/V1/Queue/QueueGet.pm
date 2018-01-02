@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'QueueID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

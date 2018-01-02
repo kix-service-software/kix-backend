@@ -294,6 +294,7 @@ sub Run {
         Parameters => {
             'TicketID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },
         }

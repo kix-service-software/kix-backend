@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'SalutationID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

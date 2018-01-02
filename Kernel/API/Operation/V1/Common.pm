@@ -87,6 +87,7 @@ prepare data, check given parameters and parse them according to type
         Parameters => {
             <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
                 Type                => 'ARRAY' | 'ARRAYtoHASH',         # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values
+                DataType            => 'NUMERIC',                       # optional, use this to force numeric datatype in JSON response
                 Required            => 1,                               # optional
                 RequiredIfNot       => [ '<AltParameter>', ... ]        # optional, specify the alternate parameters to be checked, if one of them has a value
                 RequiredIf          => [ '<Parameter>', ... ]           # optional, specify the parameters that should be checked for values
@@ -297,10 +298,14 @@ sub PrepareData {
 
             # parse into arrayref if parameter value is scalar and ARRAY type is needed
             if ( $Parameters{$Parameter}->{Type} && $Parameters{$Parameter}->{Type} =~ /(ARRAY|ARRAYtoHASH)/ && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
+                my @Values = split('\s*,\s*', $Data{$Parameter});
+                if ( $Parameters{$Parameter}->{DataType} eq 'NUMERIC') {
+                    @Values = map { 0 + $_ } @Values;
+                }
                 $Self->_SetParameter(
                     Data      => $Param{Data},
                     Attribute => $Parameter,
-                    Value     => [ split('\s*,\s*', $Data{$Parameter}) ],
+                    Value     => \@Values,                    
                 );
             }
 

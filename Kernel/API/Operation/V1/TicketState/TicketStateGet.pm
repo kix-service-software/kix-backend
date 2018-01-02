@@ -118,6 +118,7 @@ sub Run {
         Parameters => {
             'StateID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

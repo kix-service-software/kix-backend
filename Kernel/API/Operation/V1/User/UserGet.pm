@@ -121,6 +121,7 @@ sub Run {
         Parameters => {
             'UserID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }
