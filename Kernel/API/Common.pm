@@ -62,8 +62,11 @@ Error message is written to debugger, written to environment for response.
 Error is generated to be passed to provider/requester.
 
     my $Result = $TransportObject->_Error(
-        Code      => 'Code'        # error code (textual)
-        Message   => 'Message',    # error message
+        Code       => 'Code'        # error code (textual)
+        Message    => 'Message',    # error message
+        Additional => {             # optional information that can be used in transport backend
+            <Header Attribute> => <Value>
+        }
     );
 
     $Result = {
