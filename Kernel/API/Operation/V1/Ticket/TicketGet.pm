@@ -174,13 +174,13 @@ one or more ticket entries in one call.
                     # if Include=TimeUnits was passed, the sum of all TimeUnits of all articles will be included
                     TimeUnits
 
-                    # If Include=Articles was passed, you'll get an entry like this for each article:
+                    # If Include=Articles was passed, you'll get an entry like this:
                     Articles => [
                         <ArticleID>
                         # . . .
                     ]
 
-                    # If Include=Articles AND Expand=Articles was passed, you'll the article data will be expanded (see ArticleGet for details):
+                    # If Include=Articles AND Expand=Articles was passed, the article data will be expanded (see ArticleGet for details):
                     Articles => [
                         {
                             ArticleID
@@ -230,6 +230,34 @@ one or more ticket entries in one call.
                                    # . . .
                                 },
                             ]
+                        },
+                        {
+                            #. . .
+                        },
+                    ],
+
+                    # If Include=History was passed, you'll get an entry like this:
+                    History => [
+                        <HistoryID>
+                        # . . .
+                    ]
+
+                    # If Include=History AND Expand=History was passed, the history data will be expanded (see HistoryGet for details):
+                    History => [
+                        {
+                            OwnerID 
+                            ArticleID
+                            CreateBy
+                            HistoryType
+                            CreateTime
+                            StateID
+                            TypeID
+                            HistoryTypeID
+                            Name 
+                            HistoryID
+                            QueueID
+                            TicketID
+                            PriorityID                        
                         },
                         {
                             #. . .
@@ -364,6 +392,20 @@ sub Run {
             );
 
             $TicketData{Articles} = \@ArticleIndex;
+        }
+
+        # include history if requested
+        if ( $Param{Data}->{include}->{History} ) {
+            my @HistoryItems = $TicketObject->HistoryGet(
+                TicketID   => $TicketID,
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            my @HistoryIDs;
+            foreach my $HistoryItem ( @HistoryItems ) {
+                push(@HistoryIDs, $HistoryItem->{HistoryID});
+            }
+            $TicketData{History} = \@HistoryIDs;
         }
 
         # include TimeUnits if requested
