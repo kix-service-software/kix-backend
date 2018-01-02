@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'ServiceID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

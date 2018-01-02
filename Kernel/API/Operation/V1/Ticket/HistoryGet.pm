@@ -129,6 +129,7 @@ sub Run {
             },
             'HistoryID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },
         }

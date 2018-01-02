@@ -119,11 +119,9 @@ sub Run {
         Parameters => {
             'DynamicFieldID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },           
-            'include' => {
-                Type     => 'ARRAYtoHASH',
-            },
         }
     );
 

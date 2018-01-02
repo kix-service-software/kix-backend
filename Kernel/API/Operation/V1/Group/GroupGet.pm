@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'GroupID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

@@ -129,6 +129,7 @@ sub Run {
             },
             'AttachmentID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },
         }

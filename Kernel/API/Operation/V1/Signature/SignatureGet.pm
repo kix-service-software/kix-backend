@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'SignatureID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }

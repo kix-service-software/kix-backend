@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'ArticleTypeID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }
