@@ -154,6 +154,9 @@ generate response for an incoming web service request.
         Success         => 1,       # 1 or 0
         Code            => '...'    # optional
         Message         => '',      # in case of an error, optional
+        Additional      => {        # optional information that can be used by the backends
+            ...
+        }
         Data            => {        # data payload for response, optional
             ...
         },

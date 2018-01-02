@@ -223,6 +223,33 @@ sub ProviderProcessRequest {
         }
     }
 
+    if ( !%PossibleOperations ) {
+        # we didn't find any possible operation, respond with 405 - find all allowed methods for this resource
+        my @AllowedMethods;
+        for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+
+            next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
+
+            my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
+            my $RouteRegEx = $RouteMapping{Route};
+            $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+
+            next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+
+            push(@AllowedMethods, @{$RouteMapping{RequestMethod}});
+        }        
+
+        return $Self->_Error(
+            Code       => 'NotAllowed',
+            Message    => HTTP::Status::status_message(405),
+            Additional => {
+                AddHeader => {
+                    Allow => join(', ', @AllowedMethods),
+                }
+            }
+        );
+    }
+
     # use the most recent operation (prefer "hard" routes above parameterized routes)
     my $CurrentRoute = (reverse sort keys %PossibleOperations)[0];
     $Operation = $PossibleOperations{$CurrentRoute}->{Operation};
@@ -353,6 +380,9 @@ The HTTP code is set accordingly
         Success  => 1
         Code     => ...     # optional
         Message  => ...     # optional
+        Additional => {     # optional
+            ...
+        }
         Data     => {       # data payload for response, optional
             ...
         },
@@ -365,6 +395,12 @@ The HTTP code is set accordingly
 sub ProviderGenerateResponse {
     my ( $Self, %Param ) = @_;
     my $MappedCode;
+
+    # add headers if given
+    my $AddHeader;
+    if ( IsHashRefWithData($Param{Additional}) && IsHashRefWithData($Param{Additional}->{AddHeader}) ) {
+        $AddHeader = $Param{Additional}->{AddHeader};
+    }
 
     # do we have to return an http error code
     if ( IsStringWithData( $Param{Code} ) ) {
@@ -389,8 +425,9 @@ sub ProviderGenerateResponse {
     if ( IsStringWithData( $Param{Message} ) ) {
         # return message directly
         return $Self->_Output(
-            HTTPCode => $MappedCode,
-            Content  => $Param{Message},
+            HTTPCode  => $MappedCode,
+            Content   => $Param{Message},
+            AddHeader => $AddHeader,
         );
     }
 
@@ -428,8 +465,9 @@ sub ProviderGenerateResponse {
 
     # no error - return output
     return $Self->_Output(
-        HTTPCode => $HTTPCode,
-        Content  => $JSONString,
+        HTTPCode   => $HTTPCode,
+        Content    => $JSONString,
+        AddHeader  => $AddHeader,
     );
 }
 
@@ -843,8 +881,11 @@ Environment variables are checked for potential error messages.
 Returns structure to be passed to provider.
 
     my $Result = $TransportObject->_Output(
-        HTTPCode => 200,           # http code to be returned, optional
-        Content  => 'response',    # message content, XML response on normal execution
+        HTTPCode  => 200,           # http code to be returned, optional
+        Content   => 'response',    # message content, XML response on normal execution
+        AddHeader => {              # optional to set some special headers in response
+            <Header> => <Value>     
+        }
     );
 
     $Result = {
@@ -940,6 +981,14 @@ sub _Output {
     print STDOUT "Content-Type: $ContentType; charset=UTF-8\r\n";
     print STDOUT "Content-Length: $ContentLength\r\n";
     print STDOUT "Connection: $Connection\r\n";
+    
+    # add headers if requested
+    if ( IsHashRefWithData($Param{AddHeader}) ) {
+        foreach my $Header ( sort keys %{$Param{AddHeader}} ) {
+            print STDOUT "$Header: $Param{AddHeader}->{$Header}\r\n";
+        }
+    }
+    
     print STDOUT "\r\n";
     print STDOUT $Param{Content};
 

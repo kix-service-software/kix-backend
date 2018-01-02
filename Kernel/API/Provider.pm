@@ -166,14 +166,8 @@ sub Run {
     # If the request was not processed correctly, send error to client.
     if ( !$FunctionResult->{Success} ) {
 
-        # # don't tell something about the interna of the API
-        my $ErrorResponse = $Self->_Error(
-            Code    => 'BadRequest',
-            Message => 'Request could not be processed',
-        );
-
         return $Self->_GenerateErrorResponse(
-            %{$ErrorResponse},
+            %{$FunctionResult},
         );
     }
 
