@@ -212,43 +212,6 @@ sub PrepareData {
         }
     }
 
-    # prepare expander
-    if ( exists($Param{Data}->{expand}) && IsStringWithData($Param{Data}->{expand}) ) {
-        foreach my $Expander ( split(/,/, $Param{Data}->{expand}) ) {            
-            my ($Object, $Attribute) = split(/\./, $Expander, 2);
-
-            my @Attributes;
-            if ($Attribute =~ /^\[(.*?)\]$/g ) {
-               @Attributes = split(/\s*;\s*/, $1);
-            }
-            else {
-               push(@Attributes, $Attribute);
-            }
-
-            foreach $Attribute ( @Attributes ) {
-                # ignore this expander if it isn't possible in this operation
-                next if ( !$Self->{OperationConfig}->{'Expandable::'.$Attribute} );
-
-                my %ExpanderDef = (
-                    Attribute => $Attribute,
-                );
-                foreach my $DefPart ( split(/,/, $Self->{OperationConfig}->{'Expandable::'.$Attribute})) {
-                    my ($Key, $Value) = split(/=/, $DefPart, 2);
-                    $ExpanderDef{$Key} = $Value;
-                }
-
-                if ( IsStringWithData($ExpanderDef{Add}) ) {
-                    $ExpanderDef{Add} = [ split(/;/, $ExpanderDef{Add}) ];
-                }
-
-                if ( !IsArrayRefWithData($Self->{Expand}->{$Object}) ) {
-                    $Self->{Expand}->{$Object} = [];
-                }
-                push @{$Self->{Expand}->{$Object}}, \%ExpanderDef;
-            }
-        }
-    }
-
     my %Data = %{$Param{Data}};
 
     # store data for later use
@@ -285,8 +248,11 @@ sub PrepareData {
 
         my %Parameters = %{$Param{Parameters}};
 
-        # always add include parameter
+        # always add include and expand parameter
         $Parameters{'include'} = {
+            Type => 'ARRAYtoHASH',
+        };
+        $Parameters{'expand'} = {
             Type => 'ARRAYtoHASH',
         };
 
@@ -375,8 +341,9 @@ sub PrepareData {
         }
     }
 
-    # store include for later
+    # store include and expand for later
     $Self->{Include} = $Param{Data}->{include};
+    $Self->{Expand}  = $Param{Data}->{expand};
     
     return $Result; 
 }
@@ -407,7 +374,7 @@ sub _Success {
             Data => \%Param,
         );
     }
-    
+   
     # honor a field selector, if we have one
     if ( IsHashRefWithData($Self->{Fields}) ) {
         $Self->_ApplyFieldSelector(
@@ -1047,6 +1014,7 @@ sub _ApplyInclude {
     if ( IsHashRefWithData($GenericIncludes) ) {
         foreach my $Include ( keys %{$Self->{Include}} ) {
             next if !$GenericIncludes->{$Include};
+            next if $Self->{OperationType} =~ /$GenericIncludes->{$Include}->{IgnoreOperationRegEx}/;
 
             # we've found a requested generic include, now we have to handle it
             my $IncludeHandler = 'Kernel::API::Operation::' . $GenericIncludes->{$Include}->{Module};
@@ -1064,16 +1032,27 @@ sub _ApplyInclude {
                 );
             }
 
-            # do it for every object in response
+            # do it for every object in the response
             foreach my $Object ( keys %{$Param{Data}} ) {
-                my $Result = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
-                    Object   => $Object,
-                    ObjectID => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
-                    UserID   => $Self->{Authorization}->{UserID},
-                );
+                if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
 
-                # add result to response
-                $Param{Data}->{$Object}->{$Include} = $Result;
+                    my $Index = 0;
+                    foreach my $ObjectID ( split(/\s*,\s*/, $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}}) ) {
+                        
+                        $Param{Data}->{$Object}->[$Index++]->{$Include} = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
+                            Object   => $Object,
+                            ObjectID => $ObjectID,
+                            UserID   => $Self->{Authorization}->{UserID},
+                        );
+                    }
+                }
+                else {
+                    $Param{Data}->{$Object}->{$Include} = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
+                        Object   => $Object,
+                        ObjectID => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
+                        UserID   => $Self->{Authorization}->{UserID},
+                    );
+                }
             }
         }
     }
@@ -1089,39 +1068,42 @@ sub _ApplyExpand {
         return;
     }    
 
-    foreach my $Object ( keys %{$Self->{Expand}} ) {
-        # which elements should be expanded
-        foreach my $Expander ( @{$Self->{Expand}->{$Object}} ) {
-            if ( ref($Param{Data}->{$Object}) eq 'ARRAY' ) {
-                foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
-                    my $Result = $Self->_ExpandAttribute(
-                        Expander => $Expander,
-                        Data     => $ObjectItem,
-                    );
-                    if ( !$Result->{Success} ) {
-                        return $Result;
-                    }
-                }
-            } 
-            elsif ( ref($Param{Data}->{$Object}) eq 'HASH' ) {
+    if ( $ENV{'REQUEST_METHOD'} ne 'GET' || !$Self->{OperationConfig}->{ObjectID} || !$Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}} ) {
+        # no GET request or no ObjectID configured or given
+        return;
+    }
+
+    my $GenericExpands = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::GenericExpand');
+
+    if ( IsHashRefWithData($GenericExpands) ) {
+        foreach my $Object ( keys %{$Param{Data}} ) {
+            foreach my $AttributeToExpand ( keys %{$Self->{Expand}} ) {
+                
+                next if !$GenericExpands->{$AttributeToExpand};
+                next if $GenericExpands->{$AttributeToExpand}->{Operation} eq $Self->{OperationType};
+                next if !$Param{Data}->{$Object}->{$AttributeToExpand};
+
                 my $Result = $Self->_ExpandObject(
-                    Expander => $Expander,
-                    Data     => $Param{Data}->{$Object},
+                    AttributeToExpand => $AttributeToExpand,
+                    ExpanderConfig    => $GenericExpands->{$AttributeToExpand},
+                    Data              => $Param{Data}->{$Object},
                 );
 
                 if ( !$Result->{Success} ) {
                     return $Result;
                 }
-            }
+            }            
         }
     }
+
+    return 1;
 }
 
 sub _ExpandObject {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Expander Data)) {
+    for my $Needed (qw(AttributeToExpand ExpanderConfig Data)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => '_ExpandObject.MissingParameter',
@@ -1131,10 +1113,10 @@ sub _ExpandObject {
     }
 
     my @Data;
-    if ( ref($Param{Data}->{$Param{Expander}->{Attribute}}) eq 'ARRAY' ) {
-        @Data = @{$Param{Data}->{$Param{Expander}->{Attribute}}};
+    if ( IsArrayRefWithData($Param{Data}->{$Param{AttributeToExpand}}) ) {
+        @Data = @{$Param{Data}->{$Param{AttributeToExpand}}};
     }
-    elsif ( ref($Param{Data}->{$Param{Expander}->{Attribute}}) eq 'HASH' ) {
+    elsif ( IsHashRefWithData($Param{Data}->{$Param{AttributeToExpand}}) ) {
         # hashref isn't possible
         return $Self->_Error(
             Code    => 'BadRequest',
@@ -1143,39 +1125,57 @@ sub _ExpandObject {
     }
     else {
         # convert scalar into our data array for further use
-        @Data = ( $Param{Data}->{$Param{Expander}->{Attribute}} );
+        @Data = ( $Param{Data}->{$Param{AttributeToExpand}} );
     }
 
+    # get primary key for get operation
+    my $OperationConfig = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{ExpanderConfig}->{Operation}};
+    if ( !IsHashRefWithData($OperationConfig) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "No config for expand operation found!",
+        );        
+    }
+    if ( !$OperationConfig->{ObjectID} ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "No ObjectID for expand operation configured!",
+        );        
+    }
+    
+    # add primary ObjectID to params
     my %ExecData = (
-        include     => $Self->{RequestData}->{include},
-        expand      => $Self->{RequestData}->{expand},
+        "$OperationConfig->{ObjectID}" => join(',', sort @Data)
     );
-    $ExecData{$Param{Expander}->{ID}} = join(',', sort @Data);
 
-    if ( $Param{Expander}->{Add} && ref($Param{Expander}->{Add}) eq 'ARRAY' ) {
-        foreach my $AddParam ( @{$Param{Expander}->{Add}} ) {
+    if ( $Param{ExpanderConfig}->{AddParams} ) {
+        my @AddParams = split(/\s*,\s*/, $Param{ExpanderConfig}->{AddParams});
+        foreach my $AddParam ( @AddParams ) {
             $ExecData{$AddParam} = $Self->{RequestData}->{$AddParam},
         }
     }
 
     my $Result = $Self->ExecOperation(
-        OperationType => $Param{Expander}->{Operation},
+        OperationType => $Param{ExpanderConfig}->{Operation},
         Data          => \%ExecData,
     );
     if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
         return $Result;
     }
 
-    if ( ref($Param{Data}->{$Param{Expander}->{Attribute}}) eq 'ARRAY' ) {
-        if ( IsArrayRefWithData($Result->{Data}->{$Param{Expander}->{Return}}) ) {
-            $Param{Data}->{$Param{Expander}->{Attribute}} = $Result->{Data}->{$Param{Expander}->{Return}};
+    # extract the relevant data from result
+    my $ResultData = $Result->{Data}->{((keys %{$Result->{Data}})[0])};
+
+    if ( ref($Param{Data}->{$Param{AttributeToExpand}}) eq 'ARRAY' ) {
+        if ( IsArrayRefWithData($ResultData) ) {
+            $Param{Data}->{$Param{AttributeToExpand}} = $ResultData;
         }
         else {
-            $Param{Data}->{$Param{Expander}->{Attribute}} = [ $Result->{Data}->{$Param{Expander}->{Return}} ];
+            $Param{Data}->{$Param{AttributeToExpand}} = [ $ResultData ];
         }
     }
     else {
-        $Param{Data}->{$Param{Expander}->{Attribute}} = $Result->{Data}->{$Param{Expander}->{Return}};
+        $Param{Data}->{$Param{AttributeToExpand}} = $ResultData;
     }
 
     return $Self->_Success();
