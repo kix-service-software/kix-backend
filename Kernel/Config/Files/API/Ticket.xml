@@ -31,6 +31,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">TicketID</Item>
                 <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; Created; CreateBy; Changed; ChangedBy; TimeUnits]</Item>
                 <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
                 <Item Key="Expandable::Articles">Operation=V1::Ticket::ArticleGet,ID=ArticleID,Return=Article,Add=TicketID</Item>
@@ -97,6 +98,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">ArticleID</Item>
                 <Item Key="Expandable::Attachments">Operation=V1::Ticket::ArticleAttachmentGet,ID=AttachmentID,Return=Attachment,Add=ArticleID;TicketID</Item>
             </Hash>
         </Setting>
@@ -178,6 +180,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">AttachmentID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -201,6 +204,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">HistoryID</Item>
             </Hash>
         </Setting>
     </ConfigItem>

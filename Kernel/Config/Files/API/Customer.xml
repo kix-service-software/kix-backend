@@ -9,6 +9,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Customer</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">CustomerID</Item>
             </Hash>
         </Setting>
     </ConfigItem>

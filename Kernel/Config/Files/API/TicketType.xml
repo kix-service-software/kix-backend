@@ -9,6 +9,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">TicketType</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">TypeID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
