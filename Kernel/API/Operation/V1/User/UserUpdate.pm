@@ -187,7 +187,7 @@ sub Run {
 
     # check UserEmail exists
     if ( IsStringWithData($User->{UserEmail}) ) {
-        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+        my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
             PostMasterSearch => $User->{UserEmail},
         );
         if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
