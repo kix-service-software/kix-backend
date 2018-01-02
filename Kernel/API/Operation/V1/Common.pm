@@ -342,8 +342,8 @@ sub PrepareData {
     }
 
     # store include and expand for later
-    $Self->{Include} = $Param{Data}->{include};
-    $Self->{Expand}  = $Param{Data}->{expand};
+    $Self->{Include} = $Param{Data}->{include} || {};
+    $Self->{Expand}  = $Param{Data}->{expand} || {};
     
     return $Result; 
 }
@@ -828,7 +828,7 @@ sub _ApplyFieldSelector {
         if ( ref($Param{Data}->{$Object}) eq 'HASH' ) {
             # extract filtered fields from hash
             my %NewObject;
-            foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
+            foreach my $Field ( (@{$Self->{Fields}->{$Object}}, keys %{$Self->{Include}}) ) {
                 if ( $Field eq '*' ) {
                     # include all fields
                     %NewObject = %{$Param{Data}->{$Object}};
@@ -845,7 +845,7 @@ sub _ApplyFieldSelector {
             foreach my $ObjectItem ( @{$Param{Data}->{$Object}} ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
                     my %NewObjectItem;
-                    foreach my $Field ( @{$Self->{Fields}->{$Object}} ) {
+                    foreach my $Field ( (@{$Self->{Fields}->{$Object}}, keys %{$Self->{Include}}) ) {
                         if ( $Field eq '*' ) {
                             # include all fields
                             %NewObjectItem = %{$ObjectItem};
