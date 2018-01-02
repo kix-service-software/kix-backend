@@ -183,15 +183,6 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericInclude###Links" Required="0" Valid="1">
-        <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">V1::Link::GenericIncludeHandler</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
     <ConfigItem Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
         <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code</Description>
         <Setting>
