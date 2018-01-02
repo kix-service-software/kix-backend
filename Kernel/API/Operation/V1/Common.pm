@@ -1064,14 +1064,17 @@ sub _ApplyInclude {
                 );
             }
 
-            my $Result = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
-                Controller => $Self->{OperationConfig}->{Controller},
-                ObjectID   => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
-                UserID     => $Self->{Authorization}->{UserID},
-            );
+            # do it for every object in response
+            foreach my $Object ( keys %{$Param{Data}} ) {
+                my $Result = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
+                    Object   => $Object,
+                    ObjectID => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
+                    UserID   => $Self->{Authorization}->{UserID},
+                );
 
-            # add result to response
-            $Param{Data}->{$Include} = $Result;
+                # add result to response
+                $Param{Data}->{$Object}->{$Include} = $Result;
+            }
         }
     }
 

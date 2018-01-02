@@ -68,7 +68,7 @@ sub new {
 This will return a Link ID list.
 
     my $Result = $Object->Run(
-        Controller => '...',        # required
+        Object     => '...',        # required
         ObjectID   => '...'         # required
     );
 
@@ -84,7 +84,7 @@ sub Run {
     my @Result;
 
     # check required parameters
-    foreach my $Key ( qw(Controller ObjectID UserID) ) {
+    foreach my $Key ( qw(Object ObjectID UserID) ) {
         if ( !$Param{$Key} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -96,12 +96,12 @@ sub Run {
 
     # perform Link search
     my $LinkListSource = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
-        SourceObject => $Param{Controller},
+        SourceObject => $Param{Object},
         SourceKey    => $Param{ObjectID},
         UserID       => $Param{UserID},
     );
     my $LinkListTarget = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
-        TargetObject => $Param{Controller},
+        TargetObject => $Param{Object},
         TargetKey    => $Param{ObjectID},
         UserID       => $Param{UserID},
     );
