@@ -115,7 +115,7 @@ sub Run {
 
     # perform MailAccount search
     my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList(
-        Valid => 1,
+        Valid => 0,
     );
 
 	# get already prepared MailAccount data from MailAccountGet operation
