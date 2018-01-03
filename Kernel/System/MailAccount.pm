@@ -494,45 +494,6 @@ sub MailAccountCheck {
     }
 }
 
-=item MailAccountDelete()
-
-Delete a MailAccountes.
-
-    my $Result = $MailAccountObject->MailAccountDelete(
-        MailAccountID      => '...',
-    );
-
-=cut
-
-sub MailAccountDelete {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(MID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-    return if !$DBObject->Prepare(
-        SQL  => 'DELETE FROM mail_account WHERE id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
-    # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-
-    return 1;
-}
-
 1;
 
 

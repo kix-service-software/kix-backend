@@ -114,9 +114,7 @@ sub Run {
     }
 
     # perform MailAccount search
-    my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList(
-        Valid => 1,
-    );
+    my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList();
 
 	# get already prepared MailAccount data from MailAccountGet operation
     if ( IsHashRefWithData(\%MailAccountList) ) {  	
@@ -142,7 +140,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        MailAccount => {},
+        MailAccount => [],
     );
 }
 

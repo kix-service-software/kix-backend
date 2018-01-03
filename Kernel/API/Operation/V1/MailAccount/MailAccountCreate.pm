@@ -111,7 +111,7 @@ sub Run {
         );
     }
 
-    my %List = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
 
     # prepare data
     $Result = $Self->PrepareData(
@@ -121,7 +121,7 @@ sub Run {
                 Type     => 'HASH',
                 Required => 1
             },
-           'MailAccount::Login' => {
+            'MailAccount::Login' => {
                 Required => 1
             },            
             'MailAccount::Password' => {
@@ -132,11 +132,11 @@ sub Run {
             },
             'MailAccount::Type' => {
                 Required => 1,
-                OneOf => [join(',', sort keys %List)]
+                OneOf    => sort keys %BackendList,
             },
-           'MailAccount::DispatchingBy' => {
+            'MailAccount::DispatchingBy' => {
                 Required => 1,
-                OneOf => [
+                OneOf    => [
                     'Queue',
                     'From'
                 ]
@@ -158,19 +158,26 @@ sub Run {
         Data => $Param{Data}->{MailAccount}
     );
 
+    if ( $MailAccount->{DispatchingBy} eq 'Queue' && !$MailAccount->{QueueID} ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
+        );        
+    }
+
     # create MailAccount
     my $MailAccountID = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountAdd(
         Login         => $MailAccount->{Login},
         Password      => $MailAccount->{Password},
         Host          => $MailAccount->{Host},
         Type          => $MailAccount->{Type},
-        IMAPFolder    => $MailAccount->{IMAPFolder},
+        IMAPFolder    => $MailAccount->{IMAPFolder} || '',
         ValidID       => $MailAccount->{ValidID} || 1,
         Trusted       => $MailAccount->{Trusted} || 0,
         DispatchingBy => $MailAccount->{DispatchingBy},
         QueueID       => $MailAccount->{QueueID} || '',
         Comment       => $MailAccount->{Comment} || '',
-        UserID   => $Self->{Authorization}->{UserID},
+        UserID        => $Self->{Authorization}->{UserID},
     );
 
     if ( !$MailAccountID ) {

@@ -113,9 +113,7 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    my $Message = '';
-     
+         
     # start MailAccount loop
     MailAccount:    
     foreach my $MailAccountID ( @{$Param{Data}->{MailAccountID}} ) {

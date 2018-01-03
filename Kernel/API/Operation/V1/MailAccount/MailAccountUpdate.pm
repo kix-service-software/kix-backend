@@ -115,6 +115,8 @@ sub Run {
         );
     }
 
+    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+
     # prepare data
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
@@ -126,6 +128,17 @@ sub Run {
                 Type => 'HASH',
                 Required => 1
             },   
+            'MailAccount::Type' => {
+                RequiresValueIfUsed => 1,
+                OneOf => sort keys %BackendList,
+            },
+           'MailAccount::DispatchingBy' => {
+                RequiresValueIfUsed => 1,
+                OneOf => [
+                    'Queue',
+                    'From'
+                ]
+            },            
         }        
     );
 
@@ -141,11 +154,11 @@ sub Run {
     my $MailAccount = $Self->_Trim(
         Data => $Param{Data}->{MailAccount}
     );
-
+    
     # check if MailAccount exists 
     my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
-        ID => $Param{Data}->{MailAccountID},
-        UserID      => $Self->{Authorization}->{UserID},
+        ID     => $Param{Data}->{MailAccountID},
+        UserID => $Self->{Authorization}->{UserID},
     );
  
     if ( !%MailAccountData ) {
@@ -155,9 +168,16 @@ sub Run {
         );
     }
 
+    if ( $MailAccount->{DispatchingBy} eq 'Queue' && !$MailAccount->{QueueID} ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
+        );        
+    }
+
     # update MailAccount
     my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountUpdate(
-        ID       => $Param{Data}->{MailAccountID},
+        ID            => $Param{Data}->{MailAccountID},
         Login         => $MailAccount->{Login} || $MailAccountData{Login},
         Password      => $MailAccount->{Password} || $MailAccountData{Password},
         Host          => $MailAccount->{Host} || $MailAccountData{Host},
