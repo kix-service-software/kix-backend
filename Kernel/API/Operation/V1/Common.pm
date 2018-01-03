@@ -548,6 +548,13 @@ sub _ValidateFilter {
         Data => $Param{Filter}
     );
 
+    if ( !IsHashRefWithData($FilterDef) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "JSON parse error in filter!",
+        );
+    }
+
     foreach my $Object ( keys %{$FilterDef} ) {
         # do we have a object definition ?
         if ( !IsHashRefWithData($FilterDef->{$Object}) ) {
