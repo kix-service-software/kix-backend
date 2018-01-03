@@ -201,25 +201,26 @@ sub MailAccountGet {
             ChangeTime => $Data[10],
         );
     }
-
-    if ( $Data{QueueID} == 0 ) {
-        $Data{DispatchingBy} = 'From';
-    }
-    else {
-        $Data{DispatchingBy} = 'Queue';
-    }
-
-    # only return IMAP folder on IMAP type accounts
-    # fallback to 'INBOX' if none given
-    if ( $Data{Type} =~ m{ IMAP .* }xmsi ) {
-        if ( defined $Data{IMAPFolder} && !$Data{IMAPFolder} ) {
-            $Data{IMAPFolder} = 'INBOX';
+    if ( $Data{ID} ) {
+        
+        if ( $Data{QueueID} == 0 ) {
+            $Data{DispatchingBy} = 'From';
+        }
+        else {
+            $Data{DispatchingBy} = 'Queue';
+        }
+    
+        # only return IMAP folder on IMAP type accounts
+        # fallback to 'INBOX' if none given
+        if ( $Data{Type} =~ m{ IMAP .* }xmsi ) {
+            if ( defined $Data{IMAPFolder} && !$Data{IMAPFolder} ) {
+                $Data{IMAPFolder} = 'INBOX';
+            }
+        }
+        else {
+            $Data{IMAPFolder} = '';
         }
     }
-    else {
-        $Data{IMAPFolder} = '';
-    }
-
     return %Data;
 }
 
