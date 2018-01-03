@@ -126,21 +126,11 @@ sub Run {
         );
     }
 
-    # isolate Role parameter
-    my $Role = $Param{Data}->{Role};
+    # isolate and trim Role parameter
+    my $Role = $Self->_Trim(
+        Data => $Param{Data}->{Role}
+    );
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Role} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Role->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Role->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-        	
     # check if Role exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
         Role => $Role->{Name},

@@ -261,20 +261,10 @@ sub Run {
         );
     }
 
-    # isolate config item parameter
-    my $ConfigItem = $Param{Data}->{ConfigItem};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$ConfigItem} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            # remove leading spaces
-            $ConfigItem->{$Attribute} =~ s{\A\s+}{};
-
-            # remove trailing spaces
-            $ConfigItem->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
+    # isolate and trim config parameter
+    my $ConfigItem = $Self->_Trim(
+        Data => $Param{Data}->{ConfigItem}
+    );
 
     # if the parameter ReplaceExistingData is set to 0 or if it is missing
     # then missing, empty or only partially defined CIXMLData parameter attributes are allowed

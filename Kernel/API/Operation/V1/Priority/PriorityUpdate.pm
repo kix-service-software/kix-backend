@@ -133,20 +133,10 @@ sub Run {
         );
     }
 
-    # isolate TicketState parameter
-    my $Priority = $Param{Data}->{Priority};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Priority} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Priority->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Priority->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Priority parameter
+    my $Priority = $Self->_Trim(
+        Data => $Param{Data}->{Priority}
+    );
 
     # check if Priority exists 
     my %PriorityData = $Kernel::OM->Get('Kernel::System::Priority')->PriorityGet(

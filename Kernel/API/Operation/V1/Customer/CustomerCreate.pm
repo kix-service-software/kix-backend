@@ -162,21 +162,11 @@ sub Run {
             Message => 'Can not create Customer. Backend with given SourceID is not writable or does not exist.',
         );        
     }
-
-    # isolate Customer parameter
-    my $Customer = $Param{Data}->{Customer};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Customer} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Customer->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Customer->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
+    
+    # isolate and trim Customer parameter
+    my $Customer = $Self->_Trim(
+        Data => $Param{Data}->{Customer}
+    );
 
     # check CustomerCompanyName exists
     my %CustomerList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList(

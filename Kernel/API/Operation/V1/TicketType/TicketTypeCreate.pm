@@ -125,21 +125,11 @@ sub Run {
         );
     }
 
-    # isolate TicketType parameter
-    my $TicketType = $Param{Data}->{TicketType};
+    # isolate and trim TicketType parameter
+    my $TicketType = $Self->_Trim(
+        Data => $Param{Data}->{TicketType},
+    );
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$TicketType} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $TicketType->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $TicketType->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-        	
     # check if tickettype exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
         Name => $TicketType->{Name},

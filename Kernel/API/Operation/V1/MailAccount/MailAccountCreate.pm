@@ -160,7 +160,7 @@ sub Run {
     }
 
 
-    # isolate and trim User parameter
+    # isolate and trim MailAccount parameter
     my $MailAccount = $Self->_Trim(
         Data => $Param{Data}->{MailAccount}
     );

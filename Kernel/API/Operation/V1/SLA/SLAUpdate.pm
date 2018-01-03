@@ -140,20 +140,10 @@ sub Run {
         );
     }
 
-    # isolate SLA parameter
-    my $SLA = $Param{Data}->{SLA};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$SLA} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $SLA->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $SLA->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim SLA parameter
+    my $SLA = $Self->_Trim(
+        Data => $Param{Data}->{SLA},
+    );
 
     # check if SLA exists 
     my %SLAData = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
