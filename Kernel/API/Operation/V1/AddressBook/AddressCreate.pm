@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::AddressBook::AddressBookCreate;
+package Kernel::API::Operation::V1::AddressBook::AddressCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::AddressBook::AddressBookCreate - API AddressBook AddressBookCreate Operation backend
+Kernel::API::Operation::V1::AddressBook::AddressCreate - API AddressBook AddressCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,13 @@ sub new {
 
 =item Run()
 
-perform AddressBookCreate Operation. This will return the created AddressID.
+perform AddressCreate Operation. This will return the created AddressID.
 
     my $Result = $OperationObject->Run(
         Data => {
-        	EmailAddress => '...',
+        	Address => {
+                EmailAddress => '...',
+            }
 	    },
     );
 
@@ -105,7 +107,11 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'EmailAddress' => {
+            'Address' => {
+                Type => 'HASH',
+                Required => 1
+            },
+            'Address::EmailAddress' => {
                 Required => 1
             },
         }
@@ -119,32 +125,32 @@ sub Run {
         );
     }
 
-    # trim 
-    my $EmailAddress = $Self->_Trim(
-        Data => $Param{Data}->{EmailAddress},
+     # isolate and trim Address parameter
+    my $Address = $Self->_Trim(
+        Data => $Param{Data}->{Address},
     );        
    
-    # check if AddressBook exists
-    my $AddressBookListResult = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
-        Search => $EmailAddress,
+    # check if Address exists
+    my %AddressList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
+        Search => $Address->{EmailAddress},
     );
-    
-    if ( IsHashRefWithData($AddressBookListResult) ) {
+
+    if ( IsHashRefWithData(\%AddressList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create addressbook entry. Email address '$Param{Data}->{EmailAddress}' already exists in address book.",
+            Message => "Can not create address book entry. Another address with same email address already exists.",
         );
     }
 
     # create AddressBook
     my $AddressID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
-        EmailAddress => $EmailAddress,
+        EmailAddress => $Address->{EmailAddress},
     );
 
     if ( !$AddressID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create addressbook entry, please contact the system administrator',
+            Message => 'Could not create address book entry, please contact the system administrator',
         );
     }
     

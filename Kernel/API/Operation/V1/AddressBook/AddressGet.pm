@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::AddressBook::AddressBookGet;
+package Kernel::API::Operation::V1::AddressBook::AddressGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::AddressBook::AddressBookGet - API AddressBook Get Operation backend
+Kernel::API::Operation::V1::AddressBook::AddressGet - API AddressBook AddressGet Operation backend
 
 =head1 SYNOPSIS
 
@@ -71,8 +71,8 @@ sub new {
 
 =item Run()
 
-perform AddressBookGet Operation. This function is able to return
-one or more ticket entries in one call.
+perform AddressGet Operation. This function is able to return
+one or more address entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -85,7 +85,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            AddressBook => [
+            Address => [
                 {
                     ...
                 },
@@ -133,18 +133,18 @@ sub Run {
         );
     }
 
-    my @AddressBookList;
+    my @AddressList;
 
     # start state loop
     State:    
     foreach my $AddressID ( @{$Param{Data}->{AddressID}} ) {
 
-        # get the AddressBook data
-        my %AddressBookData = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
+        # get the Address data
+        my %AddressData = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
             AddressID => $AddressID,             
         );
 
-        if ( !IsHashRefWithData( \%AddressBookData ) ) {
+        if ( !IsHashRefWithData( \%AddressData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "No data found for AddressID $AddressID.",
@@ -152,18 +152,18 @@ sub Run {
         }
         
         # add
-        push(@AddressBookList, \%AddressBookData);
+        push(@AddressList, \%AddressData);
     }
   
-    if ( scalar(@AddressBookList) == 1 ) {
+    if ( scalar(@AddressList) == 1 ) {
         return $Self->_Success(
-            AddressBook => $AddressBookList[0],
+            Address => $AddressList[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        AddressBook => \@AddressBookList,
+        Address => \@AddressList,
     );
 }
 

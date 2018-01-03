@@ -211,7 +211,7 @@ sub AddressUpdate {
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # update group in database
+    # update address in database
     return if !$DBObject->Do(
         SQL => 'UPDATE addressbook SET email = ?, email_lower = ? WHERE id = ?',
         Bind => [
@@ -219,6 +219,10 @@ sub AddressUpdate {
         ],
     );
 
+    # delete cache
+    $Self->{CacheObject}->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     return 1;
 }
@@ -335,9 +339,9 @@ sub AddressDelete {
         Bind => [ \$Param{AddressID} ],
     );
 
-    # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
+    # delete cache
+    $Self->{CacheObject}->CleanUp(
+        Type => $Self->{CacheType}
     );
 
     return 1;

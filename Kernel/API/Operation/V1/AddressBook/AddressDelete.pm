@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::AddressBook::AddressBookDelete;
+package Kernel::API::Operation::V1::AddressBook::AddressDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::AddressBook::AddressBookDelete - API AddressBook AddressBookDelete Operation backend
+Kernel::API::Operation::V1::AddressBook::AddressDelete - API AddressBook AddressDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ sub new {
 
 =item Run()
 
-perform AddressBookDelete Operation. This will return the deleted AddressID.
+perform AddressDelete Operation. This will return the deleted AddressID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -112,17 +112,15 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    my $Message = '';
   
-    # start type loop
+    # start address loop
     TYPE:    
     foreach my $AddressID ( @{$Param{Data}->{AddressID}} ) {
 
-        # delete AddressBook	    
+        # delete Address	    
         my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressDelete(
             AddressID  => $AddressID,
-            UserID  => $Self->{Authorization}->{UserID},
+            UserID     => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {

@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::AddressBook::AddressBookSearch;
+package Kernel::API::Operation::V1::AddressBook::AddressSearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::AddressBook::AddressBookGet;
+use Kernel::API::Operation::V1::AddressBook::AddressGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -27,7 +27,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::AddressBook::AddressBookSearch - API AddressBook Search Operation backend
+Kernel::API::Operation::AddressBook::AddressSearch - API AddressBook Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -65,7 +65,7 @@ sub new {
 
 =item Run()
 
-perform AddressBookSearch Operation. This will return a Address ID list.
+perform AddressSearch Operation. This will return a Address list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -77,7 +77,7 @@ perform AddressBookSearch Operation. This will return a Address ID list.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            AddressBook => [
+            Address => [
                 {},
                 {}
             ]
@@ -114,16 +114,16 @@ sub Run {
     }
 
     # perform AddressBook search
-    my %AddressBookList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
+    my %AddressList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
         Search => '',               
     );
 
-	# get already prepared AddressBook data from AddressBookGet operation
-    if ( IsHashRefWithData(\%AddressBookList) ) {  	
+	# get already prepared AddressBook data from AddressGet operation
+    if ( IsHashRefWithData(\%AddressList) ) {  	
         my $AddressBookGetResult = $Self->ExecOperation(
-            OperationType => 'V1::AddressBook::AddressBookGet',
+            OperationType => 'V1::AddressBook::AddressGet',
             Data      => {
-                AddressID => join(',', sort keys %AddressBookList),
+                AddressID => join(',', sort keys %AddressList),
             }
         );    
 
@@ -131,18 +131,18 @@ sub Run {
             return $AddressBookGetResult;
         }
 
-        my @AddressBookDataList = IsArrayRefWithData($AddressBookGetResult->{Data}->{AddressBook}) ? @{$AddressBookGetResult->{Data}->{AddressBook}} : ( $AddressBookGetResult->{Data}->{AddressBook} );
+        my @AddressDataList = IsArrayRefWithData($AddressBookGetResult->{Data}->{Address}) ? @{$AddressBookGetResult->{Data}->{Address}} : ( $AddressBookGetResult->{Data}->{Address} );
 
-        if ( IsArrayRefWithData(\@AddressBookDataList) ) {
+        if ( IsArrayRefWithData(\@AddressDataList) ) {
             return $Self->_Success(
-                AddressBook => \@AddressBookDataList,
+                Address => \@AddressDataList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        AddressBook => [],
+        Address => [],
     );
 }
 

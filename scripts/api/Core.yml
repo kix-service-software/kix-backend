@@ -378,41 +378,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Group::GroupDelete
-    V1::AddressBook::AddressBookSearch:
+    V1::AddressBook::AddressSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::AddressBook::AddressBookSearch
-    V1::AddressBook::AddressBookCreate:
+        Type: V1::AddressBook::AddressSearch
+    V1::AddressBook::AddressCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::AddressBook::AddressBookCreate
-    V1::AddressBook::AddressBookGet:
+        Type: V1::AddressBook::AddressCreate
+    V1::AddressBook::AddressGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::AddressBook::AddressBookGet
-    V1::AddressBook::AddressBookUpdate:
+        Type: V1::AddressBook::AddressGet
+    V1::AddressBook::AddressUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::AddressBook::AddressBookUpdate
-    V1::AddressBook::AddressBookDelete:
+        Type: V1::AddressBook::AddressUpdate
+    V1::AddressBook::AddressDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::AddressBook::AddressBookDelete
+        Type: V1::AddressBook::AddressDelete
     V1::Role::RoleSearch:
         Description: ''
         MappingInbound:
@@ -1184,23 +1184,23 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /groups/:GroupID
-        V1::AddressBook::AddressBookSearch:
+        V1::AddressBook::AddressSearch:
           RequestMethod:
           - GET
           Route: /addressbook
-        V1::AddressBook::AddressBookCreate:
+        V1::AddressBook::AddressCreate:
           RequestMethod:
           - POST
           Route: /addressbook
-        V1::AddressBook::AddressBookGet:
+        V1::AddressBook::AddressGet:
           RequestMethod:
           - GET
           Route: /addressbook/:AddressID
-        V1::AddressBook::AddressBookUpdate:
+        V1::AddressBook::AddressUpdate:
           RequestMethod:
           - PATCH
           Route: /addressbook/:AddressID
-        V1::AddressBook::AddressBookDelete:
+        V1::AddressBook::AddressDelete:
           RequestMethod:
           - DELETE
           Route: /addressbook/:AddressID
