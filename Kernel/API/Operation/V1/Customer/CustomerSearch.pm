@@ -143,7 +143,7 @@ print STDERR "here!\n";
 
     # return result
     return $Self->_Success(
-        Customer => {},
+        Customer => [],
     );
 }
 

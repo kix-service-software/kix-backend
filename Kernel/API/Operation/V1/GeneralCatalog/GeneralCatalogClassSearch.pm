@@ -116,7 +116,7 @@ sub Run {
    
     # return result
     return $Self->_Success(
-        GeneralCatalogClass => {},
+        GeneralCatalogClass => [],
     );
 }
 
