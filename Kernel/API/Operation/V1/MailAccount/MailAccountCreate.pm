@@ -141,6 +141,13 @@ sub Run {
                     'From'
                 ]
             },            
+           'MailAccount::Trusted' => {
+                RequiresValueIfUsed => 1,
+                OneOf => [
+                    0,
+                    1
+                ]
+            },            
         }
     );
 

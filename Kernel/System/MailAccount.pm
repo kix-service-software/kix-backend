@@ -180,7 +180,7 @@ sub MailAccountGet {
     return if !$DBObject->Prepare(
         SQL =>
             'SELECT login, pw, host, account_type, queue_id, imap_folder, trusted, comments, valid_id, '
-            . ' create_time, change_time FROM mail_account WHERE id = ?',
+            . ' create_by, create_time, change_by, change_time FROM mail_account WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
@@ -197,8 +197,10 @@ sub MailAccountGet {
             Trusted    => $Data[6],
             Comment    => $Data[7],
             ValidID    => $Data[8],
-            CreateTime => $Data[9],
-            ChangeTime => $Data[10],
+            CreateBy   => $Data[9],
+            CreateTime => $Data[10],
+            ChangeBy   => $Data[11],
+            ChangeTime => $Data[12],
         );
     }
     if ( $Data{ID} ) {
