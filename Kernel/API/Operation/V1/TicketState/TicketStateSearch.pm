@@ -139,7 +139,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        TicketState => {},
+        TicketState => [],
     );
 }
 

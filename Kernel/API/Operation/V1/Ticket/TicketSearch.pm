@@ -142,7 +142,7 @@ sub Run {
         }
 
         my @ResultList = IsArrayRefWithData($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
-        
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Ticket => \@ResultList,
@@ -152,7 +152,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        Ticket => {},
+        Ticket => [],
     );
 }
 

@@ -138,7 +138,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        TicketType => {},
+        TicketType => [],
     );
 }
 

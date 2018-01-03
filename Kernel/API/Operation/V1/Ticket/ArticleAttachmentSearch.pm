@@ -187,7 +187,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        Attachment => {},
+        Attachment => [],
     );
 }
 
