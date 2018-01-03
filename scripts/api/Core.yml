@@ -924,6 +924,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Link::LinkDelete
+    V1::MailAccount::MailAccountTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountTypeSearch
     V1::MailAccount::MailAccountSearch:
         Description: ''
         MappingInbound:
@@ -1489,6 +1496,10 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /links/:LinkID
+        V1::MailAccount::MailAccountTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /mailaccounts/types
         V1::MailAccount::MailAccountSearch:
           RequestMethod:
           - GET

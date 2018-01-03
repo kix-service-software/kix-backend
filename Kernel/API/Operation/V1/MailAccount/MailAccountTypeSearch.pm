@@ -11,12 +11,11 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::MailAccount::MailAccountSearch;
+package Kernel::API::Operation::V1::MailAccount::MailAccountTypeSearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::MailAccount::MailAccountGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -27,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::MailAccount::MailAccountSearch - API MailAccount Search Operation backend
+Kernel::API::Operation::MailAccount::MailAccountTypeSearch - API MailAccount Type Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -77,9 +76,8 @@ perform MailAccountSearch Operation. This will return a MailAccount ID list.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            MailAccount => [
-                {},
-                {}
+            MailAccountType => [
+                ...
             ]
         },
     };
@@ -113,34 +111,21 @@ sub Run {
         );
     }
 
-    # perform MailAccount search
-    my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList();
+    # get backends
+    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
 
-	# get already prepared MailAccount data from MailAccountGet operation
-    if ( IsHashRefWithData(\%MailAccountList) ) {  	
-        my $MailAccountGetResult = $Self->ExecOperation(
-            OperationType => 'V1::MailAccount::MailAccountGet',
-            Data      => {
-                MailAccountID => join(',', sort keys %MailAccountList),
-            }
-        );    
-
-        if ( !IsHashRefWithData($MailAccountGetResult) || !$MailAccountGetResult->{Success} ) {
-            return $MailAccountGetResult;
-        }
-
-        my @MailAccountDataList = IsArrayRefWithData($MailAccountGetResult->{Data}->{MailAccount}) ? @{$MailAccountGetResult->{Data}->{MailAccount}} : ( $MailAccountGetResult->{Data}->{MailAccount} );
-
-        if ( IsArrayRefWithData(\@MailAccountDataList) ) {
-            return $Self->_Success(
-                MailAccount => \@MailAccountDataList,
-            )
-        }
+    if ( IsHashRefWithData(\%BackendList) ) {
+        my @TypeList = sort keys %BackendList;
+        use Data::Dumper;
+        print STDERR Dumper();
+        return $Self->_Success(
+            MailAccountType => \@TypeList,
+        )
     }
-
+   
     # return result
     return $Self->_Success(
-        MailAccount => [],
+        MailAccountType => [],
     );
 }
 

@@ -131,6 +131,7 @@
 /links                                                              |   POST            | V1::Link::LinkCreate
 /links/:LinkID                                                      |   GET             | V1::Link::LinkGet
 /links/:LinkID                                                      |   DELETE          | V1::Link::LinkDelete
+/mailaccounts/types                                                 |   GET             | V1::MailAccount::MailAccountTypeSearch
 /mailaccounts                                                       |   GET             | V1::MailAccount::MailAccountSearch
 /mailaccounts                                                       |   POST            | V1::MailAccount::MailAccountCreate
 /mailaccounts/:MailAccountID                                        |   GET             | V1::MailAccount::MailAccountGet
