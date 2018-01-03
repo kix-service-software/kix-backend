@@ -201,25 +201,26 @@ sub MailAccountGet {
             ChangeTime => $Data[10],
         );
     }
-
-    if ( $Data{QueueID} == 0 ) {
-        $Data{DispatchingBy} = 'From';
-    }
-    else {
-        $Data{DispatchingBy} = 'Queue';
-    }
-
-    # only return IMAP folder on IMAP type accounts
-    # fallback to 'INBOX' if none given
-    if ( $Data{Type} =~ m{ IMAP .* }xmsi ) {
-        if ( defined $Data{IMAPFolder} && !$Data{IMAPFolder} ) {
-            $Data{IMAPFolder} = 'INBOX';
+    if ( $Data{ID} ) {
+        
+        if ( $Data{QueueID} == 0 ) {
+            $Data{DispatchingBy} = 'From';
+        }
+        else {
+            $Data{DispatchingBy} = 'Queue';
+        }
+    
+        # only return IMAP folder on IMAP type accounts
+        # fallback to 'INBOX' if none given
+        if ( $Data{Type} =~ m{ IMAP .* }xmsi ) {
+            if ( defined $Data{IMAPFolder} && !$Data{IMAPFolder} ) {
+                $Data{IMAPFolder} = 'INBOX';
+            }
+        }
+        else {
+            $Data{IMAPFolder} = '';
         }
     }
-    else {
-        $Data{IMAPFolder} = '';
-    }
-
     return %Data;
 }
 
@@ -246,6 +247,7 @@ update a new mail account
 sub MailAccountUpdate {
     my ( $Self, %Param ) = @_;
 
+    # sql
     # check needed stuff
     for (qw(ID Login Password Host Type ValidID Trusted DispatchingBy QueueID UserID)) {
         if ( !defined $Param{$_} ) {
@@ -280,7 +282,6 @@ sub MailAccountUpdate {
         $Param{IMAPFolder} = '';
     }
 
-    # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE mail_account SET login = ?, pw = ?, host = ?, account_type = ?, '
             . ' comments = ?, imap_folder = ?, trusted = ?, valid_id = ?, change_time = current_timestamp, '
