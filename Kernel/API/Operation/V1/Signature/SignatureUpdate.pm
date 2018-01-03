@@ -138,18 +138,6 @@ sub Run {
         Data => $Param{Data}->{Signature},
     );
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Signature} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Signature->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Signature->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-
     # check if Signature exists 
     my %SignatureData = $Kernel::OM->Get('Kernel::System::Signature')->SignatureGet(
         ID => $Param{Data}->{SignatureID},

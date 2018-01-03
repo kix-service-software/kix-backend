@@ -128,21 +128,10 @@ sub Run {
         );
     }
 
-
-    # isolate TicketState parameter
-    my $TicketState = $Param{Data}->{TicketState};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$TicketState} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $TicketState->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $TicketState->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim TicketState parameter
+    my $TicketState = $Self->_Trim(
+        Data => $Param{Data}->{TicketState},
+    );
 
     # check if ticketState exists
     my $Exists = $Kernel::OM->Get('Kernel::System::State')->StateLookup(

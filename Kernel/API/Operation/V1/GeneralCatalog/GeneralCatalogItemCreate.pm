@@ -130,22 +130,10 @@ sub Run {
         );
     }
 
-    # isolate GeneralCatalogItem parameter
-    my $GeneralCatalogItem = $Param{Data}->{GeneralCatalogItem};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$GeneralCatalogItem} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $GeneralCatalogItem->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $GeneralCatalogItem->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
-
- 
+    # isolate and trim GeneralCatalogItem parameter
+    my $GeneralCatalogItem = $Self->_Trim(
+        Data => $Param{Data}->{GeneralCatalogItem}
+    );
 
     my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
         Class => $GeneralCatalogItem->{Class},

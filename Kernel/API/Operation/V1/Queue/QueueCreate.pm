@@ -144,21 +144,11 @@ sub Run {
         );
     }
 
-    # isolate Queue parameter
-    my $Queue = $Param{Data}->{Queue};
+    # isolate and trim Queue parameter
+    my $Queue = $Self->_Trim(
+        Data => $Param{Data}->{Queue}
+    );
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Queue} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Queue->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Queue->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-      	
     # check if Queue exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
         Queue => $Queue->{Name},

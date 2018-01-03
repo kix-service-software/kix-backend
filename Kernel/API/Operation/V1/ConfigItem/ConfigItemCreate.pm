@@ -230,20 +230,11 @@ sub Run {
         }
     }
 
-    # isolate config item parameter
-    my $ConfigItem = $Param{Data}->{ConfigItem};
+    # isolate and trim config parameter
+    my $ConfigItem = $Self->_Trim(
+        Data => $Param{Data}->{ConfigItem}
+    );
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$ConfigItem} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $ConfigItem->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $ConfigItem->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
     if ( !IsHashRefWithData( $ConfigItem->{CIXMLData} ) ) {
         return $Self->ReturnError(
             ErrorCode    => "$Self->{OperationName}.MissingParameter",

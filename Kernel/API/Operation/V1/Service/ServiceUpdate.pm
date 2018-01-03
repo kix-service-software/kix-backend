@@ -134,20 +134,10 @@ sub Run {
         );
     }
 
-    # isolate Service parameter
-    my $Service = $Param{Data}->{Service};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Service} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Service->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Service->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Service parameter
+    my $Service = $Self->_Trim(
+        Data => $Param{Data}->{Service}
+    );
 
     # check if Service exists 
     my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(

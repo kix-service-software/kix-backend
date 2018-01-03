@@ -131,20 +131,10 @@ sub Run {
         );
     }
 
-    # isolate Group parameter
-    my $Group = $Param{Data}->{Group};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Group} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Group->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Group->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Group parameter
+    my $Group = $Self->_Trim(
+        Data => $Param{Data}->{Group}
+    );
 
     # check if Group exists 
     my $GroupData = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(

@@ -148,20 +148,10 @@ sub Run {
         );
     }
 
-    # isolate DynamicField parameter
-    my $DynamicField = $Param{Data}->{DynamicField};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$DynamicField} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $DynamicField->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $DynamicField->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim DynamicField parameter
+    my $DynamicField = $Self->_Trim(
+        Data => $Param{Data}->{DynamicField}
+    );
 
     # check attribute values
     my $CheckResult = $Self->_CheckDynamicField( 

@@ -130,21 +130,11 @@ sub Run {
         );
     }
 
-    # isolate SystemAddress parameter
-    my $SystemAddress = $Param{Data}->{SystemAddress};
+    # isolate and trim SystemAddress parameter
+    my $SystemAddress = $Self->_Trim(
+        Data => $Param{Data}->{SystemAddress},
+    );
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$SystemAddress} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $SystemAddress->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $SystemAddress->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
-    	
     # check if SystemAddress exists
     my $Exists = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressLookup(
         Name => $SystemAddress->{Name},

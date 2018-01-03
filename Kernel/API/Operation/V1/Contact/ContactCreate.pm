@@ -163,20 +163,10 @@ sub Run {
         );        
     }
 
-    # isolate Contact parameter
-    my $Contact = $Param{Data}->{Contact};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Contact} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Contact->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Contact->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
+    # isolate and trim Contact parameter
+    my $Contact = $Self->_Trim(
+        Data => $Param{Data}->{Contact}
+    );
 
     # check Userlogin exists
     my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(

@@ -139,20 +139,10 @@ sub Run {
         );
     }
 
-    # isolate User parameter
-    my $User = $Param{Data}->{User};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$User} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $User->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $User->{$Attribute} =~ s{\s+\z}{};
-        }
-    }
+    # isolate and trim User parameter
+    my $User = $Self->_Trim(
+        Data => $Param{Data}->{User},
+    );
 
     # check UserLogin exists
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(

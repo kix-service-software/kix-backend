@@ -140,20 +140,11 @@ sub Run {
         );
     }
 
-    # isolate Link parameter
-    my $Link = $Param{Data}->{Link};
 
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$Link} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $Link->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $Link->{$Attribute} =~ s{\s+\z}{};
-        }
-    }   
+    # isolate and trim Link parameter
+    my $Link = $Self->_Trim(
+        Data => $Param{Data}->{Link}
+    );
 
     # check attribute values
     my $CheckResult = $Self->_CheckLink( 
