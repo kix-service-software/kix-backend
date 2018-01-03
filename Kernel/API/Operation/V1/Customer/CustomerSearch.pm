@@ -141,7 +141,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        Customer => {},
+        Customer => [],
     );
 }
 

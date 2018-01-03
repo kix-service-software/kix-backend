@@ -163,7 +163,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        History => {},
+        History => [],
     );
 }
 

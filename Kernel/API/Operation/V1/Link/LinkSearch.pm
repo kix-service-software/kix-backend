@@ -155,7 +155,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        Link => {},
+        Link => [],
     );
 }
 
