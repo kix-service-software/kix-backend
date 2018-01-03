@@ -45,7 +45,7 @@ create an object.
             TestMode        => 0,           # optional, in testing mode the data will not be written to the DB
             # ...
         },
-        WebServiceID      => 12,
+        WebserviceID      => 12,
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
