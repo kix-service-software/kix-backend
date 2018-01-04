@@ -782,7 +782,7 @@ sub _ApplyFilter {
                             }
                             # the string matches the pattern
                             elsif ( $Filter->{Operator} eq 'LIKE' ) {                        
-                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/g ) {
+                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
                                     $FilterMatch = 0;
                                 }
                             }                            
