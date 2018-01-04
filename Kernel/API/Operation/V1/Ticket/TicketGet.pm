@@ -236,6 +236,9 @@ one or more ticket entries in one call.
                         },
                     ],
 
+                    # If Include=TicketNotes was passed, you'll get an entry like this:
+                    TicketNotes => "..."
+
                     # If Include=History was passed, you'll get an entry like this:
                     History => [
                         <HistoryID>
@@ -415,7 +418,14 @@ sub Run {
                 TicketID => $TicketID,
             );
         }
-            
+
+        # include TicketNotes if requested
+        if ( $Param{Data}->{include}->{TicketNotes} ) {
+            $TicketData{TicketNotes} = $TicketObject->TicketNotesGet(
+                TicketID => $TicketID,
+            );
+        }
+        
         # add
         push(@TicketList, \%TicketData);
     }
