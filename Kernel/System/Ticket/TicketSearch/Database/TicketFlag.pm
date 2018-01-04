@@ -64,7 +64,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -96,6 +97,11 @@ sub Filter {
         return;
     }
 
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
+
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
         my $Index = 1;
         foreach my $FilterValue ( sort @{ $Param{Filter}->{Value} } ) {
@@ -108,7 +114,7 @@ sub Filter {
             }
             
             if ( !$Param{Filter}->{Not} ) {
-                push( @SQLJoin, "INNER JOIN ticket_flag tf$Index ON st.id = tf$Index.ticket_id" );
+                push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN ticket_flag tf$Index ON st.id = tf$Index.ticket_id" );
                 push( @SQLWhere, "tf$Index.ticket_key = '$FilterValue->{Flag}'" );
             }
             else {

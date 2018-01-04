@@ -76,7 +76,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -108,9 +109,14 @@ sub Filter {
         'CreatedPriorityID' => 'th.priority_id',
     );
 
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
+
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
+        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN ticket_history th ON st.id = th.ticket_id' );
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 

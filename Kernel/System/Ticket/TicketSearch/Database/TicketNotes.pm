@@ -62,7 +62,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -86,9 +87,14 @@ sub Filter {
         return;
     }
 
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
+    
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        push( @SQLJoin, 'INNER JOIN kix_ticket_notes ktn ON st.id = ktn.ticket_id' );
+        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN kix_ticket_notes ktn ON st.id = ktn.ticket_id' );
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 

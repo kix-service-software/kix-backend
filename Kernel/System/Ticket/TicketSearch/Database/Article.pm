@@ -73,7 +73,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -106,6 +107,11 @@ sub Filter {
         'Body'              => 'art.a_body',
     );
 
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
+
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
@@ -113,7 +119,7 @@ sub Filter {
         if ( $SearchIndexModule =~ /::StaticDB$/ ) {
             $ArticleSearchTable = 'article_search';
         }
-        push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
+        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 

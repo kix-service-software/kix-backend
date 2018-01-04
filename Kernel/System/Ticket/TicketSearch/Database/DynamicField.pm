@@ -62,7 +62,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -103,6 +104,11 @@ sub Filter {
         );
         return;
     }
+
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
 
     if ( !$Self->{DynamicFields} ) {
 
@@ -185,11 +191,11 @@ sub Filter {
     $Self->{ModuleData}->{JoinTables}->{$DFName} = $JoinTable;
 
     if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
-        push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
     } 
     elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
         if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
-            push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
+            push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
             $Self->{ModuleData}->{ArticleTableJoined} = 1;
         }
         push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
