@@ -581,9 +581,10 @@ sub _CreateAttributeSQL {
 
             # execute attribute module to prepare SQL
             my $Result = $AttributeModule->Filter(
-                UserID   => $Param{UserID},
-                UserType => $Param{UserType},            
-                Filter   => $Filter,
+                UserID       => $Param{UserID},
+                UserType     => $Param{UserType},
+                BoolOperator => $BoolOperator,            
+                Filter       => $Filter,
             );
 
             if ( !IsHashRefWithData($Result) ) {

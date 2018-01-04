@@ -60,7 +60,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -84,6 +85,11 @@ sub Filter {
         return;
     }
 
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
+
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         my $StorageModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule');
@@ -95,7 +101,7 @@ sub Filter {
             );            
             return;
         }
-        push( @SQLJoin, 'INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
+        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
         push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }

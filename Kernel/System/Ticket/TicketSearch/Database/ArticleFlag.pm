@@ -62,7 +62,8 @@ sub GetSupportedAttributes {
 run this module and return the SQL extensions
 
     my $Result = $Object->Filter(
-        Filter => {}
+        BoolOperator => 'AND' | 'OR',
+        Filter       => {}
     );
 
     $Result = {
@@ -94,6 +95,11 @@ sub Filter {
         return;
     }
 
+    my %JoinType = (
+        'AND' => 'INNER',
+        'OR'  => 'FULL OUTER'
+    );
+
     if ( $Param{Filter}->{Operator} eq 'EQ' ) {
         my $Index = 1;
         foreach my $FilterValue ( sort @{ $Param{Filter}->{Value} } ) {
@@ -106,12 +112,12 @@ sub Filter {
             }
             
             if ( !$Param{Filter}->{Not} ) {
-                push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
+                push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
                 push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag$Index.id = af$Index.article_id" );
                 push( @SQLWhere, "af$Index.article_key = '$FilterValue->{Flag}'" );
             }
             else {
-                push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
+                push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
                 push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag$Index.id = af$Index.article_id" );
                 push( @SQLWhere, "naf$Index.article_key = '$FilterValue->{Flag}'" );
             }
