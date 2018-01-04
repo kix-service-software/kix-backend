@@ -1082,13 +1082,13 @@ sub TicketNotesUpdate {
     }
 
     # check if update is needed
-    my %Notes = $Self->TicketNotesGet(
+    my $Notes = $Self->TicketNotesGet(
         TicketID => $Param{TicketID},
     );
-    return 1 if ( %Notes && $Notes{ $Param{TicketID} } eq $Param{Notes} );
+    return 1 if ( $Notes && $Notes eq $Param{Notes} );
 
     # update action
-    if ( defined( $Notes{ $Param{TicketID} } ) ) {
+    if ( defined( $Notes ) ) {
         return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
             SQL =>
                 'UPDATE kix_ticket_notes SET note = ?, change_time = current_timestamp, change_by = ? '
@@ -1129,15 +1129,13 @@ sub TicketNotesUpdate {
 
 Get ticket remark and its ID
 
-    my %TicketRemark = $TicketObject->TicketNotesGet(
+    my $Notes = $TicketObject->TicketNotesGet(
         TicketID => 123,
     );
 
 Returns:
 
-    %TicketRemark = (
-        123 => 'remark content',
-    );
+    $Notes = 'remark content';
 
 =cut
 
@@ -1157,7 +1155,7 @@ sub TicketNotesGet {
 
     # check if result is cached
     if ( $Self->{$CacheKey} ) {
-        return %{ $Self->{$CacheKey} };
+        return $Self->{$CacheKey};
     }
 
     return () if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -1166,15 +1164,15 @@ sub TicketNotesGet {
         Limit => 1,
     );
 
-    my %Notes;
+    my $Notes;
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
-        $Notes{ $Param{TicketID} } = $Row[0];
+        $Notes = $Row[0];
     }
 
     # cache ticket notes result
-    $Self->{$CacheKey} = \%Notes;
+    $Self->{$CacheKey} = $Notes;
 
-    return %Notes;
+    return $Notes;
 }
 
 =item TicketNotesDelete()
