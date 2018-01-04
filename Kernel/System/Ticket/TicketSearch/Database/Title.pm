@@ -98,9 +98,25 @@ sub Filter {
         push( @SQLWhere, "st.title LIKE '%".$Param{Filter}->{Value}."%'" );
     }
     elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+        my $Field = 'st.title';
         my $Value = $Param{Filter}->{Value};
         $Value =~ s/\*/%/g;
-        push( @SQLWhere, "st.title LIKE '".$Value."'" );
+
+        # check if database supports LIKE in large text types
+        if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+            if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+                $Field = "LCASE(st.title)";
+                $Value = "LCASE('$Value')";
+            }
+            else {
+                $Field = "LOWER(st.title)";
+                $Value = "LOWER('$Value')";
+            }
+        }
+        else {
+            $Value = "'$Value'";
+        }
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Filter}->{Value}}))."')" );
