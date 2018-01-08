@@ -174,6 +174,10 @@ sub Run {
         # move NameShort to Name and delete NameShort
         $ServiceData{Name} = $ServiceData{NameShort};
         delete $ServiceData{NameShort};
+
+        if ( !$ServiceData{ParentID} ) {
+            $ServiceData{ParentID} = undef;
+        }
                 
         # add
         push(@ServiceList, \%ServiceData);

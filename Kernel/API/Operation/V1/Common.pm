@@ -687,12 +687,16 @@ sub _ApplyFilter {
                             my $Type = $Filter->{Type};
 
                             # check if the value references a field in our hash and take its value in this case
-                            if ( $FilterValue =~ /^\$(.*?)$/ ) {
+                            if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
                                 $FilterValue =  exists($ObjectItem->{$1}) ? $ObjectItem->{$1} : undef;
                             }
-
-                            # replace wildcards with valid RegEx in FilterValue
-                            $FilterValue =~ s/\*/.*?/g;
+                            elsif ( $FilterValue ) {
+                                # replace wildcards with valid RegEx in FilterValue
+                                $FilterValue =~ s/\*/.*?/g;
+                            }
+                            else {
+                                $FilterValue = undef;
+                            }
 
                             # prepare date compare
                             if ( $Type eq 'DATE' ) {
@@ -716,19 +720,25 @@ sub _ApplyFilter {
 
                             # equal (=)
                             if ( $Filter->{Operator} eq 'EQ' ) {
-                                if ( $Type eq 'STRING' && $FieldValue ne $FilterValue ) {
+                                if ( !$FilterValue && $FieldValue ) {
+                                    $FilterMatch = 0
+                                }
+                                elsif ( $Type eq 'STRING' && ($FieldValue||'') ne ($FilterValue||'') ) {
                                     $FilterMatch = 0;
                                 }
-                                elsif ( $Type eq 'NUMERIC' && $FieldValue != $FilterValue ) {
+                                elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') != ($FilterValue||'') ) {
                                     $FilterMatch = 0;
                                 }                                
                             }
                             # not equal (!=)
                             elsif ( $Filter->{Operator} eq 'NE' ) {                        
-                                if ( $Type eq 'STRING' && $FieldValue eq $FilterValue ) {
+                                if ( !$FilterValue && !$FieldValue ) {
+                                    $FilterMatch = 0
+                                }
+                                elsif ( $Type eq 'STRING' && ($FieldValue||'') eq ($FilterValue||'') ) {
                                     $FilterMatch = 0;
                                 }
-                                elsif ( $Type eq 'NUMERIC' && $FieldValue == $FilterValue ) {
+                                elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') == ($FilterValue||'') ) {
                                     $FilterMatch = 0;
                                 }                                
                             }
