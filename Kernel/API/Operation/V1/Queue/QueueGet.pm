@@ -136,7 +136,7 @@ sub Run {
     my @QueueList;
 
     # start state loop
-    Queue:    
+    QUEUE:    
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
 
         # get the Queue data
@@ -144,13 +144,44 @@ sub Run {
             ID => $QueueID,
         );
 
+        my @ParentQueueParts = split(/::/, $QueueData{Name});
+
         if ( !IsHashRefWithData( \%QueueData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "No data found for QueueID $QueueID.",
             );
         }
-        
+        # include SubQueues if requested
+        if ( $Param{Data}->{include}->{SubQueues} ) {
+            my %SubQueueList = $Kernel::OM->Get('Kernel::System::Queue')->GetAllSubQueues(
+                QueueID => $QueueID,
+            );
+
+            # filter direct children
+            my @DirectSubQueues;
+            foreach my $SubQueueID ( sort keys %SubQueueList ) {
+                my @QueueParts = split(/::/, $SubQueueList{$SubQueueID});
+                next if scalar(@QueueParts) > scalar(@ParentQueueParts)+1;
+                push(@DirectSubQueues, $SubQueueID)
+            }
+
+            $QueueData{SubQueues} = \@DirectSubQueues;
+        }
+
+        # remove hierarchy from name (use last element of name split)
+        $QueueData{Name} = pop @ParentQueueParts;
+
+        # add "pseudo" ParentID
+        if ( scalar(@ParentQueueParts) > 0 ) {            
+            $QueueData{ParentID} = 0 + $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                Queue => join('::', @ParentQueueParts),
+            );
+        }
+        else {
+            $QueueData{ParentID} = undef;
+        }
+
         # add
         push(@QueueList, \%QueueData);
     }

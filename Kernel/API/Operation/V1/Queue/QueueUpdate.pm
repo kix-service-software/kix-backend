@@ -75,6 +75,7 @@ perform QueueUpdate Operation. This will return the updated TypeID.
             QueueID => 123,
             Queue  => {
                 Name                => '...',
+                ParentID            => 123,
                 Comment             => '...',     # (optional)
                 ValidID             => '...',     # (optional)              
                 GroupID             => '...',
@@ -162,11 +163,34 @@ sub Run {
             Message => "Cannot update Queue. No Queue with ID '$Param{Data}->{QueueID}' found.",
         );
     } 
-        
+
     my %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
         ID => $Param{Data}->{QueueID},
     );
-  
+
+    # set name to support internal representation of hierarchy
+    if ( $Queue->{Name} ) {
+        if ( $Queue->{ParentID} ) {
+            # ParentID given
+            my $ParentQueueName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                QueueID => $Queue->{ParentID},
+            );
+            if ( !$ParentQueueName ) {
+                return $Self->_Error(
+                    Code    => 'Object.NotFound',
+                    Message => "Cannot update Queue. No Queue with ParentID '$Queue->{ParentID}' found.",
+                );
+            }
+            $Queue->{Name} = $ParentQueueName.'::'.$Queue->{Name};
+        }
+        else {
+            # no ParentID given
+            my @NameParts = split(/::/, $QueueData{Name});
+            pop @NameParts;
+            $Queue->{Name} = join('::', @NameParts).'::'.$Queue->{Name};
+        }
+    }
+      
     # update Queue
     my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueUpdate(    
         QueueID             => $Param{Data}->{QueueID},

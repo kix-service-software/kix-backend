@@ -145,6 +145,8 @@ sub Run {
             UserID  => $Self->{Authorization}->{UserID},
         );
 
+        my @ParentServiceParts = split(/::/, $ServiceData{Name});
+
         if ( !IsHashRefWithData( \%ServiceData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
@@ -152,6 +154,27 @@ sub Run {
             );
         }
         
+        # include SubServices if requested
+        if ( $Param{Data}->{include}->{SubServices} ) {
+            my %SubServiceList = $Kernel::OM->Get('Kernel::System::Service')->GetAllSubServices(
+                ServiceID => $ServiceID,
+            );
+
+            # filter direct children
+            my @DirectSubServices;
+            foreach my $SubServiceID ( sort keys %SubServiceList ) {
+                my @ServiceParts = split(/::/, $SubServiceList{$SubServiceID});
+                next if scalar(@ServiceParts) > scalar(@ParentServiceParts)+1;
+                push(@DirectSubServices, $SubServiceID)
+            }
+
+            $ServiceData{SubServices} = \@DirectSubServices;
+        }
+
+        # move NameShort to Name and delete NameShort
+        $ServiceData{Name} = $ServiceData{NameShort};
+        delete $ServiceData{NameShort};
+                
         # add
         push(@ServiceList, \%ServiceData);
     }

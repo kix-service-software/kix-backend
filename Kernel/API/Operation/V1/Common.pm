@@ -299,7 +299,7 @@ sub PrepareData {
             # parse into arrayref if parameter value is scalar and ARRAY type is needed
             if ( $Parameters{$Parameter}->{Type} && $Parameters{$Parameter}->{Type} =~ /(ARRAY|ARRAYtoHASH)/ && $Data{$Parameter} && ref($Data{$Parameter}) ne 'ARRAY' ) {
                 my @Values = split('\s*,\s*', $Data{$Parameter});
-                if ( $Parameters{$Parameter}->{DataType} eq 'NUMERIC') {
+                if ( $Parameters{$Parameter}->{DataType} && $Parameters{$Parameter}->{DataType} eq 'NUMERIC') {
                     @Values = map { 0 + $_ } @Values;
                 }
                 $Self->_SetParameter(
@@ -1090,19 +1090,26 @@ sub _ApplyExpand {
     if ( IsHashRefWithData($GenericExpands) ) {
         foreach my $Object ( keys %{$Param{Data}} ) {
             foreach my $AttributeToExpand ( keys %{$Self->{Expand}} ) {
-                
                 next if !$GenericExpands->{$AttributeToExpand};
-                next if $GenericExpands->{$AttributeToExpand}->{Operation} eq $Self->{OperationType};
-                next if !$Param{Data}->{$Object}->{$AttributeToExpand};
 
-                my $Result = $Self->_ExpandObject(
-                    AttributeToExpand => $AttributeToExpand,
-                    ExpanderConfig    => $GenericExpands->{$AttributeToExpand},
-                    Data              => $Param{Data}->{$Object},
-                );
+                my @ItemList;
+                if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
+                    @ItemList = @{$Param{Data}->{$Object}};
+                }
+                else {
+                    @ItemList = ( $Param{Data}->{$Object} );
+                }
 
-                if ( !$Result->{Success} ) {
-                    return $Result;
+                foreach my $ItemData ( @ItemList ) {
+                    my $Result = $Self->_ExpandObject(
+                        AttributeToExpand => $AttributeToExpand,
+                        ExpanderConfig    => $GenericExpands->{$AttributeToExpand},
+                        Data              => $ItemData
+                    );
+
+                    if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
+                        return $Result;
+                    }
                 }
             }            
         }
@@ -1135,9 +1142,13 @@ sub _ExpandObject {
             Message => "Expanding a hash is not possible!",
         );
     }
-    else {
+    elsif ( IsStringWithData($Param{Data}->{$Param{AttributeToExpand}}) ) {
         # convert scalar into our data array for further use
         @Data = ( $Param{Data}->{$Param{AttributeToExpand}} );
+    }
+    else {
+        # no data available to expand
+        return 1;
     }
 
     # get primary key for get operation
@@ -1154,7 +1165,7 @@ sub _ExpandObject {
             Message => "No ObjectID for expand operation configured!",
         );        
     }
-    
+
     # add primary ObjectID to params
     my %ExecData = (
         "$OperationConfig->{ObjectID}" => join(',', sort @Data)

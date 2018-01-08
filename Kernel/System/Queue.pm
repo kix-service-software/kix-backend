@@ -583,6 +583,60 @@ sub GetAllCustomQueues {
     return @QueueIDs;
 }
 
+=item GetAllSubQueues()
+
+get all sub queues of a queue
+
+    my %Queues = $QueueObject->GetAllSubQueues( QueueID => 123 );
+
+=cut
+
+sub GetAllSubQueues {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{QueueID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need QueueID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'GetAllSubQueues::' . $Param{QueueID};
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # search all custom queues
+    return if !$DBObject->Prepare(
+        SQL  => "SELECT q2.id, q2.name FROM queue q1, queue q2 WHERE q1.id = ? AND q2.id <> ? AND q2.name like q1.name||'::%'",
+        Bind => [ \$Param{QueueID}, \$Param{QueueID} ],
+    );
+
+    # fetch the result
+    my %QueueIDs;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $QueueIDs{$Row[0]} = $Row[1];
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%QueueIDs,
+    );
+
+    return %QueueIDs;
+}
+
 =item QueueLookup()
 
 get id or name for queue
