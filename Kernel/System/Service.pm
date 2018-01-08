@@ -1529,6 +1529,61 @@ sub GetAllCustomServices {
 
     return @ServiceIDs;
 }
+
+=item GetAllSubServices()
+
+get all sub Services of a Service
+
+    my %Services = $ServiceObject->GetAllSubServices( ServiceID => 123 );
+
+=cut
+
+sub GetAllSubServices {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{ServiceID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ServiceID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'GetAllSubServices::' . $Param{ServiceID};
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # search all custom Services
+    return if !$DBObject->Prepare(
+        SQL  => "SELECT s2.id, s2.name FROM service s1, service s2 WHERE s1.id = ? AND s2.id <> ? AND s2.name like s1.name||'::%'",
+        Bind => [ \$Param{ServiceID}, \$Param{ServiceID} ],
+    );
+
+    # fetch the result
+    my %ServiceIDs;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $ServiceIDs{$Row[0]} = $Row[1];
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%ServiceIDs,
+    );
+
+    return %ServiceIDs;
+}
+
 # ---
 # GeneralCatalog
 # ---

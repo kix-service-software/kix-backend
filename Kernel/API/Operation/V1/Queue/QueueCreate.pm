@@ -149,6 +149,20 @@ sub Run {
         Data => $Param{Data}->{Queue}
     );
 
+    # set name to support internal representation of hierarchy
+    if ( $Queue->{ParentID} ) {
+        my $ParentQueueName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            QueueID => $Queue->{ParentID},
+        );
+        if ( !$ParentQueueName ) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "Cannot create Queue. No Queue with ParentID '$Queue->{ParentID}' found.",
+            );
+        }
+        $Queue->{Name} = $ParentQueueName.'::'.$Queue->{Name};
+    }
+
     # check if Queue exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
         Queue => $Queue->{Name},
@@ -157,7 +171,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Queue. Queue with same name '$Queue->{Name}' already exists.",
+            Message => "Cannot create Queue. Queue '$Queue->{Name}' already exists.",
         );
     }
 
