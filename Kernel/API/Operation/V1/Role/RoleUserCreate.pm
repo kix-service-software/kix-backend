@@ -66,7 +66,7 @@ sub new {
 
 =item Run()
 
-perform RoleUserCreate Operation. This will return the created RoleUserID.
+perform RoleUserCreate Operation. This will return sucsess.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -82,7 +82,6 @@ perform RoleUserCreate Operation. This will return the created RoleUserID.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            RoleUserID  => '',                         # ID of the created RoleUser
         },
     };
 
@@ -123,7 +122,6 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-
 
     # create RoleUser
     my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(

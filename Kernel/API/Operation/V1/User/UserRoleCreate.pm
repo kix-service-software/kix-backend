@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/RoleUserCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/User/UserRoleCreate.pm - API RoleUser Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::RoleUserCreate;
+package Kernel::API::Operation::V1::User::UserRoleCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::RoleUserCreate - API User RoleUser Create Operation backend
+Kernel::API::Operation::V1::User::UserRoleCreate - API User UserRole Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,31 +66,20 @@ sub new {
 
 =item Run()
 
-perform RoleUserCreate Operation. This will return the created RoleUserID.
+perform UserRoleCreate Operation. This will return sucsess.
 
     my $Result = $OperationObject->Run(
         Data => {
-            RoleUser  => {
-                UserID    => 12,
-                RoleID    => 6,
-            },
+            UserID    => 12,
+            RoleID    => 6,
         },
     );
-
-    my $Success = $GroupObject->PermissionRoleUserAdd(
-        UID    => 12,
-        RID    => 6,
-        Active => 1,
-        UserID => 123,
-    );
-
 
     $Result = {
         Success         => 1,                       # 0 or 1
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            RoleUserID  => '',                         # ID of the created RoleUser
         },
     };
 
@@ -131,7 +120,6 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-
 
     # create RoleUser
     my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
