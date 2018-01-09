@@ -106,8 +106,10 @@ sub Run {
             'RoleID' => {
                 Required => 1
             },
+        }
     );
-
+use Data::Dumper;
+print STDERR "Param".Dumper(\%Param);
     # check result
     if ( !$Result->{Success} ) {
         return $Self->_Error(
@@ -120,7 +122,7 @@ sub Run {
     my %UserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserGet(
         RoleID => $Param{Data}->{RoleID},
     );
-
+print STDERR "Param".Dumper(\%UserList);
     my @ResultList = sort keys %UserList;
     if ( IsArrayRefWithData(\@ResultList) ) {
         return $Self->_Success(

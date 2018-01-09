@@ -102,9 +102,11 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+        Parameters => {
             'UserID' => {
                 Required => 1
             },
+        }
     );
 
     # check result
