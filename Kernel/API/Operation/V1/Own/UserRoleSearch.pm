@@ -77,8 +77,7 @@ perform UserRoleSearch Operation. This will return a Role ID.
         Message => '',                          # In case of an error
         Data    => {
             RoleID => [
-                {},
-                {}
+                ...
             ]
         },
     };
@@ -102,6 +101,9 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+            'UserID' => {
+                Required => 1
+            },
     );
 
     # check result
@@ -117,7 +119,7 @@ sub Run {
         UserID        => $Self->{Authorization}->{UserID},
     );
 
-    my @ResultList = keys %RoleList;
+    my @ResultList = sort keys %RoleList;
     if ( IsArrayRefWithData(\@ResultList) ) {
         return $Self->_Success(
             RoleIDs => \@ResultList,

@@ -50,8 +50,8 @@
             <Item Key="APIVersion">V1</Item>
             <Item Key="Controller">Own</Item>
             <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            <Item Key="Permission">Group=admin:ro</Item>
         </Hash>
     </Setting>
 </ConfigItem>
+
 </kix_config>

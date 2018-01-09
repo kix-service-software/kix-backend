@@ -2953,7 +2953,7 @@ sub RoleDelete {
 
 }
 
-sub RoleUserDelete {
+sub PermissionRoleUserDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff

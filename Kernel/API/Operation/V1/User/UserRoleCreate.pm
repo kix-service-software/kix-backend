@@ -126,13 +126,13 @@ sub Run {
         UID    => $Param{Data}->{UserID},
         RID    => $Param{Data}->{RoleID},
         Active => 1,
-        UserID        => $Self->{Authorization}->{UserID},
+        UserID => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create UserRole permissions, please contact the system administrator',
+            Message => 'Could not create role assignment, please contact the system administrator',
         );
     }
     

@@ -10,6 +10,10 @@
 /users/:UserID                                                      |   GET             | V1::User::UserGet
 /users/:UserID                                                      |   PATCH           | V1::User::UserUpdate
 /user                                                               |   GET             | V1::Own::UserGet
+/users/:UserID/roleids                                              |   GET             | V1::User::UserRoleSearch 
+/users/:UserID/roleids                                              |   POST            | V1::User::UserRoleCreate 
+/users/:UserID/roleids/:RoleID                                      |   DELETE          | V1::User::UserRoleDelete
+/user/roleids                                                       |   GET             | V1::Own::RoleUserSearch
 /tickettypes                                                        |   GET             | V1::TicketType::TicketTypeSearch
 /tickettypes                                                        |   POST            | V1::TicketType::TicketTypeCreate
 /tickettypes/:TypeID                                                |   GET             | V1::TicketType::TicketTypeGet
@@ -63,6 +67,9 @@
 /roles/:RoleID                                                      |   GET             | V1::Role::RoleGet
 /roles/:RoleID                                                      |   PATCH           | V1::Role::RoleUpdate
 /roles/:RoleID                                                      |   DELETE          | V1::Role::RoleDelete
+/roles/:RoleID/userids                                              |   GET             | V1::Role::RoleUserSearch
+/roles/:RoleID/userids                                              |   POST            | V1::Role::RoleUserCreate
+/roles/:RoleID/userids/:UserID                                      |   DELETE          | V1::Role::RoleUserDelete
 /ticketlocks                                                        |   GET             | V1::Lock::LockSearch
 /ticketlocks/:LockID                                                |   GET             | V1::Lock::LockGet
 /queues                                                             |   GET             | V1::Queue::QueueSearch
@@ -137,11 +144,4 @@
 /mailaccounts/:MailAccountID                                        |   GET             | V1::MailAccount::MailAccountGet
 /mailaccounts/:MailAccountID                                        |   PATCH           | V1::MailAccount::MailAccountUpdate
 /mailaccounts/:MailAccountID                                        |   DELETE          | V1::MailAccount::MailAccountDelete
-/users/:UserID/roleids                                              |   GET             | V1::User::UserRoleSearch 
-/users/:UserID/roleids                                              |   POST            | V1::User::UserRoleCreate 
-/users/:UserID/roleids/:RoleID                                      |   DELETE          | V1::User::UserRoleDelete
-/roles/:RoleID/userids                                              |   GET             | V1::Role::RoleUserSearch
-/roles/:RoleID/userids                                              |   POST            | V1::Role::RoleUserCreate
-/roles/:RoleID/userids/:UserID                                      |   DELETE          | V1::Role::RoleUserDelete
-/user/roleids                                                       |   GET             | V1::Own::RoleUserSearch
 

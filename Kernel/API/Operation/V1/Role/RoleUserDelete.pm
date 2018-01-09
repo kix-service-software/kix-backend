@@ -118,7 +118,7 @@ sub Run {
     }
 
     # delete RoleUser	    
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleUserDelete(
+    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserDelete(
         RoleID  => $Param{Data}->{RoleID},
         UserID  => $Param{Data}->{UserID},
     );
@@ -126,7 +126,7 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToDelete',
-            Message => 'Could not delete RoleUser, please contact the system administrator',
+            Message => 'Could not create role assignment, please contact the system administrator',
         );
     }
 
