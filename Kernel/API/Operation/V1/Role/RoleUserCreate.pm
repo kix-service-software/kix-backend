@@ -77,14 +77,6 @@ perform RoleUserCreate Operation. This will return the created RoleUserID.
         },
     );
 
-    my $Success = $GroupObject->PermissionRoleUserAdd(
-        UID    => 12,
-        RID    => 6,
-        Active => 1,
-        UserID => 123,
-    );
-
-
     $Result = {
         Success         => 1,                       # 0 or 1
         Code            => '',                      # 
