@@ -67,5 +67,46 @@
                 <Item Key="UserPw">1</Item>
             </Hash>
         </Setting>
-    </ConfigItem>  
+    </ConfigItem>
+    
+    <ConfigItem Name="API::Operation::Module###V1::User::UserRoleSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserRoleSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">User</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:ro</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::User::UserRoleCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserRoleCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">User</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+        <ConfigItem Name="API::Operation::Module###V1::User::UserRoleDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserRoleDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">User</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>

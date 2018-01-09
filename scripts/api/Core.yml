@@ -966,6 +966,55 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::MailAccount::MailAccountDelete
+    V1::User::UserRoleSearch :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleSearch 
+    V1::User::UserRoleCreate :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleCreate 
+    V1::User::UserRoleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleDelete
+    V1::Role::RoleUserSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserSearch
+    V1::Role::RoleUserCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserCreate
+    V1::Role::RoleUserDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserDelete
+    V1::Own::RoleUserSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Own::RoleUserSearch
 
   Transport:
     Config:
@@ -1520,6 +1569,34 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /mailaccounts/:MailAccountID
+        V1::User::UserRoleSearch :
+          RequestMethod:
+          - GET
+          Route: /users/:UserID/roleids
+        V1::User::UserRoleCreate :
+          RequestMethod:
+          - POST
+          Route: /users/:UserID/roleids
+        V1::User::UserRoleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /users/:UserID/roleids/:RoleID
+        V1::Role::RoleUserSearch:
+          RequestMethod:
+          - GET
+          Route: /roles/:RoleID/userids
+        V1::Role::RoleUserCreate:
+          RequestMethod:
+          - POST
+          Route: /roles/:RoleID/userids
+        V1::Role::RoleUserDelete:
+          RequestMethod:
+          - DELETE
+          Route: /roles/:RoleID/userids/:UserID
+        V1::Own::RoleUserSearch:
+          RequestMethod:
+          - GET
+          Route: /user/roleids
 
     Type: HTTP::REST
 RemoteSystem: ''

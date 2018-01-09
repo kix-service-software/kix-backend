@@ -59,4 +59,45 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">RoleUserSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Role</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:ro</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">RoleUserCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Role</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">RoleUserDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Role</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>

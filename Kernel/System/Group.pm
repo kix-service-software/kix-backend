@@ -2953,6 +2953,47 @@ sub RoleDelete {
 
 }
 
+sub RoleUserDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(RoleID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+
+    # delete existing RoleUser relation
+    $DBObject->Do(
+        SQL  => 'DELETE FROM role_user WHERE user_id = ? AND role_id = ?',
+        Bind => [ \$Param{UserID}, \$Param{RoleID} ],
+    );
+
+    # reset cache
+    $CacheObject->CleanUp(
+        Type => 'DBRoleUserGet',
+    );
+
+    $CacheObject->CleanUp(
+        Type => 'GroupPermissionUserGet',
+    );
+
+    $CacheObject->CleanUp(
+        Type => 'GroupPermissionGroupGet',
+    );
+
+    return 1;
+}
+
+
 1;
 
 =end Internal:
