@@ -126,7 +126,7 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToDelete',
-            Message => 'Could not create role assignment, please contact the system administrator',
+            Message => 'Could not delete role assignment, please contact the system administrator',
         );
     }
 
