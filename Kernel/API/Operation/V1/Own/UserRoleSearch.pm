@@ -100,12 +100,7 @@ sub Run {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'UserID' => {
-                Required => 1
-            },
-        }
+        Data => $Param{Data}
     );
 
     # check result
@@ -118,7 +113,7 @@ sub Run {
 
     # perform UserRole search
     my %RoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserRoleGet(
-        UserID        => $Self->{Authorization}->{UserID},
+        UserID => $Self->{Authorization}->{UserID},
     );
 
     my @ResultList = sort keys %RoleList;
