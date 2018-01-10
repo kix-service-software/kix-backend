@@ -13,6 +13,8 @@ package Kernel::System::SearchProfile;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck (qw(:all));
+
 our @ObjectDependencies = (
     'Kernel::System::Cache',
     'Kernel::System::DB',
@@ -73,12 +75,18 @@ sub new {
 
 to add a search profile item
 
-    $SearchProfileObject->SearchProfileAdd(
-        Base      => 'TicketSearch',
+    $ID = $SearchProfileObject->SearchProfileAdd(
+        Object    => 'Ticket',
         Name      => 'last-search',
-        Key       => 'Body',
-        Value     => $String,    # SCALAR|ARRAYREF
-        UserLogin => 123,
+        UserType  => 'Agent'|'Customer'
+        UserLogin => '...',
+        SubscribedProfileID => 123,     # optional, ID of the subscribed (referenced) search profile
+        Data      => {                  # necessary if no subscription
+            Key => Value
+        },
+        Categories => [                 # optional
+            '...'
+        ]
     );
 
 =cut
@@ -87,7 +95,7 @@ sub SearchProfileAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Base Name Key UserLogin)) {
+    for (qw(Object Name UserLogin UserType)) {
         if ( !defined $Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -97,58 +105,126 @@ sub SearchProfileAdd {
         }
     }
 
-    # check value
-    return 1 if !defined $Param{Value};
-
-    # create login string
-    my $Login = $Param{Base} . '::' . $Param{UserLogin};
-
-    my @Data;
-    if ( ref $Param{Value} eq 'ARRAY' ) {
-        @Data = @{ $Param{Value} };
-        $Param{Type} = 'ARRAY';
-    }
-    else {
-        @Data = ( $Param{Value} );
-        $Param{Type} = 'SCALAR';
-    }
-
-    for my $Value (@Data) {
-
-        return if !$Self->{DBObject}->Do(
-            SQL => "
-                INSERT INTO search_profile
-                (login, profile_name,  profile_type, profile_key, profile_value)
-                VALUES (?, ?, ?, ?, ?)
-                ",
-            Bind => [
-                \$Login, \$Param{Name}, \$Param{Type}, \$Param{Key}, \$Value,
-            ],
+    if ( !$Param{SubscribedProfileID} && !IsHashRefWithData($Param{Data}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need Data if search profile is no subscription!"
         );
+        return;        
     }
+
+    if ( $Param{UserType} !~ /^(Agent|Customer)$/g ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "UserType must be 'Agent' or 'Customer'!"
+        );
+        return;        
+    }
+
+    # find existing profile
+    $Self->{DBObject}->Prepare(
+        SQL   => 'SELECT id FROM search_profile WHERE user_login = ? AND user_type = ? AND name = ? AND object = ?',
+        Bind  => [ \$Param{UserLogin}, \$Param{UserType}, \$Param{Name}, \$Param{Object} ],
+        Limit => 1,
+    );
+    my $Exists;
+    while ( $Self->{DBObject}->FetchrowArray() ) {
+        $Exists = 1;
+    }
+
+    # add profile to database
+    if ($Exists) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Can\'t add search profile! A profile with same name already exists for this object.'
+        );
+        return;
+    }
+
+    return if !$Self->{DBObject}->Do(
+        SQL => "
+            INSERT INTO search_profile (user_login, user_type, name, object, subscribed_profile_id) VALUES (?, ?, ?, ?)",
+        Bind => [
+            \$Param{UserLogin}, \$Param{UserType}, \$Param{Name}, \$Param{Object}, \$Param{SubscribedProfileID}
+        ],
+    );
+
+    # get profile id
+    $Self->{DBObject}->Prepare(
+        SQL   => 'SELECT id FROM search_profile WHERE user_login = ? AND user_type = ? AND name = ? AND object = ?',
+        Bind  => [ 
+            \$Param{UserLogin}, \$Param{UserType}, \$Param{Name}, \$Param{Object}
+        ],
+        Limit => 1,
+    );
+    my $SearchProfileID;
+    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+        $SearchProfileID = $Row[0];
+    }
+
+    if ( IsHashRefWithData($Param{Data}) ) {
+        # store data into preferences table
+        foreach my $Key (sort keys %{$Param{Data}}) {
+
+            my @Data;
+            my $Type;
+            if ( ref $Param{Data}->{$Key} eq 'ARRAY' ) {
+                @Data = @{ $Param{Data}->{$Key} };
+                $Type = 'ARRAY';
+            }
+            else {
+                @Data = ( $Param{Data}->{$Key} );
+                $Type = 'SCALAR';
+            }
+
+            foreach my $Value (@Data) {
+                return if !$Self->{DBObject}->Do(
+                    SQL => "
+                        INSERT INTO search_profile_preferences
+                        (search_profile_id, preferences_type, preferences_key, preferences_value)
+                        VALUES (?, ?, ?, ?)
+                        ",
+                    Bind => [
+                        \$SearchProfileID, \$Type, \$Key, \$Value,
+                    ],
+                );
+            }
+        }
+    }
+
+    if ( IsArrayRefWithData($Param{Categories}) ) {
+        # store into categories table
+        foreach my $Category ( @{$Param{Categories}} ) {
+
+            return if !$Self->{DBObject}->Do(
+                SQL => "
+                    INSERT INTO search_profile_categories
+                    (search_profile_id, category)
+                    VALUES (?, ?)
+                    ",
+                Bind => [
+                    \$SearchProfileID, \$Category
+                ],
+            );
+        }
+    }    
 
     # reset cache
-    my $CacheKey = $Login . '::' . $Param{Name};
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $Login,
-    );
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
     );
 
-    return 1;
+    return $SearchProfileID;
 }
 
 =item SearchProfileGet()
 
 returns hash with search profile.
 
-    my %SearchProfileData = $SearchProfileObject->SearchProfileGet(
-        Base      => 'TicketSearch',
-        Name      => 'last-search',
-        UserLogin => 'me',
+    my %SearchProfile = $SearchProfileObject->SearchProfileGet(
+        ID             => 123,
+        WithData       => 1,
+        WithCategories => 1,
     );
 
 =cut
@@ -157,7 +233,7 @@ sub SearchProfileGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Base Name UserLogin)) {
+    for (qw(ID)) {
         if ( !defined( $Param{$_} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -167,11 +243,8 @@ sub SearchProfileGet {
         }
     }
 
-    # create login string
-    my $Login = $Param{Base} . '::' . $Param{UserLogin};
-
     # check the cache
-    my $CacheKey = $Login . '::' . $Param{Name};
+    my $CacheKey = 'SearchProfileGet::' . $Param{ID} . '::' . $Param{WithData};
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -179,33 +252,215 @@ sub SearchProfileGet {
     return %{$Cache} if $Cache;
 
     # get search profile
-    return if !$Self->{DBObject}->Prepare(
-        SQL => "
-            SELECT profile_type, profile_key, profile_value
-            FROM search_profile
-            WHERE profile_name = ?
-                AND $Self->{Lower}(login) = $Self->{Lower}(?)
-            ",
-        Bind => [ \$Param{Name}, \$Login ],
+    $Self->{DBObject}->Prepare(
+        SQL => "SELECT object, name, user_login, user_type, subscribed_profile_id FROM search_profile WHERE id = ?",
+        Bind => [ \$Param{ID} ],
     );
 
-    my %Result;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        if ( $Data[0] eq 'ARRAY' ) {
-            push @{ $Result{ $Data[1] } }, $Data[2];
-        }
-        else {
-            $Result{ $Data[1] } = $Data[2];
-        }
+    my %SearchProfile;
+    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+        $SearchProfile{ID}        = $Row[0];
+        $SearchProfile{Object}    = $Row[1];
+        $SearchProfile{Name}      = $Row[2];
+        $SearchProfile{UserLogin} = $Row[3];
+        $SearchProfile{UserType}  = $Row[4];
+        $SearchProfile{SubscribedProfileID} = $Row[5];
     }
+
+    # check service
+    if ( !$SearchProfile{ID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such search profile ($Param{ID})!",
+        );
+        return;
+    }
+
+    if ( $Param{WithData} ) {
+        # get search profile data
+        return if !$Self->{DBObject}->Prepare(
+            SQL => "
+                SELECT preferences_type, preferences_key, preferences_value
+                FROM search_profile_preferences
+                WHERE search_profile_id = ?",
+            Bind => [ \$Param{ID} ],
+        );
+
+        my %Data;
+        while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+            if ( $Row[0] eq 'ARRAY' ) {
+                push @{ $Data{ $Row[1] } }, $Row[2];
+            }
+            else {
+                $Data{ $Row[1] } = $Row[2];
+            }
+        }
+        %SearchProfile{Data} = \%Data;
+    }
+
+    if ( $Param{WithCategories} ) {
+        # get search profile categories
+        return if !$Self->{DBObject}->Prepare(
+            SQL  => "SELECT category FROM search_profile_category WHERE search_profile_id = ?",
+            Bind => [ \$Param{ID} ],
+        );
+
+        my @Categories;
+        while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+            push(@Categories, $Row[0])
+        }
+        %SearchProfile{Categories} = \%Data;
+    }
+
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
-        Value => \%Result
+        Value => \%SearchProfile
     );
 
-    return %Result;
+    return %SearchProfile;
+}
+
+=item SearchProfileUpdate()
+
+update a search profile
+
+    $Success = $SearchProfileObject->SearchProfileUpdate(
+        ID        => 123,
+        Name      => 'last-search',     # optional
+        SubscribedProfileID => 123,     # optional, ID of the subscribed (referenced) search profile
+        Data      => {                  # necessary if no subscription
+            Key => Value
+        },
+        Categories => [                 # optional
+            '...'
+        ]
+    );
+
+=cut
+
+sub SearchProfileUpdate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    return 1 if !$Param{Name} && !IsHashRefWithData($Param{Data});
+
+    my %SearchProfile = $Self->SearchProfileGet(
+        ID       => $Param{ID},
+    );
+    return if !%SearchProfile;
+
+    # update name if necessary
+    if ( $Param{Name} && $Param{Name} ne $SearchProfile{Name} ) {
+
+        # find existing profile
+        $Self->{DBObject}->Prepare(
+            SQL   => 'SELECT id FROM search_profile WHERE user_login = ? AND user_type = ? AND name = ? AND object = ? AND id <> ?',
+            Bind  => [ \$SearchProfile{UserLogin}, \$SearchProfile{UserType}, \$Param{Name}, \$SearchProfile{Object}, $Param{ID} ],
+            Limit => 1,
+        );
+        my $Exists;
+        while ( $Self->{DBObject}->FetchrowArray() ) {
+            $Exists = 1;
+        }
+
+        # add profile to database
+        if ($Exists) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => 'Can\'t add search profile! A profile with same name already exists for this object.'
+            );
+            return;
+        }
+        
+        return if !$Self->{DBObject}->Do(
+            SQL  => "UPDATE search_profile SET name = ?",
+            Bind => [
+                \$Param{Name}
+            ],
+        );
+    }
+
+    if ( IsHashRefWithData($Param{Data}) ) {    
+        # delete all data
+        $Self->{DBObject}->Do(
+            SQL   => 'DELETE FROM search_profile_preferences WHERE search_profile_id = ?',
+            Bind  => [ 
+                \$Param{ID}
+            ],
+        );
+
+        # store data into preferences table
+        foreach my $Key (sort keys %{$Param{Data}}) {
+
+            my @Data;
+            my $Type;
+            if ( ref $Param{Data}->{$Key} eq 'ARRAY' ) {
+                @Data = @{ $Param{Data}->{$Key} };
+                $Type = 'ARRAY';
+            }
+            else {
+                @Data = ( $Param{Data}->{$Key} );
+                $Type = 'SCALAR';
+            }
+
+            foreach my $Value (@Data) {
+                return if !$Self->{DBObject}->Do(
+                    SQL => "
+                        INSERT INTO search_profile_preferences
+                        (search_profile_id, preferences_type, preferences_key, preferences_value)
+                        VALUES (?, ?, ?, ?)
+                        ",
+                    Bind => [
+                        \$Param{ID}, \$Type, \$Key, \$Value,
+                    ],
+                );
+            }
+        }
+    }
+
+    if ( IsArrayRefWithData($Param{Categories}) ) {    
+        # delete all categories
+        $Self->{DBObject}->Do(
+            SQL   => 'DELETE FROM search_profile_categories WHERE search_profile_id = ?',
+            Bind  => [ 
+                \$Param{ID}
+            ],
+        );
+
+        # store into categories table
+        foreach my $Category ( @{$Param{Categories}} ) {
+
+            return if !$Self->{DBObject}->Do(
+                SQL => "
+                    INSERT INTO search_profile_categories
+                    (search_profile_id, category)
+                    VALUES (?, ?)
+                    ",
+                Bind => [
+                    \$Param{ID}, \$Category
+                ],
+            );
+        }
+    }
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 =item SearchProfileDelete()
@@ -213,9 +468,7 @@ sub SearchProfileGet {
 deletes a search profile.
 
     $SearchProfileObject->SearchProfileDelete(
-        Base      => 'TicketSearch',
-        Name      => 'last-search',
-        UserLogin => 'me',
+        ID => 123
     );
 
 =cut
@@ -224,7 +477,7 @@ sub SearchProfileDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Base Name UserLogin)) {
+    for (qw(ID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -234,30 +487,29 @@ sub SearchProfileDelete {
         }
     }
 
-    # create login string
-    my $Login = $Param{Base} . '::' . $Param{UserLogin};
+    # delete search profile data
+    return if !$Self->{DBObject}->Do(
+        SQL  => "DELETE FROM search_profile_preferences WHERE search_profile_id = ?",
+        Bind => [ \$Param{ID} ],
+    );
+
+    # delete search profile categories
+    return if !$Self->{DBObject}->Do(
+        SQL  => "DELETE FROM search_profile_categories WHERE search_profile_id = ?",
+        Bind => [ \$Param{ID} ],
+    );
 
     # delete search profile
     return if !$Self->{DBObject}->Do(
-        SQL => "
-            DELETE
-            FROM search_profile
-            WHERE profile_name = ?
-                AND $Self->{Lower}(login) = $Self->{Lower}(?)
-            ",
-        Bind => [ \$Param{Name}, \$Login ],
+        SQL  => "DELETE FROM search_profile WHERE id = ?",
+        Bind => [ \$Param{ID} ],
     );
 
     # delete cache
-    my $CacheKey = $Login . '::' . $Param{Name};
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $Login,
     );
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
+
     return 1;
 }
 
@@ -433,8 +685,8 @@ sub SearchProfileList {
 changes the UserLogin of SearchProfiles
 
     my $Result = $SearchProfileObject->SearchProfileUpdateUserLogin(
-        Base         => 'TicketSearch',
-        UserLogin    => 'me',
+        UserType     => 'Agent'|'Customer',
+        OldUserLogin => 'me',
         NewUserLogin => 'newme',
     );
 
