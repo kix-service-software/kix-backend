@@ -122,7 +122,10 @@ sub Run {
         UserID => $Param{Data}->{UserID},
     );
 
-    my @ResultList = sort keys %RoleList;
+    my @ResultList;
+    foreach my $RoleID ( sort keys %RoleList ) {
+        push(@ResultList, 0 + $RoleID);     # enforce nummeric ID
+    }
     if ( IsArrayRefWithData(\@ResultList) ) {
         return $Self->_Success(
             RoleID => \@ResultList,
