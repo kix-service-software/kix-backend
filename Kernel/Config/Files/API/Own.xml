@@ -40,5 +40,18 @@
                 <Item Key="UserPw">1</Item>
             </Hash>
         </Setting>
-    </ConfigItem>  
+    </ConfigItem>
+    
+    <ConfigItem Name="API::Operation::Module###V1::Own::UserRoleSearch" Required="0" Valid="1">
+    <Description Translatable="1">API module registration for the operation layer.</Description>
+    <Setting>
+        <Hash>
+            <Item Key="Name">UserRoleSearch</Item>
+            <Item Key="APIVersion">V1</Item>
+            <Item Key="Controller">Own</Item>
+            <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+        </Hash>
+    </Setting>
+</ConfigItem>
+
 </kix_config>
