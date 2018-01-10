@@ -144,6 +144,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###RoleValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">RoleValidator</Item>
+                <Item Key="Validates">Role,RoleID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">RoleGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Validator::Module###ServiceValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
