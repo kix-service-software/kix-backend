@@ -218,10 +218,29 @@ sub PrepareData {
     # store data for later use
     $Self->{RequestData} = \%Data;
 
+    # prepare Parameters
+    my %Parameters;
+    if ( IsHashRefWithData($Param{Parameters}) ) {
+        %Parameters = %{$Param{Parameters}};
+    }
+
+    # always add include and expand parameter if given
+    if ($Param{Data}->{include}) {
+        $Parameters{'include'} = {
+            Type => 'ARRAYtoHASH',
+        };
+    }
+    if ($Param{Data}->{expand}) {
+        $Parameters{'expand'} = {
+            Type => 'ARRAYtoHASH',
+        };
+    }
+
     # if needed flatten hash structure for easier access to sub structures
-    if ( ref($Param{Parameters}) eq 'HASH' ) {
-        
-        if ( grep(/::/, keys %{$Param{Parameters}}) ) {
+    if ( %Parameters ) {
+
+        if ( grep(/::/, keys %Parameters) ) {
+
             my $FlatData = Hash::Flatten::flatten(
                 $Param{Data},
                 {
@@ -246,16 +265,6 @@ sub PrepareData {
                 %{$FlatData},
             );
         }
-
-        my %Parameters = %{$Param{Parameters}};
-
-        # always add include and expand parameter
-        $Parameters{'include'} = {
-            Type => 'ARRAYtoHASH',
-        };
-        $Parameters{'expand'} = {
-            Type => 'ARRAYtoHASH',
-        };
 
         foreach my $Parameter ( sort keys %Parameters ) {
 
