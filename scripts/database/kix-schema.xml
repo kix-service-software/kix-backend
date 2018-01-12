@@ -1585,7 +1585,6 @@
 <Table Name="search_profile">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="type" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="object" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="user_login" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
     <Column Name="subscribed_profile_id" Type="INTEGER"/>

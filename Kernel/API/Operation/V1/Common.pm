@@ -1261,9 +1261,10 @@ sub _Trim {
         }
     }
     elsif ( ref($Param{Data}) eq 'ARRAY' ) {
+        my $Index = 0;
         foreach my $Attribute ( @{$Param{Data}} ) {
-            $Param{Data}->{$Attribute} = $Self->_Trim(
-                Data => $Param{Data}->{$Attribute}
+            $Param{Data}->[$Index++] = $Self->_Trim(
+                Data => $Attribute
             );
         }
     }

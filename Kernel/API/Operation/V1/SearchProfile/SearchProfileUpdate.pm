@@ -19,7 +19,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::SearchProfile::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -74,16 +74,14 @@ perform SearchProfileUpdate Operation. This will return the updated TypeID.
         Data => {
             SearchProfileID => 123,
             SearchProfile  => {
-                Login         => 'mail',            # optional
-                Password      => 'SomePassword',    # optional
-                Host          => 'pop3.example.com',# optional
-                Type          => 'POP3',            # optional
-                IMAPFolder    => 'Some Folder',     # optional, only valid for IMAP-type accounts
-                ValidID       => 1,                 # optional
-                Trusted       => 0,                 # optional
-                DispatchingBy => 'Queue',           # Queue|From
-                Comment       => '...',             # optional
-                QueueID       => 12,
+                Name                => 'last-search',
+                SubscribedProfileID => 123,                 # optional, ID of the subscribed (referenced) search profile
+                Data                => {                    # optional
+                    Key => Value
+                },
+                Categories   => [                           # optional, if profile should be shared
+                    '...'
+                ]
             },
         },
     );
@@ -115,8 +113,6 @@ sub Run {
         );
     }
 
-    my %BackendList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileBackendList();
-
     # prepare data
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
@@ -128,24 +124,6 @@ sub Run {
                 Type => 'HASH',
                 Required => 1
             },   
-            'SearchProfile::Type' => {
-                RequiresValueIfUsed => 1,
-                OneOf => sort keys %BackendList,
-            },
-           'SearchProfile::DispatchingBy' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    'Queue',
-                    'From'
-                ]
-            },            
-           'SearchProfile::Trusted' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    0,
-                    1
-                ]
-            },            
         }        
     );
 
@@ -175,27 +153,45 @@ sub Run {
         );
     }
 
-    if ( $SearchProfile->{DispatchingBy} eq 'Queue' && !$SearchProfile->{QueueID} ) {
+    # check attribute values
+    my $CheckResult = $Self->_CheckSearchProfile( 
+        SearchProfile => {
+            %SearchProfileData,            
+            %{$SearchProfile}
+        }
+    );
+
+    if ( !$CheckResult->{Success} ) {
         return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
-        );        
+            %{$CheckResult},
+        );
+    }
+
+    if ( $SearchProfile->{Name} ) {
+        # check if SearchProfile exists
+        my @ExistingProfileIDs = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+            Type        => $SearchProfileData{Type},
+            Name        => $SearchProfile->{Name},
+            UserType    => $SearchProfileData{UserType},
+            UserLogin   => $SearchProfileData{UserLogin},
+        );
+        
+        if ( @ExistingProfileIDs && $ExistingProfileIDs[0] != $SearchProfileData{ID}) {
+            return $Self->_Error(
+                Code    => 'Object.AlreadyExists',
+                Message => "Cannot update SearchProfile. Another profile with the same name already exists for this object and user.",
+            );
+        }
     }
 
     # update SearchProfile
     my $Success = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileUpdate(
-        ID            => $Param{Data}->{SearchProfileID},
-        Login         => $SearchProfile->{Login} || $SearchProfileData{Login},
-        Password      => $SearchProfile->{Password} || $SearchProfileData{Password},
-        Host          => $SearchProfile->{Host} || $SearchProfileData{Host},
-        Type          => $SearchProfile->{Type} || $SearchProfileData{Type},
-        IMAPFolder    => $SearchProfile->{IMAPFolder} || $SearchProfileData{IMAPFolder},
-        ValidID       => $SearchProfile->{ValidID} || $SearchProfileData{ValidID},
-        Trusted       => $SearchProfile->{Trusted} || $SearchProfileData{Trusted},
-        DispatchingBy => $SearchProfile->{DispatchingBy} || $SearchProfileData{DispatchingBy},
-        QueueID       => $SearchProfile->{QueueID} || $SearchProfileData{QueueID},
-        Comment       => $SearchProfile->{Comment} || $SearchProfileData{Comment},        
-        UserID        => $Self->{Authorization}->{UserID},                      
+        ID                  => $Param{Data}->{SearchProfileID},
+        Name                => $SearchProfile->{Name} || '',
+        SubscribedProfileID => $SearchProfile->{SubscribedProfileID} || '',
+        Data                => $SearchProfile->{Data} || undef,
+        Categories          => $SearchProfile->{Categories} || undef,
+        UserID              => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {

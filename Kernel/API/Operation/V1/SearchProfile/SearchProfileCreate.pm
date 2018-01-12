@@ -19,7 +19,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::SearchProfile::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -71,16 +71,17 @@ perform SearchProfileCreate Operation. This will return the created SearchProfil
     my $Result = $OperationObject->Run(
         Data => {
             SearchProfile  => {
-                Login         => 'mail',
-                Password      => 'SomePassword',
-                Host          => 'pop3.example.com',
-                Type          => 'POP3',
-                IMAPFolder    => 'Some Folder',     # optional, only valid for IMAP-type accounts
-                ValidID       => 1,
-                Trusted       => 0,
-                DispatchingBy => 'Queue',           # Queue|From
-                Comment       => '...',             # optional
-                QueueID       => 12,
+                Type                => 'Ticket',
+                Name                => 'last-search',
+                UserType            => 'Agent'|'Customer'
+                UserLogin           => '...',
+                SubscribedProfileID => 123,                 # optional, ID of the subscribed (referenced) search profile
+                Data                => {                    # necessary if no subscription
+                    Key => Value
+                },
+                Categories   => [                           # optional, if profile should be shared
+                    '...'
+                ]
             },
         },
     );
@@ -90,7 +91,7 @@ perform SearchProfileCreate Operation. This will return the created SearchProfil
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            SearchProfileID  => '',                         # ID of the created SearchProfile
+            SearchProfileID  => '',                 # ID of the created SearchProfile
         },
     };
 
@@ -111,8 +112,6 @@ sub Run {
         );
     }
 
-    my %BackendList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileBackendList();
-
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -121,33 +120,25 @@ sub Run {
                 Type     => 'HASH',
                 Required => 1
             },
-            'SearchProfile::Login' => {
+            'SearchProfile::Type' => {
                 Required => 1
             },            
-            'SearchProfile::Password' => {
+            'SearchProfile::Name' => {
+                Required => 1
+            },            
+            'SearchProfile::UserLogin' => {
                 Required => 1
             },
-            'SearchProfile::Host' => {
-                Required => 1
-            },
-            'SearchProfile::Type' => {
-                Required => 1,
-                OneOf    => sort keys %BackendList,
-            },
-            'SearchProfile::DispatchingBy' => {
+            'SearchProfile::UserType' => {
                 Required => 1,
                 OneOf    => [
-                    'Queue',
-                    'From'
+                    'Agent',
+                    'Customer'
                 ]
-            },            
-           'SearchProfile::Trusted' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    0,
-                    1
-                ]
-            },            
+            },
+            'SearchProfile::SubscribedProfileID' => {
+                RequiredIfNot => [ 'SearchProfile::Data' ],
+            },
         }
     );
 
@@ -159,32 +150,47 @@ sub Run {
         );
     }
 
-
     # isolate and trim SearchProfile parameter
     my $SearchProfile = $Self->_Trim(
         Data => $Param{Data}->{SearchProfile}
     );
 
-    if ( $SearchProfile->{DispatchingBy} eq 'Queue' && !$SearchProfile->{QueueID} ) {
+    # check attribute values
+    my $CheckResult = $Self->_CheckSearchProfile( 
+        SearchProfile => $SearchProfile
+    );
+
+    if ( !$CheckResult->{Success} ) {
         return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
-        );        
+            %{$CheckResult},
+        );
     }
 
+    # check if SearchProfile exists
+    my @ExistingProfileIDs = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+        Type        => $SearchProfile->{Type},
+        Name        => $SearchProfile->{Name},
+        UserType    => $SearchProfile->{UserType},
+        UserLogin   => $SearchProfile->{UserLogin},
+    );
+    
+    if ( @ExistingProfileIDs ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Cannot create SearchProfile. A profile with the same name already exists for this type and user.",
+        );
+    }
+    
     # create SearchProfile
     my $SearchProfileID = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileAdd(
-        Login         => $SearchProfile->{Login},
-        Password      => $SearchProfile->{Password},
-        Host          => $SearchProfile->{Host},
-        Type          => $SearchProfile->{Type},
-        IMAPFolder    => $SearchProfile->{IMAPFolder} || '',
-        ValidID       => $SearchProfile->{ValidID} || 1,
-        Trusted       => $SearchProfile->{Trusted} || 0,
-        DispatchingBy => $SearchProfile->{DispatchingBy},
-        QueueID       => $SearchProfile->{QueueID} || '',
-        Comment       => $SearchProfile->{Comment} || '',
-        UserID        => $Self->{Authorization}->{UserID},
+        Type              => $SearchProfile->{Type},
+        Name                => $SearchProfile->{Name},
+        UserType            => $SearchProfile->{UserType},
+        UserLogin           => $SearchProfile->{UserLogin},
+        SubscribedProfileID => $SearchProfile->{SubscribedProfileID},
+        Data                => $SearchProfile->{Data},
+        Categories          => $SearchProfile->{Categories},
+        UserID              => $Self->{Authorization}->{UserID},
     );
 
     if ( !$SearchProfileID ) {

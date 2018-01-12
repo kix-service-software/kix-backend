@@ -21,7 +21,7 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::SearchProfile::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -140,7 +140,10 @@ sub Run {
 
         # get the SearchProfile data
         my %SearchProfileData = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileGet(
-            ID => $SearchProfileID,
+            ID                  => $SearchProfileID,
+            WithData            => $Param{Data}->{include}->{Data} ? 1 : 0,
+            WithCategories      => $Param{Data}->{include}->{Categories} ? 1 : 0,
+            WithSubscriptions   => $Param{Data}->{include}->{Subscriptions} ? 1 : 0,
         );
 
         if ( !IsHashRefWithData( \%SearchProfileData ) ) {

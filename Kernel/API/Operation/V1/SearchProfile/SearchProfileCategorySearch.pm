@@ -11,23 +11,22 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SearchProfile::SearchProfileSearch;
+package Kernel::API::Operation::V1::SearchProfile::SearchProfileCategorySearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::SearchProfile::SearchProfileGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::SearchProfile::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::SearchProfile::SearchProfileSearch - API SearchProfile Search Operation backend
+Kernel::API::Operation::SearchProfile::SearchProfileCategorySearch - API SearchProfile Category Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -77,9 +76,8 @@ perform SearchProfileSearch Operation. This will return a SearchProfile ID list.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            SearchProfile => [
-                {},
-                {}
+            SearchProfileType => [
+                ...
             ]
         },
     };
@@ -113,34 +111,19 @@ sub Run {
         );
     }
 
-    # perform SearchProfile search
-    my %SearchProfileList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList();
+    # get category list
+    my %CategoryList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileCategoryList();
 
-	# get already prepared SearchProfile data from SearchProfileGet operation
-    if ( IsHashRefWithData(\%SearchProfileList) ) {  	
-        my $SearchProfileGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SearchProfile::SearchProfileGet',
-            Data      => {
-                SearchProfileID => join(',', sort keys %SearchProfileList),
-            }
-        );    
-
-        if ( !IsHashRefWithData($SearchProfileGetResult) || !$SearchProfileGetResult->{Success} ) {
-            return $SearchProfileGetResult;
-        }
-
-        my @SearchProfileDataList = IsArrayRefWithData($SearchProfileGetResult->{Data}->{SearchProfile}) ? @{$SearchProfileGetResult->{Data}->{SearchProfile}} : ( $SearchProfileGetResult->{Data}->{SearchProfile} );
-
-        if ( IsArrayRefWithData(\@SearchProfileDataList) ) {
-            return $Self->_Success(
-                SearchProfile => \@SearchProfileDataList,
-            )
-        }
+    if ( IsHashRefWithData(\%CategoryList) ) {
+        my @Result = sort keys %CategoryList;
+        return $Self->_Success(
+            SearchProfileCategory => \@Result,
+        )
     }
-
+   
     # return result
     return $Self->_Success(
-        SearchProfile => [],
+        SearchProfileCategoryList => [],
     );
 }
 

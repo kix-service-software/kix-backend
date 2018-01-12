@@ -11,22 +11,23 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SearchProfile::SearchProfileCategorySearch;
+package Kernel::API::Operation::V1::SearchProfile::SearchProfileSearch;
 
 use strict;
 use warnings;
 
+use Kernel::API::Operation::V1::SearchProfile::SearchProfileGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::SearchProfile::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::SearchProfile::SearchProfileCategorySearch - API SearchProfile Category Search Operation backend
+Kernel::API::Operation::SearchProfile::SearchProfileSearch - API SearchProfile Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -76,8 +77,9 @@ perform SearchProfileSearch Operation. This will return a SearchProfile ID list.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            SearchProfileType => [
-                ...
+            SearchProfile => [
+                {},
+                {}
             ]
         },
     };
@@ -111,21 +113,48 @@ sub Run {
         );
     }
 
-    # get backends
-    my %BackendList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileBackendList();
+    # prepare filter if given
+    my %SearchFilter;
+    if ( IsArrayRefWithData($Self->{Filter}->{SearchProfile}->{AND}) ) {
+        foreach my $FilterItem ( @{$Self->{Filter}->{SearchProfile}->{AND}} ) {
+            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
+            next if ($FilterItem->{Field} !~ /^(Type|UserLogin|UserType|SubscribeProfileID|Category)$/g);
+            next if ($FilterItem->{Operator} ne 'EQ');
 
-    if ( IsHashRefWithData(\%BackendList) ) {
-        my @TypeList = sort keys %BackendList;
-        use Data::Dumper;
-        print STDERR Dumper();
-        return $Self->_Success(
-            SearchProfileType => \@TypeList,
-        )
+            $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+        }
     }
-   
+
+    # perform SearchProfile search
+    my @SearchProfileList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+        %SearchFilter
+    );
+
+	# get already prepared SearchProfile data from SearchProfileGet operation
+    if ( IsArrayRefWithData(\@SearchProfileList) ) {  	
+        my $SearchProfileGetResult = $Self->ExecOperation(
+            OperationType => 'V1::SearchProfile::SearchProfileGet',
+            Data      => {
+                SearchProfileID => join(',', @SearchProfileList),
+            }
+        );    
+
+        if ( !IsHashRefWithData($SearchProfileGetResult) || !$SearchProfileGetResult->{Success} ) {
+            return $SearchProfileGetResult;
+        }
+
+        my @SearchProfileDataList = IsArrayRefWithData($SearchProfileGetResult->{Data}->{SearchProfile}) ? @{$SearchProfileGetResult->{Data}->{SearchProfile}} : ( $SearchProfileGetResult->{Data}->{SearchProfile} );
+
+        if ( IsArrayRefWithData(\@SearchProfileDataList) ) {
+            return $Self->_Success(
+                SearchProfile => \@SearchProfileDataList,
+            )
+        }
+    }
+
     # return result
     return $Self->_Success(
-        SearchProfileType => [],
+        SearchProfile => [],
     );
 }
 

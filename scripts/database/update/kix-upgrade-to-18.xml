@@ -2,6 +2,7 @@
 <database Name="kix">
     <TableAlter Name="search_profile">
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <ColumnAdd Name="type" Required="true" Size="200" Type="VARCHAR"/>
         <ColumnChange NameOld="login" NameNew="user_login"/>  
         <ColumnAdd Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
         <ColumnAdd Name="subscribed_profile_id" Type="INTEGER"/>  
