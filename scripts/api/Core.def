@@ -150,4 +150,8 @@
 /searchprofiles/:SearchProfileID                                    |   GET             | V1::SearchProfile::SearchProfileGet
 /searchprofiles/:SearchProfileID                                    |   PATCH           | V1::SearchProfile::SearchProfileUpdate
 /searchprofiles/:SearchProfileID                                    |   DELETE          | V1::SearchProfile::SearchProfileDelete
+/clientregistration                                                 |   GET             | V1::ClientRegistration::ClientRegistrationSearch
+/clientregistration                                                 |   POST            | V1::ClientRegistration::ClientRegistrationCreate
+/clientregistration/:ClientID                                       |   GET             | V1::ClientRegistration::ClientRegistrationGet
+/clientregistration/:ClientID                                       |   DELETE          | V1::ClientRegistration::ClientRegistrationDelete
 
