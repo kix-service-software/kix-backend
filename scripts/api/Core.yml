@@ -1057,6 +1057,34 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SearchProfile::SearchProfileDelete
+    V1::ClientRegistration::ClientRegistrationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationSearch
+    V1::ClientRegistration::ClientRegistrationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationCreate
+    V1::ClientRegistration::ClientRegistrationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationGet
+    V1::ClientRegistration::ClientRegistrationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationDelete
 
   Transport:
     Config:
@@ -1663,6 +1691,22 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /searchprofiles/:SearchProfileID
+        V1::ClientRegistration::ClientRegistrationSearch:
+          RequestMethod:
+          - GET
+          Route: /clientregistration
+        V1::ClientRegistration::ClientRegistrationCreate:
+          RequestMethod:
+          - POST
+          Route: /clientregistration
+        V1::ClientRegistration::ClientRegistrationGet:
+          RequestMethod:
+          - GET
+          Route: /clientregistration/:ClientID
+        V1::ClientRegistration::ClientRegistrationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /clientregistration/:ClientID
 
     Type: HTTP::REST
 RemoteSystem: ''
