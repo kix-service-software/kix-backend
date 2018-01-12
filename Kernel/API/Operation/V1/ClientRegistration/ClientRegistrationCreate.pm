@@ -148,7 +148,7 @@ sub Run {
     }
 
     # create ClientRegistration
-    my $ClientRegistrationID = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationAdd(
+    my $ClientID = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationAdd(
         ClientID       => $ClientRegistration->{ClientID},
         CallbackURL    => $ClientRegistration->{CallbackURL},
         Authentication => $ClientRegistration->{Authentication},
@@ -164,7 +164,7 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        ClientRegistrationID => $ClientRegistrationID,
+        ClientID => $ClientID,
     );    
 }
 
