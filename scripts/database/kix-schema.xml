@@ -1583,17 +1583,30 @@
 
 <!-- search_profile -->
 <Table Name="search_profile">
-    <Column Name="login" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="profile_name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="profile_type" Required="true" Size="30" Type="VARCHAR"/>
-    <Column Name="profile_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="profile_value" Required="false" Size="200" Type="VARCHAR"/>
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="type" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="user_login" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
+    <Column Name="subscribed_profile_id" Type="INTEGER"/>
     <Index Name="search_profile_login">
         <IndexColumn Name="login"/>
     </Index>
-    <Index Name="search_profile_profile_name">
-        <IndexColumn Name="profile_name"/>
-    </Index>
+</Table>
+<Table Name="search_profile_preferences">
+    <Column Name="search_profile_id" Required="true" Type="INTEGER"/>
+    <Column Name="preferences_type" Required="true" Size="30" Type="VARCHAR"/>
+    <Column Name="preferences_key" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="preferences_value" Required="false" Size="200" Type="VARCHAR"/>
+    <ForeignKey ForeignTable="search_profile">
+        <Reference Local="search_profile_id" Foreign="id"/>
+    </ForeignKey>
+</Table>
+<Table Name="search_profile_category">
+    <Column Name="search_profile_id"  Required="true"  Type="INTEGER"/>
+    <Column Name="category" Required="true"  Type="VARCHAR" Size="100"/>
+    <ForeignKey ForeignTable="search_profile">
+        <Reference Local="search_profile_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 
 <!-- process_id -->
@@ -2832,17 +2845,6 @@
     <Column Name="create_by"   Required="true"  Type="INTEGER"/>
     <Column Name="change_time" Required="true"  Type="DATE"/>
     <Column Name="change_by"   Required="true"  Type="INTEGER"/>
-</Table>
-<Table Name="kix_search_profile">
-    <Column Name="category" Required="true"  Type="VARCHAR" Size="100"/>
-    <Column Name="name"     Required="true"  Type="VARCHAR" Size="255"/>
-    <Column Name="state"    Required="true"  Type="VARCHAR" Size="32"/>
-    <Column Name="login"    Required="true"  Type="VARCHAR" Size="64"/>
-    <Index Name="kix_search_profile_nme_st_log">
-        <IndexColumn Name="name"/>
-        <IndexColumn Name="state"/>
-        <IndexColumn Name="login"/>
-    </Index>
 </Table>
 <Table Name="kix_link_graph">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>

@@ -144,4 +144,10 @@
 /mailaccounts/:MailAccountID                                        |   GET             | V1::MailAccount::MailAccountGet
 /mailaccounts/:MailAccountID                                        |   PATCH           | V1::MailAccount::MailAccountUpdate
 /mailaccounts/:MailAccountID                                        |   DELETE          | V1::MailAccount::MailAccountDelete
+/searchprofiles/categories                                          |   GET             | V1::SearchProfile::SearchProfileCategorySearch
+/searchprofiles                                                     |   GET             | V1::SearchProfile::SearchProfileSearch
+/searchprofiles                                                     |   POST            | V1::SearchProfile::SearchProfileCreate
+/searchprofiles/:SearchProfileID                                    |   GET             | V1::SearchProfile::SearchProfileGet
+/searchprofiles/:SearchProfileID                                    |   PATCH           | V1::SearchProfile::SearchProfileUpdate
+/searchprofiles/:SearchProfileID                                    |   DELETE          | V1::SearchProfile::SearchProfileDelete
 

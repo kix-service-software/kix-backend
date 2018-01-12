@@ -1015,6 +1015,48 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::MailAccount::MailAccountDelete
+    V1::SearchProfile::SearchProfileCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileCategorySearch
+    V1::SearchProfile::SearchProfileSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileSearch
+    V1::SearchProfile::SearchProfileCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileCreate
+    V1::SearchProfile::SearchProfileGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileGet
+    V1::SearchProfile::SearchProfileUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileUpdate
+    V1::SearchProfile::SearchProfileDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileDelete
 
   Transport:
     Config:
@@ -1597,6 +1639,30 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /mailaccounts/:MailAccountID
+        V1::SearchProfile::SearchProfileCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /searchprofiles/categories
+        V1::SearchProfile::SearchProfileSearch:
+          RequestMethod:
+          - GET
+          Route: /searchprofiles
+        V1::SearchProfile::SearchProfileCreate:
+          RequestMethod:
+          - POST
+          Route: /searchprofiles
+        V1::SearchProfile::SearchProfileGet:
+          RequestMethod:
+          - GET
+          Route: /searchprofiles/:SearchProfileID
+        V1::SearchProfile::SearchProfileUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /searchprofiles/:SearchProfileID
+        V1::SearchProfile::SearchProfileDelete:
+          RequestMethod:
+          - DELETE
+          Route: /searchprofiles/:SearchProfileID
 
     Type: HTTP::REST
 RemoteSystem: ''

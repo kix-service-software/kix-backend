@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="search_profile">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <ColumnAdd Name="type" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnChange NameOld="login" NameNew="user_login"/>  
+        <ColumnAdd Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
+        <ColumnAdd Name="subscribed_profile_id" Type="INTEGER"/>  
+        <IndexIndex Name="search_profile_profile_name"/>
+    </TableAlter>
+    <TableAlter Name="kix_search_profile">
+        <ColumnAdd Name="search_profile_id" Type="INTEGER"/>  
+        <ColumnDrop Name="name"/>  
+        <IndexDrop Name="kix_search_profile_nme_st_log"/>
+        <Index Name="kix_search_profile_st_log">
+            <IndexColumn Name="state"/>
+            <IndexColumn Name="login"/>
+        </Index>
+    </TableAlter>
     <TableDrop Name="link_state"/>
     <TableAlter Name="link_relation">
         <ColumnDrop Name="state_id"/>
