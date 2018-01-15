@@ -337,20 +337,20 @@ sub PrepareData {
                 );
             }
 
-            # check valid values
-            if ( exists($Parameters{$Parameter}->{OneOf}) && ref($Parameters{$Parameter}->{OneOf}) eq 'ARRAY' ) {
-                if ( !grep(/^$Data{$Parameter}$/g, @{$Parameters{$Parameter}->{OneOf}}) ) {
-                    $Result->{Success} = 0;
-                    $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Parameters{$Parameter}->{OneOf}}))."'!",
-                    last;
-                }
-            }
-
             # check if we have an optional parameter that needs a value
             if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
                 $Result->{Message} = "Optional parameter $Parameter is used without a value!",
                 last;
+            }
+
+            # check valid values
+            if ( exists($Data{$Parameter}) && exists($Parameters{$Parameter}->{OneOf}) && ref($Parameters{$Parameter}->{OneOf}) eq 'ARRAY') {
+                if ( !grep(/^$Data{$Parameter}$/g, @{$Parameters{$Parameter}->{OneOf}}) ) {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Parameters{$Parameter}->{OneOf}}))."'!",
+                    last;
+                }
             }
         }
     }

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="kix_text_module">
+        <ColumnAdd Name="category"    Required="false" Type="VARCHAR" Size="255"/>
+        <ColumnChange Name="subject"  Required="false" Type="VARCHAR" Size="255"/>
+        <ColumnChange NameOld="comment1" NameNew="comment"/>  
+        <ColumnDrop Name="comment2"/>  
+    </Table>
     <TableAlter Name="search_profile">
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
         <ColumnAdd Name="type" Required="true" Size="200" Type="VARCHAR"/>
