@@ -127,8 +127,7 @@ sub Run {
         foreach my $ID ( keys %{$FAQArticle} ){
             $ItemIDs->{$FAQArticle->{$ID}->{ItemID}} = $FAQArticle->{$ID}->{ItemID};
         }
-use Data::Dumper;
-print STDERR "param".Dumper($ItemID);
+
         my $FAQArticleGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleGet',
             Data      => {

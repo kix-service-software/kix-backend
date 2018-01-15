@@ -135,6 +135,19 @@ sub Run {
         );
     }
 
+    # check rw permissions
+    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $Param{Data}->{FAQCategoryID},
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+
+    if ( $Permission ne 'rw' ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to create tickets in given queue!",
+        );
+    }
+
     # isolate and trim FAQArticle parameter
     my $FAQArticle = $Self->_Trim(
         Data => $Param{Data}->{FAQArticle}
@@ -153,8 +166,7 @@ sub Run {
             Message => "Cannot update FAQArticle. No FAQArticle with ID '$Param{Data}->{FAQArticleID}' found.",
         );
     }
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
+
     # update FAQArticle
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQUpdate(
         ItemID => $Param{Data}->{FAQArticleID} || $FAQArticleData{FAQArticleID},

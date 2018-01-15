@@ -113,20 +113,7 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-    
+         
     # start FAQCategory loop
     FAQCategory:    
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
@@ -144,7 +131,7 @@ sub Run {
         }
 
         # delete FAQCategory        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDelete(
             ID     => $FAQCategoryID,
             UserID => $Self->{Authorization}->{UserID},
         );

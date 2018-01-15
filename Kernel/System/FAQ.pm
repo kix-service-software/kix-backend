@@ -520,7 +520,8 @@ sub FAQAdd {
 
     # get log object
     my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
-
+use Data::Dumper;
+print STDERR "paramfaq".Dumper(\%Param);
     # check needed stuff
     for my $Argument (qw(CategoryID StateID LanguageID Title UserID ContentType)) {
         if ( !$Param{$Argument} ) {

@@ -76,7 +76,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            CategoryID => 1,
+            FAQCategoryID => 1,
         },
     );
 
@@ -121,6 +121,19 @@ sub Run {
         return $Self->_Error(
             Code    => 'Operation.PrepareDataError',
             Message => $Result->{Message},
+        );
+    }
+
+    # check rw permissions
+    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $Param{Data}->{FAQCategoryID},
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !$Permission ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to create tickets in given queue!",
         );
     }
 

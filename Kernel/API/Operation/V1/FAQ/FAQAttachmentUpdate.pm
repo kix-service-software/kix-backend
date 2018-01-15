@@ -126,19 +126,6 @@ sub Run {
         );
     }
 
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
     # isolate and trim FAQCategory parameter
     my $FAQCategory = $Self->_Trim(
         Data => $Param{Data}->{FAQCategory}

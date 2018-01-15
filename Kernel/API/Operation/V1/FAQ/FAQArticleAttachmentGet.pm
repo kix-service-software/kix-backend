@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/V1/FAQ/FAQArticleGet.pm - API FAQ Get operation backend
+# Kernel/API/Operation/V1/FAQ/FAQArticleAttachmentGet.pm - API FAQ Get operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::FAQ::FAQArticleGet;
+package Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::FAQ::FAQArticleGet - API FAQArticle Get Operation backend
+Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentGet - API FAQCategory Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Kernel::API::Operation::V1::FAQ::FAQArticleGet - API FAQArticle Get Operation ba
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::FAQ::FAQArticleGet->new();
+by using Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentGet->new();
 
 =cut
 
@@ -64,27 +64,28 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQCategory::FAQArticleAttachmentGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform FAQArticleGet Operation. This function is able to return
+perform FAQArticleAttachmentGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ArticleID => 1,
+            FAQArticleID    => 123,
+            AttachmentID => 123,
         },
     );
 
     $Result = {
-        ArticleID => 2,
+        CategoryID => 2,
         ParentID   => 0,
-        Name       => 'My Article',
-        Comment    => 'This is my first Article.',
+        Name       => 'My Category',
+        Comment    => 'This is my first category.',
         ValidID    => 1,
     );
 
@@ -109,10 +110,13 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'FAQArticleID' => {
+            'AttachmentID' => {
                 Type     => 'ARRAY',
                 Required => 1
-            }                
+            },
+            'FAQArticleID' => {
+                Required => 1
+            },
         }
     );
 
@@ -124,52 +128,39 @@ sub Run {
         );
     }
 
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
-    my @FAQArticleData;
+    my @FAQAttachmentData;
 
     # start faq loop
-    FAQArticle:    
-    foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
+    FAQAttachment:    
+    foreach my $FAQAttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
-        # get the FAQArticle data
-        my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
-            ItemID     => $FAQArticleID,
-            ItemFields => 1,
-            UserID     => $Self->{Authorization}->{UserID},
+        # get the FAQCategory data
+        my %FAQAttachment = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentGet(
+            FileID => $FAQAttachmentID,
+            ItemID => $Param{Data}->{FAQArticleID},
+            UserID => $Self->{Authorization}->{UserID},
         );
 
-        if ( !IsHashRefWithData( \%FAQArticle ) ) {
+        if ( !IsHashRefWithData( \%FAQAttachment ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for FAQArticleID $FAQArticleID.",
+                Message => "No data found for FAQAttachmentID $FAQAttachmentID.",
             );
         }
         
         # add
-        push(@FAQArticleData, \%FAQArticle);
+        push(@FAQAttachmentData, \%FAQAttachment);
     }
 
-    if ( scalar(@FAQArticleData) == 1 ) {
+    if ( scalar(@FAQAttachmentData) == 1 ) {
         return $Self->_Success(
-            FAQArticle => $FAQArticleData[0],
+            FAQCategory => $FAQAttachmentData[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        FAQArticle => \@FAQArticleData,
+        FAQAttachment => \@FAQAttachmentData,
     );
 }
 

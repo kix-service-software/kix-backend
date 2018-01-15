@@ -18,6 +18,8 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
+use Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentCreate;
+
 use base qw(
     Kernel::API::Operation::V1::Common
 );
@@ -72,6 +74,8 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
 
     my $Result = $OperationObject->Run(
         Data => {
+            FAQCategoryID => 123,
+            FAQArticleID  => 123,
             FAQArticle  => {
                 Title       => 'Some Text',
                 StateID     => 1,
@@ -87,7 +91,7 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                 Approved    => 1,                # (optional)
                 ValidID     => 1,
                 ContentType => 'text/plain',     # or 'text/html'
-                Attachments => [
+                FAQAttachments => [
                     {
                         Content     => $Content,
                         ContentType => 'text/xml',
@@ -125,8 +129,7 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
+
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -135,6 +138,10 @@ print STDERR "param".Dumper(\%Param);
                 Type     => 'HASH',
                 Required => 1
             },
+            'FAQCategoryID' => {
+                Type     => 'HASH',
+                Required => 1
+            },            
             'FAQArticle::Title' => {
                 Required => 1
             },
@@ -155,26 +162,28 @@ print STDERR "param".Dumper(\%Param);
         );
     }
 
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermission(
-        FAQArticle => $Param{Data}->{FAQArticle},
-        UserID     => $Self->{Authorization}->{UserID},
-        UserType   => $Self->{Authorization}->{UserType},
+    # check rw permissions
+    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $Param{Data}->{FAQCategoryID},
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$Permission ) {
+    if ( $Permission ne 'rw' ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
             Message => "No permission to create tickets in given queue!",
         );
     }
-    # isolate FAQArticle parameter
+    
+    # delete FAQAttachments from FAQArticle hash
+    my $FAQAttachments = $Param{Data}->{FAQArticle}->{FAQAttachments};
+    delete ($Param{Data}->{FAQArticle}->{FAQAttachments});
 
+    # isolate FAQArticle parameter
     my $FAQArticle = $Self->_Trim(
         Data => $Param{Data}->{FAQArticle},
     );        
-use Data::Dumper;
-print STDERR "param2".Dumper($FAQArticle);
+
     # everything is ok, let's create the FAQArticle
     my $FAQArticleID = $Kernel::OM->Get('Kernel::System::FAQ')->FAQAdd(
         Title       => $FAQArticle->{Title},
@@ -202,25 +211,24 @@ print STDERR "param2".Dumper($FAQArticle);
         );
     }
 
-    # set attachments
-    if ( IsArrayRefWithData($FAQArticle->{Attachments}) ) {
-        foreach my $Attachment ( @{$FAQArticle->{Attachments}} ) {
+    # create new attachment
+    if ( $FAQAttachments ) {
+        foreach my $Attachment ( @{$FAQAttachments} ) {
             my $Result = $Self->ExecOperation(
-                OperationType => 'V1::FAQ::FAQAttachmentCreate',
+                OperationType => 'V1::FAQ::FAQArticleAttachmentCreate',
                 Data          => {
-                    FAQCategoryID  => $Param{Data}->{FAQCategoryID},
+                    FAQCategoryID => $Param{Data}->{FAQCategoryID},
                     FAQArticleID  => $FAQArticleID,
-                    Attachment => $Attachment,
+                    FAQAttachment => $Attachment,
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     ${$Result},
                 )
             }
         }
-    }
     }
 
     return $Self->_Success(

@@ -70,6 +70,8 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
 
     my $Result = $OperationObject->Run(
         Data => {
+            FAQCategoryID => 123,
+            FAQArticleID  => 123,
             FAQAttachment  => {
                 Content     => $Content,
                 ContentType => 'text/xml',
@@ -122,6 +124,12 @@ sub Run {
             'FAQAttachment::Filename' => {
                 Required => 1
             },
+            'FAQAttachment::ContentType' => {
+                Required => 1
+            },
+            'FAQAttachment::Content' => {
+                Required => 1
+            },
         }
     );
 
@@ -132,15 +140,26 @@ sub Run {
             Message => $Result->{Message},
         );
     }
+    
+    # check rw permissions
+    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $Param{Data}->{FAQCategoryID},
+        UserID   => $Self->{Authorization}->{UserID},
+    );
 
+    if ( $Permission ne 'rw' ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to create tickets in given queue!",
+        );
+    }
 
     # isolate and trim FAQAttachment parameter
     my $FAQAttachment = $Self->_Trim(
         Data => $Param{Data}->{FAQAttachment}
     );
 
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
+
 
     # create FAQAttachment
     my $FAQAttachmentID = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentAdd(
@@ -151,14 +170,14 @@ print STDERR "param".Dumper(\%Param);
         Inline      => $FAQAttachment->{Inline},
         UserID   => $Self->{Authorization}->{UserID},
     );
-print STDERR "param2".Dumper($FAQAttachmentID);
+
     if ( !$FAQAttachmentID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create FAQAttachment, please contact the system administrator',
+            Message => 'Could not create FAQArticleAttachment, please contact the system administrator',
         );
     }
-    
+
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',

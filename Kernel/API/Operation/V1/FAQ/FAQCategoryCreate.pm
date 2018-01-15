@@ -136,9 +136,6 @@ sub Run {
         Data => $Param{Data}->{FAQCategory}
     );
 
-use Data::Dumper;
-print STDERR "param".Dumper(\%Param);
-
     # create FAQCategory
     my $FAQCategoryID = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryAdd(
         Name     => $FAQCategory->{Name},
@@ -147,7 +144,7 @@ print STDERR "param".Dumper(\%Param);
         ValidID  => $FAQCategory->{ValidID} || 1,
         UserID   => $Self->{Authorization}->{UserID},
     );
-print STDERR "param2".Dumper($FAQCategoryID);
+
     if ( !$FAQCategoryID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
