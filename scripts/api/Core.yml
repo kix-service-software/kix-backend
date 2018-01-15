@@ -1015,6 +1015,132 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::MailAccount::MailAccountDelete
+    V1::FAQ::FAQCategoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryGet
+    V1::FAQ::FAQCategoryCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryCreate
+    V1::FAQ::FAQCategoryUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryUpdate
+    V1::FAQ::FAQCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategorySearch
+    V1::FAQ::FAQCategoryDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryDelete
+    V1::FAQ::FAQArticleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleGet
+    V1::FAQ::FAQArticleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleCreate
+    V1::FAQ::FAQArticleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleUpdate
+    V1::FAQ::FAQArticleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleSearch
+    V1::FAQ::FAQArticleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleDelete
+    V1::FAQ::FAQArticleAttachmentGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentGet
+    V1::FAQ::FAQArticleAttachmentCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentCreate
+    V1::FAQ::FAQArticleAttachmentUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentUpdate
+    V1::FAQ::FAQArticleAttachmentSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentSearch
+    V1::FAQ::FAQArticleAttachmentDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentDelete
+    V1::FAQ::FAQArticleHistorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleHistorySearch
+    V1::FAQ::FAQArticleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleSearch
+    V1::FAQ::FAQArticleHistorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleHistorySearch
 
   Transport:
     Config:
@@ -1597,6 +1723,78 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /mailaccounts/:MailAccountID
+        V1::FAQ::FAQCategoryGet:
+          RequestMethod:
+          - GET
+          Route: /faq/:FAQCategoryID
+        V1::FAQ::FAQCategoryCreate:
+          RequestMethod:
+          - POST
+          Route: /faq
+        V1::FAQ::FAQCategoryUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /faq/:FAQCategoryID
+        V1::FAQ::FAQCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /faq
+        V1::FAQ::FAQCategoryDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/:FAQCategoryID
+        V1::FAQ::FAQArticleGet:
+          RequestMethod:
+          - GET
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID
+        V1::FAQ::FAQArticleCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/:FAQCategoryID/articles
+        V1::FAQ::FAQArticleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID
+        V1::FAQ::FAQArticleSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/:FAQCategoryID/articles
+        V1::FAQ::FAQArticleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID
+        V1::FAQ::FAQArticleAttachmentGet:
+          RequestMethod:
+          - GET
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
+        V1::FAQ::FAQArticleAttachmentCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments
+        V1::FAQ::FAQArticleAttachmentUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
+        V1::FAQ::FAQArticleAttachmentSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments
+        V1::FAQ::FAQArticleAttachmentDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
+        V1::FAQ::FAQArticleHistorySearch:
+          RequestMethod:
+          - GET
+          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/history
+        V1::FAQ::FAQArticleSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/articles
+        V1::FAQ::FAQArticleHistorySearch:
+          RequestMethod:
+          - GET
+          Route: /faq/history
 
     Type: HTTP::REST
 RemoteSystem: ''
