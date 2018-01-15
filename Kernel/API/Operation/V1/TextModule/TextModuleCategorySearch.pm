@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/SearchProfile/SearchProfileSearch.pm - API SearchProfile Search operation backend
+# Kernel/API/Operation/TextModule/TextModuleSearch.pm - API TextModule Search operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SearchProfile::SearchProfileCategorySearch;
+package Kernel::API::Operation::V1::TextModule::TextModuleCategorySearch;
 
 use strict;
 use warnings;
@@ -19,14 +19,14 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::SearchProfile::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::SearchProfile::SearchProfileCategorySearch - API SearchProfile Category Search Operation backend
+Kernel::API::Operation::TextModule::TextModuleCategorySearch - API TextModule Category Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -64,7 +64,7 @@ sub new {
 
 =item Run()
 
-perform SearchProfileSearch Operation. This will return a SearchProfile ID list.
+perform TextModuleSearch Operation. This will return a TextModule ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -76,7 +76,7 @@ perform SearchProfileSearch Operation. This will return a SearchProfile ID list.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            SearchProfileType => [
+            TextModuleCategory => [
                 ...
             ]
         },
@@ -112,18 +112,17 @@ sub Run {
     }
 
     # get category list
-    my %CategoryList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileCategoryList();
+    my $CategoryList = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleCategoryList();
 
-    if ( IsHashRefWithData(\%CategoryList) ) {
-        my @Result = sort keys %CategoryList;
+    if ( IsArrayRefWithData($CategoryList) ) {
         return $Self->_Success(
-            SearchProfileCategory => \@Result,
+            TextModuleCategory => $CategoryList,
         )
     }
    
     # return result
     return $Self->_Success(
-        SearchProfileCategory => [],
+        TextModuleCategory => [],
     );
 }
 

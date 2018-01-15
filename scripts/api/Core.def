@@ -154,4 +154,10 @@
 /clientregistration                                                 |   POST            | V1::ClientRegistration::ClientRegistrationCreate
 /clientregistration/:ClientID                                       |   GET             | V1::ClientRegistration::ClientRegistrationGet
 /clientregistration/:ClientID                                       |   DELETE          | V1::ClientRegistration::ClientRegistrationDelete
+/textmodules/categories                                             |   GET             | V1::TextModule::TextModuleCategorySearch
+/textmodules                                                        |   GET             | V1::TextModule::TextModuleSearch
+/textmodules                                                        |   POST            | V1::TextModule::TextModuleCreate
+/textmodules/:TextModuleID                                          |   GET             | V1::TextModule::TextModuleGet
+/textmodules/:TextModuleID                                          |   PATCH           | V1::TextModule::TextModuleUpdate
+/textmodules/:TextModuleID                                          |   DELETE          | V1::TextModule::TextModuleDelete
 

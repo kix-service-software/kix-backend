@@ -86,6 +86,8 @@ sub new {
         }
     }
 
+    $Self->{CacheType} = 'TextModule';
+
     return $Self;
 }
 
@@ -95,17 +97,17 @@ Adds a new TextModule
 
     my $HashRef = $TextModuleObject->TextModuleAdd(
         Name       => 'some short name',
-        ValidID    => 1,
-        TextModule => 'some blabla...',
-        UserID     => 1,
+        Text       => 'some blabla...',
+        Category   => ''                  #optional
         Language   => 'de',               #optional
         Keywords   => 'key1, key2, key3', #optional
-        Comment1   => '',                 #optional
-        Comment2   => '',                 #optional
-        Agent      => 1,                  #optional, set autom. if neither Customer nor Public is set
-        Customer   => 1,                  #optional
-        Public     => 1,                  #optional
+        Comment    => '',                 #optional
+        AgentFrontend    => 1,            #optional
+        CustomerFrontend => 1,            #optional
+        PublicFrontend   => 1,            #optional
         Subject    => '',                 #optional
+        UserID     => 1,
+        ValidID    => 1,
     );
 
 =cut
@@ -114,7 +116,7 @@ sub TextModuleAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Name ValidID TextModule UserID)) {
+    for (qw(Name Text UserID ValidID)) {
         if ( !defined( $Param{$_} ) ) {
             $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
             return;
@@ -127,7 +129,7 @@ sub TextModuleAdd {
     }
 
     # set frontend display flags...
-    for my $CurrKey (qw(Agent Customer Public )) {
+    for my $CurrKey (qw(AgentFrontend CustomerFrontend PublicFrontend)) {
         if ( $Param{$CurrKey} ) {
             $Param{$CurrKey} = 1;
         }
@@ -135,27 +137,23 @@ sub TextModuleAdd {
             $Param{$CurrKey} = 0;
         }
     }
-    if ( !$Param{Agent} && !$Param{Customer} && !$Param{Public} ) {
-        $Param{Agent} = 1;
-    }
 
     # build sql...
     my $SQL = "INSERT INTO kix_text_module "
-        . "(name, valid_id, keywords, comment1, comment2, text, subject, language, "
+        . "(name, valid_id, keywords, category, comment, text, subject, language, "
         . "f_agent, f_customer, f_public, "
         . "create_time, create_by, change_time, change_by ) "
         . "VALUES "
-        . "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"
-        . " current_timestamp, ?, current_timestamp, ?) ";
+        . "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+        . "current_timestamp, ?, current_timestamp, ?) ";
 
     # do the db insert...
     my $DBInsert = $Self->{DBObject}->Do(
         SQL  => $SQL,
         Bind => [
-            \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Comment1},
-            \$Param{Comment2}, \$Param{TextModule}, \$Param{Subject},
-            \$Param{Language},
-            \$Param{Agent}, \$Param{Customer}, \$Param{Public},
+            \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Category}, 
+            \$Param{Comment}, \$Param{Text}, \$Param{Subject}, \$Param{Language},
+            \$Param{AgentFrontend}, \$Param{CustomerFrontend}, \$Param{PublicFrontend},
             \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -164,7 +162,9 @@ sub TextModuleAdd {
     if ($DBInsert) {
 
         # delete cache
-        $Self->{CacheObject}->CleanUp(Type => 'TextModule');
+        $Self->{CacheObject}->CleanUp(
+            Type => $Self->{CacheType}
+        );
 
         return 0 if !$Self->{DBObject}->Prepare(
             SQL => 'SELECT max(id) FROM kix_text_module '
@@ -208,7 +208,7 @@ sub TextModuleGet {
     # read cache
     my $CacheKey = 'TextModule::' . $Param{ID};
     my $Cache    = $Self->{CacheObject}->Get(
-        Type => 'TextModule',
+        Type => $Self->{CacheType},
         Key  => $CacheKey
     );
     return %{$Cache} if $Cache;
@@ -220,12 +220,15 @@ sub TextModuleGet {
 
     # sql
     my $SQL
-        = 'SELECT name, valid_id, keywords, comment1, comment2, text, '
-        . 'language, f_agent, f_customer, f_public, subject '
+        = 'SELECT name, valid_id, keywords, category, comment, text, '
+        . 'language, subject, f_agent, f_customer, f_public '
         . 'FROM kix_text_module '
-        . 'WHERE id = ' . $Param{ID};
+        . 'WHERE id = ?';
 
-    return if !$Self->{DBObject}->Prepare( SQL => $SQL );
+    return if !$Self->{DBObject}->Prepare( 
+        SQL  => $SQL,
+        Bind => [ \$Param{ID} ] 
+    );
 
     if ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
         my %Data = (
@@ -233,19 +236,19 @@ sub TextModuleGet {
             Name       => $Data[0],
             ValidID    => $Data[1],
             Keywords   => $Data[2],
-            Comment1   => $Data[3],
-            Comment2   => $Data[4],
-            TextModule => $Data[5],
+            Category   => $Data[3],
+            Comment    => $Data[4],
+            Text       => $Data[5],
             Language   => $Data[6],
-            Agent      => $Data[7],
-            Customer   => $Data[8],
-            Public     => $Data[9],
-            Subject    => $Data[10],
+            Subject    => $Data[7],
+            AgentFrontend      => $Data[8],
+            CustomerFrontend   => $Data[9],
+            PublicFrontend     => $Data[10],
         );
 
         # set cache
         $Self->{CacheObject}->Set(
-            Type  => 'TextModule',
+            Type  => $Self->{CacheType},
             Key   => $CacheKey,
             Value => \%Data
         );
@@ -256,9 +259,96 @@ sub TextModuleGet {
     return;
 }
 
+=item TextModuleUpdate()
+
+Updates an existing TextModule
+
+    my $HashRef = $TextModuleObject->TextModuleUpdate(
+        ID         => 1234,               #required
+        Name       => 'some short name',  #required
+        ValidID    => 1,                  #required
+        Text       => 'some blabla...',   #required
+        UserID     => 1,                  #required
+        Category   => '',                 #optional
+        Language   => 'de',               #optional
+        Keywords   => 'key1, key2, key3', #optional
+        Comment    => '',                 #optional
+        AgentFrontend      => 1,          #optional
+        CustomerFrontend   => 1,          #optional
+        PublicFrontend     => 1,          #optional
+    );
+
+=cut
+
+sub TextModuleUpdate {
+    my ( $Self, %Param ) = @_;
+
+    # check required params...
+    for (qw(ID Name Text UserID ValidID)) {
+        if ( !defined( $Param{$_} ) ) {
+            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+
+    # default language...
+    if ( !$Param{Language} ) {
+        $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
+    }
+
+    # set frontend display flags...
+    for my $CurrKey (qw(AgentFrontend CustomerFrontend PublicFrontend )) {
+        if ( $Param{$CurrKey} ) {
+            $Param{$CurrKey} = 1;
+        }
+        else {
+            $Param{$CurrKey} = 0;
+        }
+    }
+
+    # build sql...
+    my $SQL = "UPDATE kix_text_module SET "
+        . " name = ?, text = ?, subject = ?, keywords = ?, language = ?, "
+        . " category = ?, comment = ?, valid_id = ?, "
+        . " f_agent = ?, f_customer = ?, f_public = ?, "
+        . " change_time = current_timestamp, change_by = ? "
+        . "WHERE id = ?";
+
+    # do the db insert...
+    my $DBUpdate = $Self->{DBObject}->Do(
+        SQL  => $SQL,
+        Bind => [
+            \$Param{Name}, \$Param{Text}, \$Param{Subject},
+            \$Param{Keywords}, \$Param{Language},
+            \$Param{Category}, \$Param{Comment}, \$Param{ValidID},
+            \$Param{AgentFrontend}, \$Param{CustomerFrontend}, \$Param{PublicFrontend},
+            \$Param{UserID},   \$Param{ID}
+        ],
+    );
+
+    # handle update result...
+    if ($DBUpdate) {
+
+        # delete cache
+        $Self->{CacheObject}->CleanUp(
+            Type => $Self->{CacheType}
+        );
+
+        return $Param{ID};
+    }
+    else {
+        $Self->{LogObject}->Log(
+            Priority => 'error',
+            Message  => "TextModules::DB update of $Param{ID} failed!",
+        );
+        return;
+    }
+
+}
+
 =item TextModuleDelete()
 
-Deletes a text module and all queue relations.
+Deletes a text module.
 
     my $HashRef = $TextModuleObject->TextModuleDelete(
         ID      => 1234,  #required
@@ -276,11 +366,8 @@ sub TextModuleDelete {
     }
 
     # delete cache
-    $Self->{CacheObject}->CleanUp(Type => 'TextModule');
-
-    # delete queue <-> text module relation
-    $Self->TextModuleObjectLinkDelete(
-        TextModuleID => $Param{ID},
+    $Self->{CacheObject}->CleanUp(
+        Type => $Self->{CacheType}
     );
 
     return $Self->{DBObject}->Do(
@@ -288,6 +375,108 @@ sub TextModuleDelete {
         Bind => [ \$Param{ID} ],
     );
 }
+
+=item TextModuleList()
+
+Returns all TextModuleIDs depending on given parameters.
+
+    my $TextModuleIDs = $TextModuleObject->TextModuleList(
+        Name          => '...'   #optional
+        Category      => '...',  #optional
+        Language      => 'de',   #optional
+        AgentFrontend => 1,      #optional
+        CustomerFrontend => 1    #optional
+        PublicFrontend => 1,     #optional
+        ValidID        => 1,     #optional: 1 is assumed as default
+    );
+
+=cut
+
+sub TextModuleList {
+    my ( $Self, %Param ) = @_;
+
+    my @Result;
+    my @SQLWhere;
+    my @BindVars;
+
+    # read cache
+    my $CacheKey = 'TextModuleList::';
+    my @Params;
+    foreach my $ParamKey (
+        qw{Category Name AgentFrontend CustomerFrontend PublicFrontend Language ValidID}
+        )
+    {
+        if ( $Param{$ParamKey} ) {
+            push( @Params, $Param{$ParamKey} );
+        }
+        else {
+            push( @Params, '' );
+        }
+    }
+    $CacheKey .= join( '::', @Params );
+    my $Cache = $Self->{CacheObject}->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    # set valid
+    if ( exists( $Param{ValidID} ) ) {
+        push(@SQLWhere, 'valid_id = ?');
+        push(@BindVars, \$Param{ValidID});
+    }
+
+    # set frontend display flags...
+    if ( $Param{AgentFrontend} ) {
+        push(@SQLWhere, 'f_agent = 1');
+    }
+    elsif ( $Param{CustomerFrontend} ) {
+        push(@SQLWhere, 'f_customer = 1');
+    }
+    elsif ( $Param{PublicFrontend} ) {
+        push(@SQLWhere, 'f_public = 1');
+    }
+
+    if ( $Param{Name} ) {
+        push(@SQLWhere, 'name = ?');
+        push(@BindVars, \$Param{Name});
+    }
+
+    if ( $Param{Language} ) {
+        push(@SQLWhere, 'language = ?');
+        push(@BindVars, \$Param{Language});
+    }
+
+    # create SQL-String
+    my $SQL = "SELECT id FROM kix_text_module";
+
+    if ( @SQLWhere ) {
+        $SQL .= ' WHERE '.join(' AND ', @SQLWhere);
+    }
+
+    # do query
+    return if !$Self->{DBObject}->Prepare( 
+        SQL  => $SQL,
+        Bind => \@BindVars
+    );
+
+    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+        push( @Result, $Data[0] );
+    }
+
+    # set cache
+    $Self->{CacheObject}->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@Result
+    );
+
+    # return result
+    return \@Result;
+}
+
+
+
 
 #-------------------------------------------------------------------------------
 # BEGIN CATEGORY-RELATED FUNCTIONS
@@ -528,113 +717,31 @@ sub TextModuleCategoryGet {
     return;
 }
 
-=item TextModuleCategoryDelete()
-
-Deletes a TextModuleCategory and all TextModule links
-
-    my $HashRef = $TextModuleObject->TextModuleCategoryDelete(
-        ID      => 1234,  #required
-    );
-
-=cut
-
-sub TextModuleCategoryDelete {
-    my ( $Self, %Param ) = @_;
-
-    # check required params...
-    if ( !$Param{ID} ) {
-        $Self->{LogObject}
-            ->Log( Priority => 'error', Message => 'TextModuleCategoryDelete: Need ID!' );
-        return;
-    }
-
-    my $CategoryName = $Self->TextModuleCategoryLookup(
-        ID => $Param{ID},
-    );
-    my %CategoryList = $Self->TextModuleCategoryList(
-        Name => $CategoryName . '::*',
-    );
-    $CategoryList{ $Param{ID} } = $CategoryName;
-
-    foreach my $ID ( keys %CategoryList ) {
-
-        # delete category <-> text module link
-        $Self->TextModuleObjectLinkDelete(
-            ObjectType => 'TextModuleCategory',
-            ObjectID   => $ID
-        );
-
-        my $Result = $Self->{DBObject}->Do(
-            SQL  => 'DELETE FROM kix_text_module_category WHERE id = ?',
-            Bind => [ \$ID ],
-        );
-    }
-    return 1;
-}
-
 =item TextModuleCategoryList()
 
 Returns all TextModuleCategories
 
-    my %Hash = $TextModuleObject->TextModuleCategoryList(
-        Name  => '...'       # optional
-        Limit => 123         # optional
-    );
+    my $CategoryList = $TextModuleObject->TextModuleCategoryList();
 
 =cut
 
 sub TextModuleCategoryList {
     my ( $Self, %Param ) = @_;
-    my $WHEREClauseExt = '';
-    my %Result;
 
-    if ( $Param{Name} ) {
-        my $Name = $Param{Name};
-        $Name =~ s/\*/%/g;
-        $WHEREClauseExt .= " AND name like \'$Name\'";
-    }
+    my $SQL = "SELECT DISTINCT(category) FROM kix_text_module WHERE category <> ''";
 
-    my $SQL = "SELECT id, name FROM kix_text_module_category WHERE 1=1";
-
-    return if !$Self->{DBObject}->Prepare( SQL => $SQL . $WHEREClauseExt . " ORDER by name" );
-
-    my $Count = 0;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        $Result{ $Data[0] } = $Data[1];
-
-        last if ( $Param{Limit} && ++$Count >= $Param{Limit} );
-    }
-
-    return %Result;
-}
-
-=item TextModuleCategoryAssignmentCounts()
-
-Returns all assignment counts for all categores
-
-    my %Hash = $TextModuleObject->TextModuleCategoryAssignmentCounts(
+    return if !$Self->{DBObject}->Prepare( 
+        SQL => $SQL,
     );
 
-=cut
-
-sub TextModuleCategoryAssignmentCounts {
-    my ( $Self, %Param ) = @_;
-    my %Result;
-
-    my $SQL = "SELECT tmc.id, count(*) FROM "
-        . "kix_text_module_category tmc, "
-        . "kix_text_module_object_link tmol "
-        . "WHERE tmol.object_type = 'TextModuleCategory' "
-        . "AND tmol.object_id = tmc.id "
-        . "GROUP BY tmc.id";
-    return if !$Self->{DBObject}->Prepare( SQL => $SQL );
-
+    my @Result;
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        $Result{ $Data[0] } = $Data[1];
+        push(@Result, $Data[0]);
     }
 
-    return %Result;
+    return \@Result;
 }
+
 
 =item TextModuleCategoriesExport()
 
@@ -1341,388 +1448,6 @@ sub TextModuleCount {
     }
 
     return $Count;
-}
-
-=item TextModuleList()
-
-Returns all text modules depending on given parameters.
-    Result => undef: returns short HASH with TextModuleIDs as key,
-    Result => HASH:  returns all data in HASH,
-    Result => ARRAY: returns Textmodule-IDs in ARRAY,
-
-    my $HashOrArrayRef = $TextModuleObject->TextModuleList(
-        Name          => '...'   #optional
-        CategoryID    => 1234,   #optional
-        TicketTypeID  => 1234,   #optional
-        QueueID       => 1234,   #optional
-        TicketStateID => 1234,   #optional
-        ValidID       => 1,      #optional: 1 is assumed as default
-        Language      => 'de',   #optional
-        Result        => 'HASH', #optional: HASH returns all data, IDs in ARRAY otherwise
-        Agent         => 1,      #optional, automatically assumed if neither Agent, nor Customer, nor Public param specified
-        Customer      => 1       #optional
-        Public        => 1,      #optional
-        Limit         => 123     #optional
-    );
-
-=cut
-
-sub TextModuleList {
-    my ( $Self, %Param ) = @_;
-
-    my @ResultArr;
-    my %ResultHash;
-    my $WHEREClauseExt = '';
-
-    # Redirect to other method if feature Ticket::Type is disabled...
-    if ( !$Self->{ConfigObject}->Get('Ticket::Type') ) {
-        $Param{TicketTypeID} = '';
-    }
-
-    # read cache
-    my $CacheKey = 'TextModuleList::';
-    my @Params;
-    foreach my $ParamKey (
-        qw{Result CategoryID TextModuleID QueueID TicketTypeID TicketStateID Customer Public Agent Language ValidID Limit Name}
-        )
-    {
-        if ( $Param{$ParamKey} ) {
-            push( @Params, $Param{$ParamKey} );
-        }
-        else {
-            push( @Params, '' );
-        }
-    }
-    $CacheKey .= join( '::', @Params );
-    my $Cache = $Self->{CacheObject}->Get(
-        Type => 'TextModule',
-        Key  => $CacheKey,
-    );
-    if ( defined $Param{Result} && $Param{Result} eq 'ARRAY' ) {
-        return @{$Cache} if $Cache;
-    }
-    else {
-        return %{$Cache} if $Cache;
-    }
-
-    # set valid
-    if ( exists( $Param{ValidID} ) ) {
-        $WHEREClauseExt .= " AND t.valid_id = $Param{ValidID}";
-    }
-
-    # set frontend display flags...
-    if ( $Param{Customer} ) {
-        $WHEREClauseExt = 'AND t.f_customer = 1';
-    }
-    elsif ( $Param{Public} ) {
-        $WHEREClauseExt = 'AND t.f_public = 1';
-    }
-    elsif ( $Param{Agent} ) {
-        $WHEREClauseExt = 'AND t.f_agent = 1';
-    }
-
-    if ( $Param{Name} ) {
-        my $Name = $Param{Name};
-        $Name =~ s/\*/%/g;
-        $WHEREClauseExt .= " AND t.name like \'$Name\'";
-    }
-
-    # language filter
-    for (qw(Language)) {
-        $Param{$_} = $Self->{DBObject}->Quote( $Param{$_} ) || '';
-    }
-
-    if ( $Param{Language} ) {
-        $WHEREClauseExt .= " AND t.language='" . $Param{Language} . "' ";
-    }
-
-    if ( $Param{CategoryID} && $Param{CategoryID} !~ /^_/ ) {
-        $WHEREClauseExt .= " AND EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'TextModuleCategory' "
-            . "        AND olt.object_id = $Param{CategoryID})";
-    }
-    elsif ( defined $Param{CategoryID} && $Param{CategoryID} eq '_UNASSIGNED_' ) {
-        $WHEREClauseExt .= " AND NOT EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'TextModuleCategory')";
-    }
-
-# get all TMs where the specific object is assigned (Queue, TicketType, TicketState, ...) for the selected value
-# or the object is not assigned (no row for this object type)
-    if ( $Param{QueueID} ) {
-        $WHEREClauseExt .= " AND (EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'Queue' "
-            . "        AND olt.object_id = $Param{QueueID}) "
-            . "   OR NOT EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'Queue'))";
-
-    }
-    if ( $Param{TicketTypeID} ) {
-        $WHEREClauseExt .= " AND (EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'TicketType' "
-            . "        AND olt.object_id = $Param{TicketTypeID}) "
-            . "   OR NOT EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'TicketType'))";
-    }
-    if ( $Param{TicketStateID} ) {
-        $WHEREClauseExt .= " AND (EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'TicketState' "
-            . "        AND olt.object_id = $Param{TicketStateID}) "
-            . "   OR NOT EXISTS ( "
-            . "   SELECT text_module_id FROM kix_text_module_object_link olt "
-            . "      WHERE olt.text_module_id = t.id "
-            . "        AND olt.object_type = 'TicketState'))";
-    }
-
-    # create SQL-String
-    my $SQL = "SELECT t.id, t.name, t.valid_id, t.keywords, t.comment1, "
-        . "t.comment2, t.text, t.language, t.f_agent, t.f_customer, t.f_public, t.subject "
-        . "FROM kix_text_module t";
-
-    # append WHERE clause
-    if ( defined $Param{ValidID} && $Param{ValidID} ) {
-        $SQL .= " WHERE t.valid_id = $Param{ValidID} " . $WHEREClauseExt;
-    }
-    else {
-        $SQL .= " WHERE 1=1 " . $WHEREClauseExt;
-    }
-
-    # append limit
-    if ( defined $Param{Limit} && $Param{Limit} ) {
-        $SQL .= " LIMIT " . $Param{Limit};
-    }
-
-    # do query
-    return if !$Self->{DBObject}->Prepare( SQL => $SQL );
-
-    my $Count = 0;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        push( @ResultArr, $Data[0] );
-
-        if ( !$Param{Result} ) {
-            $ResultHash{ $Data[0] } = $Data[1] . " (" . $Data[7] . ")";
-        }
-        elsif ( $Param{Result} eq 'HASH' ) {
-            $ResultHash{ $Data[0] }->{ID}         = $Data[0];
-            $ResultHash{ $Data[0] }->{Name}       = $Data[1];
-            $ResultHash{ $Data[0] }->{ValidID}    = $Data[2];
-            $ResultHash{ $Data[0] }->{Keywords}   = $Data[3];
-            $ResultHash{ $Data[0] }->{Comment1}   = $Data[4];
-            $ResultHash{ $Data[0] }->{Comment2}   = $Data[5];
-            $ResultHash{ $Data[0] }->{TextModule} = $Data[6];
-            $ResultHash{ $Data[0] }->{Language}   = $Data[7];
-            $ResultHash{ $Data[0] }->{Agent}      = $Data[8];
-            $ResultHash{ $Data[0] }->{Customer}   = $Data[9];
-            $ResultHash{ $Data[0] }->{Public}     = $Data[10];
-            $ResultHash{ $Data[0] }->{Subject}    = $Data[11];
-
-            my @FrontendInfoArray;
-            push( @FrontendInfoArray, 'A' ) if ( $ResultHash{ $Data[0] }->{Agent} );
-            push( @FrontendInfoArray, 'C' ) if ( $ResultHash{ $Data[0] }->{Customer} );
-            push( @FrontendInfoArray, 'P' ) if ( $ResultHash{ $Data[0] }->{Public} );
-            $ResultHash{ $Data[0] }->{FrontendInfoStrg} = join( '/', @FrontendInfoArray );
-        }
-
-        last if ( $Param{Limit} && ++$Count >= $Param{Limit} );
-    }
-
-    # return result
-    if ( defined $Param{Result} && $Param{Result} eq 'ARRAY' ) {
-
-        # set cache
-        $Self->{CacheObject}->Set(
-            Type  => 'TextModule',
-            Key   => $CacheKey,
-            Value => \@ResultArr
-        );
-
-        return @ResultArr;
-    }
-    else {
-
-        # set cache
-        $Self->{CacheObject}->Set(
-            Type  => 'TextModule',
-            Key   => $CacheKey,
-            Value => \%ResultHash
-        );
-
-        return %ResultHash;
-    }
-}
-
-=item TextModuleUpdate()
-
-Updates an existing TextModule
-
-    my $HashRef = $TextModuleObject->TextModuleUpdate(
-        ID         => 1234,               #required
-        Name       => 'some short name',  #required
-        ValidID    => 1,                  #required
-        TextModule => 'some blabla...',   #required
-        UserID     => 1,                  #required
-        Language   => 'de',               #optional
-        Keywords   => 'key1, key2, key3', #optional
-        Comment1   => '',                 #optional
-        Comment2   => '',                 #optional
-        Agent      => 1,                  #optional, set autom. if neither Customer nor Public is set
-        Customer   => 1,                  #optional
-        Public     => 1,                  #optional
-    );
-
-=cut
-
-sub TextModuleUpdate {
-    my ( $Self, %Param ) = @_;
-
-    # check required params...
-    for (qw(ID Name ValidID TextModule UserID)) {
-        if ( !defined( $Param{$_} ) ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
-            return;
-        }
-    }
-
-    # default language...
-    if ( !$Param{Language} ) {
-        $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
-    }
-
-    # set frontend display flags...
-    for my $CurrKey (qw(Agent Customer Public )) {
-        if ( $Param{$CurrKey} ) {
-            $Param{$CurrKey} = 1;
-        }
-        else {
-            $Param{$CurrKey} = 0;
-        }
-    }
-    if ( !$Param{Agent} && !$Param{Customer} && !$Param{Public} ) {
-        $Param{Agent} = 1;
-    }
-
-    # build sql...
-    my $SQL = "UPDATE kix_text_module SET "
-        . " name = ?, text = ?, subject = ?, keywords = ?, language = ?, "
-        . " comment1 = ?, comment2 = ?, valid_id = ?, "
-        . " f_agent = ?, f_customer = ?, f_public = ?, "
-        . " change_time = current_timestamp, change_by = ? "
-        . "WHERE id = ?";
-
-    # do the db insert...
-    my $DBUpdate = $Self->{DBObject}->Do(
-        SQL  => $SQL,
-        Bind => [
-            \$Param{Name}, \$Param{TextModule}, \$Param{Subject},
-            \$Param{Keywords}, \$Param{Language},
-            \$Param{Comment1}, \$Param{Comment2}, \$Param{ValidID},
-            \$Param{Agent},    \$Param{Customer}, \$Param{Public},
-            \$Param{UserID},   \$Param{ID}
-        ],
-    );
-
-    # handle update result...
-    if ($DBUpdate) {
-
-        # delete cache
-        $Self->{CacheObject}->CleanUp(Type => 'TextModule');
-
-        return $Param{ID};
-    }
-    else {
-        $Self->{LogObject}->Log(
-            Priority => 'error',
-            Message  => "TextModules::DB update of $Param{ID} failed!",
-        );
-        return;
-    }
-
-}
-
-=item TextModuleLookup()
-
-get id or name for text module.
-
-    my $TextModule = $TextModuleObject->TextModuleLookup( TextModuleID => $TextModuleID );
-
-    my $TextModuleID = $TextModuleObject->TextModuleLookup( Name => $TextModule );
-
-=cut
-
-sub TextModuleLookup {
-    my ( $Self, %Param ) = @_;
-
-    # check required params...
-    if ( !$Param{Name} && !$Param{TextModuleID} ) {
-        $Self->{LogObject}->Log(
-            Priority => 'error',
-            Message  => "Got no Name or TextModuleID!"
-        );
-        return;
-    }
-
-    # read cache
-    for my $Key (qw(TextModuleID Name)) {
-        if ( !defined $Param{$Key} ) {
-            $Param{$Key} = '';
-        }
-    }
-    my $CacheKey = 'TextModuleLookup::' . $Param{TextModuleID} . '::' . $Param{Name};
-    my $Cache    = $Self->{CacheObject}->Get(
-        Type => 'TextModule',
-        Key  => $CacheKey
-    );
-    return $Cache if $Cache;
-
-    my $Key = $Param{Name} || $Param{TextModuleID};
-    return $Self->{"TextModuleLookup$Key"} if ( $Self->{"TextModuleLookup$Key"} );
-
-    # get data
-    if ( $Param{Name} ) {
-        return if !$Self->{DBObject}->Prepare(
-            SQL  => 'SELECT id FROM kix_text_module WHERE name = ?',
-            Bind => [ \$Param{Name} ],
-        );
-    }
-    else {
-        return if !$Self->{DBObject}->Prepare(
-            SQL  => 'SELECT name FROM kix_text_module WHERE id = ?',
-            Bind => [ \$Param{TextModuleID} ],
-        );
-    }
-
-    my $Data;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        $Data = $Row[0];
-    }
-
-    # check if data exists
-    if ( !$Data ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Found no $Key!" );
-        return;
-    }
-
-    # set cache
-    $Self->{CacheObject}->Set(
-        Type  => 'TextModule',
-        Key   => $CacheKey,
-        Value => $Data
-    );
-
-    return $Data;
 }
 
 =item TextModuleGetList()

@@ -1085,6 +1085,48 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::ClientRegistration::ClientRegistrationDelete
+    V1::TextModule::TextModuleCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleCategorySearch
+    V1::TextModule::TextModuleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleSearch
+    V1::TextModule::TextModuleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleCreate
+    V1::TextModule::TextModuleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleGet
+    V1::TextModule::TextModuleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleUpdate
+    V1::TextModule::TextModuleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleDelete
 
   Transport:
     Config:
@@ -1707,6 +1749,30 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /clientregistration/:ClientID
+        V1::TextModule::TextModuleCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /textmodules/categories
+        V1::TextModule::TextModuleSearch:
+          RequestMethod:
+          - GET
+          Route: /textmodules
+        V1::TextModule::TextModuleCreate:
+          RequestMethod:
+          - POST
+          Route: /textmodules
+        V1::TextModule::TextModuleGet:
+          RequestMethod:
+          - GET
+          Route: /textmodules/:TextModuleID
+        V1::TextModule::TextModuleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /textmodules/:TextModuleID
+        V1::TextModule::TextModuleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /textmodules/:TextModuleID
 
     Type: HTTP::REST
 RemoteSystem: ''

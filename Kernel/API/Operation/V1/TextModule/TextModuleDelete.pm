@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/SearchProfile/SearchProfileSearch.pm - API SearchProfile Search operation backend
+# Kernel/API/Operation/TextModule/TextModuleDelete.pm - API TextModule Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,22 +11,24 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SearchProfile::SearchProfileCategorySearch;
+package Kernel::API::Operation::V1::TextModule::TextModuleDelete;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
-    Kernel::API::Operation::V1::SearchProfile::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::SearchProfile::SearchProfileCategorySearch - API SearchProfile Category Search Operation backend
+Kernel::API::Operation::V1::TextModule::TextModuleDelete - API TextModule Delete Operation backend
+
+=head1 SYNOPSIS
 
 =head1 PUBLIC INTERFACE
 
@@ -48,7 +50,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
+    for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'Operation.InternalError',
@@ -64,29 +66,24 @@ sub new {
 
 =item Run()
 
-perform SearchProfileSearch Operation. This will return a SearchProfile ID list.
+perform TextModuleDelete Operation. This will return the deleted TextModuleID.
 
     my $Result = $OperationObject->Run(
         Data => {
-        }
+            TextModuleID  => '...',
+        },		
     );
 
     $Result = {
-        Success => 1,                                # 0 or 1
-        Code    => '',                          # In case of an error
-        Message => '',                          # In case of an error
-        Data    => {
-            SearchProfileType => [
-                ...
-            ]
-        },
+        Message    => '',                      # in case of error
     };
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
+    
+    # init webService
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -101,6 +98,12 @@ sub Run {
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
+        Parameters => {
+            'TextModuleID' => {
+                Type     => 'ARRAY',
+                Required => 1
+            },
+        }
     );
 
     # check result
@@ -110,21 +113,27 @@ sub Run {
             Message => $Result->{Message},
         );
     }
+         
+    # start loop
+    TEXTMODULE:    
+    foreach my $TextModuleID ( @{$Param{Data}->{TextModuleID}} ) {
 
-    # get category list
-    my %CategoryList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileCategoryList();
-
-    if ( IsHashRefWithData(\%CategoryList) ) {
-        my @Result = sort keys %CategoryList;
-        return $Self->_Success(
-            SearchProfileCategory => \@Result,
-        )
+        # delete TextModule	    
+        my $Success = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleDelete(
+            ID     => $TextModuleID,
+            UserID => $Self->{Authorization}->{UserID},
+        );
+ 
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete TextModule, please contact the system administrator',
+            );
+        }
     }
-   
+
     # return result
-    return $Self->_Success(
-        SearchProfileCategory => [],
-    );
+    return $Self->_Success();
 }
 
 1;
