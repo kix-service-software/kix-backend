@@ -114,11 +114,11 @@ sub Run {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentisStandardTemplate(
+    my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
         ID     => $AttachmentID,
     );
 
-    if ( !$Success ) {
+    if ( IsHashRefWithData(\%Result) ) {
         return $Self->_Error(
             Code    => 'Object.DependingObjectExists',
             Message => 'Can not delete StandardAttachment. A StandardTemplate with this StandardAttachment already exists.',

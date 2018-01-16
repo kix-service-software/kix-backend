@@ -68,7 +68,7 @@ sub new {
 
 =item Run()
 
-perform StandardAttachmentUpdate Operation. This will return the updated TypeID.
+perform StandardAttachmentUpdate Operation. This will return the updated StandardAttachmentID.
 
     my $Result = $OperationObject->Run(
         Data => {

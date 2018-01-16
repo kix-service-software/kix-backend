@@ -701,34 +701,6 @@ sub StdAttachmentStandardTemplateMemberList {
     return %Data;
 }
 
-sub StdAttachmentisStandardTemplate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need AttachmentID !',
-        );
-        return;
-    }
-
-    # insert new relation
-    my $Success = $Self->{DBObject}->Do(
-        SQL => '
-            SELCET standard_attachment_id FROM standard_template_attachment 
-            WHERE standard_attachment_id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-    
-    return $Success;
-
-}
-
 1;
 
 
