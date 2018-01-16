@@ -172,9 +172,17 @@ sub Run {
         return $Permission;
     }
 
+    # get ticket
+    my %TicketData = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        TicketID => $Param{Data}->{TicketID}
+    );
+
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket( 
-        Ticket => $Ticket 
+        Ticket => {
+            %TicketData,
+            %{$Ticket},
+        } 
     );
 
     if ( !$TicketCheck->{Success} ) {
@@ -229,7 +237,7 @@ sub _TicketUpdate {
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
     my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket->{CustomerUser},
+        User => $Ticket->{CustomerUserID},
     );
 
     my $CustomerID = $CustomerUserData{UserCustomerID} || '';
@@ -586,18 +594,18 @@ sub _TicketUpdate {
         }
     }
 
-    # update Ticket->CustomerUser && Ticket->CustomerID
-    if ( $Ticket->{CustomerUser} || $Ticket->{CustomerID} ) {
+    # update Ticket->CustomerUserID && Ticket->CustomerID
+    if ( $Ticket->{CustomerUserID} || $Ticket->{CustomerID} ) {
 
         # set values to empty if they are not defined
         $TicketData{CustomerUserID} = $TicketData{CustomerUserID} || '';
         $TicketData{CustomerID}     = $TicketData{CustomerID}     || '';
-        $Ticket->{CustomerUser}     = $Ticket->{CustomerUser}     || '';
+        $Ticket->{CustomerUserID}   = $Ticket->{CustomerUserID}   || '';
         $Ticket->{CustomerID}       = $Ticket->{CustomerID}       || '';
 
         my $Success;
         if (
-            $Ticket->{CustomerUser} ne $TicketData{CustomerUserID}
+            $Ticket->{CustomerUserID} ne $TicketData{CustomerUserID}
             || $Ticket->{CustomerID} ne $TicketData{CustomerID}
             )
         {
@@ -610,7 +618,7 @@ sub _TicketUpdate {
 
             $Success = $TicketObject->TicketCustomerSet(
                 No       => $CustomerID,
-                User     => $Ticket->{CustomerUser},
+                User     => $Ticket->{CustomerUserID},
                 TicketID => $Param{TicketID},
                 UserID   => $Param{UserID},
             );
