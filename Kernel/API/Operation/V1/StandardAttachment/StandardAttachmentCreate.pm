@@ -105,8 +105,6 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-use Data::Dumper;
-print STDERR "Param".Dumper(\%Param);
 
     # prepare data
     $Result = $Self->PrepareData(
@@ -151,7 +149,7 @@ print STDERR "Param".Dumper(\%Param);
     if ( $ID ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create StandardAttachment entry. Another StandardAttachment with same email name already exists.",
+            Message => "Can not create StandardAttachment entry. Another StandardAttachment with same name already exists.",
         );
     }
     

@@ -99,7 +99,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'StandardAttachmentID' => {
+            'AttachmentID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -115,7 +115,7 @@ sub Run {
     }
 
     my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
-        ID     => $AttachmentID,
+        AttachmentID     => $AttachmentID,
     );
 
     if ( IsHashRefWithData(\%Result) ) {

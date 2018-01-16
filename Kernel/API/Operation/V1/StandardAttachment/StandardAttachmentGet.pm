@@ -119,6 +119,7 @@ sub Run {
         Parameters => {
             'AttachmentID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }
@@ -142,6 +143,10 @@ sub Run {
         my %StandardAttachmentData = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentGet(
             ID => $AttachmentID,
         );
+
+        if ( !$Param{Data}->{include}->{Content} ) {
+            delete $StandardAttachmentData{Content};
+        }
 
         if ( !IsHashRefWithData( \%StandardAttachmentData ) ) {
             return $Self->_Error(
