@@ -144,20 +144,9 @@
 /mailaccounts/:MailAccountID                                        |   GET             | V1::MailAccount::MailAccountGet
 /mailaccounts/:MailAccountID                                        |   PATCH           | V1::MailAccount::MailAccountUpdate
 /mailaccounts/:MailAccountID                                        |   DELETE          | V1::MailAccount::MailAccountDelete
-/searchprofiles/categories                                          |   GET             | V1::SearchProfile::SearchProfileCategorySearch
-/searchprofiles                                                     |   GET             | V1::SearchProfile::SearchProfileSearch
-/searchprofiles                                                     |   POST            | V1::SearchProfile::SearchProfileCreate
-/searchprofiles/:SearchProfileID                                    |   GET             | V1::SearchProfile::SearchProfileGet
-/searchprofiles/:SearchProfileID                                    |   PATCH           | V1::SearchProfile::SearchProfileUpdate
-/searchprofiles/:SearchProfileID                                    |   DELETE          | V1::SearchProfile::SearchProfileDelete
-/clientregistration                                                 |   GET             | V1::ClientRegistration::ClientRegistrationSearch
-/clientregistration                                                 |   POST            | V1::ClientRegistration::ClientRegistrationCreate
-/clientregistration/:ClientID                                       |   GET             | V1::ClientRegistration::ClientRegistrationGet
-/clientregistration/:ClientID                                       |   DELETE          | V1::ClientRegistration::ClientRegistrationDelete
-/textmodules/categories                                             |   GET             | V1::TextModule::TextModuleCategorySearch
-/textmodules                                                        |   GET             | V1::TextModule::TextModuleSearch
-/textmodules                                                        |   POST            | V1::TextModule::TextModuleCreate
-/textmodules/:TextModuleID                                          |   GET             | V1::TextModule::TextModuleGet
-/textmodules/:TextModuleID                                          |   PATCH           | V1::TextModule::TextModuleUpdate
-/textmodules/:TextModuleID                                          |   DELETE          | V1::TextModule::TextModuleDelete
+/standardattachments                                                |   GET             | V1::StandardAttachment::StandardAttachmentSearch
+/standardattachments                                                |   POST            | V1::StandardAttachment::StandardAttachmentCreate
+/standardattachments/:AttachmentID                                  |   GET             | V1::StandardAttachment::StandardAttachmentGet
+/standardattachments/:AttachmentID                                  |   PATCH           | V1::StandardAttachment::StandardAttachmentUpdate
+/standardattachments/:AttachmentID                                  |   DELETE          | V1::StandardAttachment::StandardAttachmentDelete
 
