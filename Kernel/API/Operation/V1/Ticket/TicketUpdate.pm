@@ -90,7 +90,8 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 Owner         => 'some user login',                             # optional
                 ResponsibleID => 123,                                           # optional
                 Responsible   => 'some user login',                             # optional
-                CustomerUser  => 'some customer user login',                    # optional
+                CustomerUserID => 'some customer user login',                   # optional
+                CustomerID    => 'some customer',                               # optional
                 PendingTime   => '2011-12-03 23:05:00',                         # optional
                 DynamicFields => [                                              # optional
                     {
