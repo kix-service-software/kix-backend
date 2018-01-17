@@ -160,4 +160,9 @@
 /textmodules/:TextModuleID                                          |   GET             | V1::TextModule::TextModuleGet
 /textmodules/:TextModuleID                                          |   PATCH           | V1::TextModule::TextModuleUpdate
 /textmodules/:TextModuleID                                          |   DELETE          | V1::TextModule::TextModuleDelete
+/standardattachments                                                |   GET             | V1::StandardAttachment::StandardAttachmentSearch
+/standardattachments                                                |   POST            | V1::StandardAttachment::StandardAttachmentCreate
+/standardattachments/:AttachmentID                                  |   GET             | V1::StandardAttachment::StandardAttachmentGet
+/standardattachments/:AttachmentID                                  |   PATCH           | V1::StandardAttachment::StandardAttachmentUpdate
+/standardattachments/:AttachmentID                                  |   DELETE          | V1::StandardAttachment::StandardAttachmentDelete
 

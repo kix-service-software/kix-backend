@@ -1127,6 +1127,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::TextModule::TextModuleDelete
+    V1::StandardAttachment::StandardAttachmentSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardAttachment::StandardAttachmentSearch
+    V1::StandardAttachment::StandardAttachmentCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardAttachment::StandardAttachmentCreate
+    V1::StandardAttachment::StandardAttachmentGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardAttachment::StandardAttachmentGet
+    V1::StandardAttachment::StandardAttachmentUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardAttachment::StandardAttachmentUpdate
+    V1::StandardAttachment::StandardAttachmentDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardAttachment::StandardAttachmentDelete
 
   Transport:
     Config:
@@ -1773,6 +1808,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /textmodules/:TextModuleID
+        V1::StandardAttachment::StandardAttachmentSearch:
+          RequestMethod:
+          - GET
+          Route: /standardattachments
+        V1::StandardAttachment::StandardAttachmentCreate:
+          RequestMethod:
+          - POST
+          Route: /standardattachments
+        V1::StandardAttachment::StandardAttachmentGet:
+          RequestMethod:
+          - GET
+          Route: /standardattachments/:AttachmentID
+        V1::StandardAttachment::StandardAttachmentUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /standardattachments/:AttachmentID
+        V1::StandardAttachment::StandardAttachmentDelete:
+          RequestMethod:
+          - DELETE
+          Route: /standardattachments/:AttachmentID
 
     Type: HTTP::REST
 RemoteSystem: ''
