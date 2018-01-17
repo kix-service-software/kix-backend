@@ -121,7 +121,7 @@ sub Run {
         my $StandardAttachmentGetResult = $Self->ExecOperation(
             OperationType => 'V1::StandardAttachment::StandardAttachmentGet',
             Data      => {
-                StandardAttachmentID => join(',', sort keys %StandardAttachmentList),
+                AttachmentID => join(',', sort keys %StandardAttachmentList),
             }
         );    
 

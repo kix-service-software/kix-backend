@@ -72,6 +72,7 @@ create a new std. attachment
         Content     => $Content,
         ContentType => 'text/xml',
         Filename    => 'SomeFile.xml',
+        Comment     => '...'                # optional
         UserID      => 123,
     );
 

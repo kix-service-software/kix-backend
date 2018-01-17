@@ -1015,6 +1015,118 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::MailAccount::MailAccountDelete
+    V1::SearchProfile::SearchProfileCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileCategorySearch
+    V1::SearchProfile::SearchProfileSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileSearch
+    V1::SearchProfile::SearchProfileCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileCreate
+    V1::SearchProfile::SearchProfileGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileGet
+    V1::SearchProfile::SearchProfileUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileUpdate
+    V1::SearchProfile::SearchProfileDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SearchProfile::SearchProfileDelete
+    V1::ClientRegistration::ClientRegistrationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationSearch
+    V1::ClientRegistration::ClientRegistrationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationCreate
+    V1::ClientRegistration::ClientRegistrationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationGet
+    V1::ClientRegistration::ClientRegistrationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationDelete
+    V1::TextModule::TextModuleCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleCategorySearch
+    V1::TextModule::TextModuleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleSearch
+    V1::TextModule::TextModuleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleCreate
+    V1::TextModule::TextModuleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleGet
+    V1::TextModule::TextModuleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleUpdate
+    V1::TextModule::TextModuleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleDelete
     V1::StandardAttachment::StandardAttachmentSearch:
         Description: ''
         MappingInbound:
@@ -1632,6 +1744,70 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /mailaccounts/:MailAccountID
+        V1::SearchProfile::SearchProfileCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /searchprofiles/categories
+        V1::SearchProfile::SearchProfileSearch:
+          RequestMethod:
+          - GET
+          Route: /searchprofiles
+        V1::SearchProfile::SearchProfileCreate:
+          RequestMethod:
+          - POST
+          Route: /searchprofiles
+        V1::SearchProfile::SearchProfileGet:
+          RequestMethod:
+          - GET
+          Route: /searchprofiles/:SearchProfileID
+        V1::SearchProfile::SearchProfileUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /searchprofiles/:SearchProfileID
+        V1::SearchProfile::SearchProfileDelete:
+          RequestMethod:
+          - DELETE
+          Route: /searchprofiles/:SearchProfileID
+        V1::ClientRegistration::ClientRegistrationSearch:
+          RequestMethod:
+          - GET
+          Route: /clientregistration
+        V1::ClientRegistration::ClientRegistrationCreate:
+          RequestMethod:
+          - POST
+          Route: /clientregistration
+        V1::ClientRegistration::ClientRegistrationGet:
+          RequestMethod:
+          - GET
+          Route: /clientregistration/:ClientID
+        V1::ClientRegistration::ClientRegistrationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /clientregistration/:ClientID
+        V1::TextModule::TextModuleCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /textmodules/categories
+        V1::TextModule::TextModuleSearch:
+          RequestMethod:
+          - GET
+          Route: /textmodules
+        V1::TextModule::TextModuleCreate:
+          RequestMethod:
+          - POST
+          Route: /textmodules
+        V1::TextModule::TextModuleGet:
+          RequestMethod:
+          - GET
+          Route: /textmodules/:TextModuleID
+        V1::TextModule::TextModuleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /textmodules/:TextModuleID
+        V1::TextModule::TextModuleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /textmodules/:TextModuleID
         V1::StandardAttachment::StandardAttachmentSearch:
           RequestMethod:
           - GET

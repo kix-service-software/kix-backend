@@ -114,20 +114,20 @@ sub Run {
         );
     }
 
-    my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
-        AttachmentID     => $AttachmentID,
-    );
-
-    if ( IsHashRefWithData(\%Result) ) {
-        return $Self->_Error(
-            Code    => 'Object.DependingObjectExists',
-            Message => 'Can not delete StandardAttachment. A StandardTemplate with this StandardAttachment already exists.',
-        );
-    }
-
     # start StandardAttachment loop
     StandardAttachment:    
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
+
+        my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
+            AttachmentID => $AttachmentID,
+        );
+
+        if ( IsHashRefWithData(\%Result) ) {
+            return $Self->_Error(
+                Code    => 'Object.DependingObjectExists',
+                Message => 'Can not delete StandardAttachment. The StandardAttachment has been assigned to at least one StandardTemplate.',
+            );
+        }
 
         # delete StandardAttachment	    
         my $Success = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentDelete(

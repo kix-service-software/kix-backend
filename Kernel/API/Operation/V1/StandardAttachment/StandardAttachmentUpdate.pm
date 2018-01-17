@@ -79,6 +79,7 @@ perform StandardAttachmentUpdate Operation. This will return the updated Standar
                 Content     => $Content,        # optional
                 ContentType => 'text/xml',      # optional
                 Filename    => 'SomeFile.xml',  # optional
+                Comment     => 'some comment'   # optional
             },
         },
     );
@@ -149,6 +150,20 @@ sub Run {
         );
     }
 
+    # check if name already exists
+    if ( $StandardAttachment->{Name} ) {
+        my $ID = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentLookup(
+            StdAttachment => $StandardAttachment->{Name},
+        );
+        
+        if ( $ID && $ID != $Param{Data}->{AttachmentID}) {
+            return $Self->_Error(
+                Code    => 'Object.AlreadyExists',
+                Message => "Can not update StandardAttachment entry. Another StandardAttachment with same name already exists.",
+            );
+        }
+    }
+
     # update StandardAttachment
     my $Success = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentUpdate(
         ID          => $Param{Data}->{AttachmentID},
@@ -156,6 +171,7 @@ sub Run {
         Content     => $StandardAttachment->{Content} || $StandardAttachmentData{Content},
         ContentType => $StandardAttachment->{ContentType} || $StandardAttachmentData{ContentType},
         Filename    => $StandardAttachment->{Filename} || $StandardAttachmentData{Filename},
+        Comment     => $StandardAttachment->{Comment} || $StandardAttachmentData{Comment},
         ValidID     => $StandardAttachment->{ValidID} || $StandardAttachmentData{ValidID},
         UserID      => $Self->{Authorization}->{UserID},
     );

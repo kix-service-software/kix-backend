@@ -76,6 +76,7 @@ perform StandardAttachmentCreate Operation. This will return the created Standar
                 Content     => $Content,
                 ContentType => 'text/xml',
                 Filename    => 'SomeFile.xml',
+                Comment     => 'some comment',      # optional
             },
         },
     );
@@ -142,8 +143,9 @@ sub Run {
         Data => $Param{Data}->{StandardAttachment}
     );
     
+    # check if name already exists
     my $ID = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentLookup(
-        StandardAttachment => $StandardAttachment->{Name},
+        StdAttachment => $StandardAttachment->{Name},
     );
     
     if ( $ID ) {
@@ -156,10 +158,11 @@ sub Run {
     # create StandardAttachment
     my $StandardAttachmentID = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentAdd(
         Name        => $StandardAttachment->{Name},
-        ValidID     => $StandardAttachment->{ValidID} || 1,
         Content     => $StandardAttachment->{Content},
         ContentType => $StandardAttachment->{ContentType},
         Filename    => $StandardAttachment->{Filename},
+        Comment     => $StandardAttachment->{Comment} || '',
+        ValidID     => $StandardAttachment->{ValidID} || 1,
         UserID      => $Self->{Authorization}->{UserID},
     );
 
