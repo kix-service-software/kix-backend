@@ -1726,75 +1726,75 @@ Provider:
         V1::FAQ::FAQCategoryGet:
           RequestMethod:
           - GET
-          Route: /faq/:FAQCategoryID
+          Route: /faqs/:FAQCategoryID
         V1::FAQ::FAQCategoryCreate:
           RequestMethod:
           - POST
-          Route: /faq
+          Route: /faqs
         V1::FAQ::FAQCategoryUpdate:
           RequestMethod:
           - PATCH
-          Route: /faq/:FAQCategoryID
+          Route: /faqs/:FAQCategoryID
         V1::FAQ::FAQCategorySearch:
           RequestMethod:
           - GET
-          Route: /faq
+          Route: /faqs
         V1::FAQ::FAQCategoryDelete:
           RequestMethod:
           - DELETE
-          Route: /faq/:FAQCategoryID
+          Route: /faqs/:FAQCategoryID
         V1::FAQ::FAQArticleGet:
           RequestMethod:
           - GET
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID
         V1::FAQ::FAQArticleCreate:
           RequestMethod:
           - POST
-          Route: /faq/:FAQCategoryID/articles
+          Route: /faqs/:FAQCategoryID/articles
         V1::FAQ::FAQArticleUpdate:
           RequestMethod:
           - PATCH
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID
         V1::FAQ::FAQArticleSearch:
           RequestMethod:
           - GET
-          Route: /faq/:FAQCategoryID/articles
+          Route: /faqs/:FAQCategoryID/articles
         V1::FAQ::FAQArticleDelete:
           RequestMethod:
           - DELETE
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID
         V1::FAQ::FAQArticleAttachmentGet:
           RequestMethod:
           - GET
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
         V1::FAQ::FAQArticleAttachmentCreate:
           RequestMethod:
           - POST
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments
         V1::FAQ::FAQArticleAttachmentUpdate:
           RequestMethod:
           - PATCH
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
         V1::FAQ::FAQArticleAttachmentSearch:
           RequestMethod:
           - GET
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments
         V1::FAQ::FAQArticleAttachmentDelete:
           RequestMethod:
           - DELETE
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
         V1::FAQ::FAQArticleHistorySearch:
           RequestMethod:
           - GET
-          Route: /faq/:FAQCategoryID/articles/:FAQArticleID/history
+          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/history
         V1::FAQ::FAQArticleSearch:
           RequestMethod:
           - GET
-          Route: /faq/articles
+          Route: /faqs/articles
         V1::FAQ::FAQArticleHistorySearch:
           RequestMethod:
           - GET
-          Route: /faq/history
+          Route: /faqs/history
 
     Type: HTTP::REST
 RemoteSystem: ''

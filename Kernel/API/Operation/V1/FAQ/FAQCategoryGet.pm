@@ -76,17 +76,25 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            FAQCategoryID => 1,
+            FAQCategoryID => 1,                      # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
     $Result = {
-        CategoryID => 2,
-        ParentID   => 0,
-        Name       => 'My Category',
-        Comment    => 'This is my first category.',
-        ValidID    => 1,
-    );
+        Success      => 1,                           # 0 or 1
+        Code         => '',                          # In case of an error
+        Message      => '',                          # In case of an error
+        Data         => {
+            FAQCategory => [
+                {
+                    ...
+                },
+                {
+                    ...
+                },
+            ]
+        },
+    };
 
 =cut
 
@@ -124,29 +132,29 @@ sub Run {
         );
     }
 
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
     my @FAQCategoryData;
 
     # start faq loop
     FAQCategory:    
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
+        # check permission
+        my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+            CategoryID => $FAQCategoryID,
+            UserID     => $Self->{Authorization}->{UserID},
+        );
+
+        if ( !$Permission ) {
+            return $Self->_Error(
+                Code    => 'Object.NoPermission',
+                Message => "No permission to access FAQCategoryID $FAQCategoryID!",
+            );
+        }
+
         # get the FAQCategory data
         my %FAQCategory = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGet(
-            CategoryID     => $FAQCategoryID,
-            UserID   => $Self->{Authorization}->{UserID},
+            CategoryID => $FAQCategoryID,
+            UserID     => $Self->{Authorization}->{UserID},
         );
 
         if ( !IsHashRefWithData( \%FAQCategory ) ) {
