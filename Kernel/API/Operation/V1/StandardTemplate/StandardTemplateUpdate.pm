@@ -74,10 +74,10 @@ perform StandardTemplateUpdate Operation. This will return the updated StandardT
         Data => {
             TemplateID => 123,
             StandardTemplate  => {
-                Name         => 'New Standard Template',
-                Template     => 'Thank you for your email.',
-                ContentType  => 'text/plain; charset=utf-8',
-                TemplateType => 'Answer',                     # or 'Forward' or 'Create'
+                Name         => 'New Standard Template',        # optional
+                Template     => 'Thank you for your email.',    # optional
+                ContentType  => 'text/plain; charset=utf-8',    # optional
+                TemplateType => 'Answer',                       # or 'Forward' or 'Create'
                 ValidID     => 1,
             },
         },
@@ -146,6 +146,18 @@ sub Run {
         return $Self->_Error(
             Code    => 'Object.NotFound',
             Message => "Cannot update StandardTemplate. No StandardTemplate with ID '$Param{Data}->{StandardTemplateID}' found.",
+        );
+    }
+
+    # check if name already exists
+    my $Exist = $Kernel::OM->Get('Kernel::System::StandardTemplate')->NameExistsCheck(
+        Name => $StandardTemplate->{Name},
+    );
+    
+    if ( $Exist ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not create StandardTemplate entry. Another StandardTemplate with same name already exists.",
         );
     }
 

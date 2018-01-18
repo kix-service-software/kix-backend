@@ -144,10 +144,6 @@ sub Run {
             ID => $TemplateID,
         );
 
-        if ( !$Param{Data}->{include}->{Content} ) {
-            delete $StandardTemplateData{Content};
-        }
-
         if ( !IsHashRefWithData( \%StandardTemplateData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
