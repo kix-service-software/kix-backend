@@ -148,11 +148,11 @@ sub Run {
     );
     
     # check if name already exists
-    my $ID = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateLookup(
-        StandardTemplate => $StandardTemplate->{Name},
+    my $Exist = $Kernel::OM->Get('Kernel::System::StandardTemplate')->NameExistsCheck(
+        Name => $StandardTemplate->{Name},
     );
     
-    if ( $ID ) {
+    if ( $Exist ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => "Can not create StandardTemplate entry. Another StandardTemplate with same name already exists.",

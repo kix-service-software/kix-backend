@@ -141,7 +141,7 @@ sub Run {
     my %StandardTemplateData = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateGet(
         ID     => $Param{Data}->{TemplateID},
     );
- 
+
     if ( !IsHashRefWithData(\%StandardTemplateData) ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',

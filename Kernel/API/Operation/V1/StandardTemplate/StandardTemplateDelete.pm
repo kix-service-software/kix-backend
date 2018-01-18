@@ -118,17 +118,6 @@ sub Run {
     StandardTemplate:    
     foreach my $TemplateID ( @{$Param{Data}->{TemplateID}} ) {
 
-        my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
-            TemplateID => $TemplateID,
-        );
-
-        if ( IsHashRefWithData(\%Result) ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete StandardTemplate. The StandardTemplate has been assigned to at least one StandardAttachment.',
-            );
-        }
-
         # delete StandardTemplate	    
         my $Success = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateDelete(
             ID     => $TemplateID,
