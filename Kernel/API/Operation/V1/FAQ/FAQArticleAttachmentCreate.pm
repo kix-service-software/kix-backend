@@ -142,7 +142,7 @@ sub Run {
     }
     
     # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
         CategoryID => $Param{Data}->{FAQCategoryID},
         UserID   => $Self->{Authorization}->{UserID},
     );

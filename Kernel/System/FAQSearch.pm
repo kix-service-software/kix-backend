@@ -50,11 +50,8 @@ search in FAQ articles
         What      => '*some text*',                                   # (optional)
 
         Keyword   => '*webserver*',                                   # (optional)
-        States    => {                                                # (optional)
-            1 => 'internal',
-            2 => 'external',
-        },
-        LanguageIDs => [ 4, 5, 6 ],                                   # (optional)
+        Visibility  => [ 'agent', 'public' ],                         # (optional)
+        Languages   => [ 'en', 'de, 'fr' ],                           # (optional)
         CategoryIDs => [ 7, 8, 9 ],                                   # (optional)
         ValidIDs    => [ 1, 2, 3 ],                                   # (optional) (default 1)
 
@@ -207,14 +204,11 @@ sub FAQSearch {
         FAQID    => 'i.id',
         Number   => 'i.f_number',
         Title    => 'i.f_subject',
-        Language => 'i.f_language_id',
+        Language => 'i.language',
         Category => 'i.category_id',
         Valid    => 'i.valid_id',
         Created  => 'i.created',
         Changed  => 'i.changed',
-
-        # State attributes
-        State => 's.name',
 
         # Vote attributes
         Votes  => 'votes',
@@ -226,7 +220,7 @@ sub FAQSearch {
 
     # quote id array elements
     ARGUMENT:
-    for my $Key (qw(LanguageIDs CategoryIDs ValidIDs CreatedUserIDs LastChangedUserIDs)) {
+    for my $Key (qw(Languages CategoryIDs ValidIDs CreatedUserIDs LastChangedUserIDs)) {
         next ARGUMENT if !$Param{$Key};
 
         if ( !IsArrayRefWithData( $Param{$Key} ) ) {
@@ -327,8 +321,7 @@ sub FAQSearch {
     # SQL
     my $SQL = 'SELECT i.id, count( v.item_id ) as votes, avg( v.rate ) as vrate '
         . 'FROM faq_item i '
-        . 'LEFT JOIN faq_voting v ON v.item_id = i.id '
-        . 'LEFT JOIN faq_state s ON s.id = i.state_id';
+        . 'LEFT JOIN faq_voting v ON v.item_id = i.id ';
 
     # extended SQL
     my $Ext = '';
@@ -424,11 +417,11 @@ sub FAQSearch {
     }
 
     # search for languages
-    if ( $Param{LanguageIDs} && ref $Param{LanguageIDs} eq 'ARRAY' && @{ $Param{LanguageIDs} } ) {
+    if ( $Param{Languages} && ref $Param{Languages} eq 'ARRAY' && @{ $Param{Languages} } ) {
 
         my $InString = $Self->_InConditionGet(
-            TableColumn => 'i.f_language_id',
-            IDRef       => $Param{LanguageIDs},
+            TableColumn => 'i.language',
+            IDRef       => $Param{Languages},
         );
 
         if ($Ext) {
@@ -474,16 +467,12 @@ sub FAQSearch {
         $Ext .= $InString;
     }
 
-    # search for states
-    if ( $Param{States} && ref $Param{States} eq 'HASH' && %{ $Param{States} } ) {
-
-        my @States = map { $DBObject->Quote( $_, 'Integer' ) } keys %{ $Param{States} };
-
-        return if scalar @States != keys %{ $Param{States} };
+    # search for visibility
+    if ( $Param{Visibility} && ref $Param{Visibility} eq 'ARRAY' && @{ $Param{Visibility} } ) {
 
         my $InString = $Self->_InConditionGet(
-            TableColumn => 's.type_id',
-            IDRef       => \@States,
+            TableColumn => 'i.visbility',
+            IDRef       => $Param{Visibility},
         );
 
         if ($Ext) {
@@ -874,7 +863,7 @@ sub FAQSearch {
 
     # add GROUP BY
     $Ext
-        .= ' GROUP BY i.id, i.f_subject, i.f_language_id, i.created, i.changed, s.name, v.item_id ';
+        .= ' GROUP BY i.id, i.f_subject, i.language, i.created, i.changed, i.visibility, v.item_id ';
 
     # add HAVING clause ( Votes and Rate are aggregated columns, they can't be in the WHERE clause)
     # defined voting parameters (for Votes and Rate)

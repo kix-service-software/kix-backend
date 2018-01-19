@@ -74,9 +74,13 @@ perform FAQCategoryUpdate Operation. This will return the updated TypeID.
         Data => {
             FAQCategoryID => 123,
             FAQCategory  => {
-                ParentID   => 1,
-                Name       => 'Some Category',
-                Comment    => 'some comment',
+                Name     => 'CategoryA',    # optional
+                Comment  => 'Some comment', # optional
+                ParentID => 2,              # optional
+                ValidID  => 1,              # optional
+                GroupIDs => [               # optional
+                    1,2,3,...
+                ]
             },
         },
     );
@@ -126,19 +130,6 @@ sub Run {
         );
     }
 
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
     # isolate and trim FAQCategory parameter
     my $FAQCategory = $Self->_Trim(
         Data => $Param{Data}->{FAQCategory}
@@ -159,7 +150,7 @@ sub Run {
 
     # update FAQCategory
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryUpdate(
-        CategoryID => $Param{Data}->{FAQCategoryID} || $FAQCategoryData{FAQCategoryID},
+        CategoryID => $Param{Data}->{FAQCategoryID},
         Name       => $FAQCategory->{Name} || $FAQCategoryData{Name},
         Comment    => $FAQCategory->{Comment} || $FAQCategoryData{Comment},
         ParentID   => $FAQCategory->{ParentID} || $FAQCategoryData{ParentID},
@@ -172,6 +163,22 @@ sub Run {
             Code    => 'Object.UnableToUpdate',
             Message => 'Could not update FAQCategory, please contact the system administrator',
         );
+    }
+
+    # set groups
+    if ( IsArrayRefWithData($FAQCategory->{GroupIDs}) ) {
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
+            CategoryID => $Param{Data}->{FAQCategoryID},
+            GroupIDs   => $FAQCategory->{GroupIDs},
+            UserID     => $Self->{Authorization}->{UserID},
+        );
+
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToCreate',
+                Message => 'Could not create group assignment, please contact the system administrator',
+            );
+        }
     }
 
     # return result    

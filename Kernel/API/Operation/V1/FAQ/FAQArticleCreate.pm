@@ -74,24 +74,23 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            FAQCategoryID => 123,
-            FAQArticleID  => 123,
             FAQArticle  => {
                 Title       => 'Some Text',
-                StateID     => 1,
-                LanguageID  => 1,
-                Number      => '13402',          # (optional)
-                Keywords    => 'some keywords',  # (optional)
-                Field1      => 'Symptom...',     # (optional)
-                Field2      => 'Problem...',     # (optional)
-                Field3      => 'Solution...',    # (optional)
-                Field4      => 'Field4...',      # (optional)
-                Field5      => 'Field5...',      # (optional)
-                Field6      => 'Comment...',     # (optional)
-                Approved    => 1,                # (optional)
+                CategoryID  => 1,
                 ValidID     => 1,
-                ContentType => 'text/plain',     # or 'text/html'
-                FAQAttachments => [
+                Visibility  => 'agent',          # optional, possible values 'agent', 'customer', 'public' with fallback to 'Agent'
+                Language    => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
+                ContentType => 'text/plain',     # optional, if not given set to 'text/plain'
+                Number      => '13402',          # optional
+                Keywords    => 'some keywords',  # optional
+                Field1      => 'Symptom...',     # optional
+                Field2      => 'Problem...',     # optional
+                Field3      => 'Solution...',    # optional
+                Field4      => 'Field4...',      # optional
+                Field5      => 'Field5...',      # optional
+                Field6      => 'Comment...',     # optional
+                Approved    => 1,                # optional
+                Attachments => [                 # optional
                     {
                         Content     => $Content,
                         ContentType => 'text/xml',
@@ -130,6 +129,10 @@ sub Run {
         );
     }
 
+    # get system LanguageIDs
+    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my @LanguageIDs = sort keys %{$Languages};
+
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -138,18 +141,23 @@ sub Run {
                 Type     => 'HASH',
                 Required => 1
             },
-            'FAQCategoryID' => {
-                Type     => 'HASH',
+            'FAQArticle::CategoryID' => {
                 Required => 1
             },            
             'FAQArticle::Title' => {
                 Required => 1
             },
-            'FAQArticle::StateID' => {
-                Required => 1
+            'FAQArticle::Visibility' => {
+                RequiresValueIfUsed => 1,
+                OneOf => [
+                    'agent',
+                    'customer',
+                    'public'
+                ]
             },
-            'FAQArticle::LanguageID' => {
-                Required => 1
+            'FAQArticle::Language' => {
+                RequiresValueIfUsed => 1,
+                OneOf => \@LanguageIDs
             },
         }
     );
@@ -162,34 +170,30 @@ sub Run {
         );
     }
 
+    # isolate and trim FAQArticle parameter
+    my $FAQArticle = $Self->_Trim(
+        Data => $Param{Data}->{FAQArticle}
+    );
+
     # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
+    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $FAQArticle->{CategoryID},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( $Permission ne 'rw' ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
+            Message => "No permission to create FAQ article in given category!",
         );
     }
     
-    # delete FAQAttachments from FAQArticle hash
-    my $FAQAttachments = $Param{Data}->{FAQArticle}->{FAQAttachments};
-    delete ($Param{Data}->{FAQArticle}->{FAQAttachments});
-
-    # isolate FAQArticle parameter
-    my $FAQArticle = $Self->_Trim(
-        Data => $Param{Data}->{FAQArticle},
-    );        
-
     # everything is ok, let's create the FAQArticle
     my $FAQArticleID = $Kernel::OM->Get('Kernel::System::FAQ')->FAQAdd(
         Title       => $FAQArticle->{Title},
-        CategoryID  => $Param{Data}->{FAQCategoryID},
-        StateID     => $FAQArticle->{StateID},
-        LanguageID  => $FAQArticle->{LanguageID},
+        CategoryID  => $FAQArticle->{CategoryID},
+        Visibility  => $FAQArticle->{Visibility} || 'agent',
+        Language    => $FAQArticle->{Language} || 'en',
         Number      => $FAQArticle->{Number} || '',
         Keywords    => $FAQArticle->{Keywords} || '',
         Field1      => $FAQArticle->{Field1} || '',
@@ -201,7 +205,7 @@ sub Run {
         Approved    => $FAQArticle->{Approved} || 1,
         ValidID     => $FAQArticle->{ValidID} || 1,
         ContentType => $FAQArticle->{ContentType} || 'text/plain',
-        UserID   => $Self->{Authorization}->{UserID},
+        UserID      => $Self->{Authorization}->{UserID},
     );
 
     if ( !$FAQArticleID ) {
@@ -212,12 +216,11 @@ sub Run {
     }
 
     # create new attachment
-    if ( $FAQAttachments ) {
-        foreach my $Attachment ( @{$FAQAttachments} ) {
+    if ( IsArrayRefWithData($FAQArticle->{Attachments}) ) {
+        foreach my $Attachment ( @{$FAQArticle->{Attachments}} ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::FAQ::FAQArticleAttachmentCreate',
                 Data          => {
-                    FAQCategoryID => $Param{Data}->{FAQCategoryID},
                     FAQArticleID  => $FAQArticleID,
                     FAQAttachment => $Attachment,
                 }
@@ -233,29 +236,9 @@ sub Run {
 
     return $Self->_Success(
         Code         => 'Object.Created',
-        FAQArticleID    => $FAQArticleID,
+        FAQArticleID => $FAQArticleID,
     );
 
 }
 
-
 1;
-
-=end Internal:
-
-
-
-
-=back
-
-=head1 TERMS AND CONDITIONS
-
-This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
-
-<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut

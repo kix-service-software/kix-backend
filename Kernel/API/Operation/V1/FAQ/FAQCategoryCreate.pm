@@ -73,8 +73,11 @@ perform FAQCategoryCreate Operation. This will return the created FAQCategoryID.
             FAQCategory  => {
                 Name     => 'CategoryA',
                 Comment  => 'Some comment', # optional
-                ParentID => 2,
-                ValidID  => 1,              # default 1
+                ParentID => 2,              # optional
+                ValidID  => 1,              # optional, default 1
+                GroupIDs => [
+                    1,2,3,...
+                ]
             },
         },
     );
@@ -116,9 +119,10 @@ sub Run {
             'FAQCategory::Name' => {
                 Required => 1
             },            
-            'FAQCategory::ParentID' => {
+            'FAQCategory::GroupIDs' => {
+                Type     => 'ARRAY',
                 Required => 1
-            },
+            },            
         }
     );
 
@@ -140,7 +144,7 @@ sub Run {
     my $FAQCategoryID = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryAdd(
         Name     => $FAQCategory->{Name},
         Comment  => $FAQCategory->{Comment} || '',
-        ParentID => $FAQCategory->{ParentID},
+        ParentID => $FAQCategory->{ParentID} || 0,
         ValidID  => $FAQCategory->{ValidID} || 1,
         UserID   => $Self->{Authorization}->{UserID},
     );
@@ -149,6 +153,20 @@ sub Run {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create FAQCategory, please contact the system administrator',
+        );
+    }
+
+    # set groups    
+    my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
+        CategoryID => $FAQCategoryID,
+        GroupIDs   => $FAQCategory->{GroupIDs} || [],
+        UserID     => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !$Success ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create group assignment, please contact the system administrator',
         );
     }
     

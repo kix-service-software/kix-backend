@@ -1127,20 +1127,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::FAQ::FAQArticleHistorySearch
-    V1::FAQ::FAQArticleSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQArticleSearch
-    V1::FAQ::FAQArticleHistorySearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQArticleHistorySearch
 
   Transport:
     Config:
@@ -1726,75 +1712,67 @@ Provider:
         V1::FAQ::FAQCategoryGet:
           RequestMethod:
           - GET
-          Route: /faqs/:FAQCategoryID
+          Route: /faqs/categories/:FAQCategoryID
         V1::FAQ::FAQCategoryCreate:
           RequestMethod:
           - POST
-          Route: /faqs
+          Route: /faqs/categories
         V1::FAQ::FAQCategoryUpdate:
           RequestMethod:
           - PATCH
-          Route: /faqs/:FAQCategoryID
+          Route: /faqs/categories/:FAQCategoryID
         V1::FAQ::FAQCategorySearch:
           RequestMethod:
           - GET
-          Route: /faqs
+          Route: /faqs/categories
         V1::FAQ::FAQCategoryDelete:
           RequestMethod:
           - DELETE
-          Route: /faqs/:FAQCategoryID
+          Route: /faqs/categories/:FAQCategoryID
         V1::FAQ::FAQArticleGet:
           RequestMethod:
           - GET
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID
+          Route: /faqs/articles/:FAQArticleID
         V1::FAQ::FAQArticleCreate:
           RequestMethod:
           - POST
-          Route: /faqs/:FAQCategoryID/articles
+          Route: /faqs/articles
         V1::FAQ::FAQArticleUpdate:
           RequestMethod:
           - PATCH
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID
-        V1::FAQ::FAQArticleSearch:
-          RequestMethod:
-          - GET
-          Route: /faqs/:FAQCategoryID/articles
-        V1::FAQ::FAQArticleDelete:
-          RequestMethod:
-          - DELETE
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID
-        V1::FAQ::FAQArticleAttachmentGet:
-          RequestMethod:
-          - GET
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
-        V1::FAQ::FAQArticleAttachmentCreate:
-          RequestMethod:
-          - POST
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments
-        V1::FAQ::FAQArticleAttachmentUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
-        V1::FAQ::FAQArticleAttachmentSearch:
-          RequestMethod:
-          - GET
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments
-        V1::FAQ::FAQArticleAttachmentDelete:
-          RequestMethod:
-          - DELETE
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/attachments/:AttachmentID
-        V1::FAQ::FAQArticleHistorySearch:
-          RequestMethod:
-          - GET
-          Route: /faqs/:FAQCategoryID/articles/:FAQArticleID/history
+          Route: /faqs/articles/:FAQArticleID
         V1::FAQ::FAQArticleSearch:
           RequestMethod:
           - GET
           Route: /faqs/articles
+        V1::FAQ::FAQArticleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faqs/articles/:FAQArticleID
+        V1::FAQ::FAQArticleAttachmentGet:
+          RequestMethod:
+          - GET
+          Route: /faqs/articles/:FAQArticleID/attachments/:AttachmentID
+        V1::FAQ::FAQArticleAttachmentCreate:
+          RequestMethod:
+          - POST
+          Route: /faqs/articles/:FAQArticleID/attachments
+        V1::FAQ::FAQArticleAttachmentUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /faqs/articles/:FAQArticleID/attachments/:AttachmentID
+        V1::FAQ::FAQArticleAttachmentSearch:
+          RequestMethod:
+          - GET
+          Route: /faqs/articles/:FAQArticleID/attachments
+        V1::FAQ::FAQArticleAttachmentDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faqs/articles/:FAQArticleID/attachments/:AttachmentID
         V1::FAQ::FAQArticleHistorySearch:
           RequestMethod:
           - GET
-          Route: /faqs/history
+          Route: /faqs/articles/:FAQArticleID/history
 
     Type: HTTP::REST
 RemoteSystem: ''

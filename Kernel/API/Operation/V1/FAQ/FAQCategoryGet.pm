@@ -163,6 +163,26 @@ sub Run {
                 Message => "No data found for FAQCategoryID $FAQCategoryID.",
             );
         }
+
+        # include GroupIDs
+        $FAQCategory{GroupIDs} = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGroupGet(
+            CategoryID => $FAQCategoryID,
+            UserID     => $Self->{Authorization}->{UserID},
+        );
+
+        # include SubCategories if requested
+        if ( $Param{Data}->{include}->{SubCategories} ) {
+            $FAQCategory{SubCategories} = $Kernel::OM->Get('Kernel::System::FAQ')->CategorySubCategoryIDList(
+                ParentID => $FAQCategoryID,
+                UserID   => $Self->{Authorization}->{UserID},
+            );
+
+            # force numeric IDs
+            my $Index = 0;
+            foreach my $Value ( @{$FAQCategory{SubCategories}} ) {
+                $FAQCategory{SubCategories}->[$Index++] = 0 + $Value;
+            }
+        }
         
         # add
         push(@FAQCategoryData, \%FAQCategory);

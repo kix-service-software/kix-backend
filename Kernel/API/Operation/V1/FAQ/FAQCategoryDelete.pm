@@ -70,7 +70,7 @@ perform FAQCategoryDelete Operation. This will return the deleted FAQCategoryID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            FAQCategoryID  => '...',
+            FAQCategoryID => 1,                      # comma separated in case of multiple or arrayref (depending on transport)
         },      
     );
 
@@ -113,40 +113,27 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-    
+        
     # start FAQCategory loop
     FAQCategory:    
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
-        my @IDs = $Kernel::OM->Get('Kernel::System::FAQSearch')->FAQSearch(
-            CategoryIDs     => [$FAQCategoryID],
-            UserID => $Self->{Authorization}->{UserID},
+        my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
+            CategoryIDs => [ $FAQCategoryID ],
+            UserID      => $Self->{Authorization}->{UserID},
         );
-        
-        if ( !$IDs[0] ) {
+
+        if ( @ArticleIDs ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete FAQCategory. At least one Artikle is assigned to this faq category.',
+                Message => 'Cannot delete FAQCategory. At least one article is assigned to this category.',
             );
         }
 
         # delete FAQCategory        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQDelete(
-            ID     => $FAQCategoryID,
-            UserID => $Self->{Authorization}->{UserID},
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDelete(
+            CategoryID => $FAQCategoryID,
+            UserID     => $Self->{Authorization}->{UserID},
         );
  
         if ( !$Success ) {

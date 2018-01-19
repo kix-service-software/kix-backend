@@ -112,26 +112,19 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-####
-    # perform FAQArticle search
-    my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
-        ItemID     => $FAQArticleID,
-        ItemFields => 1,
+
+    # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
+    my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
         UserID     => $Self->{Authorization}->{UserID},
     );
 
     # get already prepared FAQ data from FAQArticleGet operation
-    if ( IsHashRefWithData($FAQArticle) ) {
-        my $ItemIDs;
-        
-        foreach my $ID ( keys %{$FAQArticle} ){
-            $ItemIDs->{$FAQArticle->{$ID}->{ItemID}} = $FAQArticle->{$ID}->{ItemID};
-        }
+    if ( @ArticleIDs ) {
 
         my $FAQArticleGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleGet',
             Data      => {
-                FAQArticleID => join(',', sort keys %{$ItemIDs}),
+                FAQArticleID => join(',', sort @ArticleIDs),
             }
         );
   

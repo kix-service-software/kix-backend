@@ -70,10 +70,8 @@ perform RoleUserCreate Operation. This will return sucsess.
 
     my $Result = $OperationObject->Run(
         Data => {
-            RoleUser  => {
-                UserID    => 12,
-                RoleID    => 6,
-            },
+            UserID    => 12,
+            RoleID    => 6,
         },
     );
 

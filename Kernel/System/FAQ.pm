@@ -111,13 +111,8 @@ Returns:
 
     %FAQ = (
         ID                => 32,
-        ItemID            => 32,
-        FAQID             => 32,
         Number            => 100032,
         CategoryID        => '2',
-        CategoryName'     => 'CategoryA::CategoryB',
-        CategoryShortName => 'CategoryB',
-        LanguageID        => 1,
         Language          => 'en',
         Title             => 'Article Title',
         Approved          => 1,                              # or 0
@@ -126,73 +121,23 @@ Returns:
         Keywords          => 'KeyWord1 KeyWord2',
         Votes             => 0,                              # number of votes
         VoteResult        => '0.00',                         # a number between 0.00 and 100.00
-        StateID           => 1,
-        State             => 'internal (agent)',             # or 'external (customer)' or
-                                                             # 'public (all)'
-        StateTypeID       => 1,
-        StateTypeName     => 'internal',                     # or 'external' or 'public'
+        Visibility        => 'agent',                        # or 'customer' or 'public'
+        Field1            => 'The Symptoms',                 # if fields should be included
+        Field2            => 'The Problem',                  # if fields should be included
+        Field3            => 'The Solution',                 # if fields should be included
+        Field4            => undef,                          # if fields should be included, Not active by default
+        Field5            => undef,                          # if fields should be included, Not active by default
+        Field6            => 'Comments',                     # if fields should be included
         CreatedBy         => 1,
         Changed'          => '2011-01-05 21:53:50',
         ChangedBy         => '1',
         Created           => '2011-01-05 21:53:50',
-        Name              => '1294286030-31.1697297104732',  # FAQ Article name or
-                                                             # systemtime + '-' + random number
-    );
-
-    my %FAQ = $FAQObject->FAQGet(
-        ItemID     => 123,
-        ItemFields => 1,
-        UserID     => 1,
-    );
-
-Returns:
-
-    %FAQ = (
-        ID                => 32,
-        ItemID            => 32,
-        FAQID             => 32,
-        Number            => 100032,
-        CategoryID        => '2',
-        CategoryName'     => 'CategoryA::CategoryB',
-        CategoryShortName => 'CategoryB',
-        LanguageID        => 1,
-        Language          => 'en',
-        Title             => 'Article Title',
-        Field1            => 'The Symptoms',
-        Field2            => 'The Problem',
-        Field3            => 'The Solution',
-        Field4            => undef,                          # Not active by default
-        Field5            => undef,                          # Not active by default
-        Field6            => 'Comments',
-        Approved          => 1,                              # or 0
-        ValidID           => 1,
-        ContentType       => 'text/plain',                  # or 'text/html'
-        Valid             => 'valid',
-        Keywords          => 'KeyWord1 KeyWord2',
-        Votes             => 0,                              # number of votes
-        VoteResult        => '0.00',                         # a number between 0.00 and 100.00
-        StateID           => 1,
-        State             => 'internal (agent)',             # or 'external (customer)' or
-                                                             # 'public (all)'
-        StateTypeID       => 1,
-        StateTypeName     => 'internal',                     # or 'external' or 'public'
-        CreatedBy         => 1,
-        Changed'          => '2011-01-05 21:53:50',
-        ChangedBy         => '1',
-        Created           => '2011-01-05 21:53:50',
-        Name              => '1294286030-31.1697297104732',  # FAQ Article name or
-                                                             # systemtime + '-' + random number
     );
 
 =cut
 
 sub FAQGet {
     my ( $Self, %Param ) = @_;
-
-    # Failures rename from ItemID to FAQID
-    if ( $Param{FAQID} ) {
-        $Param{ItemID} = $Param{FAQID};
-    }
 
     # check needed stuff
     for my $Argument (qw(UserID ItemID)) {
@@ -236,15 +181,11 @@ sub FAQGet {
 
         return if !$DBObject->Prepare(
             SQL => '
-                SELECT i.f_name, i.f_language_id, i.f_subject, i.created, i.created_by, i.changed,
-                    i.changed_by, i.category_id, i.state_id, c.name, s.name, l.name, i.f_keywords,
-                    i.approved, i.valid_id, i.content_type, i.f_number, st.id, st.name
-                FROM faq_item i, faq_category c, faq_state s, faq_state_type st, faq_language l
-                WHERE i.state_id = s.id
-                    AND s.type_id = st.id
-                    AND i.category_id = c.id
-                    AND i.f_language_id = l.id
-                    AND i.id = ?',
+                SELECT id, f_name, language, f_subject, created, created_by, changed,
+                    changed_by, category_id, visibility, f_keywords,
+                    approved, valid_id, content_type, f_number
+                FROM faq_item
+                WHERE id = ?',
             Bind  => [ \$Param{ItemID} ],
             Limit => 1,
         );
@@ -253,31 +194,22 @@ sub FAQGet {
 
             %Data = (
 
-                # var for old versions
-                ID    => $Param{ItemID},
-                FAQID => $Param{ItemID},
-
                 # get data attributes
-                ItemID        => $Param{ItemID},
-                Name          => $Row[0],
-                LanguageID    => $Row[1],
-                Title         => $Row[2],
-                Created       => $Row[3],
-                CreatedBy     => $Row[4],
-                Changed       => $Row[5],
-                ChangedBy     => $Row[6],
-                CategoryID    => $Row[7],
-                StateID       => $Row[8],
-                CategoryName  => $Row[9],
-                State         => $Row[10],
-                Language      => $Row[11],
-                Keywords      => $Row[12],
-                Approved      => $Row[13],
-                ValidID       => $Row[14],
-                ContentType   => $Row[15],
-                Number        => $Row[16],
-                StateTypeID   => $Row[17],
-                StateTypeName => $Row[18],
+                ItemID        => $Row[0],
+                Name          => $Row[1],
+                Language      => $Row[2],
+                Title         => $Row[3],
+                Created       => $Row[4],
+                CreatedBy     => $Row[5],
+                Changed       => $Row[6],
+                ChangedBy     => $Row[7],
+                CategoryID    => $Row[8],
+                Visibility    => $Row[9],
+                Keywords      => $Row[10],
+                Approved      => $Row[11],
+                ValidID       => $Row[12],
+                ContentType   => $Row[13],
+                Number        => $Row[14],
             );
         }
 
@@ -319,21 +251,6 @@ sub FAQGet {
 
             $Data{Number} = $Number;
         }
-
-        # get all category long names
-        my $CategoryTree = $Self->CategoryTreeList(
-            UserID => $Param{UserID},
-        );
-
-        # save the category short name
-        $Data{CategoryShortName} = $Data{CategoryName};
-
-        # get the category long name
-        $Data{CategoryName} = $CategoryTree->{ $Data{CategoryID} };
-
-        # get valid list
-        my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
-        $Data{Valid} = $ValidList{ $Data{ValidID} };
 
         # cache result
         $CacheObject->Set(
@@ -493,8 +410,8 @@ add an article
     my $ItemID = $FAQObject->FAQAdd(
         Title       => 'Some Text',
         CategoryID  => 1,
-        StateID     => 1,
-        LanguageID  => 1,
+        Visibility  => 'agent',          # possible values 'agent', 'customer' or 'public'
+        Language    => 'en',
         Number      => '13402',          # (optional)
         Keywords    => 'some keywords',  # (optional)
         Field1      => 'Symptom...',     # (optional)
@@ -520,10 +437,9 @@ sub FAQAdd {
 
     # get log object
     my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
-use Data::Dumper;
-print STDERR "paramfaq".Dumper(\%Param);
+
     # check needed stuff
-    for my $Argument (qw(CategoryID StateID LanguageID Title UserID ContentType)) {
+    for my $Argument (qw(CategoryID Visibility Language Title UserID ContentType)) {
         if ( !$Param{$Argument} ) {
             $LogObject->Log(
                 Priority => 'error',
@@ -584,8 +500,8 @@ print STDERR "paramfaq".Dumper(\%Param);
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             INSERT INTO faq_item
-                (f_number, f_name, f_language_id, f_subject,
-                category_id, state_id, f_keywords, approved, valid_id, content_type,
+                (f_number, f_name, language, f_subject,
+                category_id, visibility, f_keywords, approved, valid_id, content_type,
                 f_field1, f_field2, f_field3, f_field4, f_field5, f_field6,
                 created, created_by, changed, changed_by)
             VALUES
@@ -594,8 +510,8 @@ print STDERR "paramfaq".Dumper(\%Param);
                 ?, ?, ?, ?, ?, ?,
                 current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Number},     \$Param{Name},    \$Param{LanguageID}, \$Param{Title},
-            \$Param{CategoryID}, \$Param{StateID}, \$Param{Keywords},   \$Param{Approved},
+            \$Param{Number},     \$Param{Name},    \$Param{Language}, \$Param{Title},
+            \$Param{CategoryID}, \$Param{Visibility}, \$Param{Keywords},   \$Param{Approved},
             \$Param{ValidID},    \$Param{ContentType},
             \$Param{Field1}, \$Param{Field2}, \$Param{Field3},
             \$Param{Field4}, \$Param{Field5}, \$Param{Field6},
@@ -608,9 +524,9 @@ print STDERR "paramfaq".Dumper(\%Param);
         SELECT id FROM faq_item
         WHERE f_number = ?
             AND f_name = ?
-            AND f_language_id = ?
+            AND language = ?
             AND category_id = ?
-            AND state_id = ?
+            AND visibility = ?
             AND approved = ?
             AND valid_id = ?
             AND created_by = ?
@@ -651,9 +567,9 @@ print STDERR "paramfaq".Dumper(\%Param);
         Bind => [
             \$Param{Number},
             \$Param{Name},
-            \$Param{LanguageID},
+            \$Param{Language},
             \$Param{CategoryID},
-            \$Param{StateID},
+            \$Param{Visibility},
             \$Param{Approved},
             \$Param{ValidID},
             \$Param{UserID},
@@ -691,10 +607,10 @@ print STDERR "paramfaq".Dumper(\%Param);
         my $Success = $Self->_FAQApprovalTicketCreate(
             ItemID     => $ID,
             CategoryID => $Param{CategoryID},
-            LanguageID => $Param{LanguageID},
+            Language   => $Param{Language},
             FAQNumber  => $Number,
             Title      => $Param{Title},
-            StateID    => $Param{StateID},
+            Visibility => $Param{Visibility},
             UserID     => $Param{UserID},
         );
 
@@ -716,15 +632,21 @@ update an article
 
    my $Success = $FAQObject->FAQUpdate(
         ItemID      => 123,
-        CategoryID  => 1,
-        StateID     => 1,
-        LanguageID  => 1,
-        Approved    => 1,
-        ValidID     => 1,
-        ContentType => 'text/plan',     # or 'text/html'
         Title       => 'Some Text',
-        Field1      => 'Problem...',
-        Field2      => 'Solution...',
+        CategoryID  => 1,
+        Visibility  => 'agent',          # possible values 'agent', 'customer' or 'public'
+        Language    => 'en',
+        Number      => '13402',          # (optional)
+        Keywords    => 'some keywords',  # (optional)
+        Field1      => 'Symptom...',     # (optional)
+        Field2      => 'Problem...',     # (optional)
+        Field3      => 'Solution...',    # (optional)
+        Field4      => 'Field4...',      # (optional)
+        Field5      => 'Field5...',      # (optional)
+        Field6      => 'Comment...',     # (optional)
+        Approved    => 1,                # (optional)
+        ValidID     => 1,
+        ContentType => 'text/plain',     # or 'text/html'
         UserID      => 1,
         ApprovalOff => 1,               # optional, (if set to 1 approval is ignored. This is
                                         #   important when called from FAQInlineAttachmentURLUpdate)
@@ -740,7 +662,7 @@ sub FAQUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(ItemID CategoryID StateID LanguageID Title UserID ContentType)) {
+    for my $Argument (qw(ItemID CategoryID Visibility Language Title ValidID UserID ContentType)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -751,28 +673,11 @@ sub FAQUpdate {
         }
     }
 
-    # get FAQ data
-    my %FAQData = $Self->FAQGet(
-        ItemID     => $Param{ItemID},
-        ItemFields => 0,
-        UserID     => $Param{UserID},
-    );
-
-    # if no name was given use old name from FAQ
-    if ( !$Param{Name} ) {
-        $Param{Name} = $FAQData{Name};
-    }
-
-    # set default value for ValidID
-    if ( !defined $Param{ValidID} ) {
-        $Param{ValidID} = $FAQData{ValidID};
-    }
-
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             UPDATE faq_item SET
-                f_name = ?, f_language_id = ?, f_subject = ?, category_id = ?,
-                state_id = ?, f_keywords = ?, valid_id = ?, content_type = ?,
+                f_name = ?, f_language = ?, f_subject = ?, category_id = ?,
+                visbility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
                 f_field1 = ?, f_field2 = ?,
                 f_field3 = ?, f_field4 = ?,
                 f_field5 = ?, f_field6 = ?,
@@ -780,8 +685,8 @@ sub FAQUpdate {
                 changed_by = ?
             WHERE id = ?',
         Bind => [
-            \$Param{Name},    \$Param{LanguageID}, \$Param{Title},   \$Param{CategoryID},
-            \$Param{StateID}, \$Param{Keywords},   \$Param{ValidID}, \$Param{ContentType},
+            \$Param{Name},    \$Param{Language}, \$Param{Title},   \$Param{CategoryID},
+            \$Param{Visibility}, \$Param{Keywords},   \$Param{ValidID}, \$Param{ContentType},
             \$Param{Field1},  \$Param{Field2},
             \$Param{Field3},  \$Param{Field4},
             \$Param{Field5},  \$Param{Field6},
@@ -2376,10 +2281,10 @@ creates an approval ticket
     my $Success = $FAQObject->_FAQApprovalTicketCreate(
         ItemID     => 123,
         CategoryID => 2,
-        LanguageID => 1,
+        Language   => 'en',
         FAQNumber  => 10211,
         Title      => 'Some Title',
-        StateID    => 1,
+        Visibility => 'agent',
         UserID     => 1,
     );
 
@@ -2389,7 +2294,7 @@ sub _FAQApprovalTicketCreate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(ItemID CategoryID FAQNumber Title StateID UserID)) {
+    for my $Argument (qw(ItemID CategoryID FAQNumber Title Visibility UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -2460,12 +2365,6 @@ sub _FAQApprovalTicketCreate {
             UserID => $Param{UserID},
         );
 
-        # get FAQ state
-        my %State = $Self->StateGet(
-            StateID => $Param{StateID},
-            UserID  => $Param{UserID},
-        );
-
         # categories can be nested; you can have some::long::category.
         my @CategoryNames;
         my $CategoryID = $Param{CategoryID};
@@ -2481,27 +2380,17 @@ sub _FAQApprovalTicketCreate {
         }
         my $Category = join( '::', reverse @CategoryNames );
 
-        my $Language;
-        if ( $ConfigObject->Get('FAQ::MultiLanguage') ) {
-            $Language = $Self->LanguageLookup(
-                LanguageID => $Param{LanguageID},
-            );
-        }
-        else {
-            $Language = '-';
-        }
-
 #rbo - T2016121190001552 - added KIX placeholders
         # get body from config
         my $Body = $ConfigObject->Get('FAQ::ApprovalTicketBody');
         $Body =~ s{ <(KIX|OTRS)_FAQ_CATEGORYID> }{$Param{CategoryID}}xms;
         $Body =~ s{ <(KIX|OTRS)_FAQ_CATEGORY>   }{$Category}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_LANGUAGE>   }{$Language}xms;
+        $Body =~ s{ <(KIX|OTRS)_FAQ_LANGUAGE>   }{$Param{Language}}xms;
         $Body =~ s{ <(KIX|OTRS)_FAQ_ITEMID>     }{$Param{ItemID}}xms;
         $Body =~ s{ <(KIX|OTRS)_FAQ_NUMBER>     }{$Param{FAQNumber}}xms;
         $Body =~ s{ <(KIX|OTRS)_FAQ_TITLE>      }{$Param{Title}}xms;
         $Body =~ s{ <(KIX|OTRS)_FAQ_AUTHOR>     }{$UserName}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_STATE>      }{$State{Name}}xms;
+        $Body =~ s{ <(KIX|OTRS)_FAQ_STATE>      }{$Param{Visibility}}xms;
 
         #  gather user data
         my %User = $UserObject->GetUserData(

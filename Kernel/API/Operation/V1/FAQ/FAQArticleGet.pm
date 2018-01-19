@@ -76,17 +76,25 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ArticleID => 1,
+            FAQArticleID => 1,
         },
     );
 
     $Result = {
-        ArticleID => 2,
-        ParentID   => 0,
-        Name       => 'My Article',
-        Comment    => 'This is my first Article.',
-        ValidID    => 1,
-    );
+        Success      => 1,                           # 0 or 1
+        Code         => '',                          # In case of an error
+        Message      => '',                          # In case of an error
+        Data         => {
+            FAQArticle => [
+                {
+                    ...
+                },
+                {
+                    ...
+                },
+            ]
+        },
+    };
 
 =cut
 
@@ -124,19 +132,6 @@ sub Run {
         );
     }
 
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
     my @FAQArticleData;
 
     # start faq loop
@@ -156,7 +151,7 @@ sub Run {
                 Message => "No data found for FAQArticleID $FAQArticleID.",
             );
         }
-        
+
         # add
         push(@FAQArticleData, \%FAQArticle);
     }
