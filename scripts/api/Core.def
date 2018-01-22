@@ -87,8 +87,8 @@
 /slas/:SLAID                                                        |   GET             | V1::SLA::SLAGet
 /slas/:SLAID                                                        |   PATCH           | V1::SLA::SLAUpdate
 /slas/:SLAID                                                        |   DELETE          | V1::SLA::SLADelete
-/dynamicfieldtypes                                                  |   GET             | V1::DynamicField::DynamicFieldTypeSearch
-/dynamicfieldobjecttypes                                            |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
+/dynamicfields/types                                                |   GET             | V1::DynamicField::DynamicFieldTypeSearch
+/dynamicfields/objects                                              |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
 /dynamicfields                                                      |   GET             | V1::DynamicField::DynamicFieldSearch
 /dynamicfields                                                      |   POST            | V1::DynamicField::DynamicFieldCreate
 /dynamicfields/:DynamicFieldID                                      |   GET             | V1::DynamicField::DynamicFieldGet
