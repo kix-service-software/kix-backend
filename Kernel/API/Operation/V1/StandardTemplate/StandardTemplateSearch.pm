@@ -121,7 +121,7 @@ sub Run {
         my $StandardTemplateGetResult = $Self->ExecOperation(
             OperationType => 'V1::StandardTemplate::StandardTemplateGet',
             Data      => {
-                TemplateID => join(',', sort keys %StandardTemplateList),
+                StandardTemplateID => join(',', sort keys %StandardTemplateList),
             }
         );    
 

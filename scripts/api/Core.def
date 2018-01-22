@@ -167,7 +167,7 @@
 /standardattachments/:AttachmentID                                  |   DELETE          | V1::StandardAttachment::StandardAttachmentDelete
 /standardtemplates                                                  |   GET             | V1::StandardTemplate::StandardTemplateSearch
 /standardtemplates                                                  |   POST            | V1::StandardTemplate::StandardTemplateCreate
-/standardtemplates/:TemplateID                                      |   GET             | V1::StandardTemplate::StandardTemplateGet
-/standardtemplates/:TemplateID                                      |   PATCH           | V1::StandardTemplate::StandardTemplateUpdate
-/standardtemplates/:TemplateID                                      |   DELETE          | V1::StandardTemplate::StandardTemplateDelete
+/standardtemplates/:StandardTemplateID                              |   GET             | V1::StandardTemplate::StandardTemplateGet
+/standardtemplates/:StandardTemplateID                              |   PATCH           | V1::StandardTemplate::StandardTemplateUpdate
+/standardtemplates/:StandardTemplateID                              |   DELETE          | V1::StandardTemplate::StandardTemplateDelete
 

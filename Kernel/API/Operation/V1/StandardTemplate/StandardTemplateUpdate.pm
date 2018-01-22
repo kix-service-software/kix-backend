@@ -72,7 +72,7 @@ perform StandardTemplateUpdate Operation. This will return the updated StandardT
 
     my $Result = $OperationObject->Run(
         Data => {
-            TemplateID => 123,
+            StandardTemplateID => 123,
             StandardTemplate  => {
                 Name         => 'New Standard Template',        # optional
                 Template     => 'Thank you for your email.',    # optional
@@ -114,7 +114,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
         Parameters   => {
-            'TemplateID' => {
+            'StandardTemplateID' => {
                 Required => 1
             },
             'StandardTemplate' => {
@@ -139,7 +139,7 @@ sub Run {
     
     # check if StandardTemplate exists 
     my %StandardTemplateData = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateGet(
-        ID     => $Param{Data}->{TemplateID},
+        ID => $Param{Data}->{StandardTemplateID},
     );
 
     if ( !IsHashRefWithData(\%StandardTemplateData) ) {
@@ -150,20 +150,23 @@ sub Run {
     }
 
     # check if name already exists
-    my $Exist = $Kernel::OM->Get('Kernel::System::StandardTemplate')->NameExistsCheck(
-        Name => $StandardTemplate->{Name},
-    );
-    
-    if ( $Exist ) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not create StandardTemplate entry. Another StandardTemplate with same name already exists.",
+    if ( $StandardTemplate->{Name} ) {
+        my $Exist = $Kernel::OM->Get('Kernel::System::StandardTemplate')->NameExistsCheck(
+            Name => $StandardTemplate->{Name},
+            ID   => $Param{Data}->{StandardTemplateID}
         );
+        
+        if ( $Exist ) {
+            return $Self->_Error(
+                Code    => 'Object.AlreadyExists',
+                Message => "Can not create StandardTemplate entry. Another StandardTemplate with same name already exists.",
+            );
+        }
     }
 
     # update StandardTemplate
     my $Success = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateUpdate(
-        ID           => $Param{Data}->{TemplateID},
+        ID           => $Param{Data}->{StandardTemplateID},
         Name         => $StandardTemplate->{Name} || $StandardTemplateData{Name},
         Template     => $StandardTemplate->{Template} || $StandardTemplateData{Template},
         ContentType  => $StandardTemplate->{ContentType} || $StandardTemplateData{ContentType},
@@ -181,7 +184,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        StandardTemplateID => $Param{Data}->{TemplateID},
+        StandardTemplateID => $Param{Data}->{StandardTemplateID},
     );    
 }
 

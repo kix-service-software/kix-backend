@@ -125,11 +125,6 @@ sub Run {
             },
             'StandardTemplate::TemplateType' => {
                 Required => 1,
-                OneOf    => [
-                    'Answer',
-                    'Forward',
-                    'Create'
-                ]
             },
         }
     );

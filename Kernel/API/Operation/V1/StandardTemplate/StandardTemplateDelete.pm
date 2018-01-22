@@ -70,7 +70,7 @@ perform StandardTemplateDelete Operation. This will return the deleted StandardT
 
     my $Result = $OperationObject->Run(
         Data => {
-            TemplateID  => '...',
+            StandardTemplateID  => '...',
         },		
     );
 
@@ -99,8 +99,9 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TemplateID' => {
+            'StandardTemplateID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },
         }
@@ -116,7 +117,7 @@ sub Run {
 
     # start StandardTemplate loop
     StandardTemplate:    
-    foreach my $TemplateID ( @{$Param{Data}->{TemplateID}} ) {
+    foreach my $TemplateID ( @{$Param{Data}->{StandardTemplateID}} ) {
 
         # delete StandardTemplate	    
         my $Success = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateDelete(

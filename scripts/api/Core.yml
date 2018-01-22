@@ -1874,15 +1874,15 @@ Provider:
         V1::StandardTemplate::StandardTemplateGet:
           RequestMethod:
           - GET
-          Route: /standardtemplates/:TemplateID
+          Route: /standardtemplates/:StandardTemplateID
         V1::StandardTemplate::StandardTemplateUpdate:
           RequestMethod:
           - PATCH
-          Route: /standardtemplates/:TemplateID
+          Route: /standardtemplates/:StandardTemplateID
         V1::StandardTemplate::StandardTemplateDelete:
           RequestMethod:
           - DELETE
-          Route: /standardtemplates/:TemplateID
+          Route: /standardtemplates/:StandardTemplateID
 
     Type: HTTP::REST
 RemoteSystem: ''

@@ -76,7 +76,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TemplateID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            StandardTemplateID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -117,7 +117,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'TemplateID' => {
+            'StandardTemplateID' => {
                 Type     => 'ARRAY',
                 DataType => 'NUMERIC',
                 Required => 1
@@ -137,7 +137,7 @@ sub Run {
 
     # start state loop
     StandardTemplate:    
-    foreach my $TemplateID ( @{$Param{Data}->{TemplateID}} ) {
+    foreach my $TemplateID ( @{$Param{Data}->{StandardTemplateID}} ) {
 
         # get the StandardTemplate data
         my %StandardTemplateData = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateGet(
@@ -147,7 +147,7 @@ sub Run {
         if ( !IsHashRefWithData( \%StandardTemplateData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for TemplateID $TemplateID.",
+                Message => "No data found for StandardTemplateID $TemplateID.",
             );
         }
         
