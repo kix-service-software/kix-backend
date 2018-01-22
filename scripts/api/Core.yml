@@ -1162,6 +1162,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::StandardAttachment::StandardAttachmentDelete
+    V1::StandardTemplate::StandardTemplateSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardTemplate::StandardTemplateSearch
+    V1::StandardTemplate::StandardTemplateCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardTemplate::StandardTemplateCreate
+    V1::StandardTemplate::StandardTemplateGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardTemplate::StandardTemplateGet
+    V1::StandardTemplate::StandardTemplateUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardTemplate::StandardTemplateUpdate
+    V1::StandardTemplate::StandardTemplateDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StandardTemplate::StandardTemplateDelete
 
   Transport:
     Config:
@@ -1828,6 +1863,26 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /standardattachments/:AttachmentID
+        V1::StandardTemplate::StandardTemplateSearch:
+          RequestMethod:
+          - GET
+          Route: /standardtemplates
+        V1::StandardTemplate::StandardTemplateCreate:
+          RequestMethod:
+          - POST
+          Route: /standardtemplates
+        V1::StandardTemplate::StandardTemplateGet:
+          RequestMethod:
+          - GET
+          Route: /standardtemplates/:StandardTemplateID
+        V1::StandardTemplate::StandardTemplateUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /standardtemplates/:StandardTemplateID
+        V1::StandardTemplate::StandardTemplateDelete:
+          RequestMethod:
+          - DELETE
+          Route: /standardtemplates/:StandardTemplateID
 
     Type: HTTP::REST
 RemoteSystem: ''
