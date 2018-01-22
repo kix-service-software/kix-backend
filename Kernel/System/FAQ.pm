@@ -18,10 +18,8 @@ use MIME::Base64 qw();
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::FAQSearch
-    Kernel::System::FAQ::Language
+    Kernel::System::FAQ::Search
     Kernel::System::FAQ::Category
-    Kernel::System::FAQ::State
     Kernel::System::FAQ::Vote
     Kernel::System::EventHandler
 );

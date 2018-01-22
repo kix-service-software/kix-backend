@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::FAQ::FAQArticleGet;
+package Kernel::API::Operation::V1::FAQ::FAQArticleVoteGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::FAQ::FAQArticleGet - API FAQArticle Get Operation backend
+Kernel::API::Operation::V1::FAQ::FAQArticleVoteGet - API FAQArticleVote Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -64,19 +64,19 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleVoteGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform FAQArticleGet Operation. This function is able to return
-one or more ticket entries in one call.
+perform FAQArticleVoteGet Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticleID => 1,
+            VoteID => 1,
         },
     );
 
@@ -85,7 +85,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            FAQArticle => [
+            FAQArticleVote => [
                 {
                     ...
                 },
@@ -118,7 +118,11 @@ sub Run {
         Data       => $Param{Data},
         Parameters => {
             'FAQArticleID' => {
+                Required => 1
+            },      
+            'VoteID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }
@@ -132,43 +136,38 @@ sub Run {
         );
     }
 
-    my @FAQArticleData;
+    my @FAQArticleVoteData;
 
-    # start faq loop
-    FAQArticle:    
-    foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
+    # start VoteID loop
+    VOTE:    
+    foreach my $VoteID ( @{$Param{Data}->{VoteID}} ) {
 
         # get the FAQArticle data
-        my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
-            ItemID     => $FAQArticleID,
-            ItemFields => 1,
+        my %Vote = $Kernel::OM->Get('Kernel::System::FAQ')->VoteGet(
+            VoteID     => $VoteID,
             UserID     => $Self->{Authorization}->{UserID},
         );
 
-        if ( !IsHashRefWithData( \%FAQArticle ) ) {
+        if ( !IsHashRefWithData( \%Vote ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for FAQArticleID $FAQArticleID.",
+                Message => "No data found for VoteID $VoteID.",
             );
         }
 
-        # map ItemID to ID
-        $FAQArticle{ID} = $FAQArticle{ItemID};
-        delete $FAQArticle{ItemID};
-
         # add
-        push(@FAQArticleData, \%FAQArticle);
+        push(@FAQArticleVoteData, \%Vote);
     }
 
-    if ( scalar(@FAQArticleData) == 1 ) {
+    if ( scalar(@FAQArticleVoteData) == 1 ) {
         return $Self->_Success(
-            FAQArticle => $FAQArticleData[0],
+            FAQArticleVote => $FAQArticleVoteData[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        FAQArticle => \@FAQArticleData,
+        FAQArticleVote => \@FAQArticleVoteData,
     );
 }
 

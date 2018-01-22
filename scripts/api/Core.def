@@ -159,4 +159,8 @@
 /faqs/articles/:FAQArticleID/attachments/:AttachmentID                  |   PATCH           | V1::FAQ::FAQArticleAttachmentUpdate
 /faqs/articles/:FAQArticleID/attachments                                |   GET             | V1::FAQ::FAQArticleAttachmentSearch
 /faqs/articles/:FAQArticleID/attachments/:AttachmentID                  |   DELETE          | V1::FAQ::FAQArticleAttachmentDelete
+/faqs/articles/:FAQArticleID/votes/:VoteID                              |   GET             | V1::FAQ::FAQArticleVoteGet
+/faqs/articles/:FAQArticleID/votes                                      |   POST            | V1::FAQ::FAQArticleVoteCreate
+/faqs/articles/:FAQArticleID/votes                                      |   GET             | V1::FAQ::FAQArticleVoteSearch
+/faqs/articles/:FAQArticleID/votes/:VoteID                              |   DELETE          | V1::FAQ::FAQArticleVoteDelete
 /faqs/articles/:FAQArticleID/history                                    |   GET             | V1::FAQ::FAQArticleHistorySearch

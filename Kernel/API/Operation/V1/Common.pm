@@ -94,6 +94,7 @@ prepare data, check given parameters and parse them according to type
                 RequiresValueIfUsed => 1                                # optional
                 Default             => ...                              # optional
                 OneOf               => [...]                            # optional
+                Format              => '...'                            # optional, RegEx that defines the format pattern
             }
         }
     );
@@ -333,6 +334,13 @@ sub PrepareData {
                 if ( !grep(/^$Data{$Parameter}$/g, @{$Parameters{$Parameter}->{OneOf}}) ) {
                     $Result->{Success} = 0;
                     $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Parameters{$Parameter}->{OneOf}}))."'!",
+                    last;
+                }
+            }
+            if ( exists($Parameters{$Parameter}->{Format}) ) {
+                if ( $Data{$Parameter} !~ /$Parameters{$Parameter}->{Format}/g ) {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Parameter $Parameter has the wrong format!",
                     last;
                 }
             }

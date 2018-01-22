@@ -1120,6 +1120,34 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::FAQ::FAQArticleAttachmentDelete
+    V1::FAQ::FAQArticleVoteGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteGet
+    V1::FAQ::FAQArticleVoteCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteCreate
+    V1::FAQ::FAQArticleVoteSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteSearch
+    V1::FAQ::FAQArticleVoteDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteDelete
     V1::FAQ::FAQArticleHistorySearch:
         Description: ''
         MappingInbound:
@@ -1769,6 +1797,22 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /faqs/articles/:FAQArticleID/attachments/:AttachmentID
+        V1::FAQ::FAQArticleVoteGet:
+          RequestMethod:
+          - GET
+          Route: /faqs/articles/:FAQArticleID/votes/:VoteID
+        V1::FAQ::FAQArticleVoteCreate:
+          RequestMethod:
+          - POST
+          Route: /faqs/articles/:FAQArticleID/votes
+        V1::FAQ::FAQArticleVoteSearch:
+          RequestMethod:
+          - GET
+          Route: /faqs/articles/:FAQArticleID/votes
+        V1::FAQ::FAQArticleVoteDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faqs/articles/:FAQArticleID/votes/:VoteID
         V1::FAQ::FAQArticleHistorySearch:
           RequestMethod:
           - GET

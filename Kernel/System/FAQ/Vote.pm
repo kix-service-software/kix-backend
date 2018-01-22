@@ -37,7 +37,7 @@ All FAQ vote functions.
 
 add a vote
 
-    my $Success = $FAQObject->VoteAdd(
+    my $VoteID = $FAQObject->VoteAdd(
         CreatedBy => 'Some Text',
         ItemID    => '123456',
         IP        => '54.43.30.1',
@@ -67,7 +67,9 @@ sub VoteAdd {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Do(
         SQL => '
             INSERT INTO faq_voting (created_by, item_id, ip, interface, rate, created )
             VALUES ( ?, ?, ?, ?, ?, current_timestamp )',
@@ -77,6 +79,23 @@ sub VoteAdd {
         ],
     );
 
+    # get new category id
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id
+            FROM faq_voting
+            WHERE created_by = ? AND item_id = ? AND ip = ? AND interface = ?',
+        Bind  => [ 
+            \$Param{CreatedBy}, \$Param{ItemID}, \$Param{IP}, \$Param{Interface},
+        ],
+        Limit => 1,
+    );
+
+    my $VoteID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $VoteID = $Row[0];
+    }
+
     # delete cache
     my $CacheKey = 'ItemVoteDataGet::' . $Param{ItemID};
     $Kernel::OM->Get('Kernel::System::Cache')->Delete(
@@ -84,7 +103,7 @@ sub VoteAdd {
         Key  => $CacheKey,
     );
 
-    return 1;
+    return $VoteID;
 }
 
 =item VoteDelete()
@@ -132,20 +151,18 @@ sub VoteDelete {
 get a vote information
 
     my %VoteData = $FAQObject->VoteGet(
-        CreateBy  => 'Some Text',
-        ItemID    => '123456',
-        IP        => '127.0.0.1',
-        Interface => 'Some Text',
-        UserID    => 1,
+        VoteID => 1,
+        UserID => 1,
     );
 
 Returns:
 
     %VoteData = (
         ItemID    => 23,
-        Rate      => 50,                            # or 0 or 25 or 75 or 100
+        ID        => 1,
+        Rating    => 50,
         IP        => '192.168.0.1',
-        Interface => 1,                             # interface ID
+        Interface => '...',
         CreatedBy => 1,
         Created   => '2011-06-14 12:32:03',
     );
@@ -156,7 +173,7 @@ sub VoteGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CreateBy ItemID Interface IP UserID)) {
+    for my $Argument (qw(VoteID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -167,55 +184,32 @@ sub VoteGet {
         }
     }
 
-    my @Values;
-    my $SQL = '
-        SELECT created_by, item_id, interface, ip, created, rate
-        FROM faq_voting
-        WHERE';
-
-    # public
-    if ( $Param{Interface} eq '3' ) {
-        $SQL .= '
-            ip = ?
-            AND item_id = ?';
-        push @Values, ( \$Param{IP}, \$Param{ItemID} );
-    }
-
-    # customer
-    elsif ( $Param{Interface} eq '2' || $Param{Interface} eq '1' ) {
-        $SQL .= '
-            created_by = ?
-            AND item_id = ?';
-        push @Values, ( \$Param{CreateBy}, \$Param{ItemID} );
-    }
-
-    # leave a space between AND condition and ORDER BY statement
-    $SQL .= '
-        ORDER BY created DESC';
-
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Prepare(
-        SQL   => $SQL,
-        Bind  => \@Values,
+        SQL   => 'SELECT id, created_by, item_id, interface, ip, created, rate
+                  FROM faq_voting
+                  WHERE id = ?',
+        Bind  => [ \$Param{VoteID} ],
         Limit => 1,
     );
 
     my %Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         %Data = (
-            CreatedBy => $Row[0],
-            ItemID    => $Row[1],
-            Interface => $Row[2],
-            IP        => $Row[3],
-            Created   => $Row[4],
-            Rate      => $Row[5],
+            ID        => $Row[0],
+            CreatedBy => $Row[1],
+            ItemID    => $Row[2],
+            Interface => $Row[3],
+            IP        => $Row[4],
+            Created   => $Row[5],
+            Rating    => $Row[6],
         );
     }
 
     return if !%Data;
-    return \%Data;
+    return %Data;
 }
 
 =item VoteSearch()
