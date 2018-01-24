@@ -71,7 +71,7 @@ perform FAQArticleVoteDelete Operation. This will return the deleted VoteID.
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticleID  => 123,
-            VoteID => 123
+            FAQVoteID => 123
         }
     );
 
@@ -103,7 +103,7 @@ sub Run {
             'FAQArticleID' => {
                 Required => 1
             },
-            'VoteID' => {
+            'FAQVoteID' => {
                 Type     => 'ARRAY',
                 DataType => 'NUMERIC',
                 Required => 1
@@ -121,7 +121,7 @@ sub Run {
 
     # start VoteID loop
     VOTE:    
-    foreach my $VoteID ( @{$Param{Data}->{VoteID}} ) {
+    foreach my $VoteID ( @{$Param{Data}->{FAQVoteID}} ) {
 
         # delete Vote
         my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->VoteDelete(

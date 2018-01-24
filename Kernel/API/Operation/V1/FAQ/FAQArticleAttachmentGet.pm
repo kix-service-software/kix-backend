@@ -77,7 +77,7 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticleID    => 123,
-            AttachmentID => 123,
+            FAQAttachmentID => 123,
         },
     );
 
@@ -146,6 +146,10 @@ sub Run {
                 Code    => 'Object.NotFound',
                 Message => "No data found for FAQAttachmentID $FAQAttachmentID.",
             );
+        }
+
+        if ( !$Param{Data}->{include}->{Content} ) {
+            delete $FAQAttachment{Content};
         }
         
         # add

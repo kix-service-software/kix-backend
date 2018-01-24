@@ -76,7 +76,7 @@ perform FAQArticleVoteGet Operation.
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticleID => 1,
-            VoteID => 1,
+            FAQVoteID => 1,
         },
     );
 
@@ -85,7 +85,7 @@ perform FAQArticleVoteGet Operation.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            FAQArticleVote => [
+            FAQVote => [
                 {
                     ...
                 },
@@ -120,7 +120,7 @@ sub Run {
             'FAQArticleID' => {
                 Required => 1
             },      
-            'VoteID' => {
+            'FAQVoteID' => {
                 Type     => 'ARRAY',
                 DataType => 'NUMERIC',
                 Required => 1
@@ -140,7 +140,7 @@ sub Run {
 
     # start VoteID loop
     VOTE:    
-    foreach my $VoteID ( @{$Param{Data}->{VoteID}} ) {
+    foreach my $VoteID ( @{$Param{Data}->{FAQVoteID}} ) {
 
         # get the FAQArticle data
         my %Vote = $Kernel::OM->Get('Kernel::System::FAQ')->VoteGet(
@@ -151,7 +151,7 @@ sub Run {
         if ( !IsHashRefWithData( \%Vote ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for VoteID $VoteID.",
+                Message => "No data found for FAQVoteID $VoteID.",
             );
         }
 
@@ -161,13 +161,13 @@ sub Run {
 
     if ( scalar(@FAQArticleVoteData) == 1 ) {
         return $Self->_Success(
-            FAQArticleVote => $FAQArticleVoteData[0],
+            FAQVote => $FAQArticleVoteData[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        FAQArticleVote => \@FAQArticleVoteData,
+        FAQVote => \@FAQArticleVoteData,
     );
 }
 

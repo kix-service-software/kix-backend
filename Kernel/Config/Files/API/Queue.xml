@@ -59,7 +59,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###SubQueues" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::GenericExpand###Queue.SubQueues" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

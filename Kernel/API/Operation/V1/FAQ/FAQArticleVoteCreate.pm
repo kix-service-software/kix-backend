@@ -87,7 +87,7 @@ perform FAQArticleVoteCreate Operation. This will return the created VoteID.
         Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            VoteID   => 123,                        # ID of created Vote
+            FAQVoteID   => 123,                     # ID of created Vote
         },
     };
 
@@ -173,7 +173,7 @@ sub Run {
 
     return $Self->_Success(
         Code   => 'Object.Created',
-        VoteID => $VoteID,
+        FAQVoteID => $VoteID,
     );
 
 }

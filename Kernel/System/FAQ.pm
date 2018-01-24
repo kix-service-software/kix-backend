@@ -1337,9 +1337,68 @@ sub FAQHistoryAdd {
 
 =item FAQHistoryGet()
 
+get a hash with the history item
+
+    my %HistoryData = $FAQObject->FAQHistoryGet(
+        ID => 1,
+        UserID => 1,
+    );
+
+Returns:
+
+    %HistoryData = {
+        CreatedBy => 1,
+        Created   => '2010-11-02 07:45:15',
+        Name      => 'Created',
+    };
+
+=cut
+
+sub FAQHistoryGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(ID UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+
+            return;
+        }
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare(
+        SQL => '
+            SELECT id, item_id, name, created, created_by
+            FROM faq_history
+            WHERE id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    my %Data;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        %Data = (
+            ID        => $Row[0],
+            ItemID    => $Row[1],
+            Name      => $Row[2],
+            Created   => $Row[3],
+            CreatedBy => $Row[4],
+        );
+    }
+
+    return %Data;
+}
+
+=item FAQHistoryList()
+
 get an array with hash reference with the history of an article
 
-    my $HistoryDataArrayRef = $FAQObject->FAQHistoryGet(
+    my $HistoryDataArrayRef = $FAQObject->FAQHistoryList(
         ItemID => 1,
         UserID => 1,
     );
@@ -1361,7 +1420,7 @@ Returns:
 
 =cut
 
-sub FAQHistoryGet {
+sub FAQHistoryList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1381,7 +1440,7 @@ sub FAQHistoryGet {
 
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT name, created, created_by
+            SELECT id
             FROM faq_history
             WHERE item_id = ?
             ORDER BY created, id',
@@ -1390,12 +1449,7 @@ sub FAQHistoryGet {
 
     my @Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        my %Record = (
-            Name      => $Row[0],
-            Created   => $Row[1],
-            CreatedBy => $Row[2],
-        );
-        push @Data, \%Record;
+        push @Data, $Row[0];
     }
 
     return \@Data;

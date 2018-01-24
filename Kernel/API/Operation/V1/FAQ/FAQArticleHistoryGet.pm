@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::FAQ::FAQArticleGet;
+package Kernel::API::Operation::V1::FAQ::FAQArticleHistoryGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::FAQ::FAQArticleGet - API FAQArticle Get Operation backend
+Kernel::API::Operation::V1::FAQ::FAQArticleHistoryGet - API FAQArticleHistory Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -64,19 +64,19 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleHistoryGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform FAQArticleGet Operation. This function is able to return
-one or more ticket entries in one call.
+perform FAQArticleHistoryGet Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticleID => 1,
+            FAQHistoryID => 1,
         },
     );
 
@@ -85,7 +85,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            FAQArticle => [
+            FAQHistory => [
                 {
                     ...
                 },
@@ -118,7 +118,11 @@ sub Run {
         Data       => $Param{Data},
         Parameters => {
             'FAQArticleID' => {
+                Required => 1
+            },      
+            'FAQHistoryID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             }                
         }
@@ -132,70 +136,38 @@ sub Run {
         );
     }
 
-    my @FAQArticleData;
+    my @FAQArticleHistoryData;
 
-    # start faq loop
-    FAQArticle:    
-    foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
+    # start HistoryID loop
+    HISTORY:    
+    foreach my $HistoryID ( @{$Param{Data}->{FAQHistoryID}} ) {
 
-        # get the FAQArticle data
-        my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
-            ItemID     => $FAQArticleID,
-            ItemFields => 1,
-            UserID     => $Self->{Authorization}->{UserID},
+        # get the FAQHistory data
+        my %History = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryGet(
+            ID     => $HistoryID,
+            UserID => $Self->{Authorization}->{UserID},
         );
 
-        if ( !IsHashRefWithData( \%FAQArticle ) ) {
+        if ( !IsHashRefWithData( \%History ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for FAQArticleID $FAQArticleID.",
+                Message => "No data found for FAQHistoryID $HistoryID.",
             );
-        }
-
-        # map ItemID to ID
-        $FAQArticle{ID} = $FAQArticle{ItemID};
-        delete $FAQArticle{ItemID};
-
-        if ( $Param{Data}->{include}->{Attachments} ) {
-            # get attachment index (without attachments)
-            my @AtmIndex = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentIndex(
-                ItemID => $FAQArticleID,
-                UserID => $Self->{Authorization}->{UserID},
-            );
-
-            my @Attachments;
-            foreach my $Attachment ( sort {$a->{FileID} <=> $b->{FileID}} @AtmIndex ) {
-                push(@Attachments, $Attachment->{FileID});
-            }
-
-            # set Attachments data
-            $FAQArticle{Attachments} = \@Attachments;
-        }
-
-        if ( $Param{Data}->{include}->{History} ) {
-            # get history list (only IDs)
-            my $HistoryIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryList(
-                ItemID => $FAQArticleID,
-                UserID => $Self->{Authorization}->{UserID},
-            );
-
-            # set History data
-            $FAQArticle{History} = $HistoryIDs;
         }
 
         # add
-        push(@FAQArticleData, \%FAQArticle);
+        push(@FAQArticleHistoryData, \%History);
     }
 
-    if ( scalar(@FAQArticleData) == 1 ) {
+    if ( scalar(@FAQArticleHistoryData) == 1 ) {
         return $Self->_Success(
-            FAQArticle => $FAQArticleData[0],
+            FAQHistory => $FAQArticleHistoryData[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        FAQArticle => \@FAQArticleData,
+        FAQHistory => \@FAQArticleHistoryData,
     );
 }
 

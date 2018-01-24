@@ -70,13 +70,12 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
 
     my $Result = $OperationObject->Run(
         Data => {
-            FAQCategoryID => 123,
             FAQArticleID  => 123,
-            FAQAttachment  => {
-                Content     => $Content,
-                ContentType => 'text/xml',
-                Filename    => 'somename.xml',
-                Inline      => 1,   (0|1, default 0)
+            Attachment  => {
+                Content     => $Content,                    # required, base64 encoded
+                ContentType => 'text/xml',                  # required
+                Filename    => 'somename.xml',              # required
+                Inline      => 1,                           # (0|1, default 0)
             },
         },
     );
@@ -86,7 +85,7 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            FAQAttachmentID  => '',                         # ID of the created FAQAttachment
+            AttachmentID  => '',                    # ID of the created Attachment
         },
     };
 
@@ -111,23 +110,20 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'FAQAttachment' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'FAQCategoryID' => {
-                Required => 1
-            },            
             'FAQArticleID' => {
                 Required => 1
             },
-            'FAQAttachment::Filename' => {
+            'Attachment' => {
+                Type     => 'HASH',
                 Required => 1
             },
-            'FAQAttachment::ContentType' => {
+            'Attachment::Filename' => {
                 Required => 1
             },
-            'FAQAttachment::Content' => {
+            'Attachment::ContentType' => {
+                Required => 1
+            },
+            'Attachment::Content' => {
                 Required => 1
             },
         }
@@ -141,46 +137,31 @@ sub Run {
         );
     }
     
-    # check rw permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
+    # isolate and trim Attachment parameter
+    my $Attachment = $Self->_Trim(
+        Data => $Param{Data}->{Attachment}
     );
 
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
-    # isolate and trim FAQAttachment parameter
-    my $FAQAttachment = $Self->_Trim(
-        Data => $Param{Data}->{FAQAttachment}
-    );
-
-
-
-    # create FAQAttachment
-    my $FAQAttachmentID = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentAdd(
+    # create Attachment
+    my $AttachmentID = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentAdd(
         ItemID      => $Param{Data}->{FAQArticleID},
-        Content     => $FAQAttachment->{Content} || '',
-        ContentType => 'text/xml',
-        Filename    => $FAQAttachment->{Filename},
-        Inline      => $FAQAttachment->{Inline},
-        UserID   => $Self->{Authorization}->{UserID},
+        Content     => $Attachment->{Content},
+        ContentType => $Attachment->{ContentType},
+        Filename    => $Attachment->{Filename},
+        Inline      => $Attachment->{Inline} || 0,
+        UserID      => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$FAQAttachmentID ) {
+    if ( !$AttachmentID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create FAQArticleAttachment, please contact the system administrator',
+            Message => 'Could not create FAQArticle attachment, please contact the system administrator',
         );
     }
 
     # return result    
     return $Self->_Success(
-        Code   => 'Object.Created',
+        Code            => 'Object.Created',
         FAQAttachmentID => $FAQAttachmentID,
     );    
 }

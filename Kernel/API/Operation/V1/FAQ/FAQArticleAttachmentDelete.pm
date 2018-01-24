@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/FAQ/FAQCategoryDelete.pm - API FAQCategory Delete operation backend
+# Kernel/API/Operation/FAQ/FAQArticleAttachmentDelete.pm - API FAQArticleAttachment Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::FAQ::FAQCategoryDelete;
+package Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::FAQ::FAQCategoryDelete - API FAQCategory FAQCategoryDelete Operation backend
+Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentDelete - API FAQArticleAttachment Delete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,11 +66,11 @@ sub new {
 
 =item Run()
 
-perform FAQCategoryDelete Operation. This will return the deleted FAQCategoryID.
+perform FAQArticleAttachmentDelete Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
-            FAQCategoryID  => '...',
+            FAQAttachmentID  => '...',
         },      
     );
 
@@ -99,7 +99,10 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'FAQCategoryID' => {
+            'FAQArticleID' => {
+                Required => 1
+            },
+            'FAQAttachmentID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -114,32 +117,21 @@ sub Run {
         );
     }
          
-    # start FAQCategory loop
-    FAQCategory:    
-    foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
+    # start FAQArticleAttachment loop
+    FAQArticleAttachment:    
+    foreach my $FAQAttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
-        my @IDs = $Kernel::OM->Get('Kernel::System::FAQSearch')->FAQSearch(
-            CategoryIDs     => [$FAQCategoryID],
-            UserID => $Self->{Authorization}->{UserID},
-        );
-        
-        if ( !$IDs[0] ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete FAQCategory. At least one Artikle is assigned to this faq category.',
-            );
-        }
-
-        # delete FAQCategory        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDelete(
-            ID     => $FAQCategoryID,
+        # delete FAQArticleAttachment        
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentDelete(
+            ItemID => $Param{Data}->{FAQArticleID},
+            FileID => $FAQAttachmentID,
             UserID => $Self->{Authorization}->{UserID},
         );
  
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete FAQCategory, please contact the system administrator',
+                Message => 'Could not delete FAQArticle attachment, please contact the system administrator',
             );
         }
     }

@@ -222,7 +222,7 @@ sub Run {
                 OperationType => 'V1::FAQ::FAQArticleAttachmentCreate',
                 Data          => {
                     FAQArticleID  => $FAQArticleID,
-                    FAQAttachment => $Attachment,
+                    FAQAttachment => $FAQAttachment,
                 }
             );
 

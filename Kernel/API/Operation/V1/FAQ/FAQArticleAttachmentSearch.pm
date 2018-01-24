@@ -78,7 +78,7 @@ perform FAQArticleAttachmentSearch Operation. This will return a FAQArticleAttac
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            FAQArticleAttachment => [
+            FAQAttachment => [
                 {},
                 {}
             ]
@@ -115,45 +115,43 @@ sub Run {
     }
 
     # perform FAQArticleAttachment search
-    my $FAQArticleAttachmentList = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentIndex(
+    my @AttachmentList = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentIndex(
         ItemID => $Param{Data}->{FAQArticleID},
-        ShowInline => 1,
-        UserID   => $Self->{Authorization}->{UserID},
+        UserID => $Self->{Authorization}->{UserID},
     );
-use Data::Dumper;
-print STDERR "FAQArticleAttachmentList".Dumper($FAQArticleAttachmentList);
-#    # get already prepared FAQ data from FAQArticleAttachmentGet operation
-    if ( $FAQArticleAttachmentList == 0) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No Attachments for this '$Param{Data}->{MailAccountID}' found.",
+
+    if ( @AttachmentIndex ) {
+
+        my @AttachmentIDs;
+        foreach my $Attachment ( sort {$a->{FileID} <=> $b->{FileID}} @AttachmentIndex ) {
+            push(@AttachmentIDs, $Attachment->{FileID});
+        }
+        
+        # get already prepared Article data from ArticleGet operation
+        my $AttachmentGetResult = $Self->ExecOperation(
+            OperationType => 'V1::FAQ::FAQArticleAttachmentGet',
+            Data          => {
+                FAQArticleID    => $Param{Data}->{FAQArticleID},
+                FAQAttachmentID => join(',', @AttachmentIDs),
+            }
         );
+        if ( !IsHashRefWithData($AttachmentGetResult) || !$AttachmentGetResult->{Success} ) {
+            return $AttachmentGetResult;
+        }
+
+        my @ResultList = IsArrayRefWithData($AttachmentGetResult->{Data}->{Attachment}) ? @{$AttachmentGetResult->{Data}->{Attachment}} : ( $AttachmentGetResult->{Data}->{Attachment} );
+        
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                FAQAttachment => \@ResultList,
+            )
+        }
     }
-#
-#        my $FAQArticleAttachmentGetResult = $Self->ExecOperation(
-#            OperationType => 'V1::FAQ::FAQArticleAttachmentGet',
-#            Data      => {
-#                FAQArticleAttachmentID => join(',', sort keys %{$FAQCategories}),
-#            }
-#        );
-#  
-#        if ( !IsHashRefWithData($FAQArticleAttachmentGetResult) || !$FAQArticleAttachmentGetResult->{Success} ) {
-#            return $FAQArticleAttachmentGetResult;
-#        }
-#
-#        my @FAQArticleAttachmentDataList = IsArrayRefWithData($FAQArticleAttachmentGetResult->{Data}->{FAQArticleAttachment}) ? @{$FAQArticleAttachmentGetResult->{Data}->{FAQArticleAttachment}} : ( $FAQArticleAttachmentGetResult->{Data}->{FAQArticleAttachment} );
-#
-#        if ( IsArrayRefWithData(\@FAQArticleAttachmentDataList) ) {
-#            return $Self->_Success(
-#                FAQArticleAttachment => \@FAQArticleAttachmentDataList,
-#            )
-#        }
-#    }
-#
-#    # return result
-#    return $Self->_Success(
-#        FAQArticleAttachment => [],
-#    );
+
+    # return result
+    return $Self->_Success(
+        FAQAttachment => [],
+    );
 }
 
 

@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::FAQ::FAQArticleVoteSearch;
+package Kernel::API::Operation::V1::FAQ::FAQArticleHistorySearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::FAQ::FAQArticleVoteGet;
+use Kernel::API::Operation::V1::FAQ::FAQArticleHistoryGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -27,7 +27,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::FAQ::FAQArticleVoteSearch - API FAQArticle Vote Search Operation backend
+Kernel::API::Operation::FAQ::FAQArticleHistorySearch - API FAQArticle History Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -65,7 +65,7 @@ sub new {
 
 =item Run()
 
-perform FAQArticleVoteSearch Operation. This will return a FAQArticleVote ID list.
+perform FAQArticleHistorySearch Operation. This will return a FAQArticleHistory ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -77,7 +77,7 @@ perform FAQArticleVoteSearch Operation. This will return a FAQArticleVote ID lis
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            FAQVote => [
+            FAQHistory => [
                 {},
                 {}
             ]
@@ -118,39 +118,39 @@ sub Run {
         );
     }
 
-    # perform FAQVote search (at the moment without any filters - we do filtering in the API)
-    my $VoteIDs = $Kernel::OM->Get('Kernel::System::FAQ')->VoteSearch(
+    # perform FAQHistory search (at the moment without any filters - we do filtering in the API)
+    my $HistoryIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryList(
         ItemID => $Param{Data}->{FAQArticleID},
         UserID => $Self->{Authorization}->{UserID},
     );
 
-    # get already prepared FAQ data from FAQArticleVoteGet operation
-    if ( IsArrayRefWithData($VoteIDs) ) {
+    # get already prepared FAQ data from FAQArticleHistoryGet operation
+    if ( IsArrayRefWithData($HistoryIDs) ) {
 
-        my $FAQArticleVoteGetResult = $Self->ExecOperation(
-            OperationType => 'V1::FAQ::FAQArticleVoteGet',
+        my $FAQArticleHistoryGetResult = $Self->ExecOperation(
+            OperationType => 'V1::FAQ::FAQArticleHistoryGet',
             Data      => {
                 FAQArticleID => $Param{Data}->{FAQArticleID},
-                VoteID       => join(',', sort @{$VoteIDs}),
+                FAQHistoryID => join(',', sort @{$HistoryIDs}),
             }
         );
 
-        if ( !IsHashRefWithData($FAQArticleVoteGetResult) || !$FAQArticleVoteGetResult->{Success} ) {
-            return $FAQArticleVoteGetResult;
+        if ( !IsHashRefWithData($FAQArticleHistoryGetResult) || !$FAQArticleHistoryGetResult->{Success} ) {
+            return $FAQArticleHistoryGetResult;
         }
 
-        my @FAQArticleVoteDataList = IsArrayRefWithData($FAQArticleVoteGetResult->{Data}->{FAQArticle}) ? @{$FAQArticleVoteGetResult->{Data}->{FAQArticleVote}} : ( $FAQArticleVoteGetResult->{Data}->{FAQArticleVote} );
+        my @FAQArticleHistoryDataList = IsArrayRefWithData($FAQArticleHistoryGetResult->{Data}->{FAQHistory}) ? @{$FAQArticleHistoryGetResult->{Data}->{FAQHistory}} : ( $FAQArticleHistoryGetResult->{Data}->{FAQHistory} );
 
-        if ( IsArrayRefWithData(\@FAQArticleVoteDataList) ) {
+        if ( IsArrayRefWithData(\@FAQArticleHistoryDataList) ) {
             return $Self->_Success(
-                FAQVote => \@FAQArticleVoteDataList,
+                FAQHistory => \@FAQArticleHistoryDataList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        FAQVote => [],
+        FAQHistory => [],
     );
 }
 
