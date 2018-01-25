@@ -440,7 +440,7 @@ sub _TicketUpdate {
                 my $Success = $TicketObject->TicketPendingTimeSet(
                     UserID   => $Param{UserID},
                     TicketID => $Param{TicketID},
-                    %{ $Ticket->{PendingTime} },
+                    String   => $Ticket->{PendingTime},
                 );
 
                 if ( !$Success ) {

@@ -1009,8 +1009,10 @@ Returns:
         Responsible        => 'some_responsible_login',
         ResponsibleID      => 123,
         Age                => 3456,
+        PendingTime        => '2010-10-27 20:15:00'
+        PendingTimeUnix    => 1231414141
         Created            => '2010-10-27 20:15:00'
-        CreateTimeUnix     => '1231414141',
+        CreateTimeUnix     => 1231414141,
         CreateBy           => 123,
         Changed            => '2010-10-27 20:15:15',
         ChangeBy           => 123,
@@ -1161,7 +1163,7 @@ sub TicketGet {
 
             $Ticket{OwnerID}             = $Row[10];
             $Ticket{ResponsibleID}       = $Row[11] || 1;
-            $Ticket{RealTillTimeNotUsed} = $Row[12];
+            $Ticket{PendingTimeUnix}     = $Row[12];
             $Ticket{Changed}             = $Row[13];
             $Ticket{Title}               = $Row[14];
 
@@ -1244,6 +1246,10 @@ sub TicketGet {
         SystemTime => $Ticket{CreateTimeUnix},
     );
 
+    $Ticket{PendingTime} = $TimeObject->SystemTime2TimeStamp(
+        SystemTime => $Ticket{PendingTimeUnix},
+    );
+
     my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
         ID => $Ticket{QueueID},
     );
@@ -1301,13 +1307,6 @@ sub TicketGet {
 
     $Ticket{StateType} = $StateData{TypeName};
     $Ticket{State}     = $StateData{Name};
-
-    if ( !$Ticket{RealTillTimeNotUsed} || lc $StateData{TypeName} eq 'pending' ) {
-        $Ticket{UntilTime} = 0;
-    }
-    else {
-        $Ticket{UntilTime} = $Ticket{RealTillTimeNotUsed} - $TimeObject->SystemTime();
-    }
 
     # get escalation attributes
     my %Escalation = $Self->TicketEscalationDateCalculation(
