@@ -78,7 +78,7 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                 Title       => 'Some Text',
                 CategoryID  => 1,
                 ValidID     => 1,
-                Visibility  => 'agent',          # optional, possible values 'agent', 'customer', 'public' with fallback to 'Agent'
+                Visibility  => 'agent',          # optional, possible values 'agent', 'customer', 'public' with fallback to 'agent'
                 Language    => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
                 ContentType => 'text/plain',     # optional, if not given set to 'text/plain'
                 Number      => '13402',          # optional
@@ -159,6 +159,13 @@ sub Run {
                 RequiresValueIfUsed => 1,
                 OneOf => \@LanguageIDs
             },
+            'FAQArticle::Approved' => {
+                RequiresValueIfUsed => 1,
+                OneOf => [
+                    0,
+                    1
+                ]
+            },
         }
     );
 
@@ -202,7 +209,7 @@ sub Run {
         Field4      => $FAQArticle->{Field4} || '',
         Field5      => $FAQArticle->{Field5} || '',
         Field6      => $FAQArticle->{Field6} || '',
-        Approved    => $FAQArticle->{Approved} || 1,
+        Approved    => $FAQArticle->{Approved} || 0,
         ValidID     => $FAQArticle->{ValidID} || 1,
         ContentType => $FAQArticle->{ContentType} || 'text/plain',
         UserID      => $Self->{Authorization}->{UserID},

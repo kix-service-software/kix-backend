@@ -155,6 +155,10 @@ sub Run {
             );
         }
 
+        # rename ItemID in ArticleID
+        $History{ArticleID} = $History{ItemID};
+        delete $History{ItemID};
+
         # add
         push(@FAQArticleHistoryData, \%History);
     }

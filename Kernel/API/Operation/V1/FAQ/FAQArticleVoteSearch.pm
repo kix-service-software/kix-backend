@@ -131,7 +131,7 @@ sub Run {
             OperationType => 'V1::FAQ::FAQArticleVoteGet',
             Data      => {
                 FAQArticleID => $Param{Data}->{FAQArticleID},
-                VoteID       => join(',', sort @{$VoteIDs}),
+                FAQVoteID    => join(',', sort @{$VoteIDs}),
             }
         );
 
@@ -139,7 +139,7 @@ sub Run {
             return $FAQArticleVoteGetResult;
         }
 
-        my @FAQArticleVoteDataList = IsArrayRefWithData($FAQArticleVoteGetResult->{Data}->{FAQArticle}) ? @{$FAQArticleVoteGetResult->{Data}->{FAQArticleVote}} : ( $FAQArticleVoteGetResult->{Data}->{FAQArticleVote} );
+        my @FAQArticleVoteDataList = IsArrayRefWithData($FAQArticleVoteGetResult->{Data}->{FAQVote}) ? @{$FAQArticleVoteGetResult->{Data}->{FAQVote}} : ( $FAQArticleVoteGetResult->{Data}->{FAQVote} );
 
         if ( IsArrayRefWithData(\@FAQArticleVoteDataList) ) {
             return $Self->_Success(

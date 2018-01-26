@@ -138,19 +138,6 @@ sub Run {
     FAQCategory:    
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
-        # check permission
-        my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-            CategoryID => $FAQCategoryID,
-            UserID     => $Self->{Authorization}->{UserID},
-        );
-
-        if ( !$Permission ) {
-            return $Self->_Error(
-                Code    => 'Object.NoPermission',
-                Message => "No permission to access FAQCategoryID $FAQCategoryID!",
-            );
-        }
-
         # get the FAQCategory data
         my %FAQCategory = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGet(
             CategoryID => $FAQCategoryID,
@@ -162,6 +149,11 @@ sub Run {
                 Code    => 'Object.NotFound',
                 Message => "No data found for FAQCategoryID $FAQCategoryID.",
             );
+        }
+
+        # undef ParentID if not set
+        if ( $FAQCategory{ParentID} == 0 ) {
+            $FAQCategory{ParentID} = undef;
         }
 
         # include GroupIDs
@@ -182,6 +174,16 @@ sub Run {
             foreach my $Value ( @{$FAQCategory{SubCategories}} ) {
                 $FAQCategory{SubCategories}->[$Index++] = 0 + $Value;
             }
+        }
+
+        # include Articles if requested
+        if ( $Param{Data}->{include}->{Articles} ) {
+            my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
+                CategoryIDs => [ $FAQCategoryID ],
+                UserID       => $Self->{Authorization}->{UserID},
+            );
+
+            $FAQCategory{Articles} = \@ArticleIDs;
         }
         
         # add

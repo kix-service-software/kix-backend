@@ -110,11 +110,11 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'AttachmentID' => {
-                Type     => 'ARRAY',
+            'FAQArticleID' => {
                 Required => 1
             },
-            'FAQArticleID' => {
+            'FAQAttachmentID' => {
+                Type     => 'ARRAY',
                 Required => 1
             },
         }
@@ -132,7 +132,7 @@ sub Run {
 
     # start faq loop
     FAQAttachment:    
-    foreach my $FAQAttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
+    foreach my $FAQAttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
         # get the FAQCategory data
         my %FAQAttachment = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentGet(
@@ -151,6 +151,10 @@ sub Run {
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $FAQAttachment{Content};
         }
+
+        # rename ItemID in ArticleID
+        $FAQAttachment{ArticleID} = $FAQAttachment{ItemID};
+        delete $FAQAttachment{ItemID};
         
         # add
         push(@FAQAttachmentData, \%FAQAttachment);
@@ -158,13 +162,13 @@ sub Run {
 
     if ( scalar(@FAQAttachmentData) == 1 ) {
         return $Self->_Success(
-            FAQCategory => $FAQAttachmentData[0],
+            Attachment => $FAQAttachmentData[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        FAQAttachment => \@FAQAttachmentData,
+        Attachment => \@FAQAttachmentData,
     );
 }
 

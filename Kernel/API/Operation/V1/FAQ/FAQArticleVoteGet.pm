@@ -155,6 +155,10 @@ sub Run {
             );
         }
 
+        # rename ItemID in ArticleID
+        $Vote{ArticleID} = $Vote{ItemID};
+        delete $Vote{ItemID};
+
         # add
         push(@FAQArticleVoteData, \%Vote);
     }

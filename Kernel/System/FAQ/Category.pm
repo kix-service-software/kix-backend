@@ -345,7 +345,7 @@ get a category as hash
 Returns:
 
     %Category = (,
-        CategoryID => 2,
+        ID         => 2,
         ParentID   => 0,
         Name       => 'My Category',
         Comment    => 'This is my first category.',
@@ -406,7 +406,7 @@ sub CategoryGet {
     my %Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         %Data = (
-            CategoryID => $Row[0],
+            ID         => $Row[0],
             ParentID   => $Row[1],
             Name       => $Row[2],
             Comment    => $Row[3],

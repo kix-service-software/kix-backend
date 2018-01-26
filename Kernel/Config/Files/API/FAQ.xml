@@ -115,7 +115,7 @@
         </Setting>
     </ConfigItem>
     
-    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleAttachmentGet" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleAttachmentGet" Required="0" Valid="1"> 
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -123,7 +123,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">AttachmentID</Item>
+                <Item Key="ObjectID">FAQAttachmentID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -180,7 +180,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">VoteID</Item>
+                <Item Key="ObjectID">FAQVoteID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -242,6 +242,16 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::Operation::GenericExpand###FAQCategory.Articles" Required="0" Valid="1"> 
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::FAQ::FAQArticleGet</Item>
+                <Item Key="AddParams">FAQCategoryID=ID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem Name="API::Operation::GenericExpand###FAQCategory.SubCategories" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
@@ -266,6 +276,16 @@
         <Setting>
             <Hash>
                 <Item Key="Operation">V1::FAQ::FAQArticleHistoryGet</Item>
+                <Item Key="AddParams">FAQArticleID=ID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::GenericExpand###FAQArticle.Votes" Required="0" Valid="1"> 
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::FAQ::FAQArticleVoteGet</Item>
                 <Item Key="AddParams">FAQArticleID=ID</Item>
             </Hash>
         </Setting>

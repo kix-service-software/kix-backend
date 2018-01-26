@@ -921,7 +921,8 @@ sub AttachmentGet {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Prepare(
-        SQL => 'SELECT filename, content_type, content_size, content '
+        SQL => 'SELECT filename, content_type, content_size, content, inlineattachment, '
+            . 'created, created_by, changed, changed_by '
             . 'FROM faq_attachment '
             . 'WHERE id = ? AND faq_id = ? '
             . 'ORDER BY created',
@@ -938,10 +939,16 @@ sub AttachmentGet {
             $Row[3] = MIME::Base64::decode_base64( $Row[3] );
         }
 
+        $File{ItemID}      = $Param{ItemID};
         $File{Filename}    = $Row[0];
         $File{ContentType} = $Row[1];
         $File{Filesize}    = $Row[2];
         $File{Content}     = $Row[3];
+        $File{Inline}      = $Row[4];
+        $File{Created}     = $Row[5];
+        $File{CreatedBy}   = $Row[6];
+        $File{Changed}     = $Row[7];
+        $File{ChangedBy}   = $Row[8];
     }
 
     return %File;

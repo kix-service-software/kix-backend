@@ -120,10 +120,10 @@ sub Run {
         UserID => $Self->{Authorization}->{UserID},
     );
 
-    if ( @AttachmentIndex ) {
+    if ( @AttachmentList ) {
 
         my @AttachmentIDs;
-        foreach my $Attachment ( sort {$a->{FileID} <=> $b->{FileID}} @AttachmentIndex ) {
+        foreach my $Attachment ( sort {$a->{FileID} <=> $b->{FileID}} @AttachmentList ) {
             push(@AttachmentIDs, $Attachment->{FileID});
         }
         

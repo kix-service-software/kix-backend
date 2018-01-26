@@ -183,6 +183,17 @@ sub Run {
             $FAQArticle{History} = $HistoryIDs;
         }
 
+        if ( $Param{Data}->{include}->{Votes} ) {
+            # get Vote list (only IDs)
+            my $VoteIDs = $Kernel::OM->Get('Kernel::System::FAQ')->VoteSearch(
+                ItemID => $FAQArticleID,
+                UserID => $Self->{Authorization}->{UserID},
+            );
+
+            # set Vote data
+            $FAQArticle{Votes} = $VoteIDs;
+        }
+
         # add
         push(@FAQArticleData, \%FAQArticle);
     }

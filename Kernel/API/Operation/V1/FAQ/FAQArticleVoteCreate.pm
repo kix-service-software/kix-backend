@@ -73,10 +73,10 @@ perform FAQArticleVoteCreate Operation. This will return the created VoteID.
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticleID    => 123,
-            FAQArticleVote  => {
+            FAQVote  => {
                 IPAddress => 'xxx.xxx.xxx.xxx',
-                Interface => 'Agent',               # possible values: 'Agent', 'Customer' and 'Public'
-                Rate      => 100,
+                Interface => 'agent',               # possible values: 'agent', 'customer' and 'public'
+                Rating    => 100,                   # integer between 0 and 100
                 CreatedBy => '...',                 # optional
             }
         },
@@ -115,18 +115,18 @@ sub Run {
             'FAQArticleID' => {
                 Required => 1
             },
-            'FAQArticleVote' => {
+            'FAQVote' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'FAQArticleVote::CreatedBy' => {
+            'FAQVote::CreatedBy' => {
                 RequiresValueIfUsed => 1,
             },
-            'FAQArticleVote::IPAddress' => {
+            'FAQVote::IPAddress' => {
                 Required => 1,
                 Format   => '\d+\.\d+\.\d+\.\d+',
             },
-            'FAQArticleVote::Interface' => {
+            'FAQVote::Interface' => {
                 Required => 1,
                 OneOf    => [
                     'agent',
@@ -134,9 +134,9 @@ sub Run {
                     'public'
                 ]
             },
-            'FAQArticleVote::Rating' => {
+            'FAQVote::Rating' => {
                 Required => 1,
-                Format   => '\d+',
+                Format   => '^([1-9][0-9]?|^100)$',
             },
         }
     );
@@ -149,18 +149,18 @@ sub Run {
         );
     }
 
-    # isolate and trim FAQArticleVote parameter
-    my $FAQArticleVote = $Self->_Trim(
-        Data => $Param{Data}->{FAQArticleVote}
+    # isolate and trim FAQVote parameter
+    my $FAQVote = $Self->_Trim(
+        Data => $Param{Data}->{FAQVote}
     );
     
     # everything is ok, let's create the Vote
     my $VoteID = $Kernel::OM->Get('Kernel::System::FAQ')->VoteAdd(
         ItemID      => $Param{Data}->{FAQArticleID},
-        IP          => $FAQArticleVote->{IPAddress},
-        Interface   => $FAQArticleVote->{Interface},
-        Rate        => $FAQArticleVote->{Rating},
-        CreatedBy   => $FAQArticleVote->{CreatedBy} || 'unknown',
+        IP          => $FAQVote->{IPAddress},
+        Interface   => $FAQVote->{Interface},
+        Rate        => $FAQVote->{Rating},
+        CreatedBy   => $FAQVote->{CreatedBy} || 'unknown',
         UserID      => $Self->{Authorization}->{UserID},
     );
 

@@ -85,7 +85,7 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            AttachmentID  => '',                    # ID of the created Attachment
+            FAQAttachmentID  => '',                 # ID of the created Attachment
         },
     };
 
