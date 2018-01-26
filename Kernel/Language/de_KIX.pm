@@ -1260,6 +1260,7 @@ sub Data {
     $Lang->{'Linked config items'} = 'Verknüpfte ConfigItems';
     $Lang->{'All Attributes'}      = 'Alle Attribute';
     $Lang->{'Common Attributes'}   = 'Gemeinsame Attribute';
+    $Lang->{'Notes'}               = 'Anmerkungen';
     $Lang->{'Number of Linked ConfigItems per Page'}
         = 'Anzahl der verknüpften ConfigItems pro Seite';
     $Lang->{'Defines parameters for the AgentITSMWorkOrderZoomTab "Linked Objects".'}
