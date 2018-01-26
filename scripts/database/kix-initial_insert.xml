@@ -5088,6 +5088,16 @@ TranslatableValues: '1'
         <Data Key="change_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
     </Insert>
+    <Insert Table="general_catalog">
+        <Data Key="id" Type="AutoIncrement">99</Data>
+        <Data Key="general_catalog_class" Type="Quote">DynamicField::DisplayGroup</Data>
+        <Data Key="name" Type="Quote">Default</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+    </Insert>
 
 <!-- general catalog preferences -->
     <Insert Table="general_catalog_preferences">
