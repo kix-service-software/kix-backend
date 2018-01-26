@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/FAQ/FAQArticleAttachmentCreate.pm - API FAQAttachment Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserCreate;
+package Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleUserCreate - API Role RoleUser Create Operation backend
+Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentCreate - API FAQAttachment Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,12 +66,17 @@ sub new {
 
 =item Run()
 
-perform RoleUserCreate Operation. This will return sucsess.
+perform FAQArticleAttachmentCreate Operation. This will return the created FAQAttachmentID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID    => 12,
-            RoleID    => 6,
+            FAQArticleID  => 123,
+            Attachment  => {
+                Content     => $Content,                    # required, base64 encoded
+                ContentType => 'text/xml',                  # required
+                Filename    => 'somename.xml',              # required
+                Inline      => 1,                           # (0|1, default 0)
+            },
         },
     );
 
@@ -80,6 +85,7 @@ perform RoleUserCreate Operation. This will return sucsess.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
+            FAQAttachmentID  => '',                 # ID of the created Attachment
         },
     };
 
@@ -88,7 +94,7 @@ perform RoleUserCreate Operation. This will return sucsess.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webRoleUser
+    # init webFAQAttachment
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -104,10 +110,20 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'UserID' => {
+            'FAQArticleID' => {
                 Required => 1
             },
-            'RoleID' => {
+            'Attachment' => {
+                Type     => 'HASH',
+                Required => 1
+            },
+            'Attachment::Filename' => {
+                Required => 1
+            },
+            'Attachment::ContentType' => {
+                Required => 1
+            },
+            'Attachment::Content' => {
                 Required => 1
             },
         }
@@ -120,25 +136,33 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-
-    # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-        UID    => $Param{Data}->{UserID},
-        RID    => $Param{Data}->{RoleID},
-        Active => 1,
-        UserID => $Self->{Authorization}->{UserID},
+    
+    # isolate and trim Attachment parameter
+    my $Attachment = $Self->_Trim(
+        Data => $Param{Data}->{Attachment}
     );
 
-    if ( !$Success ) {
+    # create Attachment
+    my $AttachmentID = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentAdd(
+        ItemID      => $Param{Data}->{FAQArticleID},
+        Content     => $Attachment->{Content},
+        ContentType => $Attachment->{ContentType},
+        Filename    => $Attachment->{Filename},
+        Inline      => $Attachment->{Inline} || 0,
+        UserID      => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !$AttachmentID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create role assignment, please contact the system administrator',
+            Message => 'Could not create FAQArticle attachment, please contact the system administrator',
         );
     }
-    
+
     # return result    
     return $Self->_Success(
-        Code   => 'Object.Created',
+        Code            => 'Object.Created',
+        FAQAttachmentID => $FAQAttachmentID,
     );    
 }
 

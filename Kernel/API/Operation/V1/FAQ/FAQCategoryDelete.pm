@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/FAQ/FAQCategoryDelete.pm - API FAQCategory Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserCreate;
+package Kernel::API::Operation::V1::FAQ::FAQCategoryDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleUserCreate - API Role RoleUser Create Operation backend
+Kernel::API::Operation::V1::FAQ::FAQCategoryDelete - API FAQCategory FAQCategoryDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,29 +66,24 @@ sub new {
 
 =item Run()
 
-perform RoleUserCreate Operation. This will return sucsess.
+perform FAQCategoryDelete Operation. This will return the deleted FAQCategoryID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID    => 12,
-            RoleID    => 6,
-        },
+            FAQCategoryID => 1,                      # comma separated in case of multiple or arrayref (depending on transport)
+        },      
     );
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-        },
+        Message    => '',                      # in case of error
     };
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webRoleUser
+    
+    # init webService
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -104,10 +99,8 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'UserID' => {
-                Required => 1
-            },
-            'RoleID' => {
+            'FAQCategoryID' => {
+                Type     => 'ARRAY',
                 Required => 1
             },
         }
@@ -120,27 +113,39 @@ sub Run {
             Message => $Result->{Message},
         );
     }
+        
+    # start FAQCategory loop
+    FAQCategory:    
+    foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
-    # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-        UID    => $Param{Data}->{UserID},
-        RID    => $Param{Data}->{RoleID},
-        Active => 1,
-        UserID => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create role assignment, please contact the system administrator',
+        my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
+            CategoryIDs => [ $FAQCategoryID ],
+            UserID      => $Self->{Authorization}->{UserID},
         );
-    }
-    
-    # return result    
-    return $Self->_Success(
-        Code   => 'Object.Created',
-    );    
-}
 
+        if ( @ArticleIDs ) {
+            return $Self->_Error(
+                Code    => 'Object.DependingObjectExists',
+                Message => 'Cannot delete FAQCategory. At least one article is assigned to this category.',
+            );
+        }
+
+        # delete FAQCategory        
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDelete(
+            CategoryID => $FAQCategoryID,
+            UserID     => $Self->{Authorization}->{UserID},
+        );
+ 
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete FAQCategory, please contact the system administrator',
+            );
+        }
+    }
+
+    # return result
+    return $Self->_Success();
+}
 
 1;

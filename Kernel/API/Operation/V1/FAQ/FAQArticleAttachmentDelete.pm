@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/FAQ/FAQArticleAttachmentDelete.pm - API FAQArticleAttachment Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserCreate;
+package Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleUserCreate - API Role RoleUser Create Operation backend
+Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentDelete - API FAQArticleAttachment Delete Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,29 +66,24 @@ sub new {
 
 =item Run()
 
-perform RoleUserCreate Operation. This will return sucsess.
+perform FAQArticleAttachmentDelete Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID    => 12,
-            RoleID    => 6,
-        },
+            FAQAttachmentID  => '...',
+        },      
     );
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-        },
+        Message    => '',                      # in case of error
     };
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webRoleUser
+    
+    # init webService
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -104,10 +99,11 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'UserID' => {
+            'FAQArticleID' => {
                 Required => 1
             },
-            'RoleID' => {
+            'FAQAttachmentID' => {
+                Type     => 'ARRAY',
                 Required => 1
             },
         }
@@ -120,27 +116,28 @@ sub Run {
             Message => $Result->{Message},
         );
     }
+         
+    # start FAQArticleAttachment loop
+    FAQArticleAttachment:    
+    foreach my $FAQAttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
-    # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-        UID    => $Param{Data}->{UserID},
-        RID    => $Param{Data}->{RoleID},
-        Active => 1,
-        UserID => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create role assignment, please contact the system administrator',
+        # delete FAQArticleAttachment        
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentDelete(
+            ItemID => $Param{Data}->{FAQArticleID},
+            FileID => $FAQAttachmentID,
+            UserID => $Self->{Authorization}->{UserID},
         );
+ 
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete FAQArticle attachment, please contact the system administrator',
+            );
+        }
     }
-    
-    # return result    
-    return $Self->_Success(
-        Code   => 'Object.Created',
-    );    
-}
 
+    # return result
+    return $Self->_Success();
+}
 
 1;

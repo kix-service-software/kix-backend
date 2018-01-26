@@ -217,7 +217,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Articles" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::GenericExpand###Ticket.Articles" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -227,7 +227,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Attachments" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::GenericExpand###Article.Attachments" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -237,7 +237,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###History" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::GenericExpand###Ticket.History" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

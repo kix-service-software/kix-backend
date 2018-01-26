@@ -2237,31 +2237,6 @@
 </Table>
 
 <!-- faq -->
-<Table Name="faq_language">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT" />
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR" />
-    <Unique Name="faq_language_name">
-        <UniqueColumn Name="name" />
-    </Unique>
-</Table>
-<Table Name="faq_state_type">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT" />
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR" />
-    <Unique Name="faq_state_type_name">
-        <UniqueColumn Name="name" />
-    </Unique>
-</Table>
-<Table Name="faq_state">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT" />
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR" />
-    <Column Name="type_id" Required="true" Type="INTEGER" />
-    <Unique Name="faq_state_name">
-        <UniqueColumn Name="name" />
-    </Unique>
-    <Index Name="faq_state_type_id">
-        <IndexColumn Name="type_id" />
-    </Index>
-</Table>
 <Table Name="faq_category">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
     <Column Name="parent_id" Required="true" Type="INTEGER" />
@@ -2302,8 +2277,8 @@
     <Column Name="f_number" Required="true" Size="200" Type="VARCHAR" />
     <Column Name="f_subject" Required="false" Size="200" Type="VARCHAR" />
     <Column Name="f_name" Required="true" Size="200" Type="VARCHAR" />
-    <Column Name="f_language_id" Required="true" Type="SMALLINT" />
-    <Column Name="state_id" Required="true" Type="SMALLINT" />
+    <Column Name="language" Required="true" Size="8" Type="VARCHAR" />
+    <Column Name="visibility" Required="true" SIZE="20" Type="VARCHAR" />
     <Column Name="category_id" Required="true" Type="SMALLINT" />
     <Column Name="approved" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="valid_id" Required="true" Default="1" Type="SMALLINT" />
@@ -2319,8 +2294,11 @@
     <Column Name="created_by" Required="true" Type="INTEGER" />
     <Column Name="changed" Required="true" Type="DATE" />
     <Column Name="changed_by" Required="true" Type="INTEGER" />
-    <Index Name="faq_item_state_id">
-        <IndexColumn Name="state_id" />
+    <Index Name="faq_item_language">
+        <IndexColumn Name="language" />
+    </Index>
+    <Index Name="faq_item_visibility">
+        <IndexColumn Name="visibility" />
     </Index>
     <Index Name="faq_item_category_id">
         <IndexColumn Name="category_id" />

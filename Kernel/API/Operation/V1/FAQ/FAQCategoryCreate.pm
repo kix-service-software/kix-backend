@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/FAQ/FAQCategoryCreate.pm - API FAQCategory Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserCreate;
+package Kernel::API::Operation::V1::FAQ::FAQCategoryCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleUserCreate - API Role RoleUser Create Operation backend
+Kernel::API::Operation::V1::FAQ::FAQCategoryCreate - API FAQCategory Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -66,12 +66,19 @@ sub new {
 
 =item Run()
 
-perform RoleUserCreate Operation. This will return sucsess.
+perform FAQCategoryCreate Operation. This will return the created FAQCategoryID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID    => 12,
-            RoleID    => 6,
+            FAQCategory  => {
+                Name     => 'CategoryA',
+                Comment  => 'Some comment', # optional
+                ParentID => 2,              # optional
+                ValidID  => 1,              # optional, default 1
+                GroupIDs => [
+                    1,2,3,...
+                ]
+            },
         },
     );
 
@@ -80,6 +87,7 @@ perform RoleUserCreate Operation. This will return sucsess.
         Code            => '',                      # 
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
+            FAQCategoryID  => '',                         # ID of the created FAQCategory
         },
     };
 
@@ -88,7 +96,7 @@ perform RoleUserCreate Operation. This will return sucsess.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webRoleUser
+    # init webFAQCategory
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
     );
@@ -104,12 +112,17 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'UserID' => {
+            'FAQCategory' => {
+                Type     => 'HASH',
                 Required => 1
             },
-            'RoleID' => {
+            'FAQCategory::Name' => {
                 Required => 1
-            },
+            },            
+            'FAQCategory::GroupIDs' => {
+                Type     => 'ARRAY',
+                Required => 1
+            },            
         }
     );
 
@@ -121,24 +134,46 @@ sub Run {
         );
     }
 
-    # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-        UID    => $Param{Data}->{UserID},
-        RID    => $Param{Data}->{RoleID},
-        Active => 1,
-        UserID => $Self->{Authorization}->{UserID},
+
+    # isolate and trim FAQCategory parameter
+    my $FAQCategory = $Self->_Trim(
+        Data => $Param{Data}->{FAQCategory}
+    );
+
+    # create FAQCategory
+    my $FAQCategoryID = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryAdd(
+        Name     => $FAQCategory->{Name},
+        Comment  => $FAQCategory->{Comment} || '',
+        ParentID => $FAQCategory->{ParentID} || 0,
+        ValidID  => $FAQCategory->{ValidID} || 1,
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !$FAQCategoryID ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create FAQCategory, please contact the system administrator',
+        );
+    }
+
+    # set groups    
+    my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
+        CategoryID => $FAQCategoryID,
+        GroupIDs   => $FAQCategory->{GroupIDs} || [],
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create role assignment, please contact the system administrator',
+            Message => 'Could not create group assignment, please contact the system administrator',
         );
     }
     
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
+        FAQCategoryID => $FAQCategoryID,
     );    
 }
 

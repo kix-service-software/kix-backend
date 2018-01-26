@@ -1197,6 +1197,146 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::StandardTemplate::StandardTemplateDelete
+    V1::FAQ::FAQCategoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryGet
+    V1::FAQ::FAQCategoryCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryCreate
+    V1::FAQ::FAQCategoryUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryUpdate
+    V1::FAQ::FAQCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategorySearch
+    V1::FAQ::FAQCategoryDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryDelete
+    V1::FAQ::FAQArticleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleGet
+    V1::FAQ::FAQArticleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleCreate
+    V1::FAQ::FAQArticleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleUpdate
+    V1::FAQ::FAQArticleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleSearch
+    V1::FAQ::FAQArticleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleDelete
+    V1::FAQ::FAQArticleAttachmentGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentGet
+    V1::FAQ::FAQArticleAttachmentCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentCreate
+    V1::FAQ::FAQArticleAttachmentSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentSearch
+    V1::FAQ::FAQArticleAttachmentDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleAttachmentDelete
+    V1::FAQ::FAQArticleVoteGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteGet
+    V1::FAQ::FAQArticleVoteCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteCreate
+    V1::FAQ::FAQArticleVoteSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteSearch
+    V1::FAQ::FAQArticleVoteDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleVoteDelete
+    V1::FAQ::FAQArticleHistorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleHistorySearch
+    V1::FAQ::FAQArticleHistoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleHistoryGet
 
   Transport:
     Config:
@@ -1883,6 +2023,86 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /standardtemplates/:StandardTemplateID
+        V1::FAQ::FAQCategoryGet:
+          RequestMethod:
+          - GET
+          Route: /faq/categories/:FAQCategoryID
+        V1::FAQ::FAQCategoryCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/categories
+        V1::FAQ::FAQCategoryUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /faq/categories/:FAQCategoryID
+        V1::FAQ::FAQCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /faq/categories
+        V1::FAQ::FAQCategoryDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/categories/:FAQCategoryID
+        V1::FAQ::FAQArticleGet:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID
+        V1::FAQ::FAQArticleCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/articles
+        V1::FAQ::FAQArticleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /faq/articles/:FAQArticleID
+        V1::FAQ::FAQArticleSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/articles
+        V1::FAQ::FAQArticleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/articles/:FAQArticleID
+        V1::FAQ::FAQArticleAttachmentGet:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID/attachments/:FAQAttachmentID
+        V1::FAQ::FAQArticleAttachmentCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/articles/:FAQArticleID/attachments
+        V1::FAQ::FAQArticleAttachmentSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID/attachments
+        V1::FAQ::FAQArticleAttachmentDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/articles/:FAQArticleID/attachments/:FAQAttachmentID
+        V1::FAQ::FAQArticleVoteGet:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID/votes/:FAQVoteID
+        V1::FAQ::FAQArticleVoteCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/articles/:FAQArticleID/votes
+        V1::FAQ::FAQArticleVoteSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID/votes
+        V1::FAQ::FAQArticleVoteDelete:
+          RequestMethod:
+          - DELETE
+          Route: /faq/articles/:FAQArticleID/votes/:FAQVoteID
+        V1::FAQ::FAQArticleHistorySearch:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID/history
+        V1::FAQ::FAQArticleHistoryGet:
+          RequestMethod:
+          - GET
+          Route: /faq/articles/:FAQArticleID/history/:FAQHistoryID
 
     Type: HTTP::REST
 RemoteSystem: ''

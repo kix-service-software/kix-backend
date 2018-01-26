@@ -94,6 +94,7 @@ prepare data, check given parameters and parse them according to type
                 RequiresValueIfUsed => 1                                # optional
                 Default             => ...                              # optional
                 OneOf               => [...]                            # optional
+                Format              => '...'                            # optional, RegEx that defines the format pattern
             }
         }
     );
@@ -351,6 +352,20 @@ sub PrepareData {
                     $Result->{Message} = "Parameter $Parameter is not one of '".(join(',', @{$Parameters{$Parameter}->{OneOf}}))."'!",
                     last;
                 }
+            }
+            if ( exists($Parameters{$Parameter}->{Format}) ) {
+                if ( $Data{$Parameter} !~ /$Parameters{$Parameter}->{Format}/g ) {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Parameter $Parameter has the wrong format!",
+                    last;
+                }
+            }
+
+            # check if we have an optional parameter that needs a value
+            if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists($Data{$Parameter}) && !defined($Data{$Parameter}) ) {
+                $Result->{Success} = 0;
+                $Result->{Message} = "Optional parameter $Parameter is used without a value!",
+                last;
             }
         }
     }
@@ -1109,7 +1124,7 @@ sub _ApplyExpand {
     if ( IsHashRefWithData($GenericExpands) ) {
         foreach my $Object ( keys %{$Param{Data}} ) {
             foreach my $AttributeToExpand ( keys %{$Self->{Expand}} ) {
-                next if !$GenericExpands->{$AttributeToExpand};
+                next if !$GenericExpands->{$Object.'.'.$AttributeToExpand};
 
                 my @ItemList;
                 if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
@@ -1122,7 +1137,7 @@ sub _ApplyExpand {
                 foreach my $ItemData ( @ItemList ) {
                     my $Result = $Self->_ExpandObject(
                         AttributeToExpand => $AttributeToExpand,
-                        ExpanderConfig    => $GenericExpands->{$AttributeToExpand},
+                        ExpanderConfig    => $GenericExpands->{$Object.'.'.$AttributeToExpand},
                         Data              => $ItemData
                     );
 
@@ -1193,7 +1208,12 @@ sub _ExpandObject {
     if ( $Param{ExpanderConfig}->{AddParams} ) {
         my @AddParams = split(/\s*,\s*/, $Param{ExpanderConfig}->{AddParams});
         foreach my $AddParam ( @AddParams ) {
-            $ExecData{$AddParam} = $Self->{RequestData}->{$AddParam},
+            my ($TargetAttr, $SourceAttr) = split(/=/, $AddParam);
+            # if we don't have a special source attribute, target and source attribute are the same
+            if ( !$SourceAttr ) {
+                $SourceAttr = $TargetAttr;
+            }
+            $ExecData{$TargetAttr} = $Param{Data}->{$SourceAttr},
         }
     }
 
