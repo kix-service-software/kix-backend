@@ -77,6 +77,9 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             ServiceID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            Service => {
+                IncidentState => 1     # optional, returns CurInciState
+            },
         },
     );
 
@@ -119,7 +122,6 @@ sub Run {
         Parameters => {
             'ServiceID' => {
                 Type     => 'ARRAY',
-                DataType => 'NUMERIC',
                 Required => 1
             }                
         }
@@ -142,43 +144,26 @@ sub Run {
         # get the Service data
         my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
             ServiceID => $ServiceID,
+            IncidentState => $Param{Data}->{Service}->{IncidentState},
             UserID  => $Self->{Authorization}->{UserID},
         );
 
-        my @ParentServiceParts = split(/::/, $ServiceData{Name});
-
+        my %Tmphash;
         if ( !IsHashRefWithData( \%ServiceData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "No data found for ServiceID $ServiceID.",
             );
         }
-        
-        # include SubServices if requested
-        if ( $Param{Data}->{include}->{SubServices} ) {
-            my %SubServiceList = $Kernel::OM->Get('Kernel::System::Service')->GetAllSubServices(
-                ServiceID => $ServiceID,
-            );
-
-            # filter direct children
-            my @DirectSubServices;
-            foreach my $SubServiceID ( sort keys %SubServiceList ) {
-                my @ServiceParts = split(/::/, $SubServiceList{$SubServiceID});
-                next if scalar(@ServiceParts) > scalar(@ParentServiceParts)+1;
-                push(@DirectSubServices, $SubServiceID)
+        foreach my $Key (keys %ServiceData){
+            if ( $Key eq "CurInciStateID" || $Key eq "CurInciState" || $Key eq "CurInciStateType"){
+                $Tmphash{$Key} = $ServiceData{$Key};
+                delete $ServiceData{$Key};
             }
-
-            $ServiceData{SubServices} = \@DirectSubServices;
         }
 
-        # move NameShort to Name and delete NameShort
-        $ServiceData{Name} = $ServiceData{NameShort};
-        delete $ServiceData{NameShort};
-
-        if ( !$ServiceData{ParentID} ) {
-            $ServiceData{ParentID} = undef;
-        }
-                
+        $ServiceData{IncidentState} = \%Tmphash;
+        
         # add
         push(@ServiceList, \%ServiceData);
     }
