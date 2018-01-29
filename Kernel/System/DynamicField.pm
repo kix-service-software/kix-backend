@@ -82,16 +82,17 @@ returns id of new Dynamic field if successful or undef otherwise
 
     my $ID = $DynamicFieldObject->DynamicFieldAdd(
         InternalField => 0,             # optional, 0 or 1, internal fields are protected
-        Name        => 'NameForField',  # mandatory
-        Label       => 'a description', # mandatory, label to show
-        FieldType   => 'Text',          # mandatory, selects the DF backend to use for this field
-        ObjectType  => 'Article',       # this controls which object the dynamic field links to
+        Name            => 'NameForField',  # mandatory
+        Label           => 'a description', # mandatory, label to show
+        FieldType       => 'Text',          # mandatory, selects the DF backend to use for this field
+        ObjectType      => 'Article',       # this controls which object the dynamic field links to
                                         # allow only lowercase letters
-        Config      => $ConfigHashRef,  # it is stored on YAML format
+        DisplayGroupID  => 123,          # optional
+        Config          => $ConfigHashRef,  # it is stored on YAML format
                                         # to individual articles, otherwise to tickets
-        Reorder     => 1,               # or 0, to trigger reorder function, default 1
-        ValidID     => 1,
-        UserID      => 123,
+        Reorder         => 1,               # or 0, to trigger reorder function, default 1
+        ValidID         => 1,
+        UserID          => 123,
     );
 
 Returns:
@@ -158,11 +159,11 @@ sub DynamicFieldAdd {
     # sql
     return if !$DBObject->Do(
         SQL =>
-            'INSERT INTO dynamic_field (internal_field, name, label, field_type, object_type,' .
+            'INSERT INTO dynamic_field (internal_field, name, label, field_type, displaygroup_id, object_type,' .
             ' config, valid_id, create_time, create_by, change_time, change_by)' .
-            ' VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$InternalField, \$Param{Name}, \$Param{Label}, \$Param{FieldType},
+            \$InternalField, \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{DisplayGroupID},
             \$Param{ObjectType}, \$Config, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -261,7 +262,7 @@ sub DynamicFieldGet {
     if ( $Param{ID} ) {
         return if !$DBObject->Prepare(
             SQL =>
-                'SELECT id, internal_field, name, label, field_type, object_type, config,'
+                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config,'
                 .
                 ' valid_id, create_by, create_time, change_by, change_time ' .
                 'FROM dynamic_field WHERE id = ?',
@@ -271,7 +272,7 @@ sub DynamicFieldGet {
     else {
         return if !$DBObject->Prepare(
             SQL =>
-                'SELECT id, internal_field, name, label, field_type, object_type, config,'
+                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config,'
                 .
                 ' valid_id, create_by, create_time, change_by, change_time ' .
                 'FROM dynamic_field WHERE name = ?',
@@ -288,18 +289,19 @@ sub DynamicFieldGet {
         my $Config = $YAMLObject->Load( Data => $Data[6] );
 
         %Data = (
-            ID            => $Data[0],
-            InternalField => $Data[1],
-            Name          => $Data[2],
-            Label         => $Data[3],
-            FieldType     => $Data[4],
-            ObjectType    => $Data[5],
-            Config        => $Config,
-            ValidID       => $Data[7],
-            CreateBy      => $Data[8],
-            CreateTime    => $Data[9],
-            ChangeBy      => $Data[10],
-            ChangeTime    => $Data[11],
+            ID              => $Data[0],
+            InternalField   => $Data[1],
+            Name            => $Data[2],
+            Label           => $Data[3],
+            FieldType       => $Data[4],
+            DisplayGroupID  => $Data[5],
+            ObjectType      => $Data[6],
+            Config          => $Config,
+            ValidID         => $Data[8],
+            CreateBy        => $Data[9],
+            CreateTime      => $Data[10],
+            ChangeBy        => $Data[11],
+            ChangeTime      => $Data[12],
         );
     }
 
@@ -329,17 +331,18 @@ update Dynamic Field content into database
 returns 1 on success or undef on error
 
     my $Success = $DynamicFieldObject->DynamicFieldUpdate(
-        ID          => 1234,            # mandatory
-        Name        => 'NameForField',  # mandatory
-        Label       => 'a description', # mandatory, label to show
-        FieldType   => 'Text',          # mandatory, selects the DF backend to use for this field
-        ObjectType  => 'Article',       # this controls which object the dynamic field links to
+        ID              => 1234,            # mandatory
+        Name            => 'NameForField',  # mandatory
+        Label           => 'a description', # mandatory, label to show
+        FieldType       => 'Text',          # mandatory, selects the DF backend to use for this field
+        DisplayGroupID  => 123,          # optional
+        ObjectType      => 'Article',       # this controls which object the dynamic field links to
                                         # allow only lowercase letters
-        Config      => $ConfigHashRef,  # it is stored on YAML format
+        Config          => $ConfigHashRef,  # it is stored on YAML format
                                         # to individual articles, otherwise to tickets
-        ValidID     => 1,
-        Reorder     => 1,               # or 0, to trigger reorder function, default 1
-        UserID      => 123,
+        ValidID         => 1,
+        Reorder         => 1,               # or 0, to trigger reorder function, default 1
+        UserID          => 123,
     );
     );
 
@@ -413,11 +416,11 @@ sub DynamicFieldUpdate {
 
     # sql
     return if !$DBObject->Do(
-        SQL => 'UPDATE dynamic_field SET name = ?, label = ?, field_type = ?, '
+        SQL => 'UPDATE dynamic_field SET name = ?, label = ?, field_type = ?, displaygroup_id = ?,'
             . 'object_type = ?, config = ?, valid_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{Label}, \$Param{FieldType},
+            \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{DisplayGroupID},
             \$Param{ObjectType}, \$Config, \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
         ],
     );
