@@ -146,7 +146,6 @@ sub Run {
             UserID  => $Self->{Authorization}->{UserID},
         );
 
-        my @ParentServiceParts = split(/::/, $ServiceData{Name});
         my %Tmphash;
         
         if ( !IsHashRefWithData( \%ServiceData ) ) {
@@ -155,6 +154,8 @@ sub Run {
                 Message => "No data found for ServiceID $ServiceID.",
             );
         }
+        
+        my @ParentServiceParts = split(/::/, $ServiceData{Name});
         
         # include SubServices if requested
         if ( $Param{Data}->{include}->{SubServices} ) {
@@ -180,16 +181,12 @@ sub Run {
         if ( !$ServiceData{ParentID} ) {
             $ServiceData{ParentID} = undef;
         }
-
-        # extract attributes to subhash
-        foreach my $Key (keys %ServiceData){
-            if ( $Key eq "CurInciStateID" || $Key eq "CurInciState" || $Key eq "CurInciStateType"){
+        if ( $Param{Data}->{include}->{IncidentState} ){
+            # extract attributes to subhash
+            for my $Key ( qw(CurInciStateID CurInciState CurInciStateType) ){
                 $Tmphash{$Key} = $ServiceData{$Key};
                 delete $ServiceData{$Key};
             }
-        }
-
-        if ( $Param{Data}->{include}->{IncidentState} ){
             $ServiceData{IncidentState} = \%Tmphash;
         }
         
