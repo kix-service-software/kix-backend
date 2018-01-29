@@ -3911,7 +3911,7 @@ TranslatableValues: '1'
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
-TranslatableValues: '1'
+DefaultValue: ''
         </Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
