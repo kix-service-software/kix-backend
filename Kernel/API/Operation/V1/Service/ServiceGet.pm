@@ -146,8 +146,6 @@ sub Run {
             UserID  => $Self->{Authorization}->{UserID},
         );
 
-        my %Tmphash;
-        
         if ( !IsHashRefWithData( \%ServiceData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
@@ -183,7 +181,8 @@ sub Run {
         }
         if ( $Param{Data}->{include}->{IncidentState} ){
             # extract attributes to subhash
-            for my $Key ( qw(CurInciStateID CurInciState CurInciStateType) ){
+            my %Tmphash;
+            for my $Key ( qw(CurInciStateID CurInciState CurInciStateType) ) {
                 $Tmphash{$Key} = $ServiceData{$Key};
                 delete $ServiceData{$Key};
             }
