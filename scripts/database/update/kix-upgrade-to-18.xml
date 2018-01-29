@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <Table Name="client_registration">
+        <Column Name="client_id" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true"/>
+        <Column Name="callback_url" Required="true" Type="VARCHAR" Size="255"/>
+        <Column Name="authentication" Type="VARCHAR" Size="10000"/>
+    </Table>
     <TableDrop Name="faq_state_type"/>
     <TableDrop Name="faq_state"/>
     <TableAlter Name="faq_item">
