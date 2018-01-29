@@ -189,3 +189,8 @@
 /faq/articles/:FAQArticleID/votes/:FAQVoteID                            |   DELETE          | V1::FAQ::FAQArticleVoteDelete
 /faq/articles/:FAQArticleID/history                                     |   GET             | V1::FAQ::FAQArticleHistorySearch
 /faq/articles/:FAQArticleID/history/:FAQHistoryID                       |   GET             | V1::FAQ::FAQArticleHistoryGet
+/objecticons                                                            |   GET             | V1::ObjectIcon::ObjectIconSearch
+/objecticons                                                            |   POST            | V1::ObjectIcon::ObjectIconCreate
+/objecticons/:ObjectIconID                                              |   PATCH           | V1::ObjectIcon::ObjectIconUpdate
+/objecticons/:ObjectIconID                                              |   GET             | V1::ObjectIcon::ObjectIconGet
+/objecticons/:ObjectIconID                                              |   DELETE          | V1::ObjectIcon::ObjectIconDelete

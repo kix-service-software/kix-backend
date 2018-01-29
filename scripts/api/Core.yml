@@ -1337,6 +1337,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::FAQ::FAQArticleHistoryGet
+    V1::ObjectIcon::ObjectIconSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconSearch
+    V1::ObjectIcon::ObjectIconCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconCreate
+    V1::ObjectIcon::ObjectIconUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconUpdate
+    V1::ObjectIcon::ObjectIconGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconGet
+    V1::ObjectIcon::ObjectIconDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconDelete
 
   Transport:
     Config:
@@ -2103,6 +2138,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /faq/articles/:FAQArticleID/history/:FAQHistoryID
+        V1::ObjectIcon::ObjectIconSearch:
+          RequestMethod:
+          - GET
+          Route: /objecticons
+        V1::ObjectIcon::ObjectIconCreate:
+          RequestMethod:
+          - POST
+          Route: /objecticons
+        V1::ObjectIcon::ObjectIconUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /objecticons/:ObjectIconID
+        V1::ObjectIcon::ObjectIconGet:
+          RequestMethod:
+          - GET
+          Route: /objecticons/:ObjectIconID
+        V1::ObjectIcon::ObjectIconDelete:
+          RequestMethod:
+          - DELETE
+          Route: /objecticons/:ObjectIconID
 
     Type: HTTP::REST
 RemoteSystem: ''
