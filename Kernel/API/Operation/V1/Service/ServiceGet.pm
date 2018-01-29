@@ -77,9 +77,8 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             ServiceID => 123       # comma separated in case of multiple or arrayref (depending on transport)
-            Service => {
-                IncidentState => 1     # optional, returns CurInciState
-            },
+            IncidentState => 1     # Optional, 1 as default. If it's set with the value 1,
+                                   # IncidentState for service will be included on service data
         },
     );
 
@@ -145,7 +144,7 @@ sub Run {
         # get the Service data
         my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
             ServiceID => $ServiceID,
-            IncidentState => $Param{Data}->{Service}->{IncidentState},
+            IncidentState => $Param{Data}->{include}->{IncidentState},
             UserID  => $Self->{Authorization}->{UserID},
         );
 
@@ -183,7 +182,8 @@ sub Run {
         if ( !$ServiceData{ParentID} ) {
             $ServiceData{ParentID} = undef;
         }
-        
+
+        # extract attributes to subhash
         foreach my $Key (keys %ServiceData){
             if ( $Key eq "CurInciStateID" || $Key eq "CurInciState" || $Key eq "CurInciStateType"){
                 $Tmphash{$Key} = $ServiceData{$Key};
@@ -191,7 +191,9 @@ sub Run {
             }
         }
 
-        $ServiceData{IncidentState} = \%Tmphash;
+        if ( $Param{Data}->{include}->{IncidentState} ){
+            $ServiceData{IncidentState} = \%Tmphash;
+        }
         
         # add
         push(@ServiceList, \%ServiceData);
