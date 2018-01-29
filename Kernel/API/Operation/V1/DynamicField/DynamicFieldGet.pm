@@ -162,7 +162,7 @@ sub Run {
     if ( scalar(@DynamicFieldList) == 1 ) {
         return $Self->_Success(
             DynamicField => $DynamicFieldList[0],
-        );    
+        );
     }
 
     # return result
