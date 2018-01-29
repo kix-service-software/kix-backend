@@ -77,8 +77,6 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             ServiceID => 123       # comma separated in case of multiple or arrayref (depending on transport)
-            IncidentState => 1     # Optional, 1 as default. If it's set with the value 1,
-                                   # IncidentState for service will be included on service data
         },
     );
 
@@ -144,7 +142,7 @@ sub Run {
         # get the Service data
         my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
             ServiceID => $ServiceID,
-            IncidentState => $Param{Data}->{include}->{IncidentState},
+            IncidentState => $Param{Data}->{include}->{IncidentState} || 0,
             UserID  => $Self->{Authorization}->{UserID},
         );
 
