@@ -77,7 +77,7 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
 	            Name            => '...',            
 	            Label           => '...',            
                 FieldType       => '...',            
-                DisplayGroupID  => 123,              # optional
+                DisplayGroupID  => 123,              
                 ObjectType      => '...',            
                 Config          => { }
 	            InternalField   => 0|1,              # optional
@@ -130,6 +130,10 @@ sub Run {
             },
             'DynamicField::FieldType' => {
                 Required => 1
+            },
+            'DynamicField::DisplayGroupID' => {
+                RequiresValueIfUsed => 1,
+                OneOf => \@DisplayGroupIDs
             },
             'DynamicField::ObjectType' => {
                 Required => 1

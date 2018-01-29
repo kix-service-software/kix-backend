@@ -124,7 +124,11 @@ sub Run {
                 Type => 'HASH',
                 Required => 1
             },
-        }        
+            'DynamicField::DisplayGroupID' => {
+                RequiresValueIfUsed => 1,
+                OneOf => \@DisplayGroupIDs
+            },
+        }
     );
 
     # check result
