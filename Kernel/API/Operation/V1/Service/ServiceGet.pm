@@ -179,6 +179,7 @@ sub Run {
         if ( !$ServiceData{ParentID} ) {
             $ServiceData{ParentID} = undef;
         }
+        
         if ( $Param{Data}->{include}->{IncidentState} ){
             # extract attributes to subhash
             my %Tmphash;
