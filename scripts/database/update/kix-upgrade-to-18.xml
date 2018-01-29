@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <Table Name="object_icon">
+        <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
+        <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
+        <Column Name="object_id" Required="true" Type="VARCHAR" Size="255"/>
+        <Column Name="content_type" Required="false" Size="255" Type="VARCHAR"/>
+        <Column Name="content" Required="true" Type="LONGBLOB"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Index Name="object_icon_id">
+            <IndexColumn Name="id"/>
+        </Index>
+        <Index Name="object_icon_object">
+            <IndexColumn Name="object"/>
+        </Index>
+        <Index Name="object_icon_object_id">
+            <IndexColumn Name="object_id"/>
+        </Index>
+    </Table>
     <Table Name="client_registration">
         <Column Name="client_id" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true"/>
         <Column Name="callback_url" Required="true" Type="VARCHAR" Size="255"/>
