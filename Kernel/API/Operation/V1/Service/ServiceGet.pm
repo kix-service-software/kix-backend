@@ -142,10 +142,9 @@ sub Run {
         # get the Service data
         my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
             ServiceID => $ServiceID,
+            IncidentState => $Param{Data}->{include}->{IncidentState} || 0,
             UserID  => $Self->{Authorization}->{UserID},
         );
-
-        my @ParentServiceParts = split(/::/, $ServiceData{Name});
 
         if ( !IsHashRefWithData( \%ServiceData ) ) {
             return $Self->_Error(
@@ -153,6 +152,8 @@ sub Run {
                 Message => "No data found for ServiceID $ServiceID.",
             );
         }
+        
+        my @ParentServiceParts = split(/::/, $ServiceData{Name});
         
         # include SubServices if requested
         if ( $Param{Data}->{include}->{SubServices} ) {
@@ -178,7 +179,17 @@ sub Run {
         if ( !$ServiceData{ParentID} ) {
             $ServiceData{ParentID} = undef;
         }
-                
+        
+        if ( $Param{Data}->{include}->{IncidentState} ){
+            # extract attributes to subhash
+            my %Tmphash;
+            for my $Key ( qw(CurInciStateID CurInciState CurInciStateType) ) {
+                $Tmphash{$Key} = $ServiceData{$Key};
+                delete $ServiceData{$Key};
+            }
+            $ServiceData{IncidentState} = \%Tmphash;
+        }
+        
         # add
         push(@ServiceList, \%ServiceData);
     }
@@ -194,5 +205,6 @@ sub Run {
         Service => \@ServiceList,
     );
 }
+
 
 1;
