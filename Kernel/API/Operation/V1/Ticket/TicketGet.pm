@@ -363,10 +363,22 @@ sub Run {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 if ( $TicketRaw{$Attribute} ) {
-                    push @DynamicFields, {
-                        Name  => $1,
-                        Value => $TicketRaw{$Attribute},
-                    };
+                    my $DynamicFieldConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+                        Name => $1,
+                    );
+                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
+                        my $DFDisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ReadableValueRender(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $TicketRaw{$Attribute},
+                            LayoutObject => $LayoutObject,
+                        );
+                        
+                        push @DynamicFields, {
+                            ID           => $DynamicFieldConfig->{ID},
+                            Value        => $TicketRaw{$Attribute},
+                            DisplayValue => $DFDisplayValue,
+                        };
+                    }
                 }
                 next ATTRIBUTE;
             }
