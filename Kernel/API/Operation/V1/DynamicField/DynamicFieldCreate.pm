@@ -133,7 +133,10 @@ sub Run {
             },
             'DynamicField::DisplayGroupID' => {
                 RequiresValueIfUsed => 1,
-                OneOf => \@DisplayGroupIDs
+                OneOf    => [
+                    0,
+                    1
+                ]
             },
             'DynamicField::ObjectType' => {
                 Required => 1
