@@ -367,10 +367,9 @@ sub Run {
                         Name => $1,
                     );
                     if ( IsHashRefWithData($DynamicFieldConfig) ) {
-                        my $DFDisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ReadableValueRender(
+                        my $DFDisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
                             DynamicFieldConfig => $DynamicFieldConfig,
-                            Value              => $TicketRaw{$Attribute},
-                            LayoutObject => $LayoutObject,
+                            Key                => $TicketRaw{$Attribute},
                         );
                         
                         push @DynamicFields, {
