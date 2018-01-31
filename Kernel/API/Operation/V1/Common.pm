@@ -1124,7 +1124,7 @@ sub _ApplyExpand {
     if ( IsHashRefWithData($GenericExpands) ) {
         foreach my $Object ( keys %{$Param{Data}} ) {
             foreach my $AttributeToExpand ( keys %{$Self->{Expand}} ) {
-                next if !$GenericExpands->{$Object.'.'.$AttributeToExpand};
+                next if !$GenericExpands->{$Object.'.'.$AttributeToExpand} && !$GenericExpands->{$AttributeToExpand};
 
                 my @ItemList;
                 if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
@@ -1137,7 +1137,7 @@ sub _ApplyExpand {
                 foreach my $ItemData ( @ItemList ) {
                     my $Result = $Self->_ExpandObject(
                         AttributeToExpand => $AttributeToExpand,
-                        ExpanderConfig    => $GenericExpands->{$Object.'.'.$AttributeToExpand},
+                        ExpanderConfig    => $GenericExpands->{$Object.'.'.$AttributeToExpand} || $GenericExpands->{$AttributeToExpand},
                         Data              => $ItemData
                     );
 

@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/V1/Service/ServiceGet.pm - API Service Get operation backend
+# Kernel/API/Operation/V1/ObjectIcon/ObjectIconGet.pm - API ObjectIcon Get operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Service::ServiceGet;
+package Kernel::API::Operation::V1::ObjectIcon::ObjectIconGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Service::ServiceGet - API Service Get Operation backend
+Kernel::API::Operation::V1::ObjectIcon::ObjectIconGet - API ObjectIcon ObjectIconGet Operation backend
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Kernel::API::Operation::V1::Service::ServiceGet - API Service Get Operation back
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::Service::ServiceGet->new();
+by using Kernel::API::Operation::V1::ObjectIcon::ObjectIconGet->new();
 
 =cut
 
@@ -64,19 +64,19 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Service::ServiceGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ObjectIcon::ObjectIconGet');
 
     return $Self;
 }
 
 =item Run()
 
-perform ServiceGet Operation. This function is able to return
-one or more ticket entries in one call.
+perform ObjectIconGet Operation. This function is able to return
+one or more address entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ServiceID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            ObjectIconID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -85,7 +85,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            Service => [
+            ObjectIcon => [
                 {
                     ...
                 },
@@ -117,7 +117,7 @@ sub Run {
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
         Parameters => {
-            'ServiceID' => {
+            'ObjectIconID' => {
                 Type     => 'ARRAY',
                 DataType => 'NUMERIC',
                 Required => 1
@@ -133,78 +133,38 @@ sub Run {
         );
     }
 
-    my @ServiceList;
+    my @ObjectIconList;
 
     # start state loop
-    Service:    
-    foreach my $ServiceID ( @{$Param{Data}->{ServiceID}} ) {
+    State:    
+    foreach my $ObjectIconID ( @{$Param{Data}->{ObjectIconID}} ) {
 
-        # get the Service data
-        my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
-            ServiceID => $ServiceID,
-            IncidentState => $Param{Data}->{include}->{IncidentState} || 0,
-            UserID  => $Self->{Authorization}->{UserID},
+        # get the ObjectIcon data
+        my %ObjectIconData = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconGet(
+            ID => $ObjectIconID,             
         );
 
-        if ( !IsHashRefWithData( \%ServiceData ) ) {
+        if ( !IsHashRefWithData( \%ObjectIconData ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for ServiceID $ServiceID.",
+                Message => "No data found for ObjectIconID $ObjectIconID.",
             );
-        }
-        
-        my @ParentServiceParts = split(/::/, $ServiceData{Name});
-        
-        # include SubServices if requested
-        if ( $Param{Data}->{include}->{SubServices} ) {
-            my %SubServiceList = $Kernel::OM->Get('Kernel::System::Service')->GetAllSubServices(
-                ServiceID => $ServiceID,
-            );
-
-            # filter direct children
-            my @DirectSubServices;
-            foreach my $SubServiceID ( sort keys %SubServiceList ) {
-                my @ServiceParts = split(/::/, $SubServiceList{$SubServiceID});
-                next if scalar(@ServiceParts) > scalar(@ParentServiceParts)+1;
-                push(@DirectSubServices, $SubServiceID)
-            }
-
-            $ServiceData{SubServices} = \@DirectSubServices;
-        }
-
-        # move NameShort to Name and delete NameShort
-        $ServiceData{Name} = $ServiceData{NameShort};
-        delete $ServiceData{NameShort};
-
-        if ( !$ServiceData{ParentID} ) {
-            $ServiceData{ParentID} = undef;
-        }
-        
-        if ( $Param{Data}->{include}->{IncidentState} ){
-            # extract attributes to subhash
-            my %Tmphash;
-            for my $Key ( qw(CurInciStateID CurInciState CurInciStateType) ) {
-                $Tmphash{$Key} = $ServiceData{$Key};
-                delete $ServiceData{$Key};
-            }
-            $ServiceData{IncidentState} = \%Tmphash;
         }
         
         # add
-        push(@ServiceList, \%ServiceData);
+        push(@ObjectIconList, \%ObjectIconData);
     }
-
-    if ( scalar(@ServiceList) == 1 ) {
+  
+    if ( scalar(@ObjectIconList) == 1 ) {
         return $Self->_Success(
-            Service => $ServiceList[0],
+            ObjectIcon => $ObjectIconList[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        Service => \@ServiceList,
+        ObjectIcon => \@ObjectIconList,
     );
 }
-
 
 1;
