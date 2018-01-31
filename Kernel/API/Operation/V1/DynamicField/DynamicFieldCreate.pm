@@ -114,6 +114,11 @@ sub Run {
         );
     }
 
+    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => 'DynamicField::DisplayGroup',
+    );
+    my @DisplayGroupIDs = ( keys %{$GeneralCatalogItemList} );
+
     # prepare data
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
@@ -133,10 +138,7 @@ sub Run {
             },
             'DynamicField::DisplayGroupID' => {
                 RequiresValueIfUsed => 1,
-                OneOf    => [
-                    0,
-                    1
-                ]
+                OneOf => \@DisplayGroupIDs
             },
             'DynamicField::ObjectType' => {
                 Required => 1
