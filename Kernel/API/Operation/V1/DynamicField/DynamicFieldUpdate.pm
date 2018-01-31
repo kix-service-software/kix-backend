@@ -116,7 +116,10 @@ sub Run {
     my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
         Class => 'DynamicField::DisplayGroup',
     );
-    my @DisplayGroupIDs = ( keys %{$GeneralCatalogItemList} );
+    my @DisplayGroupIDs;
+    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
+       @DisplayGroupIDs = keys %{$GeneralCatalogItemList};
+    }
     
     # prepare data
     $Result = $Self->PrepareData(
