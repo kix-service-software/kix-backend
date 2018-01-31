@@ -74,12 +74,13 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
         Data => {
             DynamicFieldID => 123,
             DynamicField   => {
-	            Name       => '...',            # optional
-	            Label      => '...',            # optional
-                FieldType  => '...',            # optional
-                ObjectType => '...',            # optional
-                Config     => { }               # optional
-	            ValidID    => 1,                # optional
+	            Name            => '...',            # optional
+	            Label           => '...',            # optional
+                FieldType       => '...',            # optional
+                DisplayGroupID  => 123,              # optional
+                ObjectType      => '...',            # optional
+                Config          => { }               # optional
+	            ValidID         => 1,                # optional
             }
 	    },
 	);
@@ -111,7 +112,15 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-
+    
+    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => 'DynamicField::DisplayGroup',
+    );
+    my @DisplayGroupIDs;
+    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
+       @DisplayGroupIDs = keys %{$GeneralCatalogItemList};
+    }
+    
     # prepare data
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
@@ -123,7 +132,11 @@ sub Run {
                 Type => 'HASH',
                 Required => 1
             },
-        }        
+            'DynamicField::DisplayGroupID' => {
+                RequiresValueIfUsed => 1,
+                OneOf => \@DisplayGroupIDs
+            },
+        }
     );
 
     # check result
@@ -190,14 +203,15 @@ sub Run {
 
     # update DynamicField
     my $Success = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldUpdate(
-        ID         => $Param{Data}->{DynamicFieldID},
-        Name       => $DynamicField->{Name} || $DynamicFieldData->{Name},
-        Label      => $DynamicField->{Label} || $DynamicFieldData->{Label},
-        FieldType  => $DynamicField->{FieldType} || $DynamicFieldData->{FieldType},
-        ObjectType => $DynamicField->{ObjectType} || $DynamicFieldData->{ObjectType},
-        Config     => $DynamicField->{Config} || $DynamicFieldData->{Config},
-        ValidID    => $DynamicField->{ValidID} || $DynamicFieldData->{ValidID},
-        UserID     => $Self->{Authorization}->{UserID},
+        ID              => $Param{Data}->{DynamicFieldID},
+        Name            => $DynamicField->{Name} || $DynamicFieldData->{Name},
+        Label           => $DynamicField->{Label} || $DynamicFieldData->{Label},
+        FieldType       => $DynamicField->{FieldType} || $DynamicFieldData->{FieldType},
+        DisplayGroupID  => $DynamicField->{DisplayGroupID} || $DynamicFieldData->{DisplayGroupID},
+        ObjectType      => $DynamicField->{ObjectType} || $DynamicFieldData->{ObjectType},
+        Config          => $DynamicField->{Config} || $DynamicFieldData->{Config},
+        ValidID         => $DynamicField->{ValidID} || $DynamicFieldData->{ValidID},
+        UserID          => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -212,5 +226,4 @@ sub Run {
         DynamicFieldID => $Param{Data}->{DynamicFieldID},
     );    
 }
-
 

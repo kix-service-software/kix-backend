@@ -2002,6 +2002,8 @@
     <!-- this controls which object the dynamic field links to; currently we will have "ticket" and "article"; allow only lowercase letters -->
     <Column Name="object_type" Required="true" Type="VARCHAR" Size="200"/>
     <!-- config stored as YAML like in the web service configuration -->
+    <!-- the current object to link to (e. g. displaygroup ID) -->
+    <Column Name="displaygroup_id" Required="false" Type="BIGINT"/>
     <Column Name="config" Required="false" Type="LONGBLOB"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

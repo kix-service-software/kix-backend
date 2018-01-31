@@ -74,13 +74,14 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
         Data => {
             DynamicFieldID => 123,
             DynamicField   => {
-	            Name          => '...',            
-	            Label         => '...',            
-                FieldType     => '...',            
-                ObjectType    => '...',            
-                Config        => { }
-	            InternalField => 0|1,              # optional
-	            ValidID       => 1,                # optional
+	            Name            => '...',            
+	            Label           => '...',            
+                FieldType       => '...',            
+                DisplayGroupID  => 123,              
+                ObjectType      => '...',            
+                Config          => { }
+	            InternalField   => 0|1,              # optional
+	            ValidID         => 1,                # optional
             }
 	    },
 	);
@@ -113,6 +114,14 @@ sub Run {
         );
     }
 
+    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => 'DynamicField::DisplayGroup',
+    );
+    my @DisplayGroupIDs;
+    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
+       @DisplayGroupIDs = sort keys %{$GeneralCatalogItemList};
+    }
+
     # prepare data
     $Result = $Self->PrepareData(
         Data         => $Param{Data},
@@ -129,6 +138,10 @@ sub Run {
             },
             'DynamicField::FieldType' => {
                 Required => 1
+            },
+            'DynamicField::DisplayGroupID' => {
+                RequiresValueIfUsed => 1,
+                OneOf => \@DisplayGroupIDs
             },
             'DynamicField::ObjectType' => {
                 Required => 1
@@ -188,6 +201,7 @@ sub Run {
         Label           => $DynamicField->{Label},
         InternalField   => $DynamicField->{InternalField} || 0,
         FieldType       => $DynamicField->{FieldType},
+        DisplayGroupID  => $DynamicField->{DisplayGroupID},
         ObjectType      => $DynamicField->{ObjectType},
         Config          => $DynamicField->{Config},
         ValidID         => $DynamicField->{ValidID} || 1,
@@ -206,5 +220,4 @@ sub Run {
         DynamicFieldID => $ID,
     );    
 }
-
 
