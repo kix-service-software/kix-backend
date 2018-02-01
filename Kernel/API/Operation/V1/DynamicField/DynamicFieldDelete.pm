@@ -117,6 +117,17 @@ sub Run {
     DynamicField:    
     foreach my $DynamicFieldID ( @{$Param{Data}->{DynamicFieldID}} ) {
 
+        # check if df is writeable
+        my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+            ID   => $DynamicFieldID,
+        );    
+        if ( $DynamicFieldData->{InternalField} == 1 ) {
+            return $Self->_Error(
+                Code    => 'Forbidden',
+                Message => "Can not delete DynamicField. DynamicField with ID '$Param{Data}->{DynamicFieldID}' is internal and cannot be deleted.",
+            );        
+        }
+
         # check if there is an object with this dynamic field
         foreach my $ValueType ( qw(Integer DateTime Text) ) {
             my $ExistingValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
