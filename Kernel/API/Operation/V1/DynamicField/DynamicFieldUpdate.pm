@@ -193,6 +193,14 @@ sub Run {
         );
     }
 
+    # check if df is writeable
+    if ( $DynamicFieldData->{InternalField} == 1 ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not update DynamicField.  DynamicField with given $Param{Data}->{DynamicFieldID} is internal and cannot be changed.',
+        );        
+    }
+
     # if it's an internal field, it's name should not change
     if ( $DynamicField->{Name} && $DynamicFieldData->{InternalField} && $DynamicField->{Name} ne $DynamicFieldData->{Name} ) {
         return $Self->_Error(
