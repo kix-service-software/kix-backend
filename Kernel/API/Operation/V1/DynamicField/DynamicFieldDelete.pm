@@ -124,7 +124,7 @@ sub Run {
         if ( $DynamicFieldData->{InternalField} == 1 ) {
             return $Self->_Error(
                 Code    => 'Forbidden',
-                Message => 'Can not delete DynamicField.  DynamicField with given $DynamicFieldID is not writable or does not exist.',
+                Message => 'Can not delete DynamicField.  DynamicField with given $DynamicFieldID is internal and cannot be deleted.',
             );        
         }
 
