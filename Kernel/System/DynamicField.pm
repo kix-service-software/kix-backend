@@ -216,6 +216,7 @@ Returns:
         FieldType     => 'Text',
         ObjectType    => 'Article',
         Config        => $ConfigHashRef,
+        DisplayGroupID => 123,
         ValidID       => 1,
         CreateBy      => 1,
         CreateTime    => '2011-02-08 15:08:00',
@@ -286,7 +287,7 @@ sub DynamicFieldGet {
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
 
-        my $Config = $YAMLObject->Load( Data => $Data[6] );
+        my $Config = $YAMLObject->Load( Data => $Data[7] );
 
         %Data = (
             ID              => $Data[0],
