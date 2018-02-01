@@ -128,17 +128,6 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-    
-    # check if df is writeable
-    my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
-        ID   => $Param{Data}->{DynamicFieldID},
-    );    
-    if ( $DynamicFieldData->{InternalField} == 1 ) {
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'Can not update DynamicField.  DynamicField with given $Param{Data}->{DynamicFieldID} is internal and cannot be changed.',
-        );        
-    }
 
     # isolate DynamicFieldConfig parameter
     my $DynamicFieldConfig = $Param{Data}->{DynamicFieldConfig};
@@ -165,6 +154,14 @@ sub Run {
             Code    => 'Object.NotFound',
             Message => "Cannot update DynamicField config. No DynamicField with ID '$Param{Data}->{DynamicFieldID}' found.",
         );
+    }
+    
+    # check if df is writeable
+    if ( $DynamicFieldData->{InternalField} == 1 ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not update DynamicField.  DynamicField with given $Param{Data}->{DynamicFieldID} is internal and cannot be changed.',
+        );        
     }
 
     # update DynamicField
