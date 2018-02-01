@@ -4017,7 +4017,7 @@ TreeView: '0'
     </Insert>
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">18</Data>
-        <Data Key="internal_field">0</Data>
+        <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">TicketNotes</Data>
         <Data Key="label" Type="Quote">Notes</Data>
         <Data Key="field_order">17</Data>

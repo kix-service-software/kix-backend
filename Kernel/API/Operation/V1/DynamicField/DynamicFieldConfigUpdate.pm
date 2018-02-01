@@ -128,6 +128,17 @@ sub Run {
             Message => $Result->{Message},
         );
     }
+    
+    # check if df is writeable
+    my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+        ID   => $Param{Data}->{DynamicFieldID},
+    );    
+    if ( $DynamicFieldData->{InternalField} == 1 ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => 'Can not update DynamicField.  DynamicField with given $Param{Data}->{DynamicFieldID} is not writable or does not exist.',
+        );        
+    }
 
     # isolate DynamicFieldConfig parameter
     my $DynamicFieldConfig = $Param{Data}->{DynamicFieldConfig};
