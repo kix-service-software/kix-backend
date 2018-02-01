@@ -156,14 +156,6 @@ sub Run {
         );
     }
     
-    # check if df is writeable
-    if ( $DynamicFieldData->{InternalField} == 1 ) {
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => "Can not update DynamicField. DynamicField with ID '$Param{Data}->{DynamicFieldID}' is internal and cannot be changed.",
-        );        
-    }
-
     # update DynamicField
     my $Success = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldUpdate(
         ID         => $Param{Data}->{DynamicFieldID},
