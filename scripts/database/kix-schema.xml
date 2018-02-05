@@ -2763,17 +2763,6 @@
         <IndexColumn Name="language"/>
     </Index>
 </Table>
-<Table Name="kix_ticket_notes">
-    <Column Name="ticket_id"   Required="true"  Type="BIGINT"/>
-    <Column Name="note"        Required="false" Type="VARCHAR" Size="2000"/>
-    <Column Name="create_time" Required="true"  Type="DATE"/>
-    <Column Name="create_by"   Required="true"  Type="INTEGER"/>
-    <Column Name="change_time" Required="true"  Type="DATE"/>
-    <Column Name="change_by"   Required="true"  Type="INTEGER"/>
-    <ForeignKey ForeignTable="ticket">
-        <Reference Local="ticket_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
 <Table Name="kix_ticket_template">
     <Column Name="id"          Required="true" Type="INTEGER"  PrimaryKey="true" AutoIncrement="true"/>
     <Column Name="name"        Required="true" Type="VARCHAR" Size="150"/>
