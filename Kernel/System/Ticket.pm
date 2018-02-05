@@ -645,12 +645,6 @@ sub TicketDelete {
         Bind => [ \$Param{TicketID} ],
     );
 
-    # KIX4OTRS
-    # delete ticket notes...
-    return if !$Self->TicketNotesDelete(%Param);
-
-    # EO KIX4OTRS
-
     # delete ticket flags
     return if !$DBObject->Do(
         SQL  => 'DELETE FROM ticket_flag WHERE ticket_id = ?',

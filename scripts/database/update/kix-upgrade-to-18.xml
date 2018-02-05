@@ -649,4 +649,8 @@ Xp+39Q2/Pv8fMKT3adZ3BfMAAAAASUVORK5CYII=
         <Data Key="change_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
     </Insert>
+    
+    <TableDrop Name="kix_ticket_notes"/>
+    
 </database>
+
