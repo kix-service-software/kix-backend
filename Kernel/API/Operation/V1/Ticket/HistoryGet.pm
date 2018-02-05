@@ -60,6 +60,17 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    # Get mapping of history types to readable strings
+    my %HistoryTypes;
+    my %HistoryTypeConfig = %{ $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::HistoryTypes') // {} };
+    foreach my $Entry ( sort keys %HistoryTypeConfig ) {
+        %HistoryTypes = (
+            %HistoryTypes,
+            %{ $HistoryTypeConfig{$Entry} },
+        );
+    }
+    $Self->{HistoryTypes} = \%HistoryTypes;
+
     return $Self;
 }
 
@@ -171,8 +182,24 @@ sub Run {
     # start item loop
     HISTORY:
     for my $HistoryID ( sort @{$Param{Data}->{HistoryID}} ) {
+
+        my $HistoryItem = $HistoryHash{$HistoryID};
+
+        # replace text if needed
+        if ( $HistoryItem->{Name} && $HistoryItem->{Name} =~ m/^%%/x ) {
+            $HistoryItem->{Name} =~ s/^%%//xg;
+            my @Values = split( /%%/x, $HistoryItem->{Name} );
+            $HistoryItem->{Name} = $Kernel::OM->Get('Kernel::Language')->Translate(
+                $Self->{HistoryTypes}->{ $HistoryItem->{HistoryType} },
+                @Values,
+            );
+
+            # remove not needed place holder
+            $HistoryItem->{Name} =~ s/\%s//xg;
+        }
+
         # add
-        push(@HistoryItemList, $HistoryHash{$HistoryID});
+        push(@HistoryItemList, $HistoryItem);
     }
 
     if ( scalar(@HistoryItemList) == 1 ) {
