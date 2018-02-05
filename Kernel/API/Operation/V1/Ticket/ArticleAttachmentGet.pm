@@ -172,8 +172,15 @@ sub Run {
             UserID             => $Self->{Authorization}->{UserID},
         );
 
+        # add ID to result
+        $Attachment{ID} = $AttachmentID;
+
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $Attachment{Content};
+        }
+        else {
+            # encode content base64
+            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content} ),
         }
 
         # add
