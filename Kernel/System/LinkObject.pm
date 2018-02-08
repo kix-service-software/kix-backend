@@ -1395,7 +1395,10 @@ sub LinkSearch {
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    my $SQL = 'SELECT id FROM link_relation WHERE '.join(' AND ', @SQLWhere);
+    my $SQL = 'SELECT id FROM link_relation';
+    if ( @SQLWhere ) {
+        $SQL .= 'WHERE '.join(' AND ', @SQLWhere);
+    }
 
     # get links where the given object is the source
     return if !$DBObject->Prepare(

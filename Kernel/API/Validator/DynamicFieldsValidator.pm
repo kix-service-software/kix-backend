@@ -114,11 +114,9 @@ sub Validate {
                     $Found = 0;
                     last DYNAMICFIELD;    
                 }
-                foreach my $Needed ( qw(Name Value) ) {
-                    if ( !$DynamicField->{$Needed} ) {
-                        $Found = 0;
-                        last DYNAMICFIELD;
-                    }
+                if ( !$DynamicField->{Name} || !exists($DynamicField->{Value}) ) {
+                    $Found = 0;
+                    last DYNAMICFIELD;
                 }
             }
         }

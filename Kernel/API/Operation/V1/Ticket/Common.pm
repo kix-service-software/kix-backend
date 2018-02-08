@@ -470,7 +470,7 @@ sub SetDynamicFieldValue {
     }
 
     # check value structure
-    if ( !IsString( $Param{Value} ) && ref $Param{Value} ne 'ARRAY' ) {
+    if ( !IsString( $Param{Value} ) && ref $Param{Value} ne 'ARRAY' && Value ne undef ) {
         return $Self->_Error(
             Code    => 'Operation.InternalError',
             Message => "SetDynamicFieldValue() Invalid value for Value, just string and array is allowed!"
