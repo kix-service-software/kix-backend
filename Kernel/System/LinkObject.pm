@@ -1397,7 +1397,7 @@ sub LinkSearch {
 
     my $SQL = 'SELECT id FROM link_relation';
     if ( @SQLWhere ) {
-        $SQL .= 'WHERE '.join(' AND ', @SQLWhere);
+        $SQL .= ' WHERE '.join(' AND ', @SQLWhere);
     }
 
     # get links where the given object is the source
