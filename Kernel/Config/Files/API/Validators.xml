@@ -173,7 +173,7 @@
                 <Item Key="Module">SenderTypeValidator</Item>
                 <Item Key="Validates">SenderType,SenderTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(SenderTypeGet|SenderTypeSearch)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

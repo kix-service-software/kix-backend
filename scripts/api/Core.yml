@@ -1372,6 +1372,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::ObjectIcon::ObjectIconDelete
+    V1::SenderType::SenderTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SenderType::SenderTypeGet
+    V1::SenderType::SenderTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SenderType::SenderTypeSearch
 
   Transport:
     Config:
@@ -2158,6 +2172,14 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /objecticons/:ObjectIconID
+        V1::SenderType::SenderTypeGet:
+          RequestMethod:
+          - GET
+          Route: /sendertypes/:SenderTypeID
+        V1::SenderType::SenderTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /sendertypes
 
     Type: HTTP::REST
 RemoteSystem: ''

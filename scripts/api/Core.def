@@ -194,3 +194,5 @@
 /objecticons/:ObjectIconID                                              |   PATCH           | V1::ObjectIcon::ObjectIconUpdate
 /objecticons/:ObjectIconID                                              |   GET             | V1::ObjectIcon::ObjectIconGet
 /objecticons/:ObjectIconID                                              |   DELETE          | V1::ObjectIcon::ObjectIconDelete
+/sendertypes/:SenderTypeID                                              |   GET             | V1::SenderType::SenderTypeGet
+/sendertypes                                                            |   GET             | V1::SenderType::SenderTypeSearch
