@@ -135,8 +135,8 @@ sub Run {
 
     my @SenderTypeList;
 
-    # start state loop
-    State:    
+    # start SenderType loop
+    SenderType:    
     foreach my $SenderTypeID ( @{$Param{Data}->{SenderTypeID}} ) {
 
         # get the SenderType data
@@ -153,9 +153,8 @@ sub Run {
        
         my %SenderType;
         
-        $SenderType{ID} = $SenderTypeID;
+        $SenderType{ID}   = $SenderTypeID;
         $SenderType{Name} = $SenderTypeName;
-
         
         # add
         push(@SenderTypeList, \%SenderType);
