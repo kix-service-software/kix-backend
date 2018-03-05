@@ -116,7 +116,6 @@ sub Run {
     # perform SenderType search
     my %SenderTypeList = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeList(
         Result => 'HASH',
-#        Type   => 'Customer', # optional to get only customer viewable sender types
     );
 
 	# get already prepared SenderType data from SenderTypeGet operation
