@@ -247,5 +247,29 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleFlagGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">ArticleFlagID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleFlagSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>
     
