@@ -35,6 +35,8 @@
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID        |   DELETE          | V1::Ticket::ArticleAttachmentDelete
 /tickets/:TicketID/history                                              |   GET             | V1::Ticket::HistorySearch
 /tickets/:TicketID/history/:HistoryID                                   |   GET             | V1::Ticket::HistoryGet
+/tickets/:TicketID/articles/:ArticleID/flags/:ArticleFlag               |   GET             | V1::Ticket::ArticleFlagGet
+/tickets/:TicketID/articles/:ArticleID/flags                            |   GET             | V1::Ticket::ArticleFlagSearch
 /ticketstates                                                           |   GET             | V1::TicketState::TicketStateSearch
 /ticketstates                                                           |   POST            | V1::TicketState::TicketStateCreate
 /ticketstates/:StateID                                                  |   GET             | V1::TicketState::TicketStateGet
@@ -196,3 +198,4 @@
 /objecticons/:ObjectIconID                                              |   DELETE          | V1::ObjectIcon::ObjectIconDelete
 /sendertypes/:SenderTypeID                                              |   GET             | V1::SenderType::SenderTypeGet
 /sendertypes                                                            |   GET             | V1::SenderType::SenderTypeSearch
+
