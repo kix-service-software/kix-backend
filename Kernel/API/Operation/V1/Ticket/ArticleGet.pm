@@ -263,7 +263,7 @@ sub Run {
         }
 
         # add flags array into 'Flags' hash key if included
-        if ( $Param{Data}->{include}->{Flags} ) {
+        if ( $Param{Data}->{include}->{Flags} || $Param{Data}->{include}->{'Article.Flags'} ) {
             my %ArticleFlags = $TicketObject->ArticleFlagGet(
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
