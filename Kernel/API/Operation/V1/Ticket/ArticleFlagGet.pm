@@ -70,11 +70,9 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '1',                                           # required 
-            ArticleID            => '32',                                          # required, could be coma separated IDs or an Array
-            AttachmentID         => ':1',                                          # required, could be coma separated IDs or an Array
-            include              => '...',                                         # Optional, 0 as default. Include additional objects
-                                                                                   # (supported: Content)
+            TicketID     => 1'                                             # required 
+            ArticleID    => 32,                                            # required
+            ArticleFlag  => 'seen',                                        # required, could be coma separated IDs or an Array
         },
     );
 
@@ -83,15 +81,11 @@ one or more ticket entries in one call.
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
         Data         => {
-            Attachment => [
+            ArticleFlag => [
                 {
-                    AttachmentID      => 123
-                    ContentAlternative => "",
-                    ContentID          => "",
-                    ContentType        => "application/pdf",
-                    Filename           => "StdAttachment-Test1.pdf",
-                    Filesize           => "4.6 KBytes",
-                    FilesizeRaw        => 4722,
+                    ArticleID  => 32,
+                    Name       => 'seen',
+                    Value      => '...',
                 },
                 {
                     #. . .
@@ -127,9 +121,8 @@ sub Run {
             'ArticleID' => {
                 Required => 1
             },
-            'AttachmentID' => {
+            'ArticleFlag' => {
                 Type     => 'ARRAY',
-                DataType => 'NUMERIC',
                 Required => 1
             },
         }
@@ -160,41 +153,34 @@ sub Run {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    my @AttachmentList;
+    my @FlagList;
 
-    # start attachment loop
-    ATTACHMENT:
-    foreach my $AttachmentID ( sort @{$Param{Data}->{AttachmentID}} ) {
-        
-        my %Attachment = $TicketObject->ArticleFlag(
-            ArticleID          => $Param{Data}->{ArticleID},
-            FileID             => $AttachmentID,
-            UserID             => $Self->{Authorization}->{UserID},
+    my %ArticleFlags = $TicketObject->ArticleFlagGet(
+        ArticleID => $Param{Data}->{ArticleID},
+        UserID    => $Self->{Authorization}->{UserID},
+    );
+
+    # start flag loop
+    FLAG:
+    foreach my $ArticleFlag ( sort @{$Param{Data}->{ArticleFlag}} ) {
+        my %Flag = (
+            ArticleID => $Param{Data}->{ArticleID},
+            Name      => $ArticleFlag,
+            Value     => $ArticleFlags{$ArticleFlag},
         );
 
-        # add ID to result
-        $Attachment{ID} = $AttachmentID;
-
-        if ( !$Param{Data}->{include}->{Content} ) {
-            delete $Attachment{Content};
-        }
-        else {
-            # encode content base64
-            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content} ),
-        }
-
         # add
-        push(@AttachmentList, \%Attachment);
+        push(@FlagList, \%Flag);
     }
 
-    if ( scalar(@AttachmentList) == 1 ) {
+    if ( scalar(@FlagList) == 1 ) {
         return $Self->_Success(
-            Attachment => $AttachmentList[0],
+            ArticleFlag => $FlagList[0],
         );    
     }
 
     return $Self->_Success(
-        Attachment => \@AttachmentList,
+        ArticleFlag => \@FlagList,
     );
 }
 

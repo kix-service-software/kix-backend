@@ -259,6 +259,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::HistoryGet
+    V1::Ticket::ArticleFlagGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleFlagGet
+    V1::Ticket::ArticleFlagSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleFlagSearch
     V1::TicketState::TicketStateSearch:
         Description: ''
         MappingInbound:
@@ -1536,6 +1550,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /tickets/:TicketID/history/:HistoryID
+        V1::Ticket::ArticleFlagGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles/:ArticleID/flags/:ArticleFlag
+        V1::Ticket::ArticleFlagSearch:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles/:ArticleID/flags
         V1::TicketState::TicketStateSearch:
           RequestMethod:
           - GET

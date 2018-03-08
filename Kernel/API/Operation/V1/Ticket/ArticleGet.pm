@@ -261,6 +261,16 @@ sub Run {
         if ( $Param{Data}->{include}->{DynamicFields} ) {
             $ArticleData{DynamicFields} = \@DynamicFields;
         }
+
+        # add flags array into 'Flags' hash key if included
+        if ( $Param{Data}->{include}->{Flags} ) {
+            my %ArticleFlags = $TicketObject->ArticleFlagGet(
+                ArticleID => $ArticleID,
+                UserID    => $Self->{Authorization}->{UserID},
+            );
+
+            $ArticleData{Flags} = [ sort keys %ArticleFlags ];
+        }
             
         # add
         push(@ArticleList, \%ArticleData);

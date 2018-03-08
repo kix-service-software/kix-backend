@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/ArticleAttachmentSearch.pm - API User Search operation backend
+# Kernel/API/Operation/User/ArticleFlagSearch.pm - API User Search operation backend
 # based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -9,7 +9,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Ticket::ArticleAttachmentSearch;
+package Kernel::API::Operation::V1::Ticket::ArticleFlagSearch;
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::Ticket::ArticleAttachmentSearch - API Ticket Article Attachment Search Operation backend
+Kernel::API::Operation::Ticket::ArticleFlagSearch - API Ticket Article Flag Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,18 +62,20 @@ sub new {
 
 =item Run()
 
-perform ArticleAttachmentSearch Operation. This will return a article attachment list.
+perform ArticleFlagSearch Operation. This will return a article attachment list.
 
     my $Result = $OperationObject->Run(
         Data => {
+            TicketID  => 1'                                             # required 
+            ArticleID => 32,                                            # required            
         }
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
-        Message => '',                               # In case of an error
+        Message => '',                                    # In case of an error
         Data         => {
-            Attachment => [
+            ArticleFlag => [
                 {
                 },
                 {
@@ -136,58 +138,38 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    my %Article = $TicketObject->ArticleGet(
-        ArticleID  => $Param{Data}->{ArticleID},
-        UserID     => $Self->{Authorization}->{UserID},
+    my %ArticleFlags = $TicketObject->ArticleFlagGet(
+        ArticleID => $Param{Data}->{ArticleID},
+        UserID    => $Self->{Authorization}->{UserID},
     );
 
-    # restrict article sender types
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' && $Article{ArticleSenderType} ne 'customer') {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access article $Param{Data}->{ArticleID}.",
-        );
-    }    
+    if ( %ArticleFlags ) {
 
-    # By default does not include HTML body as attachment (3) unless is explicitly requested (2).
-    my $StripPlainBodyAsAttachment = $Param{Data}->{HTMLBodyAsAttachment} ? 2 : 3;
-
-    my %AttachmentIndex = $TicketObject->ArticleAttachmentIndex(
-        ContentPath                => $Article{ContentPath},
-        ArticleID                  => $Param{Data}->{ArticleID},
-        StripPlainBodyAsAttachment => $StripPlainBodyAsAttachment,
-        UserID                     => $Self->{Authorization}->{UserID},
-    );
-
-    if ( %AttachmentIndex ) {
-
-        # get already prepared Article data from ArticleGet operation
-        my $AttachmentGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Ticket::ArticleAttachmentGet',
+        # get already prepared ArticleFlag data from ArticleFlagGet operation
+        my $FlagGetResult = $Self->ExecOperation(
+            OperationType => 'V1::Ticket::ArticleFlagGet',
             Data          => {
                 TicketID     => $Param{Data}->{TicketID},
                 ArticleID    => $Param{Data}->{ArticleID},
-                AttachmentID => join(',', keys %AttachmentIndex),
-                include      => $Param{Data}->{include},
-                expand       => $Param{Data}->{expand},
+                ArticleFlag  => join(',', keys %ArticleFlags),
             }
         );
-        if ( !IsHashRefWithData($AttachmentGetResult) || !$AttachmentGetResult->{Success} ) {
-            return $AttachmentGetResult;
+        if ( !IsHashRefWithData($FlagGetResult) || !$FlagGetResult->{Success} ) {
+            return $FlagGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($AttachmentGetResult->{Data}->{Attachment}) ? @{$AttachmentGetResult->{Data}->{Attachment}} : ( $AttachmentGetResult->{Data}->{Attachment} );
+        my @ResultList = IsArrayRefWithData($FlagGetResult->{Data}->{ArticleFlag}) ? @{$FlagGetResult->{Data}->{ArticleFlag}} : ( $FlagGetResult->{Data}->{ArticleFlag} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Attachment => \@ResultList,
+                ArticleFlag => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        Attachment => [],
+        ArticleFlag => [],
     );
 }
 

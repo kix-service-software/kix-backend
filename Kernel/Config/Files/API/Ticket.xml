@@ -193,6 +193,30 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleFlagGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">ArticleFlag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleFlagSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem Name="API::Operation::Module###V1::Ticket::HistoryGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
@@ -227,16 +251,6 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Article.Attachments" Required="0" Valid="1">
-        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Operation">V1::Ticket::ArticleAttachmentGet</Item>
-                <Item Key="AddParams">TicketID,ArticleID</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
     <ConfigItem Name="API::Operation::GenericExpand###Ticket.History" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
@@ -247,26 +261,22 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagGet" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
+    <ConfigItem Name="API::Operation::GenericExpand###Article.Attachments" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">ArticleFlagGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">ArticleFlagID</Item>
+                <Item Key="Operation">V1::Ticket::ArticleAttachmentGet</Item>
+                <Item Key="AddParams">TicketID,ArticleID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
+
+    <ConfigItem Name="API::Operation::GenericExpand###Article.Flags" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">ArticleFlagSearch</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Operation">V1::Ticket::ArticleFlagGet</Item>
+                <Item Key="AddParams">TicketID,ArticleID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
