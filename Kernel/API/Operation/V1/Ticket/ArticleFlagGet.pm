@@ -72,7 +72,7 @@ one or more ticket entries in one call.
         Data => {
             TicketID     => 1'                                             # required 
             ArticleID    => 32,                                            # required
-            ArticleFlag  => 'seen',                                        # required, could be coma separated IDs or an Array
+            FlagName     => 'seen',                                        # required, could be coma separated IDs or an Array
         },
     );
 
@@ -121,7 +121,7 @@ sub Run {
             'ArticleID' => {
                 Required => 1
             },
-            'ArticleFlag' => {
+            'FlagName' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -162,7 +162,7 @@ sub Run {
 
     # start flag loop
     FLAG:
-    foreach my $ArticleFlag ( sort @{$Param{Data}->{ArticleFlag}} ) {
+    foreach my $ArticleFlag ( sort @{$Param{Data}->{FlagName}} ) {
         my %Flag = (
             ArticleID => $Param{Data}->{ArticleID},
             Name      => $ArticleFlag,
