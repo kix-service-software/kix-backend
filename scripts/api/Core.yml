@@ -266,6 +266,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleFlagUpdate
+    V1::Ticket::ArticleFlagCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleFlagCreate
     V1::TicketState::TicketStateSearch:
         Description: ''
         MappingInbound:
@@ -1547,6 +1554,10 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /tickets/:TicketID/articles/:ArticleID/flags/:FlagName
+        V1::Ticket::ArticleFlagCreate:
+          RequestMethod:
+          - POST
+          Route: /tickets/:TicketID/articles/:ArticleID/flags
         V1::TicketState::TicketStateSearch:
           RequestMethod:
           - GET

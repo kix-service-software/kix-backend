@@ -36,6 +36,7 @@
 /tickets/:TicketID/articles/:ArticleID/flags/:FlagName                  |   GET             | V1::Ticket::ArticleFlagGet
 /tickets/:TicketID/articles/:ArticleID/flags                            |   GET             | V1::Ticket::ArticleFlagSearch
 /tickets/:TicketID/articles/:ArticleID/flags/:FlagName                  |   PATCH           | V1::Ticket::ArticleFlagUpdate
+/tickets/:TicketID/articles/:ArticleID/flags                            |   POST            | V1::Ticket::ArticleFlagCreate
 /ticketstates                                                           |   GET             | V1::TicketState::TicketStateSearch
 /ticketstates                                                           |   POST            | V1::TicketState::TicketStateCreate
 /ticketstates/:StateID                                                  |   GET             | V1::TicketState::TicketStateGet
