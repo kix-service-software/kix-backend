@@ -231,20 +231,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleAttachmentGet
-    V1::Ticket::ArticleAttachmentUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentUpdate
-    V1::Ticket::ArticleAttachmentDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ArticleAttachmentDelete
     V1::Ticket::HistorySearch:
         Description: ''
         MappingInbound:
@@ -273,6 +259,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleFlagSearch
+    V1::Ticket::ArticleFlagUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleFlagUpdate
     V1::TicketState::TicketStateSearch:
         Description: ''
         MappingInbound:
@@ -1534,14 +1527,6 @@ Provider:
           RequestMethod:
           - GET
           Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
-        V1::Ticket::ArticleAttachmentUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
-        V1::Ticket::ArticleAttachmentDelete:
-          RequestMethod:
-          - DELETE
-          Route: /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID
         V1::Ticket::HistorySearch:
           RequestMethod:
           - GET
@@ -1553,11 +1538,15 @@ Provider:
         V1::Ticket::ArticleFlagGet:
           RequestMethod:
           - GET
-          Route: /tickets/:TicketID/articles/:ArticleID/flags/:ArticleFlag
+          Route: /tickets/:TicketID/articles/:ArticleID/flags/:FlagName
         V1::Ticket::ArticleFlagSearch:
           RequestMethod:
           - GET
           Route: /tickets/:TicketID/articles/:ArticleID/flags
+        V1::Ticket::ArticleFlagUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /tickets/:TicketID/articles/:ArticleID/flags/:FlagName
         V1::TicketState::TicketStateSearch:
           RequestMethod:
           - GET

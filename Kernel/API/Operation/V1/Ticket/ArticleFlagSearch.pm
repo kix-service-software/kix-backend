@@ -149,9 +149,9 @@ sub Run {
         my $FlagGetResult = $Self->ExecOperation(
             OperationType => 'V1::Ticket::ArticleFlagGet',
             Data          => {
-                TicketID     => $Param{Data}->{TicketID},
-                ArticleID    => $Param{Data}->{ArticleID},
-                ArticleFlag  => join(',', keys %ArticleFlags),
+                TicketID  => $Param{Data}->{TicketID},
+                ArticleID => $Param{Data}->{ArticleID},
+                FlagName  => join(',', keys %ArticleFlags),
             }
         );
         if ( !IsHashRefWithData($FlagGetResult) || !$FlagGetResult->{Success} ) {

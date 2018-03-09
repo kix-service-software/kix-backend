@@ -31,12 +31,11 @@
 /tickets/:TicketID/articles/:ArticleID/attachments                      |   GET             | V1::Ticket::ArticleAttachmentSearch
 /tickets/:TicketID/articles/:ArticleID/attachments                      |   POST            | V1::Ticket::ArticleAttachmentCreate
 /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID        |   GET             | V1::Ticket::ArticleAttachmentGet
-/tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID        |   PATCH           | V1::Ticket::ArticleAttachmentUpdate
-/tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID        |   DELETE          | V1::Ticket::ArticleAttachmentDelete
 /tickets/:TicketID/history                                              |   GET             | V1::Ticket::HistorySearch
 /tickets/:TicketID/history/:HistoryID                                   |   GET             | V1::Ticket::HistoryGet
-/tickets/:TicketID/articles/:ArticleID/flags/:ArticleFlag               |   GET             | V1::Ticket::ArticleFlagGet
+/tickets/:TicketID/articles/:ArticleID/flags/:FlagName                  |   GET             | V1::Ticket::ArticleFlagGet
 /tickets/:TicketID/articles/:ArticleID/flags                            |   GET             | V1::Ticket::ArticleFlagSearch
+/tickets/:TicketID/articles/:ArticleID/flags/:FlagName                  |   PATCH           | V1::Ticket::ArticleFlagUpdate
 /ticketstates                                                           |   GET             | V1::TicketState::TicketStateSearch
 /ticketstates                                                           |   POST            | V1::TicketState::TicketStateCreate
 /ticketstates/:StateID                                                  |   GET             | V1::TicketState::TicketStateGet
