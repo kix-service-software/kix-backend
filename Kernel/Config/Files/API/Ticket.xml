@@ -201,7 +201,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">ArticleFlag</Item>
+                <Item Key="ObjectID">FlagName</Item>
             </Hash>
         </Setting>
     </ConfigItem>
