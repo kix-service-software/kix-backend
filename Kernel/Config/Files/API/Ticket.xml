@@ -147,25 +147,25 @@
     <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryType" Required="1" Valid="1">
         <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
         <Setting>
-            <String Regex="">NewTicket</String>
+            <String Regex="">AddNote</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryComment" Required="1" Valid="1">
         <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
         <Setting>
-            <String Regex="">%%API Create</String>
+            <String Regex="">%%</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::V1::ArticleCreate###ArticleType" Required="1" Valid="1">
         <Description Translatable="1">Defines the default type of the article for this operation.</Description>
         <Setting>
-            <String Regex="">webrequest</String>
+            <String Regex="">note-internal</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::V1::ArticleCreate###AutoResponseType" Required="1" Valid="1">
         <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
         <Setting>
-            <String Regex="">auto reply</String>
+            <String Regex=""></String>
         </Setting>
     </ConfigItem>
 
