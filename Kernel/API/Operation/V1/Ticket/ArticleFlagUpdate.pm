@@ -163,7 +163,7 @@ sub Run {
         UserID    => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$ArticleFlags{$Param{Data}->{FlagName}} ) {
+    if ( !exists($ArticleFlags{$Param{Data}->{FlagName}}) ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
             Message => "Cannot update article flag. No flag with name '$Param{Data}->{FlagName}' found for the given article.",
