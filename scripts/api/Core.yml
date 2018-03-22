@@ -273,6 +273,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleFlagCreate
+    V1::Ticket::ArticleAttachmentZipGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::ArticleAttachmentZipGet
     V1::TicketState::TicketStateSearch:
         Description: ''
         MappingInbound:
@@ -1558,6 +1565,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /tickets/:TicketID/articles/:ArticleID/flags
+        V1::Ticket::ArticleAttachmentZipGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/articles/:ArticleID/attachments/zip
         V1::TicketState::TicketStateSearch:
           RequestMethod:
           - GET
