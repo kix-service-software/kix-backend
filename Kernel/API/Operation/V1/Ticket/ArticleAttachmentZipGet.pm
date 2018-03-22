@@ -29,7 +29,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::ArticleAttachmentGet - API Ticket Get Operation backend
+Kernel::API::Operation::V1::Ticket::ArticleAttachmentZipGet - API Ticket attachment zip Operation backend
 
 =head1 SYNOPSIS
 
@@ -220,7 +220,7 @@ sub Run {
 	# output all attachmentfiles
     return $Self->_Success(
         Filename    => $ZipFilename,
-        ContentType => 'application/unknown',
+        ContentType => 'application/zip',
         Content     => MIME::Base64::encode_base64($ZipResult),
         Type        => 'attachment',
     );
