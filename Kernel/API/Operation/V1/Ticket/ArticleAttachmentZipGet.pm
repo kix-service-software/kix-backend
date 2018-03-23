@@ -75,7 +75,7 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             TicketID             => '1',                                           # required 
-            ArticleID            => '32',                                          # required, could be coma separated IDs or an Array
+            ArticleID            => '32',                                          # required
         },
     );
 
@@ -86,10 +86,10 @@ one or more ticket entries in one call.
         Data         => {
             Attachment => [
                 {
-                    Content => "",
-                    ContentType        => "application/unknown",
-                    Filename           => "Ticket_2017090510000095_Article_82.zip",
-                    Type		       => "attachment",
+                    Content     => "...",                 # base64 encoded
+                    ContentType => "application/zip",
+                    Filename    => "Ticket_2017090510000095_Article_82.zip",
+                    Type	    => "attachment",
                 },
             ],
         },
@@ -166,20 +166,36 @@ sub Run {
         DynamicFields => 0,
     );
 
+    # check if article exists
+    if ( !%Article ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+        );
+    }
+
+    # check if article belongs to the given ticket
+    if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+        );
+    }
+
+    # restrict article sender types
+    if ( $Self->{Authorization}->{UserType} eq 'Customer' && $Article{ArticleSenderType} ne 'customer') {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to access article $Param{Data}->{ArticleID}.",
+        );
+    }
+
     # get all attachments from article
     my %ArticleAttachments = $TicketObject->ArticleAttachmentIndex(
         ArticleID                  => $Param{Data}->{ArticleID},
-        UserID                     => 1,
-        Article                    => \%Article,
+        UserID                     => $Self->{Authorization}->{UserID},,
         StripPlainBodyAsAttachment => 1,
     );
-
-    if ( !%ArticleAttachments ) {
-        return $Self->_Error(
-        	Code    => 'Object.UnableToCreate',
-            Message  => "No attachments given for this article",
-        );
-    }
 
     #search attachments
     for my $AttachmentNr ( keys %ArticleAttachments ) {
@@ -198,8 +214,8 @@ sub Run {
 
             if ( !$ZipObject ) {
 		        return $Self->_Error(
-		        	Code    => 'Object.UnableToCreate',
-		            Message  => "Unable to create Zip object.",
+		        	Code    => 'Operation.InternalError',
+		            Message => 'Unable to create Zip object.',
 		        );
             }
 
@@ -217,12 +233,14 @@ sub Run {
         $ZipObject->close();
     }
     
-	# output all attachmentfiles
+	# output zipped attachments
     return $Self->_Success(
-        Filename    => $ZipFilename,
-        ContentType => 'application/zip',
-        Content     => MIME::Base64::encode_base64($ZipResult),
-        Type        => 'attachment',
+        Attachment => {
+            Filename    => $ZipFilename,
+            ContentType => 'application/zip',
+            Content     => MIME::Base64::encode_base64($ZipResult),
+            Type        => 'attachment',
+        }
     );
 }
 
