@@ -214,6 +214,14 @@ sub Run {
             UserID             => $Self->{Authorization}->{UserID},
         );
         
+        # check if article exists
+        if ( !%Article ) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            );
+        }
+        
 	    # check if article belongs to the given ticket
 	    if ( $ArticleRaw{TicketID} != $Param{Data}->{TicketID} ) {
 	        return $Self->_Error(
