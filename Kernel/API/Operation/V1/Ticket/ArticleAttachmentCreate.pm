@@ -183,7 +183,15 @@ sub Run {
             Message => "Article $Param{Data}->{ArticleID} not found!",
         );
     }
-
+    
+    # check if article belongs to the given ticket
+    if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+        );
+    }
+    
     # check attachment values
     my $AttachmentCheck = $Self->_CheckAttachment( 
         Attachment => $Param{Data}->{Attachment} 

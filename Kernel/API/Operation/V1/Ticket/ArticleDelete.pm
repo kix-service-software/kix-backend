@@ -139,6 +139,30 @@ sub Run {
         );
     }
 
+    # get ticket object
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    my %Article = $TicketObject->ArticleGet(
+        ArticleID     => $Param{Data}->{ArticleID},
+        DynamicFields => 0,
+    );
+
+    # check if article exists
+    if ( !%Article ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+        );
+    }
+
+    # check if article belongs to the given ticket
+    if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+        );
+    }
+
     my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleDelete(
         ArticleID => $Param{Data}->{ArticleID},
         UserID    => $Self->{Authorization}->{UserID},
