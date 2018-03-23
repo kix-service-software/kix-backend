@@ -232,15 +232,31 @@ sub Run {
     if ($ZipObject) {
         $ZipObject->close();
     }
+
+    my %Attachment = (
+        Filename    => $ZipFilename,
+        ContentType => 'application/zip',
+        FilesizeRaw => length $ZipResult,
+    );
+
+    if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
+        $Attachment{Filesize} = sprintf "%.1f MBytes", ( $Attachment{FilesizeRaw} / ( 1024 * 1024 ) );
+    }
+    elsif ( $Attachment{FilesizeRaw} > 1024 ) {
+        $Attachment{Filesize} = sprintf "%.1f KBytes", ( ( $Attachment{FilesizeRaw} / 1024 ) );
+    }
+    else {
+        $Attachment{Filesize} = $Attachment{FilesizeRaw} . ' Bytes';
+    }
+
+
+    if ( $Param{Data}->{include}->{Content} ) {
+        $Attachment{Content} = MIME::Base64::encode_base64($ZipResult),
+    }
     
 	# output zipped attachments
     return $Self->_Success(
-        Attachment => {
-            Filename    => $ZipFilename,
-            ContentType => 'application/zip',
-            Content     => MIME::Base64::encode_base64($ZipResult),
-            Type        => 'attachment',
-        }
+        Attachment => \%Attachment
     );
 }
 
