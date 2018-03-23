@@ -101,13 +101,11 @@ sub Validate {
         );
     }
 
-    my $Valid;
+    my $FailedMail = '';
     if ( $Param{Attribute} =~ /^(From|Cc|Bcc|To)$/g ) {
-        $Valid = 0;
         for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
-            $Valid = 1;
             if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
-                $Valid = 0;
+                $FailedMail = $Email->address();
                 last;
             }
         }
@@ -119,14 +117,14 @@ sub Validate {
         );
     }
 
-    if ( !$Valid ) {
+    if ( $FailedMail ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
-        );        
+            Message => "Validation of attribute $Param{Attribute} failed ($FailedMail)!",
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;
