@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="article">
+        <ColumnAdd Name="a_bcc" Required="false" Size="3800" Type="VARCHAR"/>    
+    </TableAlter>
     <Table Name="object_icon">
         <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
         <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
