@@ -46,6 +46,7 @@ create an article
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
         Cc               => 'Some Customer B <customer-b@example.com>', # not required but useful
+        Bcc				 => 'Some Customer C <customer-b@example.com>', # not required but useful
         ReplyTo          => 'Some Customer B <customer-b@example.com>', # not required
         Subject          => 'some short description',               # required
         Body             => 'the message text',                     # required
@@ -302,14 +303,14 @@ sub ArticleCreate {
     return if !$DBObject->Do(
         SQL => 'INSERT INTO article '
             . '(ticket_id, article_type_id, article_sender_type_id, a_from, a_reply_to, a_to, '
-            . 'a_cc, a_subject, a_message_id, a_message_id_md5, a_in_reply_to, a_references, a_body, a_content_type, '
+            . 'a_cc, a_bcc, a_subject, a_message_id, a_message_id_md5, a_in_reply_to, a_references, a_body, a_content_type, '
             . 'content_path, valid_id, incoming_time, create_time, create_by, change_time, change_by) '
             . 'VALUES '
-            . '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            . '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{TicketID}, \$Param{ArticleTypeID}, \$Param{SenderTypeID},
             \$Param{From},     \$Param{ReplyTo},       \$Param{To},
-            \$Param{Cc},       \$Param{Subject},
+            \$Param{Cc},       \$Param{Bcc},			   \$Param{Subject},
             \$ArticleInsertFingerprint,    # just for next search; will be updated with correct MessageID
             \$Param{MD5},
             \$Param{InReplyTo}, \$Param{References}, \$Param{Body},
@@ -1337,6 +1338,7 @@ Article:
     From
     To
     Cc
+    Bcc
     Subject
     Body
     ReplyTo
@@ -1495,7 +1497,7 @@ sub ArticleGet {
     my @Content;
     my @Bind;
     # my $SQL = '
-    #     SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_subject,
+    #     SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
     #         sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
     #         st.create_time_unix, st.ticket_state_id, st.queue_id, sa.create_time,
     #         sa.a_content_type, sa.create_by, st.tn, article_sender_type_id, st.customer_id,
@@ -1510,7 +1512,7 @@ sub ArticleGet {
     #     WHERE ';
 
     my $SQL = '
-        SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_subject,
+        SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
             sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
             sa.create_time, sa.a_content_type, sa.create_by, article_sender_type_id,
             sa.article_type_id, sa.incoming_time, sa.id
@@ -1574,21 +1576,22 @@ sub ArticleGet {
         $Data{From}             = $Row[1];
         $Data{To}               = $Row[2];
         $Data{Cc}               = $Row[3];
-        $Data{Subject}          = $Row[4];
-        $Data{ReplyTo}          = $Row[5];
-        $Data{MessageID}        = $Row[6];
-        $Data{InReplyTo}        = $Row[7];
-        $Data{References}       = $Row[8];
-        $Data{Body}             = $Row[9];
-        $Data{CreateTime}       = $Row[10];
-        $Data{ContentType}      = $Row[11];
-        $Data{CreatedBy}        = $Row[12];
-        $Data{SenderTypeID}     = $Row[13];
-        $Data{ArticleTypeID}    = $Row[14];
-        $Data{IncomingTime}     = $Row[15];
-        $Data{ArticleID}        = $Row[16];
-        $Data{ChangeTime}       = $Row[17];
-        $Data{ChangedBy}        = $Row[18];
+        $Data{Bcc}              = $Row[4];
+        $Data{Subject}          = $Row[5];
+        $Data{ReplyTo}          = $Row[6];
+        $Data{MessageID}        = $Row[7];
+        $Data{InReplyTo}        = $Row[8];
+        $Data{References}       = $Row[9];
+        $Data{Body}             = $Row[10];
+        $Data{CreateTime}       = $Row[11];
+        $Data{ContentType}      = $Row[12];
+        $Data{CreatedBy}        = $Row[13];
+        $Data{SenderTypeID}     = $Row[14];
+        $Data{ArticleTypeID}    = $Row[15];
+        $Data{IncomingTime}     = $Row[16];
+        $Data{ArticleID}        = $Row[17];
+        $Data{ChangeTime}       = $Row[18];
+        $Data{ChangedBy}        = $Row[19];
 
         if ( $Data{ContentType} && $Data{ContentType} =~ /charset=/i ) {
             $Data{Charset} = $Data{ContentType};

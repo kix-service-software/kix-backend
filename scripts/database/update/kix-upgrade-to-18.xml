@@ -132,6 +132,9 @@
         <Column Name="t_pending_time" Type="INTEGER"/>
         <Column Name="t_pending_type" Type="INTEGER"/>
     </Table>
+    <TableAlter Name="article">
+        <ColumnAdd Name="a_bcc"    Required="false" Type="VARCHAR" Size="3800"/>    
+    </Table>    
     <Table Name="kix_article_flag">
         <Column Name="article_id"  Required="true" Type="BIGINT"/>
         <Column Name="article_key" Required="true" Type="VARCHAR" Size="50"/>
