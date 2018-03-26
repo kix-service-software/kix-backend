@@ -215,7 +215,7 @@ sub Run {
         );
         
         # check if article exists
-        if ( !%Article ) {
+        if ( !%ArticleRaw ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "Could not get data for article $Param{Data}->{ArticleID}",
