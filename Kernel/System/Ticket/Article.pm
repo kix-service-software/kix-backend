@@ -91,6 +91,8 @@ example with "Charset & MimeType" and no "ContentType"
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
+        Cc               => 'Some Customer A <customer-a@example.com>', # optional
+        Bcc              => 'Some Customer A <customer-a@example.com>', # optional
         Subject          => 'some short description',               # required
         Body             => 'the message text',                     # required
         IncomingTime     => 'YYYY-MM-DD HH24:MI:SS',                # optional
@@ -1617,7 +1619,7 @@ sub ArticleGet {
 
         # strip not wanted stuff
         RECIPIENT:
-        for my $Key (qw(From To Cc Subject)) {
+        for my $Key (qw(From To Cc Bcc Subject)) {
             next RECIPIENT if !$Data{$Key};
             $Data{$Key} =~ s/\n|\r//g;
         }
