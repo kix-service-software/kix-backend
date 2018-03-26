@@ -46,7 +46,7 @@ create an article
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
         Cc               => 'Some Customer B <customer-b@example.com>', # not required but useful
-        Bcc				 => 'Some Customer C <customer-b@example.com>', # not required but useful
+        Bcc	             => 'Some Customer C <customer-b@example.com>', # not required but useful
         ReplyTo          => 'Some Customer B <customer-b@example.com>', # not required
         Subject          => 'some short description',               # required
         Body             => 'the message text',                     # required
@@ -310,7 +310,7 @@ sub ArticleCreate {
         Bind => [
             \$Param{TicketID}, \$Param{ArticleTypeID}, \$Param{SenderTypeID},
             \$Param{From},     \$Param{ReplyTo},       \$Param{To},
-            \$Param{Cc},       \$Param{Bcc},			   \$Param{Subject},
+            \$Param{Cc},       \$Param{Bcc},           \$Param{Subject},
             \$ArticleInsertFingerprint,    # just for next search; will be updated with correct MessageID
             \$Param{MD5},
             \$Param{InReplyTo}, \$Param{References}, \$Param{Body},
