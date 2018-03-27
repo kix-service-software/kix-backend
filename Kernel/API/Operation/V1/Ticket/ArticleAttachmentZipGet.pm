@@ -199,11 +199,14 @@ sub Run {
 
     #search attachments
     for my $AttachmentNr ( keys %ArticleAttachments ) {
+        
         my %Attachment = $TicketObject->ArticleAttachment(
             ArticleID => $Param{Data}->{ArticleID},
             FileID    => $AttachmentNr,
             UserID   => $Self->{Authorization}->{UserID},
         );
+
+        next if ( $Attachment{Filename} eq 'file-2' );
 
         if ( !$ZipObject ) {
             $ZipObject = new IO::Compress::Zip(
