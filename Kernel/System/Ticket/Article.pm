@@ -1694,8 +1694,11 @@ sub ArticleGet {
 
         # add real name lines
         RECIPIENT:
-        for my $Key (qw( From To Cc)) {
-            next RECIPIENT if !$Part->{$Key};
+        for my $Key (qw( From To Cc Bcc)) {
+            if (!$Part->{$Key}) {
+                $Part->{ $Key . 'Realname' } = undef;                
+                next RECIPIENT;
+            }
 
             # check if it's a queue
             if ( $Part->{$Key} !~ /@/ ) {
