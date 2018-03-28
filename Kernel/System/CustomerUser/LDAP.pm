@@ -386,13 +386,13 @@ sub CustomerSearch {
         # KIX4OTRS-capeIT
         # if multiple customer ids used
         if ( $Param{MultipleCustomerIDs} ) {
-            my @CustomerIDsMap;
-            for my $Array ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-                next if $Array->[0] !~ m/UserCustomerIDs$/;
-                @CustomerIDsMap = @{$Array};
+            my $CustomerIDsMap;
+            for my $Field ( @{ $Self->{CustomerUserMap}->{Map} } ) {
+                next if $Field->{Attribute}} !~ m/UserCustomerIDs$/;
+                $CustomerIDsMap = $Field;
             }
 
-            if ( scalar @CustomerIDsMap && $CustomerIDsMap[5] eq 'array' ) {
+            if ( $CustomerIDsMap && $CustomerIDsMap->{Type} eq 'array' ) {
                 $Filter .= " || ( $Self->{CustomerIDs} =~ m/$Param{CustomerID}/ )";
             }
         }
@@ -874,7 +874,7 @@ sub CustomerUserDataGet {
     # perform user search
     my @Attributes;
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        push( @Attributes, $Entry->[2] );
+        push( @Attributes, $Entry->{MappedTo} );
     }
     my $Filter = "($Self->{CustomerKey}=" . escape_filter_value( $Param{User} ) . ')';
 
@@ -925,34 +925,34 @@ sub CustomerUserDataGet {
         # KIX4OTRS-capeIT
         # my $Value = $Self->_ConvertFrom( $Result2->get_value( $Entry->[2] ) ) || '';
         my $Value = "";
-        if ( $Entry->[5] && $Entry->[5] =~ /^ArrayIndex\[(\d+)\]$/ ) {
+        if ( $Entry->{Type} && $Entry->{Type} =~ /^ArrayIndex\[(\d+)\]$/ ) {
             my $Index       = $1;
-            my @ResultArray = $Result2->get_value( $Entry->[2] );
+            my @ResultArray = $Result2->get_value( $Entry->{MappedTo} );
             $Value = $Self->_ConvertFrom( $ResultArray[$Index] ) || '';
         }
-        elsif ( $Entry->[5] && $Entry->[5] =~ /^ArrayJoin\[(.+)\]$/ ) {
+        elsif ( $Entry->{Type} && $Entry->{Type} =~ /^ArrayJoin\[(.+)\]$/ ) {
             my $JoinStrg    = $1;
-            my @ResultArray = $Result2->get_value( $Entry->[2] );
+            my @ResultArray = $Result2->get_value( $Entry->{MappedTo} );
             $Value = $Self->_ConvertFrom( join( $JoinStrg, @ResultArray ) ) || '';
         }
         else {
-            $Value = $Self->_ConvertFrom( $Result2->get_value( $Entry->[2] ) ) || '';
+            $Value = $Self->_ConvertFrom( $Result2->get_value( $Entry->{MappedTo} ) ) || '';
         }
 
         # EO KIX4OTRS-capeIT
 
-        if ( $Value && $Entry->[2] =~ /^targetaddress$/i ) {
+        if ( $Value && $Entry->{MappedTo} =~ /^targetaddress$/i ) {
             $Value =~ s/SMTP:(.*)/$1/;
         }
 
         # KIX4OTRS-capeIT
-        if ( !$Value && $Entry->[8] ) {
-            $Value = $Entry->[8];
+        if ( !$Value && $Entry->{DefaultValue} ) {
+            $Value = $Entry->{DefaultValue};
         }
 
         # EO KIX4OTRS-capeIT
 
-        $Data{ $Entry->[0] } = $Value;
+        $Data{ $Entry->{Attribute} } = $Value;
     }
 
     # KIX4OTRS-capeIT

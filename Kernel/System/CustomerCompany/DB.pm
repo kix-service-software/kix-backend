@@ -218,8 +218,8 @@ sub CustomerCompanyGet {
     my @Fields;
     my %FieldsMap;
     for my $Entry ( @{ $Self->{CustomerCompanyMap}->{Map} } ) {
-        push @Fields, $Entry->[2];
-        $FieldsMap{ $Entry->[2] } = $Entry->[0];
+        push @Fields, $Entry->{MappedTo};
+        $FieldsMap{ $Entry->{MappedTo} } = $Entry->{Attribute};
     }
     my $SQL = 'SELECT ' . join( ', ', @Fields );
 
@@ -296,9 +296,9 @@ sub CustomerCompanyAdd {
     my @Values;
 
     for my $Entry ( @{ $Self->{CustomerCompanyMap}->{Map} } ) {
-        push @Fields,       $Entry->[2];
+        push @Fields,       $Entry->{MappedTo};
         push @Placeholders, '?';
-        push @Values,       \$Param{ $Entry->[0] };
+        push @Values,       \$Param{ $Entry->{Attribute} };
     }
     if ( !$Self->{ForeignDB} ) {
         push @Fields,       qw(create_time create_by change_time change_by);
@@ -341,10 +341,10 @@ sub CustomerCompanyUpdate {
 
     # check needed stuff
     for my $Entry ( @{ $Self->{CustomerCompanyMap}->{Map} } ) {
-        if ( !$Param{ $Entry->[0] } && $Entry->[4] && $Entry->[0] ne 'UserPassword' ) {
+        if ( !$Param{ $Entry->{Attribute} } && $Entry->{Required} && $Entry->{Attribute} ne 'UserPassword' ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Entry->[0]!"
+                Message  => "Need $Entry->{Attribute}!"
             );
             return;
         }
@@ -355,9 +355,9 @@ sub CustomerCompanyUpdate {
 
     FIELD:
     for my $Entry ( @{ $Self->{CustomerCompanyMap}->{Map} } ) {
-        next FIELD if $Entry->[0] =~ /^UserPassword$/i;
-        push @Fields, $Entry->[2] . ' = ?';
-        push @Values, \$Param{ $Entry->[0] };
+        next FIELD if $Entry->{Attribute} =~ /^UserPassword$/i;
+        push @Fields, $Entry->{MappedTo} . ' = ?';
+        push @Values, \$Param{ $Entry->{Attribute} };
     }
     if ( !$Self->{ForeignDB} ) {
         push @Fields, ( 'change_time = current_timestamp', 'change_by = ?' );

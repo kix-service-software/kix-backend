@@ -161,7 +161,7 @@ sub Run {
 
         # add attributes from Map to whitelist
         foreach my $MapItem ( @{$CustomerData{Config}->{Map}} ) {
-            $AttributeWhitelist->{$MapItem->[0]} = 1;
+            $AttributeWhitelist->{$MapItem->{Attribute}} = 1;
         }
 
         # add required attributes to whitelist

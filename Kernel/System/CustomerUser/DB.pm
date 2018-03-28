@@ -72,7 +72,7 @@ sub new {
     # check if CustomerKey is var or int
     ENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        if ( $Entry->[0] eq 'UserLogin' && $Entry->[5] =~ /^int$/i ) {
+        if ( $Entry->{Attribute} eq 'UserLogin' && $Entry->{Type} =~ /^int$/i ) {
             $Self->{CustomerKeyInteger} = 1;
             last ENTRY;
         }
@@ -327,22 +327,22 @@ sub CustomerSearch {
         # if multiple customer ids used
         if ( $Param{MultipleCustomerIDs} ) {
 
-            my @CustomerIDsMap;
-            for my $Array ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-                next if $Array->[0] !~ m/UserCustomerIDs$/;
-                @CustomerIDsMap = @{$Array};
+            my $CustomerIDsMap;
+            for my $Field ( @{ $Self->{CustomerUserMap}->{Map} } ) {
+                next if $Field->{Attribute} !~ m/UserCustomerIDs$/;
+                $CustomerIDsMap = $Field;
             }
 
             # if mapping exists
-            if ( defined $CustomerIDsMap[5] && $CustomerIDsMap[5] )
+            if ( $CustomerIDsMap && $CustomerIDsMap->{Type} )
             {
                 my $MultipleCustomerID = '%'.$CustomerID.'%';
                 push @Bind, \$MultipleCustomerID;
                 if ( $Self->{CaseSensitive} ) {
-                    $SQL .= " OR $CustomerIDsMap[2] LIKE ? $LikeEscapeString";
+                    $SQL .= " OR $CustomerIDsMap->{MappedTo} LIKE ? $LikeEscapeString";
                 }
                 else {
-                    $SQL .= " OR LOWER($CustomerIDsMap[2]) LIKE LOWER(?) $LikeEscapeString"
+                    $SQL .= " OR LOWER($CustomerIDsMap->{MappedTo}) LIKE LOWER(?) $LikeEscapeString"
                 }
             }
         }
@@ -662,7 +662,7 @@ sub CustomerUserDataGet {
     # build select
     my $SQL = 'SELECT ';
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        $SQL .= " $Entry->[2], ";
+        $SQL .= " $Entry->{MappedTo}, ";
     }
 
     if ( !$Self->{ForeignDB} ) {
@@ -708,7 +708,7 @@ sub CustomerUserDataGet {
 
             # KIX4OTRS-capeIT
             # $Data{ $Entry->[0] } = $Row[$MapCounter];
-            $Data{ $Entry->[0] } = $Row[$MapCounter] || $Entry->[8] || '';
+            $Data{ $Entry->{Attribute} } = $Row[$MapCounter] || $Entry->{DefaultValue} || '';
 
             # EO KIX4OTRS-capeIT
 
@@ -779,14 +779,14 @@ sub CustomerUserAdd {
     # check needed stuff
     ENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        if ( !$Param{ $Entry->[0] } && $Entry->[4] ) {
+        if ( !$Param{ $Entry->{Attribute} } && $Entry->{Required} ) {
 
             # skip UserLogin, will be checked later
-            next ENTRY if ( $Entry->[0] eq 'UserLogin' );
+            next ENTRY if ( $Entry->{Attribute} eq 'UserLogin' );
 
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Entry->[0]!",
+                Message  => "Need $Entry->{Attribute}!",
             );
             return;
         }
@@ -856,20 +856,20 @@ sub CustomerUserAdd {
     # quote values
     my %Value;
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        if ( $Entry->[5] =~ /^int$/i ) {
-            if ( $Param{ $Entry->[0] } ) {
-                $Value{ $Entry->[0] } = $Param{ $Entry->[0] };
+        if ( $Entry->{Type} && $Entry->{Type} =~ /^int$/i ) {
+            if ( $Param{ $Entry->{Attribute} } ) {
+                $Value{ $Entry->{Attribute} } = $Param{ $Entry->{Attribute} };
             }
             else {
-                $Value{ $Entry->[0] } = 0;
+                $Value{ $Entry->{Attribute} } = 0;
             }
         }
         else {
-            if ( $Param{ $Entry->[0] } ) {
-                $Value{ $Entry->[0] } = $Param{ $Entry->[0] };
+            if ( $Param{ $Entry->{Attribute} } ) {
+                $Value{ $Entry->{Attribute} } = $Param{ $Entry->{Attribute} };
             }
             else {
-                $Value{ $Entry->[0] } = '';
+                $Value{ $Entry->{Attribute} } = '';
             }
         }
     }
@@ -882,9 +882,9 @@ sub CustomerUserAdd {
 
     MAPENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        next MAPENTRY if ( lc( $Entry->[0] ) eq "userpassword" );
-        next MAPENTRY if $SeenKey{ $Entry->[2] }++;
-        push @ColumnNames, $Entry->[2];
+        next MAPENTRY if ( lc( $Entry->{Attribute} ) eq "userpassword" );
+        next MAPENTRY if $SeenKey{ $Entry->{AppedTo} }++;
+        push @ColumnNames, $Entry->{MappedTo};
     }
 
     $SQL .= join ', ', @ColumnNames;
@@ -900,10 +900,10 @@ sub CustomerUserAdd {
 
     ENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        next ENTRY if ( lc( $Entry->[0] ) eq "userpassword" );
-        next ENTRY if $SeenValue{ $Entry->[2] }++;
+        next ENTRY if ( lc( $Entry->{Attribute} ) eq "userpassword" );
+        next ENTRY if $SeenValue{ $Entry->{MappedTo} }++;
         $BindColumns++;
-        push @Bind, \$Value{ $Entry->[0] };
+        push @Bind, \$Value{ $Entry->{Attribute} };
     }
 
     $SQL .= join ', ', ('?') x $BindColumns;
@@ -954,10 +954,10 @@ sub CustomerUserUpdate {
 
     # check needed stuff
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        if ( !$Param{ $Entry->[0] } && $Entry->[4] && $Entry->[0] ne 'UserPassword' ) {
+        if ( !$Param{ $Entry->{Attribute} } && $Entry->{Required} && $Entry->{Attribute} ne 'UserPassword' ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Entry->[0]!",
+                Message  => "Need $Entry->{Attribute}!",
             );
             return;
         }
@@ -1006,20 +1006,20 @@ sub CustomerUserUpdate {
     # quote values
     my %Value;
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        if ( $Entry->[5] =~ /^int$/i ) {
-            if ( $Param{ $Entry->[0] } ) {
-                $Value{ $Entry->[0] } = $Param{ $Entry->[0] };
+        if ( $Entry->{Type} =~ /^int$/i ) {
+            if ( $Param{ $Entry->{Attribute} } ) {
+                $Value{ $Entry->{Attribute} } = $Param{ $Entry->{Attribute} };
             }
             else {
-                $Value{ $Entry->[0] } = 0;
+                $Value{ $Entry->{Attribute} } = 0;
             }
         }
         else {
-            if ( $Param{ $Entry->[0] } ) {
-                $Value{ $Entry->[0] } = $Param{ $Entry->[0] };
+            if ( $Param{ $Entry->{Attribute} } ) {
+                $Value{ $Entry->{Attribute} } = $Param{ $Entry->{Attribute} };
             }
             else {
-                $Value{ $Entry->[0] } = "";
+                $Value{ $Entry->{Attribute} } = "";
             }
         }
     }
@@ -1031,11 +1031,11 @@ sub CustomerUserUpdate {
     my %SeenKey;    # If the map contains duplicated field names, insert only once.
     ENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        next ENTRY if $Entry->[7];                               # skip readonly fields
-        next ENTRY if ( lc( $Entry->[0] ) eq "userpassword" );
-        next ENTRY if $SeenKey{ $Entry->[2] }++;
-        $SQL .= " $Entry->[2] = ?, ";
-        push @Bind, \$Value{ $Entry->[0] };
+        next ENTRY if $Entry->{ReadOnly};                               # skip readonly fields
+        next ENTRY if ( lc( $Entry->{Attribute} ) eq "userpassword" );
+        next ENTRY if $SeenKey{ $Entry->{MappedTo} }++;
+        $SQL .= " $Entry->{MappedTo} = ?, ";
+        push @Bind, \$Value{ $Entry->{Attribute} };
     }
 
     if ( !$Self->{ForeignDB} ) {
@@ -1225,11 +1225,11 @@ sub SetPassword {
 
     # update db
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
-        if ( $Entry->[0] =~ /^UserPassword$/i ) {
-            $Param{PasswordCol} = $Entry->[2];
+        if ( $Entry->{Attribute} =~ /^UserPassword$/i ) {
+            $Param{PasswordCol} = $Entry->{MappedTo};
         }
-        if ( $Entry->[0] =~ /^UserLogin$/i ) {
-            $Param{LoginCol} = $Entry->[2];
+        if ( $Entry->{Attribute} =~ /^UserLogin$/i ) {
+            $Param{LoginCol} = $Entry->{MappedTo};
         }
     }
 

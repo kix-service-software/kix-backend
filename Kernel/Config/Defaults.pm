@@ -1357,27 +1357,32 @@ via the Preferences button after logging in.
 #        ReadOnly => 1,
         Map => [
 
-            # note: Login, Email and CustomerID needed!
-            # var, frontend, storage, shown (1=always,2=lite), required, storage-type, http-link, readonly, http-link-target, link class(es)
-            [ 'UserTitle',      Translatable('Title or salutation'), 'title',  1, 0, 'var', '', 0 ],
-            [ 'UserFirstname',  Translatable('Firstname'),  'first_name', 1, 1, 'var', '', 0 ],
-            [ 'UserLastname',   Translatable('Lastname'),   'last_name',  1, 1, 'var', '', 0 ],
-            [ 'UserLogin',      Translatable('Username'),   'login',      1, 1, 'var', '', 0 ],
-            [ 'UserPassword',   Translatable('Password'),   'pw',         0, 0, 'var', '', 0 ],
-            [ 'UserEmail',      Translatable('Email'),      'email',      1, 1, 'var', '', 0 ],
-#rbo - T2016121190001552 - renamed OTRS to KIX
-#            [ 'UserEmail',      Translatable('Email'), 'email',           1, 1, 'var', '[% Env("CGIHandle") %]?Action=AgentTicketCompose;ResponseID=1;TicketID=[% Data.TicketID | uri %];ArticleID=[% Data.ArticleID | uri %]', 0, '', 'AsPopup KIXPopup_TicketAction' ],
-            [ 'UserCustomerID', Translatable('CustomerID'), 'customer_id', 0, 1, 'var', '', 0 ],
-#            [ 'UserCustomerIDs', Translatable('CustomerIDs'), 'customer_ids', 1, 0, 'var', '', 0 ],
-            [ 'UserPhone',        Translatable('Phone'),       'phone',        1, 0, 'var', '', 0 ],
-            [ 'UserFax',          Translatable('Fax'),         'fax',          1, 0, 'var', '', 0 ],
-            [ 'UserMobile',       Translatable('Mobile'),      'mobile',       1, 0, 'var', '', 0 ],
-            [ 'UserStreet',       Translatable('Street'),      'street',       1, 0, 'var', '', 0 ],
-            [ 'UserZip',          Translatable('Zip'),         'zip',          1, 0, 'var', '', 0 ],
-            [ 'UserCity',         Translatable('City'),        'city',         1, 0, 'var', '', 0 ],
-            [ 'UserCountry',      Translatable('Country'),     'country',      1, 0, 'var', '', 0 ],
-            [ 'UserComment',      Translatable('Comment'),     'comments',     1, 0, 'var', '', 0 ],
-            [ 'ValidID',          Translatable('Valid'),       'valid_id',     0, 1, 'int', '', 0 ],
+            # supported keys:
+            #   Attribute - the attribute name in the object hash
+            #   Label - the display label
+            #   MappedTo - the storage attribute this should be mapped to
+            #   Exposed - if set to 1 the attribute will be expose in the API, if set to 0 it won't
+            #   Required - if set to 1 the attribute will be needed in the API during Creation or Update, if set to 0 it won't
+            #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
+            #   Type - special storage type (array, int)
+            #   DefaultValue - fallback value if source dosn't contain a value for this attribute
+            { Attribute => 'UserTitle',      Label => Translatable('Title or salutation'), MappedTo => 'title',       Exposed => 1 },
+            { Attribute => 'UserFirstname',  Label => Translatable('Firstname'),           MappedTo => 'first_name',  Exposed => 1, Required => 1 },
+            { Attribute => 'UserLastname',   Label => Translatable('Lastname'),            MappedTo => 'last_name',   Exposed => 1, Required => 1 },
+            { Attribute => 'UserLogin',      Label => Translatable('Username'),            MappedTo => 'login',       Exposed => 1, Required => 1 },
+            { Attribute => 'UserPassword',   Label => Translatable('Password'),            MappedTo => 'pw',          Exposed => 0 },
+            { Attribute => 'UserEmail',      Label => Translatable('Email'),               MappedTo => 'email',       Exposed => 1, Required => 1 },
+            { Attribute => 'UserCustomerID', Label => Translatable('CustomerID'),          MappedTo => 'customer_id', Exposed => 1, Required => 1 },
+#            { Attribute => 'UserCustomerIDs', Label => Translatable('CustomerIDs'),       MappedTo => 'customer_ids', Exposed => 1, Type => 'array' },
+            { Attribute => 'UserPhone',      Label => Translatable('Phone'),               MappedTo => 'phone',       Exposed => 1 },
+            { Attribute => 'UserFax',        Label => Translatable('Fax'),                 MappedTo => 'fax',         Exposed => 1 },
+            { Attribute => 'UserMobile',     Label => Translatable('Mobile'),              MappedTo => 'mobile',      Exposed => 1 },
+            { Attribute => 'UserStreet',     Label => Translatable('Street'),              MappedTo => 'street',      Exposed => 1 },
+            { Attribute => 'UserZip',        Label => Translatable('Zip'),                 MappedTo => 'zip',         Exposed => 1 },
+            { Attribute => 'UserCity',       Label => Translatable('City'),                MappedTo => 'city',        Exposed => 1 },
+            { Attribute => 'UserCountry',    Label => Translatable('Country'),             MappedTo => 'country',     Exposed => 1 },
+            { Attribute => 'UserComment',    Label => Translatable('Comment'),             MappedTo => 'comments',    Exposed => 1 },
+            { Attribute => 'ValidID',        Label => Translatable('Valid'),               MappedTo => 'valid_id',    Exposed => 1, Type => 'int' },
         ],
 
         # default selections
@@ -1441,20 +1446,27 @@ via the Preferences button after logging in.
 #        # cache time to live in sec. - cache any ldap queries
 #        CacheTTL => 0,
 #        Map => [
-#            # note: Login, Email and CustomerID needed!
-#            # var, frontend, storage, shown (1=always,2=lite), required, storage-type, http-link, readonly
-#            [ 'UserTitle',      'Title',      'title',           1, 0, 'var', '', 0 ],
-#            [ 'UserFirstname',  'Firstname',  'givenname',       1, 1, 'var', '', 0 ],
-#            [ 'UserLastname',   'Lastname',   'sn',              1, 1, 'var', '', 0 ],
-#            [ 'UserLogin',      'Username',   'uid',             1, 1, 'var', '', 0 ],
-#            [ 'UserEmail',      'Email',      'mail',            1, 1, 'var', '', 0 ],
-#            [ 'UserCustomerID', 'CustomerID', 'mail',            0, 1, 'var', '', 0 ],
-#            # [ 'UserCustomerIDs', 'CustomerIDs', 'second_customer_ids', 1, 0, 'var', '', 0 ],
-#            [ 'UserPhone',      'Phone',      'telephonenumber', 1, 0, 'var', '', 0 ],
-#            [ 'UserAddress',    'Address',    'postaladdress',   1, 0, 'var', '', 0 ],
-#            [ 'UserComment',    'Comment',    'description',     1, 0, 'var', '', 0 ],
+#            # supported keys:
+#            #   Attribute - the attribute name in the object hash
+#            #   Label - the display label
+#            #   MappedTo - the storage attribute this should be mapped to
+#            #   Exposed - if set to 1 the attribute will be expose in the API, if set to 0 it won't
+#            #   Required - if set to 1 the attribute will be needed in the API during Creation or Update, if set to 0 it won't
+#            #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
+#            #   Type - special storage type (array, int)
+#            #   DefaultValue - fallback value if source dosn't contain a value for this attribute
+#            { Attribute => 'UserTitle',       Label => Translatable('Title or salutation'), MappedTo => 'title',               Exposed => 1 },
+#            { Attribute => 'UserFirstname',   Label => Translatable('Firstname'),           MappedTo => 'givenname',           Exposed => 1, Required => 1 },
+#            { Attribute => 'UserLastname',    Label => Translatable('Lastname'),            MappedTo => 'sn',                  Exposed => 1, Required => 1 },
+#            { Attribute => 'UserLogin',       Label => Translatable('Username'),            MappedTo => 'uid',                 Exposed => 1, Required => 1 },
+#            { Attribute => 'UserEmail',       Label => Translatable('Email'),               MappedTo => 'mail',                Exposed => 1, Required => 1 },
+#            { Attribute => 'UserCustomerID',  Label => Translatable('CustomerID'),          MappedTo => 'mail',                Exposed => 1, Required => 1 },
+#            #{ Attribute => 'UserCustomerIDs', Label => Translatable('CustomerIDs'),        MappedTo => 'second_customer_ids', Exposed => 1 },
+#            { Attribute => 'UserPhone',       Label => Translatable('Phone'),               MappedTo => 'telephonenumber',     Exposed => 1 },
+#           { Attribute => 'UserAddress',      Label => Translatable('Address'),             MappedTo => 'postaladdress',       Exposed => 1 },
+#            { Attribute => 'UserComment',     Label => Translatable('Comment'),             MappedTo => 'description',         Exposed => 1 },
 #            # this is needed, if "SMIME::FetchFromCustomer" is active
-#            # [ 'UserSMIMECertificate', 'SMIMECertificate', 'userSMIMECertificate',      0, 1, 'var', '', 0 ],
+#            { Attribute => 'UserSMIMECertificate', Label => Translatable('SMIMECertificate'), MappedTo => 'userSMIMECertificate', Exposed => 0, Required => 1 },
 #        ],
 #    };
 
@@ -1497,16 +1509,22 @@ via the Preferences button after logging in.
         CacheTTL                       => 60 * 60 * 24, # use 0 to turn off cache
 
         Map => [
-            # var, frontend, storage, shown (1=always,2=lite), required, storage-type, http-link, readonly
-            [ 'CustomerID',             'CustomerID', 'customer_id', 0, 1, 'var', '', 0 ],
-            [ 'CustomerCompanyName',    'Customer',   'name',        1, 1, 'var', '', 0 ],
-            [ 'CustomerCompanyStreet',  'Street',     'street',      1, 0, 'var', '', 0 ],
-            [ 'CustomerCompanyZIP',     'Zip',        'zip',         1, 0, 'var', '', 0 ],
-            [ 'CustomerCompanyCity',    'City',       'city',        1, 0, 'var', '', 0 ],
-            [ 'CustomerCompanyCountry', 'Country',    'country',     1, 0, 'var', '', 0 ],
-            [ 'CustomerCompanyURL',     'URL',        'url',         1, 0, 'var', '[% Data.CustomerCompanyURL | html %]', 0 ],
-            [ 'CustomerCompanyComment', 'Comment',    'comments',    1, 0, 'var', '', 0 ],
-            [ 'ValidID',                'Valid',      'valid_id',    0, 1, 'int', '', 0 ],
+            # supported keys:
+            #   Attribute - the attribute name in the object hash
+            #   Label - the display label
+            #   MappedTo - the storage attribute this should be mapped to
+            #   Exposed - if set to 1 the attribute will be expose in the API, if set to 0 it won't
+            #   Required - if set to 1 the attribute will be needed in the API during Creation or Update, if set to 0 it won't
+            #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
+            { Attribute => 'CustomerID',             Label => Translatable('CustomerID'), MappedTo => 'customer_id', Exposed => 1, Required => 1 },
+            { Attribute => 'CustomerCompanyName',    Label => Translatable('Customer'),   MappedTo => 'name',        Exposed => 1, Required => 1 },
+            { Attribute => 'CustomerCompanyStreet',  Label => Translatable('Street'),     MappedTo => 'street',      Exposed => 1 },
+            { Attribute => 'CustomerCompanyZIP',     Label => Translatable('Zip'),        MappedTo => 'zip',         Exposed => 1 },
+            { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1 },
+            { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1 },
+            { Attribute => 'CustomerCompanyURL',     Label => Translatable('URL'),        MappedTo => 'url',         Exposed => 1 },
+            { Attribute => 'CustomerCompanyComment', Label => Translatable('Comment'),    MappedTo => 'comments',    Exposed => 1 },
+            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Type => 'int' },
         ],
     };
 

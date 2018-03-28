@@ -125,9 +125,9 @@ sub Run {
     my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
     my %RequiredAttributes;
     foreach my $MapItem ( @{$Config->{Map}} ) {
-        next if !$MapItem->[4] || $MapItem->[0] eq 'ValidID';
+        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
 
-        $RequiredAttributes{'Contact::'.$MapItem->[0]} = {
+        $RequiredAttributes{'Contact::'.$MapItem->{Attribute}} = {
             Required => 1
         };
     }
