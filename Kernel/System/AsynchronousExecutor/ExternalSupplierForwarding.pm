@@ -224,15 +224,15 @@ sub Run {
                 {
                     next
                         if (
-                        grep { $_ eq ${$Field}[0]; }
+                        grep { $_ eq $Field->{Attribute}; }
                         @{$CustomerUserAttrBlacklist}
                         );
                 }
 
                 # EO Remove blacklisted fields
-                if ( ${$Field}[3] && $CustomerUserData{ ${$Field}[0] } ) {
-                    if ( length( ${$Field}[1] ) > $MaxLength ) {
-                        $MaxLength = length( ${$Field}[1] );
+                if ( $Field->{Exposed} && $CustomerUserData{ $Field->{Attribute} } ) {
+                    if ( length( $Field->{Label} ) > $MaxLength ) {
+                        $MaxLength = length( $Field->{Label} );
                     }
                 }
             }
@@ -246,17 +246,17 @@ sub Run {
                 {
                     next
                         if (
-                        grep { $_ eq ${$Field}[0]; }
+                        grep { $_ eq $Field->{Attribute}; }
                         @{$CustomerUserAttrBlacklist}
                         );
                 }
 
                 # EO Remove blacklisted fields
-                if ( ${$Field}[3] && $CustomerUserData{ ${$Field}[0] } ) {
+                if ( $Field->{Exposed} && $CustomerUserData{ $Field->{Attribute} } ) {
                     $FwdBody .= sprintf(
                         "%" . $MaxLength . "s: %s\n",
-                        $Self->{LanguageObject}->Translate( ${$Field}[1] ),
-                        $CustomerUserData{ ${$Field}[0] }
+                        $Self->{LanguageObject}->Translate( $Field->{Label} ),
+                        $CustomerUserData{ $Field->{Attibute} }
                     );
                 }
             }

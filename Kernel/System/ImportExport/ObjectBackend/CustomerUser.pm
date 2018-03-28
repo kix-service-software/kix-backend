@@ -624,9 +624,9 @@ sub ImportDataSave {
     my $CustomerBackend = $Kernel::OM->Get('Kernel::Config')->Get($ObjectData->{CustomerBackend} || $ObjectData->{CustomerUserBackend});
     if ( $CustomerBackend && $CustomerBackend->{CustomerKey} && $CustomerBackend->{Map} ) {
         for my $Entry ( @{ $CustomerBackend->{Map} } ) {
-            next if ( $Entry->[1] ne $CustomerBackend->{CustomerKey} );
+            next if ( $Entry->{Label} ne $CustomerBackend->{CustomerKey} );
 
-            $CustomerUserKey = $Entry->[0];
+            $CustomerUserKey = $Entry->{Attribute};
             last;
         }
         if ( !$CustomerUserKey ) {

@@ -742,7 +742,7 @@ sub Run {
         # get params
         my %GetParams;
         for my $Entry ( @{ $ConfigObject->Get('CustomerUser')->{Map} } ) {
-            $GetParams{ $Entry->[0] } = $ParamObject->GetParam( Param => $Entry->[1] )
+            $GetParams{ $Entry->{Attribute} } = $ParamObject->GetParam( Param => $Entry->{Label} )
                 || '';
         }
         $GetParams{ValidID} = 1;
