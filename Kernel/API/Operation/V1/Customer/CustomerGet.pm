@@ -160,15 +160,16 @@ sub Run {
         my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
 
         # add attributes from Map to whitelist
-        foreach my $MapItem ( @{$CustomerData{Config}->{Map}} ) {
-            $AttributeWhitelist->{$MapItem->{Attribute}} = 1;
+        foreach my $Field ( @{$CustomerData{Config}->{Map}} ) {
+            next if !$Field->{Exposed};
+            $AttributeWhitelist->{$Field->{Attribute}} = 1;
         }
 
         # add required attributes to whitelist
         foreach my $Attr ( qw(SourceID CustomerID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
             $AttributeWhitelist->{$Attr} = 1;
         } 
-        
+
         # filter valid attributes
         if ( IsHashRefWithData($AttributeWhitelist) ) {
             foreach my $Attr (sort keys %CustomerData) {

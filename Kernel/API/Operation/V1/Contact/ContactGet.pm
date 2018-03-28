@@ -164,8 +164,9 @@ sub Run {
         my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
 
         # add attributes from Map to whitelist
-        foreach my $MapItem ( @{$ContactData{Config}->{Map}} ) {
-            $AttributeWhitelist->{$MapItem->{Attribute}} = 1;
+        foreach my $Field ( @{$ContactData{Config}->{Map}} ) {
+            next if !$Field->{Exposed};
+            $AttributeWhitelist->{$Field->{Attribute}} = 1;
         }
 
         # add required attributes to whitelist
