@@ -116,7 +116,8 @@ sub Run {
 
     if (IsHashRefWithData(\%SourceList) ) {        
         my @ResultList;
-        foreach my $Key (sort keys %SourceList) { 
+        foreach my $Key (sort keys %SourceList) {
+        	 
             my @AttributeMapping;
             foreach my $Attr (@{$SourceList{$Key}->{Map}}){
                 next if !$Attr->{Exposed}; 
