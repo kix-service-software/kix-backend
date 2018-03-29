@@ -57,26 +57,6 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
     
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-       
-    # load customer company backend modules
-    SOURCE:
-    for my $Count ( '', 1 .. 10 ) {
-
-        next SOURCE if !$ConfigObject->Get("CustomerCompany$Count");
-
-        my $GenericModule = $ConfigObject->Get("CustomerCompany$Count")->{Module}
-            || 'Kernel::System::CustomerCompany::DB';
-        if ( !$MainObject->Require($GenericModule) ) {
-            $MainObject->Die("Can't load backend module $GenericModule! $@");
-        }
-        $Self->{"CustomerCompany$Count"} = $GenericModule->new(
-            Count              => $Count,
-            CustomerCompanyMap => $ConfigObject->Get("CustomerCompany$Count"),
-        );
-    }
-
     return $Self;
 }
 
@@ -132,48 +112,27 @@ sub Run {
     }
 
     # perform search
-    my %SourceListRW = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList(
-        ReadOnly => 0
-    );
-    my %SourceListRO = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList(
-        ReadOnly => 1
-    );
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList();
     
-    my @AttributeMapping;
-
-    if (IsHashRefWithData(\%SourceListRO) || IsHashRefWithData(\%SourceListRW) ) {        
+    if (IsHashRefWithData(\%SourceList) ) {        
         my @ResultList;
-        foreach my $Key (sort keys %SourceListRO) {
-		    foreach my $Attr (@{$Self->{$Key}->{CustomerCompanyMap}->{Map}}){
-		        next if ( $Attr->{Exposed} == 0 );
-		        delete $Attr->{MappedTo};
-		        delete $Attr->{Type};
-		        push(@AttributeMapping, $Attr)   
+        foreach my $Key (sort keys %SourceList) {
+            my @AttributeMapping;
+		    foreach my $Attr (@{$SourceList{$Key}->{Map}}){
+                next if !$Attr->{Exposed};
+
+                my %AttrDef = %{$Attr};
+                delete $AttrDef{MappedTo};
+                delete $AttrDef{Type};
+                push(@AttributeMapping, \%AttrDef)   
 		    }
 
             push(@ResultList, {
-                ID       => $Key,
-                Name     => $SourceListRO{$Key},
-                ReadOnly => 1,
+                ID               => $Key,
+                Name             => $SourceList{$Key}->{Name},
+                ReadOnly         => $SourceList{$Key}->{ReadOnly} ? 1 : 0,
                 AttributeMapping => \@AttributeMapping,
-            });
-            
-        }
-        foreach my $Key (sort keys %SourceListRW) {
-            foreach my $Attr (@{$Self->{$Key}->{CustomerCompanyMap}->{Map}}){
-                next if ( $Attr->{Exposed} == 0 );
-                delete $Attr->{MappedTo};
-                delete $Attr->{Type};
-                push(@AttributeMapping, $Attr)   
-            }
-            
-            push(@ResultList, {
-                ID       => $Key,
-                Name     => $SourceListRW{$Key},
-                ReadOnly => 0,
-                AttributeMapping => \@AttributeMapping,
-            });
-            
+            });    
         }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
