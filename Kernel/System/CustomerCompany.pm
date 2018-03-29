@@ -303,7 +303,7 @@ sub CustomerCompanySourceList {
             }
         }
 
-        $Data{"CustomerCompany$Count"} = $ConfigObject->Get("CustomerCompany$Count")->{Name}
+        $Data{"CustomerCompany$Count"} = $ConfigObject->Get("CustomerCompany$Count")
             || "No Name $Count";
     }
 
