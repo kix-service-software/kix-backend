@@ -358,7 +358,7 @@ sub _ArticleCreate {
     # set Article To
     my $To;
     if ( $Article->{To} ) { 
-        $To => $Article->{To}
+        $To = $Article->{To}
     }
     else {
         if ( $Ticket->{Queue} ) {
