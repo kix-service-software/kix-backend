@@ -110,31 +110,29 @@ sub Run {
             Message => $Result->{Message},
         );
     }
-
+ 
     # perform search
-    my %SourceListRW = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
-        ReadOnly => 0
-    );
-    my %SourceListRO = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
-        ReadOnly => 1
-    );
+    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList();
 
-    if (IsHashRefWithData(\%SourceListRO) || IsHashRefWithData(\%SourceListRW) ) {
-        
+    if (IsHashRefWithData(\%SourceList) ) {        
         my @ResultList;
-        foreach my $Key (sort keys %SourceListRO) {
+        foreach my $Key (sort keys %SourceList) {
+        	 
+            my @AttributeMapping;
+            foreach my $Attr (@{$SourceList{$Key}->{Map}}){
+                next if !$Attr->{Exposed}; 
+                my %AttrDef = %{$Attr};
+                delete $AttrDef{MappedTo};
+                delete $AttrDef{Type};
+                push(@AttributeMapping, \%AttrDef)   
+            }
+
             push(@ResultList, {
-                ID       => $Key,
-                Name     => $SourceListRO{$Key},
-                ReadOnly => 1,
-            });
-        }
-        foreach my $Key (sort keys %SourceListRW) {
-            push(@ResultList, {
-                ID       => $Key,
-                Name     => $SourceListRW{$Key},
-                ReadOnly => 0,
-            });
+                ID               => $Key,
+                Name             => $SourceList{$Key}->{Name},
+                ReadOnly         => $SourceList{$Key}->{ReadOnly} ? 1 : 0,
+                AttributeMapping => \@AttributeMapping,
+            });    
         }
 
         if ( IsArrayRefWithData(\@ResultList) ) {

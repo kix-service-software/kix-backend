@@ -214,6 +214,7 @@ sub CustomerSourceList {
     for my $Count ( '', 1 .. 10 ) {
 
         next SOURCE if !$ConfigObject->Get("CustomerUser$Count");
+
         if ( defined $Param{ReadOnly} ) {
             my $CustomerBackendConfig = $ConfigObject->Get("CustomerUser$Count");
             if ( $Param{ReadOnly} ) {
@@ -223,9 +224,10 @@ sub CustomerSourceList {
                 next SOURCE if $CustomerBackendConfig->{ReadOnly};
             }
         }
-        $Data{"CustomerUser$Count"} = $ConfigObject->Get("CustomerUser$Count")->{Name}
+        $Data{"CustomerUser$Count"} = $ConfigObject->Get("CustomerUser$Count")
             || "No Name $Count";
     }
+ 
     return %Data;
 }
 
