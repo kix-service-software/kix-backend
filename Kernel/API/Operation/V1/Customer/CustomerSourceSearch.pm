@@ -122,8 +122,12 @@ sub Run {
                 next if !$Attr->{Exposed};
 
                 my %AttrDef = %{$Attr};
+
+                # remove internal infos
                 delete $AttrDef{MappedTo};
                 delete $AttrDef{Type};
+                delete $AttrDef{Exposed};                
+
                 push(@AttributeMapping, \%AttrDef)   
 		    }
 
