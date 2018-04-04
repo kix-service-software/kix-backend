@@ -105,6 +105,14 @@ sub _LockPID {
 	close $FH;
 }
 
+# add middlewares
+builder {
+    enable "Deflater",
+        content_type => ['application/json'],
+        vary_user_agent => 1;
+    $App;
+};
+
 =back
 
 =head1 TERMS AND CONDITIONS
