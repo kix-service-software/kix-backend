@@ -403,7 +403,7 @@ sub SystemAddressLookup {
 
         # lookup
         $DBObject->Prepare(
-            SQL => "SELECT queue_id FROM system_address WHERE "
+            SQL => "SELECT id FROM system_address WHERE "
                 . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
                 . "AND value0 = ?",        
             Bind  => [ \$Param{Name} ],
