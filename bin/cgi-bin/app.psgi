@@ -107,7 +107,6 @@ sub _LockPID {
 
 # add middlewares
 builder {
-    enable "Refresh";
     enable "Deflater",
         content_type => ['application/json'],
         vary_user_agent => 1;
