@@ -1330,8 +1330,8 @@ via the Preferences button after logging in.
 
         # The last field must always be the email address so that a valid
         #   email address like "John Doe" <john.doe@domain.com> can be constructed from the fields.
-        CustomerUserListFields => [ 'first_name', 'last_name', 'email' ],
-
+#        CustomerUserListFields => [ 'first_name', 'last_name', 'email' ],
+        DisplayString => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
 #        CustomerUserListFields => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
         CustomerUserSearchFields           => [ 'login', 'first_name', 'last_name', 'customer_id' ],
         CustomerUserSearchPrefix           => '*',

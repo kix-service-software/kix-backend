@@ -219,14 +219,14 @@ sub CustomerSearch {
     my @Bind;
 
     # KIX4OTRS-capeIT
-    # if ( $Self->{CustomerUserMap}->{CustomerUserListFields} ) {
+    # if ( $Self->{CustomerUserMap}->{DisplayString} ) {
     if ( $Param{ListFields} && $Param{ListFields} ne '' ) {
         $SQL .= $Param{ListFields};
     }
-    elsif ( $Self->{CustomerUserMap}->{CustomerUserListFields} ) {
+    elsif ( $Self->{CustomerUserMap}->{DisplayString} ) {
 
         # EO KIX4OTRS-capeIT
-        for my $Entry ( @{ $Self->{CustomerUserMap}->{CustomerUserListFields} } ) {
+        for my $Entry ( @{ $Self->{CustomerUserMap}->{DisplayString} } ) {
             $SQL .= ", $Entry";
         }
     }
