@@ -135,7 +135,6 @@ sub Run {
     }
 
     my @ContactList;
-    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList();
     my $Config = $Kernel::OM->Get('Kernel::Config')->Get('CustomerUser');
   
     # start Contact loop
@@ -180,7 +179,7 @@ sub Run {
         }
 
         # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID ) ) {
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
             $AttributeWhitelist->{$Attr} = 1;
         } 
 
