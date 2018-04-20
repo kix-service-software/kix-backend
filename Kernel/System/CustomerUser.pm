@@ -431,11 +431,11 @@ sub CustomerUserDataGet {
             Data     => \%Customer,
             UserID   => 1,#$Self->{Authorization}->{UserID},
         );      
-     
+      
         if ( $DisplayValue ){
             $Customer{'StringValue'} = $DisplayValue;
         }
-      
+    
         # add preferences defaults
         my $Config = $ConfigObject->Get('CustomerPreferencesGroups');
         if ($Config) {
@@ -449,7 +449,7 @@ sub CustomerUserDataGet {
                 $Customer{ $Config->{$Key}->{PrefKey} } = $Config->{$Key}->{DataSelected};
             }
         }
- 
+
         # check if customer company support is enabled and get company data
         my %Company;
         if (

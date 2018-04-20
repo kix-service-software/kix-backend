@@ -1455,7 +1455,7 @@ sub _Replace {
 
     # cleanup
     $Param{Text} =~ s/$Tag.+?$End/-/gi;
-
+ 
     #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get customer and agent params and replace it with <KIX_CUSTOMER_... or <KIX_AGENT_...
     my %ArticleData = (

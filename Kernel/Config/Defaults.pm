@@ -1501,7 +1501,8 @@ via the Preferences button after logging in.
         # company unique id
         CustomerCompanyKey             => 'customer_id',
         CustomerCompanyValid           => 'valid_id',
-        CustomerCompanyListFields      => [ 'customer_id', 'name' ],
+        DisplayString                  => "<CustomerCompanyName> (<CustomerID>)",
+#        CustomerCompanyListFields      => [ 'customer_id', 'name' ],
         CustomerCompanySearchFields    => ['customer_id', 'name'],
         CustomerCompanySearchPrefix    => '*',
         CustomerCompanySearchSuffix    => '*',
