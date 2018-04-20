@@ -153,14 +153,6 @@ sub Run {
                 Message => "No Contact data found for ContactID $ContactID.",
             );
         }
-            
-        my $DisplayValue = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
-            RichText => '0',
-            Text =>  $Config->{'DisplayString'},
-            CustomerUserID => $ContactID,
-            Data     => \%ContactData,
-            UserID   => $Self->{Authorization}->{UserID},
-        );          
 
         # map UserID to ContactID
         $ContactData{ContactID} = $ContactData{UserID};
@@ -179,7 +171,7 @@ sub Run {
         }
 
         # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID StringValue) ) {
             $AttributeWhitelist->{$Attr} = 1;
         } 
 
@@ -195,10 +187,6 @@ sub Run {
             foreach my $Attr (sort keys %ContactData) {
                 delete $ContactData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
-        }
-        
-        if ( $DisplayValue ){
-            $ContactData{StringValue} = $DisplayValue;
         }
               
         # add

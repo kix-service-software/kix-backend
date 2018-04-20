@@ -462,9 +462,16 @@ sub CustomerSearch {
 
     # create ldap connect
     return if !$Self->_Connect();
-
+    
+    my @Attributes;
+    
     # combine needed attrs
-    my @Attributes = ( @{ $Self->{CustomerUserMap}->{DisplayString} }, $Self->{CustomerKey} );
+    if ( $Self->{CustomerUserMap}->{CustomerUserListFields} ) {
+        @Attributes = ( @{ $Self->{CustomerUserMap}->{CustomerUserListFields} }, $Self->{CustomerKey} );
+    }
+    else{
+        @Attributes = ( $Self->{CustomerKey} );
+    }
 
     # perform user search
     my $Result = $Self->{LDAP}->search(
@@ -501,7 +508,7 @@ sub CustomerSearch {
 
         my $CustomerString = '';
 
-        for my $Field ( @{ $Self->{CustomerUserMap}->{DisplayString} } ) {
+        for my $Field ( @{ $Self->{CustomerUserMap}->{CustomerUserListFields} } ) {
 
             my $Value = $Self->_ConvertFrom( $Entry->get_value($Field) );
 
