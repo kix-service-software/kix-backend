@@ -171,9 +171,15 @@ sub Run {
         }
 
         # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID DisplayValue) ) {
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID DisplayValue UserCustomerIDs) ) {
             $AttributeWhitelist->{$Attr} = 1;
         } 
+
+        # always add UserCustomerIDs (override existing one)
+        my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
+            User => $ContactID,
+        );
+        $ContactData{UserCustomerIDs} = \@CustomerIDs;
 
         # filter valid attributes
         if ( IsHashRefWithData($AttributeWhitelist) ) {
@@ -188,7 +194,7 @@ sub Run {
                 delete $ContactData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
-              
+
         # add
         push(@ContactList, \%ContactData);
     }
