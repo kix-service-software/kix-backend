@@ -1331,7 +1331,6 @@ via the Preferences button after logging in.
         # defines the format of the DisplayValue attribute
         DisplayString                      => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
 #        CustomerUserListFields             => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
-        CustomerUserSearchFields           => [ 'login', 'first_name', 'last_name', 'customer_id' ],
         CustomerUserSearchPrefix           => '*',
         CustomerUserSearchSuffix           => '*',
         CustomerUserSearchListLimit        => 250,
@@ -1365,11 +1364,11 @@ via the Preferences button after logging in.
             #   Type - special storage type (array, int)
             #   DefaultValue - fallback value if source dosn't contain a value for this attribute
             { Attribute => 'UserTitle',      Label => Translatable('Title or salutation'), MappedTo => 'title',       Exposed => 1},
-            { Attribute => 'UserFirstname',  Label => Translatable('Firstname'),           MappedTo => 'first_name',  Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'UserLastname',   Label => Translatable('Lastname'),            MappedTo => 'last_name',   Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'UserLogin',      Label => Translatable('Username'),            MappedTo => 'login',       Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
+            { Attribute => 'UserFirstname',  Label => Translatable('Firstname'),           MappedTo => 'first_name',  Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
+            { Attribute => 'UserLastname',   Label => Translatable('Lastname'),            MappedTo => 'last_name',   Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
+            { Attribute => 'UserLogin',      Label => Translatable('Username'),            MappedTo => 'login',       Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
             { Attribute => 'UserPassword',   Label => Translatable('Password'),            MappedTo => 'pw',          Exposed => 0 },
-            { Attribute => 'UserCustomerID', Label => Translatable('CustomerID'),          MappedTo => 'customer_id', Exposed => 1, Required => 1 },
+            { Attribute => 'UserCustomerID', Label => Translatable('CustomerID'),          MappedTo => 'customer_id', Exposed => 1, Required => 1, Searchable => 1 },
 #            { Attribute => 'UserCustomerIDs', Label => Translatable('CustomerIDs'),       MappedTo => 'customer_ids', Exposed => 1, Type => 'array' },
             { Attribute => 'UserPhone',      Label => Translatable('Phone'),               MappedTo => 'phone',       Exposed => 1, DisplayGroup => 'Communication' },
             { Attribute => 'UserFax',        Label => Translatable('Fax'),                 MappedTo => 'fax',         Exposed => 1, DisplayGroup => 'Communication' },
@@ -1431,7 +1430,6 @@ via the Preferences button after logging in.
 #        # defines the format of the DisplayValue attribute
 #        DisplayString           => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
 #        CustomerUserListFields => ['cn', 'mail'],
-#        CustomerUserSearchFields => ['uid', 'cn', 'mail'],
 #        CustomerUserSearchPrefix => '',
 #        CustomerUserSearchSuffix => '*',
 #        CustomerUserSearchListLimit => 250,
@@ -1455,11 +1453,12 @@ via the Preferences button after logging in.
 #            #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
 #            #   Type - special storage type (array, int)
 #            #   DefaultValue - fallback value if source dosn't contain a value for this attribute
+#            { Attribute => 'UserCommonName',  Label => Translatable('CN'),                  MappedTo => 'cn',                  Exposed => 0, Searchable => 1 },
 #            { Attribute => 'UserTitle',       Label => Translatable('Title or salutation'), MappedTo => 'title',               Exposed => 1 },
 #            { Attribute => 'UserFirstname',   Label => Translatable('Firstname'),           MappedTo => 'givenname',           Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
 #            { Attribute => 'UserLastname',    Label => Translatable('Lastname'),            MappedTo => 'sn',                  Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
-#            { Attribute => 'UserLogin',       Label => Translatable('Username'),            MappedTo => 'uid',                 Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
-#            { Attribute => 'UserCustomerID',  Label => Translatable('CustomerID'),          MappedTo => 'mail',                Exposed => 1, Required => 1 },
+#            { Attribute => 'UserLogin',       Label => Translatable('Username'),            MappedTo => 'uid',                 Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
+#            { Attribute => 'UserCustomerID',  Label => Translatable('CustomerID'),          MappedTo => 'mail',                Exposed => 1, Required => 1, Searchable => 1 },
 #            #{ Attribute => 'UserCustomerIDs', Label => Translatable('CustomerIDs'),        MappedTo => 'second_customer_ids', Exposed => 1 },
 #            { Attribute => 'UserPhone',       Label => Translatable('Phone'),               MappedTo => 'telephonenumber',     Exposed => 1, DisplayGroup => 'Communication' },
 #            { Attribute => 'UserEmail',       Label => Translatable('Email'),               MappedTo => 'mail',                Exposed => 1, Required => 1, DisplayGroup => 'Communication' },
