@@ -200,18 +200,14 @@ sub CustomerCompanyGet {
         my %Company = $Self->{"CustomerCompany$Count"}->CustomerCompanyGet( %Param, );
         next SOURCE if !%Company;
 
-        my $DisplayValue = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
-            RichText => '0',
-            Text =>  $ConfigObject->{"CustomerCompany$Count"}->{'DisplayString'},
-            CustomerUserID => $Param{User},
-            Data     => \%Company,
-            UserID   => 1,#$Self->{Authorization}->{UserID},
+        # add DisplayValue attribute
+        $Company{DisplayValue} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+            RichText       => '0',
+            Text           =>  $ConfigObject->{"CustomerCompany$Count"}->{'DisplayString'},
+            Data           => \%Company,
+            UserID         => 1,
         );      
       
-        if ( $DisplayValue ){
-            $Company{'StringValue'} = $DisplayValue;
-        }
-
         # return company data
         return (
             %Company,
