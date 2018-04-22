@@ -108,10 +108,16 @@ sub CustomerCompanyList {
     }
 
     # what is the result
-    my $What = join(
-        ', ',
-        @{ $Self->{CustomerCompanyMap}->{CustomerCompanyListFields} }
-    );
+    my $What;
+    if ($Self->{CustomerCompanyMap}->{CustomerCompanyListFields}) {
+        $What = join(
+            ', ',
+            @{ $Self->{CustomerCompanyMap}->{CustomerCompanyListFields} }
+        );
+    }
+    else {
+        $What = 'customer_id, name';
+    }
 
     # add valid option if required
     my $SQL;
