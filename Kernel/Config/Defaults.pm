@@ -1328,11 +1328,9 @@ via the Preferences button after logging in.
         CustomerID             => 'customer_id',
         CustomerValid          => 'valid_id',
 
-        # The last field must always be the email address so that a valid
-        #   email address like "John Doe" <john.doe@domain.com> can be constructed from the fields.
-#        CustomerUserListFields => [ 'first_name', 'last_name', 'email' ],
-        DisplayString => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
-#        CustomerUserListFields => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
+        # defines the format of the DisplayValue attribute
+        DisplayString                      => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
+#        CustomerUserListFields             => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
         CustomerUserSearchFields           => [ 'login', 'first_name', 'last_name', 'customer_id' ],
         CustomerUserSearchPrefix           => '*',
         CustomerUserSearchSuffix           => '*',
@@ -1430,6 +1428,8 @@ via the Preferences button after logging in.
 #        CustomerKey => 'uid',
 #        # customer #
 #        CustomerID => 'mail',
+#        # defines the format of the DisplayValue attribute
+#        DisplayString           => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
 #        CustomerUserListFields => ['cn', 'mail'],
 #        CustomerUserSearchFields => ['uid', 'cn', 'mail'],
 #        CustomerUserSearchPrefix => '',
@@ -1501,8 +1501,7 @@ via the Preferences button after logging in.
         # company unique id
         CustomerCompanyKey             => 'customer_id',
         CustomerCompanyValid           => 'valid_id',
-        DisplayString                  => "<CustomerCompanyName> (<CustomerID>)",
-#        CustomerCompanyListFields      => [ 'customer_id', 'name' ],
+        CustomerCompanyListFields      => [ 'customer_id', 'name' ],
         CustomerCompanySearchFields    => ['customer_id', 'name'],
         CustomerCompanySearchPrefix    => '*',
         CustomerCompanySearchSuffix    => '*',

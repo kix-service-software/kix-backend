@@ -171,7 +171,7 @@ sub Run {
         }
 
         # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID StringValue) ) {
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID DisplayValue) ) {
             $AttributeWhitelist->{$Attr} = 1;
         } 
 
