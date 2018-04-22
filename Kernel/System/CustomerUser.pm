@@ -174,6 +174,15 @@ sub new {
 
         # EO KIX4OTRS-capeIT
 
+        # prepare SearchFields for backend
+        my $CustomerUserMap = $ConfigObject->Get("CustomerUser$Count");
+        my @SearchFields;
+        foreach my $Attr ( @{$CustomerUserMap->{Map}} ) {
+            next if !$Attr->{Searchable};
+            push(@SearchFields, $Attr->{MappedTo});
+        }
+        $CustomerUserMap->{CustomerUserSearchFields} = \@SearchFields;
+
         my $GenericModule = $ConfigObject->Get("CustomerUser$Count")->{Module};
         if ( !$MainObject->Require($GenericModule) ) {
             $MainObject->Die("Can't load backend module $GenericModule! $@");
@@ -181,7 +190,7 @@ sub new {
         $Self->{"CustomerUser$Count"} = $GenericModule->new(
             Count             => $Count,
             PreferencesObject => $Self->{PreferencesObject},
-            CustomerUserMap   => $ConfigObject->Get("CustomerUser$Count"),
+            CustomerUserMap   => $CustomerUserMap,
         );
     }
 
