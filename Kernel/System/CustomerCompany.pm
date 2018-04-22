@@ -72,6 +72,15 @@ sub new {
 
         next SOURCE if !$ConfigObject->Get("CustomerCompany$Count");
 
+        # prepare SearchFields for backend
+        my $CustomerCompanyMap = $ConfigObject->Get("CustomerCompany$Count");
+        my @SearchFields;
+        foreach my $Attr ( @{$CustomerCompanyMap->{Map}} ) {
+            next if !$Attr->{Searchable};
+            push(@SearchFields, $Attr->{MappedTo});
+        }
+        $CustomerCompanyMap->{CustomerCompanySearchFields} = \@SearchFields;
+
         my $GenericModule = $ConfigObject->Get("CustomerCompany$Count")->{Module}
             || 'Kernel::System::CustomerCompany::DB';
         if ( !$MainObject->Require($GenericModule) ) {
@@ -79,7 +88,7 @@ sub new {
         }
         $Self->{"CustomerCompany$Count"} = $GenericModule->new(
             Count              => $Count,
-            CustomerCompanyMap => $ConfigObject->Get("CustomerCompany$Count"),
+            CustomerCompanyMap => $CustomerCompanyMap,
         );
     }
 

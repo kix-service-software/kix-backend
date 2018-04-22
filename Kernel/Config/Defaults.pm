@@ -1502,7 +1502,6 @@ via the Preferences button after logging in.
         CustomerCompanyValid           => 'valid_id',
         DisplayString                  => "<KIX_CUSTOMER_CustomerCompanyName> (<KIX_CUSTOMER_CustomerID>)",
 #        CustomerCompanyListFields      => [ 'customer_id', 'name' ],
-        CustomerCompanySearchFields    => ['customer_id', 'name'],
         CustomerCompanySearchPrefix    => '*',
         CustomerCompanySearchSuffix    => '*',
         CustomerCompanySearchListLimit => 250,
@@ -1516,8 +1515,8 @@ via the Preferences button after logging in.
             #   Exposed - if set to 1 the attribute will be expose in the API, if set to 0 it won't
             #   Required - if set to 1 the attribute will be needed in the API during Creation or Update, if set to 0 it won't
             #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
-            { Attribute => 'CustomerID',             Label => Translatable('CustomerID'), MappedTo => 'customer_id', Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'CustomerCompanyName',    Label => Translatable('Customer'),   MappedTo => 'name',        Exposed => 1, Required => 1, DisplayGroup => 'Basic Data' },
+            { Attribute => 'CustomerID',             Label => Translatable('CustomerID'), MappedTo => 'customer_id', Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
+            { Attribute => 'CustomerCompanyName',    Label => Translatable('Customer'),   MappedTo => 'name',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
             { Attribute => 'CustomerCompanyStreet',  Label => Translatable('Street'),     MappedTo => 'street',      Exposed => 1, DisplayGroup => 'Postal Address' },
             { Attribute => 'CustomerCompanyZIP',     Label => Translatable('Zip'),        MappedTo => 'zip',         Exposed => 1, DisplayGroup => 'Postal Address' },
             { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1, DisplayGroup => 'Postal Address' },
