@@ -135,7 +135,8 @@ sub Run {
     }
 
     my @ContactList;
-
+    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('CustomerUser');
+  
     # start Contact loop
     Contact:    
     foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
@@ -170,7 +171,7 @@ sub Run {
         }
 
         # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID) ) {
+        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID DisplayValue) ) {
             $AttributeWhitelist->{$Attr} = 1;
         } 
 
@@ -187,7 +188,7 @@ sub Run {
                 delete $ContactData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
-                
+              
         # add
         push(@ContactList, \%ContactData);
     }

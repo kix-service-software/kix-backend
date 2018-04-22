@@ -423,7 +423,16 @@ sub CustomerUserDataGet {
 
         my %Customer = $Self->{"CustomerUser$Count"}->CustomerUserDataGet( %Param, );
         next SOURCE if !%Customer;
-
+    
+        # add DisplayValue
+        $Customer{DisplayValue} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+            RichText       => '0',
+            Text           =>  $ConfigObject->{"CustomerUser$Count"}->{'DisplayString'},
+            CustomerUserID => $Param{User},
+            Data           => \%Customer,
+            UserID         => 1,
+        );      
+    
         # add preferences defaults
         my $Config = $ConfigObject->Get('CustomerPreferencesGroups');
         if ($Config) {
