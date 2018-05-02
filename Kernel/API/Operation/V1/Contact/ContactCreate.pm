@@ -193,9 +193,10 @@ sub Run {
     # create Contact
     my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
         %{$Contact},
-        Source  => $Param{Data}->{SourceID},
-        UserID  => $Self->{Authorization}->{UserID},
-        ValidID => 1,
+        UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $Contact->{UserCustomerID},
+        Source          => $Param{Data}->{SourceID},
+        UserID          => $Self->{Authorization}->{UserID},
+        ValidID         => 1,
     );    
     if ( !$ContactID ) {
         return $Self->_Error(

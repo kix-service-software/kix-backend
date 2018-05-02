@@ -197,8 +197,9 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
         %ContactData,
         %{$Contact},
-        ID     => $ContactData{UserID},
-        UserID => $Self->{Authorization}->{UserID},
+        UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $ContactData{UserCustomerIDs},
+        ID              => $ContactData{UserID},
+        UserID          => $Self->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
         return $Self->_Error(
