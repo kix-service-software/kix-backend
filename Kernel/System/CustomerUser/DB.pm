@@ -629,8 +629,8 @@ sub CustomerIDs {
         }
     }
 
-    # use also the primary customer id
-    if ( $Data{UserCustomerID} && !$Self->{ExcludePrimaryCustomerID} ) {
+    # use also the primary customer id if not already included
+    if ( $Data{UserCustomerID} && !$Self->{ExcludePrimaryCustomerID} && !grep(/^$Data{UserCustomerID}$/g, @CustomerIDs) ) {
         push @CustomerIDs, $Data{UserCustomerID};
     }
 
@@ -883,7 +883,7 @@ sub CustomerUserAdd {
     MAPENTRY:
     for my $Entry ( @{ $Self->{CustomerUserMap}->{Map} } ) {
         next MAPENTRY if ( lc( $Entry->{Attribute} ) eq "userpassword" );
-        next MAPENTRY if $SeenKey{ $Entry->{AppedTo} }++;
+        next MAPENTRY if $SeenKey{ $Entry->{MappedTo} }++;
         push @ColumnNames, $Entry->{MappedTo};
     }
 

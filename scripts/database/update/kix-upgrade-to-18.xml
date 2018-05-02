@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
+    <TableAlter Name="customer_user">
+        <ColumnAdd Name="customer_ids" Required="false" Size="10000" Type="VARCHAR"/>
+    </TableAlter>
     <TableAlter Name="article">
         <ColumnAdd Name="a_bcc" Required="false" Size="3800" Type="VARCHAR"/>    
     </TableAlter>

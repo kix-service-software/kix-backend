@@ -261,6 +261,13 @@ sub PrepareData {
                 $FlatData->{$DummyKey} = {};
             }
 
+            # combine flattened array for requirement checking
+            foreach my $Entry ( keys %{$FlatData} ) {
+                next if $Entry !~ /^(.*?):\d+/g;
+
+                $FlatData->{$1} = [];
+            }
+
             %Data = (
                 %Data,
                 %{$FlatData},

@@ -1475,6 +1475,7 @@
     <Column Name="login" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="email" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="customer_id" Required="true" Size="150" Type="VARCHAR"/>
+    <Column Name="customer_ids" Required="false" Size="10000" Type="VARCHAR"/>
     <Column Name="pw" Required="false" Size="64" Type="VARCHAR"/>
     <Column Name="title" Required="false" Size="50" Type="VARCHAR"/>
     <Column Name="first_name" Required="true" Size="100" Type="VARCHAR"/>
