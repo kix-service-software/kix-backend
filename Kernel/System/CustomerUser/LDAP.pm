@@ -37,7 +37,7 @@ sub new {
     }
 
     # max shown user a search list
-    $Self->{UserSearchListLimit} = $Self->{CustomerUserMap}->{CustomerUserSearchListLimit} || 200;
+    $Self->{UserSearchListLimit} = $Self->{CustomerUserMap}->{CustomerUserSearchListLimit} || 0;
 
     # get ldap preferences
     $Self->{Die} = 0;

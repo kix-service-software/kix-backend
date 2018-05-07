@@ -1333,7 +1333,6 @@ via the Preferences button after logging in.
 #        CustomerUserListFields             => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
         CustomerUserSearchPrefix           => '*',
         CustomerUserSearchSuffix           => '*',
-        CustomerUserSearchListLimit        => 250,
         CustomerUserPostMasterSearchFields => ['email'],
         CustomerUserNameFields             => [ 'title', 'first_name', 'last_name' ],
         CustomerUserEmailUniqCheck         => 1,
@@ -1432,7 +1431,6 @@ via the Preferences button after logging in.
 #        CustomerUserListFields => ['cn', 'mail'],
 #        CustomerUserSearchPrefix => '',
 #        CustomerUserSearchSuffix => '*',
-#        CustomerUserSearchListLimit => 250,
 #        CustomerUserPostMasterSearchFields => ['mail'],
 #        CustomerUserNameFields => ['givenname', 'sn'],
 #        # show now own tickets in customer panel, CompanyTickets
@@ -1504,7 +1502,6 @@ via the Preferences button after logging in.
 #        CustomerCompanyListFields      => [ 'customer_id', 'name' ],
         CustomerCompanySearchPrefix    => '*',
         CustomerCompanySearchSuffix    => '*',
-        CustomerCompanySearchListLimit => 250,
         CacheTTL                       => 60 * 60 * 24, # use 0 to turn off cache
 
         Map => [

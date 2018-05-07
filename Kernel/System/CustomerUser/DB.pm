@@ -47,7 +47,7 @@ sub new {
     # EO KIX4OTRS-capeIT
 
     # max shown user per search list
-    $Self->{UserSearchListLimit} = $Self->{CustomerUserMap}->{CustomerUserSearchListLimit} || 250;
+    $Self->{UserSearchListLimit} = $Self->{CustomerUserMap}->{CustomerUserSearchListLimit} || 0;
 
     # config options
     $Self->{CustomerTable} = $Self->{CustomerUserMap}->{Params}->{Table}
@@ -423,7 +423,7 @@ sub CustomerSearch {
     # get data
     return if !$Self->{DBObject}->Prepare(
         SQL   => $SQL,
-        Bind  => \@Bind,
+        Bind  => \@Bind, 
         Limit => $Param{Limit} || $Self->{UserSearchListLimit},
     );
     ROW:
