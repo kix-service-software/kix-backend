@@ -389,13 +389,12 @@ sub _TicketCreate {
     # set pending time
     elsif ( $StateData{TypeName} =~ /^pending/i ) {
 
-# TODO!!!!
         # set pending time
         if ( defined $Ticket->{PendingTime} ) {
             $TicketObject->TicketPendingTimeSet(
                 UserID   => $Param{UserID},
                 TicketID => $TicketID,
-                %{ $Ticket->{PendingTime} },
+                String   => $Ticket->{PendingTime},
             );
         }
     }
