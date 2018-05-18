@@ -1318,6 +1318,7 @@ Return
         TargetObject  => '...',     # optional
         TargetKey     => '...',     # optional
         Type          => '...'      # optional        
+        Limit         => 123        # optional
     );
 
 =cut
@@ -1339,13 +1340,14 @@ sub LinkSearch {
     }
 
     # check cache
-    my $CacheKey = 'LinkGet::'
+    my $CacheKey = 'LinkSearch::'
                  .$Param{UserID}.'::'
                  .($Param{SourceObject}||'').'::'
                  .($Param{SourceKey}||'').'::'
                  .($Param{TargetObject}||'').'::'
                  .($Param{TargetKey}||'').'::'
-                 .($Param{Type}||'');
+                 .($Param{Type}||'').'::'
+                 .($Param{Limit}||'');
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1402,8 +1404,9 @@ sub LinkSearch {
 
     # get links where the given object is the source
     return if !$DBObject->Prepare(
-        SQL  => $SQL,
-        Bind => \@BindVars
+        SQL   => $SQL,
+        Bind  => \@BindVars,
+        Limit => $Param{Limit}
     );
 
     # fetch results
