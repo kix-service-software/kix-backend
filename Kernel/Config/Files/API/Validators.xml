@@ -195,7 +195,7 @@
                 <Item Key="Module">StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">TicketStateGet</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketStateGet|ChecklistCreate|ChecklistUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

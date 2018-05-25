@@ -77,11 +77,13 @@ sub Run {
 
         # insert checklist data for this ticket id
         if ( defined $KIXSidebarChecklistStrg && $KIXSidebarChecklistStrg ) {
-            my $NewTasks = $Self->{TicketObject}->TicketChecklistUpdate(
-                TaskString => $KIXSidebarChecklistStrg,
-                TicketID   => $Param{TicketID},
-                State      => $KIXSidebarChecklistConfig->{DefaultCreateState} || 'open',
-            );
+            foreach my $Item (split(/\n/, KIXSidebarChecklistStrg)) {
+                my $ItemID = $Self->{TicketObject}->TicketChecklistItemAdd(
+                    TicketID => $Param{TicketID},
+                    Text     => $Item,
+                    State    => $KIXSidebarChecklistConfig->{DefaultCreateState} || 'open',
+                );
+            }
         }
     }
 

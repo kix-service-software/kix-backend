@@ -458,7 +458,7 @@ sub _TicketCreate {
         }
     }
 
-    # set attachments
+    # create articles
     if ( IsArrayRefWithData($Ticket->{Articles}) ) {
 
         foreach my $Article ( @{$Ticket->{Articles}} ) {
@@ -467,6 +467,26 @@ sub _TicketCreate {
                 Data          => {
                     TicketID => $TicketID,
                     Article  => $Article,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    ${$Result},
+                )
+            }
+        }
+    }
+
+    # create checklist
+    if ( IsHashRefWithData($Ticket->{Checklist}) ) {
+
+        foreach my $ChecklistItem ( @{$Ticket->{Checklist}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Ticket::TicketChecklistCreate',
+                Data          => {
+                    TicketID      => $TicketID,
+                    ChecklistItem => ChecklistItem,
                 }
             );
             
