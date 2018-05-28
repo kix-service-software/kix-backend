@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Ticket::TicketChecklistUpdate;
+package Kernel::API::Operation::V1::Ticket::ChecklistUpdate;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::TicketChecklistUpdate - API TicketChecklistUpdate Operation backend
+Kernel::API::Operation::V1::Ticket::ChecklistUpdate - API ChecklistUpdate Operation backend
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ArticleUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ChecklistUpdate');
 
     return $Self;
 }
@@ -71,9 +71,11 @@ perform TicketChecklistUpdate Operation. This will return the updated ChecklistI
         Data => {
             TicketID  => 123,                                                  # required
             ChecklistItemID  => 123',                                          # required            
-            CheckListItem => {                                                 # required
-                Value => '...'                                                 # required
-            }
+            ChecklistItem => {                                                 # required
+                Text     => '...',
+                State    => 'open',
+                Position => 1,
+            },
         },
     );
 
@@ -103,6 +105,10 @@ sub Run {
         );
     }
 
+    # get possible item states
+    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
+    my @PossibleItemStates = sort keys %{$PossibleItemStates};
+
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -110,19 +116,21 @@ sub Run {
             'TicketID' => {
                 Required => 1
             },
-            'ArticleID' => {
-                Required => 1
-            },
-            'FlagName' => {
-                Required => 1
-            },
-            'ArticleFlag' => {
+            'ChecklistItem' => {
                 Type     => 'HASH',
                 Required => 1
             },
-            'ArticleFlag::Value' => {
-                Required => 1
+            'ChecklistItem::Text' => {
+                RequiresValueIfUsed => 1,
             },
+            'ChecklistItem::State' => {
+                RequiresValueIfUsed => 1,
+                OneOf    => \@PossibleItemStates,
+            },
+            'ChecklistItem::Position' => {
+                RequiresValueIfUsed => 1,
+                Format   => '^(\d+)$',
+            },            
         }
     );
 
@@ -152,62 +160,47 @@ sub Run {
     if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to update article flag!",
+            Message => "No permission to update checkliste item",
         );
     }
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    my %Article = $TicketObject->ArticleGet(
-        ArticleID     => $Param{Data}->{ArticleID},
-        DynamicFields => 0,
+    # check if checklist item exists
+    my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
+        TicketID => $Param{Data}->{TicketID},
+        Result   => 'ID',
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
-    # check if article exists
-    if ( !%Article ) {
+    if ( !IsHashRefWithData($Checklist) || !$Checklist->{$Param{Data}->{ChecklistItemID}}) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            Message => "Checklist item $Param{Data}->{ChecklistItemID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
 
-    # check if article belongs to the given ticket
-    if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
-        );
-    }
-
-    # check if flag exists
-    my %ArticleFlags = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleFlagGet(
-        ArticleID => $Param{Data}->{ArticleID},
-        UserID    => $Self->{Authorization}->{UserID},
+    # isolate and trim ChecklistItem parameter
+    my $ChecklistItem = $Self->_Trim(
+        Data => $Param{Data}->{ChecklistItem},
     );
 
-    if ( !exists($ArticleFlags{$Param{Data}->{FlagName}}) ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update article flag. No flag with name '$Param{Data}->{FlagName}' found for the given article.",
-        );
-    }
-
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleFlagSet(
-        ArticleID => $Param{Data}->{ArticleID},
-        Key       => $Param{Data}->{FlagName},
-        Value     => $Param{Data}->{ArticleFlag}->{Value},
-        UserID    => $Self->{Authorization}->{UserID},
+    my $ChecklistItemID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistItemUpdate(
+        TicketID   => $Param{Data}->{TicketID},
+        ItemID     => $Param{Data}->{ChecklistItemID},
+        Text       => $ChecklistItem->{Text} || $Checklist->{$Param{Data}->{ChecklistItemID}}->{Text},
+        State      => $ChecklistItem->{State} || $Checklist->{$Param{Data}->{ChecklistItemID}}->{State},
+        Position   => $ChecklistItem->{Position} || $Checklist->{$Param{Data}->{ChecklistItemID}}->{Position},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$Success ) {
+    if ( !$ChecklistItemID ) {
         return $Self->_Error(
             Code         => 'Object.UnableToUpdate',
-            Message      => "Unable to update article flag '$Param{Data}->{FlagName}'",
+            Message      => "Unable to update checklist item $Param{Data}->{ChecklistItemID}",
         );
     }
 
     return $Self->_Success(
-        FlagName => $Param{Data}->{FlagName},
+        ChecklistItemID => $Param{Data}->{ChecklistItemID},
     );
 }
 

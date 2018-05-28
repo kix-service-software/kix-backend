@@ -29,11 +29,11 @@ All ticket ACL functions.
 
 =cut
 
-=item TicketChecklistUpdate()
+=item obsolete__TicketChecklistUpdate()
 
 Creates new tasks
 
-    my $HashRef = $TicketObject->TicketChecklistUpdate(
+    my $HashRef = $TicketObject->obsolete__TicketChecklistUpdate(
         TicketID => 123,
         ItemString => String,
         State => 'open',
@@ -41,7 +41,7 @@ Creates new tasks
 
 =cut
 
-sub TicketChecklistUpdate {
+sub obsolete__TicketChecklistUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -231,7 +231,7 @@ sub TicketChecklistItemUpdate {
     # update
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'UPDATE kix_ticket_checklist SET task = ?, position = ?, state = ? WHERE id = ?',
-        Bind => [ \$Param{Text}, \$Param{Position}, \$Param{ItemID}, \$Param{State} ],
+        Bind => [ \$Param{Text}, \$Param{Position}, \$Param{State}, \$Param{ItemID} ],
     );
 
     return 1;
@@ -321,7 +321,7 @@ sub TicketChecklistItemDelete {
 
 =item TicketChecklistGet()
 
-Returns a hash of task string and task data
+Returns a hash of items
 
     my $HashRef = $TicketObject->TicketChecklistGet(
         TicketID => 123,
@@ -333,7 +333,7 @@ sub TicketChecklistGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(TicketID Result)) {
+    for my $Needed (qw(TicketID)) {
         if ( !defined( $Param{$Needed} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')
                 ->Log( Priority => 'error', Message => "TicketChecklistGet: Need $Needed!" );
@@ -341,52 +341,26 @@ sub TicketChecklistGet {
         }
     }
 
-    # if order by given
-    if (
-        !defined $Param{Sort} || ( $Param{Sort} ne 'id' && $Param{Sort} ne 'position' )
-        )
-    {
-        $Param{Sort} = 'position';
-    }
-
     # fetch the result
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'SELECT id, task, state, position'
             . ' FROM kix_ticket_checklist'
-            . ' WHERE ticket_id = ? ORDER BY '.$Param{Sort},
+            . ' WHERE ticket_id = ? ORDER BY position',
         Bind => [ \$Param{TicketID} ],
     );
 
     # get checklist items
-    my %ChecklistData;
-    my $ChecklistString = '';
+    my %Checklist;
 
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
         my %TempHash;
         $TempHash{ID}       = $Row[0];
-        $TempHash{Item}     = $Row[1];
+        $TempHash{Text}     = $Row[1];
         $TempHash{State}    = $Row[2];
         $TempHash{Position} = $Row[3] || 0;
 
-        # create data hash
-        if ( $Param{Result} eq 'Item' ) {
-            $ChecklistData{ $Row[1] } = \%TempHash;
-        }
-        elsif ( $Param{Result} eq 'Position' ) {
-            $ChecklistData{ $Row[3] } = \%TempHash;
-        }
-        else {
-            $ChecklistData{ $Row[0] } = \%TempHash;
-        }
-
-        # create string
-        $ChecklistString .= $Row[1] . "\n";
+        $Checklist{ $Row[0] } = \%TempHash;
     }
-
-    # create hash of single task data and checklist string
-    my %Checklist;
-    $Checklist{Data}   = \%ChecklistData;
-    $Checklist{String} = $ChecklistString;
 
     # return hash
     return \%Checklist;

@@ -135,6 +135,19 @@ sub Run {
         );
     }
 
+    # check if checklist item exists
+    my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
+        TicketID => $Param{Data}->{TicketID},
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !IsHashRefWithData($Checklist) || !$Checklist->{$Param{Data}->{ChecklistItemID}}) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Checklist item $Param{Data}->{ChecklistItemID} not found in ticket $Param{Data}->{TicketID}",
+        );
+    }
+
     my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistItemDelete(
         ItemID => $Param{Data}->{ChecklistItemID}
     );

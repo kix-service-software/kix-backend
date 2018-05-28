@@ -134,14 +134,13 @@ sub Run {
 
     my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
         TicketID => $Param{Data}->{TicketID},
-        Result   => 'ID',
         UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( IsHashRefWithData($Checklist) ) {
 
         return $Self->_Success(
-            ChecklistItem => [ map {$Checklist->{Data}->{$_}} sort keys %{$Checklist->{Data}} ],
+            ChecklistItem => [ map {$Checklist->{$_}} sort keys %{$Checklist} ],
         )
     }
 

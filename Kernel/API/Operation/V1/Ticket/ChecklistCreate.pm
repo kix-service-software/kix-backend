@@ -71,9 +71,9 @@ perform ChecklistCreate Operation. This will return the created ChecklistItemID
         Data => {
             TicketID  => 123,                                                  # required
             ChecklistItem => {                                                 # required
-                Text     => '...',
-                Position => 1,
-                State    => 'open',
+                Text     => '...',                                             # required
+                State    => 'open',                                            # required
+                Position => 1,                                                 # required
             },
         },
     );
@@ -151,7 +151,7 @@ sub Run {
     if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to create checklist!",
+            Message => "No permission to create checklist item!",
         );
     }
 

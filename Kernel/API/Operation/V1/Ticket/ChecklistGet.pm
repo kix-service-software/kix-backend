@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Ticket::TicketChecklistGet;
+package Kernel::API::Operation::V1::Ticket::ChecklistGet;
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::TicketChecklistGet - API TicketChecklistGet Operation backend
+Kernel::API::Operation::V1::Ticket::ChecklistGet - API ChecklistGet Operation backend
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,6 @@ sub Run {
 
     my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
         TicketID => $Param{Data}->{TicketID},
-        Result   => 'ID',
         UserID   => $Self->{Authorization}->{UserID},
     );
 
@@ -154,7 +153,7 @@ sub Run {
         # start item loop
         ITEM:
         foreach my $ItemID ( sort @{$Param{Data}->{ChecklistItemID}} ) {
-            push(@ItemList, $Checklist->{Data}->{$ItemID});
+            push(@ItemList, $Checklist->{$ItemID});
         }
     }
 
