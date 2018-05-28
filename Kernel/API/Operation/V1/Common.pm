@@ -360,7 +360,7 @@ sub PrepareData {
                     last;
                 }
             }
-            if ( exists($Parameters{$Parameter}->{Format}) ) {
+            if ( exists($Data{$Parameter}) && exists($Parameters{$Parameter}->{Format}) ) {
                 if ( $Data{$Parameter} !~ /$Parameters{$Parameter}->{Format}/g ) {
                     $Result->{Success} = 0;
                     $Result->{Message} = "Parameter $Parameter has the wrong format!",

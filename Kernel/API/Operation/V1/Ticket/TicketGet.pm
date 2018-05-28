@@ -426,6 +426,20 @@ sub Run {
                 TicketID => $TicketID,
             );
         }
+
+        # include Checklist if requested
+        if ( $Param{Data}->{include}->{Checklist} ) {
+            # get already prepared Checklist data from TicketChecklistSearch operation
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Ticket::TicketChecklistSearch',
+                Data          => {
+                    TicketID  => $TicketID,
+                }
+            );
+            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                $TicketData{Checklist} = $Result->{Data}->{ChecklistItem};
+            }
+        }
         
         # add
         push(@TicketList, \%TicketData);

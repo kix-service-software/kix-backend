@@ -38,6 +38,11 @@
 /tickets/:TicketID/articles/:ArticleID/flags/:FlagName                  |   PATCH           | V1::Ticket::ArticleFlagUpdate
 /tickets/:TicketID/articles/:ArticleID/flags                            |   POST            | V1::Ticket::ArticleFlagCreate
 /tickets/:TicketID/articles/:ArticleID/attachments/zip                  |   GET             | V1::Ticket::ArticleAttachmentZipGet
+/tickets/:TicketID/checklist                                            |   GET             | V1::Ticket::ChecklistSearch
+/tickets/:TicketID/checklist                                            |   POST            | V1::Ticket::ChecklistCreate
+/tickets/:TicketID/checklist/:ChecklistItemID                           |   GET             | V1::Ticket::ChecklistGet
+/tickets/:TicketID/checklist/:ChecklistItemID                           |   PATCH           | V1::Ticket::ChecklistUpdate
+/tickets/:TicketID/checklist/:ChecklistItemID                           |   DELETE          | V1::Ticket::ChecklistDelete
 /ticketstates                                                           |   GET             | V1::TicketState::TicketStateSearch
 /ticketstates                                                           |   POST            | V1::TicketState::TicketStateCreate
 /ticketstates/:StateID                                                  |   GET             | V1::TicketState::TicketStateGet
