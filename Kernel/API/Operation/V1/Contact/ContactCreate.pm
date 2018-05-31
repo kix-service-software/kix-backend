@@ -196,7 +196,6 @@ sub Run {
         UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $Contact->{UserCustomerID},
         Source          => $Param{Data}->{SourceID},
         UserID          => $Self->{Authorization}->{UserID},
-        ValidID         => 1,
     );    
     if ( !$ContactID ) {
         return $Self->_Error(
