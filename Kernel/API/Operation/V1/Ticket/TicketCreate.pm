@@ -486,7 +486,7 @@ sub _TicketCreate {
                 OperationType => 'V1::Ticket::TicketChecklistCreate',
                 Data          => {
                     TicketID      => $TicketID,
-                    ChecklistItem => ChecklistItem,
+                    ChecklistItem => $ChecklistItem,
                 }
             );
             
