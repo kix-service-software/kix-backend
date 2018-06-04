@@ -151,7 +151,7 @@ sub ValidateToken {
     }
 
     # check idle time
-    if ($LastRequestTimeUnix) {
+    if ($LastRequestTimeUnix && !$Payload->{IgnoreMaxIdleTime}) {
         my $TokenMaxIdleTime = $ConfigObject->Get('TokenMaxIdleTime');
 
         if ( ( $TimeNow - $TokenMaxIdleTime ) >= $LastRequestTimeUnix ) {
@@ -192,6 +192,7 @@ create a new token with given data
             TokenType   => 'AccessToken',          # optional, used to create special AccessTokens
             ValidUntil  => 'YYYY-MM-YY HH24:MI:SS' # optional, used to create special AccessTokens
             RemoteIP    => '...'                   # optional, used to create special AccessTokens
+            IgnoreMaxIdleTime => '...'             # optional, used to create special AccessTokens
             PermittedOperations => {}              # optional, used to create special AccessTokens
             DeniedOperations => {}                 # optional, used to create special AccessTokens                          
             Description => '...'                   # optional, used to create special AccessTokens
@@ -254,6 +255,7 @@ sub CreateToken {
     $Payload{CreateTimeUnix}       = $TimeObject->SystemTime();
     $Payload{ValidUntilTimeUnix}   = $ValidUntilTimeUnix;
     $Payload{RemoteIP}             = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
+    $Payload{IgnoreMaxIdleTime}    = $Param{Payload}->{IgnoreMaxIdleTime} + 0 || 0;
     $Payload{Description}          = $Param{Payload}->{Description} || '';
     $Payload{TokenType}            = $Param{Payload}->{TokenType} || 'Normal';
     $Payload{AllowedOperations}    = $Param{Payload}->{AllowedOperations} || [];
