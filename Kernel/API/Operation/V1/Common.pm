@@ -799,8 +799,13 @@ sub _ApplyFilter {
                             }
                             # value is contained in an array or values
                             elsif ( $Filter->{Operator} eq 'IN' ) {
-                                if ( !grep(/^$FieldValue$/g, @{$FilterValue}) ) {
-                                    $FilterMatch = 0;
+                                $FilterMatch = 0;
+                                foreach $FilterValue ( @{$FilterValue} ) {
+                                    if ( $Type eq 'NUMERIC' ) {                                    
+                                        next if $FilterValue != $FieldValue + 0;
+                                    }
+                                    next if $FilterValue ne $FieldValue;
+                                    $FilterMatch = 1;
                                 }
                             }
                             # the string contains a part
