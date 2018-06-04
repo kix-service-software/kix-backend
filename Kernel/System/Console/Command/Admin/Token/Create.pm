@@ -47,7 +47,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'remote-ip',
-        Description => "The the remote IP for which the token should be valid.",
+        Description => "The remote IP for which the token should be valid. The value 0.0.0.0 represents all IPs.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -59,6 +59,14 @@ sub Configure {
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
+    );
+
+    $Self->AddOption(
+        Name        => 'ignore-max-idle-time',
+        Description => "Set to 1 to not validate the MaxIdleTime for this token.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/^1$/smx,
     );
 
     $Self->AddOption(
@@ -122,6 +130,7 @@ sub Run {
             UserType    => $UserType,
             ValidUntil  => $Self->GetOption('valid-until'),
             RemoteIP    => $Self->GetOption('remote-ip'),
+            IgnoreMaxIdleTime => $Self->GetOption('ignore-max-idle-time'),
             Description => $Self->GetOption('description'),
             AllowedOperations => \@AllowedOperations,
             DeniedOperations  => \@DeniedOperations,
