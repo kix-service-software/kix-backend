@@ -645,35 +645,19 @@ sub _ValidateFilter {
                     );                                
                 }
 
-                # prepare value if it is a DATE type
-                if ( $Filter->{Type} eq 'DATE' ) {
-                    if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
-                        return $Self->_Error(
-                            Code    => 'PrepareData.InvalidFilter',
-                            Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
-                        );
-                    }
-                    my ($DatePart, $TimePart) = split(/\s/, $Filter->{Value});
-
-                    # convert Value to unixtime to later compares
-                    $Filter->{Value} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                        String => $DatePart.' 12:00:00',
+                # check DATE value
+                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
+                    return $Self->_Error(
+                        Code    => 'PrepareData.InvalidFilter',
+                        Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
                     );
                 }
 
-                if ( $Filter->{Type} eq 'DATETIME' ) {
-                    if ( $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
-                        return $Self->_Error(
-                            Code    => 'PrepareData.InvalidFilter',
-                            Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
-                        );
-                    }
-                    my ($DatePart, $TimePart) = split(/\s/, $Filter->{Value});
-                    $TimePart =~ s/-/:/g;
-
-                    # convert Value to unixtime to later compares
-                    $Filter->{Value} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                        String => $DatePart.' '.$TimePart,
+                # check DATETIME value
+                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
+                    return $Self->_Error(
+                        Code    => 'PrepareData.InvalidFilter',
+                        Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
                     );
                 }
             }
