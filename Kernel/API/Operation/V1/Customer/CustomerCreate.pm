@@ -182,9 +182,9 @@ sub Run {
     # create Customer
     my $CustomerID = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyAdd(
         %{$Customer},
+        ValidID => $Customer->{ValidID} || 1,
         Source  => $Param{Data}->{SourceID},
         UserID  => $Self->{Authorization}->{UserID},
-        ValidID => 1,
     );    
     if ( !$CustomerID ) {
         return $Self->_Error(

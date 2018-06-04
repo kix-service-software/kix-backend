@@ -194,6 +194,7 @@ sub Run {
     my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
         %{$Contact},
         UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $Contact->{UserCustomerID},
+        ValidID         => $Contact->{ValidID} || 1,
         Source          => $Param{Data}->{SourceID},
         UserID          => $Self->{Authorization}->{UserID},
     );    

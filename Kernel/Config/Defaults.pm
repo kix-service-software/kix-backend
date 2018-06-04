@@ -1520,7 +1520,7 @@ via the Preferences button after logging in.
             { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1 },
             { Attribute => 'CustomerCompanyURL',     Label => Translatable('URL'),        MappedTo => 'url',         Exposed => 1, DisplayGroup => 'Web' },
             { Attribute => 'CustomerCompanyComment', Label => Translatable('Comment'),    MappedTo => 'comments',    Exposed => 1 },
-            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Type => 'int' },
+            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Type => 'int' },
         ],
     };
 
