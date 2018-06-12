@@ -43,6 +43,10 @@
 /tickets/:TicketID/checklist/:ChecklistItemID                           |   GET             | V1::Ticket::ChecklistGet
 /tickets/:TicketID/checklist/:ChecklistItemID                           |   PATCH           | V1::Ticket::ChecklistUpdate
 /tickets/:TicketID/checklist/:ChecklistItemID                           |   DELETE          | V1::Ticket::ChecklistDelete
+/tickets/:TicketID/watchers                                             |   GET             | V1::Ticket::WatchenSearch
+/tickets/:TicketID/watchers                                             |   POST            | V1::Ticket::WatcherCreate
+/tickets/:TicketID/watchers/:UserID                                     |   GET             | V1::Ticket::WatcherGet
+/tickets/:TicketID/watchers/:UserID                                     |   DELETE          | V1::Ticket::WatcherDelete
 /ticketstates                                                           |   GET             | V1::TicketState::TicketStateSearch
 /ticketstates                                                           |   POST            | V1::TicketState::TicketStateCreate
 /ticketstates/:StateID                                                  |   GET             | V1::TicketState::TicketStateGet
