@@ -69,8 +69,8 @@ perform ArticleFlagGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
-            TicketID         => 123                                            # required
-            UserID  => 1                                              # required 
+            TicketID   => 123                                            # required
+            WatcherID  => 1                                              # required 
     );
 
     $Result = {
@@ -78,11 +78,8 @@ one or more ticket entries in one call.
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
         Data         => {
-            WatcherItem => {
-                ID       => 1,
-                Task     => 'text1',
-                State    => 'open',
-                Position => 1
+            WatcherID => {
+                123
             }
         },
     };
@@ -111,7 +108,7 @@ sub Run {
             'TicketID' => {
                 Required => 1
             },
-            'UserID' => {
+            'WatcherID' => {
                 Type     => 'ARRAY',
                 Required => 1
             },
@@ -153,31 +150,31 @@ sub Run {
     
     my @WatchList;        
     USER:
-    foreach my $UserID ( @{$Param{Data}->{UserID}} ) {                 
+    foreach my $WatcherID ( @{$Param{Data}->{WatcherID}} ) {                 
         # start item loop
         ITEM:
     	foreach my $WatchUserID ( keys %Watcher ) {
-       		if ($WatchUserID == $UserID){
-				$Watcher{$WatchUserID}->{WatchUserID} = $WatchUserID;
+       		if ($WatchUserID == $WatcherID){
+				$Watcher{$WatchUserID}->{WatcherID} = $WatcherID;
             	push(@WatchList, $Watcher{$WatchUserID});
        		}
     	}
     }
-    
+  
     if ( scalar(@WatchList) == 0 ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could not get data for Watcher $Param{Data}->{UserID} in ticket $Param{Data}->{TicketID}",
+            Message => "Could not get data for Watcher $Param{Data}->{WatcherID} in ticket $Param{Data}->{TicketID}",
         );
     }
     elsif ( scalar(@WatchList) == 1 ) {
         return $Self->_Success(
-            WatcherUserID => $WatchList[0],
+            WatcherID => $WatchList[0],
         );    
     }
 
     return $Self->_Success(
-        WatchUserID => \@WatchList,
+        WatcherID => \@WatchList,
     );
 }
 

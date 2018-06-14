@@ -12389,11 +12389,11 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatchenSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherSearch" Required="0" Valid="1">
         <Description TranWatchertable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">WatchenSearchh</Item>
+                <Item Key="Name">WatcherSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

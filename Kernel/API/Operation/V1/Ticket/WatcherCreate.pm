@@ -69,9 +69,9 @@ perform WatcherCreate Operation. This will return the created WatcherItemID
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID  => 123,                                        # required
-            Watcher => {                                         # required
-                WatchUserID => 123,                                # required
+            TicketID  => 123,                                  # required
+            Watcher => {                                       # required
+                WatcherID => 123,                                # required
             },
         },
     );
@@ -81,7 +81,7 @@ perform WatcherCreate Operation. This will return the created WatcherItemID
         Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            WatcherItemID => 1
+            WatcherID => 1
         },
     };
 
@@ -102,10 +102,6 @@ sub Run {
         );
     }
 
-#    # get possible item states
-#    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarWatcher')->{ItemState};
-#    my @PossibleItemStates = sort keys %{$PossibleItemStates};
-
     # prepare data
     $Result = $Self->PrepareData(
         Data       => $Param{Data},
@@ -113,7 +109,7 @@ sub Run {
             'TicketID' => {
                 Required => 1
             },
-            'Watcher::WatchUserID' => {
+            'Watcher::WatcherID' => {
                 Required => 1
             },
         }
@@ -148,20 +144,20 @@ sub Run {
 
     my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchSubscribe(
         TicketID    => $Param{Data}->{TicketID},
-        WatchUserID => $Watcher->{WatchUserID},
+        WatchUserID => $Watcher->{WatcherID},
         UserID      => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Watcher item, please contact the system administrator',
+            Message => 'Could not create Watcher, please contact the system administrator',
         );
     }
 
     return $Self->_Success(
         Code            => 'Object.Created',
-        WatcherItemID => $Watcher->{WatchUserID},
+        WatcherID => $Watcher->{WatcherID},
     );
 }
 

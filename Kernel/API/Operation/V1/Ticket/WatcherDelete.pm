@@ -69,8 +69,8 @@ perform WatcherDelete Operation. This will return the deleted WatcherUserID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID          => 123,                                  # required
-            UserID   => 1                                              # required
+            TicketID    => 123,                                  # required
+            WatcherID   => 1                                     # required
         },
     );
 
@@ -79,7 +79,7 @@ perform WatcherDelete Operation. This will return the deleted WatcherUserID.
         Code            => '',                      #
         ErrorMessage    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            WatcherItemID   => 123,               # ID of deleted item
+            WatcherID   => 123,                     # ID of deleted item
         },
     };
 
@@ -107,7 +107,7 @@ sub Run {
             'TicketID' => {
                 Required => 1
             },
-            'UserID' => {
+            'WatcherID' => {
                 Required => 1
             },
         }
@@ -137,7 +137,7 @@ sub Run {
 
     my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchUnsubscribe(
         TicketID    => $Param{Data}->{TicketID},
-        WatchUserID => $Param{Data}->{UserID},
+        WatchUserID => $Param{Data}->{WatcherID},
         UserID   	=> $Self->{Authorization}->{UserID},
     );
 
@@ -149,7 +149,7 @@ sub Run {
     }
 
     return $Self->_Success(
-        WatcherItemID => [],
+        WatcherID => [],
     );
 }
 
