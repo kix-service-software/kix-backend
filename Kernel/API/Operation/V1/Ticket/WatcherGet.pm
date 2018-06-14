@@ -78,9 +78,11 @@ one or more ticket entries in one call.
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
         Data         => {
-            WatcherID => {
-                123
-            }
+            WatcherID => [
+                {
+                    ...
+                },
+            ]
         },
     };
 
@@ -160,11 +162,11 @@ sub Run {
        		}
     	}
     }
-  
+
     if ( scalar(@WatchList) == 0 ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could not get data for Watcher $Param{Data}->{WatcherID} in ticket $Param{Data}->{TicketID}",
+            Message => "Could no Watcher in ticket $Param{Data}->{TicketID}",
         );
     }
     elsif ( scalar(@WatchList) == 1 ) {

@@ -75,12 +75,7 @@ perform WatcherDelete Operation. This will return the deleted WatcherUserID.
     );
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      #
-        ErrorMessage    => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            WatcherID   => 123,                     # ID of deleted item
-        },
+        Message    => '',                      # in case of error
     };
 
 =cut
