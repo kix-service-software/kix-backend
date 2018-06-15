@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Ticket/WatchenSearch.pm - API User Search operation backend
+# Kernel/API/Operation/Ticket/WatcherSearch.pm - API User Search operation backend
 # based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
