@@ -151,7 +151,7 @@
                 <Item Key="Module">RoleValidator</Item>
                 <Item Key="Validates">Role,RoleID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">RoleGet</Item>
+                <Item Key="IgnoreOperationRegEx">(RoleGet|RoleCreate|RoleUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
