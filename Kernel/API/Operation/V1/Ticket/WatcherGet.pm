@@ -112,6 +112,7 @@ sub Run {
             },
             'WatcherID' => {
                 Type     => 'ARRAY',
+                DataType => 'NUMERIC',
                 Required => 1
             },
         }
@@ -139,44 +140,35 @@ sub Run {
         );
     }
     
-    my %Watcher = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
+    my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
         TicketID => $Param{Data}->{TicketID},
     );
-
-    if ( !IsHashRefWithData( \%Watcher ) ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Watcher not found for Ticket $Param{Data}->{TicketID}.",
-        );
-    }
     
-    my @WatchList;        
-    USER:
+    my @WatcherList;        
     foreach my $WatcherID ( @{$Param{Data}->{WatcherID}} ) {                 
-        # start item loop
-        ITEM:
-    	foreach my $WatchUserID ( keys %Watcher ) {
-       		if ($WatchUserID == $WatcherID){
-				$Watcher{$WatchUserID}->{WatcherID} = $WatcherID;
-            	push(@WatchList, $Watcher{$WatchUserID});
-       		}
-    	}
+        next if !$Watchers{$WatcherID};
+
+        $Watchers{$WatcherID}->{TicketID} = $Param{Data}->{TicketID} + 0;
+        $Watchers{$WatcherID}->{UserID}   = $WatcherID + 0;
+        $Watchers{$WatcherID}->{ID}       = $WatcherID + 0;
+
+        push(@WatcherList, $Watchers{$WatcherID});
     }
 
-    if ( scalar(@WatchList) == 0 ) {
+    if ( scalar(@WatcherList) == 0 ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could no Watcher in ticket $Param{Data}->{TicketID}",
+            Message => "Could not get data for watcher ".join(',', $Param{Data}->{WatcherID})." in ticket $Param{Data}->{TicketID}",
         );
     }
-    elsif ( scalar(@WatchList) == 1 ) {
+    elsif ( scalar(@WatcherList) == 1 ) {
         return $Self->_Success(
-            WatcherID => $WatchList[0],
+            Watcher => $WatcherList[0],
         );    
     }
 
     return $Self->_Success(
-        WatcherID => \@WatchList,
+        Watcher => \@WatcherList,
     );
 }
 

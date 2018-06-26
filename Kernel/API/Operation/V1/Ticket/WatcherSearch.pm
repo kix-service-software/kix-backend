@@ -150,7 +150,7 @@ sub Run {
             return $WatcherResult;
         }
 
-        my @WatcherList = IsArrayRefWithData($WatcherResult->{Data}->{WatcherID}) ? @{$WatcherResult->{Data}->{WatcherID}} : ( $WatcherResult->{Data}->{WatcherID} );
+        my @WatcherList = IsArrayRefWithData($WatcherResult->{Data}->{Watcher}) ? @{$WatcherResult->{Data}->{Watcher}} : ( $WatcherResult->{Data}->{Watcher} );
 
         if ( IsArrayRefWithData(\@WatcherList) ) {
             return $Self->_Success(

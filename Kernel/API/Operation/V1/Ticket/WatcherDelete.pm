@@ -126,7 +126,19 @@ sub Run {
     if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to delete Watcher item.",
+            Message => "No permission to delete Watcher.",
+        );
+    }
+
+    # check if Watcher exists
+    my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
+        TicketID => $Param{Data}->{TicketID},
+    );
+    
+    if ( !$Watchers{$Param{Data}->{WatcherID}} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Watcher $Param{Data}->{WatcherID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
 
@@ -143,8 +155,9 @@ sub Run {
         );
     }
 
+    # return result
     return $Self->_Success(
-        WatcherID => [],
+        WatcherID => $Param{Data}->{WatcherID},
     );
 }
 

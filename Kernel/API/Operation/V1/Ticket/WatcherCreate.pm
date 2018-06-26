@@ -71,7 +71,7 @@ perform WatcherCreate Operation. This will return the created WatcherItemID
         Data => {
             TicketID  => 123,                                  # required
             Watcher => {                                       # required
-                WatcherID => 123,                                # required
+                UserID => 123,                                 # required
             },
         },
     );
@@ -109,7 +109,7 @@ sub Run {
             'TicketID' => {
                 Required => 1
             },
-            'Watcher::WatcherID' => {
+            'Watcher::UserID' => {
                 Required => 1
             },
         }
@@ -133,7 +133,7 @@ sub Run {
     if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to create Watcher item!",
+            Message => "No permission to add Watchers!",
         );
     }
 
@@ -142,9 +142,21 @@ sub Run {
         Data => $Param{Data}->{Watcher},
     );
 
+    # check if Watcher exists
+    my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
+        TicketID => $Param{Data}->{TicketID},
+    );
+    
+    if ( $Watchers{$Watcher->{UserID}} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not create Watcher. Watcher already exists.",
+        );
+    }
+    
     my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchSubscribe(
         TicketID    => $Param{Data}->{TicketID},
-        WatchUserID => $Watcher->{WatcherID},
+        WatchUserID => $Watcher->{UserID},
         UserID      => $Self->{Authorization}->{UserID},
     );
 
@@ -156,8 +168,8 @@ sub Run {
     }
 
     return $Self->_Success(
-        Code            => 'Object.Created',
-        WatcherID => $Watcher->{WatcherID},
+        Code      => 'Object.Created',
+        WatcherID => $Watcher->{UserID},
     );
 }
 
