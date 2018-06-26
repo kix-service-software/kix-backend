@@ -315,6 +315,34 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ChecklistDelete
+    V1::Ticket::WatcherSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::WatcherSearch
+    V1::Ticket::WatcherCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::WatcherCreate
+    V1::Ticket::WatcherGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::WatcherGet
+    V1::Ticket::WatcherDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Ticket::WatcherDelete
     V1::TicketState::TicketStateSearch:
         Description: ''
         MappingInbound:
@@ -1624,6 +1652,22 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /tickets/:TicketID/checklist/:ChecklistItemID
+        V1::Ticket::WatcherSearch:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/watchers
+        V1::Ticket::WatcherCreate:
+          RequestMethod:
+          - POST
+          Route: /tickets/:TicketID/watchers
+        V1::Ticket::WatcherGet:
+          RequestMethod:
+          - GET
+          Route: /tickets/:TicketID/watchers/:WatcherID
+        V1::Ticket::WatcherDelete:
+          RequestMethod:
+          - DELETE
+          Route: /tickets/:TicketID/watchers/:WatcherID
         V1::TicketState::TicketStateSearch:
           RequestMethod:
           - GET
