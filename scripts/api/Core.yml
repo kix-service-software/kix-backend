@@ -1,6 +1,6 @@
 ---
 Debugger:
-  DebugThreshold: debug
+  DebugThreshold: error
   TestMode: 0
 Description: KIX Core API
 FrameworkVersion: __VERSION__
