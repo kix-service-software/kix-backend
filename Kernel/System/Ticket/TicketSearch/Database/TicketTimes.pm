@@ -156,7 +156,7 @@ sub Filter {
             Result    => 'ID',
         );
         if (@List) {
-            push( @SQLWhere, 'st.ticket_state_id IN ('.(join(', ', sort @List)).')' );
+            push( @SQLWhere, 'st.ticket_state_id IN ('.(join(', ', sort @List)). ')' );
         }
     }
 

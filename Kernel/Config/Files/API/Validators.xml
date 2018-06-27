@@ -129,7 +129,7 @@
                 <Item Key="Module">PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">PriorityGet</Item>
+                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriotityCreate|PriorityUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -151,7 +151,7 @@
                 <Item Key="Module">RoleValidator</Item>
                 <Item Key="Validates">Role,RoleID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">RoleGet</Item>
+                <Item Key="IgnoreOperationRegEx">(RoleGet|RoleCreate|RoleUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

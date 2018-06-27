@@ -645,7 +645,7 @@ sub _ValidateFilter {
                     );                                
                 }
 
-                # check date value
+                # check DATE value
                 if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
                     return $Self->_Error(
                         Code    => 'PrepareData.InvalidFilter',
@@ -653,7 +653,7 @@ sub _ValidateFilter {
                     );
                 }
 
-                # check datetime value
+                # check DATETIME value
                 if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
                     return $Self->_Error(
                         Code    => 'PrepareData.InvalidFilter',
@@ -713,109 +713,120 @@ sub _ApplyFilter {
                                 $FilterValue = undef;
                             }
 
-                            # prepare date compare
-                            if ( $Type eq 'DATE' ) {
-                                # convert values to unixtime
-                                my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
-                                $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                                    String => $DatePart.' 12:00:00',
-                                );
-                                # handle this as a numeric compare
-                                $Type = 'NUMERIC';
-                            }
-                            # prepare datetime compare
-                            elsif ( $Type eq 'DATETIME' ) {
-                                # convert values to unixtime
-                                $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                                    String => $FieldValue,
-                                );
-                                # handle this as a numeric compare
-                                $Type = 'NUMERIC';
+                            my @FieldValues = ( $FieldValue );
+                            if ( IsArrayRefWithData($FieldValue) ) {
+                                @FieldValues = @{$FieldValue}
                             }
 
-                            # equal (=)
-                            if ( $Filter->{Operator} eq 'EQ' ) {
-                                if ( !$FilterValue && $FieldValue ) {
-                                    $FilterMatch = 0
+                            # handle multiple FieldValues (array)
+                            FIELDVALUE:
+                            foreach my $FieldValue ( @FieldValues ) {
+                                # prepare date compare
+                                if ( $Type eq 'DATE' ) {
+                                    # convert values to unixtime
+                                    my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
+                                    $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                        String => $DatePart.' 12:00:00',
+                                    );
+                                    # handle this as a numeric compare
+                                    $Type = 'NUMERIC';
                                 }
-                                elsif ( $Type eq 'STRING' && ($FieldValue||'') ne ($FilterValue||'') ) {
-                                    $FilterMatch = 0;
+                                # prepare datetime compare
+                                elsif ( $Type eq 'DATETIME' ) {
+                                    # convert values to unixtime
+                                    $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                        String => $FieldValue,
+                                    );
+                                    # handle this as a numeric compare
+                                    $Type = 'NUMERIC';
                                 }
-                                elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') != ($FilterValue||'') ) {
-                                    $FilterMatch = 0;
-                                }                                
-                            }
-                            # not equal (!=)
-                            elsif ( $Filter->{Operator} eq 'NE' ) {                        
-                                if ( !$FilterValue && !$FieldValue ) {
-                                    $FilterMatch = 0
-                                }
-                                elsif ( $Type eq 'STRING' && ($FieldValue||'') eq ($FilterValue||'') ) {
-                                    $FilterMatch = 0;
-                                }
-                                elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') == ($FilterValue||'') ) {
-                                    $FilterMatch = 0;
-                                }                                
-                            }
-                            # less than (<)
-                            elsif ( $Filter->{Operator} eq 'LT' ) {               
-                                if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
-                                    $FilterMatch = 0;
-                                }                                
-                            }
-                            # greater than (>)
-                            elsif ( $Filter->{Operator} eq 'GT' ) {                        
-                                if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
-                                    $FilterMatch = 0;
-                                }                                
-                            }
-                            # less than or equal (<=)
-                            elsif ( $Filter->{Operator} eq 'LTE' ) {                        
-                                if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
-                                    $FilterMatch = 0;
-                                }                                
-                            }
-                            # greater than or equal (>=)
-                            elsif ( $Filter->{Operator} eq 'GTE' ) {                        
-                                if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
-                                    $FilterMatch = 0;
-                                }                                
-                            }
-                            # value is contained in an array or values
-                            elsif ( $Filter->{Operator} eq 'IN' ) {
-                                $FilterMatch = 0;
-                                foreach $FilterValue ( @{$FilterValue} ) {
-                                    if ( $Type eq 'NUMERIC' ) {                                    
-                                        next if $FilterValue != $FieldValue + 0;
+
+                                # equal (=)
+                                if ( $Filter->{Operator} eq 'EQ' ) {
+                                    if ( !$FilterValue && $FieldValue ) {
+                                        $FilterMatch = 0
                                     }
-                                    next if $FilterValue ne $FieldValue;
-                                    $FilterMatch = 1;
+                                    elsif ( $Type eq 'STRING' && ($FieldValue||'') ne ($FilterValue||'') ) {
+                                        $FilterMatch = 0;
+                                    }
+                                    elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') != ($FilterValue||'') ) {
+                                        $FilterMatch = 0;
+                                    }                                
                                 }
-                            }
-                            # the string contains a part
-                            elsif ( $Filter->{Operator} eq 'CONTAINS' ) {                        
-                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                # not equal (!=)
+                                elsif ( $Filter->{Operator} eq 'NE' ) {                        
+                                    if ( !$FilterValue && !$FieldValue ) {
+                                        $FilterMatch = 0
+                                    }
+                                    elsif ( $Type eq 'STRING' && ($FieldValue||'') eq ($FilterValue||'') ) {
+                                        $FilterMatch = 0;
+                                    }
+                                    elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') == ($FilterValue||'') ) {
+                                        $FilterMatch = 0;
+                                    }                                
+                                }
+                                # less than (<)
+                                elsif ( $Filter->{Operator} eq 'LT' ) {                        
+                                    if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }                                
+                                }
+                                # greater than (>)
+                                elsif ( $Filter->{Operator} eq 'GT' ) {                        
+                                    if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }                                
+                                }
+                                # less than or equal (<=)
+                                elsif ( $Filter->{Operator} eq 'LTE' ) {                        
+                                    if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }                                
+                                }
+                                # greater than or equal (>=)
+                                elsif ( $Filter->{Operator} eq 'GTE' ) {                        
+                                    if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }                                
+                                }
+                                # value is contained in an array or values
+                                elsif ( $Filter->{Operator} eq 'IN' ) {
                                     $FilterMatch = 0;
+                                    foreach $FilterValue ( @{$FilterValue} ) {
+                                        if ( $Type eq 'NUMERIC' ) {                                    
+                                            next if $FilterValue != $FieldValue + 0;
+                                        }
+                                        next if $FilterValue ne $FieldValue;
+                                        $FilterMatch = 1;
+                                    }
                                 }
+                                # the string contains a part
+                                elsif ( $Filter->{Operator} eq 'CONTAINS' ) {                        
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+                                # the string starts with the part
+                                elsif ( $Filter->{Operator} eq 'STARTSWITH' ) {                        
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+                                # the string ends with the part
+                                elsif ( $Filter->{Operator} eq 'ENDSWITH' ) {                        
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+                                # the string matches the pattern
+                                elsif ( $Filter->{Operator} eq 'LIKE' ) {                        
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                last if $FilterMatch;
                             }
-                            # the string starts with the part
-                            elsif ( $Filter->{Operator} eq 'STARTSWITH' ) {                        
-                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
-                                    $FilterMatch = 0;
-                                }
-                            }
-                            # the string ends with the part
-                            elsif ( $Filter->{Operator} eq 'ENDSWITH' ) {                        
-                                if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
-                                    $FilterMatch = 0;
-                                }
-                            }
-                            # the string matches the pattern
-                            elsif ( $Filter->{Operator} eq 'LIKE' ) {                        
-                                if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
-                                    $FilterMatch = 0;
-                                }
-                            }                            
 
                             if ( $Filter->{Not} ) {
                                 # negate match result
