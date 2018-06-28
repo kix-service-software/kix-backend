@@ -10,7 +10,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },
@@ -24,7 +24,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -41,7 +41,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -58,7 +58,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -73,7 +73,7 @@
                 "Operators": [
                     "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -84,7 +84,7 @@
                 "Operators": [
                     "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -96,7 +96,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -108,7 +108,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -120,7 +120,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -132,7 +132,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -143,7 +143,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -154,7 +154,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -165,7 +165,7 @@
                 "Operators": [
                     "EQ", "LT", "GT", "LTE", "GTE"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -180,7 +180,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -191,7 +191,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -202,7 +202,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -213,7 +213,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -224,7 +224,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -235,7 +235,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -246,7 +246,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -257,7 +257,7 @@
                 "Operators": [
                     "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -268,7 +268,7 @@
                 "Operators": [
                     "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         },        
@@ -279,7 +279,7 @@
                 "Operators": [
                     "EQ", "IN"
                 ],
-                "NOT": false,
+                "Not": false,
                 "Sortable": true
             }
         }
