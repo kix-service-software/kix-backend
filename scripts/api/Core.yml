@@ -1470,6 +1470,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SenderType::SenderTypeSearch
+    V1::ObjectDefinition::ObjectDefinitionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectDefinition::ObjectDefinitionSearch
+    V1::ObjectDefinition::ObjectDefinitionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectDefinition::ObjectDefinitionGet
 
   Transport:
     Config:
@@ -2312,6 +2326,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /sendertypes
+        V1::ObjectDefinition::ObjectDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /objectdefinitions
+        V1::ObjectDefinition::ObjectDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /objectdefinitions/:ObjectType
 
     Type: HTTP::REST
 RemoteSystem: ''

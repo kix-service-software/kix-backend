@@ -146,6 +146,57 @@ sub new {
     return $Self;
 }
 
+=item GetObjectDefinition()
+
+Returns the JSON definition of a given object
+
+    my $ObjectDefinition = $Kernel::OM->GetObjectDefinition('Ticket');
+
+=cut
+
+sub GetObjectDefinition {
+    my ( $Self, $Object ) = @_;
+
+    my $Result = $Self->Get('Kernel::System::Main')->FileRead(
+        Directory => $Self->Get('Kernel::Config')->Get('Home').'/Kernel/Config/ObjectDefinitions',
+        Filename  => $Object.'.json',
+    );
+
+    if ( ref $Result ne 'SCALAR' ) {
+        $Self->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Unable to get object definition for object "'.$Object.'"',
+        );
+        return;
+    }
+
+    return $Self->Get('Kernel::System::JSON')->Decode(Data => $$Result);
+}
+
+=item GetObjectDefinitionList()
+
+Returns an array of object types for which a definition exists
+
+    my @ObjectDefinitionList = $Kernel::OM->GetObjectDefinitionList();
+
+=cut
+
+sub GetObjectDefinitionList {
+    my ( $Self, %Param ) = @_;
+
+    my @Result = $Self->Get('Kernel::System::Main')->DirectoryRead(
+        Directory => $Self->Get('Kernel::Config')->Get('Home').'/Kernel/Config/ObjectDefinitions',
+        Filter    => '*.json',
+    );
+
+    use File::Basename;
+    foreach my $File (@Result) {
+        $File = basename($File, '.json');
+    }
+
+    return @Result;
+}
+
 =item Get()
 
 Retrieves a singleton object, and if it not yet exists, implicitly creates one for you.
