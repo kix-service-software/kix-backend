@@ -208,4 +208,6 @@
 /objecticons/:ObjectIconID                                              |   DELETE          | V1::ObjectIcon::ObjectIconDelete
 /sendertypes/:SenderTypeID                                              |   GET             | V1::SenderType::SenderTypeGet
 /sendertypes                                                            |   GET             | V1::SenderType::SenderTypeSearch
+/objectdefinitions                                                      |   GET             | V1::ObjectDefinition::ObjectDefinitionSearch
+/objectdefinitions/:ObjectType                                          |   GET             | V1::ObjectDefinition::ObjectDefinitionGet
 

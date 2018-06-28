@@ -1,0 +1,287 @@
+{
+    "Object": "Ticket",
+    "Attributes": [
+        {
+            "Name": "Age",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Name": "Age",
+                "Datatype": "DATETIME",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },
+        {
+            "Name": "ArchiveFlag",
+            "Datatype": "STRING",
+            "PossibleValues": [
+                "y", "n"
+            ],
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "ChangeBy",
+            "Datatype": "INTEGER",
+            "References": "User"
+        },        
+        {
+            "Name": "Changed",
+            "Datatype": "DATETIME",
+            "Search": {
+                "Name": "ChangeTime",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "CreateBy",
+            "Datatype": "INTEGER",
+            "References": "User"
+        },        
+        {
+            "Name": "Created",
+            "Datatype": "DATETIME",
+            "Search": {
+                "Name": "CreateTime",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "CreateTimeUnix",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "CustomerID",
+            "Datatype": "STRING",
+            "Search": {
+                "Operators": [
+                    "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "CustomerUserID",
+            "Datatype": "STRING",
+            "Search": {
+                "Operators": [
+                    "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "EscalationResponseTime",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Datatype": "DATETIME",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "EscalationSolutionTime",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Datatype": "DATETIME",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "EscalationTime",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Datatype": "DATETIME",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "EscalationUpdateTime",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Datatype": "DATETIME",
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "LockID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "OwnerID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "PendingTime",
+            "Datatype": "DATETIME",
+            "Search": {
+                "Operators": [
+                    "EQ", "LT", "GT", "LTE", "GTE"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "PendingTimeUnix",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "PriorityID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "QueueID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "ResponsibleID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "ServiceID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "SLAID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "StateID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "TicketID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "TicketNumber",
+            "Datatype": "STRING",
+            "Search": {
+                "Operators": [
+                    "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "Title",
+            "Datatype": "STRING",
+            "Search": {
+                "Operators": [
+                    "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        },        
+        {
+            "Name": "TypeID",
+            "Datatype": "INTEGER",
+            "Search": {
+                "Operators": [
+                    "EQ", "IN"
+                ],
+                "NOT": false,
+                "Sortable": true
+            }
+        }
+    ]
+}
