@@ -697,6 +697,9 @@ sub _ApplyFilter {
                         foreach my $Filter ( @{$Self->{Filter}->{$Object}->{$BoolOperator}} ) {
                             my $FilterMatch = 1;
 
+                            # ignore filter attributes that are not contained in the response (otherwise the filter will fail)
+                            next if (!exists($ObjectItem->{$Filter->{Field}}));
+
                             my $FieldValue = $ObjectItem->{$Filter->{Field}};
                             my $FilterValue = $Filter->{Value};
                             my $Type = $Filter->{Type};
