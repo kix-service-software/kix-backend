@@ -164,43 +164,40 @@ sub Run {
             "<green>Done</green> (changed <yellow>$Count</yellow> articles for user <yellow>$User{UserLogin}</yellow>).\n"
         );
 
-        if ( $ConfigObject->Get('Ticket::Watcher') ) {
+        $Self->Print(
+            "Checking for tickets with ticket watcher entries for user <yellow>$User{UserLogin}</yellow>...\n"
+        );
 
-            $Self->Print(
-                "Checking for tickets with ticket watcher entries for user <yellow>$User{UserLogin}</yellow>...\n"
-            );
+        return if !$DBObject->Prepare(
+            SQL => "
+                SELECT DISTINCT(ticket.id)
+                FROM ticket
+                    INNER JOIN ticket_watcher ON ticket.id = ticket_watcher.ticket_id",
+            Limit => 1_000_000,
+        );
 
-            return if !$DBObject->Prepare(
-                SQL => "
-                    SELECT DISTINCT(ticket.id)
-                    FROM ticket
-                        INNER JOIN ticket_watcher ON ticket.id = ticket_watcher.ticket_id",
-                Limit => 1_000_000,
-            );
-
-            @TicketIDs = ();
-            while ( my @Row = $DBObject->FetchrowArray() ) {
-                push @TicketIDs, $Row[0];
-            }
-
-            my $Count = 0;
-            for my $TicketID (@TicketIDs) {
-
-                $TicketObject->TicketWatchUnsubscribe(
-                    TicketID    => $TicketID,
-                    WatchUserID => $UserID,
-                    UserID      => 1,
-                );
-                $Count++;
-                print
-                    "    Removing ticket watcher entries of ticket <yellow>$TicketID</yellow> for user <yellow>$User{UserLogin}</yellow>\n";
-                Time::HiRes::usleep($MicroSleep) if $MicroSleep;
-            }
-
-            $Self->Print(
-                "<green>Done</green> (changed <yellow>$Count</yellow> tickets for user <yellow>$User{UserLogin}</yellow>).\n"
-            );
+        @TicketIDs = ();
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            push @TicketIDs, $Row[0];
         }
+
+        my $Count = 0;
+        for my $TicketID (@TicketIDs) {
+
+            $TicketObject->TicketWatchUnsubscribe(
+                TicketID    => $TicketID,
+                WatchUserID => $UserID,
+                UserID      => 1,
+            );
+            $Count++;
+            print
+                "    Removing ticket watcher entries of ticket <yellow>$TicketID</yellow> for user <yellow>$User{UserLogin}</yellow>\n";
+            Time::HiRes::usleep($MicroSleep) if $MicroSleep;
+        }
+
+        $Self->Print(
+            "<green>Done</green> (changed <yellow>$Count</yellow> tickets for user <yellow>$User{UserLogin}</yellow>).\n"
+        );
     }
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

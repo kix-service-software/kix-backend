@@ -4369,7 +4369,6 @@ sub TicketArchiveFlagSet {
 
         if (
             $ConfigObject->Get('Ticket::ArchiveSystem::RemoveTicketWatchers')
-            && $ConfigObject->Get('Ticket::Watcher')
             )
         {
             $Self->TicketWatchUnsubscribe(
@@ -6655,9 +6654,6 @@ sub TicketWatchGet {
         );
         return;
     }
-
-    # check if feature is enabled
-    return if !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::Watcher');
 
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');

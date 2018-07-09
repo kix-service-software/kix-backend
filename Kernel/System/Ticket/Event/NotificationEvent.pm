@@ -672,7 +672,6 @@ sub _RecipientsGet {
                 }
                 elsif ( $Recipient eq 'AgentWatcher' ) {
 
-                    # is not needed to check Ticket::Watcher,
                     # its checked on TicketWatchGet function
                     push @{ $Notification{Data}->{RecipientAgents} }, $TicketObject->TicketWatchGet(
                         TicketID => $Param{Data}->{TicketID},

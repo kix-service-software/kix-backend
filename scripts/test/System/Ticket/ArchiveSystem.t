@@ -30,11 +30,6 @@ $ConfigObject->Set(
     Value => 1,
 );
 
-$ConfigObject->Set(
-    Key   => 'Ticket::Watcher',
-    Value => 1,
-);
-
 # get ticket object
 my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
