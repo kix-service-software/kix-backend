@@ -127,7 +127,6 @@ sub Run {
 
     if (
         $ConfigObject->Get('Ticket::ArchiveSystem::RemoveTicketWatchers')
-        && $ConfigObject->Get('Ticket::Watcher')
         )
     {
 

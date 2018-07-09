@@ -23,13 +23,6 @@ $Selenium->RunTest(
         # get helper object
         my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-        # enable ticket watcher feature
-        $Helper->ConfigSettingChange(
-            Valid => 1,
-            Key   => 'Ticket::Watcher',
-            Value => 1
-        );
-
         # create test user and login
         my $TestUserLogin = $Helper->TestUserCreate(
             Groups => [ 'admin', 'users' ],

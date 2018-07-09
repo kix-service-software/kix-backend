@@ -30,13 +30,6 @@ $Selenium->RunTest(
             Value => 0,
         );
 
-        # enable ticket watcher feature
-        $Helper->ConfigSettingChange(
-            Valid => 1,
-            Key   => 'Ticket::Watcher',
-            Value => 1,
-        );
-
         # create test user and login
         my $TestUserLogin = $Helper->TestUserCreate(
             Groups => [ 'admin', 'users' ],

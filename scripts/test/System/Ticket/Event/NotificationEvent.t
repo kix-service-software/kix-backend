@@ -90,12 +90,6 @@ $ConfigObject->Set(
     Value => 1,
 );
 
-# enable watcher
-$ConfigObject->Set(
-    Key   => 'Ticket::Watcher',
-    Value => 1,
-);
-
 # create a new user for current test
 my $UserLogin = $Helper->TestUserCreate(
     Groups => ['users'],

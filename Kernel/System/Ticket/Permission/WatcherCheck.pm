@@ -43,9 +43,6 @@ sub Run {
         }
     }
 
-    # return if no watcher feature is active
-    return if !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::Watcher');
-
     # return no access if it's wrong permission type
     return if $Param{Type} ne 'ro';
 

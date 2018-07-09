@@ -26,12 +26,6 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-# enable watcher feature
-$Kernel::OM->Get('Kernel::Config')->Set(
-    Key   => 'Ticket::Watcher',
-    Value => 1,
-);
-
 my @TicketIDs;
 my @TestUserIDs;
 for ( 1 .. 2 ) {

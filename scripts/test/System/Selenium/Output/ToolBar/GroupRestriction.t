@@ -33,13 +33,6 @@ $Selenium->RunTest(
             Value => 1
         );
 
-        # enable ticket watcher feature
-        $Helper->ConfigSettingChange(
-            Valid => 1,
-            Key   => 'Ticket::Watcher',
-            Value => 1
-        );
-
         # create test group
         my $TestGroup   = 'Group' . $Helper->GetRandomID();
         my $TestGroupID = $GroupObject->GroupAdd(
