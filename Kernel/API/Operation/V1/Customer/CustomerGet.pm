@@ -183,7 +183,16 @@ sub Run {
                 delete $CustomerData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
-                
+
+        # include Contacts if requested
+        if ( $Param{Data}->{include}->{Contacts} ) {
+            # execute customer user search
+            my %CustomerUserList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+                CustomerID => $CustomerID,
+            );
+            $CustomerData{Contacts} = [ sort keys %CustomerUserList ];
+        }
+
         # include Tickets if requested
         if ( $Param{Data}->{include}->{Tickets} ) {
             # execute ticket search
