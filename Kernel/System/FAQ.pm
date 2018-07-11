@@ -117,7 +117,7 @@ Returns:
         ValidID           => 1,
         Valid             => 'valid',
         Keywords          => 'KeyWord1 KeyWord2',
-        Visibility        => 'agent',                        # or 'customer' or 'public'
+        Visibility        => 'internal',                     # or 'external' or 'public'
         Field1            => 'The Symptoms',                 # if fields should be included
         Field2            => 'The Problem',                  # if fields should be included
         Field3            => 'The Solution',                 # if fields should be included
@@ -387,7 +387,7 @@ add an article
     my $ItemID = $FAQObject->FAQAdd(
         Title       => 'Some Text',
         CategoryID  => 1,
-        Visibility  => 'agent',          # possible values 'agent', 'customer' or 'public'
+        Visibility  => 'internal',       # possible values 'internal', 'external' or 'public'
         Language    => 'en',
         Number      => '13402',          # (optional)
         Keywords    => 'some keywords',  # (optional)

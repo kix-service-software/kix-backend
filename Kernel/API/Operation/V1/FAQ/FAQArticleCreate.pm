@@ -78,7 +78,7 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                 Title       => 'Some Text',
                 CategoryID  => 1,
                 ValidID     => 1,
-                Visibility  => 'agent',          # optional, possible values 'agent', 'customer', 'public' with fallback to 'agent'
+                Visibility  => 'internal',       # optional, possible values 'internal', 'external', 'public' with fallback to 'internal'
                 Language    => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
                 ContentType => 'text/plain',     # optional, if not given set to 'text/plain'
                 Number      => '13402',          # optional
@@ -150,8 +150,8 @@ sub Run {
             'FAQArticle::Visibility' => {
                 RequiresValueIfUsed => 1,
                 OneOf => [
-                    'agent',
-                    'customer',
+                    'internal',
+                    'external',
                     'public'
                 ]
             },
@@ -199,7 +199,7 @@ sub Run {
     my $FAQArticleID = $Kernel::OM->Get('Kernel::System::FAQ')->FAQAdd(
         Title       => $FAQArticle->{Title},
         CategoryID  => $FAQArticle->{CategoryID},
-        Visibility  => $FAQArticle->{Visibility} || 'agent',
+        Visibility  => $FAQArticle->{Visibility} || 'internal',
         Language    => $FAQArticle->{Language} || 'en',
         Number      => $FAQArticle->{Number} || '',
         Keywords    => $FAQArticle->{Keywords} || '',
