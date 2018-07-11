@@ -42,7 +42,7 @@ add a vote
         ItemID    => '123456',
         IP        => '54.43.30.1',
         Interface => 'Some Text',
-        Rate      => 100,
+        Rate      => 1,
         UserID    => 1,
     );
 
@@ -160,7 +160,7 @@ Returns:
     %VoteData = (
         ItemID    => 23,
         ID        => 1,
-        Rating    => 50,
+        Rating    => 5,
         IP        => '192.168.0.1',
         Interface => '...',
         CreatedBy => 1,
@@ -277,7 +277,7 @@ Returns a hash reference with the number of votes and the vote result.
 Returns:
 
     $VoteDataHashRef = {
-        Result => 75.0000,
+        Result => 3.5,
         Votes  => 5
     };
 

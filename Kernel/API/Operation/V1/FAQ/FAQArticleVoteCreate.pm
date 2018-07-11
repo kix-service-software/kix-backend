@@ -76,7 +76,7 @@ perform FAQArticleVoteCreate Operation. This will return the created VoteID.
             FAQVote  => {
                 IPAddress => 'xxx.xxx.xxx.xxx',
                 Interface => 'agent',               # possible values: 'agent', 'customer' and 'public'
-                Rating    => 100,                   # integer between 0 and 100
+                Rating    => 1,                     # integer between 1 and 5
                 CreatedBy => '...',                 # optional
             }
         },
@@ -136,7 +136,7 @@ sub Run {
             },
             'FAQVote::Rating' => {
                 Required => 1,
-                Format   => '^([1-9][0-9]?|^100)$',
+                Format   => '^([1-5]{1})$',
             },
         }
     );
