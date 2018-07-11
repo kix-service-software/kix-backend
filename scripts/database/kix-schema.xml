@@ -1591,7 +1591,7 @@
     <Column Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
     <Column Name="subscribed_profile_id" Type="INTEGER"/>
     <Index Name="search_profile_login">
-        <IndexColumn Name="login"/>
+        <IndexColumn Name="user_login"/>
     </Index>
 </Table>
 <Table Name="search_profile_preferences">
@@ -2282,7 +2282,7 @@
     <Column Name="f_subject" Required="false" Size="200" Type="VARCHAR" />
     <Column Name="f_name" Required="true" Size="200" Type="VARCHAR" />
     <Column Name="language" Required="true" Size="8" Type="VARCHAR" />
-    <Column Name="visibility" Required="true" SIZE="20" Type="VARCHAR" />
+    <Column Name="visibility" Required="true" Size="20" Type="VARCHAR" />
     <Column Name="category_id" Required="true" Type="SMALLINT" />
     <Column Name="approved" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="valid_id" Required="true" Default="1" Type="SMALLINT" />
@@ -2787,14 +2787,6 @@
     <ForeignKey ForeignTable="kix_ticket_template">
         <Reference Local="template_id" Foreign="id"/>
     </ForeignKey>
-</Table>
-<Table Name="kix_text_module_category">
-    <Column Name="id"          Required="true"  Type="INTEGER"  PrimaryKey="true" AutoIncrement="true"/>
-    <Column Name="name"        Required="true"  Type="VARCHAR" Size="2000"/>
-    <Column Name="create_time" Required="true"  Type="DATE"/>
-    <Column Name="create_by"   Required="true"  Type="INTEGER"/>
-    <Column Name="change_time" Required="true"  Type="DATE"/>
-    <Column Name="change_by"   Required="true"  Type="INTEGER"/>
 </Table>
 <Table Name="kix_link_graph">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>

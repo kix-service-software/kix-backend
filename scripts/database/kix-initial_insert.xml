@@ -505,7 +505,6 @@ Your Ticket-Team
         <Data Key="value1" Type="Quote">KIX System</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Standard Address.</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="queue_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -3669,7 +3668,6 @@ A(z) [<KIX_CONFIG_Ticket::Hook><KIX_CONFIG_Ticket::HookDivider><KIX_TICKET_Ticke
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ProcessManagementProcessID</Data>
         <Data Key="label" Type="Quote">Process</Data>
-        <Data Key="field_order">2</Data>
         <Data Key="field_type" Type="Quote">ProcessID</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3686,7 +3684,6 @@ DefaultValue: ''
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ProcessManagementActivityID</Data>
         <Data Key="label" Type="Quote">Activity</Data>
-        <Data Key="field_order">3</Data>
         <Data Key="field_type" Type="Quote">ActivityID</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3703,7 +3700,6 @@ DefaultValue: ''
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMCriticality</Data>
         <Data Key="label" Type="Quote">Criticality</Data>
-        <Data Key="field_order">4</Data>
         <Data Key="field_type" Type="Quote">Dropdown</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3729,7 +3725,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMImpact</Data>
         <Data Key="label" Type="Quote">Impact</Data>
-        <Data Key="field_order">5</Data>
         <Data Key="field_type" Type="Quote">Dropdown</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3755,7 +3750,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMReviewRequired</Data>
         <Data Key="label" Type="Quote">Review Required</Data>
-        <Data Key="field_order">6</Data>
         <Data Key="field_type" Type="Quote">Dropdown</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3778,7 +3772,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMDecisionResult</Data>
         <Data Key="label" Type="Quote">Decision Result</Data>
-        <Data Key="field_order">7</Data>
         <Data Key="field_type" Type="Quote">Dropdown</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3804,7 +3797,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMRepairStartTime</Data>
         <Data Key="label" Type="Quote">Repair Start Time</Data>
-        <Data Key="field_order">8</Data>
         <Data Key="field_type" Type="Quote">DateTime</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3827,7 +3819,6 @@ YearsPeriod: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMRecoveryStartTime</Data>
         <Data Key="label" Type="Quote">Recovery Start Time</Data>
-        <Data Key="field_order">9</Data>
         <Data Key="field_type" Type="Quote">DateTime</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3848,7 +3839,6 @@ YearsPeriod: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMDecisionDate</Data>
         <Data Key="label" Type="Quote">Decision Date</Data>
-        <Data Key="field_order">10</Data>
         <Data Key="field_type" Type="Quote">DateTime</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3869,7 +3859,6 @@ YearsPeriod: '1'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">ITSMDueDate</Data>
         <Data Key="label" Type="Quote">Due Date</Data>
-        <Data Key="field_order">11</Data>
         <Data Key="field_type" Type="Quote">DateTime</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3890,7 +3879,6 @@ YearsPeriod: '1'
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">SysMonXHost</Data>
         <Data Key="label" Type="Quote">SystemMonitoring HostName</Data>
-        <Data Key="field_order">12</Data>
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3907,7 +3895,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">SysMonXService</Data>
         <Data Key="label" Type="Quote">SystemMonitoring ServiceName</Data>
-        <Data Key="field_order">13</Data>
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3924,7 +3911,6 @@ DefaultValue: ''
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">SysMonXAddress</Data>
         <Data Key="label" Type="Quote">SystemMonitoring AddressName</Data>
-        <Data Key="field_order">14</Data>
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3941,7 +3927,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">SysMonXAlias</Data>
         <Data Key="label" Type="Quote">SystemMonitoring AliasName</Data>
-        <Data Key="field_order">15</Data>
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3958,7 +3943,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">SysMonXState</Data>
         <Data Key="label" Type="Quote">SystemMonitoring StateName</Data>
-        <Data Key="field_order">16</Data>
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Article</Data>
         <Data Key="config" Type="Quote">---
@@ -3978,7 +3962,6 @@ RegExList: []
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">AcknowledgeName</Data>
         <Data Key="label" Type="Quote">SystemMonitoring AcknowledgeNameField</Data>
-        <Data Key="field_order">17</Data>
         <Data Key="field_type" Type="Quote">Text</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -3995,7 +3978,6 @@ TranslatableValues: '1'
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote">KIXFAQEntry</Data>
         <Data Key="label" Type="Quote">Suggest as FAQ-Entry</Data>
-        <Data Key="field_order">1</Data>
         <Data Key="field_type" Type="Quote">Dropdown</Data>
         <Data Key="object_type" Type="Quote">Article</Data>
         <Data Key="config" Type="Quote">---
@@ -4020,7 +4002,6 @@ TreeView: '0'
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote">TicketNotes</Data>
         <Data Key="label" Type="Quote">Notes</Data>
-        <Data Key="field_order">17</Data>
         <Data Key="field_type" Type="Quote">TextArea</Data>
         <Data Key="object_type" Type="Quote">Ticket</Data>
         <Data Key="config" Type="Quote">---
@@ -4034,36 +4015,6 @@ DefaultValue: ''
     </Insert>
 
 <!-- faq -->
-    <Insert Table="faq_language">
-        <Data Key="name" Type="Quote">en</Data>
-    </Insert>
-    <Insert Table="faq_language">
-        <Data Key="name" Type="Quote">de</Data>
-    </Insert>
-    <Insert Table="faq_state_type">
-        <Data Key="id" Type="AutoIncrement">1</Data>
-        <Data Key="name" Type="Quote">internal</Data>
-    </Insert>
-    <Insert Table="faq_state_type">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote">external</Data>
-    </Insert>
-    <Insert Table="faq_state_type">
-        <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="name" Type="Quote">public</Data>
-    </Insert>
-    <Insert Table="faq_state">
-        <Data Key="name" Type="Quote">internal (agent)</Data>
-        <Data Key="type_id">1</Data>
-    </Insert>
-    <Insert Table="faq_state">
-        <Data Key="name" Type="Quote">external (customer)</Data>
-        <Data Key="type_id">2</Data>
-    </Insert>
-    <Insert Table="faq_state">
-        <Data Key="name" Type="Quote">public (all)</Data>
-        <Data Key="type_id">3</Data>
-    </Insert>
     <Insert Table="faq_category">
         <Data Key="name" Type="Quote">Misc</Data>
         <Data Key="comments" Type="Quote">Misc Comment</Data>
