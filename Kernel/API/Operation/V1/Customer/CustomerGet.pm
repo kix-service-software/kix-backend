@@ -184,6 +184,25 @@ sub Run {
             }
         }
                 
+        # include Tickets if requested
+        if ( $Param{Data}->{include}->{Tickets} ) {
+            # execute ticket search
+            my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerID',
+                            Operator => 'EQ',
+                            Value    => $CustomerID,
+                        }
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'ARRAY',
+            );
+            $CustomerData{Tickets} = \@TicketIDs;
+        }
+
         # add
         push(@CustomerList, \%CustomerData);
     }

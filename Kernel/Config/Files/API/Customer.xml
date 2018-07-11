@@ -76,4 +76,13 @@
         </Setting>
     </ConfigItem>  
 
+    <ConfigItem Name="API::Operation::GenericExpand###Customer.Tickets" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Ticket::TicketGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>
