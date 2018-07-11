@@ -117,8 +117,6 @@ Returns:
         ValidID           => 1,
         Valid             => 'valid',
         Keywords          => 'KeyWord1 KeyWord2',
-        Votes             => 0,                              # number of votes
-        VoteResult        => '0.00',                         # a number between 0.00 and 100.00
         Visibility        => 'agent',                        # or 'customer' or 'public'
         Field1            => 'The Symptoms',                 # if fields should be included
         Field2            => 'The Problem',                  # if fields should be included
@@ -258,25 +256,6 @@ sub FAQGet {
             TTL   => $Self->{CacheTTL},
         );
     }
-
-    # get vote data for this FAQ item
-    my $VoteData;
-    if ( $Self->{Voting} ) {
-        $VoteData = $Self->ItemVoteDataGet(
-            ItemID => $Param{ItemID},
-            UserID => $Param{UserID},
-        );
-    }
-
-    # get number of decimal places from config
-    my $DecimalPlaces = $ConfigObject->Get('FAQ::Explorer::ItemList::VotingResultDecimalPlaces') || 0;
-
-    # format the vote result
-    my $VoteResult = sprintf( "%0." . $DecimalPlaces . "f", $VoteData->{Result} || 0 );
-
-    # add voting information to FAQ item
-    $Data{VoteResult} = $VoteResult;
-    $Data{Votes} = $VoteData->{Votes} || 0;
 
     # check if need to return DynamicFields
     if ( $Param{DynamicFields} ) {
