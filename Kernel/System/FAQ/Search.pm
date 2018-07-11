@@ -50,7 +50,7 @@ search in FAQ articles
         What      => '*some text*',                                   # (optional)
 
         Keyword   => '*webserver*',                                   # (optional)
-        Visibility  => [ 'agent', 'public' ],                         # (optional)
+        Visibility  => [ 'internal', 'external', 'public' ],          # (optional)
         Languages   => [ 'en', 'de, 'fr' ],                           # (optional)
         CategoryIDs => [ 7, 8, 9 ],                                   # (optional)
         ValidIDs    => [ 1, 2, 3 ],                                   # (optional) (default 1)
