@@ -724,6 +724,8 @@ sub _ApplyFilter {
                             # handle multiple FieldValues (array)
                             FIELDVALUE:
                             foreach my $FieldValue ( @FieldValues ) {
+                                $FilterMatch = 1;
+
                                 # prepare date compare
                                 if ( $Type eq 'DATE' ) {
                                     # convert values to unixtime
@@ -828,7 +830,7 @@ sub _ApplyFilter {
                                     }
                                 }
 
-                                last if $FilterMatch;
+                                last FIELDVALUE if $FilterMatch;
                             }
 
                             if ( $Filter->{Not} ) {
