@@ -113,7 +113,6 @@ sub Run {
 
     # perform Customer search
     my %CustomerList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList(
-        Search => '*',          # search all customers
         Valid  => 0,
     );
 
