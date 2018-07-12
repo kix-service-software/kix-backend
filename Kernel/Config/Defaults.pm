@@ -1514,13 +1514,13 @@ via the Preferences button after logging in.
             #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
             { Attribute => 'CustomerID',             Label => Translatable('CustomerID'), MappedTo => 'customer_id', Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
             { Attribute => 'CustomerCompanyName',    Label => Translatable('Customer'),   MappedTo => 'name',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'CustomerCompanyStreet',  Label => Translatable('Street'),     MappedTo => 'street',      Exposed => 1, DisplayGroup => 'Postal Address' },
+            { Attribute => 'CustomerCompanyStreet',  Label => Translatable('Street'),     MappedTo => 'street',      Exposed => 1, Searchable => 1, DisplayGroup => 'Postal Address' },
             { Attribute => 'CustomerCompanyZIP',     Label => Translatable('Zip'),        MappedTo => 'zip',         Exposed => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1 },
+            { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1, Searchable => 1, DisplayGroup => 'Postal Address' },
+            { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1, Searchable => 1 },
             { Attribute => 'CustomerCompanyURL',     Label => Translatable('URL'),        MappedTo => 'url',         Exposed => 1, DisplayGroup => 'Web' },
             { Attribute => 'CustomerCompanyComment', Label => Translatable('Comment'),    MappedTo => 'comments',    Exposed => 1 },
-            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Type => 'int' },
+            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Searchable => 1, Type => 'int' },
         ],
     };
 
