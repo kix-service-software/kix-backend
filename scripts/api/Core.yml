@@ -1484,6 +1484,76 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::ObjectDefinition::ObjectDefinitionGet
+    V1::CMDB::ClassSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassSearch
+    V1::CMDB::ClassGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassGet
+    V1::CMDB::ClassDefinitionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassDefinitionSearch
+    V1::CMDB::ClassDefinitionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassDefinitionGet
+    V1::CMDB::ConfigItemSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemSearch
+    V1::CMDB::ConfigItemGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemGet
+    V1::CMDB::ConfigItemVersionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemVersionSearch
+    V1::CMDB::ConfigItemVersionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemVersionGet
+    V1::CMDB::ConfigItemHistorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemHistorySearch
+    V1::CMDB::ConfigItemHistoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemHistoryGet
 
   Transport:
     Config:
@@ -2334,6 +2404,46 @@ Provider:
           RequestMethod:
           - GET
           Route: /objectdefinitions/:ObjectType
+        V1::CMDB::ClassSearch:
+          RequestMethod:
+          - GET
+          Route: /cmdb/classes
+        V1::CMDB::ClassGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/classes/:ClassID
+        V1::CMDB::ClassDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /cmdb/classes/:ClassID/definitions
+        V1::CMDB::ClassDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/classes/:ClassID/definitions/:DefinitionID
+        V1::CMDB::ConfigItemSearch:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems
+        V1::CMDB::ConfigItemGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID
+        V1::CMDB::ConfigItemVersionSearch:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID/versions
+        V1::CMDB::ConfigItemVersionGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID/versions/:VersionID
+        V1::CMDB::ConfigItemHistorySearch:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID/history
+        V1::CMDB::ConfigItemHistoryGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID/history/:HistoryID
 
     Type: HTTP::REST
 RemoteSystem: ''
