@@ -184,25 +184,6 @@ sub CustomerSearch {
     my %Users;
     my $Valid = defined $Param{Valid} ? $Param{Valid} : 1;
 
-    # check needed stuff
-    if (
-        !$Param{Search}
-        && !$Param{UserLogin}
-        && !$Param{PostMasterSearch}
-        && !$Param{CustomerID}
-        && !$Param{CustomerIDRaw}
-        # KIX4OTRS-capeIT
-        && !$Param{SearchFields}
-        # EO KIX4OTRS-capeIT
-        )
-    {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Search, UserLogin, PostMasterSearch, CustomerIDRaw or CustomerID!',
-        );
-        return;
-    }
-
     # check cache
     my $CacheKey = join '::', map { $_ . '=' . $Param{$_} } sort keys %Param;
 
@@ -238,7 +219,7 @@ sub CustomerSearch {
     my $LikeEscapeString = $Self->{DBObject}->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string 2/2
-    $SQL .= " FROM $Self->{CustomerTable} WHERE ";
+    $SQL .= " FROM $Self->{CustomerTable} ";
     if ( $Param{Search} ) {
         if ( !$Self->{CustomerUserMap}->{CustomerUserSearchFields} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -260,7 +241,7 @@ sub CustomerSearch {
             BindMode      => 1,
         );
 
-        $SQL .= $QueryCondition{SQL};
+        $SQL .= "WHERE ".$QueryCondition{SQL};
         push @Bind, @{ $QueryCondition{Values} };
 
         $SQL .= ' ';
@@ -282,7 +263,7 @@ sub CustomerSearch {
                     $SQLExt .= " LOWER($Field) = LOWER(?) ";
                 }
             }
-            $SQL .= $SQLExt;
+            $SQL .= "WHERE ".$SQLExt;
         }
     }
     elsif ( $Param{UserLogin} ) {
@@ -295,7 +276,7 @@ sub CustomerSearch {
             # return if login is no integer
             return if $Param{UserLogin} !~ /^(\+|\-|)\d{1,16}$/;
 
-            $SQL .= "$Self->{CustomerKey} = ?";
+            $SQL .= "WHERE $Self->{CustomerKey} = ?";
             push @Bind, \$UserLogin;
         }
         else {
@@ -303,10 +284,10 @@ sub CustomerSearch {
             $UserLogin =~ s/\*/%/g;
             push @Bind, \$UserLogin;
             if ( $Self->{CaseSensitive} ) {
-                $SQL .= "$Self->{CustomerKey} LIKE ? $LikeEscapeString";
+                $SQL .= "WHERE $Self->{CustomerKey} LIKE ? $LikeEscapeString";
             }
             else {
-                $SQL .= "LOWER($Self->{CustomerKey}) LIKE LOWER(?) $LikeEscapeString";
+                $SQL .= "WHERE LOWER($Self->{CustomerKey}) LIKE LOWER(?) $LikeEscapeString";
             }
         }
     }
@@ -317,10 +298,10 @@ sub CustomerSearch {
         push @Bind, \$CustomerID;
 
         if ( $Self->{CaseSensitive} ) {
-            $SQL .= "$Self->{CustomerID} LIKE ? $LikeEscapeString";
+            $SQL .= "WHERE $Self->{CustomerID} LIKE ? $LikeEscapeString";
         }
         else {
-            $SQL .= "LOWER($Self->{CustomerID}) LIKE LOWER(?) $LikeEscapeString";
+            $SQL .= "WHERE LOWER($Self->{CustomerID}) LIKE LOWER(?) $LikeEscapeString";
         }
 
         # KIX4OTRS-capeIT
@@ -354,10 +335,10 @@ sub CustomerSearch {
         push @Bind, \$Param{CustomerIDRaw};
 
         if ( $Self->{CaseSensitive} ) {
-            $SQL .= "$Self->{CustomerID} = ? ";
+            $SQL .= "WHERE $Self->{CustomerID} = ? ";
         }
         else {
-            $SQL .= "LOWER($Self->{CustomerID}) = LOWER(?) ";
+            $SQL .= "WHERE LOWER($Self->{CustomerID}) = LOWER(?) ";
         }
     }
 
@@ -415,9 +396,14 @@ sub CustomerSearch {
         # get valid object
         my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
 
-        $SQL .= ' AND '
-            . $Self->{CustomerUserMap}->{CustomerValid}
-            . ' IN (' . join( ', ', $ValidObject->ValidIDsGet() ) . ') ';
+        if ($SQL !~ / WHERE /g) {
+            $SQL .= " WHERE ";
+        }
+        else {
+            $SQL .= " AND ";
+        }
+        $SQL .= $Self->{CustomerUserMap}->{CustomerValid}
+             . ' IN (' . join( ', ', $ValidObject->ValidIDsGet() ) . ') ';
     }
 
     # get data
