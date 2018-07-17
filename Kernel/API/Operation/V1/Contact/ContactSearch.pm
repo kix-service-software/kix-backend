@@ -111,10 +111,28 @@ sub Run {
         );
     }
 
+    # prepare filter if given
+    my %SearchFilter;
+    if ( IsArrayRefWithData($Self->{Filter}->{Contact}->{AND}) ) {
+        foreach my $FilterItem ( @{$Self->{Filter}->{Contact}->{AND}} ) {
+            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
+            next if ($FilterItem->{Operator} ne 'EQ');
+
+            if ($FilterItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
+                $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+            }
+            elsif ($FilterItem->{Field} =~ /^(ValidID)$/g) {
+                $SearchFilter{Valid} = $FilterItem->{Value};
+            }
+            else {
+                $SearchFilter{Search} = $FilterItem->{Value};
+            }
+        }
+    }
+
     # perform Contact search
     my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-        Search => '*',          # search all contacts
-        Valid  => 0,
+        %SearchFilter,
     );
 
     if (IsHashRefWithData(\%ContactList)) {
