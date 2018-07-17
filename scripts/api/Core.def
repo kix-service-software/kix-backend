@@ -215,6 +215,7 @@
 /cmdb/classes/:ClassID/definitions                                      |   GET             | V1::CMDB::ClassDefinitionSearch
 /cmdb/classes/:ClassID/definitions/:DefinitionID                        |   GET             | V1::CMDB::ClassDefinitionGet
 /cmdb/configitems                                                       |   GET             | V1::CMDB::ConfigItemSearch
+/cmdb/configitems                                                       |   POST            | V1::CMDB::ConfigItemCreate
 /cmdb/configitems/:ConfigItemID                                         |   GET             | V1::CMDB::ConfigItemGet
 /cmdb/configitems/:ConfigItemID/versions                                |   GET             | V1::CMDB::ConfigItemVersionSearch
 /cmdb/configitems/:ConfigItemID/versions/:VersionID                     |   GET             | V1::CMDB::ConfigItemVersionGet
