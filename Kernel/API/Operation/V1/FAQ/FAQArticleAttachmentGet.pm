@@ -148,6 +148,9 @@ sub Run {
             );
         }
 
+        # add ID to result
+        $FAQAttachment{ID} = $FAQAttachmentID;
+
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $FAQAttachment{Content};
         }
