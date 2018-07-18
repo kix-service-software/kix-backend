@@ -162,7 +162,7 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code            => 'Object.Created',
-        FAQAttachmentID => $FAQAttachmentID,
+        FAQAttachmentID => $AttachmentID,
     );    
 }
 
