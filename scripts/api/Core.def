@@ -218,6 +218,7 @@
 /cmdb/configitems                                                       |   POST            | V1::CMDB::ConfigItemCreate
 /cmdb/configitems/:ConfigItemID                                         |   GET             | V1::CMDB::ConfigItemGet
 /cmdb/configitems/:ConfigItemID/versions                                |   GET             | V1::CMDB::ConfigItemVersionSearch
+/cmdb/configitems/:ConfigItemID/versions                                |   POST            | V1::CMDB::ConfigItemVersionCreate
 /cmdb/configitems/:ConfigItemID/versions/:VersionID                     |   GET             | V1::CMDB::ConfigItemVersionGet
 /cmdb/configitems/:ConfigItemID/history                                 |   GET             | V1::CMDB::ConfigItemHistorySearch
 /cmdb/configitems/:ConfigItemID/history/:HistoryID                      |   GET             | V1::CMDB::ConfigItemHistoryGet

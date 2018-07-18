@@ -114,7 +114,7 @@ sub Run {
         Data       => $Param{Data},
         Parameters => {
             'ConfigItem' => {
-                Required => 1
+                Required => 1,
                 Type     => 'HASH'
             },
             'ConfigItem::ClassID' => {
@@ -156,6 +156,7 @@ sub Run {
         ConfigItem => $ConfigItem
     );
 
+
     if ( !$ConfigItemCheck->{Success} ) {
         return $Self->_Error(
             %{$ConfigItemCheck},
@@ -164,7 +165,102 @@ sub Run {
 
     # everything is ok, let's create the ConfigItem
     return $Self->_ConfigItemCreate(
-        ConfigItem     => $ConfigItem,
-        UserID         => $Self->{Authorization}->{UserID},
+        ConfigItem => $ConfigItem,
+        UserID     => $Self->{Authorization}->{UserID},
     );
 }
+
+=begin Internal:
+
+=item _ConfigItemCreate()
+
+creates a configuration item.
+
+    my $Response = $OperationObject->_ConfigItemCreate(
+        ConfigItem     => $ConfigItem,             # all configuration item parameters
+        UserID         => 123,
+    );
+
+    returns:
+
+    $Response = {
+        Success => 1,                               # if everything is OK
+        Data => {
+            ConfigItemID => 123,
+        }
+    }
+
+    $Response = {
+        Success      => 0,                         # if unexpected error
+        Code         => '...'
+        Message      => '...',
+    }
+=cut
+
+sub _ConfigItemCreate {
+    my ( $Self, %Param ) = @_;
+
+    my $ConfigItem = $Param{ConfigItem};
+
+    my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+
+    # create new config item
+    my $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
+        Number  => $ConfigItem->{Number},
+        ClassID => $Self->{ReverseClassList}->{ $ConfigItem->{Class} },
+        UserID  => $Param{UserID},
+    );
+# TODO!!!
+    if ( !$ConfigItemID ) {
+        return $Self->_Error(
+            Code    => '',
+            Message => 'Configuration Item could not be created, please contact the system administrator',
+        );
+    }
+
+    # set attachments
+    if ( IsArrayRefWithData($AttachmentList) ) {
+
+        for my $Attachment ( @{$AttachmentList} ) {
+            my $Result = $Self->CreateAttachment(
+                Attachment   => $Attachment,
+                ConfigItemID => $ConfigItemID,
+                UserID       => $Param{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                my $ErrorMessage =
+                    $Result->{ErrorMessage} || "Attachment could not be created, please contact the system administrator";
+
+                return {
+                    Success      => 0,
+                    ErrorMessage => $ErrorMessage,
+                };
+            }
+        }
+    }
+
+    # get ConfigItem data
+    my $ConfigItemData = $ConfigItemObject->ConfigItemGet(
+        ConfigItemID => $ConfigItemID,
+    );
+
+    if ( !IsHashRefWithData($ConfigItemData) ) {
+        return {
+            Success      => 0,
+            ErrorMessage => 'Could not get new configuration item information, please contact the system administrator',
+        };
+    }
+
+    return {
+        Success => 1,
+        Data    => {
+            ConfigItemID => $ConfigItemID,
+            Number       => $ConfigItemData->{Number},
+        },
+    };
+}
+
+1;
+
+=end Internal:

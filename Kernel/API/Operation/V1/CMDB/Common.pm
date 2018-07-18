@@ -100,16 +100,6 @@ sub _CheckConfigItem {
 
     my $ConfigItem = $Param{ConfigItem};
 
-    # check ticket internally
-    for my $Needed (qw(Name)) {
-        if ( !$ConfigItem->{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => "Required parameter $Needed is missing!",
-            );
-        }
-    }
-
     my $ConfigObject     = $Kernel::OM->Get('Kernel::Config');
     my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
 
@@ -120,7 +110,7 @@ sub _CheckConfigItem {
     ) {
         my $ConfigItemIDs = $ConfigItemObject->ConfigItemSearchExtended(
             Name           => $ConfigItem->{Name},
-            ClassIDs       => [ $ConfigItem->{ClassID ],
+            ClassIDs       => [ $ConfigItem->{ClassID} ],
             UsingWildcards => 0,
         );
 
@@ -149,7 +139,9 @@ sub _CheckConfigItem {
         }
 
         # check version attribute values
-        my $VersionCheck = $Self->_CheckConfigItemVersion( ConfigItemVersion => $VersionItem );
+        my $VersionCheck = $Self->_CheckConfigItemVersion( 
+            ConfigItemVersion => $ConfigItem->{Version} 
+        );
 
         if ( !$VersionCheck->{Success} ) {
             return $Self->_Error( 
@@ -259,7 +251,7 @@ sub _CheckXMLData {
             return $Self->_Error(
                 Code    => "BadRequest",
                 Message => "Parameter ConfigItem::Version::$Parent$ItemKey is missing!",
-            };
+            );
         }
 
         if ( ref $XMLData->{$ItemKey} eq 'ARRAY' ) {
@@ -290,7 +282,7 @@ sub _CheckXMLData {
                     return $Self->_Error(
                         Code    => "BadRequest",
                         Message => "Parameter ConfigItem::Version::$Parent$ItemKey is invalid!",
-                    };
+                    );
                 }
             }
         }
@@ -333,7 +325,7 @@ sub _CheckXMLData {
                 return $Self->_Error(
                     Code    => "BadRequest",
                     Message => "Parameter ConfigItem::Version::$Parent$ItemKey count exceeds allowed maximum!",
-                };
+                );
             }
         }
 

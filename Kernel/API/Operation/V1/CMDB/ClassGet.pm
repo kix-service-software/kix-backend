@@ -135,13 +135,45 @@ sub Run {
             );
         }        
 
+        my %Class = %{$ItemData};
+            
         # prepare data
-        $ItemData->{ID} = $ClassID;
+        $Class{ID} = $ClassID;
         foreach my $Key (qw(ItemID Class Permission)) {
-            delete $ItemData->{$Key};
+            delete $Class{$Key};
         }
 
-        push(@ClassList, $ItemData);
+        # include CurrentDefinition if requested
+        if ( $Param{Data}->{include}->{CurrentDefinition} ) {
+            # get already prepared data of current definition from ClassDefinitionSearch operation
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::CMDB::ClassDefinitionSearch',
+                Data          => {
+                    ClassID   => $ClassID,
+                    sort      => 'ConfigItemClassDefinition.-DefinitionID',
+                    limit     => 1,
+                }
+            );
+            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                $Class{CurrentDefinition} = $Result->{Data}->{ConfigItemClassDefinition};
+            }
+        }
+
+        # include Definitions if requested
+        if ( $Param{Data}->{include}->{Definitions} ) {
+            # get already prepared Definitions data from ClassDefinitionSearch operation
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::CMDB::ClassDefinitionSearch',
+                Data          => {
+                    ClassID   => $ClassID,
+                }
+            );
+            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                $Class{Definitions} = $Result->{Data}->{ConfigItemClassDefinition};
+            }
+        }
+
+        push(@ClassList, \%Class);
     }
 
     if ( scalar(@ClassList) == 0 ) {

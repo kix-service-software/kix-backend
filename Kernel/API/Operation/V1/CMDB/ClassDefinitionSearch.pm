@@ -122,8 +122,10 @@ sub Run {
     # check if ClassID exists in GeneralCatalog
     my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
         ItemID  => $Param{Data}->{ClassID},
-        UserID  => $Self->{Authorization}->{UserID},
     );
+
+use Data::Dumper;
+print STDERR Dumper($ItemData);
 
     if (!IsHashRefWithData($ItemData) || $ItemData->{Class} ne 'ITSM::ConfigItem::Class') {
         return $Self->_Error(

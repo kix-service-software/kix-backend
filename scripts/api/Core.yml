@@ -1519,6 +1519,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemSearch
+    V1::CMDB::ConfigItemCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemCreate
     V1::CMDB::ConfigItemGet:
         Description: ''
         MappingInbound:
@@ -1533,6 +1540,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemVersionSearch
+    V1::CMDB::ConfigItemVersionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemVersionCreate
     V1::CMDB::ConfigItemVersionGet:
         Description: ''
         MappingInbound:
@@ -2424,6 +2438,10 @@ Provider:
           RequestMethod:
           - GET
           Route: /cmdb/configitems
+        V1::CMDB::ConfigItemCreate:
+          RequestMethod:
+          - POST
+          Route: /cmdb/configitems
         V1::CMDB::ConfigItemGet:
           RequestMethod:
           - GET
@@ -2431,6 +2449,10 @@ Provider:
         V1::CMDB::ConfigItemVersionSearch:
           RequestMethod:
           - GET
+          Route: /cmdb/configitems/:ConfigItemID/versions
+        V1::CMDB::ConfigItemVersionCreate:
+          RequestMethod:
+          - POST
           Route: /cmdb/configitems/:ConfigItemID/versions
         V1::CMDB::ConfigItemVersionGet:
           RequestMethod:
