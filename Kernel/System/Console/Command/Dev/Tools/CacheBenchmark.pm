@@ -13,6 +13,15 @@ package Kernel::System::Console::Command::Dev::Tools::CacheBenchmark;
 use strict;
 use warnings;
 
+our $IsWin32 = 0; 
+if ( $^O eq 'MSWin32' ) {
+    eval { 
+        require Win32; 
+        require Win32::Process; 
+    } or last;
+    $IsWin32 = 1;
+}
+
 use Time::HiRes ();
 
 use base qw(Kernel::System::Console::BaseCommand);
@@ -28,11 +37,39 @@ sub Configure {
 
     $Self->Description('Runs a benchmark over the available cache backends.');
 
+    $Self->AddOption(
+        Name        => 'backend',
+        Description => "The cache backend to benchmark, i.e. FileStorable",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/^[a-zA-Z0-9]$/smx,
+    );
+    $Self->AddOption(
+        Name        => 'processes',
+        Description => "Number of parallel processes to use. Default: 1",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/^\d+$/smx,
+    );
+    $Self->AddOption(
+        Name        => 'process-id',
+        Description => "The ID of the job process. Needed for the job process in Win32.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/^\d+$/smx,
+        Invisible   => 1,
+    );
+    $Self->AdditionalHelp("<red>Please don't use this command in production environments.</red>\n");
+
     return;
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
+
+    my $Backend   = $Self->GetOption('backend');
+    my $ProcessID = $Self->GetOption('process-id');
+    my $Processes = $Self->GetOption('processes');
 
     # get home directory
     my $HomeDir = $Kernel::OM->Get('Kernel::Config')->Get('Home');
@@ -40,7 +77,7 @@ sub Run {
     # get all avaliable backend modules
     my @BackendModuleFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
         Directory => $HomeDir . '/Kernel/System/Cache/',
-        Filter    => '*.pm',
+        Filter    => $Backend ? $Backend.'.pm' : '*.pm',
         Silent    => 1,
     );
 
@@ -69,6 +106,8 @@ sub Run {
             die "Could not create cache backend Kernel::System::Cache::$Module";
         }
 
+        print "Testing cache module $Module\n";
+
         $CacheObject->Configure(
             CacheInMemory  => 0,
             CacheInBackend => 1,
@@ -83,8 +122,6 @@ sub Run {
         my $SetOK;
         my $GetOK;
         my $DelOK;
-
-        print "Testing cache module $Module\n";
 
         # load cache initially with 100k 1kB items
         print "Preloading cache with 100k x 1kB items... ";
@@ -103,6 +140,11 @@ sub Run {
         print "Cache module    Item Size[b] Operations Time[s]    Op/s  Set OK  Get OK  Del OK\n";
         print "--------------- ------------ ---------- ------- ------- ------- ------- -------\n";
 
+        $Self->_Benchmark(
+            Backend   => $Backend,
+            Processes => $Processes || 1,
+        );
+    
         for my $ItemSize ( 64, 256, 512, 1024, 4096, 10240, 102400, 1048576, 4194304 ) {
 
             my $Content = ' ' x $ItemSize;
