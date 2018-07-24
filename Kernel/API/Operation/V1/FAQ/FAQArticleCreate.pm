@@ -82,7 +82,9 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                 Language    => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
                 ContentType => 'text/plain',     # optional, if not given set to 'text/plain'
                 Number      => '13402',          # optional
-                Keywords    => 'some keywords',  # optional
+                Keywords    => [                 # optional
+                    'some', 'keywords',  
+                ]
                 Field1      => 'Symptom...',     # optional
                 Field2      => 'Problem...',     # optional
                 Field3      => 'Solution...',    # optional
@@ -202,7 +204,7 @@ sub Run {
         Visibility  => $FAQArticle->{Visibility} || 'internal',
         Language    => $FAQArticle->{Language} || 'en',
         Number      => $FAQArticle->{Number} || '',
-        Keywords    => $FAQArticle->{Keywords} || '',
+        Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : '',
         Field1      => $FAQArticle->{Field1} || '',
         Field2      => $FAQArticle->{Field2} || '',
         Field3      => $FAQArticle->{Field3} || '',
