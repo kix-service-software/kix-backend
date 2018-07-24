@@ -391,8 +391,8 @@ Your OTRS Notification Master
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Object1">FAQ</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object1">FAQArticle</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">Normal</Item>
             </Hash>
         </Setting>
@@ -403,8 +403,8 @@ Your OTRS Notification Master
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Object1">FAQ</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object1">FAQArticle</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">ParentChild</Item>
             </Hash>
         </Setting>
@@ -415,7 +415,7 @@ Your OTRS Notification Master
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Object1">FAQ</Item>
+                <Item Key="Object1">FAQArticle</Item>
                 <Item Key="Object2">Ticket</Item>
                 <Item Key="Type">Normal</Item>
             </Hash>
@@ -427,7 +427,7 @@ Your OTRS Notification Master
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Object1">FAQ</Item>
+                <Item Key="Object1">FAQArticle</Item>
                 <Item Key="Object2">Ticket</Item>
                 <Item Key="Type">ParentChild</Item>
             </Hash>

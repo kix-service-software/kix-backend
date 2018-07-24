@@ -156,6 +156,10 @@ sub Run {
         $FAQArticle{ID} = $FAQArticle{ItemID};
         delete $FAQArticle{ItemID};
 
+        # convert Keywords to array
+        my @Keywords = split(/\s+/, $FAQArticle{Keywords});
+        $FAQArticle{Keywords} = \@Keywords;
+
         if ( $Param{Data}->{include}->{Attachments} ) {
             # get attachment index (without attachments)
             my @AtmIndex = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentIndex(

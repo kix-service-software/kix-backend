@@ -78,6 +78,9 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
                 StateID     => 1,
                 LanguageID  => 1,
                 Approved    => 1,
+                Keywords    => [                 # optional
+                    'some', 'keywords',  
+                ],
                 ValidID     => 1,
                 ContentType => 'text/plan',     # or 'text/html'
                 Title       => 'Some Text',
@@ -136,7 +139,7 @@ sub Run {
     }
 
     # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
         CategoryID => $Param{Data}->{FAQCategoryID},
         UserID   => $Self->{Authorization}->{UserID},
     );
@@ -173,6 +176,7 @@ sub Run {
         StateID     => $FAQArticle->{StateID} || $FAQArticleData{StateID},
         CategoryID  => $FAQArticle->{FAQCategoryID} || $FAQArticleData{CategoryID},
         LanguageID  => $FAQArticle->{LanguageID} || $FAQArticleData{LanguageID},
+        Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : $FAQArticleData{Keywords},
         Approved    => $FAQArticle->{Approved} || $FAQArticleData{Approved},
         ContentType => $FAQArticle->{ContentType} || $FAQArticleData{ContentType},
         Title       => $FAQArticle->{Title} || $FAQArticleData{Title},,
