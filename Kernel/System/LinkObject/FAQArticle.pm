@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::LinkObject::FAQ;
+package Kernel::System::LinkObject::FAQArticle;
 
 use strict;
 use warnings;
