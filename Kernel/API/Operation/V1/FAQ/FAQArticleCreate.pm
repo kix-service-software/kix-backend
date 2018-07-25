@@ -230,8 +230,8 @@ sub Run {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::FAQ::FAQArticleAttachmentCreate',
                 Data          => {
-                    FAQArticleID  => $FAQArticleID,
-                    FAQAttachment => $Attachment,
+                    FAQArticleID => $FAQArticleID,
+                    Attachment   => $Attachment,
                 }
             );
 
