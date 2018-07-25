@@ -124,6 +124,7 @@ sub Run {
             if ( !$CacheObject->{CacheObject}->isa("Kernel::System::Cache::$Module") ) {
                 die "Could not create cache backend Kernel::System::Cache::$Module";
             }
+
             $CacheObject->Configure(
                 CacheInMemory  => 0,
                 CacheInBackend => 1,
@@ -136,37 +137,17 @@ sub Run {
             my $SID;
             $SID .= $Dictionary[ rand @Dictionary ] for 1 .. 8;
 
-            my $Result;
-            my $SetOK;
-            my $GetOK;
-            my $DelOK;
-
-            # load cache initially with 100k 1kB items
-            print "Preloading cache with 100k x 1kB items per process...\n";
-            $| = 1;
-            my $Content1kB = '.' x 1024;
-            
-            for my $ProcessID ( 1 .. $Processes ) {
-                print $ProcessID.': ';
-                for ( my $i = 0; $i < 100000; $i++ ) {
-                    $Result = $CacheObject->Set(
-                        Type => 'CacheTestInitContent' . $SID . ( $i % 10 ),
-                        Key => 'Test' . $ProcessID . $i,
-                        Value => $Content1kB,
-                        TTL   => 60 * 24 * 60 * 60,
-                    );
-                    if ($i && $i % 10000 == 0) {
-                       printf("%i ", $i / 10000);
-                    }
-                }
-                print "\n";
-            }
-            print "done.\n";
+            # preload cache for each process
+            $Self->Preload(
+                Backend   => $Module,
+                SID       => $SID,
+                Processes => $Processes || 1,
+            );
 
             print "Cache module    Item Size[b] Operations Time[s]    Op/s  Set OK  Get OK  Del OK\n";
             print "--------------- ------------ ---------- ------- ------- ------- ------- -------\n";
 
-            $Self->_Benchmark(
+            $Self->Benchmark(
                 Backend   => $Module,
                 SID       => $SID,
                 Processes => $Processes || 1,
@@ -175,7 +156,7 @@ sub Run {
             # cleanup initial cache
             print "Removing preloaded 100k x 1kB items... ";
             for ( my $i = 0; $i < 10; $i++ ) {
-                $Result = $CacheObject->CleanUp(
+                my $Result = $CacheObject->CleanUp(
                     Type => 'CacheTestInitContent' . $SID . ( $i % 10 ),
                 );
             }
@@ -185,6 +166,7 @@ sub Run {
     else {
         my $SID = $Self->GetOption('sid');
         my $ItemSize = $Self->GetOption('item-size');
+        my $Preload = $Self->GetOption('preload');
 
         $Kernel::OM->Get('Kernel::Config')->Set(
             Key   => 'Cache::Module',
@@ -202,18 +184,60 @@ sub Run {
             die "Could not create cache backend Kernel::System::Cache::$Param{Backend}";
         }
 
-        $Self->_TestItemSize(
-            $Self, 
-            SID       => $SID,
-            ItemSize  => $ItemSize,
-            ProcessID => $ProcessID,
+        $CacheObject->Configure(
+            CacheInMemory  => 0,
+            CacheInBackend => 1,
         );
+
+        if ($Preload) {
+            $Self->_DoPreload(
+                $Self, 
+                SID       => $SID,
+                ProcessID => $ProcessID,
+            );
+        }
+        else {
+            $Self->_TestItemSize(
+                $Self, 
+                SID       => $SID,
+                ItemSize  => $ItemSize,
+                ProcessID => $ProcessID,
+            );
+        }
     }
 
     return $Self->ExitCodeOk();
 }
 
-sub _Benchmark {
+sub Preload {
+    my ( $Self, %Param ) = @_;
+
+    # load cache initially with 100k 1kB items
+    print "Preloading cache with 100k x 1kB items per process... ";
+    $| = 1;
+    if (!$IsWin32) {
+        my $JobResult = $Self->_DoJob( 
+            Backend   => $Param{Backend},
+            SID       => $Param{SID},
+            Preload   => 1,
+            Processes => $Param{Processes},
+        );
+    }
+    else {
+        my $JobResult = $Self->_DoJobWin32( 
+            Backend   => $Param{Backend},
+            SID       => $Param{SID},
+            Preload   => 1,
+            Processes => $Param{Processes},
+        );
+    }
+
+    print "done.\n";
+
+    return 1;
+}
+
+sub Benchmark {
     my ( $Self, %Param ) = @_;
 
     my $TimeTotal = 0;
@@ -256,6 +280,27 @@ sub _Benchmark {
     return 1;
 }
 
+sub _DoPreload {
+    my ( $Self, %Param ) = @_;
+
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+
+    my $Content1kB = '.' x 1024;
+    
+    for ( my $i = 0; $i < 100000; $i++ ) {
+        my $Result = $CacheObject->Set(
+            Type => 'CacheTestInitContent' . $Param{SID} . ( $i % 10 ),
+            Key => 'Test' . $Param{ProcessID} . $i,
+            Value => $Content1kB,
+            TTL   => 60 * 24 * 60 * 60,
+        );
+    }
+
+    print $Param{ProcessID}.' ';
+
+    return 1;
+}
+
 sub _DoJob {
     my ( $Self, %Param ) = @_;
 
@@ -266,12 +311,21 @@ sub _DoJob {
 
         if (!$PID) {
             # child process - do your job
-            $Self->_TestItemSize(
-                Backend   => $Param{Backend},
-                SID       => $Param{SID},
-                ProcessID => $ProcessID,
-                ItemSize  => $Param{ItemSize}
-            );
+            if ($Param{Preload}) {
+                $Self->_DoPreload(
+                    Backend   => $Param{Backend},
+                    SID       => $Param{SID},
+                    ProcessID => $ProcessID,
+                );
+            }
+            else {
+                $Self->_TestItemSize(
+                    Backend   => $Param{Backend},
+                    SID       => $Param{SID},
+                    ProcessID => $ProcessID,
+                    ItemSize  => $Param{ItemSize}
+                );
+            }
 
             exit 0;
         }
@@ -280,30 +334,40 @@ sub _DoJob {
         }
     }
  
-    my $SetOK = 0;
-    my $GetOK = 0;
-    my $DelOK = 0;
-    while (@Children) { 
-        my $PID = shift @Children;
-        waitpid($PID, 0); 
+    my $Result;
+    if ($Param{ItemSize}) {
+        my $SetOK = 0;
+        my $GetOK = 0;
+        my $DelOK = 0;
+        while (@Children) { 
+            my $PID = shift @Children;
+            waitpid($PID, 0); 
 
-        # read result file
-        my $JobResult = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-            Directory => $Kernel::OM->Get('Kernel::Config')->Get('TempDir'),
-            Filename  => 'CacheBenchmark.'.$Param{ItemSize}.'.'.$PID.'.result',
-        );        
+            # read result file
+            my $JobResult = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                Directory => $Kernel::OM->Get('Kernel::Config')->Get('TempDir'),
+                Filename  => 'CacheBenchmark.'.$Param{ItemSize}.'.'.$PID.'.result',
+            );        
 
-        my ($JobSetOK, $JobGetOK, $JobDelOK) = split(/::/, $$JobResult);
-        $SetOK += $JobSetOK;
-        $GetOK += $JobGetOK;
-        $DelOK += $JobDelOK;
+            my ($JobSetOK, $JobGetOK, $JobDelOK) = split(/::/, $$JobResult);
+            $SetOK += $JobSetOK;
+            $GetOK += $JobGetOK;
+            $DelOK += $JobDelOK;
+        }
+
+        $Result = {
+            SetOK => $SetOK / $Param{Processes},
+            GetOK => $GetOK / $Param{Processes},
+            DelOK => $DelOK / $Param{Processes},
+        };
     }
-
-    my $Result = {
-        SetOK => $SetOK / $Param{Processes},
-        GetOK => $GetOK / $Param{Processes},
-        DelOK => $DelOK / $Param{Processes},
-    };
+    else {
+        while (@Children) { 
+            my $PID = shift @Children;
+            waitpid($PID, 0); 
+        }
+        $Result = 1;
+    }
 
     return $Result;
 }
@@ -320,7 +384,7 @@ sub _DoJobWin32 {
         Win32::Process::Create(
             $Child, 
             $ENV{COMSPEC},
-            "/c $Home/bin/kix.Console.pl Dev::Tools::Database::SQLBenchmark --allow-root --backend $Param{Backend} --process-id $ProcessID --item-size $Param{ItemSize} --sid $Param{SID}", 
+            "/c $Home/bin/kix.Console.pl Dev::Tools::Database::SQLBenchmark --allow-root --backend $Param{Backend} --process-id $ProcessID --item-size $Param{ItemSize} --sid $Param{SID} --preload $Param{Preload}", 
             0, 0, "."
         );
         push(@Children, $Child);
@@ -344,11 +408,6 @@ sub _TestItemSize {
     my ( $Self, %Param ) = @_;
 
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
-    $CacheObject->Configure(
-        CacheInMemory  => 0,
-        CacheInBackend => 1,
-    );
 
     my $Content = ' ' x $Param{ItemSize};
     my $OpCount = 10 + 50 * int( 7 - Log10($Param{ItemSize}) );
