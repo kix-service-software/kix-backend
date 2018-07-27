@@ -24,6 +24,7 @@
                 <Item Key="Controller">User</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="CacheType">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>
