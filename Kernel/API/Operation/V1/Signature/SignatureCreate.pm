@@ -64,6 +64,39 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'Signature' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'Signature::Name' => {
+            Required => 1
+        },
+        'Signature::Text' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform SignatureCreate Operation. This will return the created SignatureID.
@@ -93,43 +126,6 @@ perform SignatureCreate Operation. This will return the created SignatureID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webSignature
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Signature' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Signature::Name' => {
-                Required => 1
-            },
-            'Signature::Text' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim Signature parameter
     my $Signature = $Self->_Trim(

@@ -63,6 +63,51 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # get possible item states
+    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
+    my @PossibleItemStates = sort keys %{$PossibleItemStates};
+
+    return {
+        'TicketID' => {
+            Required => 1
+        },
+        'ChecklistItem' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'ChecklistItem::Text' => {
+            Required => 1
+        },
+        'ChecklistItem::State' => {
+            OneOf    => \@PossibleItemStates,
+            Required => 1
+        },
+        'ChecklistItem::Position' => {
+            Required => 1,
+            Format   => '^(\d+)$',
+        },            
+    }
+}
+
 =item Run()
 
 perform ChecklistCreate Operation. This will return the created ChecklistItemID

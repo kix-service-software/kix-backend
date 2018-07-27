@@ -10,6 +10,7 @@
                 <Item Key="Controller">TicketState</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">StateID</Item>
+                <Item Key="CacheType">State</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -63,6 +63,51 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # get possible item states
+    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
+    my @PossibleItemStates = sort keys %{$PossibleItemStates};
+
+    return {
+        'TicketID' => {
+            Required => 1
+        },
+        'ChecklistItem' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'ChecklistItem::Text' => {
+            RequiresValueIfUsed => 1,
+        },
+        'ChecklistItem::State' => {
+            RequiresValueIfUsed => 1,
+            OneOf    => \@PossibleItemStates,
+        },
+        'ChecklistItem::Position' => {
+            RequiresValueIfUsed => 1,
+            Format   => '^(\d+)$',
+        },            
+    }
+}
+
 =item Run()
 
 perform TicketChecklistUpdate Operation. This will return the updated ChecklistItemID
@@ -92,55 +137,6 @@ perform TicketChecklistUpdate Operation. This will return the updated ChecklistI
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # get possible item states
-    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
-    my @PossibleItemStates = sort keys %{$PossibleItemStates};
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'ChecklistItem' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'ChecklistItem::Text' => {
-                RequiresValueIfUsed => 1,
-            },
-            'ChecklistItem::State' => {
-                RequiresValueIfUsed => 1,
-                OneOf    => \@PossibleItemStates,
-            },
-            'ChecklistItem::Position' => {
-                RequiresValueIfUsed => 1,
-                Format   => '^(\d+)$',
-            },            
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         # customers are not allowed to update articles

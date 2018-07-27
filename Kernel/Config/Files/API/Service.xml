@@ -10,6 +10,7 @@
                 <Item Key="Controller">Service</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ServiceID</Item>
+                <Item Key="CacheType">Service</Item>
             </Hash>
         </Setting>
     </ConfigItem>

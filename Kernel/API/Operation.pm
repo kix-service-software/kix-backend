@@ -96,8 +96,8 @@ sub new {
         );
     }
 
-    my $OperationConfig = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
-    if ( !IsHashRefWithData($OperationConfig) ) {
+    $Self->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
+    if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(
             Code    => 'Operation.InternalError',
             Message => 'No OperationConfig found!',
@@ -108,7 +108,7 @@ sub new {
     if ( IsHashRefWithData($Param{Authorization}) ) {
         my $Permission = $Self->_CheckOperationPermission(
             OperationType   => $Param{OperationType},
-            OperationConfig => $OperationConfig,
+            OperationConfig => $Self->{OperationConfig},
             Authorization   => $Param{Authorization},
         );
         if ( !$Permission ) {
@@ -153,7 +153,7 @@ sub new {
     # pass operation information to backend
     $Self->{BackendObject}->{Operation}       = $Param{Operation};
     $Self->{BackendObject}->{OperationType}   = $Param{OperationType};
-    $Self->{BackendObject}->{OperationConfig} = $OperationConfig;
+    $Self->{BackendObject}->{OperationConfig} = $Self->{OperationConfig};
 
     return $Self;
 }
@@ -194,7 +194,7 @@ sub Run {
     }
 
     # start map on backend
-    return $Self->{BackendObject}->Run(%Param);
+    return $Self->{BackendObject}->RunOperation(%Param);
 }
 
 =begin Internal:

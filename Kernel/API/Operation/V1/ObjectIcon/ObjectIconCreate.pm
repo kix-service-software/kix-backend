@@ -64,6 +64,45 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'ObjectIcon' => {
+            Type => 'HASH',
+            Required => 1
+        },
+        'ObjectIcon::Object' => {
+            Required => 1
+        },
+        'ObjectIcon::ObjectID' => {
+            Required => 1
+        },
+        'ObjectIcon::ContentType' => {
+            Required => 1
+        },
+        'ObjectIcon::Content' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform ObjectIconCreate Operation. This will return the created ObjectIconID.
@@ -92,50 +131,6 @@ perform ObjectIconCreate Operation. This will return the created ObjectIconID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    # trim 
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'ObjectIcon' => {
-                Type => 'HASH',
-                Required => 1
-            },
-            'ObjectIcon::Object' => {
-                Required => 1
-            },
-            'ObjectIcon::ObjectID' => {
-                Required => 1
-            },
-            'ObjectIcon::ContentType' => {
-                Required => 1
-            },
-            'ObjectIcon::Content' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
      # isolate and trim ObjectIcon parameter
     my $ObjectIcon = $Self->_Trim(

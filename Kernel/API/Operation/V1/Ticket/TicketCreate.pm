@@ -63,6 +63,48 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'Ticket' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'Ticket::Title' => {
+            Required => 1
+        },
+        'Ticket::CustomerUser' => {
+            Required => 1
+        },
+        'Ticket::State' => {
+            RequiredIfNot => [ 'Ticket::StateID' ],
+        },
+        'Ticket::Priority' => {
+            RequiredIfNot => [ 'Ticket::PriorityID' ],
+        },
+        'Ticket::Queue' => {
+            RequiredIfNot => [ 'Ticket::QueueID' ],
+        },
+    }
+}
+
 =item Run()
 
 perform TicketCreate Operation. This will return the created TicketID.
@@ -154,52 +196,6 @@ perform TicketCreate Operation. This will return the created TicketID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Ticket' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Ticket::Title' => {
-                Required => 1
-            },
-            'Ticket::CustomerUser' => {
-                Required => 1
-            },
-            'Ticket::State' => {
-                RequiredIfNot => [ 'Ticket::StateID' ],
-            },
-            'Ticket::Priority' => {
-                RequiredIfNot => [ 'Ticket::PriorityID' ],
-            },
-            'Ticket::Queue' => {
-                RequiredIfNot => [ 'Ticket::QueueID' ],
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     my $PermissionUserID = $Self->{Authorization}->{UserID};
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {

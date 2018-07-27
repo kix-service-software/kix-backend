@@ -10,6 +10,7 @@
                 <Item Key="Controller">Contact</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ContactID</Item>
+                <Item Key="CacheType">CustomerUser</Item>
             </Hash>
         </Setting>
     </ConfigItem>

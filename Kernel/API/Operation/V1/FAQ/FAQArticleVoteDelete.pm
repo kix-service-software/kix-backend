@@ -64,6 +64,37 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'FAQArticleID' => {
+            Required => 1
+        },
+        'FAQVoteID' => {
+            Type     => 'ARRAY',
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform FAQArticleVoteDelete Operation. This will return the deleted VoteID.
@@ -84,43 +115,7 @@ perform FAQArticleVoteDelete Operation. This will return the deleted VoteID.
 sub Run {
     my ( $Self, %Param ) = @_;
     
-    # init webService
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'FAQArticleID' => {
-                Required => 1
-            },
-            'FAQVoteID' => {
-                Type     => 'ARRAY',
-                DataType => 'NUMERIC',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
-    # start VoteID loop
-    VOTE:    
+    # start loop
     foreach my $VoteID ( @{$Param{Data}->{FAQVoteID}} ) {
 
         # delete Vote

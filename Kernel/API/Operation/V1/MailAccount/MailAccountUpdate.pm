@@ -66,6 +66,57 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+
+    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+
+    return {
+        'MailAccountID' => {
+            Required => 1
+        },
+        'MailAccount' => {
+            Type => 'HASH',
+            Required => 1
+        },   
+        'MailAccount::Type' => {
+            RequiresValueIfUsed => 1,
+            OneOf => sort keys %BackendList,
+        },
+        'MailAccount::DispatchingBy' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [
+                'Queue',
+                'From'
+            ]
+        },            
+        'MailAccount::Trusted' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [
+                0,
+                1
+            ]
+        },            
+    }
+}
+
 =item Run()
 
 perform MailAccountUpdate Operation. This will return the updated TypeID.
@@ -102,60 +153,6 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webMailAccount
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data         => $Param{Data},
-        Parameters   => {
-            'MailAccountID' => {
-                Required => 1
-            },
-            'MailAccount' => {
-                Type => 'HASH',
-                Required => 1
-            },   
-            'MailAccount::Type' => {
-                RequiresValueIfUsed => 1,
-                OneOf => sort keys %BackendList,
-            },
-           'MailAccount::DispatchingBy' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    'Queue',
-                    'From'
-                ]
-            },            
-           'MailAccount::Trusted' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    0,
-                    1
-                ]
-            },            
-        }        
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim MailAccount parameter
     my $MailAccount = $Self->_Trim(

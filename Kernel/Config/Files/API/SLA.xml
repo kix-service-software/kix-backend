@@ -10,6 +10,7 @@
                 <Item Key="Controller">SLA</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SLAID</Item>
+                <Item Key="CacheType">SLA</Item>
             </Hash>
         </Setting>
     </ConfigItem>

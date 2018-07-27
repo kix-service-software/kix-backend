@@ -64,6 +64,68 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # get system LanguageIDs
+    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my @LanguageIDs = sort keys %{$Languages};
+
+    return {
+        'TextModule' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'TextModule::Name' => {
+            Required => 1
+        },            
+        'TextModule::Text' => {
+            Required => 1
+        },
+        'TextModule::Language' => {
+            RequiresValueIfUsed => 1,
+            OneOf => \@LanguageIDs
+        },
+        'TextModule::AgentFrontend' => {
+            RequiresValueIfUsed => 1,
+            OneOf    => [
+                0,
+                1
+            ]
+        },
+        'TextModule::CustomerFrontend' => {
+            RequiresValueIfUsed => 1,
+            OneOf    => [
+                0,
+                1
+            ]
+        },
+        'TextModule::PublicFrontend' => {
+            RequiresValueIfUsed => 1,
+            OneOf    => [
+                0,
+                1
+            ]
+        },
+    }
+}
+
 =item Run()
 
 perform TextModuleCreate Operation. This will return the created TextModuleID.
@@ -99,72 +161,6 @@ perform TextModuleCreate Operation. This will return the created TextModuleID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webTextModule
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # get system LanguageIDs
-    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
-    my @LanguageIDs = sort keys %{$Languages};
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TextModule' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'TextModule::Name' => {
-                Required => 1
-            },            
-            'TextModule::Text' => {
-                Required => 1
-            },
-            'TextModule::Language' => {
-                RequiresValueIfUsed => 1,
-                OneOf => \@LanguageIDs
-            },
-            'TextModule::AgentFrontend' => {
-                RequiresValueIfUsed => 1,
-                OneOf    => [
-                    0,
-                    1
-                ]
-            },
-            'TextModule::CustomerFrontend' => {
-                RequiresValueIfUsed => 1,
-                OneOf    => [
-                    0,
-                    1
-                ]
-            },
-            'TextModule::PublicFrontend' => {
-                RequiresValueIfUsed => 1,
-                OneOf    => [
-                    0,
-                    1
-                ]
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim TextModule parameter
     my $TextModule = $Self->_Trim(

@@ -64,6 +64,35 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'UserID' => {
+            Required => 1
+        },
+        'RoleID' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform UserRoleDelete Operation. This will return {}.
@@ -83,39 +112,6 @@ perform UserRoleDelete Operation. This will return {}.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
-    # init webService
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'RoleID' => {
-                Required => 1
-            },
-            'UserID' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # delete UserRole	    
     my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserDelete(

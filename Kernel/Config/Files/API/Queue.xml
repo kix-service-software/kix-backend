@@ -10,6 +10,7 @@
                 <Item Key="Controller">Queue</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">QueueID</Item>
+                <Item Key="CacheType">Queue</Item>
             </Hash>
         </Setting>
     </ConfigItem>

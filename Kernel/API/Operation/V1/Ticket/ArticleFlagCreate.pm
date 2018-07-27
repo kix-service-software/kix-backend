@@ -63,6 +63,45 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TicketID' => {
+            Required => 1
+        },
+        'ArticleID' => {
+            Required => 1
+        },
+        'ArticleFlag' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'ArticleFlag::Name' => {
+            Required => 1
+        },
+        'ArticleFlag::Value' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
@@ -91,49 +130,6 @@ perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'ArticleID' => {
-                Required => 1
-            },
-            'ArticleFlag' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'ArticleFlag::Name' => {
-                Required => 1
-            },
-            'ArticleFlag::Value' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         # customers are not allowed to update articles

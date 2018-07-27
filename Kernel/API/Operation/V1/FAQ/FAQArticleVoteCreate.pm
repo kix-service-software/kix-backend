@@ -66,6 +66,55 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'FAQArticleID' => {
+            Required => 1
+        },
+        'FAQVote' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'FAQVote::CreatedBy' => {
+            RequiresValueIfUsed => 1,
+        },
+        'FAQVote::IPAddress' => {
+            Required => 1,
+            Format   => '\d+\.\d+\.\d+\.\d+',
+        },
+        'FAQVote::Interface' => {
+            Required => 1,
+            OneOf    => [
+                'agent',
+                'customer',
+                'public'
+            ]
+        },
+        'FAQVote::Rating' => {
+            Required => 1,
+            Format   => '^([1-5]{1})$',
+        },
+    }
+}
+
 =item Run()
 
 perform FAQArticleVoteCreate Operation. This will return the created VoteID.
@@ -95,59 +144,6 @@ perform FAQArticleVoteCreate Operation. This will return the created VoteID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'FAQArticleID' => {
-                Required => 1
-            },
-            'FAQVote' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'FAQVote::CreatedBy' => {
-                RequiresValueIfUsed => 1,
-            },
-            'FAQVote::IPAddress' => {
-                Required => 1,
-                Format   => '\d+\.\d+\.\d+\.\d+',
-            },
-            'FAQVote::Interface' => {
-                Required => 1,
-                OneOf    => [
-                    'agent',
-                    'customer',
-                    'public'
-                ]
-            },
-            'FAQVote::Rating' => {
-                Required => 1,
-                Format   => '^([1-5]{1})$',
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim FAQVote parameter
     my $FAQVote = $Self->_Trim(

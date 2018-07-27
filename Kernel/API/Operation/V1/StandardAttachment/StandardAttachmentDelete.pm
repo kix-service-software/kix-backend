@@ -64,6 +64,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'AttachmentID' => {
+            Type     => 'ARRAY',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform StandardAttachmentDelete Operation. This will return the deleted StandardAttachmentID.
@@ -82,40 +109,8 @@ perform StandardAttachmentDelete Operation. This will return the deleted Standar
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
-    # init webService
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
 
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'AttachmentID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
-    # start StandardAttachment loop
-    StandardAttachment:    
+    # start loop
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
         my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(

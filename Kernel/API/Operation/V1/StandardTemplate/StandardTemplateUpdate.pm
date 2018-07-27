@@ -66,6 +66,36 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'StandardTemplateID' => {
+            Required => 1
+        },
+        'StandardTemplate' => {
+            Type => 'HASH',
+            Required => 1
+        },   
+    }
+}
+
 =item Run()
 
 perform StandardTemplateUpdate Operation. This will return the updated StandardTemplateID.
@@ -97,40 +127,6 @@ perform StandardTemplateUpdate Operation. This will return the updated StandardT
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webStandardTemplate
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data         => $Param{Data},
-        Parameters   => {
-            'StandardTemplateID' => {
-                Required => 1
-            },
-            'StandardTemplate' => {
-                Type => 'HASH',
-                Required => 1
-            },   
-        }        
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim User parameter
     my $StandardTemplate = $Self->_Trim(

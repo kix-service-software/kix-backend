@@ -63,6 +63,53 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TicketID' => {
+            Required => 1
+        },
+        'Article' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'Article::Subject' => {
+            Required => 1
+        },
+        'Article::Body' => {
+            Required => 1
+        },
+        'Article::ContentType' => {
+            RequiredIfNot => [ 'Article::MimeType', 'Article::Charset' ],
+        },
+        'Article::MimeType' => {
+            RequiredIfNot => [ 'Article::ContentType' ],
+            RequiredIf    => [ 'Article::Charset' ],
+        },
+        'Article::Charset' => {
+            RequiredIfNot => [ 'Article::ContentType' ],
+            RequiredIf    => [ 'Article::MimeType' ],
+        },
+    }
+}
+
 =item Run()
 
 perform ArticleCreate Operation. This will return the created ArticleID.
@@ -128,58 +175,7 @@ perform ArticleCreate Operation. This will return the created ArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'Article' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Article::Subject' => {
-                Required => 1
-            },
-            'Article::Body' => {
-                Required => 1
-            },
-            'Article::ContentType' => {
-                RequiredIfNot => [ 'Article::MimeType', 'Article::Charset' ],
-            },
-            'Article::MimeType' => {
-                RequiredIfNot => [ 'Article::ContentType' ],
-                RequiredIf    => [ 'Article::Charset' ],
-            },
-            'Article::Charset' => {
-                RequiredIfNot => [ 'Article::ContentType' ],
-                RequiredIf    => [ 'Article::MimeType' ],
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
-   my $PermissionUserID = $Self->{Authorization}->{UserID};
+    my $PermissionUserID = $Self->{Authorization}->{UserID};
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
     }

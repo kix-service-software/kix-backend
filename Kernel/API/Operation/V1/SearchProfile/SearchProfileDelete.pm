@@ -64,6 +64,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'SearchProfileID' => {
+            Type     => 'ARRAY',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform SearchProfileDelete Operation. This will return the deleted SearchProfileID.
@@ -82,40 +109,8 @@ perform SearchProfileDelete Operation. This will return the deleted SearchProfil
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
-    # init webService
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'SearchProfileID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-         
-    # start SearchProfile loop
-    SearchProfile:    
+             
+    # start loop
     foreach my $SearchProfileID ( @{$Param{Data}->{SearchProfileID}} ) {
 
         # delete SearchProfile	    

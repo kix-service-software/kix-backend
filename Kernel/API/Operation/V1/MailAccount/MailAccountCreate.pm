@@ -64,6 +64,62 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+
+    return {
+        'MailAccount' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'MailAccount::Login' => {
+            Required => 1
+        },            
+        'MailAccount::Password' => {
+            Required => 1
+        },
+        'MailAccount::Host' => {
+            Required => 1
+        },
+        'MailAccount::Type' => {
+            Required => 1,
+            OneOf    => sort keys %BackendList,
+        },
+        'MailAccount::DispatchingBy' => {
+            Required => 1,
+            OneOf    => [
+                'Queue',
+                'From'
+            ]
+        },            
+        'MailAccount::Trusted' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [
+                0,
+                1
+            ]
+        },            
+    }
+}
+
 =item Run()
 
 perform MailAccountCreate Operation. This will return the created MailAccountID.
@@ -98,67 +154,6 @@ perform MailAccountCreate Operation. This will return the created MailAccountID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webMailAccount
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'MailAccount' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'MailAccount::Login' => {
-                Required => 1
-            },            
-            'MailAccount::Password' => {
-                Required => 1
-            },
-            'MailAccount::Host' => {
-                Required => 1
-            },
-            'MailAccount::Type' => {
-                Required => 1,
-                OneOf    => sort keys %BackendList,
-            },
-            'MailAccount::DispatchingBy' => {
-                Required => 1,
-                OneOf    => [
-                    'Queue',
-                    'From'
-                ]
-            },            
-           'MailAccount::Trusted' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    0,
-                    1
-                ]
-            },            
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
 
     # isolate and trim MailAccount parameter
     my $MailAccount = $Self->_Trim(
