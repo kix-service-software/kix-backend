@@ -89,30 +89,6 @@ perform SysConfigItemDefinitionSearch Operation. This will return a SysConfig de
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # perform SysConfig search
     my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
 

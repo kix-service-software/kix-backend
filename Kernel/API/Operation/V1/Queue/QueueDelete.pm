@@ -64,6 +64,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'QueueID' => {
+            Type     => 'ARRAY',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform QueueDelete Operation. This will return the deleted QueueID.
@@ -82,41 +109,8 @@ perform QueueDelete Operation. This will return the deleted QueueID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
 
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'QueueID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-   
-    my $Message = '';
-
-    # start Queue loop
-    Queue:    
+    # start loop
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
  
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        

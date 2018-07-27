@@ -10,6 +10,7 @@
                 <Item Key="Controller">Role</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">RoleID</Item>
+                <Item Key="CacheType">Group</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

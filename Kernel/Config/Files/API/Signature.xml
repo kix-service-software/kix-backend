@@ -10,6 +10,7 @@
                 <Item Key="Controller">Signature</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SignatureID</Item>
+                <Item Key="CacheType">Signature</Item>
             </Hash>
         </Setting>
     </ConfigItem>

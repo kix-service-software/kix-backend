@@ -10,6 +10,7 @@
                 <Item Key="Controller">AddressBook</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AddressID</Item>
+                <Item Key="CacheType">AddressBook</Item>
             </Hash>
         </Setting>
     </ConfigItem>

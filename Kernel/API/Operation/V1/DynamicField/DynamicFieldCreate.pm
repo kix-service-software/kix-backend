@@ -66,6 +66,61 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => 'DynamicField::DisplayGroup',
+    );
+    my @DisplayGroupIDs;
+    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
+       @DisplayGroupIDs = sort keys %{$GeneralCatalogItemList};
+    }
+
+    return {
+        'DynamicField' => {
+            Type => 'HASH',
+            Required => 1
+        },
+        'DynamicField::Name' => {
+            Required => 1
+        },
+        'DynamicField::Label' => {
+            Required => 1
+        },
+        'DynamicField::FieldType' => {
+            Required => 1
+        },
+        'DynamicField::DisplayGroupID' => {
+            RequiresValueIfUsed => 1,
+            OneOf => \@DisplayGroupIDs
+        },
+        'DynamicField::ObjectType' => {
+            Required => 1
+        },
+        'DynamicField::Config' => {
+            Type => 'HASH',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform DynamicFieldCreate Operation. This will return the created DynamicFieldID.
@@ -101,65 +156,6 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
-        Class => 'DynamicField::DisplayGroup',
-    );
-    my @DisplayGroupIDs;
-    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
-       @DisplayGroupIDs = sort keys %{$GeneralCatalogItemList};
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data         => $Param{Data},
-        Parameters   => {
-            'DynamicField' => {
-                Type => 'HASH',
-                Required => 1
-            },
-            'DynamicField::Name' => {
-                Required => 1
-            },
-            'DynamicField::Label' => {
-                Required => 1
-            },
-            'DynamicField::FieldType' => {
-                Required => 1
-            },
-            'DynamicField::DisplayGroupID' => {
-                RequiresValueIfUsed => 1,
-                OneOf => \@DisplayGroupIDs
-            },
-            'DynamicField::ObjectType' => {
-                Required => 1
-            },
-            'DynamicField::Config' => {
-                Type => 'HASH',
-                Required => 1
-            },
-        }        
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim DynamicField parameter
     my $DynamicField = $Self->_Trim(

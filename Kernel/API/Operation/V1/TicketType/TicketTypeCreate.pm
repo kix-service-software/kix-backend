@@ -64,6 +64,36 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TicketType' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'TicketType::Name' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform TicketTypeCreate Operation. This will return the created TypeID.

@@ -66,6 +66,39 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'PriorityID' => {
+            Required => 1
+        },
+        'Priority' => {
+            Type => 'HASH',
+            Required => 1
+        },
+        'Priority::Name' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform PriorityUpdate Operation. This will return the updated Priority.
@@ -95,43 +128,6 @@ perform PriorityUpdate Operation. This will return the updated Priority.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data         => $Param{Data},
-        Parameters   => {
-            'PriorityID' => {
-                Required => 1
-            },
-            'Priority' => {
-                Type => 'HASH',
-                Required => 1
-            },
-            'Priority::Name' => {
-                Required => 1
-            },
-        }        
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim Priority parameter
     my $Priority = $Self->_Trim(

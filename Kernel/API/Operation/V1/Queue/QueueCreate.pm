@@ -64,6 +64,39 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'Queue' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'Queue::Name' => {
+            Required => 1
+        },
+        'Queue::GroupID' => {
+            Required => 1
+        },            
+    }
+}
+
 =item Run()
 
 perform QueueCreate Operation. This will return the created QueueID.
@@ -106,43 +139,6 @@ perform QueueCreate Operation. This will return the created QueueID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Queue' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Queue::Name' => {
-                Required => 1
-            },
-            'Queue::GroupID' => {
-                Required => 1
-            },            
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim Queue parameter
     my $Queue = $Self->_Trim(

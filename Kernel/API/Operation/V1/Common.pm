@@ -33,6 +33,87 @@ Kernel::API::Operation::V1::Common - Base class for all Operations
 
 =cut
 
+
+=item RunOperation()
+
+initialize and run the current operation
+
+    my $Return = $CommonObject->RunOperation(
+        Data => {
+            ...
+        }
+    );
+
+    $Return = {
+        Success => 1,                       # or 0 in case of failure,
+        Code    => 123
+        Message => 'Error Message',
+        Data => {
+            ...
+        }
+    }
+
+=cut
+
+sub RunOperation {
+    my ( $Self, %Param ) = @_;
+
+    # init webservice
+    my $Result = $Self->Init(
+        WebserviceID => $Self->{WebserviceID},
+    );
+
+    if ( !$Result->{Success} ) {
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
+        );
+    }
+
+    # get parameter definitions (if available)
+    my $Parameters;
+    if ( $Self->can('ParameterDefinition') ) {
+        $Parameters = $Self->ParameterDefinition(
+            %Param,
+        );
+    }
+
+    # prepare data
+    $Result = $Self->PrepareData(
+        Data       => $Param{Data},
+        Parameters => $Parameters,
+    );
+
+    # check result
+    if ( !$Result->{Success} ) {
+        return $Self->_Error(
+            Code    => 'Operation.PrepareDataError',
+            Message => $Result->{Message},
+        );
+    }
+
+    # check cache if CacheType is set for this operation
+    if ( $Self->{OperationConfig}->{CacheType} ) {
+        my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+            Type => $Self->{OperationConfig}->{CacheType},
+            Key  => $Self->_GetCacheKey(),
+        );
+
+        if ( IsHashRefWithData($CacheResult) ) {
+            print STDERR "return cached content\n";
+            $Self->{'_CachedResponse'} = 1;
+            return $Self->_Success(
+                %{$CacheResult}
+            );
+        }
+    }
+
+    # run the operation itself
+    return $Self->Run(
+        %Param,
+    );
+}
+
 =item Init()
 
 initialize the operation by checking the webservice configuration
@@ -397,44 +478,53 @@ helper function to return a successful result.
 sub _Success {
     my ( $Self, %Param ) = @_;
 
+    # ignore cached calues if we have a cached response (see end of Init method)
+
     # honor a filter, if we have one
-    if ( IsHashRefWithData($Self->{Filter}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Filter}) ) {
         $Self->_ApplyFilter(
             Data => \%Param,
         );
     }
 
     # honor a sorter, if we have one
-    if ( IsHashRefWithData($Self->{Sort}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Sort}) ) {
         $Self->_ApplySort(
             Data => \%Param,
         );
     }
    
     # honor a field selector, if we have one
-    if ( IsHashRefWithData($Self->{Fields}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Fields}) ) {
         $Self->_ApplyFieldSelector(
             Data => \%Param,
         );
     }
 
     # honor an offset, if we have one
-    if ( IsHashRefWithData($Self->{Offset}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Offset}) ) {
         $Self->_ApplyOffset(
             Data => \%Param,
         );
     }
 
     # honor a limiter, if we have one
-    if ( IsHashRefWithData($Self->{Limit}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Limit}) ) {
         $Self->_ApplyLimit(
             Data => \%Param,
         );
     }
 
     # honor a generic include, if we have one
-    if ( IsHashRefWithData($Self->{Include}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Include}) ) {
         $Self->_ApplyInclude(
+            Data => \%Param,
+        );
+    }
+
+    # cache request if CacheType is set for this operation
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
+        $Self->_CacheRequest(
             Data => \%Param,
         );
     }
@@ -1318,6 +1408,33 @@ sub _Trim {
     }
 
     return $Param{Data};
+}
+
+sub _GetCacheKey {
+    my ( $Self, %Param ) = @_;
+
+    my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{Operation}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
+        $Self->{RequestData},
+        'ascii'
+    );
+
+    return $CacheKey;
+}
+
+sub _CacheRequest {
+    my ( $Self, %Param ) = @_;
+
+    if ( $Param{Data} ) {
+        my $CacheKey = $Self->_GetCacheKey();
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{OperationConfig}->{CacheType},
+            Key   => $CacheKey,
+            Value => $Param{Data},
+            TTL   => 60 * 60 * 24 * 7,                      # 7 days
+        );
+    }
+
+    return 1;
 }
 
 1;

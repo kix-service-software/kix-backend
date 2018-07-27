@@ -66,6 +66,49 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'UserID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+        'User' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'User::UserLogin' => {
+            RequiresValueIfUsed => 1
+        },
+        'User::UserFirstname' => {
+            RequiresValueIfUsed => 1
+        },
+        'User::UserLastname' => {
+            RequiresValueIfUsed => 1
+        },
+        'User::UserEmail' => {
+            RequiresValueIfUsed => 1
+        },
+    }
+}
+
 =item Run()
 
 perform UserUpdate Operation. This will return the updated UserID.
@@ -101,49 +144,6 @@ perform UserUpdate Operation. This will return the updated UserID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'User' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'User::UserLogin' => {
-                RequiresValueIfUsed => 1
-            },
-            'User::UserFirstname' => {
-                RequiresValueIfUsed => 1
-            },
-            'User::UserLastname' => {
-                RequiresValueIfUsed => 1
-            },
-            'User::UserEmail' => {
-                RequiresValueIfUsed => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim User parameter
     my $User = $Self->_Trim(

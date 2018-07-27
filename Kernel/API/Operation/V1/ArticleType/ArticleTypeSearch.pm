@@ -89,34 +89,9 @@ perform ArticleTypeSearch Operation. This will return a ArticleType ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # perform ArticleType search
     my %ArticleTypeList = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeList(
         Result => 'HASH',
-#        Type   => 'Customer', # optional to get only customer viewable article types
     );
 
 	# get already prepared ArticleType data from ArticleTypeGet operation

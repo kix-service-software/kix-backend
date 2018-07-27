@@ -10,6 +10,7 @@
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">GeneralCatalogID</Item>
+                <Item Key="CacheType">GeneralCatalog</Item>
             </Hash>
         </Setting>
     </ConfigItem>
