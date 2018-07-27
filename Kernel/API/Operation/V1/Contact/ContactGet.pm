@@ -214,6 +214,90 @@ sub Run {
             $ContactData{Tickets} = \@TicketIDs;
         }
 
+        # include TicketStats if requested
+        if ( $Param{Data}->{include}->{TicketStats} ) {
+            # execute ticket searches
+            my %TicketStats;
+            # new tickets
+            $TicketStats{NewCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'new',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # open tickets
+            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'open',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # pending tickets
+            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'pending reminder',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # escalated tickets
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'EscalationTime',
+                            Operator => 'LT',
+                            DataType => 'NUMERIC',
+                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            $ContactData{TicketStats} = \%TicketStats;
+        }
+
         # add
         push(@ContactList, \%ContactData);
     }
