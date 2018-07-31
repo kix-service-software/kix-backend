@@ -68,6 +68,62 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # get system LanguageIDs
+    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my @LanguageIDs = sort keys %{$Languages};
+
+    return {
+        'FAQArticle' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'FAQArticle::CategoryID' => {
+            Required => 1
+        },            
+        'FAQArticle::Title' => {
+            Required => 1
+        },
+        'FAQArticle::Visibility' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [
+                'internal',
+                'external',
+                'public'
+            ]
+        },
+        'FAQArticle::Language' => {
+            RequiresValueIfUsed => 1,
+            OneOf => \@LanguageIDs
+        },
+        'FAQArticle::Approved' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [
+                0,
+                1
+            ]
+        },
+    }
+}
+
 =item Run()
 
 perform FAQArticleCreate Operation. This will return the created FAQArticleID.
@@ -82,7 +138,9 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                 Language    => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
                 ContentType => 'text/plain',     # optional, if not given set to 'text/plain'
                 Number      => '13402',          # optional
-                Keywords    => 'some keywords',  # optional
+                Keywords    => [                 # optional
+                    'some', 'keywords',  
+                ]
                 Field1      => 'Symptom...',     # optional
                 Field2      => 'Problem...',     # optional
                 Field3      => 'Solution...',    # optional
@@ -117,66 +175,6 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # get system LanguageIDs
-    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
-    my @LanguageIDs = sort keys %{$Languages};
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'FAQArticle' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'FAQArticle::CategoryID' => {
-                Required => 1
-            },            
-            'FAQArticle::Title' => {
-                Required => 1
-            },
-            'FAQArticle::Visibility' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    'internal',
-                    'external',
-                    'public'
-                ]
-            },
-            'FAQArticle::Language' => {
-                RequiresValueIfUsed => 1,
-                OneOf => \@LanguageIDs
-            },
-            'FAQArticle::Approved' => {
-                RequiresValueIfUsed => 1,
-                OneOf => [
-                    0,
-                    1
-                ]
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # isolate and trim FAQArticle parameter
     my $FAQArticle = $Self->_Trim(
         Data => $Param{Data}->{FAQArticle}
@@ -202,7 +200,7 @@ sub Run {
         Visibility  => $FAQArticle->{Visibility} || 'internal',
         Language    => $FAQArticle->{Language} || 'en',
         Number      => $FAQArticle->{Number} || '',
-        Keywords    => $FAQArticle->{Keywords} || '',
+        Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : '',
         Field1      => $FAQArticle->{Field1} || '',
         Field2      => $FAQArticle->{Field2} || '',
         Field3      => $FAQArticle->{Field3} || '',
@@ -228,8 +226,8 @@ sub Run {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::FAQ::FAQArticleAttachmentCreate',
                 Data          => {
-                    FAQArticleID  => $FAQArticleID,
-                    FAQAttachment => $FAQAttachment,
+                    FAQArticleID => $FAQArticleID,
+                    Attachment   => $Attachment,
                 }
             );
 

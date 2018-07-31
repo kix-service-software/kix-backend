@@ -63,6 +63,39 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TicketID' => {
+            Required => 1
+        },
+        'ArticleID' => {
+            Required => 1
+        },
+        'FlagName' => {
+            Type     => 'ARRAY',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform ArticleFlagGet Operation. This function is able to return
@@ -98,43 +131,6 @@ one or more ticket entries in one call.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'ArticleID' => {
-                Required => 1
-            },
-            'FlagName' => {
-                Type     => 'ARRAY',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # check ticket permission
     my $Permission = $Self->CheckAccessPermission(
@@ -181,8 +177,7 @@ sub Run {
         UserID    => $Self->{Authorization}->{UserID},
     );
 
-    # start flag loop
-    FLAG:
+    # start loop
     foreach my $ArticleFlag ( sort @{$Param{Data}->{FlagName}} ) {
         my %Flag = (
             ArticleID => $Param{Data}->{ArticleID},

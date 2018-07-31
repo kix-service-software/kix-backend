@@ -10,6 +10,7 @@
                 <Item Key="Controller">Own</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">UserID</Item>
+                <Item Key="CacheType">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>

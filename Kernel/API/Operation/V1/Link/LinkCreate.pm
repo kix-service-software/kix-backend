@@ -64,6 +64,48 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'Link' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'Link::SourceObject' => {
+            Required => 1
+        },
+        'Link::SourceKey' => {
+            Required => 1
+        },            
+        'Link::TargetObject' => {
+            Required => 1
+        },
+        'Link::TargetKey' => {
+            Required => 1
+        },            
+        'Link::Type' => {
+            Required => 1
+        },            
+    }
+}
+
 =item Run()
 
 perform LinkCreate Operation. This will return the created LinkID.
@@ -93,53 +135,6 @@ perform LinkCreate Operation. This will return the created LinkID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webLink
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Link' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Link::SourceObject' => {
-                Required => 1
-            },
-            'Link::SourceKey' => {
-                Required => 1
-            },            
-            'Link::TargetObject' => {
-                Required => 1
-            },
-            'Link::TargetKey' => {
-                Required => 1
-            },            
-            'Link::Type' => {
-                Required => 1
-            },            
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
 
     # isolate and trim Link parameter
     my $Link = $Self->_Trim(

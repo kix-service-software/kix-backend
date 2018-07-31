@@ -10,6 +10,7 @@
                 <Item Key="Controller">Priority</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">PriorityID</Item>
+                <Item Key="CacheType">Priority</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -21,6 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Priority</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Priority</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

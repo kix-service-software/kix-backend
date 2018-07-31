@@ -66,6 +66,36 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'SysConfigItemID' => {
+            Required => 1
+        },
+        'SysConfigItem' => {
+            Type => 'HASH',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform SysConfigItemUpdate Operation. This will return the updated SysConfigItemID.
@@ -95,40 +125,6 @@ perform SysConfigItemUpdate Operation. This will return the updated SysConfigIte
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data         => $Param{Data},
-        Parameters   => {
-            'SysConfigItemID' => {
-                Required => 1
-            },
-            'SysConfigItem' => {
-                Type => 'HASH',
-                Required => 1
-            },
-        }        
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate SysConfigItem parameter
     my $SysConfigItem = $Param{Data}->{SysConfigItem};    

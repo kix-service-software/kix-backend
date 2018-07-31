@@ -74,6 +74,37 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TicketID' => {
+            Required => 1
+        },
+        'HistoryID' => {
+            Type     => 'ARRAY',
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform HistoryGet Operation. This function is able to return
@@ -119,41 +150,6 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'HistoryID' => {
-                Type     => 'ARRAY',
-                DataType => 'NUMERIC',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # check ticket permission
     my $Permission = $Self->CheckAccessPermission(
         TicketID => $Param{Data}->{TicketID},
@@ -179,8 +175,7 @@ sub Run {
 
     my @HistoryItemList;
 
-    # start item loop
-    HISTORY:
+    # start loop
     for my $HistoryID ( sort @{$Param{Data}->{HistoryID}} ) {
 
         my $HistoryItem = $HistoryHash{$HistoryID};

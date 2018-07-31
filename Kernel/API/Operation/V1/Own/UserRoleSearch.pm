@@ -62,6 +62,7 @@ sub new {
     return $Self;
 }
 
+
 =item Run()
 
 perform UserRoleSearch Operation. This will return a Role ID.
@@ -86,30 +87,6 @@ perform UserRoleSearch Operation. This will return a Role ID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data => $Param{Data}
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # perform UserRole search
     my %RoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserRoleGet(

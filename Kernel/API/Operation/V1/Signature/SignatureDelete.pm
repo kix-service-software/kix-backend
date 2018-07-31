@@ -64,6 +64,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'SignatureID' => {
+            Type     => 'ARRAY',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform SignatureDelete Operation. This will return {}.
@@ -82,39 +109,7 @@ perform SignatureDelete Operation. This will return {}.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
-    # init webService
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
 
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'SignatureID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-    
-    my $Message = '';
     my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
 
     my %AssignedSignatures;
@@ -126,8 +121,7 @@ sub Run {
         $AssignedSignatures{$Queue{SignatureID}} = 1;
     }
          
-    # start Signature loop
-    Signature:    
+    # start loop
     foreach my $SignatureID ( @{$Param{Data}->{SignatureID}} ) {
 
         if ( $AssignedSignatures{$SignatureID} ) {

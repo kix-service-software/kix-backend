@@ -71,6 +71,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'CustomerID' => {
+            Type     => 'ARRAY',
+            Required => 1
+        }                
+    }
+}
+
 =item Run()
 
 perform CustomerGet Operation. This function is able to return
@@ -103,41 +130,9 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'CustomerID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            }                
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     my @CustomerList;
 
-    # start Customer loop
-    Customer:    
+    # start loop
     foreach my $CustomerID ( @{$Param{Data}->{CustomerID}} ) {
 
         # get the Customer data
@@ -210,6 +205,90 @@ sub Run {
                 Result => 'ARRAY',
             );
             $CustomerData{Tickets} = \@TicketIDs;
+        }
+
+        # include TicketStats if requested
+        if ( $Param{Data}->{include}->{TicketStats} ) {
+            # execute ticket searches
+            my %TicketStats;
+            # new tickets
+            $TicketStats{NewCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerID',
+                            Operator => 'EQ',
+                            Value    => $CustomerID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'new',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # open tickets
+            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerID',
+                            Operator => 'EQ',
+                            Value    => $CustomerID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'open',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # pending tickets
+            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerID',
+                            Operator => 'EQ',
+                            Value    => $CustomerID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'pending reminder',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # escalated tickets
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerID',
+                            Operator => 'EQ',
+                            Value    => $CustomerID,
+                        },
+                        {
+                            Field    => 'EscalationTime',
+                            Operator => 'LT',
+                            DataType => 'NUMERIC',
+                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            $CustomerData{TicketStats} = \%TicketStats;
         }
 
         # add

@@ -10,6 +10,7 @@
                 <Item Key="Controller">Valid</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ValidID</Item>
+                <Item Key="CacheType">Valid</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -21,6 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Valid</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Valid</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

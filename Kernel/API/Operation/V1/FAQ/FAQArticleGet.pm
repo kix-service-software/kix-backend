@@ -69,6 +69,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'FAQArticleID' => {
+            Type     => 'ARRAY',
+            Required => 1
+        }                
+    }
+}
+
 =item Run()
 
 perform FAQArticleGet Operation. This function is able to return
@@ -101,41 +128,9 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'FAQArticleID' => {
-                Type     => 'ARRAY',
-                Required => 1
-            }                
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     my @FAQArticleData;
 
-    # start faq loop
-    FAQArticle:    
+    # start loop
     foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
 
         # get the FAQArticle data
@@ -155,6 +150,10 @@ sub Run {
         # map ItemID to ID
         $FAQArticle{ID} = $FAQArticle{ItemID};
         delete $FAQArticle{ItemID};
+
+        # convert Keywords to array
+        my @Keywords = split(/\s+/, $FAQArticle{Keywords});
+        $FAQArticle{Keywords} = \@Keywords;
 
         if ( $Param{Data}->{include}->{Attachments} ) {
             # get attachment index (without attachments)

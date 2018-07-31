@@ -66,6 +66,32 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'FAQArticleID' => {
+            Required => 1
+        },      
+    }
+}
+
 =item Run()
 
 perform FAQArticleUpdate Operation. This will return the updated TypeID.
@@ -78,6 +104,9 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
                 StateID     => 1,
                 LanguageID  => 1,
                 Approved    => 1,
+                Keywords    => [                 # optional
+                    'some', 'keywords',  
+                ],
                 ValidID     => 1,
                 ContentType => 'text/plan',     # or 'text/html'
                 Title       => 'Some Text',
@@ -105,38 +134,8 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webFAQArticle
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data         => $Param{Data},
-        Parameters   => {
-            'FAQArticleID' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
         CategoryID => $Param{Data}->{FAQCategoryID},
         UserID   => $Self->{Authorization}->{UserID},
     );
@@ -173,6 +172,7 @@ sub Run {
         StateID     => $FAQArticle->{StateID} || $FAQArticleData{StateID},
         CategoryID  => $FAQArticle->{FAQCategoryID} || $FAQArticleData{CategoryID},
         LanguageID  => $FAQArticle->{LanguageID} || $FAQArticleData{LanguageID},
+        Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : $FAQArticleData{Keywords},
         Approved    => $FAQArticle->{Approved} || $FAQArticleData{Approved},
         ContentType => $FAQArticle->{ContentType} || $FAQArticleData{ContentType},
         Title       => $FAQArticle->{Title} || $FAQArticleData{Title},,

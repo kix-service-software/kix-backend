@@ -84,37 +84,12 @@ remove token (invalidate)
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
         Token => $Self->{Authorization}->{Token}
     );
 
     # check result
-    if ( !$Result ) {
+    if ( !$Payload ) {
         return $Self->_Error(
             Code    => 'SessionGet.TokenError',
             Message => 'SessionGet: unable to extract token!',

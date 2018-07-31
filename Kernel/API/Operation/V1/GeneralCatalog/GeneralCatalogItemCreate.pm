@@ -64,6 +64,39 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'GeneralCatalogItem' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'GeneralCatalogItem::Class' => {
+            Required => 1
+        },
+        'GeneralCatalogItem::Name' => {
+            Required => 1
+        },                             
+    }
+}
+
 =item Run()
 
 perform GeneralCatalogItemCreate Operation. This will return the created GeneralCatalogItemItemID.
@@ -92,43 +125,6 @@ perform GeneralCatalogItemCreate Operation. This will return the created General
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webGeneralCatalog
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'GeneralCatalogItem' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'GeneralCatalogItem::Class' => {
-                Required => 1
-            },
-            'GeneralCatalogItem::Name' => {
-                Required => 1
-            },                             
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim GeneralCatalogItem parameter
     my $GeneralCatalogItem = $Self->_Trim(

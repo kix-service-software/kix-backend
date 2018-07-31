@@ -64,6 +64,52 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'SearchProfile' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'SearchProfile::Type' => {
+            Required => 1
+        },            
+        'SearchProfile::Name' => {
+            Required => 1
+        },            
+        'SearchProfile::UserLogin' => {
+            Required => 1
+        },
+        'SearchProfile::UserType' => {
+            Required => 1,
+            OneOf    => [
+                'Agent',
+                'Customer'
+            ]
+        },
+        'SearchProfile::SubscribedProfileID' => {
+            RequiredIfNot => [ 'SearchProfile::Data' ],
+        },
+    }
+}
+
 =item Run()
 
 perform SearchProfileCreate Operation. This will return the created SearchProfileID.
@@ -99,56 +145,6 @@ perform SearchProfileCreate Operation. This will return the created SearchProfil
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webSearchProfile
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'SearchProfile' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'SearchProfile::Type' => {
-                Required => 1
-            },            
-            'SearchProfile::Name' => {
-                Required => 1
-            },            
-            'SearchProfile::UserLogin' => {
-                Required => 1
-            },
-            'SearchProfile::UserType' => {
-                Required => 1,
-                OneOf    => [
-                    'Agent',
-                    'Customer'
-                ]
-            },
-            'SearchProfile::SubscribedProfileID' => {
-                RequiredIfNot => [ 'SearchProfile::Data' ],
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim SearchProfile parameter
     my $SearchProfile = $Self->_Trim(

@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
+    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQCategoryGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FAQCategoryGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">FAQ</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">FAQCategoryID</Item>
+                <Item Key="CacheType">FAQ</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQCategorySearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FAQCategoryGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">FAQ</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">FAQ</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQCategoryCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
@@ -17,29 +42,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQCategoryUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQCategoryGet" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">FAQCategoryGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">FAQCategoryID</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQCategorySearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">FAQCategoryGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -67,6 +69,19 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQArticleID</Item>
+                <Item Key="CacheType">FAQ</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FAQArticleSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">FAQ</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">FAQ</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -86,17 +101,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">FAQArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -124,6 +128,19 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQAttachmentID</Item>
+                <Item Key="CacheType">FAQ</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleAttachmentSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FAQArticleAttachmentSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">FAQ</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">FAQ</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -143,17 +160,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleAttachmentUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleAttachmentSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">FAQArticleAttachmentSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -181,17 +187,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQVoteID</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleVoteCreate" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">FAQArticleVoteCreate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">FAQ</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -200,6 +196,18 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleVoteSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">FAQ</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">FAQ</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::FAQ::FAQArticleVoteCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FAQArticleVoteCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -227,6 +235,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQHistoryID</Item>
+                <Item Key="CacheType">FAQ</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -238,6 +247,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">FAQ</Item>
             </Hash>
         </Setting>
     </ConfigItem>

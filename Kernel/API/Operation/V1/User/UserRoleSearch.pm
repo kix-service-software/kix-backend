@@ -62,6 +62,32 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'UserID' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform UserRoleSearch Operation. This will return a User ID.
@@ -87,35 +113,6 @@ perform UserRoleSearch Operation. This will return a User ID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'UserID' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # perform UserRole search
     my %RoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserRoleGet(

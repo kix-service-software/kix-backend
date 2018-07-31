@@ -3078,7 +3078,7 @@
         <Setting>
             <Hash>
                 <Item Key="Object1">ITSMConfigItem</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">Normal</Item>
             </Hash>
         </Setting>
@@ -3090,7 +3090,7 @@
         <Setting>
             <Hash>
                 <Item Key="Object1">ITSMConfigItem</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">ParentChild</Item>
             </Hash>
         </Setting>
@@ -3102,7 +3102,7 @@
         <Setting>
             <Hash>
                 <Item Key="Object1">ITSMConfigItem</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">RelevantTo</Item>
             </Hash>
         </Setting>
@@ -3114,7 +3114,7 @@
         <Setting>
             <Hash>
                 <Item Key="Object1">Service</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">Normal</Item>
             </Hash>
         </Setting>
@@ -3126,7 +3126,7 @@
         <Setting>
             <Hash>
                 <Item Key="Object1">Service</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">ParentChild</Item>
             </Hash>
         </Setting>
@@ -3138,7 +3138,7 @@
         <Setting>
             <Hash>
                 <Item Key="Object1">Service</Item>
-                <Item Key="Object2">FAQ</Item>
+                <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">RelevantTo</Item>
             </Hash>
         </Setting>

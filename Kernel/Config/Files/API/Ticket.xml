@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
 
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">TicketID</Item>
+                <Item Key="CacheType">Ticket</Item>
+                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy]</Item>
+                <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
@@ -17,31 +44,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketGet" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">TicketGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">TicketID</Item>
-                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy]</Item>
-                <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">TicketGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -97,6 +99,19 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ArticleID</Item>
+                <Item Key="CacheType">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ArticleSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -116,17 +131,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -178,6 +182,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -189,6 +194,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -213,6 +219,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FlagName</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -224,6 +231,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -259,6 +267,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">HistoryID</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -270,6 +279,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -283,6 +293,19 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ArticleID</Item>
+                <Item Key="CacheType">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ChecklistSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Ticket</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -302,17 +325,6 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ChecklistSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -339,6 +351,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -350,6 +363,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -384,6 +398,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -64,6 +64,36 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'Role' => {
+            Type     => 'HASH',
+            Required => 1
+        },
+        'Role::Name' => {
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform RoleCreate Operation. This will return the created RoleID.
@@ -91,40 +121,6 @@ perform RoleCreate Operation. This will return the created RoleID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Role' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'Role::Name' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim Role parameter
     my $Role = $Self->_Trim(
