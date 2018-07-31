@@ -140,7 +140,8 @@ sub _CheckConfigItem {
 
         # check version attribute values
         my $VersionCheck = $Self->_CheckConfigItemVersion( 
-            ConfigItemVersion => $ConfigItem->{Version} 
+            ConfigItem => $ConfigItem,
+            Version    => $ConfigItem->{Version} 
         );
 
         if ( !$VersionCheck->{Success} ) {
@@ -159,8 +160,8 @@ sub _CheckConfigItem {
 checks if the given version parameters are valid.
 
     my $VersionCheck = $OperationObject->_CheckConfigItemVersion(
-        ConfigItem        => $ConfigItem                          # all ConfigItem parameters
-        ConfigItemVersion => $ConfigItemVersion,                  # all Version parameters
+        ConfigItem  => $ConfigItem                          # all ConfigItem parameters
+        Version     => $ConfigItemVersion,                  # all Version parameters
     );
 
     returns:
@@ -179,20 +180,17 @@ checks if the given version parameters are valid.
 sub _CheckConfigItemVersion {
     my ( $Self, %Param ) = @_;
 
-    my $ConfigItem        = $Param{ConfigItem};
-    my $ConfigItemVersion = $Param{ConfigItemVersion};
+    my $ConfigItem = $Param{ConfigItem};
+    my $Version    = $Param{Version};
 
-    my $ConfigObject     = $Kernel::OM->Get('Kernel::Config');
-    my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-
-    # get last config item defintion
-    my $DefinitionData = $ConfigItemObject->DefinitionGet(
+    # get last config item definition
+    my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
         ClassID => $ConfigItem->{ClassID},
     );
 
     my $XMLDataCheckResult = $Self->_CheckXMLData(
         Definition => $DefinitionData->{DefinitionRef},
-        XMLData    => $ConfigItemVersion,
+        XMLData    => $Version,
     );
 
     if ( !$XMLDataCheckResult->{Success} ) {
@@ -337,7 +335,7 @@ sub _CheckXMLData {
                 for my $ArrayItem ( @{ $XMLData->{$ItemKey} } ) {
 
                     # start recursion for each array item
-                    my $XMLDataCheck = $Self->CheckXMLData(
+                    my $XMLDataCheck = $Self->_CheckXMLData(
                         Definition => $DefItem->{Sub},
                         XMLData    => $ArrayItem,
                         Parent     => $Parent . $ItemKey . "[$Counter]::",
@@ -351,7 +349,7 @@ sub _CheckXMLData {
             elsif ( ref $XMLData->{$ItemKey} eq 'HASH' ) {
 
                 # start recursion
-                my $XMLDataCheck = $Self->CheckXMLData(
+                my $XMLDataCheck = $Self->_CheckXMLData(
                     Definition => $DefItem->{Sub},
                     XMLData    => $XMLData->{$ItemKey},
                     Parent     => $Parent . $ItemKey . '::',
@@ -363,7 +361,7 @@ sub _CheckXMLData {
             else {
 
                 # start recusrsion
-                my $XMLDataCheck = $Self->CheckXMLData(
+                my $XMLDataCheck = $Self->_CheckXMLData(
                     Definition => $DefItem->{Sub},
                     XMLData    => {},
                     Parent     => $Parent . $ItemKey . '::',
@@ -422,100 +420,34 @@ sub _CheckValue {
         );
     }
 
-# TODO!!!
+    # check if we have already created an instance of this type
+    if ( !$Self->{AttributeTypeModules}->{$Param{Input}->{Type}} ) {
+        # create module instance
+        my $Module = 'Kernel::System::ITSMConfigItem::XML::Type::'.$Param{Input}->{Type};
+        my $Object = $Kernel::OM->Get($Module);
 
-    if ( $Param{Input}->{Type} eq 'Text' || $Param{Input}->{Type} eq 'TextArea' ) {
+        if (ref $Object ne $Module) {
+            return $Self->_Error(
+                Code    => "Operation.InternalError",
+                Message => "Unable to create instance of attribute type module for parameter ConfigItem::Version::$Parent$ItemKey!",
+            );
+        }
+        $Self->{AttributeTypeModules}->{$Param{Input}->{Type}} = $Object;
+    }
 
-        # run Text validations
-        if ( !$Self->ValidateInputText(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " excedes the maxium length!",
-            };
+    # validate value if possible
+    if ( $Self->{AttributeTypeModules}->{$Param{Input}->{Type}}->can('ValidateValue') ) {
+        my $ValidateResult = $Self->{AttributeTypeModules}->{$Param{Input}->{Type}}->ValidateValue(%Param);
+
+        if ( $ValidateResult != 1 ) {
+            return $Self->_Error(
+                Code    => "BadRequest",
+                Message => "Parameter ConfigItem::Version::$Parent$ItemKey has an invalid value ($ValidateResult)!",
+            );
         }
     }
-    elsif ( $Param{Input}->{Type} eq 'Date' ) {
 
-        # run Date validations
-        if ( !$Self->ValidateInputDate(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " is not a valid Date format!",
-            };
-        }
-    }
-    elsif ( $Param{Input}->{Type} eq 'DateTime' ) {
-
-        # run DateTime validations
-        if ( !$Self->ValidateInputDateTime(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " is not a valid DateTime format!",
-            };
-        }
-    }
-    elsif ( $Param{Input}->{Type} eq 'Customer' ) {
-
-        # run Customer validations
-        if ( !$Self->ValidateInputCustomer(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " is not a valid customer!",
-            };
-        }
-    }
-    elsif ( $Param{Input}->{Type} eq 'CustomerCompany' ) {
-
-        # run CustomerCompany validations
-        if ( !$Self->ValidateInputCustomerCompany(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " is not a valid customer company!",
-            };
-        }
-    }
-    elsif ( $Param{Input}->{Type} eq 'Integer' ) {
-
-        # run Integer validations
-        if ( !$Self->ValidateInputInteger(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " is not a valid Integer or out of range!",
-            };
-        }
-    }
-    elsif ( $Param{Input}->{Type} eq 'GeneralCatalog' ) {
-
-        # run General Catalog validations
-        if ( !$Self->ValidateInputGeneralCatalog(%Param) ) {
-            return {
-                ErrorCode => "$Self->{OperationName}.InvalidParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: ConfigItem->CIXMLData->$Parent$ItemKey parameter value"
-                    . " is not a valid for General Catalog '$Param{Input}->{Class}'!",
-            };
-        }
-    }
-    else {
-
-        # The type is dummy, do nothing
-    }
-
-    return {
-        Success => 1,
-    };
+    return $Self->_Success();
 }
 
 1;

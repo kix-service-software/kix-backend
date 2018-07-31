@@ -174,6 +174,32 @@ sub ImportValuePrepare {
     return $Param{Value};
 }
 
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => ..., # (optional)
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    # check length
+    if (
+        defined $Param{Input}->{MaxLength}
+        && $Param{Input}->{MaxLength}
+        && length $Param{Value} > $Param{Input}->{MaxLength}
+        )
+    {
+        return 'exceeds maximum length';
+    }
+
+    return 1;
+}
+
 1;
 
 

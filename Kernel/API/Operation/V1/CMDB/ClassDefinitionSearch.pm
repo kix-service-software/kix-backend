@@ -62,6 +62,33 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'ClassID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform ClassDefinitionSearch Operation. This will return a class list.
@@ -93,39 +120,10 @@ sub Run {
         WebserviceID => $Self->{WebserviceID},
     );
 
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'ClassID' => {
-                DataType => 'NUMERIC',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # check if ClassID exists in GeneralCatalog
     my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
         ItemID  => $Param{Data}->{ClassID},
     );
-
-use Data::Dumper;
-print STDERR Dumper($ItemData);
 
     if (!IsHashRefWithData($ItemData) || $ItemData->{Class} ne 'ITSM::ConfigItem::Class') {
         return $Self->_Error(

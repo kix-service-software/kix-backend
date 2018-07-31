@@ -63,6 +63,34 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'ConfigItemID' => {
+            Type     => 'ARRAY',
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform ConfigItemGet Operation. 
@@ -89,38 +117,6 @@ perform ConfigItemGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'ConfigItemID' => {
-                Type     => 'ARRAY',
-                DataType => 'NUMERIC',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     my @ConfigItemList;        
     foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {                 
 
@@ -146,7 +142,7 @@ sub Run {
                 }
             );
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{CurrentVersion} = $Result->{Data}->{Version};
+                $ConfigItem->{CurrentVersion} = $Result->{Data}->{ConfigItemVersion};
             }
         }
 
@@ -160,7 +156,7 @@ sub Run {
                 }
             );
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{Versions} = $Result->{Data}->{Version};
+                $ConfigItem->{Versions} = $Result->{Data}->{ConfigItemVersion};
             }
         }
 

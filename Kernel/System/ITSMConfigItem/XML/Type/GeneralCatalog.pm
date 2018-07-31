@@ -252,6 +252,33 @@ sub ImportValuePrepare {
     return $GeneralCatalogID;
 }
 
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => ..., # (optional)
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    # get the values for the General catalog class
+    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => $Param{Input}->{Class},
+    );
+
+    if (!$ItemList->{$Value}) {
+        return 'not a valid GeneralCatalog item'
+    }
+
+    return 1;
+}
+
 1;
 
 

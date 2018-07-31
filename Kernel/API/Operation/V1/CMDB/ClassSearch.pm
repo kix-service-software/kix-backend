@@ -88,30 +88,6 @@ perform ClassSearch Operation. This will return a class list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'WebService.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # get IDs of CI classes from General Catalog
     my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
         Class   => 'ITSM::ConfigItem::Class',

@@ -63,6 +63,38 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'ConfigItemID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+        'VersionID' => {
+            Type     => 'ARRAY',
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform ConfigItemVersionGet Operation.
@@ -90,72 +122,38 @@ perform ConfigItemVersionGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'ConfigItemID' => {
-                DataType => 'NUMERIC',
-                Required => 1
-            },
-            'VersionID' => {
-                Type     => 'ARRAY',
-                DataType => 'NUMERIC',
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     my @VersionList;        
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
-        ConfigItemID => $ConfigItemID,
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
     if (!IsHashRefWithData($ConfigItem)) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could not get data for ConfigItemID $Param{Data}->{ConfigItemID}",
+            Message => "ConfigItem $Param{Data}->{ConfigItemID} does not exist",
         );
     }
 
-    # get all versions of ConfigItem (it's cheaper that getting selected version by single requests)
-    my %Versions = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
-        ConfigItemID => $ConfigItemID,
+    # get all versions of ConfigItem (it's cheaper than getting selected version by single requests)
+    my $Versions = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionZoomList(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
-    if (IsHashRefWithData(\%Versions)) {
+    if (IsArrayRefWithData($Versions)) {
+        my %VersionListMap = map { $_->{VersionID} => $_ } @{$Versions};
+    
         foreach my $VersionID ( @{$Param{Data}->{VersionID}} ) {                 
 
-            if (!$Versions{$Param{Data}->{ConfigItemID}}->{$VersionID}) {
+            my $Version = $VersionListMap{$VersionID};
+
+            if (!IsHashRefWithData($Version)) {
                 return $Self->_Error(
                     Code    => 'Object.NotFound',
                     Message => "Could not get data for VersionID $VersionID in ConfigItemID $Param{Data}->{ConfigItemID}",
                 );
             }     
-
-            my $Version = $Versions{$Param{Data}->{ConfigItemID}}->{$VersionID};
 
             # include Definition if requested
             if ( $Param{Data}->{include}->{Definition} ) {
@@ -170,6 +168,16 @@ sub Run {
                 if ( IsHashRefWithData($Result) && $Result->{Success} ) {
                     $Version->{Definition} = $Result->{Data}->{ConfigItemClassDefinition};
                 }
+            }
+
+            # include XMLData if requested
+            if ( $Param{Data}->{include}->{XMLData} ) {
+                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                    VersionID  => $VersionID,
+                    XMLDataGet => 1,
+                );
+
+                $Version->{XMLData} = $VersionData->{XMLData};
             }
 
             push(@VersionList, $Version);

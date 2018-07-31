@@ -64,6 +64,56 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # get valid ClassIDs
+    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => 'ITSM::ConfigItem::Class',
+        Valid => 1,
+    );
+    my @ClassIDs = sort keys %{$ItemList};
+
+    return {
+        'ConfigItem' => {
+            Required => 1,
+            Type     => 'HASH'
+        },
+        'ConfigItem::ClassID' => {
+            Required => 1,
+            OneOf    => \@ClassIDs,
+        },
+        'ConfigItem::Name' => {
+            Required => 1,
+        },
+        'ConfigItem::DeploymentStateID' => {
+            Required => 1,
+        },
+        'ConfigItem::IncidentStateID' => {
+            Required => 1,
+        },
+        'ConfigItem::Version' => {
+            Required => 1,
+        }
+    }
+}
+
 =item Run()
 
 perform ConfigItemCreate Operation. This will return the created ConfigItemLogin.
@@ -89,48 +139,6 @@ perform ConfigItemCreate Operation. This will return the created ConfigItemLogin
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # get valid CLassIDs
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
-        Class => 'ITSM::ConfigItem::Class',
-        Valid => 1,
-    );
-    my @ClassIDs = sort keys %{$ItemList};
-
-    # prepare data (first check)
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'ConfigItem' => {
-                Required => 1,
-                Type     => 'HASH'
-            },
-            'ConfigItem::ClassID' => {
-                Required => 1,
-                OneOf    => \@ClassIDs,
-            }
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
     
     # isolate and trim ConfigItem parameter
     my $ConfigItem = $Self->_Trim(
@@ -207,58 +215,39 @@ sub _ConfigItemCreate {
     # create new config item
     my $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
         Number  => $ConfigItem->{Number},
-        ClassID => $Self->{ReverseClassList}->{ $ConfigItem->{Class} },
+        ClassID => $ConfigItem->{ClassID},
         UserID  => $Param{UserID},
     );
-# TODO!!!
+
     if ( !$ConfigItemID ) {
         return $Self->_Error(
-            Code    => '',
+            Code    => 'Object.UnableToCreate',
             Message => 'Configuration Item could not be created, please contact the system administrator',
         );
     }
 
-    # set attachments
-    if ( IsArrayRefWithData($AttachmentList) ) {
-
-        for my $Attachment ( @{$AttachmentList} ) {
-            my $Result = $Self->CreateAttachment(
-                Attachment   => $Attachment,
-                ConfigItemID => $ConfigItemID,
-                UserID       => $Param{UserID},
-            );
-
-            if ( !$Result->{Success} ) {
-                my $ErrorMessage =
-                    $Result->{ErrorMessage} || "Attachment could not be created, please contact the system administrator";
-
-                return {
-                    Success      => 0,
-                    ErrorMessage => $ErrorMessage,
-                };
+    # create version
+    if ( IsHashRefWithData($ConfigItem->{Version}) ) {
+        my $Result = $Self->ExecOperation(
+            OperationType => 'V1::CMDB::ConfigItemVersionCreate',
+            Data          => {
+                %{$ConfigItem},
+                ConfigItemID  => $ConfigItemID,
+                Version       => $ConfigItem->{Version},
             }
+        );
+        if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToCreate',
+                Message => 'Configuration Item Version could not be created, please contact the system administrator',
+            );
         }
     }
 
-    # get ConfigItem data
-    my $ConfigItemData = $ConfigItemObject->ConfigItemGet(
+    return $Self->_Success(
+        Code         => 'Object.Created',
         ConfigItemID => $ConfigItemID,
     );
-
-    if ( !IsHashRefWithData($ConfigItemData) ) {
-        return {
-            Success      => 0,
-            ErrorMessage => 'Could not get new configuration item information, please contact the system administrator',
-        };
-    }
-
-    return {
-        Success => 1,
-        Data    => {
-            ConfigItemID => $ConfigItemID,
-            Number       => $ConfigItemData->{Number},
-        },
-    };
 }
 
 1;
