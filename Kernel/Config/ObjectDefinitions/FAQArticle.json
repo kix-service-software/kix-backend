@@ -68,6 +68,10 @@
             "Datatype": "STRING"
         },        
         {
+            "Name": "Language",
+            "Datatype": "STRING"
+        },        
+        {
             "Name": "Name",
             "Datatype": "STRING"
         },        
@@ -250,6 +254,16 @@
             "Sortable": true
         },        
         {
+            "Name": "Language",
+            "CorrespondingAttribute": "Language",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },        
+        {
             "Name": "Name",
             "CorrespondingAttribute": "Name",
             "Datatype": "STRING",
@@ -298,7 +312,7 @@
                 "internal", "external", "public"
             ],
             "Operators": [
-                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+                "EQ", "IN"
             ],
             "Not": true,
             "Sortable": true
