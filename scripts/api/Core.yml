@@ -1540,6 +1540,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemGet
+    V1::CMDB::ConfigItemDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemDelete
     V1::CMDB::ConfigItemVersionSearch:
         Description: ''
         MappingInbound:
@@ -2456,6 +2463,10 @@ Provider:
         V1::CMDB::ConfigItemGet:
           RequestMethod:
           - GET
+          Route: /cmdb/configitems/:ConfigItemID
+        V1::CMDB::ConfigItemDelete:
+          RequestMethod:
+          - DELETE
           Route: /cmdb/configitems/:ConfigItemID
         V1::CMDB::ConfigItemVersionSearch:
           RequestMethod:
