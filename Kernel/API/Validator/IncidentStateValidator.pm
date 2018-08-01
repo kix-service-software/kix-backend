@@ -103,7 +103,7 @@ sub Validate {
     }
 
     my $Found;
-    if ( $Param{Attribute} eq 'IncidentStateID' ) {
+    if ( $Param{Attribute} eq 'InciStateID' ) {
         my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
             ItemID => $Param{Data}->{$Param{Attribute}},
         );

@@ -1526,6 +1526,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemCreate
+    V1::CMDB::ConfigItemUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemUpdate
     V1::CMDB::ConfigItemGet:
         Description: ''
         MappingInbound:
@@ -2442,6 +2449,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /cmdb/configitems
+        V1::CMDB::ConfigItemUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /cmdb/configitems/:ConfigItemID
         V1::CMDB::ConfigItemGet:
           RequestMethod:
           - GET

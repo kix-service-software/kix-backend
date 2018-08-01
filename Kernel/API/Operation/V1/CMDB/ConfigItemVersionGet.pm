@@ -171,13 +171,16 @@ sub Run {
             }
 
             # include XMLData if requested
-            if ( $Param{Data}->{include}->{XMLData} ) {
+            if ( $Param{Data}->{include}->{Data} ) {
                 my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
                     VersionID  => $VersionID,
                     XMLDataGet => 1,
                 );
 
-                $Version->{XMLData} = $VersionData->{XMLData};
+                $Version->{Data} = $Self->ConvertDataToExternal(
+                    Definition => $VersionData->{XMLDefinition},
+                    Data       => $VersionData->{XMLData}->[1]->{Version}
+                );
             }
 
             push(@VersionList, $Version);

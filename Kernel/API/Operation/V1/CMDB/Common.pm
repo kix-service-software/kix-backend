@@ -129,25 +129,27 @@ sub _CheckConfigItem {
         }
     }
 
-    if ( defined $ConfigItem->{Version} ) {
+    if ( defined $ConfigItem->{Data} ) {
 
-        if ( !IsHashRefWithData($ConfigItem->{Version}) ) {
+        if ( !IsHashRefWithData($ConfigItem->{Data}) ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => "Parameter ConfigItem::Version is invalid!",
+                Message => "Parameter Data is invalid!",
             );            
         }
 
-        # check version attribute values
-        my $VersionCheck = $Self->_CheckConfigItemVersion( 
-            ConfigItem => $ConfigItem,
-            Version    => $ConfigItem->{Version} 
+        # get last config item definition
+        my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+            ClassID => $ConfigItem->{ClassID},
         );
 
-        if ( !$VersionCheck->{Success} ) {
-            return $Self->_Error( 
-                %{$VersionCheck} 
-            );
+        my $DataCheckResult = $Self->_CheckConfigItemVersion(
+            Definition => $DefinitionData->{DefinitionRef},
+            Version    => $ConfigItem->{Version},
+        );
+
+        if ( !$DataCheckResult->{Success} ) {
+            return $DataCheckResult;
         }
     }
 
@@ -188,47 +190,47 @@ sub _CheckConfigItemVersion {
         ClassID => $ConfigItem->{ClassID},
     );
 
-    my $XMLDataCheckResult = $Self->_CheckXMLData(
+    my $DataCheckResult = $Self->_CheckData(
         Definition => $DefinitionData->{DefinitionRef},
-        XMLData    => $Version,
+        Data       => $Version->{Data},
     );
 
-    if ( !$XMLDataCheckResult->{Success} ) {
-        return $XMLDataCheckResult;
+    if ( !$DataCheckResult->{Success} ) {
+        return $DataCheckResult;
     }
 
     # if everything is OK then return Success
     return $Self->_Success();
 }
 
-=item _CheckXMLData()
+=item _CheckData()
 
-checks if the given XMLData value are valid.
+checks if the given Data value are valid.
 
-    my $XMLDataCheck = $CommonObject->_CheckXMLData(
+    my $DataCheck = $CommonObject->_CheckData(
         Definition => $DefinitionArrayRef,          # Config Item Definition ot just part of it
-        XMLData    => $XMLDataHashRef,
+        Data       => $DataHashRef,
         Parent     => 'some parent',
     );
 
     returns:
 
-    $XMLDataCheck = {
+    $DataCheck = {
         Success => 1,                               # if everything is OK
     }
 
-    $XMLDataCheck = {
+    $DataCheck = {
         Code    => 'Function.Error',           # if error
         Message => 'Error description',
     }
 
 =cut
 
-sub _CheckXMLData {
+sub _CheckData {
     my ( $Self, %Param ) = @_;
 
     my $Definition = $Param{Definition};
-    my $XMLData    = $Param{XMLData};
+    my $Data       = $Param{Data};
     my $Parent     = $Param{Parent} || '';
 
     my $CheckValueResult;
@@ -243,17 +245,17 @@ sub _CheckXMLData {
                 && defined $DefItem->{Input}->{Required}
                 && $DefItem->{Input}->{Required}
             )
-            && ( !defined $XMLData->{$ItemKey} || !$XMLData->{$ItemKey} )
+            && ( !defined $Data->{$ItemKey} || !$Data->{$ItemKey} )
             )
         {
             return $Self->_Error(
                 Code    => "BadRequest",
-                Message => "Parameter ConfigItem::Version::$Parent$ItemKey is missing!",
+                Message => "Parameter Version::Data::$Parent$ItemKey is missing!",
             );
         }
 
-        if ( ref $XMLData->{$ItemKey} eq 'ARRAY' ) {
-            for my $ArrayItem ( @{ $XMLData->{$ItemKey} } ) {
+        if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
+            for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
                 if ( ref $ArrayItem eq 'HASH' ) {
                     $CheckValueResult = $Self->_CheckValue(
                         Value   => $ArrayItem->{$ItemKey},
@@ -279,14 +281,14 @@ sub _CheckXMLData {
                 else {
                     return $Self->_Error(
                         Code    => "BadRequest",
-                        Message => "Parameter ConfigItem::Version::$Parent$ItemKey is invalid!",
+                        Message => "Parameter Version::Data::$Parent$ItemKey is invalid!",
                     );
                 }
             }
         }
-        elsif ( ref $XMLData->{$ItemKey} eq 'HASH' ) {
+        elsif ( ref $Data->{$ItemKey} eq 'HASH' ) {
             $CheckValueResult = $Self->_CheckValue(
-                Value   => $XMLData->{$ItemKey}->{$ItemKey},
+                Value   => $Data->{$ItemKey}->{$ItemKey},
                 Input   => $DefItem->{Input},
                 ItemKey => $ItemKey,
                 Parent  => $Parent,
@@ -297,11 +299,11 @@ sub _CheckXMLData {
         }
         else {
 
-            # only perform checks if item really exits in the XMLData
+            # only perform checks if item really exits in the Data
             # CountNin checks was verified and passed before!, so it is safe to skip if needed
-            if ( $XMLData->{$ItemKey} ) {
+            if ( $Data->{$ItemKey} ) {
                 $CheckValueResult = $Self->_CheckValue(
-                    Value   => $XMLData->{$ItemKey},
+                    Value   => $Data->{$ItemKey},
                     Input   => $DefItem->{Input},
                     ItemKey => $ItemKey,
                     Parent  => $Parent,
@@ -316,13 +318,13 @@ sub _CheckXMLData {
         if ( defined $DefItem->{CountMax} )
         {
             if (
-                ref $XMLData->{$ItemKey} eq 'ARRAY'
-                && scalar @{ $XMLData->{$ItemKey} } > $DefItem->{CountMax}
+                ref $Data->{$ItemKey} eq 'ARRAY'
+                && scalar @{ $Data->{$ItemKey} } > $DefItem->{CountMax}
                 )
             {
                 return $Self->_Error(
                     Code    => "BadRequest",
-                    Message => "Parameter ConfigItem::Version::$Parent$ItemKey count exceeds allowed maximum!",
+                    Message => "Parameter Version::Data::$Parent$ItemKey count exceeds allowed maximum!",
                 );
             }
         }
@@ -330,44 +332,43 @@ sub _CheckXMLData {
         # check if there is a sub and start recursion
         if ( defined $DefItem->{Sub} ) {
 
-            if ( ref $XMLData->{$ItemKey} eq 'ARRAY' ) {
+            if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
                 my $Counter = 0;
-                for my $ArrayItem ( @{ $XMLData->{$ItemKey} } ) {
+                for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
 
                     # start recursion for each array item
-                    my $XMLDataCheck = $Self->_CheckXMLData(
+                    my $DataCheck = $Self->_CheckData(
                         Definition => $DefItem->{Sub},
-                        XMLData    => $ArrayItem,
+                        Data       => $ArrayItem,
                         Parent     => $Parent . $ItemKey . "[$Counter]::",
                     );
-                    if ( !$XMLDataCheck->{Success} ) {
-                        return $XMLDataCheck;
+                    if ( !$DataCheck->{Success} ) {
+                        return $DataCheck;
                     }
                     $Counter++;
                 }
             }
-            elsif ( ref $XMLData->{$ItemKey} eq 'HASH' ) {
+            elsif ( ref $Data->{$ItemKey} eq 'HASH' ) {
 
                 # start recursion
-                my $XMLDataCheck = $Self->_CheckXMLData(
+                my $DataCheck = $Self->_CheckData(
                     Definition => $DefItem->{Sub},
-                    XMLData    => $XMLData->{$ItemKey},
+                    Data       => $Data->{$ItemKey},
                     Parent     => $Parent . $ItemKey . '::',
                 );
-                if ( !$XMLDataCheck->{Success} ) {
-                    return $XMLDataCheck;
+                if ( !$DataCheck->{Success} ) {
+                    return $DataCheck;
                 }
             }
             else {
-
-                # start recusrsion
-                my $XMLDataCheck = $Self->_CheckXMLData(
+                # start recursion
+                my $DataCheck = $Self->_CheckData(
                     Definition => $DefItem->{Sub},
-                    XMLData    => {},
+                    Data       => {},
                     Parent     => $Parent . $ItemKey . '::',
                 );
-                if ( !$XMLDataCheck->{Success} ) {
-                    return $XMLDataCheck;
+                if ( !$DataCheck->{Success} ) {
+                    return $DataCheck;
                 }
             }
         }
@@ -416,7 +417,7 @@ sub _CheckValue {
     {
         return $Self->_Error(
             Code    => "BadRequest",
-            Message => "Parameter ConfigItem::Version::$Parent$ItemKey value is required and missing!",
+            Message => "Parameter Version::Data::$Parent$ItemKey value is required and missing!",
         );
     }
 
@@ -429,7 +430,7 @@ sub _CheckValue {
         if (ref $Object ne $Module) {
             return $Self->_Error(
                 Code    => "Operation.InternalError",
-                Message => "Unable to create instance of attribute type module for parameter ConfigItem::Version::$Parent$ItemKey!",
+                Message => "Unable to create instance of attribute type module for parameter Version::Data::$Parent$ItemKey!",
             );
         }
         $Self->{AttributeTypeModules}->{$Param{Input}->{Type}} = $Object;
@@ -442,12 +443,258 @@ sub _CheckValue {
         if ( $ValidateResult != 1 ) {
             return $Self->_Error(
                 Code    => "BadRequest",
-                Message => "Parameter ConfigItem::Version::$Parent$ItemKey has an invalid value ($ValidateResult)!",
+                Message => "Parameter Version::Data::$Parent$ItemKey has an invalid value ($ValidateResult)!",
             );
         }
     }
 
     return $Self->_Success();
+}
+
+=item ConvertDataToInternal()
+
+Create a Data suitable for VersionAdd.
+
+    my $NewData = $CommonObject->ConvertDataToInternal(
+        Data    => $DataHashRef,
+        Child      => 1,                    # or 0, optional
+    );
+
+    returns:
+
+    $NewData = $DataHashRef,                  # suitable for version add
+
+=cut
+
+sub ConvertDataToInternal {
+    my ( $Self, %Param ) = @_;
+
+    my $Data = $Param{Data};
+    my $Child   = $Param{Child};
+
+    my $NewData;
+
+    for my $RootKey ( sort keys %{$Data} ) {
+        if ( ref $Data->{$RootKey} eq 'ARRAY' ) {
+            my @NewXMLParts;
+            $NewXMLParts[0] = undef;
+
+            for my $ArrayItem ( @{ $Data->{$RootKey} } ) {
+                if ( ref $ArrayItem eq 'HASH' ) {
+
+                    # extract the root key from the hash and assign it to content key
+                    my $Content = delete $ArrayItem->{$RootKey};
+
+                    # start recursion
+                    my $NewDataPart = $Self->ConvertDataToInternal(
+                        Data => $ArrayItem,
+                        Child   => 1,
+                    );
+                    push @NewXMLParts, {
+                        Content => $Content,
+                        %{$NewDataPart},
+                    };
+                }
+                elsif ( ref $ArrayItem eq '' ) {
+                    push @NewXMLParts, {
+                        Content => $ArrayItem,
+                    };
+                }
+            }
+
+            # assamble the final value from the parts array
+            $NewData->{$RootKey} = \@NewXMLParts;
+        }
+
+        if ( ref $Data->{$RootKey} eq 'HASH' ) {
+
+            my @NewXMLParts;
+            $NewXMLParts[0] = undef;
+
+            # extract the root key from the hash and assign it to content key
+            my $Content = delete $Data->{$RootKey}->{$RootKey};
+
+            # start recursion
+            my $NewDataPart = $Self->ConvertDataToInternal(
+                Data => $Data->{$RootKey},
+                Child   => 1,
+            );
+            push @NewXMLParts, {
+                Content => $Content,
+                %{$NewDataPart},
+            };
+
+            # assamble the final value from the parts array
+            $NewData->{$RootKey} = \@NewXMLParts;
+        }
+
+        elsif ( ref $Data->{$RootKey} eq '' ) {
+            $NewData->{$RootKey} = [
+                undef,
+                {
+                    Content => $Data->{$RootKey},
+                }
+                ],
+        }
+    }
+
+    # return only the part on recursion
+    if ($Child) {
+        return $NewData;
+    }
+
+    # return the complete Data as needed for version add
+    return [
+        undef,
+        {
+            Version => [
+                undef,
+                $NewData
+            ],
+        },
+    ];
+}
+
+=item ConvertDataToExternal()
+
+Creates a readible Data.
+
+    my $NewData = $CommonObject->ConvertDataToExternal(
+        Definition => $DefinitionHashRef,
+        Data       => $DataHashRef,
+    );
+
+    returns:
+
+    $NewData = $DataHashRef,                  # suitable for display
+
+=cut
+
+sub ConvertDataToExternal {
+    my ( $Self, %Param ) = @_;
+
+    my $Data = $Param{Data};
+
+    my $NewData;
+    my $Content;
+    ROOTHASH:
+    for my $RootHash ( @{$Data} ) {
+        next ROOTHASH if !defined $RootHash;
+        delete $RootHash->{TagKey};
+
+        for my $RootHashKey ( sort keys %{$RootHash} ) {
+
+            # get attribute definition 
+            my $AttrDef = $Self->_GetAttributeDefByKey(
+                Key        => $RootHashKey,
+                Definition => $Param{Definition},
+            );
+
+            if ( $AttrDef->{CountMax} > 1 ) {
+
+                # we have multiple items
+                my $Counter = 0;
+                ARRAYITEM:
+                for my $ArrayItem ( @{ $RootHash->{$RootHashKey} } ) {
+                    next ARRAYITEM if !defined $ArrayItem;
+    
+                    delete $ArrayItem->{TagKey};
+
+                    $Content = delete $ArrayItem->{Content} || '';
+
+                    # look if we have a sub structure
+                    if ( $AttrDef->{Sub} ) {
+                        $NewData->{$RootHashKey}->[$Counter]->{$RootHashKey} = $Content;
+
+                        # start recursion
+                        for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
+
+                            my $NewDataPart = $Self->ConvertDataToExternal(
+                                Definition => $Param{Definition},
+                                Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
+                                RootKey    => $RootHashKey,
+                            );
+                            for my $Key ( sort keys %{$NewDataPart} ) {
+                                $NewData->{$RootHashKey}->[$Counter]->{$Key} = $NewDataPart->{$Key};
+                            }
+                        }
+                    }
+                    else {
+                        $NewData->{$RootHashKey}->[$Counter] = $Content;
+                    }
+
+                    $Counter++;
+                }
+            }
+            else {
+                # we've got a single item
+
+                ARRAYITEM:
+                for my $ArrayItem ( @{ $RootHash->{$RootHashKey} } ) {
+                    next ARRAYITEM if !defined $ArrayItem;
+
+                    delete $ArrayItem->{TagKey};
+
+                    $Content = delete $ArrayItem->{Content} || '';
+
+                    $NewData->{$RootHashKey} = $Content;
+
+                    # look if we have a sub structure
+                    if ( $AttrDef->{Sub} ) {
+                        # start recursion
+                        for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
+
+                            my $NewDataPart = $Self->ConvertDataToExternal(
+                                Definition => $Param{Definition},
+                                Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
+                                RootKey    => $RootHashKey,
+                            );
+                            $NewData->{$RootHashKey}->{$ArrayItemKey} = $NewDataPart;
+                        }
+                    }
+                }
+            }
+            # # if we are on a final node
+            # elsif ( !$Param{RootKey} && ref $RootHash->{$RootHashKey} eq '' && $RootHashKey eq 'Content' ) {
+            #     $NewData = $RootHash->{$RootHashKey};
+            # }
+        }
+    }
+
+    return $NewData;
+}
+
+sub _GetAttributeDefByKey {
+    my ( $Self, %Param ) = @_;
+
+    # check required params...
+    return
+        if (
+        !$Param{Definition} || ref( $Param{Definition} ) ne 'ARRAY' ||
+        !$Param{Key}
+        );
+
+    ITEM:
+    for my $Item ( @{ $Param{Definition} } ) {
+
+        if ( $Item->{Key} eq $Param{Key} ) {
+            return $Item;
+        }
+
+        next ITEM if ( !$Item->{Sub} );
+
+        # recurse if subsection available...
+        my $SubResult = $Self->_GetAttributeDefByKey(
+            Key        => $Param{Key},
+            Definition => $Item->{Sub},
+        );
+
+        if ( $SubResult && ref($SubResult) eq 'HASH' ) {
+            return $SubResult;
+        }
+    }
+
+    return;
 }
 
 1;

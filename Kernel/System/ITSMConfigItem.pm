@@ -508,6 +508,68 @@ sub ConfigItemAdd {
     return $ConfigItemID;
 }
 
+=item ConfigItemUpdate()
+
+update the CurInciStateID and CurDeplStateID of a config item
+
+    my $Result = $ConfigItemObject->ConfigItemUpdate(
+        ConfigItemID => 123,
+        InciStateID  => 1,           # optional
+        DeplStateID  => 2,           # optional
+        UserID  => 1,
+    );
+
+=cut
+
+sub ConfigItemUpdate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(ConfigItemID UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    if ($Param{DeplStateID}) {
+        # update current incident state
+        $Kernel::OM->Get('Kernel::System::DB')->Do(
+            SQL  => 'UPDATE configitem SET cur_depl_state_id = ? WHERE id = ?',
+            Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
+        );
+    }
+
+    if ($Param{InciStateID}) {
+        # update current incident state
+        $Kernel::OM->Get('Kernel::System::DB')->Do(
+            SQL  => 'UPDATE configitem SET cur_inci_state_id = ? WHERE id = ?',
+            Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
+        );
+    }
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+
+    # trigger ConfigItemCreate
+    $Self->EventHandler(
+        Event => 'ConfigItemUpdate',
+        Data  => {
+            ConfigItemID => $Param{ConfigItemID},
+            Comment      => $Param{ConfigItemID} . '%%' . $Param{Number},
+        },
+        UserID => $Param{UserID},
+    );
+
+    return 1;
+}
+
 =item ConfigItemDelete()
 
 delete an existing config item

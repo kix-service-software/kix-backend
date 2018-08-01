@@ -72,7 +72,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">DeploymentStateValidator</Item>
-                <Item Key="Validates">DeploymentStateID</Item>
+                <Item Key="Validates">DeplStateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
@@ -116,7 +116,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">IncidentStateValidator</Item>
-                <Item Key="Validates">IncidentStateID</Item>
+                <Item Key="Validates">InciStateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>

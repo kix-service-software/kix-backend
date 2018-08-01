@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/ConfigItem/ConfigItemCreate.pm - API ConfigItem Create operation backend
+# Kernel/API/Operation/ConfigItem/ConfigItemUpdate.pm - API ConfigItem Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ConfigItemCreate;
+package Kernel::API::Operation::V1::CMDB::ConfigItemUpdate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ConfigItemCreate - API ConfigItem Create Operation backend
+Kernel::API::Operation::V1::CMDB::ConfigItemUpdate - API ConfigItem Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -83,45 +83,20 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    # get valid ClassIDs
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
-        Class => 'ITSM::ConfigItem::Class',
-        Valid => 1,
-    );
-    my @ClassIDs = sort keys %{$ItemList};
-
     return {
+        'ConfigItemID' => {
+            Required => 1,
+        },
         'ConfigItem' => {
             Required => 1,
             Type     => 'HASH'
         },
-        'ConfigItem::ClassID' => {
-            Required => 1,
-            OneOf    => \@ClassIDs,
-        },
-        'ConfigItem::Version' => {
-            Required => 1,
-            Type     => 'HASH'
-        },
-        'ConfigItem::Version::Name' => {
-            Required => 1,
-        },
-        'ConfigItem::Version::DeplStateID' => {
-            Required => 1,
-        },
-        'ConfigItem::Version::InciStateID' => {
-            Required => 1,
-        },
-        'ConfigItem::Version::Data' => {
-            Required => 1,
-            Type     => 'HASH'
-        }
     }
 }
 
 =item Run()
 
-perform ConfigItemCreate Operation. This will return the created ConfigItemLogin.
+perform ConfigItemUpdate Operation. This will return the created ConfigItemLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -145,10 +120,18 @@ perform ConfigItemCreate Operation. This will return the created ConfigItemLogin
 sub Run {
     my ( $Self, %Param ) = @_;
     
-    # isolate and trim ConfigItem parameter
-    my $ConfigItem = $Self->_Trim(
-        Data => $Param{Data}->{ConfigItem}
+    # get config item data
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID}
     );
+
+    # check if ConfigItem exists
+    if ( !$ConfigItem ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
+        );
+    }
 
     # check create permissions
     my $Permission = $Self->CheckCreatePermission(
@@ -160,9 +143,14 @@ sub Run {
     if ( !$Permission ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to create ConfigItems for this class!",
+            Message => "No permission to update ConfigItems for this class!",
         );
     }
+
+    # isolate and trim ConfigItem parameter
+    my $ConfigItem = $Self->_Trim(
+        Data => $Param{Data}->{ConfigItem}
+    );
 
     # check ConfigItem attribute values
     my $ConfigItemCheck = $Self->_CheckConfigItem( 
@@ -175,40 +163,22 @@ sub Run {
         );
     }
 
-    # create new config item
-    my $ConfigItemID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemAdd(
-        Number  => $ConfigItem->{Number},
-        ClassID => $ConfigItem->{ClassID},
+    # update config item
+    my $ConfigItemID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemUpdate(        
+        ConfigItemID   => $Param{Data}->{ConfigItemID},
+        %{$ConfigItem},
         UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$ConfigItemID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Configuration Item could not be created, please contact the system administrator',
+            Code    => 'Object.UnableToUpdate',
+            Message => 'Configuration Item could not be updated, please contact the system administrator',
         );
-    }
-
-    # create version
-    if ( IsHashRefWithData($ConfigItem->{Version}) ) {
-        my $Result = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ConfigItemVersionCreate',
-            Data          => {
-                ConfigItemID  => $ConfigItemID,
-                Version       => $ConfigItem->{Version},
-            }
-        );
-        if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToCreate',
-                Message => 'Configuration Item Version could not be created, please contact the system administrator',
-            );
-        }
     }
 
     return $Self->_Success(
-        Code         => 'Object.Created',
-        ConfigItemID => $ConfigItemID,
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 }
 

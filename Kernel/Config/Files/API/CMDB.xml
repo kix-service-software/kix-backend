@@ -83,6 +83,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ConfigItemUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">CMDB</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryType" Required="1" Valid="1">
         <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>

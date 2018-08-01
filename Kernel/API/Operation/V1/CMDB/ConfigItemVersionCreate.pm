@@ -90,7 +90,16 @@ sub ParameterDefinition {
         'Version' => {
             Required => 1,
             Type     => 'HASH'
-        }
+        },
+        'Version::Name' => {
+            Required => 1,
+        },
+        'Version::DeplStateID' => {
+            Required => 1,
+        },
+        'Version::InciStateID' => {
+            Required => 1,
+        },
     }
 }
 
@@ -131,6 +140,14 @@ sub Run {
         ConfigItemID => $Param{Data}->{ConfigItemID}
     );
 
+    # check if ConfigItem exists
+    if ( !$ConfigItem ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
+        );
+    }
+
     # check create permissions
     my $Permission = $Self->CheckCreatePermission(
         ConfigItem => $ConfigItem,
@@ -161,15 +178,29 @@ sub Run {
     my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
         ClassID => $ConfigItem->{ClassID},
     );
+
+    if ( !IsHashRefWithData($DefinitionData) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "Unable to get current definition of CI Class!",
+        );
+    }
     
+    my $FormattedData;
+    if ( $Version->{Data} ) {
+        $FormattedData = $Self->ConvertDataToInternal(
+            Data => $Version->{Data},
+        );
+    }
+
     # everything is ok, let's create the version
     my $VersionID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionAdd(
         %{$ConfigItem},
-        DeplStateID  => $Param{Data}->{DeploymentStateID} || $ConfigItem->{DeplStateID},
-        InciStateID  => $Param{Data}->{IncidentStateID} || $ConfigItem->{InciStateID},
         DefinitionID => $DefinitionData->{DefinitionID},
-        Name         => $Version->{Name} || $Param{Data}->{Name},
-        XMLData      => $Version,
+        DeplStateID  => $Version->{DeplStateID},
+        InciStateID  => $Version->{InciStateID},
+        Name         => $Version->{Name},
+        XMLData      => $FormattedData,
         UserID       => $Self->{Authorization}->{UserID},
     );
 
