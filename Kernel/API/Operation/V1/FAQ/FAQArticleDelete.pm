@@ -148,7 +148,7 @@ sub Run {
             );
         }
 
-        my @IDs = $Kernel::OM->Get('Kernel::System::FAQSearch')->FAQSearch(
+        my @IDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
             ArticleIDs     => [$FAQArticleID],
             UserID => $Self->{Authorization}->{UserID},
         );
