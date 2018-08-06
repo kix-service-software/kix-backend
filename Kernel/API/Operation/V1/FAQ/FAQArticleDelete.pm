@@ -119,7 +119,6 @@ sub Run {
         # get the FAQArticle data
         my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
             ItemID     => $FAQArticleID,
-            ItemFields => 0,
             UserID     => $Self->{Authorization}->{UserID},
         );
    
