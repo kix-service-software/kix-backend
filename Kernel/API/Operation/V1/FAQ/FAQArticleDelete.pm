@@ -122,8 +122,7 @@ sub Run {
             ItemFields => 1,
             UserID     => $Self->{Authorization}->{UserID},
         );
- use Data::Dumper;
- print STDERR "FAQArticle".Dumper(\%FAQArticle, $FAQArticle{CategoryID});   
+   
         # check rw permissions
         my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
             CategoryID => $FAQArticle{CategoryID},
@@ -155,7 +154,7 @@ sub Run {
             ItemID     => $FAQArticleID,
             UserID => $Self->{Authorization}->{UserID},
         );
-print STDERR "Success".Dumper($Success);  
+  
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
