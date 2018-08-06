@@ -119,7 +119,7 @@ sub Run {
         # get the FAQArticle data
         my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
             ItemID     => $FAQArticleID,
-            ItemFields => 1,
+            ItemFields => 0,
             UserID     => $Self->{Authorization}->{UserID},
         );
    
@@ -132,20 +132,7 @@ sub Run {
         if ( $Permission ne 'rw' ) {
             return $Self->_Error(
                 Code    => 'Object.NoPermission',
-                Message => "No permission to create FAQ article in given category!",
-            );
-        }
-
-
-        my @IDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
-            ArticleIDs     => [$FAQArticleID],
-            UserID => $Self->{Authorization}->{UserID},
-        );
-        
-        if ( !$IDs[0] ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete FAQArticle. At least one Article is assigned to this faq Article.',
+                Message => "No permission to delete FAQ article in given category!",
             );
         }
 
