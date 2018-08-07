@@ -131,7 +131,7 @@ sub Run {
         if ( $Permission ne 'rw' ) {
             return $Self->_Error(
                 Code    => 'Object.NoPermission',
-                Message => "No permission to delete FAQ article in given category!",
+                Message => "No permission to delete FAQArticle!",
             );
         }
 
