@@ -4025,6 +4025,36 @@ DefaultValue: ''
         <Data Key="changed_by">1</Data>
         <Data Key="parent_id">0</Data>
     </Insert>
+    <Insert Table="faq_category">
+        <Data Key="name" Type="Quote">Infrastructure</Data>
+        <Data Key="comments" Type="Quote">Infrastructure Comment</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+        <Data Key="parent_id">0</Data>
+    </Insert>
+    <Insert Table="faq_category">
+        <Data Key="name" Type="Quote">Organisation</Data>
+        <Data Key="comments" Type="Quote">Organisation Comment</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+        <Data Key="parent_id">0</Data>
+    </Insert>
+    <Insert Table="faq_category">
+        <Data Key="name" Type="Quote">Software</Data>
+        <Data Key="comments" Type="Quote">Software Comment</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+        <Data Key="parent_id">0</Data>
+    </Insert>
     <Insert Table="faq_history">
         <Data Key="name" Type="Quote">Created</Data>
         <Data Key="item_id">1</Data>
