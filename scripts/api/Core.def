@@ -210,4 +210,17 @@
 /sendertypes                                                            |   GET             | V1::SenderType::SenderTypeSearch
 /objectdefinitions                                                      |   GET             | V1::ObjectDefinition::ObjectDefinitionSearch
 /objectdefinitions/:ObjectType                                          |   GET             | V1::ObjectDefinition::ObjectDefinitionGet
-
+/cmdb/classes                                                           |   GET             | V1::CMDB::ClassSearch
+/cmdb/classes/:ClassID                                                  |   GET             | V1::CMDB::ClassGet
+/cmdb/classes/:ClassID/definitions                                      |   GET             | V1::CMDB::ClassDefinitionSearch
+/cmdb/classes/:ClassID/definitions/:DefinitionID                        |   GET             | V1::CMDB::ClassDefinitionGet
+/cmdb/configitems                                                       |   GET             | V1::CMDB::ConfigItemSearch
+/cmdb/configitems                                                       |   POST            | V1::CMDB::ConfigItemCreate
+/cmdb/configitems/:ConfigItemID                                         |   PATCH           | V1::CMDB::ConfigItemUpdate
+/cmdb/configitems/:ConfigItemID                                         |   GET             | V1::CMDB::ConfigItemGet
+/cmdb/configitems/:ConfigItemID                                         |   DELETE          | V1::CMDB::ConfigItemDelete
+/cmdb/configitems/:ConfigItemID/versions                                |   GET             | V1::CMDB::ConfigItemVersionSearch
+/cmdb/configitems/:ConfigItemID/versions                                |   POST            | V1::CMDB::ConfigItemVersionCreate
+/cmdb/configitems/:ConfigItemID/versions/:VersionID                     |   GET             | V1::CMDB::ConfigItemVersionGet
+/cmdb/configitems/:ConfigItemID/history                                 |   GET             | V1::CMDB::ConfigItemHistorySearch
+/cmdb/configitems/:ConfigItemID/history/:HistoryID                      |   GET             | V1::CMDB::ConfigItemHistoryGet

@@ -181,6 +181,32 @@ sub ImportValuePrepare {
     return $Param{Value};
 }
 
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => ..., # (optional)
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    return if !$Value;
+
+    my %CompanyList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList();
+
+    if (!$CompanyList{ $Param{Value} }) {
+        return 'customer not found';
+    };
+
+    return 1;
+}
+
 1;
 
 

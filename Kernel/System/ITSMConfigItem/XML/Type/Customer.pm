@@ -181,6 +181,44 @@ sub ImportValuePrepare {
     return $Param{Value};
 }
 
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => ..., # (optional)
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    return if !$Value;
+
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+        User => $Param{Value},
+    );
+
+    # if customer is not registered in the database
+     if (!IsHashRefWithData( \%CustomerData )) {
+        return 'contact not found';
+    }
+
+    # if ValidID is present, check if it is valid!
+    if ( defined $CustomerData{ValidID} ) {
+
+        # return false if customer is not valid
+        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $CustomerData{ValidID} ) ne 'valid') {
+            return 'invalid contact';
+        }
+    }
+
+    return 1;
+}
+
 1;
 
 

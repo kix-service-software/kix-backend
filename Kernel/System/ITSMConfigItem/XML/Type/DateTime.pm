@@ -175,6 +175,43 @@ sub ImportValuePrepare {
     return $Param{Value};
 }
 
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => ..., # (optional)
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    # check and convert for date format like "2011-05-18"
+    if ( $Value =~ m{\A (\d{4} - \d{2} - \d{2} \z) }xms ) {
+        $Value = $1 . ' 00:00:00';
+    }
+
+    # convert the raw data to a system time format
+    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        String => $Value,
+    );
+
+    # convert it back to a standard time stamp
+    my $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        SystemTime => $SystemTime,
+    );
+
+    if (!$TimeStamp) {
+        return 'not a valid datetime';
+    }
+
+    return 1;
+}
+
 1;
 
 

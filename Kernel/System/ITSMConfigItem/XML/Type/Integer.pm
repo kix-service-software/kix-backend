@@ -177,6 +177,35 @@ sub ImportValuePrepare {
     return $Param{Value};
 }
 
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => ..., # (optional)
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    if (!IsInteger($Value)) {
+        return 'not an integer';
+    }
+
+    if (defined $Param{ValueMin} && $Value < $Param{ValueMin}) {
+        return 'below minimum value';
+    }
+    if (defined $Param{ValueMax} && $Value > $Param{ValueMax}) {
+        return 'above maximum value';
+    }
+
+    return 1;
+}
+
 1;
 
 
