@@ -113,41 +113,34 @@ perform FAQArticleDelete Operation. This will return the deleted FAQArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check rw permissions
-    my $PermissionString = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
     # start loop
     foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
 
-        my @IDs = $Kernel::OM->Get('Kernel::System::FAQSearch')->FAQSearch(
-            ArticleIDs     => [$FAQArticleID],
-            UserID => $Self->{Authorization}->{UserID},
+        # get the FAQArticle data
+        my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
+            ItemID     => $FAQArticleID,
+            UserID     => $Self->{Authorization}->{UserID},
         );
-        
-        if ( !$IDs[0] ) {
+   
+        # check rw permissions
+        my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+            CategoryID => $FAQArticle{CategoryID},
+            UserID   => $Self->{Authorization}->{UserID},
+        );
+    
+        if ( $Permission ne 'rw' ) {
             return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete FAQArticle. At least one Article is assigned to this faq Article.',
+                Code    => 'Object.NoPermission',
+                Message => "No permission to delete FAQArticle!",
             );
         }
 
         # delete FAQArticle        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->ArticleDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQDelete(
             ItemID     => $FAQArticleID,
-            FileID => $Param{Data}->{FAQArticle}->{FileID},
             UserID => $Self->{Authorization}->{UserID},
         );
- 
+  
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
