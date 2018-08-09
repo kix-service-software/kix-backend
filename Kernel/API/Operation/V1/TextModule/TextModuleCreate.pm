@@ -167,22 +167,11 @@ sub Run {
         Data => $Param{Data}->{TextModule}
     );
 
-    # check attribute values
-    my $CheckResult = $Self->_CheckTextModule( 
-        TextModule => $TextModule
-    );
-
-    if ( !$CheckResult->{Success} ) {
-        return $Self->_Error(
-            %{$CheckResult},
-        );
-    }
-
     # check if TextModule exists
     my $ExistingTextModuleIDs = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleList(
         Name => $TextModule->{Name},
     );
-    
+
     if ( IsArrayRefWithData($ExistingTextModuleIDs) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
