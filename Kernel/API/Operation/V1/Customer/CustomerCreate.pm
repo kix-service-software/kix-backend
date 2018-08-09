@@ -83,10 +83,26 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
+    # determine required attributes from Map config
+    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
+    my %RequiredAttributes;
+    foreach my $MapItem ( @{$Config->{Map}} ) {
+        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
+
+        $RequiredAttributes{'Customer::'.$MapItem->{Attribute}} = {
+            Required => 1
+        };
+    }
+
     return {
         'SourceID' => {
             Required => 1
         },
+        'Customer' => {
+            Type     => 'HASH',
+            Required => 1
+        },          
+        %RequiredAttributes,
     }
 }
 
@@ -117,37 +133,6 @@ perform CustomerCreate Operation. This will return the created CustomerLogin.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # determine required attributes from Map config
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
-    my %RequiredAttributes;
-    foreach my $MapItem ( @{$Config->{Map}} ) {
-        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
-
-        $RequiredAttributes{'Customer::'.$MapItem->{Attribute}} = {
-            Required => 1
-        };
-    }
-
-    # prepare data (second check with more attributes)
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Customer' => {
-                Type     => 'HASH',
-                Required => 1
-            },          
-            %RequiredAttributes,
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
     # check if backend (Source) is writeable
     my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanySourceList(
         ReadOnly => 0
@@ -158,7 +143,7 @@ sub Run {
             Message => 'Can not create Customer. Backend with given SourceID is not writable or does not exist.',
         );        
     }
-    
+
     # isolate and trim Customer parameter
     my $Customer = $Self->_Trim(
         Data => $Param{Data}->{Customer}

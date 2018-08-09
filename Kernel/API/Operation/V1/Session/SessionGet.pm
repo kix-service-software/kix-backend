@@ -117,7 +117,7 @@ sub Run {
     );
 
     # check result
-    if ( !$Result ) {
+    if ( !$Payload ) {
         return $Self->_Error(
             Code    => 'SessionGet.TokenError',
             Message => 'SessionGet: unable to extract token!',

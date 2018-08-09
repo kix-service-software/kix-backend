@@ -83,10 +83,26 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
+    # determine required attributes from Map config
+    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
+    my %RequiredAttributes;
+    foreach my $MapItem ( @{$Config->{Map}} ) {
+        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
+
+        $RequiredAttributes{'Contact::'.$MapItem->{Attribute}} = {
+            Required => 1
+        };
+    }
+
     return {
         'SourceID' => {
             Required => 1
         },
+        'Contact' => {
+            Type     => 'HASH',
+            Required => 1
+        },          
+        %RequiredAttributes,
     }
 }
 
@@ -116,37 +132,6 @@ perform ContactCreate Operation. This will return the created ContactLogin.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # determine required attributes from Map config
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
-    my %RequiredAttributes;
-    foreach my $MapItem ( @{$Config->{Map}} ) {
-        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
-
-        $RequiredAttributes{'Contact::'.$MapItem->{Attribute}} = {
-            Required => 1
-        };
-    }
-
-    # prepare data (second check with more attributes)
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'Contact' => {
-                Type     => 'HASH',
-                Required => 1
-            },          
-            %RequiredAttributes,
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # check if backend (Source) is writeable
     my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
