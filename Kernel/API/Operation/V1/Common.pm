@@ -93,7 +93,7 @@ sub RunOperation {
     }
 
     # check cache if CacheType is set for this operation
-    if ( $Self->{OperationConfig}->{CacheType} ) {
+    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && $Self->{OperationConfig}->{CacheType} ) {
         my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{OperationConfig}->{CacheType},
             Key  => $Self->_GetCacheKey(),
@@ -523,7 +523,7 @@ sub _Success {
     }
 
     # cache request if CacheType is set for this operation
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
+    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
         $Self->_CacheRequest(
             Data => \%Param,
         );
