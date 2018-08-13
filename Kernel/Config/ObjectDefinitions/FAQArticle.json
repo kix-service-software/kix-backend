@@ -232,17 +232,7 @@
             ],
             "Not": true,
             "Sortable": true
-        },        
-        {
-            "Name": "ID",
-            "CorrespondingAttribute": "ID",
-            "Datatype": "INTEGER",
-            "Operators": [
-                "EQ", "IN"
-            ],
-            "Not": true,
-            "Sortable": true            
-        },        
+        },          
         {
             "Name": "Keywords",
             "CorrespondingAttribute": "Keywords",
