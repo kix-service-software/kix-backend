@@ -115,11 +115,37 @@ one or more ticket entries in one call.
         Data         => {
             Queue => [
                 {
-                    ...
-                },
-                {
-                    ...
-                },
+                    "SystemAddressID":...,
+                    "UnlockTimeout":...,
+                    "ChangeTime": "...",
+                    "Email": "...",
+                    "Calendar": "",
+                    "SalutationID": ...,
+                    "CreateTime": "...",
+                    "ValidID": ...,
+                    "QueueID": ...,
+                    "FirstResponseNotify":...,
+                    "UpdateNotify": ...,
+                    "FollowUpLock": ...,
+                    "Comment": "...",
+                    "ParentID": ...,
+                    "DefaultSignKey": ...,
+                    "GroupID": ...,
+                    "SolutionTime": ...,
+                    "FollowUpID": ...,
+                    "Name": "...",
+                    "SolutionNotify": ...,
+                    "RealName": "...",
+                    "SignatureID": ...,
+                    "UpdateTime": ...,
+                    "FirstResponseTime": ... 
+                    # If Include=TicketStats was passed, you'll get an entry like this:
+                    "TicketStats": {
+                        "EscalatedCount":...,
+                        "OpenCount":...,
+                        "LockCount":...
+                    }
+                }
             ]
         },
     };
