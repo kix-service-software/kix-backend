@@ -179,6 +179,7 @@ sub Run {
 
         # include TicketStats if requested
         if ( $Param{Data}->{include}->{TicketStats} ) {
+        
             # execute ticket searches
             my %TicketStats;
             # locked tickets
@@ -186,9 +187,9 @@ sub Run {
                 Filter => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'QueueID',
                             Operator => 'EQ',
-                            Value    => $ContactID,
+                            Value    => $QueueID,
                         },
                         {
                             Field    => 'Lock',
@@ -205,9 +206,9 @@ sub Run {
                 Filter => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'QueueID',
                             Operator => 'EQ',
-                            Value    => $ContactID,
+                            Value    => $QueueID,
                         },
                         {
                             Field    => 'StateType',
@@ -224,9 +225,9 @@ sub Run {
                 Filter => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'QueueID',
                             Operator => 'EQ',
-                            Value    => $ContactID,
+                            Value    => $QueueID,
                         },
                         {
                             Field    => 'EscalationTime',
@@ -239,7 +240,7 @@ sub Run {
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
-            $QueueList{TicketStats} = \%TicketStats;
+            $QueueData{TicketStats} = \%TicketStats;
         }
 
 
