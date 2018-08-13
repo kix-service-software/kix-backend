@@ -227,6 +227,7 @@ sub Run {
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
+            
             # open tickets
             $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
                 Filter => {
@@ -246,6 +247,7 @@ sub Run {
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
+            
             # escalated tickets
             $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
                 Filter => {
@@ -263,9 +265,11 @@ sub Run {
                         },
                     ]
                 },
+                
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
+            
             $QueueData{TicketStats} = \%TicketStats;
         }
 
