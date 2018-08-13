@@ -177,6 +177,72 @@ sub Run {
             $QueueData{ParentID} = undef;
         }
 
+        # include TicketStats if requested
+        if ( $Param{Data}->{include}->{TicketStats} ) {
+            # execute ticket searches
+            my %TicketStats;
+            # locked tickets
+            $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'Lock',
+                            Operator => 'EQ',
+                            Value    => '2',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # open tickets
+            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'open',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            # escalated tickets
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'CustomerUserID',
+                            Operator => 'EQ',
+                            Value    => $ContactID,
+                        },
+                        {
+                            Field    => 'EscalationTime',
+                            Operator => 'LT',
+                            DataType => 'NUMERIC',
+                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            $QueueList{TicketStats} = \%TicketStats;
+        }
+
+
         # add
         push(@QueueList, \%QueueData);
     }
