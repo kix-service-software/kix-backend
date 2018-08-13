@@ -115,11 +115,37 @@ one or more ticket entries in one call.
         Data         => {
             Queue => [
                 {
-                    ...
-                },
-                {
-                    ...
-                },
+                    "SystemAddressID":...,
+                    "UnlockTimeout":...,
+                    "ChangeTime": "...",
+                    "Email": "...",
+                    "Calendar": "",
+                    "SalutationID": ...,
+                    "CreateTime": "...",
+                    "ValidID": ...,
+                    "QueueID": ...,
+                    "FirstResponseNotify":...,
+                    "UpdateNotify": ...,
+                    "FollowUpLock": ...,
+                    "Comment": "...",
+                    "ParentID": ...,
+                    "DefaultSignKey": ...,
+                    "GroupID": ...,
+                    "SolutionTime": ...,
+                    "FollowUpID": ...,
+                    "Name": "...",
+                    "SolutionNotify": ...,
+                    "RealName": "...",
+                    "SignatureID": ...,
+                    "UpdateTime": ...,
+                    "FirstResponseTime": ... 
+                    # If Include=TicketStats was passed, you'll get an entry like this:
+                    "TicketStats": {
+                        "EscalatedCount":...,
+                        "OpenCount":...,
+                        "LockCount":...
+                    }
+                }
             ]
         },
     };
@@ -176,6 +202,77 @@ sub Run {
         else {
             $QueueData{ParentID} = undef;
         }
+
+        # include TicketStats if requested
+        if ( $Param{Data}->{include}->{TicketStats} ) {
+        
+            # execute ticket searches
+            my %TicketStats;
+            # locked tickets
+            $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'QueueID',
+                            Operator => 'EQ',
+                            Value    => $QueueID,
+                        },
+                        {
+                            Field    => 'LockID',
+                            Operator => 'EQ',
+                            Value    => '2',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            
+            # open tickets
+            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'QueueID',
+                            Operator => 'EQ',
+                            Value    => $QueueID,
+                        },
+                        {
+                            Field    => 'StateType',
+                            Operator => 'EQ',
+                            Value    => 'Open',
+                        },
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            
+            # escalated tickets
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'QueueID',
+                            Operator => 'EQ',
+                            Value    => $QueueID,
+                        },
+                        {
+                            Field    => 'EscalationTime',
+                            Operator => 'LT',
+                            DataType => 'NUMERIC',
+                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                        },
+                    ]
+                },
+                
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'COUNT',
+            );
+            
+            $QueueData{TicketStats} = \%TicketStats;
+        }
+
 
         # add
         push(@QueueList, \%QueueData);
