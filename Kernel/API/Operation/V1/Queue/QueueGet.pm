@@ -218,7 +218,7 @@ sub Run {
                             Value    => $QueueID,
                         },
                         {
-                            Field    => 'Lock',
+                            Field    => 'LockID',
                             Operator => 'EQ',
                             Value    => '2',
                         },
@@ -239,7 +239,7 @@ sub Run {
                         {
                             Field    => 'StateType',
                             Operator => 'EQ',
-                            Value    => 'open',
+                            Value    => 'Open',
                         },
                     ]
                 },
