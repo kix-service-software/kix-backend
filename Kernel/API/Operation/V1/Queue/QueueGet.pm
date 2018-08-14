@@ -270,6 +270,10 @@ sub Run {
                 Result => 'COUNT',
             );
             
+            # force numeric values
+            foreach my $Key (keys %TicketStats) {
+                $TicketStats{$Key} = 0 + $TicketStats{$Key};
+            }
             $QueueData{TicketStats} = \%TicketStats;
         }
 
