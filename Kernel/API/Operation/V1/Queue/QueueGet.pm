@@ -105,10 +105,10 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             QueueID => 123       # comma separated in case of multiple or arrayref (depending on transport)
-            include              => '...',                                         # Optional, 0 as default. Include additional objects
-                                                                                   # (supported: TicketStats, Tickets)
-            expand               => 0,                                             # Optional, 0 as default. Expand referenced objects
-                                                                                   # (supported: Tickets)             
+            include => '...',    # Optional, 0 as default. Include additional objects
+                                 # (supported: TicketStats, Tickets)
+            expand  => 0,        # Optional, 0 as default. Expand referenced objects
+                                 # (supported: Tickets)             
         },
     );
 
@@ -157,14 +157,9 @@ one or more ticket entries in one call.
                     # If include=Tickets => 1 AND expand=Tickets => 1 was passed, you'll get an entry like this for each tickets:
                     Tickets => [
                         {
-                            AttachmentID       => 123
-                            ContentAlternative => "",
-                            ContentID          => "",
-                            ContentType        => "application/pdf",
-                            Filename           => "StdAttachment-Test1.pdf",
-                            Filesize           => "4.6 KBytes",
-                            FilesizeRaw        => 4722,
-                        },                    
+                            ...,
+                        },
+                    ]                    
                 }
             ]
         },
