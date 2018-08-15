@@ -185,30 +185,6 @@ sub Run {
         );
     }
 
-    # check needed stuff
-    if (
-        !$Param{Data}->{UserLogin}
-        && !$Param{Data}->{SessionID}
-        )
-    {
-        return $Self->ReturnError(
-            ErrorCode => "$Self->{OperationName}.MissingParameter",
-            ErrorMessage =>
-                "$Self->{OperationName}: UserLogin or SessionID is required!",
-        );
-    }
-
-    if ( $Param{Data}->{UserLogin} ) {
-
-        if ( !$Param{Data}->{Password} )
-        {
-            return $Self->ReturnError(
-                ErrorCode    => "$Self->{OperationName}.MissingParameter",
-                ErrorMessage => "$Self->{OperationName}: Password or SessionID is required!",
-            );
-        }
-    }
-
     # authenticate user
     my ( $UserID, $UserType ) = $Self->Auth(%Param);
 
@@ -217,17 +193,6 @@ sub Run {
             ErrorCode    => "$Self->{OperationName}.AuthFail",
             ErrorMessage => "$Self->{OperationName}: User could not be authenticated!",
         );
-    }
-
-    # check needed hashes
-    for my $Needed (qw(ConfigItem)) {
-        if ( !IsHashRefWithData( $Param{Data}->{$Needed} ) ) {
-            return $Self->ReturnError(
-                ErrorCode => "$Self->{OperationName}.MissingParameter",
-                ErrorMessage =>
-                    "$Self->{OperationName}: $Needed parameter is missing or not valid!",
-            );
-        }
     }
 
     # isolate and trim config parameter
