@@ -113,7 +113,6 @@ sub ParameterDefinition {
             Required => 1,
         },
         'ConfigItem::Version::Data' => {
-            Required => 1,
             Type     => 'HASH'
         }
     }

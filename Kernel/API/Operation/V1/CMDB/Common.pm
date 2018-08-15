@@ -189,12 +189,13 @@ sub _CheckConfigItemVersion {
     my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
         ClassID => $ConfigItem->{ClassID},
     );
-
-    my $DataCheckResult = $Self->_CheckData(
-        Definition => $DefinitionData->{DefinitionRef},
-        Data       => $Version->{Data},
-    );
-
+    
+    if ( $Version->{Data} ) {
+        my $DataCheckResult = $Self->_CheckData(
+            Definition => $DefinitionData->{DefinitionRef},
+            Data       => $Version->{Data},
+        );
+    }
     if ( !$DataCheckResult->{Success} ) {
         return $DataCheckResult;
     }
