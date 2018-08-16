@@ -16,6 +16,7 @@ use warnings;
 use Kernel::System::EventHandler;
 use Kernel::System::ITSMConfigItem::Definition;
 use Kernel::System::ITSMConfigItem::History;
+use Kernel::System::ITSMConfigItem::Image;
 use Kernel::System::ITSMConfigItem::Number;
 use Kernel::System::ITSMConfigItem::Permission;
 use Kernel::System::ITSMConfigItem::Version;

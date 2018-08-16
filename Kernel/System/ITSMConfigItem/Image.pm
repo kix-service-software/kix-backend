@@ -13,6 +13,11 @@ package Kernel::System::ITSMConfigItem::Image;
 use strict;
 use warnings;
 
+use File::Path qw(mkpath);
+use File::Basename qw(fileparse);
+
+use Kernel::System::VariableCheck qw(:all);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -49,6 +54,7 @@ Returns:
 
 sub ImageGet {
     my ( $Self, %Param ) = @_;
+    my %Image;
 
     # check needed stuff
     for my $Needed (qw(ConfigItemID ImageID)) {
@@ -61,25 +67,50 @@ sub ImageGet {
         }
     }
 
-    my $Directory = $Self->_GetDirectory(
-        ConfigItemID => $Param{ConfigItemID}
+    my $ImageFiles = $Self->_GetImageFileList(
+        ConfigItemID => $Param{ConfigItemID},
+        ImageID      => $Param{ImageID},
     );
 
-    if ( -e $Directory ) {
-        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-            Location => $Directory . "/" . $Param{ImageID},
-            Mode     => 'binmode',
-        );
-        if (!$$Content) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to read image file $Directory/$Param{ImageID!",
-            );
-            return;               
-        }
+    if (IsArrayRefWithData($ImageFiles)) {
 
-        $Image{Filename} = $Param{ImageID};
-        $Image{Content}  = $$Content;
+        foreach my $File (@{$ImageFiles}) {
+            next if ($File =~ /.*?\.txt$/g);
+
+            my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                Location => $File,
+                Mode     => 'binmode',
+            );
+
+            if (!$Content) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to read image file $File!",
+                );
+                return;               
+            }
+
+            my($Filename, $Dir, $Suffix) = fileparse($File, qr/\.[^.]*/);
+
+            $Image{Filename} = $Filename . $Suffix;
+            $Image{Content}  = $$Content;
+            $Image{Comment}  = '';
+
+            if ( -e $Dir.$Filename.'.txt') {
+                # read comment file
+                $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                    Directory => $Dir,
+                    Filename  => $Filename . '.txt',
+                    Silent    => 1,
+                );
+
+                if ($Content) {
+                    $Image{Comment}  = $$Content;
+                }
+            }
+
+            last;
+        }
     }
 
     return %Image;
@@ -90,9 +121,10 @@ sub ImageGet {
 Adds a single image to the config item.
 
     my $ImageID = $ConfigItemObject->ImageAdd(
-        ConfigItemID  => 1234,
-        Filename      => '...',
-        Content       => '...'
+        ConfigItemID  => 1234,          # required
+        Filename      => '...',         # required
+        Content       => '...'          # required
+        Comment       => '...'
         UserID        => 1,
     );
 =cut
@@ -102,7 +134,7 @@ sub ImageAdd {
     my $Filename;
 
     # check needed stuff
-    for my $Needed (qw(ConfigItemID Filename ContentType Content)) {
+    for my $Needed (qw(ConfigItemID Filename Content)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -130,14 +162,14 @@ sub ImageAdd {
 
         my $FileType = $1;
         my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay )= $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
-            SystemTime => $TimeObject->SystemTime(),
+            SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
         );
         
-        $Filename = $Year . $Month . $Day . $Hour . $Min . $Sec . "." . $FileType;
+        $Filename = $Year . $Month . $Day . $Hour . $Min . $Sec;
 
         my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
             Directory => $Directory,
-            Filename  => $Filename,
+            Filename  => $Filename . '.' . $FileType,
             Content   => \$Param{Content},
         );
 
@@ -148,6 +180,22 @@ sub ImageAdd {
             );
             return;            
         }
+
+        if ($Param{Comment}) {
+            my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+                Directory => $Directory,
+                Filename  => $Filename . '.txt',
+                Content   => \$Param{Comment},
+            );
+
+            if (!$FileLocation) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to store comment file $Directory/$Filename.txt!",
+                );
+                return;            
+            }    
+        }   
     }
 
     return $Filename;
@@ -178,35 +226,24 @@ sub ImageDelete {
         }
     }
 
-    my $Directory = $Self->_GetDirectory(
-        ConfigItemID => $Param{ConfigItemID}
+    my $ImageFiles = $Self->_GetImageFileList(
+        ConfigItemID => $Param{ConfigItemID},
+        ImageID      => $Param{ImageID},
     );
 
-    if ( -e $Directory . "/" . $Param{ImageID} ) {
-        my $OK = $MainObject->FileDelete(
-            Directory => $Directory,
-            Filename  => $Param{ImageID},
-        );
-        if (!$OK) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to delete image file $Directory/$Param{ImageID}!",
-            );
-            return;
-        }
-    }
+    if (IsArrayRefWithData($ImageFiles)) {
 
-    if ( -e $Directory . "/" . $ImageID . ".txt" ) {
-        my $OK = $MainObject->FileDelete(
-            Directory => $Directory,
-            Filename  => $Param{ImageID} . ".txt",
-        );
-        if (!$OK) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to delete image file comment $Directory/$Param{ImageID}.txt!",
+        foreach my $File (@{$ImageFiles}) {
+            my $OK = $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+                Location  => $File,
             );
-            return;
+            if (!$OK) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to delete image file $File!",
+                );
+                return;
+            }
         }
     }
 
@@ -238,40 +275,23 @@ sub ImageList {
         }
     }
 
-    my $Directory = $Self->_GetDirectory(
-        ConfigItemID => $Param{ConfigItemID}
+    my $ImageFiles = $Self->_GetImageFileList(
+        ConfigItemID => $Param{ConfigItemID},
     );
 
-    if ( -e $Directory ) {
+    if (IsArrayRefWithData($ImageFiles)) {
 
-        my $ImageTypes = $Self->_GetValidImageTypes();
-
-        # get all source files
-        opendir( DIR, $Directory );
-        my @Files = grep { !/^(.|..)$/g } readdir(DIR);
-        closedir(DIR);
-
-        for my $File (@Files) {
-
-            next if $File !~ m/(.*?)\.($ImageTypes)$/i;
-
-            my $CurrentImageID   = $1;
-            my $CurrentImageType = $2;
-
-            # get text
-            my $Text;
-            if ( -e $Directory . "/" . $1 . ".txt" ) {
-                my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                    Location => $Directory . "/" . $CurrentImageID . ".txt",
-                    Mode     => 'utf8',
-                );
-
-                $Text = ${$Content};
-            }
+        my %ImageIDs;
+        foreach my $File (@{$ImageFiles}) {
+            next if ($File =~ /.*?\.txt$/g);
+            my($Filename, $Dirs, $Suffix) = fileparse($File, qr/\.[^.]*/);
+            $ImageIDs{$Filename} = 1;
         }
+    
+        @Result = (sort keys %ImageIDs);
     }
 
-    return @Result;
+    return \@Result;
 }
 
 =begin Internal:
@@ -289,17 +309,18 @@ get the relevant directory path for the given ConfigItemID
 sub _GetDirectory {
     my ( $Self, %Param ) = @_;
 
-    my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/ITSMConfigItem/' . $ConfigItemID;
-
-    if ( !( -e $Home . $Path ) ) {
-        if ( !mkpath( $Home . $Path, 0, 0755 ) ) {
+    # check needed stuff
+    for my $Needed (qw(ConfigItemID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Can't create directory '$Home.$Path'!",
+                Message  => "Need $Needed!",
             );
             return;
         }
     }
+
+    my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/ITSMConfigItem/' . $Param{ConfigItemID};
 
     if ( !( -e $Directory ) ) {
         if ( !mkpath( $Directory, 0, 0755 ) ) {
@@ -312,6 +333,48 @@ sub _GetDirectory {
     }
 
     return $Directory;
+}
+
+=item _GetImageFileList()
+
+get the images files for the given ConfigItemID and optionally the given ImageID
+
+    my $ImageFiles = $ConfigItemObject->_GetImageFileList(
+        ConfigItemID => $ConfigItemID,      # required
+        ImageID      => '...',              # optional
+    );
+
+=cut
+
+sub _GetImageFileList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ConfigItemID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    my $Directory = $Self->_GetDirectory(
+        ConfigItemID => $Param{ConfigItemID}
+    );
+
+    my $Filter = '*';
+    if ($Param{ImageID}) {
+        $Filter = $Param{ImageID} . '.*';
+    }
+
+    my @ImageFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        Directory => $Directory,
+        Filter    => $Filter,
+    );    
+
+    return \@ImageFiles;
 }
 
 =item _GetValidImageTypes()

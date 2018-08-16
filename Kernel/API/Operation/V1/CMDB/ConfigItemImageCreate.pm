@@ -94,9 +94,6 @@ sub ParameterDefinition {
         'Image::Filename' => {
             Required => 1,
         },
-        'Image::ContentType' => {
-            Required => 1,
-        },
         'Image::Content' => {
             Required => 1,
         },
@@ -151,20 +148,30 @@ sub Run {
     # everything is ok, let's create the image
     my $ImageID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageAdd(
         ConfigItemID => $Param{Data}->{ConfigItemID},
-        Content      => $Image->{Content},
-        ContentType  => $Image->{ContentType},
         Filename     => $Image->{Filename},
+        Content      => $Image->{Content},
+        Comment      => $Image->{Comment},
         UserID       => $Self->{Authorization}->{UserID},
     );
 
     return $Self->_Success(
         Code      => 'Object.Created',
-        VersionID => $ImageID,
+        ImageID => $ImageID,
     )
 }
 
-=begin Internal:
-
 1;
 
-=end Internal:
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<http://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+COPYING for license information (AGPL). If you did not receive this file, see
+
+<http://www.gnu.org/licenses/agpl.txt>.
+
+=cut

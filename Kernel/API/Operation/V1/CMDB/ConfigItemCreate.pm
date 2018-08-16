@@ -111,10 +111,6 @@ sub ParameterDefinition {
         },
         'ConfigItem::Version::InciStateID' => {
             Required => 1,
-        },
-        'ConfigItem::Version::Data' => {
-            Required => 1,
-            Type     => 'HASH'
         }
     }
 }
@@ -199,10 +195,7 @@ sub Run {
             }
         );
         if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToCreate',
-                Message => 'Configuration Item Version could not be created, please contact the system administrator',
-            );
+            return $Result;
         }
     }
 
@@ -213,3 +206,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<http://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+COPYING for license information (AGPL). If you did not receive this file, see
+
+<http://www.gnu.org/licenses/agpl.txt>.
+
+=cut

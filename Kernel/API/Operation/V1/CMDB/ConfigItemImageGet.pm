@@ -120,9 +120,7 @@ perform ConfigItemImageGet Operation.
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;
-
-    my @ImageList;        
+    my ( $Self, %Param ) = @_;     
 
     # check if ConfigItem exists
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
@@ -139,25 +137,35 @@ sub Run {
     my @ImageList;
     foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
 
-        my $Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
+        my %Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
             ConfigItemID => $Param{Data}->{ConfigItemID},
             ImageID      => $ImageID,
         );
+
+        if (!IsHashRefWithData(\%Image)) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "ConfigItem image $ImageID does not exist",
+            );
+        }
 
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $Image{Content};
         }
 
-        # add ConfigItemID to version hash
-        $Image->{ConfigItemID} = $Param{Data}->{ConfigItemID};
+        # add ImageID to result
+        $Image{ID} = $ImageID;
 
-        push(@ImageList, $Image);
+        # add ConfigItemID to result
+        $Image{ConfigItemID} = $Param{Data}->{ConfigItemID};
+
+        push(@ImageList, \%Image);
     }
 
     if ( scalar(@ImageList) == 0 ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could not get data for VersionID ".join(',', $Param{Data}->{VersionID}),
+            Message => "Could not get data for ImageID ".join(',', $Param{Data}->{ImageID}),
         );
     }
     elsif ( scalar(@ImageList) == 1 ) {
@@ -172,8 +180,6 @@ sub Run {
 }
 
 1;
-
-
 
 
 =back
