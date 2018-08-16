@@ -16,6 +16,7 @@ use warnings;
 use Kernel::System::EventHandler;
 use Kernel::System::ITSMConfigItem::Definition;
 use Kernel::System::ITSMConfigItem::History;
+use Kernel::System::ITSMConfigItem::Image;
 use Kernel::System::ITSMConfigItem::Number;
 use Kernel::System::ITSMConfigItem::Permission;
 use Kernel::System::ITSMConfigItem::Version;
@@ -77,6 +78,7 @@ sub new {
     @ISA = qw(
         Kernel::System::ITSMConfigItem::Definition
         Kernel::System::ITSMConfigItem::History
+        Kernel::System::ITSMConfigItem::Image
         Kernel::System::ITSMConfigItem::Number
         Kernel::System::ITSMConfigItem::Permission
         Kernel::System::ITSMConfigItem::Version

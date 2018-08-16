@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ConfigItemDelete;
+package Kernel::API::Operation::V1::CMDB::ConfigItemImageDelete;
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ConfigItemDelete - API ConfigItemDelete Operation backend
+Kernel::API::Operation::V1::CMDB::ConfigItemImageDelete - API ConfigItemImageDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,10 @@ sub ParameterDefinition {
 
     return {
         'ConfigItemID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },        
+        'ImageID' => {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
@@ -97,6 +101,7 @@ perform Operation.
 
     my $Result = $OperationObject->Run(
         ConfigItemID => 1,                                # required 
+        ImageID      => 123,                              # required
     );
 
     $Result = {
@@ -109,29 +114,44 @@ perform Operation.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
-    foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {                 
 
-        my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
-            ConfigItemID => $ConfigItemID,
+    # get config item data
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID}
+    );
+
+    # check if ConfigItem exists
+    if ( !$ConfigItem ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
+        );
+    }
+       
+    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
+
+        my %Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            ImageID      => $ImageID,
         );
 
-        if (!IsHashRefWithData($ConfigItem)) {
+        if (!IsHashRefWithData(\%Image)) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "Could not get data for ConfigItemID $ConfigItemID",
+                Message => "Could not get data for ImageID $ImageID",
             );
         }     
 
-        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemDelete(
-            ConfigItemID => $ConfigItemID,
+        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageDelete(
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            ImageID      => $ImageID,
             UserID       => $Self->{Authorization}->{UserID}
         );
 
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete ConfigItem, please contact the system administrator',
+                Message => 'Could not delete image, please contact the system administrator',
             );
         }
     }

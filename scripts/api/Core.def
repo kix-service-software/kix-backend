@@ -224,3 +224,7 @@
 /cmdb/configitems/:ConfigItemID/versions/:VersionID                     |   GET             | V1::CMDB::ConfigItemVersionGet
 /cmdb/configitems/:ConfigItemID/history                                 |   GET             | V1::CMDB::ConfigItemHistorySearch
 /cmdb/configitems/:ConfigItemID/history/:HistoryID                      |   GET             | V1::CMDB::ConfigItemHistoryGet
+/cmdb/configitems/:ConfigItemID/images                                  |   GET             | V1::CMDB::ConfigItemImageSearch
+/cmdb/configitems/:ConfigItemID/images                                  |   POST            | V1::CMDB::ConfigItemImageCreate
+/cmdb/configitems/:ConfigItemID/images/:ImageID                         |   GET             | V1::CMDB::ConfigItemImageGet
+/cmdb/configitems/:ConfigItemID/images/:ImageID                         |   DELETE          | V1::CMDB::ConfigItemImageDelete

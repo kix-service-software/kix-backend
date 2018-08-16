@@ -1582,6 +1582,34 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemHistoryGet
+    V1::CMDB::ConfigItemImageSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemImageSearch
+    V1::CMDB::ConfigItemImageCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemImageCreate
+    V1::CMDB::ConfigItemImageGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemImageGet
+    V1::CMDB::ConfigItemImageDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemImageDelete
 
   Transport:
     Config:
@@ -2488,6 +2516,22 @@ Provider:
           RequestMethod:
           - GET
           Route: /cmdb/configitems/:ConfigItemID/history/:HistoryID
+        V1::CMDB::ConfigItemImageSearch:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID/images
+        V1::CMDB::ConfigItemImageCreate:
+          RequestMethod:
+          - POST
+          Route: /cmdb/configitems/:ConfigItemID/images
+        V1::CMDB::ConfigItemImageGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/:ConfigItemID/images/:ImageID
+        V1::CMDB::ConfigItemImageDelete:
+          RequestMethod:
+          - DELETE
+          Route: /cmdb/configitems/:ConfigItemID/images/:ImageID
 
     Type: HTTP::REST
 RemoteSystem: ''
