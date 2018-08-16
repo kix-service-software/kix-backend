@@ -116,12 +116,26 @@ perform ConfigItemVersionSearch Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # check if ConfigItem exists
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
+    );
+
+    if (!IsHashRefWithData($ConfigItem)) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItemID $Param{Data}->{ConfigItemID}",
+        );
+    }
+    
     # get ConfigItem versions
     my $VersionList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionList(
         ConfigItemID => $Param{Data}->{ConfigItemID},
         UserID       => $Self->{Authorization}->{UserID},
     );
 
+use Data::Dumper;
+print STDERR Dumper($VersionList);
 	# get already prepared CI version data from ConfigItemVersionGet operation
     if ( IsArrayRefWithData($VersionList) ) {  	
 

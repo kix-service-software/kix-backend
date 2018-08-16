@@ -136,6 +136,10 @@ sub Run {
             );
         }     
 
+        # rename DefinitionRef to Definition and remove DefinitionRef attribute
+        $Definition->{Definition} = $Definition->{DefinitionRef};
+        delete $Definition->{DefinitionRef};
+
         push(@DefinitionList, $Definition);
     }
 

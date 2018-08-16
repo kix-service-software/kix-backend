@@ -117,7 +117,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->HistoryGet(
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
@@ -140,7 +140,7 @@ sub Run {
         # prepare ID list
         my @HistoryIDs;
         foreach my $History (@{$HistoryList}) {
-            push(@HistoryIDs, $History->{HistoryID});
+            push(@HistoryIDs, $History->{HistoryEntryID});
         }
 
         my $GetResult = $Self->ExecOperation(
@@ -159,14 +159,14 @@ sub Run {
 
         if ( IsArrayRefWithData(\@DataList) ) {
             return $Self->_Success(
-                ConfigItemHistory => \@DataList,
+                ConfigItemHistoryItem => \@DataList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        ConfigItemHistory => [],
+        ConfigItemHistoryItem => [],
     );
 }
 

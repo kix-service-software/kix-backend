@@ -87,17 +87,17 @@ sub ParameterDefinition {
         'ConfigItemID' => {
             Required => 1,
         },
-        'Version' => {
+        'ConfigItemVersion' => {
             Required => 1,
             Type     => 'HASH'
         },
-        'Version::Name' => {
+        'ConfigItemVersion::Name' => {
             Required => 1,
         },
-        'Version::DeplStateID' => {
+        'ConfigItemVersion::DeplStateID' => {
             Required => 1,
         },
-        'Version::InciStateID' => {
+        'ConfigItemVersion::InciStateID' => {
             Required => 1,
         },
     }
@@ -110,7 +110,7 @@ perform ConfigItemVersionCreate Operation. This will return the created VersionI
     my $Result = $OperationObject->Run(
         Data => {
             ConfigItemID => 123,
-            Version => {
+            ConfigItemVersion => {
                 ...                                
             },
         },
@@ -132,7 +132,7 @@ sub Run {
     
     # isolate and trim Version parameter
     my $Version = $Self->_Trim(
-        Data => $Param{Data}->{Version}
+        Data => $Param{Data}->{ConfigItemVersion}
     );
 
     # get config item data

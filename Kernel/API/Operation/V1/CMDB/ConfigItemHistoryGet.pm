@@ -123,8 +123,8 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->HistoryGet(
-        ConfigItemID => $ConfigItemID,
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
     if (!IsHashRefWithData($ConfigItem)) {

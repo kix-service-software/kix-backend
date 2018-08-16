@@ -194,8 +194,8 @@ sub Run {
         my $Result = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemVersionCreate',
             Data          => {
-                ConfigItemID  => $ConfigItemID,
-                Version       => $ConfigItem->{Version},
+                ConfigItemID      => $ConfigItemID,
+                ConfigItemVersion => $ConfigItem->{Version},
             }
         );
         if ( IsHashRefWithData($Result) && !$Result->{Success} ) {

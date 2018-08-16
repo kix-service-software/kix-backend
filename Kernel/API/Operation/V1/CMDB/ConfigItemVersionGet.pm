@@ -183,6 +183,9 @@ sub Run {
                 );
             }
 
+            # add ConfigItemID to version hash
+            $Version->{ConfigItemID} = $Param{Data}->{ConfigItemID};
+
             push(@VersionList, $Version);
         }
 
