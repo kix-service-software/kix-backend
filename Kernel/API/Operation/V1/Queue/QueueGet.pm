@@ -105,6 +105,10 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             QueueID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            include => '...',    # Optional, 0 as default. Include additional objects
+                                 # (supported: TicketStats, Tickets)
+            expand  => 0,        # Optional, 0 as default. Expand referenced objects
+                                 # (supported: Tickets)             
         },
     );
 
@@ -145,6 +149,17 @@ one or more ticket entries in one call.
                         "OpenCount":...,
                         "LockCount":...
                     }
+                    # If include=Tickets => 1 was passed, you'll get an entry like this for each tickets:
+                    Tickets => [
+                        <TicketID>
+                        # . . .
+                    ]                            
+                    # If include=Tickets => 1 AND expand=Tickets => 1 was passed, you'll get an entry like this for each tickets:
+                    Tickets => [
+                        {
+                            ...,
+                        },
+                    ]                    
                 }
             ]
         },
@@ -201,6 +216,25 @@ sub Run {
         }
         else {
             $QueueData{ParentID} = undef;
+        }
+
+        # include Tickets if requested
+        if ( $Param{Data}->{include}->{Tickets} ) {
+            # execute ticket search
+            my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+                Filter => {
+                    AND => [
+                        {
+                            Field    => 'QueueID',
+                            Operator => 'EQ',
+                            Value    => $QueueID,
+                        }
+                    ]
+                },
+                UserID => $Self->{Authorization}->{UserID},
+                Result => 'ARRAY',
+            );
+            $QueueData{Tickets} = \@TicketIDs;
         }
 
         # include TicketStats if requested
