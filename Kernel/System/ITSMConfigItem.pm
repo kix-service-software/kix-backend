@@ -77,6 +77,7 @@ sub new {
     @ISA = qw(
         Kernel::System::ITSMConfigItem::Definition
         Kernel::System::ITSMConfigItem::History
+        Kernel::System::ITSMConfigItem::Image
         Kernel::System::ITSMConfigItem::Number
         Kernel::System::ITSMConfigItem::Permission
         Kernel::System::ITSMConfigItem::Version
