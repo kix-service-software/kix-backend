@@ -15,6 +15,7 @@ use warnings;
 
 use File::Path qw(mkpath);
 use File::Basename qw(fileparse);
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -37,17 +38,17 @@ All image functions.
 =item ImageGet()
 
     my %File = $ConfigItemObject->ImageGet(
-        ConfigItemID => 123,
-        ImageID      => '...',
+        ConfigItemID => 123,                # required
+        ImageID      => '20180817004645',   # required
         UserID       => 1,
     );
 
 Returns:
 
     %Image = (
-        Filesize    => '540286',                # file size in bytes
-        Filename    => 'Error.jpg',
-        Content     => '...'                    # file binary content
+        Filename    => '20180817004645.jpg',
+        Content     => '...'                    # file content, base64 coded
+        Comment     => '...'
     );
 
 =cut
@@ -93,7 +94,7 @@ sub ImageGet {
             my($Filename, $Dir, $Suffix) = fileparse($File, qr/\.[^.]*/);
 
             $Image{Filename} = $Filename . $Suffix;
-            $Image{Content}  = $$Content;
+            $Image{Content}  = encode_base64($$Content);
             $Image{Comment}  = '';
 
             if ( -e $Dir.$Filename.'.txt') {
@@ -123,7 +124,7 @@ Adds a single image to the config item.
     my $ImageID = $ConfigItemObject->ImageAdd(
         ConfigItemID  => 1234,          # required
         Filename      => '...',         # required
-        Content       => '...'          # required
+        Content       => '...'          # required, base64 coded
         Comment       => '...'
         UserID        => 1,
     );
@@ -167,10 +168,12 @@ sub ImageAdd {
         
         $Filename = $Year . $Month . $Day . $Hour . $Min . $Sec;
 
+        my $ImageContent = decode_base64($Param{Content});
+
         my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
             Directory => $Directory,
             Filename  => $Filename . '.' . $FileType,
-            Content   => \$Param{Content},
+            Content   => \$ImageContent,
         );
 
         if (!$FileLocation) {
