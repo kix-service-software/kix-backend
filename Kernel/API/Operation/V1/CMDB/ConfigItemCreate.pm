@@ -112,9 +112,6 @@ sub ParameterDefinition {
         'ConfigItem::Version::InciStateID' => {
             Required => 1,
         },
-        'ConfigItem::Version::Data' => {
-            Type     => 'HASH'
-        }
     }
 }
 
