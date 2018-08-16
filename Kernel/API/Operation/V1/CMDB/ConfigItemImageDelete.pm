@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ClassDefinitionGet;
+package Kernel::API::Operation::V1::CMDB::ConfigItemImageDelete;
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ClassDefinitionGet - API ClassDefinitionGet Operation backend
+Kernel::API::Operation::V1::CMDB::ConfigItemImageDelete - API ConfigItemImageDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -83,11 +83,11 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'ClassID' => {
+        'ConfigItemID' => {
             DataType => 'NUMERIC',
             Required => 1
-        },
-        'DefinitionID' => {
+        },        
+        'ImageID' => {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
@@ -97,24 +97,17 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ClassDefinitionGet Operation.
+perform Operation. 
 
     my $Result = $OperationObject->Run(
-        ClassID      => 1,                                # required 
-        DefinitionID => 1                                 # required
+        ConfigItemID => 1,                                # required 
+        ImageID      => 123,                              # required
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
-        Data         => {
-            ConfigItemClassDefinition => [
-                {
-                    ...
-                },
-            ]
-        },
     };
 
 =cut
@@ -122,42 +115,48 @@ perform ClassDefinitionGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @DefinitionList;        
-    foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {                 
+    # get config item data
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID}
+    );
 
-        my $Definition = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
-            DefinitionID => $DefinitionID,
+    # check if ConfigItem exists
+    if ( !$ConfigItem ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
+        );
+    }
+       
+    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
+
+        my %Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            ImageID      => $ImageID,
         );
 
-        if (!IsHashRefWithData($Definition) || $Definition->{ClassID} != $Param{Data}->{ClassID}) {
+        if (!IsHashRefWithData(\%Image)) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "Could not get data for DefinitionID $DefinitionID in ClassID $Param{Data}->{ClassID}",
+                Message => "Could not get data for ImageID $ImageID",
             );
         }     
 
-        # rename DefinitionRef to Definition and remove DefinitionRef attribute
-        $Definition->{Definition} = $Definition->{DefinitionRef};
-        delete $Definition->{DefinitionRef};
-
-        push(@DefinitionList, $Definition);
-    }
-
-    if ( scalar(@DefinitionList) == 0 ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for DefinitionID ".join(',', $Param{Data}->{DefinitionID}),
+        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageDelete(
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            ImageID      => $ImageID,
+            UserID       => $Self->{Authorization}->{UserID}
         );
-    }
-    elsif ( scalar(@DefinitionList) == 1 ) {
-        return $Self->_Success(
-            ConfigItemClassDefinition => $DefinitionList[0],
-        );    
+
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete image, please contact the system administrator',
+            );
+        }
     }
 
-    return $Self->_Success(
-        ConfigItemClassDefinition => \@DefinitionList,
-    );
+    return $Self->_Success();
 }
 
 1;

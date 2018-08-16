@@ -116,6 +116,18 @@ perform ConfigItemVersionSearch Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # check if ConfigItem exists
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
+    );
+
+    if (!IsHashRefWithData($ConfigItem)) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItemID $Param{Data}->{ConfigItemID}",
+        );
+    }
+    
     # get ConfigItem versions
     my $VersionList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionList(
         ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -153,3 +165,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<http://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+COPYING for license information (AGPL). If you did not receive this file, see
+
+<http://www.gnu.org/licenses/agpl.txt>.
+
+=cut

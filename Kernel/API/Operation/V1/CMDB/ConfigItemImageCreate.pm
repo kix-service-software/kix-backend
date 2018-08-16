@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ConfigItemVersionCreate;
+package Kernel::API::Operation::V1::CMDB::ConfigItemImageCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ConfigItemVersionCreate - API ConfigItemVersion Create Operation backend
+Kernel::API::Operation::V1::CMDB::ConfigItemImageCreate - API ConfigItemImage Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -87,17 +87,14 @@ sub ParameterDefinition {
         'ConfigItemID' => {
             Required => 1,
         },
-        'ConfigItemVersion' => {
+        'Image' => {
             Required => 1,
             Type     => 'HASH'
         },
-        'ConfigItemVersion::Name' => {
+        'Image::Filename' => {
             Required => 1,
         },
-        'ConfigItemVersion::DeplStateID' => {
-            Required => 1,
-        },
-        'ConfigItemVersion::InciStateID' => {
+        'Image::Content' => {
             Required => 1,
         },
     }
@@ -105,12 +102,12 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ConfigItemVersionCreate Operation. This will return the created VersionID.
+perform ConfigItemImageCreate Operation. This will return the created VersionID.
 
     my $Result = $OperationObject->Run(
         Data => {
             ConfigItemID => 123,
-            ConfigItemVersion => {
+            Image => {
                 ...                                
             },
         },
@@ -130,11 +127,6 @@ perform ConfigItemVersionCreate Operation. This will return the created VersionI
 sub Run {
     my ( $Self, %Param ) = @_;
     
-    # isolate and trim Version parameter
-    my $Version = $Self->_Trim(
-        Data => $Param{Data}->{ConfigItemVersion}
-    );
-
     # get config item data
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
@@ -148,70 +140,27 @@ sub Run {
         );
     }
 
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermission(
-        ConfigItem => $ConfigItem,
-        UserID     => $Self->{Authorization}->{UserID},
-        UserType   => $Self->{Authorization}->{UserType},
+    # isolate and trim Image parameter
+    my $Image = $Self->_Trim(
+        Data => $Param{Data}->{Image}
     );
 
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create a version for this ConfigItem!",
-        );
-    }
-
-    # check ConfigItem attribute values
-    my $VersionCheck = $Self->_CheckConfigItemVersion( 
-        ConfigItem => $ConfigItem,
-        Version    => $Version
-    );
-
-    if ( !$VersionCheck->{Success} ) {
-        return $Self->_Error(
-            %{$VersionCheck},
-        );
-    }
-
-    # get current definition
-    my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
-        ClassID => $ConfigItem->{ClassID},
-    );
-
-    if ( !IsHashRefWithData($DefinitionData) ) {
-        return $Self->_Error(
-            Code    => 'Operation.InternalError',
-            Message => "Unable to get current definition of CI Class!",
-        );
-    }
-    
-    my $FormattedData;
-    if ( $Version->{Data} ) {
-        $FormattedData = $Self->ConvertDataToInternal(
-            Data => $Version->{Data},
-        );
-    }
-
-    # everything is ok, let's create the version
-    my $VersionID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionAdd(
-        %{$ConfigItem},
-        DefinitionID => $DefinitionData->{DefinitionID},
-        DeplStateID  => $Version->{DeplStateID},
-        InciStateID  => $Version->{InciStateID},
-        Name         => $Version->{Name},
-        XMLData      => $FormattedData,
+    # everything is ok, let's create the image
+    my $ImageID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageAdd(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
+        Filename     => $Image->{Filename},
+        Content      => $Image->{Content},
+        Comment      => $Image->{Comment},
         UserID       => $Self->{Authorization}->{UserID},
     );
 
     return $Self->_Success(
         Code      => 'Object.Created',
-        VersionID => $VersionID,
+        ImageID => $ImageID,
     )
 }
 
 1;
-
 
 =back
 

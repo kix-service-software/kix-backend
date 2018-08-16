@@ -93,7 +93,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ConfigItemGet Operation. 
+perform Operation. 
 
     my $Result = $OperationObject->Run(
         ConfigItemID => 1,                                # required 
@@ -103,21 +103,13 @@ perform ConfigItemGet Operation.
         Success      => 1,                                # 0 or 1
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
-        Data         => {
-            ConfigItem => [
-                {
-                    ...
-                },
-            ]
-        },
     };
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    my @ConfigItemList;        
+    
     foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {                 
 
         my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(

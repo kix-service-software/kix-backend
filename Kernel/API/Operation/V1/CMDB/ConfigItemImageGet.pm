@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ClassDefinitionGet;
+package Kernel::API::Operation::V1::CMDB::ConfigItemImageGet;
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ClassDefinitionGet - API ClassDefinitionGet Operation backend
+Kernel::API::Operation::V1::CMDB::ConfigItemImageGet - API ConfigItemImageGet Operation backend
 
 =head1 SYNOPSIS
 
@@ -83,11 +83,11 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'ClassID' => {
+        'ConfigItemID' => {
             DataType => 'NUMERIC',
             Required => 1
         },
-        'DefinitionID' => {
+        'ImageID' => {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
@@ -97,11 +97,11 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ClassDefinitionGet Operation.
+perform ConfigItemImageGet Operation.
 
     my $Result = $OperationObject->Run(
-        ClassID      => 1,                                # required 
-        DefinitionID => 1                                 # required
+        ConfigItemID => 1,                                # required 
+        ImageID      => 1                                 # required
     );
 
     $Result = {
@@ -109,7 +109,7 @@ perform ClassDefinitionGet Operation.
         Code         => '',                               # In case of an error
         Message      => '',                               # In case of an error
         Data         => {
-            ConfigItemClassDefinition => [
+            Image => [
                 {
                     ...
                 },
@@ -120,49 +120,66 @@ perform ClassDefinitionGet Operation.
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;
+    my ( $Self, %Param ) = @_;     
 
-    my @DefinitionList;        
-    foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {                 
+    # check if ConfigItem exists
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
+    );
 
-        my $Definition = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
-            DefinitionID => $DefinitionID,
-        );
-
-        if (!IsHashRefWithData($Definition) || $Definition->{ClassID} != $Param{Data}->{ClassID}) {
-            return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for DefinitionID $DefinitionID in ClassID $Param{Data}->{ClassID}",
-            );
-        }     
-
-        # rename DefinitionRef to Definition and remove DefinitionRef attribute
-        $Definition->{Definition} = $Definition->{DefinitionRef};
-        delete $Definition->{DefinitionRef};
-
-        push(@DefinitionList, $Definition);
-    }
-
-    if ( scalar(@DefinitionList) == 0 ) {
+    if (!IsHashRefWithData($ConfigItem)) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Could not get data for DefinitionID ".join(',', $Param{Data}->{DefinitionID}),
+            Message => "ConfigItem $Param{Data}->{ConfigItemID} does not exist",
         );
     }
-    elsif ( scalar(@DefinitionList) == 1 ) {
+
+    my @ImageList;
+    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
+
+        my %Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            ImageID      => $ImageID,
+        );
+
+        if (!IsHashRefWithData(\%Image)) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => "ConfigItem image $ImageID does not exist",
+            );
+        }
+
+        if ( !$Param{Data}->{include}->{Content} ) {
+            delete $Image{Content};
+        }
+
+        # add ImageID to result
+        $Image{ID} = $ImageID;
+
+        # add ConfigItemID to result
+        $Image{ConfigItemID} = $Param{Data}->{ConfigItemID};
+
+        push(@ImageList, \%Image);
+    }
+
+    if ( scalar(@ImageList) == 0 ) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ImageID ".join(',', $Param{Data}->{ImageID}),
+        );
+    }
+    elsif ( scalar(@ImageList) == 1 ) {
         return $Self->_Success(
-            ConfigItemClassDefinition => $DefinitionList[0],
+            Image => $ImageList[0],
         );    
     }
 
     return $Self->_Success(
-        ConfigItemClassDefinition => \@DefinitionList,
+        Image => \@ImageList,
     );
 }
 
 1;
-
-
 
 
 =back

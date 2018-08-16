@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ClassSearch;
+package Kernel::API::Operation::V1::CMDB::ConfigItemImageSearch;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::CMDB::ClassSearch - API CMDB Search Operation backend
+Kernel::API::Operation::CMDB::ConfigItemImageSearch - API CMDB Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,12 +62,40 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'ConfigItemID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
-perform ClassSearch Operation. This will return a class list.
+perform ConfigItemImageSearch Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
+            ConfigItemID => 1                   # required
         }
     );
 
@@ -76,7 +104,7 @@ perform ClassSearch Operation. This will return a class list.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            ConfigItemClass => [
+            Image => [
                 {},
                 {}
             ]
@@ -88,18 +116,32 @@ perform ClassSearch Operation. This will return a class list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # get IDs of CI classes from General Catalog
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
-        Class   => 'ITSM::ConfigItem::Class',
-        UserID  => $Self->{Authorization}->{UserID},
+    # check if ConfigItem exists
+    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
-	# get already prepared CI Class data from ClassGet operation
-    if ( IsHashRefWithData($ItemList) ) {  	
+    if (!IsHashRefWithData($ConfigItem)) {
+        return $Self->_Error(
+            Code    => 'Object.NotFound',
+            Message => "Could not get data for ConfigItemID $Param{Data}->{ConfigItemID}",
+        );
+    }
+    
+    # get ConfigItem versions
+    my $ImageList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageList(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
+        UserID       => $Self->{Authorization}->{UserID},
+    );
+
+	# get already prepared CI version data from ConfigItemImageGet operation
+    if ( IsArrayRefWithData($ImageList) ) {  	
+
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ClassGet',
+            OperationType => 'V1::CMDB::ConfigItemImageGet',
             Data      => {
-                ClassID => join(',', sort keys %{$ItemList}),
+                ConfigItemID => $Param{Data}->{ConfigItemID},
+                ImageID    => join(',', @{$ImageList}),
             }
         );    
 
@@ -107,23 +149,22 @@ sub Run {
             return $GetResult;
         }
 
-        my @ClassDataList = IsArrayRefWithData($GetResult->{Data}->{ConfigItemClass}) ? @{$GetResult->{Data}->{ConfigItemClass}} : ( $GetResult->{Data}->{ConfigItemClass} );
+        my @DataList = IsArrayRefWithData($GetResult->{Data}->{Image}) ? @{$GetResult->{Data}->{Image}} : ( $GetResult->{Data}->{Image} );
 
-        if ( IsArrayRefWithData(\@ClassDataList) ) {
+        if ( IsArrayRefWithData(\@DataList) ) {
             return $Self->_Success(
-                ConfigItemClass => \@ClassDataList,
+                Image => \@DataList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        ConfigItemClass => [],
+        Image => [],
     );
 }
 
 1;
-
 
 =back
 
