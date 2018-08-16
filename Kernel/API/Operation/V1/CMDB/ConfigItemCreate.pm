@@ -111,7 +111,7 @@ sub ParameterDefinition {
         },
         'ConfigItem::Version::InciStateID' => {
             Required => 1,
-        }
+        },
     }
 }
 

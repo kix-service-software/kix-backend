@@ -129,15 +129,15 @@ sub _CheckConfigItem {
         }
     }
 
-    if ( defined $ConfigItem->{Data} ) {
+    if ( defined $ConfigItem->{Version} ) {
 
-        if ( !IsHashRefWithData($ConfigItem->{Data}) ) {
+        if ( !IsHashRefWithData($ConfigItem->{Version}) ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => "Parameter Data is invalid!",
+                Message => "Parameter Version is invalid!",
             );            
         }
-
+        
         # get last config item definition
         my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
             ClassID => $ConfigItem->{ClassID},
@@ -189,16 +189,25 @@ sub _CheckConfigItemVersion {
     my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
         ClassID => $ConfigItem->{ClassID},
     );
+    
+    if ( defined $Version->{Data} ) {
 
-    my $DataCheckResult = $Self->_CheckData(
-        Definition => $DefinitionData->{DefinitionRef},
-        Data       => $Version->{Data},
-    );
-
-    if ( !$DataCheckResult->{Success} ) {
-        return $DataCheckResult;
+        if ( !IsHashRefWithData($Version->{Data}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Version::Data is invalid!",
+            );            
+        }
+        
+        my $DataCheckResult = $Self->_CheckData(
+            Definition => $DefinitionData->{DefinitionRef},
+            Data       => $Version->{Data},
+        );
+        if ( !$DataCheckResult->{Success} ) {
+            return $DataCheckResult;
+        }
     }
-
+    
     # if everything is OK then return Success
     return $Self->_Success();
 }
