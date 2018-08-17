@@ -574,6 +574,11 @@ sub LinkAdd {
         $LinkID = $Row[0];
     }
 
+    # invalidate cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # run post event module of source object
     $BackendSourceObject->LinkAddPost(
         Key          => $Param{SourceKey},
