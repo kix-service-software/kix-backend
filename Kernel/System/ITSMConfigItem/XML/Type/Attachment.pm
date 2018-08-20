@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ITSMConfigItem::XML::Type::CIAttachment;
+package Kernel::System::ITSMConfigItem::XML::Type::Attachment;
 
 use strict;
 use warnings;
@@ -18,11 +18,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::ITSMConfigItem::XML::Type::CIAttachment - xml backend module
+Kernel::System::ITSMConfigItem::XML::Type::Attachment - xml backend module
 
 =head1 SYNOPSIS
 
-All xml functions of CIAttachment objects
+All xml functions of Attachment objects
 
 =over 4
 
@@ -34,7 +34,7 @@ create a object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $BackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::CIAttachment');
+    my $BackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::Attachment');
 
 =cut
 

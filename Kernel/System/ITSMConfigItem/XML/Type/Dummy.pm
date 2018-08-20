@@ -21,7 +21,7 @@ Kernel::System::ITSMConfigItem::XML::Type::Dummy - xml backend module
 
 =head1 SYNOPSIS
 
-All xml functions of dummy objects
+All xml functions of Dummy objects
 
 =over 4
 
@@ -145,6 +145,12 @@ sub ImportValuePrepare {
 
 1;
 
+
+=head1 VERSION
+
+$Revision$ $Date$
+
+=cut
 
 
 
