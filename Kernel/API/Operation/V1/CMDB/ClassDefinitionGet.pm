@@ -125,22 +125,24 @@ sub Run {
     my @DefinitionList;        
     foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {                 
 
-        my $Definition = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+        my $DefinitionRef = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
             DefinitionID => $DefinitionID,
         );
 
-        if (!IsHashRefWithData($Definition) || $Definition->{ClassID} != $Param{Data}->{ClassID}) {
+        if (!IsHashRefWithData($DefinitionRef) || $DefinitionRef->{ClassID} != $Param{Data}->{ClassID}) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "Could not get data for DefinitionID $DefinitionID in ClassID $Param{Data}->{ClassID}",
             );
         }     
 
-        # rename DefinitionRef to Definition and remove DefinitionRef attribute
-        $Definition->{Definition} = $Definition->{DefinitionRef};
-        delete $Definition->{DefinitionRef};
+        my %Definition = %{$DefinitionRef};
 
-        push(@DefinitionList, $Definition);
+        # rename DefinitionRef to Definition and remove DefinitionRef attribute
+        $Definition{Definition} = $Definition{DefinitionRef};
+        delete $Definition{DefinitionRef};
+
+        push(@DefinitionList, \%Definition);
     }
 
     if ( scalar(@DefinitionList) == 0 ) {
