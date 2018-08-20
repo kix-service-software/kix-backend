@@ -151,7 +151,7 @@ sub Run {
                 }
             );
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $Class{CurrentDefinition} = $Result->{Data}->{ConfigItemClassDefinition};
+                $Class{CurrentDefinition} = IsArrayRefWithData($Result->{Data}->{ConfigItemClassDefinition}) ? $Result->{Data}->{ConfigItemClassDefinition}->[0] : undef;
             }
         }
 
