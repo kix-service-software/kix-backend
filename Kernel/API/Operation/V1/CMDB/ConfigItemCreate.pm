@@ -185,6 +185,23 @@ sub Run {
         );
     }
 
+    # create images
+    if ( IsArrayRefWithData($ConfigItem->{Images}) ) {
+        foreach my $Image ( @{$ConfigItem->{Images}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::CMDB::ConfigItemImageCreate',
+                Data          => {
+                    ConfigItemID => $ConfigItemID,
+                    Image        => $Image,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+    }
+
     # create version
     if ( IsHashRefWithData($ConfigItem->{Version}) ) {
         my $Result = $Self->ExecOperation(

@@ -160,7 +160,7 @@ sub Run {
             }
         }
 
-        # include Versions if requested
+        # include History if requested
         if ( $Param{Data}->{include}->{History} ) {
             # get already prepared Versions data from VersionSearch operation
             my $Result = $Self->ExecOperation(
@@ -171,6 +171,20 @@ sub Run {
             );
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
                 $ConfigItem->{History} = $Result->{Data}->{ConfigItemHistory};
+            }
+        }
+
+        # include Images if requested
+        if ( $Param{Data}->{include}->{Images} ) {
+            # get already prepared Images data from ImageSearch operation
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::CMDB::ConfigItemImageSearch',
+                Data          => {
+                    ConfigItemID  => $ConfigItemID,
+                }
+            );
+            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                $ConfigItem->{Images} = $Result->{Data}->{Image};
             }
         }
 

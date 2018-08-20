@@ -153,6 +153,36 @@ sub _CheckConfigItem {
         }
     }
 
+    if ( defined $ConfigItem->{Images} ) {
+
+        if ( !IsArrayRefWithData($ConfigItem->{Images}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Images is invalid!",
+            );            
+        }
+        
+        # check Images internal structure
+        foreach my $ImageItem (@{$ConfigItem->{Images}}) {
+            if ( !IsHashRefWithData($ImageItem) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Parameter Images is invalid!",
+                );
+            }
+
+            # check Image attribute values
+            foreach my $Needed (qw(Filename Content)) {
+                if ( !$ImageItem->{$Needed} ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Parameter Images::$Needed is missing!",
+                    );
+                }
+            }
+        }
+    }
+
     # if everything is OK then return Success
     return $Self->_Success();
 }
@@ -162,7 +192,7 @@ sub _CheckConfigItem {
 checks if the given version parameters are valid.
 
     my $VersionCheck = $OperationObject->_CheckConfigItemVersion(
-        ConfigItem  => $ConfigItem                          # all ConfigItem parameters
+        Definition  => $Definition                          # relevant definition
         Version     => $ConfigItemVersion,                  # all Version parameters
     );
 
@@ -182,13 +212,8 @@ checks if the given version parameters are valid.
 sub _CheckConfigItemVersion {
     my ( $Self, %Param ) = @_;
 
-    my $ConfigItem = $Param{ConfigItem};
+    my $Definition = $Param{Definition};
     my $Version    = $Param{Version};
-
-    # get last config item definition
-    my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
-        ClassID => $ConfigItem->{ClassID},
-    );
     
     if ( defined $Version->{Data} ) {
 
@@ -200,7 +225,7 @@ sub _CheckConfigItemVersion {
         }
         
         my $DataCheckResult = $Self->_CheckData(
-            Definition => $DefinitionData->{DefinitionRef},
+            Definition => $Definition->{DefinitionRef},
             Data       => $Version->{Data},
         );
         if ( !$DataCheckResult->{Success} ) {
