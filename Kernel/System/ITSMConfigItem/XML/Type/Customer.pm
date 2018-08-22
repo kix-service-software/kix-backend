@@ -1,7 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -14,8 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
-    'Kernel::System::Log',
+    'Kernel::Config',
+    'Kernel::System::CustomerCompany',
+    'Kernel::System::Log'
 );
 
 =head1 NAME
@@ -24,7 +23,7 @@ Kernel::System::ITSMConfigItem::XML::Type::Customer - xml backend module
 
 =head1 SYNOPSIS
 
-All xml functions of customer objects
+All xml functions of Customer objects
 
 =over 4
 
@@ -36,7 +35,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeCustomerBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::Customer');
+    my $BackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::Customer');
 
 =cut
 
@@ -46,6 +45,10 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
+
+    $Self->{ConfigObject}          = $Kernel::OM->Get('Kernel::Config');
+    $Self->{CustomerCompanyObject} = $Kernel::OM->Get('Kernel::System::CustomerCompany');
+    $Self->{LogObject}             = $Kernel::OM->Get('Kernel::System::Log');
 
     return $Self;
 }
@@ -65,11 +68,29 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %CustomerSearchList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-        Search => $Param{Value},
+    my %CustomerCompanySearchList = $Self->{CustomerCompanyObject}->CustomerCompanyGet(
+        CustomerID => $Param{Value},
     );
 
-    return $CustomerSearchList{ $Param{Value} } || $Param{Value};
+    my $CustomerCompanyDataStr = '';
+    my $CustCompanyMapRef =
+        $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::CompanyBackendMapping');
+
+    if ( $CustCompanyMapRef && ref($CustCompanyMapRef) eq 'HASH' ) {
+
+        for my $MappingField ( sort( keys( %{$CustCompanyMapRef} ) ) ) {
+            if ( $CustomerCompanySearchList{ $CustCompanyMapRef->{$MappingField} } ) {
+                $CustomerCompanyDataStr .= ' '
+                    . $CustomerCompanySearchList{ $CustCompanyMapRef->{$MappingField} };
+            }
+        }
+
+    }
+
+    $CustomerCompanyDataStr =~ s/\s+$//g;
+    $CustomerCompanyDataStr =~ s/^\s+//g;
+
+    return $CustomerCompanyDataStr;
 }
 
 =item StatsAttributeCreate()
@@ -90,20 +111,20 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Self->{LogObject}->Log(
                 Priority => 'error',
-                Message  => "Need $Argument!",
+                Message  => "Need $Argument!"
             );
             return;
         }
     }
 
-    # create attribute
+    # create arrtibute
     my $Attribute = [
         {
             Name             => $Param{Name},
-            UseAsXvalue      => 1,
-            UseAsValueSeries => 1,
+            UseAsXvalue      => 0,
+            UseAsValueSeries => 0,
             UseAsRestriction => 1,
             Element          => $Param{Key},
             Block            => 'InputField',
@@ -143,8 +164,25 @@ prepare value for export
 sub ExportValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    return if !defined $Param{Value};
-    return $Param{Value};
+    # check what should be exported: CustomerID or CustomerCompanyName
+    my $CustCompanyContent =
+        $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::CustomerCompany::Content');
+
+    return $Param{Value} if ( !$CustCompanyContent || ( $CustCompanyContent eq 'CustomerID' ) );
+
+    # get CustomerCompany data
+    my %CustomerCompanySearchList = $Self->{CustomerCompanyObject}->CustomerCompanyGet(
+        CustomerID => $Param{Value},
+    );
+
+    # get company name
+    my $CustomerCompanyDataStr = $CustomerCompanySearchList{CustomerCompanyName};
+
+    $CustomerCompanyDataStr =~ s/\s+$//g;
+    $CustomerCompanyDataStr =~ s/^\s+//g;
+
+    # return company name
+    return $CustomerCompanyDataStr;
 }
 
 =item ImportSearchValuePrepare()
@@ -161,6 +199,21 @@ sub ImportSearchValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
+
+    # search for name....
+    my %CustomerCompanyList = $Self->{CustomerCompanyObject}->CustomerCompanyList(
+        Search => '*' . $Param{Value} . '*',
+    );
+
+    if (
+        %CustomerCompanyList
+        && ( scalar( keys %CustomerCompanyList ) == 1 )
+        )
+    {
+        my @Result = keys %CustomerCompanyList;
+        return $Result[0];
+    }
+
     return $Param{Value};
 }
 
@@ -178,45 +231,64 @@ sub ImportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
-    return $Param{Value};
-}
 
-=item ValidateValue()
+    # check if content is CustomerID or CustomerCompanyName
+    my $CustCompanyContent =
+        $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::CustomerCompany::Content');
 
-validate given value for this particular attribute type
+    return $Param{Value} if ( !$CustCompanyContent );
 
-    my $Value = $BackendObject->ValidateValue(
-        Value => ..., # (optional)
-    );
+    my $CustomerCompanyDataStr = '';
 
-=cut
+    if ( $CustCompanyContent eq 'CustomerID' && $Param{Value} ne '' ) {
+        # check if it is a valid CustomerID
+        my %CustomerCompanySearchList = $Self->{CustomerCompanyObject}->CustomerCompanyGet(
+            CustomerID => $Param{Value},
+        );
 
-sub ValidateValue {
-    my ( $Self, %Param ) = @_;
-
-    my $Value = $Param{Value};
-
-    return if !$Value;
-
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Param{Value},
-    );
-
-    # if customer is not registered in the database
-     if (!IsHashRefWithData( \%CustomerData )) {
-        return 'contact not found';
+        if (%CustomerCompanySearchList) {
+            $CustomerCompanyDataStr = $Param{Value};
+        }
     }
+    elsif ( $CustCompanyContent eq 'CustomerCompanyName' && $Param{Value} ne '') {
 
-    # if ValidID is present, check if it is valid!
-    if ( defined $CustomerData{ValidID} ) {
+        # search for CustomerCompany data
+        my %CustomerCompanySearchList = $Self->{CustomerCompanyObject}->CustomerCompanyList(
+            Search => $Param{Value},
+            Limit  => 500,
+        );
 
-        # return false if customer is not valid
-        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $CustomerData{ValidID} ) ne 'valid') {
-            return 'invalid contact';
+        # check each found CustomerCompany
+        if (%CustomerCompanySearchList) {
+            foreach my $CustomerID ( keys(%CustomerCompanySearchList) ) {
+
+                my %CustomerCompanyData = $Self->{CustomerCompanyObject}->CustomerCompanyGet(
+                    CustomerID => $CustomerID,
+                );
+
+                # if CustomerCompanyName matches - use this CudtomerID and stop searching
+                if ( $CustomerCompanyData{CustomerCompanyName} eq $Param{Value} ) {
+                    $CustomerCompanyDataStr = $CustomerCompanyData{CustomerID};
+                    last;
+                }
+            }
         }
     }
 
-    return 1;
+    # warning if no dada found for the given CustomerID or CustomerCompanyName
+    if ( !$CustomerCompanyDataStr ) {
+        $Self->{LogObject}->Log(
+            Priority => 'warning',
+            Message =>
+                "Could not import CustomerUserCompany: no CustomerID found for CustomerCompanyName $Param{Value}!"
+        );
+        return $Param{Value};
+    }
+
+    $CustomerCompanyDataStr =~ s/\s+$//g;
+    $CustomerCompanyDataStr =~ s/^\s+//g;
+
+    return $CustomerCompanyDataStr;
 }
 
 1;

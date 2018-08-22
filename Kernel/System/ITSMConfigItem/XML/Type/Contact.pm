@@ -8,23 +8,23 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ITSMConfigItem::XML::Type::CustomerCompany;
+package Kernel::System::ITSMConfigItem::XML::Type::Contact;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerCompany',
+    'Kernel::System::CustomerUser',
     'Kernel::System::Log',
 );
 
 =head1 NAME
 
-Kernel::System::ITSMConfigItem::XML::Type::CustomerCompany - xml backend module
+Kernel::System::ITSMConfigItem::XML::Type::Contact - xml backend module
 
 =head1 SYNOPSIS
 
-All xml functions of customer company objects
+All xml functions of customer objects
 
 =over 4
 
@@ -36,7 +36,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeCustomerCompanyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::CustomerCompany');
+    my $XMLTypeCustomerBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::Contact');
 
 =cut
 
@@ -65,11 +65,11 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %CustomerCompany = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
-        CustomerID => $Param{Value},
+    my %CustomerSearchList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+        Search => $Param{Value},
     );
 
-    return $CustomerCompany{CustomerCompanyName} || '';
+    return $CustomerSearchList{ $Param{Value} } || $Param{Value};
 }
 
 =item StatsAttributeCreate()
@@ -128,6 +128,7 @@ sub ExportSearchValuePrepare {
 
     return if !defined $Param{Value};
     return $Param{Value};
+    
 }
 
 =item ExportValuePrepare()
@@ -198,11 +199,23 @@ sub ValidateValue {
 
     return if !$Value;
 
-    my %CompanyList = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyList();
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+        User => $Param{Value},
+    );
 
-    if (!$CompanyList{ $Param{Value} }) {
-        return 'customer not found';
-    };
+    # if customer is not registered in the database
+     if (!IsHashRefWithData( \%CustomerData )) {
+        return 'contact not found';
+    }
+
+    # if ValidID is present, check if it is valid!
+    if ( defined $CustomerData{ValidID} ) {
+
+        # return false if customer is not valid
+        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $CustomerData{ValidID} ) ne 'valid') {
+            return 'invalid contact';
+        }
+    }
 
     return 1;
 }
