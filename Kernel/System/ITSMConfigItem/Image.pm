@@ -16,6 +16,7 @@ use warnings;
 use File::Path qw(mkpath);
 use File::Basename qw(fileparse);
 use MIME::Base64;
+use Time::HiRes;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -162,11 +163,8 @@ sub ImageAdd {
         }
 
         my $FileType = $1;
-        my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay )= $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
-            SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
-        );
-        
-        $Filename = $Year . $Month . $Day . $Hour . $Min . $Sec;
+
+        $Filename = sprintf('%.6f', Time::HiRes::time());
 
         my $ImageContent = decode_base64($Param{Content});
 
