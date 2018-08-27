@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::LinkObject::ITSMConfigItem;
+package Kernel::System::LinkObject::ConfigItem;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel/System/LinkObject/ITSMConfigItem.pm - LinkObject module for ITSMConfigItem
+Kernel/System/LinkObject/ConfigItem.pm - LinkObject module for ITSMConfigItem
 
 =over 4
 
@@ -34,7 +34,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkObjectITSMConfigItemObject = $Kernel::OM->Get('Kernel::System::LinkObject::ITSMConfigItem');
+    my $LinkObjectConfigItemObject = $Kernel::OM->Get('Kernel::System::LinkObject::ConfigItem');
 
 =cut
 
