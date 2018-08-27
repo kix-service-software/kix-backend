@@ -11,8 +11,10 @@ package Kernel::System::ITSMConfigItem::XML::Type::Attachment;
 use strict;
 use warnings;
 
+use MIME::Base64;
+
 our @ObjectDependencies = (
-    'Kernel::System::CIAttachmentStorage::AttachmentStorage',
+    'Kernel::System::ITSMConfigItem',
     'Kernel::System::Log'
 );
 
@@ -45,9 +47,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{AttachmentStorageObject} = $Kernel::OM->Get('Kernel::System::CIAttachmentStorage::AttachmentStorage');
-    $Self->{LogObject}               = $Kernel::OM->Get('Kernel::System::Log');
-
     return $Self;
 }
 
@@ -69,7 +68,7 @@ sub ValueLookup {
     # check needed stuff
     foreach (qw(Item)) {
         if ( !$Param{$_} ) {
-            $Self->{LogObject}->Log(
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "$Param{Item}->{Input}->{Type} :: Need $_!"
             );
@@ -84,6 +83,75 @@ sub ValueLookup {
 
     return '';
 
+}
+
+=item InternalValuePrepare()
+
+prepare "external" value to "internal"
+
+    my $AttachmentDirID = $BackendObject->InternalValuePrepare(
+        Value => {
+            Filename    => '...',
+            ContentType => '...'
+            Content     => '...'            # base64 coded
+        }
+    );
+
+=cut
+
+sub InternalValuePrepare {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach (qw(Filename ContentType Content)) {
+        if ( !$Param{Value}->{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Content = decode_base64($Param{Value}->{Content});
+
+    # store the attachment in the default storage backend....
+    my $AttDirID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageAdd(
+        DataRef         => \$Content,
+        Filename        => $Param{Value}->{Filename},
+        UserID          => 1,
+        Preferences     => {
+            Datatype => $Param{Value}->{ContentType},
+        }
+    );
+
+    return $AttDirID;
+}
+
+=item ExternalValuePrepare()
+
+convert "internal" value to "external"
+
+    my $Attachment = $BackendObject->ExternalValuePrepare(
+        Value => 123
+    );
+
+=cut
+
+sub ExternalValuePrepare {
+    my ( $Self, %Param ) = @_;
+
+    return if !defined $Param{Value};
+
+    my $Attachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
+        ID => $Param{Value},
+    );
+
+    return {
+        Filename    => $Attachment->{Filename},
+        ContentType => $Attachment->{Preferences}->{Datatype},
+        Content     => ${$Attachment->{ContentRef}},
+    };
 }
 
 =item StatsAttributeCreate()
@@ -104,7 +172,7 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Self->{LogObject}->Log(
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!"
             );
@@ -160,14 +228,13 @@ sub ExportValuePrepare {
     return if !defined $Param{Value};
 
     my $RetVal       = "";
-    my %AttDirData   = ();
     my $SizeNote     = "";
     my $RealFileSize = 0;
     my $MD5Note      = "";
     my $RealMD5Sum   = "";
 
     # get saved properties (attachment directory info)
-    %AttDirData = $Self->{AttachmentStorageObject}->AttachmentStorageGetDirectory(
+    my %AttDirData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGetDirectory(
         ID => $Param{Value},
     );
 
@@ -179,7 +246,7 @@ sub ExportValuePrepare {
     {
 
         my %RealProperties =
-            $Self->{AttachmentStorageObject}->AttachmentStorageGetRealProperties(
+            $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGetRealProperties(
             %AttDirData,
             );
 
@@ -254,6 +321,34 @@ sub ImportValuePrepare {
     $Param{Value} = "";
 
     return $Param{Value};
+}
+
+=item ValidateValue()
+
+validate given value for this particular attribute type
+
+    my $Value = $BackendObject->ValidateValue(
+        Value => {
+            Filename    => '...'
+            ContentType => '...'
+            Content     => '...'
+        }
+    );
+
+=cut
+
+sub ValidateValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    my $Valid = $Value->{Filename} && $Value->{ContentType} && $Value->{Content};
+
+    if (!$Valid) {
+        return 'not a valid attachment'
+    }
+
+    return 1;
 }
 
 1;

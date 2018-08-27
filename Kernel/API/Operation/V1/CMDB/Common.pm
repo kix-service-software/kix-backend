@@ -225,7 +225,7 @@ sub _CheckConfigItemVersion {
         }
         
         my $DataCheckResult = $Self->_CheckData(
-            Definition => $Definition->{DefinitionRef},
+            Definition => $Definition,
             Data       => $Version->{Data},
         );
         if ( !$DataCheckResult->{Success} ) {
@@ -290,7 +290,7 @@ sub _CheckData {
 
         if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
             for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
-                if ( ref $ArrayItem eq 'HASH' ) {
+                if ( ref $ArrayItem eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
                     $CheckValueResult = $Self->_CheckValue(
                         Value   => $ArrayItem->{$ItemKey},
                         Input   => $DefItem->{Input},
@@ -301,7 +301,7 @@ sub _CheckData {
                         return $CheckValueResult;
                     }
                 }
-                elsif ( ref $ArrayItem eq '' ) {
+                elsif ( ref $ArrayItem eq '' || $DefItem->{Input}->{Type} eq 'Attachment' ) {        # attribute type Attachment needs some special handling
                     $CheckValueResult = $Self->_CheckValue(
                         Value   => $ArrayItem,
                         Input   => $DefItem->{Input},
@@ -320,7 +320,7 @@ sub _CheckData {
                 }
             }
         }
-        elsif ( ref $Data->{$ItemKey} eq 'HASH' ) {
+        elsif ( ref $Data->{$ItemKey} eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
             $CheckValueResult = $Self->_CheckValue(
                 Value   => $Data->{$ItemKey}->{$ItemKey},
                 Input   => $DefItem->{Input},
@@ -490,7 +490,8 @@ sub _CheckValue {
 Create a Data suitable for VersionAdd.
 
     my $NewData = $CommonObject->ConvertDataToInternal(
-        Data    => $DataHashRef,
+        Definition => $DefinitionHashRef,
+        Data       => $DataHashRef,
         Child      => 1,                    # or 0, optional
     );
 
@@ -503,35 +504,70 @@ Create a Data suitable for VersionAdd.
 sub ConvertDataToInternal {
     my ( $Self, %Param ) = @_;
 
-    my $Data = $Param{Data};
-    my $Child   = $Param{Child};
+    my $Data  = $Param{Data};
+    my $Child = $Param{Child};
 
     my $NewData;
 
     for my $RootKey ( sort keys %{$Data} ) {
+
+        # get attribute definition 
+        my $AttrDef = $Self->_GetAttributeDefByKey(
+            Key        => $RootKey,
+            Definition => $Param{Definition},
+        );
+
         if ( ref $Data->{$RootKey} eq 'ARRAY' ) {
             my @NewXMLParts;
             $NewXMLParts[0] = undef;
 
             for my $ArrayItem ( @{ $Data->{$RootKey} } ) {
-                if ( ref $ArrayItem eq 'HASH' ) {
+                if ( ref $ArrayItem eq 'HASH' && $AttrDef->{Input}->{Type} ne 'Attachment' ) {
 
                     # extract the root key from the hash and assign it to content key
                     my $Content = delete $ArrayItem->{$RootKey};
 
                     # start recursion
                     my $NewDataPart = $Self->ConvertDataToInternal(
-                        Data => $ArrayItem,
-                        Child   => 1,
+                        Definition => $Param{Definition},
+                        Data       => $ArrayItem,
+                        Child      => 1,
                     );
                     push @NewXMLParts, {
                         Content => $Content,
                         %{$NewDataPart},
                     };
                 }
-                elsif ( ref $ArrayItem eq '' ) {
+                elsif ( ref $ArrayItem eq '' || $AttrDef->{Input}->{Type} eq 'Attachment' ) {
+                    my $Value = $ArrayItem;
+
+                    # attribute type Attachment needs some special handling
+                    if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                        # check if we have already created an instance of this type
+                        if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                            # create module instance
+                            my $Module = 'Kernel::System::ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                            my $Object = $Kernel::OM->Get($Module);
+
+                            if (ref $Object ne $Module) {
+                                return $Self->_Error(
+                                    Code    => "Operation.InternalError",
+                                    Message => "Unable to create instance of attribute type module for parameter $RootKey!",
+                                );
+                            }
+                            $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                        }
+
+                        # check if we have a special handling method to prepare the value
+                        if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('InternalValuePrepare') ) {
+                            $Value = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->InternalValuePrepare(
+                                Value => $Value
+                            );
+                        }
+                    }
+
                     push @NewXMLParts, {
-                        Content => $ArrayItem,
+                        Content => $Value,
                     };
                 }
             }
@@ -550,8 +586,9 @@ sub ConvertDataToInternal {
 
             # start recursion
             my $NewDataPart = $Self->ConvertDataToInternal(
-                Data => $Data->{$RootKey},
-                Child   => 1,
+                Definition => $Param{Definition},
+                Data       => $Data->{$RootKey},
+                Child      => 1,
             );
             push @NewXMLParts, {
                 Content => $Content,
@@ -563,6 +600,7 @@ sub ConvertDataToInternal {
         }
 
         elsif ( ref $Data->{$RootKey} eq '' ) {
+
             $NewData->{$RootKey} = [
                 undef,
                 {
@@ -654,6 +692,33 @@ sub ConvertDataToExternal {
                         }
                     }
                     else {
+                        # attribute type Attachment needs some special handling
+                        if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                            # check if we have already created an instance of this type
+                            if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                                # create module instance
+                                my $Module = 'Kernel::System::ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                                my $Object = $Kernel::OM->Get($Module);
+
+                                if (ref $Object ne $Module) {
+                                    return $Self->_Error(
+                                        Code    => "Operation.InternalError",
+                                        Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
+                                    );
+                                }
+                                $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                            }
+
+                            # check if we have a special handling method to prepare the value
+                            if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ExternalValuePrepare') ) {
+                                $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ExternalValuePrepare(
+                                    Value => $Content
+                                );
+                                use Data::Dumper;
+                                print STDERR Dumper($Content);
+                            }
+                        }
+
                         $NewData->{$RootHashKey}->[$Counter] = $Content;
                     }
 
@@ -670,6 +735,31 @@ sub ConvertDataToExternal {
                     delete $ArrayItem->{TagKey};
 
                     $Content = delete $ArrayItem->{Content} || '';
+
+                    # attribute type Attachment needs some special handling
+                    if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                        # check if we have already created an instance of this type
+                        if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                            # create module instance
+                            my $Module = 'Kernel::System::ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                            my $Object = $Kernel::OM->Get($Module);
+
+                            if (ref $Object ne $Module) {
+                                return $Self->_Error(
+                                    Code    => "Operation.InternalError",
+                                    Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
+                                );
+                            }
+                            $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                        }
+
+                        # check if we have a special handling method to prepare the value
+                        if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ExternalValuePrepare') ) {
+                            $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ExternalValuePrepare(
+                                Value => $Content
+                            );
+                        }
+                    }
 
                     $NewData->{$RootHashKey} = $Content;
 
@@ -688,10 +778,6 @@ sub ConvertDataToExternal {
                     }
                 }
             }
-            # # if we are on a final node
-            # elsif ( !$Param{RootKey} && ref $RootHash->{$RootHashKey} eq '' && $RootHashKey eq 'Content' ) {
-            #     $NewData = $RootHash->{$RootHashKey};
-            # }
         }
     }
 

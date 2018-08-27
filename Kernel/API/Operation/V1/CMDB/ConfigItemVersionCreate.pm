@@ -129,7 +129,7 @@ perform ConfigItemVersionCreate Operation. This will return the created VersionI
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+        
     # isolate and trim Version parameter
     my $Version = $Self->_Trim(
         Data => $Param{Data}->{ConfigItemVersion}
@@ -189,7 +189,8 @@ sub Run {
     my $FormattedData;
     if ( $Version->{Data} ) {
         $FormattedData = $Self->ConvertDataToInternal(
-            Data => $Version->{Data},
+            Definition => $DefinitionData->{DefinitionRef},
+            Data       => $Version->{Data},
         );
     }
 

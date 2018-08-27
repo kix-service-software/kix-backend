@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::CIAttachmentStorage::AttachmentStorageDB;
+package Kernel::System::ITSMConfigItem::AttachmentStorage::DB;
 
 use strict;
 use warnings;
@@ -22,11 +22,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::CIAttachmentStorage::AttachmentStorageDB
+Kernel::System::ITSMConfigItem::AttachmentStorage::DB
 
 =head1 SYNOPSIS
 
-Provides attachment handling for data base backend - local, OTRS-data base.
+Provides attachment handling for data base backend
 
 =head1 PUBLIC INTERFACE
 
@@ -40,7 +40,7 @@ create AttachmentStorageDB object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AttachmentObject = $Kernel::OM->Get('Kernel::System::CIAttachmentStorage::AttachmentStorageDB');
+    my $AttachmentStorageObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::AttachmentStorage::DB');
 
 =cut
 
@@ -50,10 +50,6 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{EncodeObject} = $Kernel::OM->Get('Kernel::System::Encode');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
 
     return $Self;
 }
@@ -76,14 +72,14 @@ sub AttachmentAdd {
     #check required stuff...
     foreach (qw(AttDirID DataRef)) {
         if ( !$Param{$_} ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     #encode attachment if it's a postgresql backend...
-    if ( !$Self->{DBObject}->GetDatabaseFunction('DirectBlob') ) {
-        $Self->{EncodeObject}->EncodeOutput( $Param{DataRef} );
+    if ( !$Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('DirectBlob') ) {
+        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( $Param{DataRef} );
 
         #overwrite existing value instead of using another filesize of memory...
         ${ $Param{DataRef} } = encode_base64( ${ $Param{DataRef} } );
@@ -91,12 +87,12 @@ sub AttachmentAdd {
 
     #db quoting...
     foreach (qw( AttDirID)) {
-        $Param{$_} = $Self->{DBObject}->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     #build sql...
     my $SQL = "";
-    if ( $Self->{DBObject}->{Backend}->{'DB::Type'} =~ /oracle/ ) {
+    if ( $Kernel::OM->Get('Kernel::System::DB')->{Backend}->{'DB::Type'} =~ /oracle/ ) {
         $SQL = "INSERT INTO attachment_storage " .
             " (attachment_directory_id, data) " .
             " VALUES " .
@@ -112,24 +108,24 @@ sub AttachmentAdd {
 
     #run sql...
     my $DoResult = 0;
-    $DoResult = $Self->{DBObject}->Do(
+    $DoResult = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => $SQL, Bind => [ $Param{DataRef} ],    # AttDirID => $Param{AttDirID}
     );
 
     if ($DoResult) {
 
         #return ID...
-        $Self->{DBObject}->Prepare(
+        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
             SQL => "SELECT id FROM attachment_storage WHERE " .
                 "attachment_directory_id = $Param{AttDirID}",
         );
-        while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
             $ID = $Row[0];
         }
         return $ID;
     }
     else {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message => "Failed to insert attachment data!"
         );
@@ -155,13 +151,13 @@ sub AttachmentGet {
 
     #check required stuff...
     if ( !$Param{ID} && !$Param{AttDirID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Need AttDirID or ID!" );
+        $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need AttDirID or ID!" );
         return \%Data;
     }
 
     #db quoting...
     foreach (qw( AttDirID ID)) {
-        $Param{$_} = $Self->{DBObject}->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     #build sql...
@@ -174,29 +170,29 @@ sub AttachmentGet {
 
     my $SQL = "SELECT id, attachment_directory_id FROM attachment_storage " . $WHERE;
 
-    if ( !$Self->{DBObject}->Prepare( SQL => $SQL, Encode => [ 0, 0, 1 ] ) ) {
+    if ( !$Kernel::OM->Get('Kernel::System::DB')->Prepare( SQL => $SQL, Encode => [ 0, 0, 1 ] ) ) {
         return \%Data;
     }
 
-    my @Data = $Self->{DBObject}->FetchrowArray();
+    my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray();
 
     if (@Data) {
         my $SQL = "SELECT data FROM attachment_storage " . $WHERE;
 
-        if ( !$Self->{DBObject}->Prepare( SQL => $SQL ) ) {
-            $Self->{LogObject}->Log(
+        if ( !$Kernel::OM->Get('Kernel::System::DB')->Prepare( SQL => $SQL ) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "Failed to prepare SQL for FetchrowArray!"
             );
             return \%Data;
         }
 
-        my @AttachData = $Self->{DBObject}->FetchrowArray();
+        my @AttachData = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray();
 
         my $AttachDataRef = \$AttachData[0];
 
         if ( !$AttachDataRef ) {
-            $Self->{LogObject}->Log(
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "Failed to FetchrowArray!"
             );
@@ -204,7 +200,7 @@ sub AttachmentGet {
         }
 
         #decode attachment if it's a postgresql backend...
-        if ( !$Self->{DBObject}->GetDatabaseFunction('DirectBlob') ) {
+        if ( !$Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('DirectBlob') ) {
             ${$AttachDataRef} = decode_base64( ${$AttachDataRef} );
         }
 
@@ -240,7 +236,7 @@ sub AttachmentGetRealProperties {
 
     #check required stuff...
     if ( !$Param{AttDirID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Need AttDirID!" );
+        $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need AttDirID!" );
         return %RealProperties;
     }
 
@@ -253,7 +249,7 @@ sub AttachmentGetRealProperties {
 
     if ( defined $Data && $Data->{DataRef} ) {
         my $Content = ${ $Data->{DataRef} };
-        $Self->{EncodeObject}->EncodeOutput( \$Content );
+        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Content );
 
         $RealFileSize = bytes::length($Content);
         $RealMD5Sum   = md5_hex($Content);
