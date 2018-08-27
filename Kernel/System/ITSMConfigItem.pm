@@ -14,6 +14,7 @@ use strict;
 use warnings;
 
 use Kernel::System::EventHandler;
+use Kernel::System::ITSMConfigItem::AttachmentStorage;
 use Kernel::System::ITSMConfigItem::Definition;
 use Kernel::System::ITSMConfigItem::History;
 use Kernel::System::ITSMConfigItem::Image;
@@ -76,6 +77,7 @@ sub new {
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     @ISA = qw(
+        Kernel::System::ITSMConfigItem::AttachmentStorage
         Kernel::System::ITSMConfigItem::Definition
         Kernel::System::ITSMConfigItem::History
         Kernel::System::ITSMConfigItem::Image
@@ -91,36 +93,36 @@ sub new {
     # package. These packages may contain methods which overwrite functions
     # contained in @ISA as initially set, but not methods contained in this very
     # file, unless SUPER is used.
-        if (
-            !$Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules')
-            || ref( $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules') ) ne 'HASH'
-            )
-        {
-            die "Got no ITSMConfigItem::CustomModules! Please check your SysConfig! Error occured";
+    if (
+        !$Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules')
+        || ref( $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules') ) ne 'HASH'
+        )
+    {
+        die "Got no ITSMConfigItem::CustomModules! Please check your SysConfig! Error occured";
+    }
+    my %CustomModules = %{ $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules') };
+    for my $CustModKey ( sort( keys(%CustomModules) ) ) {
+        next if ( !$CustomModules{$CustModKey} );
+        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( $CustomModules{$CustModKey} ) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Can't load ITSMConfigItem custom module "
+                    . $CustomModules{$CustModKey} . " ($@)!",
+            );
         }
-        my %CustomModules = %{ $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules') };
-        for my $CustModKey ( sort( keys(%CustomModules) ) ) {
-            next if ( !$CustomModules{$CustModKey} );
-            if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( $CustomModules{$CustModKey} ) ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => "Can't load ITSMConfigItem custom module "
-                        . $CustomModules{$CustModKey} . " ($@)!",
-                );
-            }
-            else {
-                unshift( @ISA, $CustomModules{$CustModKey} );
-            }
+        else {
+            unshift( @ISA, $CustomModules{$CustModKey} );
         }
+    }
 
-        # init of pre-event handler
-        $Self->PreEventHandlerInit(
-            Config     => 'ITSMConfigItem::EventModulePre',
-            BaseObject => 'ConfigItemObject',
-            Objects    => {
-                %{$Self},
-            },
-        );
+    # init of pre-event handler
+    $Self->PreEventHandlerInit(
+        Config     => 'ITSMConfigItem::EventModulePre',
+        BaseObject => 'ConfigItemObject',
+        Objects    => {
+            %{$Self},
+        },
+    );
 
     # EO KIX4OTRS-capeIT
 
