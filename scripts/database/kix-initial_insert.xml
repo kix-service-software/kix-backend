@@ -5337,7 +5337,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input => {
-                    Type      => 'CIAttachment',
+                    Type      => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -5694,7 +5694,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input => {
-                    Type      => 'CIAttachment',
+                    Type      => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -5935,7 +5935,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input      => {
-                    Type => 'CIAttachment',
+                    Type => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -6336,7 +6336,7 @@ DefaultValue: ''
         Name       => 'Anhang',
         Searchable => 1,
         Input => {
-            Type      => 'CIAttachment',
+            Type      => 'Attachment',
         },
         CountMin => 0,
         CountMax => 5,
