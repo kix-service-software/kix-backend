@@ -740,6 +740,8 @@ sub ConvertDataToExternal {
 
                     $Content = delete $ArrayItem->{Content} || '';
 
+                    print STDERR "    Content: $Content\n";
+
                     # attribute type Attachment needs some special handling
                     if ($AttrDef->{Input}->{Type} eq 'Attachment') {
                         # check if we have already created an instance of this type
@@ -777,7 +779,22 @@ sub ConvertDataToExternal {
                                 Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
                                 RootKey    => $RootHashKey,
                             );
-                            $NewData->{$RootHashKey}->{$ArrayItemKey} = $NewDataPart;
+
+                            if (ref $NewData->{$RootHashKey} ne 'HASH') {
+                                # prepare hash for sub result
+                                if ( $NewData->{$RootHashKey} ) {
+                                    $NewData->{$RootHashKey} = {
+                                        $RootHashKey = $NewData->{$RootHashKey}
+                                    };
+                                }
+                                else {
+                                    $NewData->{$RootHashKey} = {};
+                                }
+                            }
+
+                            for my $Key ( sort keys %{$NewDataPart} ) {
+                                $NewData->{$RootHashKey}->{$Key} = $NewDataPart->{$Key};
+                            }
                         }
                     }
                 }
