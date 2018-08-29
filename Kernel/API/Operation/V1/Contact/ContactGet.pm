@@ -207,6 +207,9 @@ sub Run {
                 Result => 'ARRAY',
             );
             $ContactData{Tickets} = \@TicketIDs;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
         }
 
         # include TicketStats if requested
@@ -291,6 +294,9 @@ sub Run {
                 Result => 'COUNT',
             );
             $ContactData{TicketStats} = \%TicketStats;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
         }
 
         # add

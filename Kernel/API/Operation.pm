@@ -197,6 +197,26 @@ sub Run {
     return $Self->{BackendObject}->RunOperation(%Param);
 }
 
+=item GetCacheDependencies()
+
+returns the cache dependencies of the backend object
+
+    my $Result = $OperationObject->GetCacheDependencies();
+
+    $Result = {
+        CacheType1 => 1,
+        CacheType2 => 2
+    };
+
+=cut
+
+sub GetCacheDependencies {
+    my ( $Self, %Param ) = @_;    
+
+    return $Self->{BackendObject}->{CacheDependencies};
+}
+
+
 =begin Internal:
 
 =item _CheckOperationPermission()

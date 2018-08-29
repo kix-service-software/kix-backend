@@ -186,6 +186,9 @@ sub Run {
                 CustomerID => $CustomerID,
             );
             $CustomerData{Contacts} = [ sort keys %CustomerUserList ];
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'CustomerUser');
         }
 
         # include Tickets if requested
@@ -205,6 +208,9 @@ sub Run {
                 Result => 'ARRAY',
             );
             $CustomerData{Tickets} = \@TicketIDs;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
         }
 
         # include TicketStats if requested
@@ -289,6 +295,9 @@ sub Run {
                 Result => 'COUNT',
             );
             $CustomerData{TicketStats} = \%TicketStats;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
         }
 
         # add

@@ -178,7 +178,7 @@ sub new {
         my $CustomerUserMap = $ConfigObject->Get("CustomerUser$Count");
         my @SearchFields;
         foreach my $Attr ( @{$CustomerUserMap->{Map}} ) {
-            next if !$Attr->{Searchable} || $Attr->{Type} eq 'int';
+            next if !$Attr->{Searchable} || ($Attr->{Type} && $Attr->{Type} eq 'int');
             push(@SearchFields, $Attr->{MappedTo});
         }
         $CustomerUserMap->{CustomerUserSearchFields} = \@SearchFields;

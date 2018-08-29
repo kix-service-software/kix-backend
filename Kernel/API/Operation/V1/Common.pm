@@ -95,12 +95,12 @@ sub RunOperation {
     # check cache if CacheType is set for this operation
     if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && $Self->{OperationConfig}->{CacheType} ) {
         my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-            Type => $Self->{OperationConfig}->{CacheType},
+            Type => $Self->{OperationConfig}->{CacheType},           
             Key  => $Self->_GetCacheKey(),
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            print STDERR "return cached content\n";
+            print STDERR "[Cache] return cached response\n";
             $Self->{'_CachedResponse'} = 1;
             return $Self->_Success(
                 %{$CacheResult}
@@ -465,6 +465,32 @@ sub PrepareData {
     return $Result; 
 }
 
+=item AddCacheDependency()
+
+add a new cache dependency to inform the system about foreign depending objects included in the response
+
+    $CommonObject->AddCacheDependency(
+        Type => '...'
+    );
+
+=cut
+
+sub AddCacheDependency {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Type)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'AddCacheDependency.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    $Self->{CacheDependencies}->{$Param{Type}} = 1;
+}
+
 =item _Success()
 
 helper function to return a successful result.
@@ -501,6 +527,27 @@ sub _Success {
         );
     }
 
+    # honor a generic include, if we have one
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Include}) ) {
+        $Self->_ApplyInclude(
+            Data => \%Param,
+        );
+    }
+
+    # honor an expander, if we have one
+    if ( IsHashRefWithData($Self->{Expand}) ) {
+        $Self->_ApplyExpand(
+            Data => \%Param,
+        );
+    }
+
+    # cache request without offset and limit if CacheType is set for this operation
+    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
+        $Self->_CacheRequest(
+            Data => \%Param,
+        );
+    }
+
     # honor an offset, if we have one
     if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Offset}) ) {
         $Self->_ApplyOffset(
@@ -511,27 +558,6 @@ sub _Success {
     # honor a limiter, if we have one
     if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Limit}) ) {
         $Self->_ApplyLimit(
-            Data => \%Param,
-        );
-    }
-
-    # honor a generic include, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Include}) ) {
-        $Self->_ApplyInclude(
-            Data => \%Param,
-        );
-    }
-
-    # cache request if CacheType is set for this operation
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
-        $Self->_CacheRequest(
-            Data => \%Param,
-        );
-    }
-
-    # honor an expander, if we have one
-    if ( IsHashRefWithData($Self->{Expand}) ) {
-        $Self->_ApplyExpand(
             Data => \%Param,
         );
     }
@@ -624,13 +650,29 @@ sub ExecOperation {
         );
     }
 
-    return $OperationObject->Run(
+use Data::Dumper;
+print STDERR "[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
+
+    my $Result = $OperationObject->Run(
         Data    => {
             %{$Param{Data}},
             include => $Self->{RequestData}->{include},
             expand  => $Self->{RequestData}->{expand},
         }
     );
+
+    # check result and add cachetype if neccessary
+    if ( $Result->{Success} && $OperationObject->{OperationConfig}->{CacheType} ) {
+        $Self->{CacheDependencies}->{$OperationObject->{OperationConfig}->{CacheType}} = 1;
+        if ( IsHashRefWithData($OperationObject->GetCacheDependencies()) ) {
+            foreach my $CacheDep ( keys %{$OperationObject->GetCacheDependencies()} ) {
+                $Self->{CacheDependencies}->{$CacheDep} = 1;
+            }
+        }
+        print STDERR "    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+    }
+
+    return $Result;
 }
 
 
@@ -1413,8 +1455,12 @@ sub _Trim {
 sub _GetCacheKey {
     my ( $Self, %Param ) = @_;
 
+    # generate key without offset
+    my %RequestData = %{$Self->{RequestData}};
+    delete $RequestData{offset};
+
     my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{Operation}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
-        $Self->{RequestData},
+        \%RequestData,
         'ascii'
     );
 
@@ -1426,11 +1472,16 @@ sub _CacheRequest {
 
     if ( $Param{Data} ) {
         my $CacheKey = $Self->_GetCacheKey();
+        my @CacheDependencies;
+        if ( IsHashRefWithData($Self->{CacheDependencies}) ) {
+            @CacheDependencies = keys %{$Self->{CacheDependencies}};
+        }
         $Kernel::OM->Get('Kernel::System::Cache')->Set(
-            Type  => $Self->{OperationConfig}->{CacheType},
-            Key   => $CacheKey,
-            Value => $Param{Data},
-            TTL   => 60 * 60 * 24 * 7,                      # 7 days
+            Type       => $Self->{OperationConfig}->{CacheType},
+            Depends    => \@CacheDependencies,
+            Key        => $CacheKey,
+            Value      => $Param{Data},
+            TTL        => 60 * 60 * 24 * 7,                      # 7 days
         );
     }
 
