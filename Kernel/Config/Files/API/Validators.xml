@@ -107,7 +107,7 @@
                 <Item Key="Module">HistoryTypeValidator</Item>
                 <Item Key="Validates">HistoryType,HistoryTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">ConfigItemVersionCreate</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -261,7 +261,7 @@
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(TicketTypeGet|TicketStateCreate|TicketStateUpdate|LinkCreate|MailAccountCreate|MailAccountUpdate|SearchProfileCreate)</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketTypeGet|TicketStateCreate|TicketStateUpdate|LinkCreate|MailAccountCreate|MailAccountUpdate|SearchProfileCreate|ConfigItemVersionCreate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
