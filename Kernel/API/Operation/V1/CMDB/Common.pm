@@ -289,7 +289,7 @@ sub _CheckData {
         }
 
         # don't look at details if we don't have any value for this
-        next if !$Data->{$ItemKey};
+        next if !$Data->{$ItemKey} && $DefItem->{Input}->{Type} ne 'Dummy';
 
         # check structure and values
         if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
