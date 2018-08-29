@@ -13,6 +13,8 @@ package Kernel::System::ITSMConfigItem::XML::Type::Contact;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::System::CustomerUser',
     'Kernel::System::Log',
@@ -199,10 +201,13 @@ sub ValidateValue {
 
     return if !$Value;
 
+print STDERR "validatevalue\n";
     my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
         User => $Param{Value},
     );
 
+use Data::Dumper;
+print STDERR Dumper(\%CustomerData);
     # if customer is not registered in the database
      if (!IsHashRefWithData( \%CustomerData )) {
         return 'contact not found';
