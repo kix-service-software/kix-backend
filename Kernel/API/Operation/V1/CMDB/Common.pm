@@ -288,6 +288,10 @@ sub _CheckData {
             );
         }
 
+        # don't look at details if we don't have any value for this
+        next if !$Data->{$ItemKey};
+
+        # check structure and values
         if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
             for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
                 if ( ref $ArrayItem eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
