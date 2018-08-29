@@ -100,10 +100,11 @@ sub Configure {
 store a value in the cache.
 
     $CacheObject->Set(
-        Type  => 'ObjectName',      # only [a-zA-Z0-9_] chars usable
-        Key   => 'SomeKey',
-        Value => 'Some Value',
-        TTL   => 60 * 60 * 24 * 20, # seconds, this means 20 days
+        Type    => 'ObjectName',      # only [a-zA-Z0-9_] chars usable
+        Depends => [],                # optional, invalidate this cache key if one of these cachetypes will be cleared or keys deleted
+        Key     => 'SomeKey',
+        Value   => 'Some Value',
+        TTL     => 60 * 60 * 24 * 20, # seconds, this means 20 days
     );
 
 The Type here refers to the group of entries that should be cached and cleaned up together,
@@ -165,6 +166,20 @@ sub Set {
         );
     }
 
+    # store TypeDependencies information
+    if (ref $Param{Depends} eq 'ARRAY') {
+        if ( !$Self->{TypeDependencies} ) {
+            # load information from backend
+            $Self->{TypeDependencies} = $Self->{CacheObject}->Get(
+                Type => 'Cache',
+                Key  => 'TypeDependencies',
+            );
+        }
+        foreach my $Type (@{$Param{Depends}}) {
+            $Self->{TypeDependencies}->{$Type}->{$Param{Type}}->{$Param{Key}} = 1;
+        }
+    }
+
     # Set in-memory cache.
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } = $Param{Value};
@@ -178,6 +193,14 @@ sub Set {
 
     # Set persistent cache.
     if ( $Self->{CacheInBackend} && ( $Param{CacheInBackend} // 1 ) ) {
+        if ($Self->{TypeDependencies}) {
+            $Self->{CacheObject}->Set(
+                Type => 'Cache',
+                Key  => 'TypeDependencies',
+                Value => $Self->{TypeDependencies},
+                TTL   => 60 * 60 * 24 * 20,         # 20 days
+            );
+        }
         return $Self->{CacheObject}->Set(%Param);
     }
 
@@ -283,6 +306,11 @@ sub Delete {
     # delete from in-memory cache
     delete $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} };
 
+    # check and delete depending caches
+    $Self->_HandleDependingCacheTypes(
+        Type => $Param{Type}
+    );
+
     # delete from persistent cache
     return $Self->{CacheObject}->Delete(%Param);
 }
@@ -328,6 +356,11 @@ sub CleanUp {
     # We don't have TTL/expiry information here, so just always delete to be sure.
     if ( $Param{Type} ) {
         delete $Self->{Cache}->{ $Param{Type} };
+
+        # check and delete depending caches
+        $Self->_HandleDependingCacheTypes(
+            Type => $Param{Type}
+        );
     }
     elsif ( $Param{KeepTypes} ) {
         my %KeepTypeLookup;
@@ -336,20 +369,79 @@ sub CleanUp {
         for my $Type ( sort keys %{ $Self->{Cache} || {} } ) {
             next TYPE if exists $KeepTypeLookup{$Type};
             delete $Self->{Cache}->{$Type};
+
+            # check and delete depending caches
+            $Self->_HandleDependingCacheTypes(
+                Type => $Param{Type}
+            );
         }
     }
     else {
         delete $Self->{Cache};
+        delete $Self->{TypeDependencies};
+
+        # delete persistent cache
+        if ( $Self->{CacheInBackend} ) {
+            $Self->{CacheObject}->Delete(
+                Type => 'Cache',
+                Key  => 'TypeDependencies',
+            );
+        }
     }
 
     # cleanup persistent cache
     return $Self->{CacheObject}->CleanUp(%Param);
 }
 
-1;
 
+=item _HandleDependingCacheTypes()
 
+deletes relevant keys of depending cache types
 
+    $CacheObject->_HandleDependingCacheTypes(
+        Type => '...'
+    );
+
+=cut
+
+sub _HandleDependingCacheTypes {
+    my ( $Self, %Param ) = @_;
+
+    if ( !$Self->{TypeDependencies} ) {
+        # load information from backend
+        $Self->{TypeDependencies} = $Self->{CacheObject}->Get(
+            Type => 'Cache',
+            Key  => 'TypeDependencies',
+        );
+    }
+
+    if ($Self->{TypeDependencies} && exists $Self->{TypeDependencies}->{$Param{Type}}) {
+        print STDERR "[Cache] type ($Param{Type}) of deleted key affects other cache types\n";
+        foreach my $DependendType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
+            foreach my $Key ( keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}} ) {
+                print STDERR "  deleting type $DependendType, key $Key\n";
+                # remove key entry to make sure we don't end up in a recursive loop
+                delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}->{$Key};
+                $Self->Delete(
+                    Type => $DependendType,
+                    Key  => $Key
+                );
+            }
+        }
+
+        # Set persistent cache
+        if ( $Self->{CacheInBackend} ) {
+            $Self->{CacheObject}->Set(
+                Type => 'Cache',
+                Key  => 'TypeDependencies',
+                Value => $Self->{TypeDependencies},
+                TTL   => 60 * 60 * 24 * 20,         # 20 days
+            );
+        }
+    }
+
+    return 1;
+}
 
 =back
 

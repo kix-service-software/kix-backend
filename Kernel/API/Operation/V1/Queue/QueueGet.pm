@@ -235,6 +235,9 @@ sub Run {
                 Result => 'ARRAY',
             );
             $QueueData{Tickets} = \@TicketIDs;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
         }
 
         # include TicketStats if requested
@@ -309,8 +312,10 @@ sub Run {
                 $TicketStats{$Key} = 0 + $TicketStats{$Key};
             }
             $QueueData{TicketStats} = \%TicketStats;
-        }
 
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
+        }
 
         # add
         push(@QueueList, \%QueueData);
