@@ -107,7 +107,7 @@
                 <Item Key="Module">HistoryTypeValidator</Item>
                 <Item Key="Validates">HistoryType,HistoryTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ConfigItemVersionCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
