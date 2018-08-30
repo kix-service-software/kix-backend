@@ -1479,6 +1479,7 @@ sub _CacheRequest {
         $Kernel::OM->Get('Kernel::System::Cache')->Set(
             Type       => $Self->{OperationConfig}->{CacheType},
             Depends    => \@CacheDependencies,
+            Category   => 'API',
             Key        => $CacheKey,
             Value      => $Param{Data},
             TTL        => 60 * 60 * 24 * 7,                      # 7 days
