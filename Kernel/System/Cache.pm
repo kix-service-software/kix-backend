@@ -100,11 +100,12 @@ sub Configure {
 store a value in the cache.
 
     $CacheObject->Set(
-        Type    => 'ObjectName',      # only [a-zA-Z0-9_] chars usable
-        Depends => [],                # optional, invalidate this cache key if one of these cachetypes will be cleared or keys deleted
-        Key     => 'SomeKey',
-        Value   => 'Some Value',
-        TTL     => 60 * 60 * 24 * 20, # seconds, this means 20 days
+        Type     => 'ObjectName',      # only [a-zA-Z0-9_] chars usable
+        Depends  => [],                # optional, invalidate this cache key if one of these cachetypes will be cleared or keys deleted
+        Category => 'API',             # optional, used for statistics, if not given 'Core' will be used
+        Key      => 'SomeKey',
+        Value    => 'Some Value',
+        TTL      => 60 * 60 * 24 * 20, # seconds, this means 20 days
     );
 
 The Type here refers to the group of entries that should be cached and cleaned up together,
@@ -191,6 +192,12 @@ sub Set {
         delete $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} };
     }
 
+    # update stats
+    $Self->_UpdateCacheStats(
+        Operation => 'Set',
+        %Param,
+    );
+
     # Set persistent cache.
     if ( $Self->{CacheInBackend} && ( $Param{CacheInBackend} // 1 ) ) {
         if ($Self->{TypeDependencies}) {
@@ -254,20 +261,44 @@ sub Get {
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         if ( exists $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } ) {
+            $Self->_UpdateCacheStats(
+                Operation => 'Get',
+                Result    => 'HIT',
+                %Param,
+            );
             return $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} };
         }
     }
 
-    return if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) );
+    if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) ) {
+        $Self->_UpdateCacheStats(
+            Operation => 'Get',
+            Result    => 'MISS',
+            %Param,
+        );
+        return;
+    }
 
     # check persistent cache
     my $Value = $Self->{CacheObject}->Get(%Param);
 
     # set in-memory cache
     if ( defined $Value ) {
+        $Self->_UpdateCacheStats(
+            Operation => 'Get',
+            Result    => 'HIT',
+            %Param,
+        );
         if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
             $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } = $Value;
         }
+    }
+    else {
+        $Self->_UpdateCacheStats(
+            Operation => 'Get',
+            Result    => 'MISS',
+            %Param,
+        );
     }
 
     return $Value;
@@ -309,6 +340,11 @@ sub Delete {
     # check and delete depending caches
     $Self->_HandleDependingCacheTypes(
         Type => $Param{Type}
+    );
+
+    $Self->_UpdateCacheStats(
+        Operation => 'Delete',
+        %Param,
     );
 
     # delete from persistent cache
@@ -361,6 +397,11 @@ sub CleanUp {
         $Self->_HandleDependingCacheTypes(
             Type => $Param{Type}
         );
+
+        $Self->_UpdateCacheStats(
+            Operation => 'CleanUp',
+            %Param,
+        );
     }
     elsif ( $Param{KeepTypes} ) {
         my %KeepTypeLookup;
@@ -372,7 +413,12 @@ sub CleanUp {
 
             # check and delete depending caches
             $Self->_HandleDependingCacheTypes(
-                Type => $Param{Type}
+                Type => $Type
+            );
+
+            $Self->_UpdateCacheStats(
+                Operation => 'CleanUp',
+                Type      => $Type
             );
         }
     }
@@ -387,12 +433,44 @@ sub CleanUp {
                 Key  => 'TypeDependencies',
             );
         }
+
+        $Self->_UpdateCacheStats(
+            Operation => 'CleanUp',
+            %Param,
+        );        
     }
 
     # cleanup persistent cache
     return $Self->{CacheObject}->CleanUp(%Param);
 }
 
+=item GetCacheStats()
+
+return the cache statistics
+
+    my $HashRef = $CacheObject->GetCacheStats();
+
+=cut
+
+sub GetCacheStats {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats';
+    if ( !$Self->{CacheStats} && -f $Filename ) {
+        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+            Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+            Filename  => 'CacheStats',
+        );
+        if ($Content && $$Content) {
+            $Result = $Kernel::OM->Get('Kernel::System::YAML')->Load(
+                Data => $$Content,
+            );
+        }
+    }
+
+    return $Result;
+}
 
 =item _HandleDependingCacheTypes()
 
@@ -439,6 +517,88 @@ sub _HandleDependingCacheTypes {
             );
         }
     }
+
+    return 1;
+}
+
+=item _UpdateCacheStats()
+
+update the cache statistics
+
+    $CacheObject->_UpdateCacheStats(
+        Type => '...'
+    );
+
+=cut
+
+sub _UpdateCacheStats {
+    my ( $Self, %Param ) = @_;
+
+    # if cache stats are not disabled, manage them
+    return if $Kernel::OM->Get('Kernel::Config')->Get('DisableCacheStatistics');
+
+    # read stats from disk if empty
+    my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats';
+    if ( !$Self->{CacheStats} && -f $Filename ) {
+        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+            Location        => $Filename,
+            DisableWarnings => 1,
+        );
+        if ($Content && $$Content) {
+            $Self->{CacheStats} = $Kernel::OM->Get('Kernel::System::YAML')->Load(
+                Data => $$Content,
+            );
+        }
+    }
+
+    # add to stats
+    if ( $Param{Operation} eq 'Set' ) {
+        # init cache type stats
+        $Self->{CacheStats}->{$Param{Type}}->{Category} = $Param{Category} || 'Core';
+
+        if (!exists $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}}) {
+            $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}} = {};
+        }
+    }
+    elsif ( $Param{Operation} eq 'Get' ) {
+        if (exists $Self->{CacheStats}->{$Param{Type}}) {
+            $Self->{CacheStats}->{$Param{Type}}->{AccessCount}++;
+            if ($Param{Result} eq 'HIT') {
+                $Self->{CacheStats}->{$Param{Type}}->{HitCount}++
+            }
+        }
+        if (exists $Self->{CacheStats}->{$Param{Type}}->{$Param{Key}}) {
+            $Self->{CacheStats}->{$Param{Type}}->{$Param{Key}}->{AccessCount}++;
+            if ($Param{Result} eq 'HIT') {
+                $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}}->{HitCount}++;
+            }
+        }
+    }
+    elsif ( $Param{Operation} eq 'Delete' ) {
+        #delete $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}};
+    }
+    elsif ( $Param{Operation} eq 'CleanUp' ) {
+        if ( $Param{Type} ) {
+            delete $Self->{CacheStats}->{$Param{Type}}->{Keys};
+        } 
+        else {
+            delete $Self->{CacheStats};
+        }
+    }
+
+    # store to disk
+    my $Content = '';
+    if ( $Self->{CacheStats} ) {
+        $Content = $Kernel::OM->Get('Kernel::System::YAML')->Dump(
+            Data => $Self->{CacheStats},
+        );
+    }
+    
+    $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+        Filename  => 'CacheStats',
+        Content   => \$Content,
+    );
 
     return 1;
 }
