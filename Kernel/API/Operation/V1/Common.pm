@@ -204,7 +204,7 @@ sub PrepareData {
     }
 
     # prepare field filter
-    if ( exists($Param{Data}->{filter}) && IsStringWithData($Param{Data}->{filter}) ) {
+    if ( exists($Param{Data}->{filter}) ) {
         my $Result = $Self->_ValidateFilter(
             Filter => $Param{Data}->{filter},
         );
@@ -650,8 +650,7 @@ sub ExecOperation {
         );
     }
 
-use Data::Dumper;
-print STDERR "[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
+    print STDERR "[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
 
     my $Result = $OperationObject->Run(
         Data    => {
@@ -662,7 +661,7 @@ print STDERR "[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $Operati
     );
 
     # check result and add cachetype if neccessary
-    if ( $Result->{Success} && $OperationObject->{OperationConfig}->{CacheType} ) {
+    if ( $Result->{Success} && $OperationObject->{OperationConfig}->{CacheType} && $Self->{OperationConfig}->{CacheType}) {
         $Self->{CacheDependencies}->{$OperationObject->{OperationConfig}->{CacheType}} = 1;
         if ( IsHashRefWithData($OperationObject->GetCacheDependencies()) ) {
             foreach my $CacheDep ( keys %{$OperationObject->GetCacheDependencies()} ) {
@@ -707,9 +706,15 @@ sub _ValidateFilter {
         } 
     }
 
-    my $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
-        Data => $Param{Filter}
-    );
+    # if we have been given a perl hash as filter (i.e. when called by ExecOperation), we can use it right away
+    my $FilterDef = $Param{Filter};
+
+    # if we have a JSON string, we have to decode it
+    if (IsStringWithData($FilterDef)) {
+        my $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            Data => $Param{Filter}
+        );
+    }
 
     if ( !IsHashRefWithData($FilterDef) ) {
         return $Self->_Error(

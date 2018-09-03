@@ -169,6 +169,69 @@ sub Run {
             }
         }
 
+                # include ConfigItemStats if requested
+        if ( $Param{Data}->{include}->{ConfigItemStats} ) {
+            # execute CI searches
+            my %ConfigItemStats;
+
+            # search pre-productive CIs
+            my $Response = $Self->ExecOperation(
+                OperationType => 'V1::GeneralCatalog::GeneralCatalogItemSearch',
+                Data          => {
+                    filter => {
+                        GeneralCatalogItem => {
+                            AND => [
+                                {
+                                    Field    => 'Class',
+                                    Operator => 'EQ',
+                                    Value    => 'ITSM::ConfigItem::DeploymentState'
+                                },
+                                {
+                                    Field    => 'Functionality',
+                                    Operator => 'IN',
+                                    Value    => [ 'preproductive', 'productive' ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            );
+
+            if ( !IsHashRefWithData($Response) || !$Response->{Success} ) {
+                return $Response;
+            }
+
+            my @PreProductiveDeplStateIDs;
+            my @ProductiveDeplStateIDs;
+            foreach my $Item  (@{$Response->{Data}->{GeneralCatalogItem}}) {
+                if ($Item->{Functionality} eq 'preproductive') {
+                    push(@PreProductiveDeplStateIDs, $Item->{ItemID});
+                }
+                if ($Item->{Functionality} eq 'productive') {
+                    push(@ProductiveDeplStateIDs, $Item->{ItemID});
+                }
+            }
+
+            my $PreProductiveList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
+                ClassIDs     => [ $ClassID ],
+                DeplStateIDs => \@PreProductiveDeplStateIDs,
+                UserID       => $Self->{Authorization}->{UserID},
+            );
+            $ConfigItemStats{PreProductiveCount} = @{$PreProductiveList};
+
+            my $ProductiveList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
+                ClassIDs     => [ $ClassID ],
+                DeplStateIDs => \@ProductiveDeplStateIDs,
+                UserID       => $Self->{Authorization}->{UserID},
+            );
+            $ConfigItemStats{ProductiveCount} = @{$ProductiveList};
+
+            $Class{ConfigItemStats} = \%ConfigItemStats;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'ITSMConfigItem');
+        }
+
         push(@ClassList, \%Class);
     }
 
