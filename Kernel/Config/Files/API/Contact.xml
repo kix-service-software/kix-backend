@@ -10,7 +10,7 @@
                 <Item Key="Controller">Contact</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ContactID</Item>
-                <Item Key="CacheType">CustomerUser</Item>
+                <Item Key="CacheType">API_contacts</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Contact</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">CustomerUser</Item>                
+                <Item Key="CacheType">API_contacts</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

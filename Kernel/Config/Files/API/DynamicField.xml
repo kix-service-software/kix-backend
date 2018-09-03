@@ -10,7 +10,7 @@
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ConfigItemID</Item>
-                <Item Key="CacheType">DynamicField</Item>
+                <Item Key="CacheType">API_dynamicfields</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">DynamicField</Item>                
+                <Item Key="CacheType">API_dynamicfields</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

@@ -10,7 +10,7 @@
                 <Item Key="Controller">ClientRegistration</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ClientID</Item>
-                <Item Key="CacheType">ClientRegistration</Item>
+                <Item Key="CacheType">API_clientregistration</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,7 +23,7 @@
                 <Item Key="Controller">ClientRegistration</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="Permission">Group=admin:rw</Item>
-                <Item Key="CacheType">ClientRegistration</Item>                
+                <Item Key="CacheType">API_clientregistration</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

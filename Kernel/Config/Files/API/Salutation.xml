@@ -10,7 +10,7 @@
                 <Item Key="Controller">Salutation</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SalutationID</Item>
-                <Item Key="CacheType">Salutation</Item>                
+                <Item Key="CacheType">API_salutations</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Salutation</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">Salutation</Item>                
+                <Item Key="CacheType">API_salutations</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

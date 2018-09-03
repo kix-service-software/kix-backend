@@ -10,7 +10,7 @@
                 <Item Key="Controller">SystemAddress</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SystemAddressID</Item>
-                <Item Key="CacheType">SystemAddress</Item>
+                <Item Key="CacheType">API_systemaddresses</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">SystemAddress</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">SystemAddress</Item>                
+                <Item Key="CacheType">API_systemaddresses</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

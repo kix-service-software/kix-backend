@@ -10,7 +10,7 @@
                 <Item Key="Controller">SearchProfile</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SearchProfileID</Item>
-                <Item Key="CacheType">SearchProfile</Item>                
+                <Item Key="CacheType">API_searchprofiles</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">SearchProfile</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">SearchProfile</Item>                
+                <Item Key="CacheType">API_searchprofiles</Item>                
             </Hash>
         </Setting>
     </ConfigItem>

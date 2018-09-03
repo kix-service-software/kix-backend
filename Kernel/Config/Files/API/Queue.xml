@@ -10,7 +10,7 @@
                 <Item Key="Controller">Queue</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">QueueID</Item>
-                <Item Key="CacheType">Queue</Item>
+                <Item Key="CacheType">API_queues</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Queue</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">Queue</Item>
+                <Item Key="CacheType">API_queues</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -10,7 +10,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQCategoryID</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -69,7 +69,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQArticleID</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -81,7 +81,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -128,7 +128,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQAttachmentID</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -140,7 +140,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -187,7 +187,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQVoteID</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -199,7 +199,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -235,7 +235,7 @@
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQHistoryID</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -247,7 +247,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">FAQ</Item>
+                <Item Key="CacheType">API_faq</Item>
             </Hash>
         </Setting>
     </ConfigItem>

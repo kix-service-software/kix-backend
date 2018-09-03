@@ -23,22 +23,12 @@ sub Configure {
     my ( $Self, %Param ) = @_;
 
     $Self->Description('Shows statistics about the systems cache.');
-    $Self->AddOption(
-        Name        => 'category',
-        Description => 'Only show statistics about the specific category.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
 
     return;
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    my %Options;
-    $Options{Category} = $Self->GetOption('category');
 
     # get cache object
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
@@ -50,9 +40,11 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
+    $Self->Print("<white></white>\n");
+
     my $Line = '-------------------------------------------------------------------------------------------';
-    printf("%-50s %-10s %10s %10s %10s %10s\n", 'Cache Type', 'Category', '#Items', '#Access', '#Hits', 'Hitrate');
-    printf("%.50s %.10s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line, $Line );
+    printf("%-50s %10s %10s %10s %10s\n", 'Cache Type', '#Items', '#Access', '#Hits', 'Hitrate');
+    printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );
 
     my %Totals = (
         Items => 0,
@@ -62,18 +54,15 @@ sub Run {
     foreach my $Type (sort keys %{$CacheStats}) {
         my $StatsItem = $CacheStats->{$Type};
 
-        next if $Options{Category} && $StatsItem->{Category} ne $Options{Category};
-
-        my $KeyCount = (keys %{$StatsItem->{Keys}});
         my $Hitrate = ($StatsItem->{AccessCount} && $StatsItem->{HitCount}) ? $StatsItem->{HitCount} / $StatsItem->{AccessCount} * 100 : 0;
-        $Totals{Items}  += $KeyCount;
+        $Totals{Items}  += $StatsItem->{KeyCount};
         $Totals{Access} += $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0;
         $Totals{Hits}   += $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0;
 
-        printf("%-50s %-10s %10i %10i %10i %10i\n", $Type, $StatsItem->{Category}, $KeyCount, $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0, $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0, $Hitrate );
+        printf("%-50s %10i %10i %10i %10i\n", $Type, $StatsItem->{KeyCount}, $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0, $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0, $Hitrate );
     }
-    printf("%.50s %.10s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line, $Line );
-    printf("%-50s %-10s %10i %10i %10i %10i\n\n", 'TOTAL', '', , $Totals{Items}, $Totals{Access}, $Totals{Hits}, $Totals{Access} ? $Totals{Hits} / $Totals{Access} * 100 : 0 );
+    printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );
+    printf("%-50s %10i %10i %10i %10i\n\n", 'TOTAL', $Totals{Items}, $Totals{Access}, $Totals{Hits}, $Totals{Access} ? $Totals{Hits} / $Totals{Access} * 100 : 0 );
 
     $Self->Print("<green>Done.</green>\n");
 
