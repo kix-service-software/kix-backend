@@ -5315,9 +5315,9 @@ DefaultValue: ''
                 Input      => {
                     Type => 'TextArea',
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
             {
                 Key        => 'Note',
@@ -5337,7 +5337,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input => {
-                    Type      => 'Attachment',
+                    Type      => 'CIAttachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -5514,7 +5514,7 @@ DefaultValue: ''
                     MaxLength => 100,
                 },
                 CountMin     => 0,
-                CountMin     => 1,
+                CountMax     => 1,
                 CountDefault => 0,
             },
             {
@@ -5601,6 +5601,7 @@ DefaultValue: ''
             },
         ],
     },
+ 
 ];</Data>
         <Data Key="version">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -5672,9 +5673,9 @@ DefaultValue: ''
                 Input      => {
                     Type => 'TextArea',
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
             {
                 Key        => 'Note',
@@ -5694,7 +5695,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input => {
-                    Type      => 'Attachment',
+                    Type      => 'CIAttachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -5869,6 +5870,7 @@ DefaultValue: ''
             },
         ],
     },
+ 
 ];</Data>
         <Data Key="version">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -5913,9 +5915,9 @@ DefaultValue: ''
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
             {
                 Key => 'Note',
@@ -5927,6 +5929,7 @@ DefaultValue: ''
                     Required => 1,
                 },
                 CountMin     => 0,
+                CountMax     => 1,
                 CountDefault => 0,
             },
             {
@@ -5935,7 +5938,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input      => {
-                    Type => 'Attachment',
+                    Type => 'CIAttachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -5968,9 +5971,9 @@ DefaultValue: ''
                     Type     => 'Text',
                     Required => 1,
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
             {
                 Key        => 'City',
@@ -5998,9 +6001,9 @@ DefaultValue: ''
                     Type     => 'Text',
                     Required => 1,
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
             {
                 Key        => 'Country',
@@ -6011,9 +6014,9 @@ DefaultValue: ''
                     Type     => 'Text',
                     Required => 1,
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
         ],
     },
@@ -6210,9 +6213,9 @@ DefaultValue: ''
                 Input      => {
                     Type => 'TextArea',
                 },
-                CountMax     => 0,
-                CountDefault => 0,
+                CountMin     => 0,
                 CountMax     => 1,
+                CountDefault => 0,
             },
         ],
     },
@@ -6336,7 +6339,7 @@ DefaultValue: ''
         Name       => 'Anhang',
         Searchable => 1,
         Input => {
-            Type      => 'Attachment',
+            Type      => 'CIAttachment',
         },
         CountMin => 0,
         CountMax => 5,
