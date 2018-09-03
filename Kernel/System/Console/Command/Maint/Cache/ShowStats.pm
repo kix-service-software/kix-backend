@@ -40,8 +40,6 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->Print("<white></white>\n");
-
     my $Line = '-------------------------------------------------------------------------------------------';
     printf("%-50s %10s %10s %10s %10s\n", 'Cache Type', '#Items', '#Access', '#Hits', 'Hitrate');
     printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );

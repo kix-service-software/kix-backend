@@ -519,7 +519,21 @@ sub _Success {
             Data => \%Param,
         );
     }
-   
+
+    # honor an offset, if we have one
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Offset}) ) {
+        $Self->_ApplyOffset(
+            Data => \%Param,
+        );
+    }
+
+    # honor a limiter, if we have one
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Limit}) ) {
+        $Self->_ApplyLimit(
+            Data => \%Param,
+        );
+    }
+
     # honor a field selector, if we have one
     if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Fields}) ) {
         $Self->_ApplyFieldSelector(
@@ -544,20 +558,6 @@ sub _Success {
     # cache request without offset and limit if CacheType is set for this operation
     if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
         $Self->_CacheRequest(
-            Data => \%Param,
-        );
-    }
-
-    # honor an offset, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Offset}) ) {
-        $Self->_ApplyOffset(
-            Data => \%Param,
-        );
-    }
-
-    # honor a limiter, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Limit}) ) {
-        $Self->_ApplyLimit(
             Data => \%Param,
         );
     }
