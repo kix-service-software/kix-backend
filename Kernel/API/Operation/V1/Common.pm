@@ -711,7 +711,7 @@ sub _ValidateFilter {
 
     # if we have a JSON string, we have to decode it
     if (IsStringWithData($FilterDef)) {
-        my $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+        $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
             Data => $Param{Filter}
         );
     }
