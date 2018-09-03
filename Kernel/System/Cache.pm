@@ -13,6 +13,8 @@ package Kernel::System::Cache;
 use strict;
 use warnings;
 
+use Storable qw();
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Log',
@@ -102,7 +104,6 @@ store a value in the cache.
     $CacheObject->Set(
         Type     => 'ObjectName',      # only [a-zA-Z0-9_] chars usable
         Depends  => [],                # optional, invalidate this cache key if one of these cachetypes will be cleared or keys deleted
-        Category => 'API',             # optional, used for statistics, if not given 'Core' will be used
         Key      => 'SomeKey',
         Value    => 'Some Value',
         TTL      => 60 * 60 * 24 * 20, # seconds, this means 20 days
@@ -456,20 +457,56 @@ sub GetCacheStats {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats';
-    if ( !$Self->{CacheStats} && -f $Filename ) {
+    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+        Filter    => 'CacheStats.*',
+    );
+    foreach my $File (@Files) {
         my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-            Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
-            Filename  => 'CacheStats',
+            Location => $File,
         );
         if ($Content && $$Content) {
-            $Result = $Kernel::OM->Get('Kernel::System::YAML')->Load(
-                Data => $$Content,
-            );
+            my $CacheStats = eval { Storable::thaw( ${$Content} ) };
+            foreach my $Type (keys %{$CacheStats}) {
+                if (!exists $Result->{$Type}) {
+                    $Result->{$Type}->{AccessCount} = 0;
+                    $Result->{$Type}->{HitCount}    = 0;
+                }
+                $Result->{$Type}->{AccessCount} += $CacheStats->{$Type}->{AccessCount} || 0;
+                $Result->{$Type}->{HitCount}    += $CacheStats->{$Type}->{HitCount} || 0;
+                $Result->{$Type}->{KeyCount}    += $CacheStats->{$Type}->{KeyCount} || 0;
+            }
         }
     }
 
     return $Result;
+}
+
+=item DeleteCacheStats()
+
+delete the cache statistics
+
+    my $Result = $CacheObject->DeleteCacheStats();
+
+=cut
+
+sub DeleteCacheStats {
+    my ( $Self, %Param ) = @_;
+
+    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+        Filter    => 'CacheStats.*',
+    );
+    foreach my $File (@Files) {
+        my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+            Location => $File,
+        );
+        if (!$Result) {
+            return;
+        }
+    }
+
+    return 1;
 }
 
 =item _HandleDependingCacheTypes()
@@ -535,52 +572,39 @@ sub _UpdateCacheStats {
     my ( $Self, %Param ) = @_;
 
     # if cache stats are not disabled, manage them
-    return if $Kernel::OM->Get('Kernel::Config')->Get('DisableCacheStatistics');
+    return if $Kernel::OM->Get('Kernel::Config')->Get('DisableCacheStats');
 
     # read stats from disk if empty
-    my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats';
+    my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats.'.$$;
     if ( !$Self->{CacheStats} && -f $Filename ) {
         my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
             Location        => $Filename,
             DisableWarnings => 1,
         );
         if ($Content && $$Content) {
-            $Self->{CacheStats} = $Kernel::OM->Get('Kernel::System::YAML')->Load(
-                Data => $$Content,
-            );
+            $Self->{CacheStats} = eval { Storable::thaw( ${$Content} ) };
         }
     }
 
     # add to stats
     if ( $Param{Operation} eq 'Set' ) {
-        # init cache type stats
-        $Self->{CacheStats}->{$Param{Type}}->{Category} = $Param{Category} || 'Core';
-
-        if (!exists $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}}) {
-            $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}} = {};
-        }
+        $Self->{CacheStats}->{$Param{Type}}->{KeyCount}++;
     }
     elsif ( $Param{Operation} eq 'Get' ) {
-        if (exists $Self->{CacheStats}->{$Param{Type}}) {
-            $Self->{CacheStats}->{$Param{Type}}->{AccessCount}++;
-            if ($Param{Result} eq 'HIT') {
-                $Self->{CacheStats}->{$Param{Type}}->{HitCount}++
-            }
-        }
-        if (exists $Self->{CacheStats}->{$Param{Type}}->{$Param{Key}}) {
-            $Self->{CacheStats}->{$Param{Type}}->{$Param{Key}}->{AccessCount}++;
-            if ($Param{Result} eq 'HIT') {
-                $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}}->{HitCount}++;
-            }
+        $Self->{CacheStats}->{$Param{Type}}->{AccessCount}++;
+        if ($Param{Result} eq 'HIT') {
+            $Self->{CacheStats}->{$Param{Type}}->{HitCount}++
         }
     }
     elsif ( $Param{Operation} eq 'Delete' ) {
-        #delete $Self->{CacheStats}->{$Param{Type}}->{Keys}->{$Param{Key}};
+        if ($Self->{CacheStats}->{$Param{Type}}->{KeyCount}) {
+            $Self->{CacheStats}->{$Param{Type}}->{KeyCount}--;
+        }
     }
     elsif ( $Param{Operation} eq 'CleanUp' ) {
         if ( $Param{Type} ) {
-            delete $Self->{CacheStats}->{$Param{Type}}->{Keys};
-        } 
+            $Self->{CacheStats}->{$Param{Type}}->{KeyCount} = 0;
+        }
         else {
             delete $Self->{CacheStats};
         }
@@ -589,14 +613,12 @@ sub _UpdateCacheStats {
     # store to disk
     my $Content = '';
     if ( $Self->{CacheStats} ) {
-        $Content = $Kernel::OM->Get('Kernel::System::YAML')->Dump(
-            Data => $Self->{CacheStats},
-        );
+        $Content = Storable::nfreeze($Self->{CacheStats});
     }
-    
+
     $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
         Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
-        Filename  => 'CacheStats',
+        Filename  => 'CacheStats.'.$$,
         Content   => \$Content,
     );
 

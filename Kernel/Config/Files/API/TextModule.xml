@@ -10,7 +10,7 @@
                 <Item Key="Controller">TextModule</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">TextModuleID</Item>
-                <Item Key="CacheType">TextModule</Item>
+                <Item Key="CacheType">API_textmodules</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +22,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">TextModule</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">TextModule</Item>                
+                <Item Key="CacheType">API_textmodules</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
