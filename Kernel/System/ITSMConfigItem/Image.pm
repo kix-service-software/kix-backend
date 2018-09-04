@@ -324,7 +324,7 @@ sub _GetDirectory {
     my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/ITSMConfigItem/' . $Param{ConfigItemID};
 
     if ( !( -e $Directory ) ) {
-        if ( !mkpath( $Directory, 0, 0755 ) ) {
+        if ( !mkpath( $Directory, 0, 0775 ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "Can't create directory '$Directory'!",
