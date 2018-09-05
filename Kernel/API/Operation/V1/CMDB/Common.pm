@@ -338,7 +338,7 @@ sub _CheckData {
         else {
 
             # only perform checks if item really exits in the Data
-            # CountNin checks was verified and passed before!, so it is safe to skip if needed
+            # CountMin checks was verified and passed before!, so it is safe to skip if needed
             if ( $Data->{$ItemKey} ) {
                 $CheckValueResult = $Self->_CheckValue(
                     Value   => $Data->{$ItemKey},
@@ -511,7 +511,7 @@ sub ConvertDataToInternal {
     my $Data  = $Param{Data};
     my $Child = $Param{Child};
 
-    my $NewData;
+    my $NewData = {};
 
     for my $RootKey ( sort keys %{$Data} ) {
 
