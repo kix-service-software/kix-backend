@@ -162,7 +162,7 @@ sub Run {
 
         # include History if requested
         if ( $Param{Data}->{include}->{History} ) {
-            # get already prepared Versions data from VersionSearch operation
+            # get already prepared History data from HistorySearch operation
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::CMDB::ConfigItemHistorySearch',
                 Data          => {
@@ -170,7 +170,7 @@ sub Run {
                 }
             );
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{History} = $Result->{Data}->{ConfigItemHistory};
+                $ConfigItem->{History} = $Result->{Data}->{ConfigItemHistoryItem};
             }
         }
 
