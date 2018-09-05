@@ -99,27 +99,16 @@ sub HistoryGet {
         push @Entries, \%Tmp;
     }
 
-    # get more information about user who created history entries
-    for my $Entry (@Entries) {
-
-        # get user information
-        my %UserInfo = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $Entry->{CreateBy},
-            Cached => 1,
-        );
-
-        # save additional information for history entry
-        $Entry->{UserID}        = $UserInfo{UserID};
-        $Entry->{UserLogin}     = $UserInfo{UserLogin};
-        $Entry->{UserFirstname} = $UserInfo{UserFirstname};
-        $Entry->{UserLastname}  = $UserInfo{UserLastname};
-        $Entry->{UserFullname}  = $UserInfo{UserFullname};
-    }
+    # add some more information and prepare comment
+    my $Result = $Self->_EnrichHistoryEntries(
+        ConfigItemID => $Param{ConfigItemID},
+        Entries      => \@Entries,
+    );
 
     # save result in cache
-    $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} } = \@Entries;
+    $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} } = $Result;
 
-    return \@Entries;
+    return $Result;
 }
 
 =item HistoryEntryGet()
@@ -189,20 +178,15 @@ sub HistoryEntryGet {
         );
     }
 
-    # get user data for this entry
-    my %UserInfo = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        UserID => $Entry{CreateBy},
-        Cached => 1,
+    # add some more information and prepare comment
+    my $Result = $Self->_EnrichHistoryEntries(
+        ConfigItemID => $Entry{ConfigItemID},
+        Entries      => [ \%Entry ],
     );
 
-    $Entry{UserID}        = $UserInfo{UserID};
-    $Entry{UserLogin}     = $UserInfo{UserLogin};
-    $Entry{UserFirstname} = $UserInfo{UserFirstname};
-    $Entry{UserLastname}  = $UserInfo{UserLastname};
+    $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} }->{ $Entry{ConfigItemID} } = $Result->[0];
 
-    $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} }->{ $Entry{ConfigItemID} } = \%Entry;
-
-    return \%Entry;
+    return $Result->[0];
 }
 
 =item HistoryAdd()
@@ -447,6 +431,156 @@ sub HistoryTypeLookup {
     $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} } = $Value;
 
     return $Value;
+}
+
+sub _EnrichHistoryEntries {
+    my ( $Self, %Param ) = @_;
+
+    my @Entries = @{$Param{Entries}};
+
+    # get all information about the config item to prepare comments
+    my $ConfigItem = $Self->ConfigItemGet(
+        ConfigItemID => $Param{ConfigItemID},
+    );
+    
+    # get definition for CI's class
+    my $Definition = $Self->DefinitionGet(
+        ClassID => $ConfigItem->{ClassID},
+    );
+
+    my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+
+    # get more information about user who created history entries
+    for my $Entry (@Entries) {
+
+        # get user information
+        my %UserInfo = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            UserID => $Entry->{CreateBy},
+            Cached => 1,
+        );
+
+        # save additional information for history entry
+        $Entry->{UserID}        = $UserInfo{UserID};
+        $Entry->{UserLogin}     = $UserInfo{UserLogin};
+        $Entry->{UserFirstname} = $UserInfo{UserFirstname};
+        $Entry->{UserLastname}  = $UserInfo{UserLastname};
+        $Entry->{UserFullname}  = $UserInfo{UserFullname};
+
+        # prepare Comment
+
+        # trim the comment to only show version number
+        if ( $Entry->{HistoryType} eq 'VersionCreate' ) {
+            $Entry->{Comment} =~ s/\D//g;
+            $Entry->{VersionID} = $Entry->{Comment};
+        }
+        elsif ( $Entry->{HistoryType} eq 'ValueUpdate' ) {
+
+            # beautify comment
+            my @Parts = split /%%/, $Entry->{Comment};
+            $Parts[0] =~ s{ \A \[.*?\] \{'Version'\} \[.*?\] \{' }{}xms;
+            $Parts[0] =~ s{ '\} \[.*?\] \{' }{::}xmsg;
+            $Parts[0] =~ s{ '\} \[.*?\] \z }{}xms;
+
+            # get info about attribute
+            my $AttributeInfo = $Self->_GetAttributeInfo(
+                Definition => $Definition->{DefinitionRef},
+                Path       => $Parts[0],
+            );
+
+            if ( $AttributeInfo && $AttributeInfo->{Input}->{Type} eq 'GeneralCatalog' ) {
+                my $ItemList = $GeneralCatalogObject->ItemList(
+                    Class => $AttributeInfo->{Input}->{Class},
+                );
+
+                $Parts[1] = $ItemList->{ $Parts[1] || '' } || '';
+                $Parts[2] = $ItemList->{ $Parts[2] || '' } || '';
+            }
+
+            # assemble parts
+            $Entry->{Comment} = join '%%', @Parts;
+        }
+        elsif ( $Entry->{HistoryType} eq 'DeploymentStateUpdate' ) {
+
+            # get deployment state list
+            my $DeplStateList = $GeneralCatalogObject->ItemList(
+                Class => 'ITSM::ConfigItem::DeploymentState',
+            );
+
+            # show names
+            my @Parts = split /%%/, $Entry->{Comment};
+            for my $Part (@Parts) {
+                $Part = $DeplStateList->{$Part} || '';
+            }
+
+            # assemble parts
+            $Entry->{Comment} = join '%%', @Parts;
+        }
+        elsif ( $Entry->{HistoryType} eq 'IncidentStateUpdate' ) {
+
+            # get deployment state list
+            my $DeplStateList = $GeneralCatalogObject->ItemList(
+                Class => 'ITSM::Core::IncidentState',
+            );
+
+            # show names
+            my @Parts = split /%%/, $Entry->{Comment};
+            for my $Part (@Parts) {
+                $Part = $DeplStateList->{$Part} || '';
+            }
+
+            # assemble parts
+            $Entry->{Comment} = join '%%', @Parts;
+        }
+
+        # replace text
+        if ( $Entry->{Comment} ) {
+
+            my %Info;
+
+            $Entry->{Comment} =~ s{ \A %% }{}xmsg;
+            my @Values = split /%%/, $Entry->{Comment};
+
+            $Entry->{Comment} = $Kernel::OM->Get('Kernel::Language')->Translate(
+                'CIHistory::' . $Entry->{HistoryType},
+                @Values,
+            );
+
+            # remove not needed place holder
+            $Entry->{Comment} =~ s/\%s//g;
+        }
+    }
+
+    return \@Entries;
+}
+
+sub _GetAttributeInfo {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(Definition Path)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    my $Subtree = $Param{Definition};
+    my $Info;
+
+    PART:
+    for my $Part ( split /::/, $Param{Path} ) {
+        my ($Found) = grep { $_->{Key} eq $Part } @{$Subtree};
+
+        last PART if !$Found;
+
+        $Subtree = $Found->{Sub};
+        $Info    = $Found;
+    }
+
+    return $Info;
 }
 
 1;
