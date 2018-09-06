@@ -4322,7 +4322,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">24</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Location</Data>
+        <Data Key="name" Type="Quote">Standort</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4332,7 +4332,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">25</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Network</Data>
+        <Data Key="name" Type="Quote">Gebäude</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4342,7 +4342,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">26</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Software</Data>
+        <Data Key="name" Type="Quote">Raum</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4351,8 +4351,8 @@ DefaultValue: ''
     </Insert>
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">27</Data>
-        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Expired</Data>
+        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
+        <Data Key="name" Type="Quote">Netzwerk</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4361,8 +4361,8 @@ DefaultValue: ''
     </Insert>
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">28</Data>
-        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Inactive</Data>
+        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
+        <Data Key="name" Type="Quote">Software</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4372,7 +4372,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">29</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Maintenance</Data>
+        <Data Key="name" Type="Quote">Expired</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4382,7 +4382,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">30</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Pilot</Data>
+        <Data Key="name" Type="Quote">Inactive</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4392,7 +4392,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">31</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Planned</Data>
+        <Data Key="name" Type="Quote">Maintenance</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4402,7 +4402,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">32</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Production</Data>
+        <Data Key="name" Type="Quote">Pilot</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4412,7 +4412,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">33</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Repair</Data>
+        <Data Key="name" Type="Quote">Planned</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4422,7 +4422,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">34</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Retired</Data>
+        <Data Key="name" Type="Quote">Production</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4432,7 +4432,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">35</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Review</Data>
+        <Data Key="name" Type="Quote">Repair</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4442,7 +4442,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">36</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
-        <Data Key="name" Type="Quote">Test/QA</Data>
+        <Data Key="name" Type="Quote">Retired</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4451,6 +4451,26 @@ DefaultValue: ''
     </Insert>
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">37</Data>
+        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
+        <Data Key="name" Type="Quote">Review</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+    </Insert>
+    <Insert Table="general_catalog">
+        <Data Key="id" Type="AutoIncrement">38</Data>
+        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
+        <Data Key="name" Type="Quote">Test/QA</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+    </Insert>
+    <Insert Table="general_catalog">
+        <Data Key="id" Type="AutoIncrement">39</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::YesNo</Data>
         <Data Key="name" Type="Quote">Yes</Data>
         <Data Key="valid_id">1</Data>
@@ -4460,7 +4480,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">38</Data>
+        <Data Key="id" Type="AutoIncrement">40</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::YesNo</Data>
         <Data Key="name" Type="Quote">No</Data>
         <Data Key="valid_id">1</Data>
@@ -4470,7 +4490,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">39</Data>
+        <Data Key="id" Type="AutoIncrement">41</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Laptop</Data>
         <Data Key="valid_id">1</Data>
@@ -4480,7 +4500,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">40</Data>
+        <Data Key="id" Type="AutoIncrement">42</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Desktop</Data>
         <Data Key="valid_id">1</Data>
@@ -4490,7 +4510,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">41</Data>
+        <Data Key="id" Type="AutoIncrement">43</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Phone</Data>
         <Data Key="valid_id">1</Data>
@@ -4500,7 +4520,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">43</Data>
+        <Data Key="id" Type="AutoIncrement">44</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Server</Data>
         <Data Key="valid_id">1</Data>
@@ -4510,7 +4530,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">44</Data>
+        <Data Key="id" Type="AutoIncrement">45</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Other</Data>
         <Data Key="valid_id">1</Data>
@@ -4520,7 +4540,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">45</Data>
+        <Data Key="id" Type="AutoIncrement">46</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Monitor</Data>
         <Data Key="valid_id">1</Data>
@@ -4530,7 +4550,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">46</Data>
+        <Data Key="id" Type="AutoIncrement">47</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Printer</Data>
         <Data Key="valid_id">1</Data>
@@ -4540,7 +4560,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">47</Data>
+        <Data Key="id" Type="AutoIncrement">48</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Switch</Data>
         <Data Key="valid_id">1</Data>
@@ -4550,7 +4570,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">48</Data>
+        <Data Key="id" Type="AutoIncrement">49</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Router</Data>
         <Data Key="valid_id">1</Data>
@@ -4560,7 +4580,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">49</Data>
+        <Data Key="id" Type="AutoIncrement">50</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">WLAN Access Point</Data>
         <Data Key="valid_id">1</Data>
@@ -4570,7 +4590,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">50</Data>
+        <Data Key="id" Type="AutoIncrement">51</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Security Device</Data>
         <Data Key="valid_id">1</Data>
@@ -4580,7 +4600,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">51</Data>
+        <Data Key="id" Type="AutoIncrement">52</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Backup Device</Data>
         <Data Key="valid_id">1</Data>
@@ -4590,7 +4610,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">52</Data>
+        <Data Key="id" Type="AutoIncrement">53</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Mouse</Data>
         <Data Key="valid_id">1</Data>
@@ -4600,7 +4620,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">53</Data>
+        <Data Key="id" Type="AutoIncrement">54</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Keyboard</Data>
         <Data Key="valid_id">1</Data>
@@ -4610,7 +4630,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">54</Data>
+        <Data Key="id" Type="AutoIncrement">55</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Camera</Data>
         <Data Key="valid_id">1</Data>
@@ -4620,7 +4640,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">55</Data>
+        <Data Key="id" Type="AutoIncrement">56</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Beamer</Data>
         <Data Key="valid_id">1</Data>
@@ -4630,7 +4650,7 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id" Type="AutoIncrement">56</Data>
+        <Data Key="id" Type="AutoIncrement">57</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Modem</Data>
         <Data Key="valid_id">1</Data>
@@ -5248,10 +5268,11 @@ DefaultValue: ''
         <Data Key="change_by">1</Data>
     </Insert>
 
-<!-- config item definition -->
+<!-- CI class Computer -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">22</Data>
-        <Data Key="configitem_definition" Type="Quote">[
+        <Data Key="configitem_definition" Type="Quote">
+ [
     {
         Key   => 'SectionGeneral',
         #Name  => 'General Information',
@@ -5286,7 +5307,8 @@ DefaultValue: ''
             },
             {
                 Key        => 'Model',
-                Name       => 'Model',
+                #Name       => 'Model',
+                Name       => 'Modell',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5296,11 +5318,11 @@ DefaultValue: ''
             {
                 Key        => 'Location',
                 #Name       => 'Asset Location',
-                Name       => 'Standort',
+                Name       => 'Location',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          => 'Location',
+                    ReferencedCIClassName          =>  ['Location','Building','Room'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5337,14 +5359,15 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input => {
-                    Type      => 'CIAttachment',
+                    Type      => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
             },
         ],
     },
- 
+
+
     {
         Key   => 'SectionOwner',
         #Name  => 'Owner Information',
@@ -5376,7 +5399,93 @@ DefaultValue: ''
             },
         ],
     },
- 
+
+
+    {
+        Key   => 'SectionNetwork',
+        #Name  => 'Network Information',
+        Name  => 'Netzwerk Informationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        Sub => [
+          {
+              Key        => 'FQDN',
+              Name       => 'FQDN',
+              Searchable => 1,
+              Input      => {
+                  Type      => 'Text',
+                  MaxLength => 100,
+              },
+              CountMin     => 1,
+              CountMax     => 8,
+              CountDefault => 1,
+          },
+
+          {
+              Key   => 'NIC',
+              #Name  => 'Network Adapter',
+              Name  => 'Netzwerkschnittstelle',
+              Input => {
+                  Type      => 'Text',
+                  MaxLength => 100,
+                  Required  => 1,
+              },
+              CountMin     => 0,
+              CountMax     => 10,
+              CountDefault => 1,
+              Sub          => [
+                  {
+                      Key   => 'IPoverDHCP',
+                      #Name  => 'IP over DHCP',
+                      Name  => 'IP via DHCP',
+                      Input => {
+                          Type        => 'GeneralCatalog',
+                          Class       => 'ITSM::ConfigItem::YesNo',
+                          Translation => 1,
+                          Required    => 1,
+                      },
+                  },
+                  {
+                      Key        => 'IPAddress',
+                      #Name       => 'IP Address',
+                      Name       => 'IP Adresse',
+                      Searchable => 1,
+                      Input      => {
+                          Type      => 'Text',
+                          RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                          #RegExErrorMessage => 'Please enter a valid IPv4 address.',
+                          RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
+                          MaxLength => 40,
+                          Required  => 1,
+                      },
+                      CountMin     => 0,
+                      CountMax     => 20,
+                      CountDefault => 0,
+                  },
+                  {
+                      Key        => 'Network',
+                      #Name       => 'Network',
+                      Name       => 'Netzwerk',
+                      Searchable => 1,
+                      Input      => {
+                          Type                           => 'CIClassReference',
+                          ReferencedCIClassName          => 'Network',
+                          ReferencedCIClassLinkType      => 'ConnectedTo',
+                          ReferencedCIClassLinkDirection => 'Normal',
+                          # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
+                          #ReferencedCIClassReferenceAttributeKey => '',
+                      },
+                      CountMin     => 0,
+                      CountMax     => 1,
+                      CountDefault => 0,
+                  },
+              ],
+          },
+        ],
+    },
+
+
     {
         Key   => 'SectionHardware',
         Name  => 'Hardware Informationen',
@@ -5438,74 +5547,6 @@ DefaultValue: ''
                 ],
             },
             {
-                Key        => 'FQDN',
-                Name       => 'FQDN',
-                Searchable => 1,
-                Input      => {
-                    Type      => 'Text',
-                    MaxLength => 100,
-                },
-            },
-            {
-                Key   => 'NIC',
-                #Name  => 'Network Adapter',
-                Name  => 'Netzwerkschnittstelle',
-                Input => {
-                    Type      => 'Text',
-                    MaxLength => 100,
-                    Required  => 1,
-                },
-                CountMin     => 0,
-                CountMax     => 10,
-                CountDefault => 1,
-                Sub          => [
-                    {
-                        Key   => 'IPoverDHCP',
-                        #Name  => 'IP over DHCP',
-                        Name  => 'IP via DHCP',
-                        Input => {
-                            Type        => 'GeneralCatalog',
-                            Class       => 'ITSM::ConfigItem::YesNo',
-                            Translation => 1,
-                            Required    => 1,
-                        },
-                    },
-                    {
-                        Key        => 'IPAddress',
-                        #Name       => 'IP Address',
-                        Name       => 'IP Adresse',
-                        Searchable => 1,
-                        Input      => {
-                            Type      => 'Text',
-                            RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                            RegExErrorMessage => 'Please enter a valid IPv4 address.',
-                            MaxLength => 40,
-                            Required  => 1,
-                        },
-                        CountMin     => 0,
-                        CountMax     => 20,
-                        CountDefault => 0,
-                    },
-                    {
-                        Key        => 'Network',
-                        #Name       => 'Network',
-                        Name       => 'Netzwerk',
-                        Searchable => 1,
-                        Input      => {
-                            Type                           => 'CIClassReference',
-                            ReferencedCIClassName          => 'Network',
-                            ReferencedCIClassLinkType      => 'ConnectedTo',
-                            ReferencedCIClassLinkDirection => 'Normal',
-                            # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
-                            #ReferencedCIClassReferenceAttributeKey => '',
-                        },
-                        CountMin     => 0,
-                        CountMax     => 1,
-                        CountDefault => 0,
-                    },
-                ],
-            },
-            {
                 Key   => 'GraphicAdapter',
                 #Name  => 'Graphic Adapter',
                 Name  => 'Grafikkarte',
@@ -5514,7 +5555,7 @@ DefaultValue: ''
                     MaxLength => 100,
                 },
                 CountMin     => 0,
-                CountMax     => 1,
+                CountMin     => 1,
                 CountDefault => 0,
             },
             {
@@ -5530,7 +5571,8 @@ DefaultValue: ''
             },
         ],
     },
- 
+
+
     {
         Key   => 'SectionSoftware',
         #Name  => 'Software Information',
@@ -5567,7 +5609,8 @@ DefaultValue: ''
             },
         ],
     },
- 
+
+
     {
         Key   => 'SectionWarranty',
         #Name  => 'Warranty Information',
@@ -5601,12 +5644,13 @@ DefaultValue: ''
             },
         ],
     },
- 
+
 ];</Data>
         <Data Key="version">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
+<!-- CI class Hardware -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">23</Data>
         <Data Key="configitem_definition" Type="Quote">[
@@ -5644,7 +5688,8 @@ DefaultValue: ''
             },
             {
                 Key        => 'Model',
-                Name       => 'Model',
+                #Name       => 'Model',
+                Name       => 'Modell',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5654,17 +5699,16 @@ DefaultValue: ''
             {
                 Key        => 'Location',
                 #Name       => 'Asset Location',
-                Name       => 'Standort',
+                Name       => 'Location',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          => 'Location',
+                    ReferencedCIClassName          =>  ['Location','Building','Room'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
-                },
-            },
+                },            },
             {
                 Key        => 'Description',
                 #Name       => 'Description',
@@ -5695,14 +5739,15 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input => {
-                    Type      => 'CIAttachment',
+                    Type      => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
             },
         ],
     },
- 
+
+
     {
         Key   => 'SectionOwner',
         #Name  => 'Owner Information',
@@ -5734,7 +5779,93 @@ DefaultValue: ''
             },
         ],
     },
- 
+
+
+    {
+        Key   => 'SectionNetwork',
+        #Name  => 'Network Information',
+        Name  => 'Netzwerk Informationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        Sub => [
+          {
+              Key        => 'FQDN',
+              Name       => 'FQDN',
+              Searchable => 1,
+              Input      => {
+                  Type      => 'Text',
+                  MaxLength => 100,
+              },
+              CountMin     => 1,
+              CountMax     => 8,
+              CountDefault => 1,
+          },
+
+          {
+              Key   => 'NIC',
+              #Name  => 'Network Adapter',
+              Name  => 'Netzwerkschnittstelle',
+              Input => {
+                  Type      => 'Text',
+                  MaxLength => 100,
+                  Required  => 1,
+              },
+              CountMin     => 0,
+              CountMax     => 10,
+              CountDefault => 1,
+              Sub          => [
+                  {
+                      Key   => 'IPoverDHCP',
+                      #Name  => 'IP over DHCP',
+                      Name  => 'IP via DHCP',
+                      Input => {
+                          Type        => 'GeneralCatalog',
+                          Class       => 'ITSM::ConfigItem::YesNo',
+                          Translation => 1,
+                          Required    => 1,
+                      },
+                  },
+                  {
+                      Key        => 'IPAddress',
+                      #Name       => 'IP Address',
+                      Name       => 'IP Adresse',
+                      Searchable => 1,
+                      Input      => {
+                          Type      => 'Text',
+                          RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                          #RegExErrorMessage => 'Please enter a valid IPv4 address.',
+                          RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
+                          MaxLength => 40,
+                          Required  => 1,
+                      },
+                      CountMin     => 0,
+                      CountMax     => 20,
+                      CountDefault => 0,
+                  },
+                  {
+                      Key        => 'Network',
+                      #Name       => 'Network',
+                      Name       => 'Netzwerk',
+                      Searchable => 1,
+                      Input      => {
+                          Type                           => 'CIClassReference',
+                          ReferencedCIClassName          => 'Network',
+                          ReferencedCIClassLinkType      => 'ConnectedTo',
+                          ReferencedCIClassLinkDirection => 'Normal',
+                          # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
+                          #ReferencedCIClassReferenceAttributeKey => '',
+                      },
+                      CountMin     => 0,
+                      CountMax     => 1,
+                      CountDefault => 0,
+                  },
+              ],
+          },
+        ],
+    },
+
+
     {
         Key   => 'SectionHardware',
         Name  => 'Hardware Informationen',
@@ -5766,77 +5897,8 @@ DefaultValue: ''
             },
         ],
     },
-    {
-        Key        => 'FQDN',
-        Name       => 'FQDN',
-        Searchable => 1,
-        Input      => {
-            Type      => 'Text',
-            MaxLength => 100,
-        },
-    },
-    {
-        Key   => 'NIC',
-        #Name  => 'Network Adapter',
-        Name  => 'Netzwerkschnittstelle',
-        Input => {
-            Type      => 'Text',
-            MaxLength => 100,
-            Required  => 1,
-        },
-        CountMin     => 0,
-        CountMax     => 10,
-        CountDefault => 0,
-        Sub          => [
-            {
-                Key   => 'IPoverDHCP',
-                #Name  => 'IP over DHCP',
-                Name  => 'IP via DHCP',
-                Input => {
-                    Type        => 'GeneralCatalog',
-                    Class       => 'ITSM::ConfigItem::YesNo',
-                    Translation => 1,
-                    Required    => 1,
-                },
-            },
-            {
-                Key        => 'IPAddress',
-                #Name       => 'IP Address',
-                Name       => 'IP Adresse',
-                Searchable => 1,
-                Input      => {
-                    Type      => 'Text',
-                    RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                    RegExErrorMessage => 'Please enter a valid IPv4 address.',
-                    MaxLength => 40,
-                    Required  => 1,
-                },
-                CountMin     => 0,
-                CountMax     => 20,
-                CountDefault => 0,
-            },
-            {
-                Key        => 'Network',
-                #Name       => 'Network',
-                Name       => 'Netzwerk',
-                Searchable => 1,
-                Input      => {
-                    Type                           => 'CIClassReference',
-                    ReferencedCIClassName          => 'Network',
-                    ReferencedCIClassLinkType      => 'ConnectedTo',
-                    ReferencedCIClassLinkDirection => 'Normal',
-                    # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
-                    #ReferencedCIClassReferenceAttributeKey => '',
-                },
-                CountMin     => 0,
-                CountMax     => 1,
-                CountDefault => 0,
-            },
-        ],
-    },
- 
- 
- 
+
+
     {
         Key   => 'SectionWarranty',
         #Name  => 'Warranty Information',
@@ -5870,18 +5932,19 @@ DefaultValue: ''
             },
         ],
     },
- 
+
 ];</Data>
         <Data Key="version">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
+<!-- CI class Standort -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">24</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key => 'SectionGeneral',
- 
+
         #Name  => 'General Information',
         Name  => 'Allgemeine Informationen',
         Input => {
@@ -5889,35 +5952,14 @@ DefaultValue: ''
         },
         Sub => [
             {
-                Key => 'Type',
- 
-                #Name       => 'Type',
-                Name       => 'Typ',
+                Key        => 'GLN',
+                #Name       => 'Global Location Number',
+                Name       => 'Globale Lokationsnummer',
                 Searchable => 1,
                 Input      => {
-                    Type        => 'GeneralCatalog',
-                    Class       => 'ITSM::ConfigItem::Location::Type',
-                    Translation => 1,
+                    Type => 'Text',
+                    MaxLength => 13,
                 },
-            },
-            {
-                Key => 'ParentLocation',
- 
-                #Name       => 'Parent Location',
-                Name       => 'Übergeordneter Standort',
-                Searchable => 1,
-                Input      => {
-                    Required                       => 1,
-                    Type                           => 'CIClassReference',
-                    ReferencedCIClassName          => 'Location',
-                    ReferencedCIClassLinkType      => 'Includes',
-                    ReferencedCIClassLinkDirection => 'Reverse',
-                    # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
-                    #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
-                },
-                CountMin     => 0,
-                CountMax     => 1,
-                CountDefault => 0,
             },
             {
                 Key => 'Note',
@@ -5938,7 +5980,7 @@ DefaultValue: ''
                 Name       => 'Anhang',
                 Searchable => 1,
                 Input      => {
-                    Type => 'CIAttachment',
+                    Type => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -5948,7 +5990,7 @@ DefaultValue: ''
     {
         Key   => 'SectionAddress',
         #Name  => 'Address Information',
-        Name  => 'Addressinformationen',
+        Name  => 'Adressinformationen',
         Input => {
             Type => 'Dummy',
         },
@@ -5969,7 +6011,7 @@ DefaultValue: ''
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
-                    Required => 1,
+                    Required => 0,
                 },
                 CountMin     => 0,
                 CountMax     => 1,
@@ -5999,7 +6041,7 @@ DefaultValue: ''
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
-                    Required => 1,
+                    Required => 0,
                 },
                 CountMin     => 0,
                 CountMax     => 1,
@@ -6020,7 +6062,7 @@ DefaultValue: ''
             },
         ],
     },
- 
+
     {
         Key => 'SectionContacts',
         #Name  => 'Contact Information',
@@ -6060,8 +6102,339 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
+<!-- CI class Gebäude -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">25</Data>
+        <Data Key="configitem_definition" Type="Quote">[
+    {
+        Key => 'SectionGeneral',
+
+        #Name  => 'General Information',
+        Name  => 'Allgemeine Informationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        Sub => [
+            {
+                Key => 'ParentLocation',
+
+                #Name       => 'Parent Location',
+                Name       => 'Standort',
+                Searchable => 1,
+                Input      => {
+                    Required                       => 1,
+                    Type                           => 'CIClassReference',
+                    ReferencedCIClassName          => 'Location',
+                    ReferencedCIClassLinkType      => 'Includes',
+                    ReferencedCIClassLinkDirection => 'Reverse',
+                    # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
+                    #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
+                },
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+            },
+            {
+                Key        => 'GLN',
+                #Name       => 'Global Location Number',
+                Name       => 'Globale Lokationsnummer',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                    MaxLength => 13,
+                },
+            },
+            {
+                Key => 'Note',
+                #Name       => 'Note',
+                Name       => 'Notizen',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'TextArea',
+                    Required => 1,
+                },
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+            },
+            {
+                Key => 'Attachment',
+                #Name       => 'Attachment',
+                Name       => 'Anhang',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Attachment',
+                },
+                CountMin => 0,
+                CountMax => 5,
+            },
+        ],
+    },
+    {
+        Key   => 'SectionAddress',
+        #Name  => 'Address Information',
+        Name  => 'Adressinformationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        CountMin => 0,
+        CountMax => 1,
+        CountDefault => 0,
+        Sub => [
+            {
+                Key        => 'Street',
+                #Name       => 'Street',
+                Name       => 'Straße',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                },
+            },
+            {
+                Key        => 'Street2',
+                #Name       => 'Street 2',
+                Name       => 'Straße 2',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'Text',
+                    Required => 1,
+                },
+                CountMin     => 0,
+                CountMax     => 0,
+                CountDefault => 0,
+            },
+            {
+                Key        => 'City',
+                #Name       => 'City',
+                Name       => 'Stadt',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                },
+            },
+            {
+                Key        => 'ZIP',
+                #Name       => 'ZIP',
+                Name       => 'PLZ',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                },
+            },
+            {
+                Key        => 'Region',
+                Name       => 'Region',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'Text',
+                    Required => 0,
+                },
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+            },
+            {
+                Key        => 'Country',
+                #Name       => 'Country',
+                Name       => 'Land',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'Text',
+                    Required => 0,
+                },
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+            },
+        ],
+    },
+
+    {
+        Key => 'SectionContacts',
+        #Name  => 'Contact Information',
+        Name  => 'Kontaktinformationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        Sub => [
+            {
+                Key => 'ContactRole',
+                #Name       => 'Contact Role',
+                Name       => 'Kontaktrolle',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'Text',
+                    Required => 1,
+                },
+                Sub => [
+                    {
+                        Key => 'Contact',
+                        #Name       => 'Contact',
+                        Name       => 'Ansprechpartner',
+                        Searchable => 1,
+                        Input      => {
+                            Type     => 'Contact',
+                        },
+                    },
+                ],
+                CountMin     => 0,
+                CountMax     => 25,
+                CountDefault => 1,
+            },
+        ],
+    },
+];</Data>
+        <Data Key="version">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+    </Insert>
+<!-- CI class Raum -->
+    <Insert Table="configitem_definition">
+        <Data Key="class_id">26</Data>
+        <Data Key="configitem_definition" Type="Quote">[
+    {
+        Key => 'SectionGeneral',
+
+        #Name  => 'General Information',
+        Name  => 'Allgemeine Informationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        Sub => [
+            {
+                Key => 'ParentLocation',
+
+                #Name       => 'Parent Location',
+                Name       => 'Gebäude',
+                Searchable => 1,
+                Input      => {
+                    Required                       => 1,
+                    Type                           => 'CIClassReference',
+                    ReferencedCIClassName          => 'Building',
+                    ReferencedCIClassLinkType      => 'Includes',
+                    ReferencedCIClassLinkDirection => 'Reverse',
+                    # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
+                    #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
+                },
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+            },
+            {
+                Key        => 'RoomType',
+                #Name       => 'Room Type',
+                Name       => 'Raumtyp',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                    MaxLength => 50,
+                },
+            },
+            {
+                Key        => 'Floor',
+                #Name       => 'Floor',
+                Name       => 'Geschoss',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                    MaxLength => 50,
+                    RegEx             => '\D',
+                    #RegExErrorMessage => 'Please enter decimal numbers only.',
+                    RegExErrorMessage => 'Bitte geben Sie nur Dezimalzahlen ein.',
+                },
+            },
+            {
+                Key        => 'RoomLabel',
+                #Name       => 'Room Label',
+                Name       => 'Raumbeschriftung',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                    MaxLength => 50,
+                },
+            },
+            {
+                Key        => 'RoomType',
+                #Name       => 'Room Type',
+                Name       => 'Raumtyp',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Text',
+                    MaxLength => 50,
+                },
+            },
+            {
+                Key => 'Note',
+                #Name       => 'Note',
+                Name       => 'Notizen',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'TextArea',
+                    Required => 1,
+                },
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+            },
+            {
+                Key => 'Attachment',
+                #Name       => 'Attachment',
+                Name       => 'Anhang',
+                Searchable => 1,
+                Input      => {
+                    Type => 'Attachment',
+                },
+                CountMin => 0,
+                CountMax => 5,
+            },
+        ],
+    },
+
+    {
+        Key => 'SectionContacts',
+        #Name  => 'Contact Information',
+        Name  => 'Kontaktinformationen',
+        Input => {
+            Type => 'Dummy',
+        },
+        CountMin     => 0,
+        CountMax     => 1,
+        CountDefault => 0,
+        Sub => [
+            {
+                Key => 'ContactRole',
+                #Name       => 'Contact Role',
+                Name       => 'Kontaktrolle',
+                Searchable => 1,
+                Input      => {
+                    Type     => 'Text',
+                    Required => 1,
+                },
+                Sub => [
+                    {
+                        Key => 'Contact',
+                        #Name       => 'Contact',
+                        Name       => 'Ansprechpartner',
+                        Searchable => 1,
+                        Input      => {
+                            Type     => 'Contact',
+                        },
+                    },
+                ],
+                CountMin     => 0,
+                CountMax     => 25,
+                CountDefault => 1,
+            },
+        ],
+    },
+];</Data>
+        <Data Key="version">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+    </Insert>
+<!-- CI class Netzwerk -->
+    <Insert Table="configitem_definition">
+        <Data Key="class_id">27</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key        => 'Type',
@@ -6086,13 +6459,13 @@ DefaultValue: ''
     {
         Key        => 'NetworkAddress',
         #Name       => 'Network Address',
-        Name       => 'Netzerk Addresse',
+        Name       => 'Netzwerk Adresse',
         Searchable => 1,
         Input      => {
             Type      => 'Text',
             RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
             #RegExErrorMessage => 'Please enter a valid IPv4 address.',
-            RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Addresse im Format 123.123.123.123 ein.',
+            RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
             MaxLength => 20,
             Required  => 1,
         },
@@ -6108,7 +6481,7 @@ DefaultValue: ''
                     Type         => 'Text',
                     RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
                     #RegExErrorMessage => 'Please enter a valid IPv4 address.',
-                    RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Addresse im Format 123.123.123.123 ein.',
+                    RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
                     MaxLength    => 20,
                     ValueDefault => '255.255.255.0',
                     Required     => 1,
@@ -6149,8 +6522,9 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
+<!-- CI class Software -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">26</Data>
+        <Data Key="class_id">28</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
@@ -6219,7 +6593,7 @@ DefaultValue: ''
             },
         ],
     },
- 
+
     {
         Key   => 'SectionOwner',
         #Name  => 'Owner Information',
@@ -6251,7 +6625,7 @@ DefaultValue: ''
             },
         ],
     },
- 
+
     {
         Key   => 'SectionLicense',
         #Name  => 'License Information',
@@ -6319,7 +6693,7 @@ DefaultValue: ''
             },
         ],
     },
- 
+
     {
         Key        => 'Note',
         #Name       => 'Note',
@@ -6339,7 +6713,7 @@ DefaultValue: ''
         Name       => 'Anhang',
         Searchable => 1,
         Input => {
-            Type      => 'CIAttachment',
+            Type      => 'Attachment',
         },
         CountMin => 0,
         CountMax => 5,
