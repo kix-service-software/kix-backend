@@ -100,7 +100,7 @@ sub RunOperation {
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            print STDERR "[Cache] return cached response\n";
+            print STDERR $Self->{LevelIndent}."[Cache] return cached response\n";
             $Self->{'_CachedResponse'} = 1;
             return $Self->_Success(
                 %{$CacheResult}
@@ -153,6 +153,11 @@ sub Init {
                 . ' in Kernel::API::Operation::V1::Common::Init()',
         );
     }
+
+    # calculate LevelIndent for Logging
+    $Self->{Level} = $Self->{Level} || 0;
+
+    $Self->{LevelIndent} = '    ' x $Self->{Level} || '';
 
     return $Self->_Success();
 }
@@ -549,7 +554,7 @@ sub _Success {
     }
 
     # honor an expander, if we have one
-    if ( IsHashRefWithData($Self->{Expand}) ) {
+    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Expand}) ) {
         $Self->_ApplyExpand(
             Data => \%Param,
         );
@@ -641,6 +646,7 @@ sub ExecOperation {
         OperationType           => $Param{OperationType},
         WebserviceID            => $Self->{WebserviceID},
         Authorization           => $Self->{Authorization},
+        Level                   => $Self->{Level} + 1,
     );
 
     # if operation init failed, bail out
@@ -650,7 +656,7 @@ sub ExecOperation {
         );
     }
 
-    print STDERR "[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
+    print STDERR $Self->{LevelIndent}."[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
 
     my $Result = $OperationObject->Run(
         Data    => {
@@ -668,7 +674,7 @@ sub ExecOperation {
                 $Self->{CacheDependencies}->{$CacheDep} = 1;
             }
         }
-        print STDERR "    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+        print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
     }
 
     return $Result;
@@ -1227,6 +1233,13 @@ sub _ApplyInclude {
                 );
             }
 
+            # if CacheType is set in config of GenericInclude
+            if ( defined $GenericIncludes->{$Include}->{CacheType} ) {
+                $Self->{CacheDependencies}->{$GenericIncludes->{$Include}->{CacheType}} = 1;
+            }
+
+            print STDERR $Self->{LevelIndent}."[API] GenericInclude: $Include\n";
+
             # do it for every object in the response
             foreach my $Object ( keys %{$Param{Data}} ) {
                 if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
@@ -1239,6 +1252,13 @@ sub _ApplyInclude {
                             ObjectID => $ObjectID,
                             UserID   => $Self->{Authorization}->{UserID},
                         );
+
+                        # add specific cache dependencies after exec if available
+                        if ( $Self->{IncludeHandler}->{$IncludeHandler}->can('GetCacheDependencies') ) {
+                            foreach my $CacheDep ( keys %{$Self->{IncludeHandler}->{$IncludeHandler}->GetCacheDependencies()} ) {
+                                $Self->{CacheDependencies}->{$CacheDep} = 1;
+                            }
+                        }
                     }
                 }
                 else {
@@ -1247,8 +1267,17 @@ sub _ApplyInclude {
                         ObjectID => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
                         UserID   => $Self->{Authorization}->{UserID},
                     );
+
+                    # add specific cache dependencies after exec if available
+                    if ( $Self->{IncludeHandler}->{$IncludeHandler}->can('GetCacheDependencies') ) {
+                        foreach my $CacheDep ( keys %{$Self->{IncludeHandler}->{$IncludeHandler}->GetCacheDependencies()} ) {
+                            $Self->{CacheDependencies}->{$CacheDep} = 1;
+                        }
+                    }
                 }
             }
+
+            print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
         }
     }
 
@@ -1463,6 +1492,14 @@ sub _GetCacheKey {
     # generate key without offset
     my %RequestData = %{$Self->{RequestData}};
     delete $RequestData{offset};
+
+    # sort some things to make sure you always get the same cache key independent of the given order 
+    foreach my $What (qw(limit include expand)) {
+        next if !exists $RequestData{$What};
+
+        my @Parts = split(/,/, $RequestData{$What});
+        $RequestData{$What} = join(',', sort @Parts);
+    }
 
     my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{Operation}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
         \%RequestData,
