@@ -68,6 +68,7 @@
             <Hash>
                 <Item Key="Module">V1::Link::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::Link::LinkGet</Item>
+                <Item Key="CacheType">LinkObject</Item>
             </Hash>
         </Setting>
     </ConfigItem>

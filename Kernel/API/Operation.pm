@@ -155,6 +155,10 @@ sub new {
     $Self->{BackendObject}->{OperationType}   = $Param{OperationType};
     $Self->{BackendObject}->{OperationConfig} = $Self->{OperationConfig};
 
+    # add call level
+    $Self->{Level} = $Param{Level};
+    $Self->{BackendObject}->{Level} = $Self->{Level};
+
     return $Self;
 }
 
