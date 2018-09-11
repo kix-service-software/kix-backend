@@ -638,6 +638,7 @@ Creates a readible Data.
     my $NewData = $CommonObject->ConvertDataToExternal(
         Definition => $DefinitionHashRef,
         Data       => $DataHashRef,
+        ForDisplay => 1,                    # or 0, optional - use display values and attribute labels instead of keys
     );
 
     returns:
@@ -666,6 +667,11 @@ sub ConvertDataToExternal {
                 Definition => $Param{Definition},
             );
 
+            my $AttributeName = $RootHashKey;
+            if ( $Param{ForDisplay} ) {
+                $AttributeName = $AttrDef->{Name};
+            }
+
             if ( $AttrDef->{CountMax} > 1 ) {
 
                 # we have multiple items
@@ -680,7 +686,7 @@ sub ConvertDataToExternal {
 
                     # look if we have a sub structure
                     if ( $AttrDef->{Sub} ) {
-                        $NewData->{$RootHashKey}->[$Counter]->{$RootHashKey} = $Content;
+                        $NewData->{$AttributeName}->[$Counter]->{$RootHashKey} = $Content;
 
                         # start recursion
                         for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
@@ -689,15 +695,16 @@ sub ConvertDataToExternal {
                                 Definition => $Param{Definition},
                                 Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
                                 RootKey    => $RootHashKey,
+                                ForDisplay => $Param{ForDisplay},
                             );
                             for my $Key ( sort keys %{$NewDataPart} ) {
-                                $NewData->{$RootHashKey}->[$Counter]->{$Key} = $NewDataPart->{$Key};
+                                $NewData->{$AttributeName}->[$Counter]->{$Key} = $NewDataPart->{$Key};
                             }
                         }
                     }
                     else {
-                        # attribute type Attachment needs some special handling
-                        if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                        # get display values if ForDisplay=! is given or attribute type is Attachment
+                        if ( $Param{ForDisplay} || $AttrDef->{Input}->{Type} eq 'Attachment' ) {
                             # check if we have already created an instance of this type
                             if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
                                 # create module instance
@@ -714,16 +721,15 @@ sub ConvertDataToExternal {
                             }
 
                             # check if we have a special handling method to prepare the value
-                            if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ExternalValuePrepare') ) {
-                                $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ExternalValuePrepare(
+                            if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ValueLookup') ) {
+                                $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ValueLookup(
+                                    Item  => $AttrDef,
                                     Value => $Content
                                 );
-                                use Data::Dumper;
-                                print STDERR Dumper($Content);
                             }
                         }
 
-                        $NewData->{$RootHashKey}->[$Counter] = $Content;
+                        $NewData->{$AttributeName}->[$Counter] = $Content;
                     }
 
                     $Counter++;
@@ -740,8 +746,8 @@ sub ConvertDataToExternal {
 
                     $Content = delete $ArrayItem->{Content} || '';
 
-                    # attribute type Attachment needs some special handling
-                    if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                    # get display values if ForDisplay=! is given or attribute type is Attachment
+                    if ( $Param{ForDisplay} || $AttrDef->{Input}->{Type} eq 'Attachment' ) {
                         # check if we have already created an instance of this type
                         if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
                             # create module instance
@@ -758,14 +764,15 @@ sub ConvertDataToExternal {
                         }
 
                         # check if we have a special handling method to prepare the value
-                        if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ExternalValuePrepare') ) {
-                            $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ExternalValuePrepare(
+                        if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ValueLookup') ) {
+                            $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ValueLookup(
+                                Item  => $AttrDef,
                                 Value => $Content
                             );
                         }
                     }
 
-                    $NewData->{$RootHashKey} = $Content;
+                    $NewData->{$AttributeName} = $Content;
 
                     # look if we have a sub structure
                     if ( $AttrDef->{Sub} ) {
@@ -776,22 +783,23 @@ sub ConvertDataToExternal {
                                 Definition => $Param{Definition},
                                 Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
                                 RootKey    => $RootHashKey,
+                                ForDisplay => $Param{ForDisplay},
                             );
 
-                            if (ref $NewData->{$RootHashKey} ne 'HASH') {
+                            if (ref $NewData->{$AttributeName} ne 'HASH') {
                                 # prepare hash for sub result
-                                if ( $NewData->{$RootHashKey} ) {
-                                    $NewData->{$RootHashKey} = {
-                                        $RootHashKey = $NewData->{$RootHashKey}
+                                if ( $NewData->{$AttributeName} ) {
+                                    $NewData->{$AttributeName} = {
+                                        $RootHashKey = $NewData->{$AttributeName}
                                     };
                                 }
                                 else {
-                                    $NewData->{$RootHashKey} = {};
+                                    $NewData->{$AttributeName} = {};
                                 }
                             }
 
                             for my $Key ( sort keys %{$NewDataPart} ) {
-                                $NewData->{$RootHashKey}->{$Key} = $NewDataPart->{$Key};
+                                $NewData->{$AttributeName}->{$Key} = $NewDataPart->{$Key};
                             }
                         }
                     }

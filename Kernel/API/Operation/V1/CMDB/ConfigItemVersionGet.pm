@@ -183,6 +183,21 @@ sub Run {
                 );
             }
 
+            # include XMLData if requested
+            if ( $Param{Data}->{include}->{DisplayData} ) {
+                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                    VersionID  => $VersionID,
+                    XMLDataGet => 1,
+                );
+
+                $Version->{DisplayData} = $Self->ConvertDataToExternal(
+                    Definition => $VersionData->{XMLDefinition},
+                    Data       => $VersionData->{XMLData}->[1]->{Version},
+                    ForDisplay => 1
+                );
+            }
+
+
             # add ConfigItemID to version hash
             $Version->{ConfigItemID} = $Param{Data}->{ConfigItemID};
 

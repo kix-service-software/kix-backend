@@ -63,26 +63,26 @@ get the xml data of a version
 
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
-    my $Value = '';
+    
+    return if !$Param{Value};
 
-    # check needed stuff
-    foreach (qw(Item)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "$Param{Item}->{Input}->{Type} :: Need $_!"
-            );
-            return;
-        }
-    }
-    if ( ( defined $Param{Value} ) ) {
-        my $retVal = $Param{Value};
+    my $Attachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
+        ID => $Param{Value},
+    );
 
-        return $retVal;
+    if (!$Attachment) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
+        );
+        return;
     }
 
-    return '';
-
+    return {
+        Filename    => $Attachment->{Filename},
+        ContentType => $Attachment->{Preferences}->{Datatype},
+        Content     => ${$Attachment->{ContentRef}},
+    };
 }
 
 =item InternalValuePrepare()
@@ -126,32 +126,6 @@ sub InternalValuePrepare {
     );
 
     return $AttDirID;
-}
-
-=item ExternalValuePrepare()
-
-convert "internal" value to "external"
-
-    my $Attachment = $BackendObject->ExternalValuePrepare(
-        Value => 123
-    );
-
-=cut
-
-sub ExternalValuePrepare {
-    my ( $Self, %Param ) = @_;
-
-    return if !defined $Param{Value};
-
-    my $Attachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
-        ID => $Param{Value},
-    );
-
-    return {
-        Filename    => $Attachment->{Filename},
-        ContentType => $Attachment->{Preferences}->{Datatype},
-        Content     => ${$Attachment->{ContentRef}},
-    };
 }
 
 =item StatsAttributeCreate()
