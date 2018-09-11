@@ -740,8 +740,6 @@ sub ConvertDataToExternal {
 
                     $Content = delete $ArrayItem->{Content} || '';
 
-                    print STDERR "    Content: $Content\n";
-
                     # attribute type Attachment needs some special handling
                     if ($AttrDef->{Input}->{Type} eq 'Attachment') {
                         # check if we have already created an instance of this type
