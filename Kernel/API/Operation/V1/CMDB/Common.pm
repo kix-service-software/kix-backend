@@ -836,6 +836,132 @@ sub _GetAttributeDefByKey {
     return;
 }
 
+
+=item _CheckDefinition()
+
+check the syntax of a new definition
+
+    my $True = $ConfigItemObject->_CheckDefinition(
+        Definition      => 'the definition code',
+        CheckSubElement => 1,                 # (optional, default 0, to check sub elements recursively)
+    );
+
+=cut
+
+sub _CheckDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Definition} ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message  => 'Need Definition!',
+        );
+    }
+
+    if ( $Param{ClassID} ) {
+        # get last definition
+        my $LastDefinition = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+            ClassID => $Param{ClassID},
+        );
+
+        # stop add, if definition was not changed
+        if ( $LastDefinition->{DefinitionID} && $LastDefinition->{Definition} eq $Param{Definition} ) {
+            return $Self->_Error(
+                Code    => 'Conflict',
+                Message => "A new definition can't be created, because the definition has not been changed.",
+            );            
+        }
+    }
+
+    # if check sub elements is enabled, we must not evaluate the expression
+    # because this has been done in an earlier recursion step already
+    my $Definition;
+    if ( $Param{CheckSubElement} ) {
+        $Definition = $Param{Definition};
+    }
+    else {
+        $Definition = eval $Param{Definition};    ## no critic
+        if ( !$Definition ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Syntax error in definition! ($@)",
+            );            
+        }
+    }
+
+    # check if definition exists at all
+    if ( !$Definition ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message  => 'Invalid definition! You have a syntax error in the definition.',
+        );
+        return;
+    }
+
+    # definition must be an array
+    if ( ref $Definition ne 'ARRAY' ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => 'Invalid definition! Definition is not an array reference.',
+        );
+        return;
+    }
+
+    # check each definition attribute
+    for my $Attribute ( @{$Definition} ) {
+
+        # each definition attribute must be a hash reference with data
+        if ( !$Attribute || ref $Attribute ne 'HASH' || !%{$Attribute} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Invalid definition! At least one definition attribute is not a hash reference.',
+            );
+        }
+
+
+        # check if the key contains no spaces
+        if ( $Attribute->{Key} && $Attribute->{Key} =~ m{ \s }xms ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Invalid definition! Key '$Attribute->{Key}' must not contain whitespace!",
+            );
+        }
+
+        # check if the key contains non-ascii characters
+        if ( $Attribute->{Key} && $Attribute->{Key} =~ m{ ([^\x{00}-\x{7f}]) }xms ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Invalid definition! Key '$Attribute->{Key}' must not contain non ASCII characters '$1'!",
+            );
+        }
+
+        # recursion check for Sub-Elements
+        for my $Key ( sort keys %{$Attribute} ) {
+
+            my $Value = $Attribute->{$Key};
+
+            if ( $Key eq 'Sub' && ref $Value eq 'ARRAY' ) {
+
+                # check the sub array
+                my $DefinitionCheck = $Self->_CheckDefinition(
+                    Definition      => $Value,
+                    CheckSubElement => 1,
+                );
+                if ( !$DefinitionCheck->{Success} ) {
+                    return $Self->_Error(
+                        %{$DefinitionCheck},
+                    );
+                }
+            }
+        }
+    }
+
+    return $Self->_Success();
+}
+
+
+
 1;
 
 =end Internal:

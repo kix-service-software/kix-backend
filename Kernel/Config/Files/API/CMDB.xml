@@ -45,6 +45,29 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">CMDB</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">DefinitionID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDefinitionDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ClassDefinitionDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">CMDB</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDefinitionCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ClassDefinitionCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">CMDB</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

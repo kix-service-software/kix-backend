@@ -510,6 +510,40 @@ sub _DefinitionPrepare {
     return 1;
 }
 
+=item DefinitionDelete()
+
+return a $DefinitionID are be deleted
+
+    my $DefinitionID = $ConfigItemObject->DefinitionGet(
+        DefinitionID => 123,
+    );
+
+=cut
+
+sub DefinitionDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{DefinitionID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need DefinitionID!',
+        );
+        return;
+    }
+
+    # delete in database
+    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'DELETE FROM configitem_definition WHERE id = ?',
+        Bind  => [ \$Param{DefinitionID} ],
+    );
+    return if !$Success;
+
+    delete $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} };
+
+    return $Param{DefinitionID};
+}
+
 1;
 
 

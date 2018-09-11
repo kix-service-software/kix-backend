@@ -261,7 +261,7 @@
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(TicketTypeGet|TicketStateCreate|TicketStateUpdate|LinkCreate|MailAccountCreate|MailAccountUpdate|SearchProfileCreate|ConfigItemCreate|ConfigItemVersionCreate)</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketTypeGet|TicketStateCreate|TicketStateUpdate|LinkCreate|MailAccountCreate|MailAccountUpdate|SearchProfileCreate|ConfigItemCreate|ConfigItemVersionCreate|ClassDefinitionCreate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

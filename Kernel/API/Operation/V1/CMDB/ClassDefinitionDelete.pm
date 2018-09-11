@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ClassDefinitionGet;
+package Kernel::API::Operation::V1::CMDB::ClassDefinitionDelete;
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ClassDefinitionGet - API ClassDefinitionGet Operation backend
+Kernel::API::Operation::V1::CMDB::ClassDefinitionDelete - API ClassDefinitionDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -82,39 +82,38 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
+    # get valid ClassIDs
+    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        Class => 'ITSM::ConfigItem::Class',
+        Valid => 1,
+    );
+
+    my @ClassIDs = sort keys %{$ItemList};
+
     return {
         'ClassID' => {
-            DataType => 'NUMERIC',
-            Required => 1
-        },
+            Required => 1,
+            OneOf    => \@ClassIDs,            
+        },       
         'DefinitionID' => {
-            Type     => 'ARRAY',
-            DataType => 'NUMERIC',
-            Required => 1
+            Required => 1,
+            Type     => 'ARRAY',            
         },
     }
 }
 
 =item Run()
 
-perform ClassDefinitionGet Operation.
+perform ClassDefinitionDelete Operation.
 
     my $Result = $OperationObject->Run(
-        ClassID      => 1,                                # required 
-        DefinitionID => 1                                 # required
+        Data => {
+            DefinitionID  => '...',     
+        },      
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
-        Code         => '',                               # In case of an error
-        Message      => '',                               # In case of an error
-        Data         => {
-            ConfigItemClassDefinition => [
-                {
-                    ...
-                },
-            ]
-        },
+        Message    => '',                      # in case of error
     };
 
 =cut
@@ -122,45 +121,34 @@ perform ClassDefinitionGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @DefinitionList;        
-    foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {                 
-
-        my $DefinitionRef = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+    foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {
+     
+        my $Definition = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
             DefinitionID => $DefinitionID,
         );
 
-        if (!IsHashRefWithData($DefinitionRef) || $DefinitionRef->{ClassID} != $Param{Data}->{ClassID}) {
+        if ( !IsHashRefWithData($Definition) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "Could not get data for DefinitionID $DefinitionID in ClassID $Param{Data}->{ClassID}",
+                Message => "Could not delete class definition $Param{Data}->{DefinitionID}"
             );
-        }     
-
-        my %Definition = %{$DefinitionRef};
-
-        # rename some attributes
-        $Definition{DefinitionString} = $Definition{Definition};
-        $Definition{Definition}       = $Definition{DefinitionRef};
-        delete $Definition{DefinitionRef};
-
-        push(@DefinitionList, \%Definition);
-    }
-
-    if ( scalar(@DefinitionList) == 0 ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for DefinitionID ".join(',', $Param{Data}->{DefinitionID}),
+        }
+        
+        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionDelete(
+            DefinitionID => $DefinitionID,
+            UserID       => $Self->{Authorization}->{UserID},
         );
+    
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToDelete',
+                Message => 'Could not delete class definition, please contact the system administrator',
+            );
+        }
     }
-    elsif ( scalar(@DefinitionList) == 1 ) {
-        return $Self->_Success(
-            ConfigItemClassDefinition => $DefinitionList[0],
-        );    
-    }
-
-    return $Self->_Success(
-        ConfigItemClassDefinition => \@DefinitionList,
-    );
+    
+    # return result
+    return $Self->_Success();
 }
 
 1;
