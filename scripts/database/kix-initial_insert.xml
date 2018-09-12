@@ -4332,7 +4332,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">25</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Gebäude</Data>
+        <Data Key="name" Type="Quote">Haus</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -5322,7 +5322,8 @@ DefaultValue: ''
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          =>  ['Location','Building','Room'],
+                    #ReferencedCIClassName          =>  ['Location','Building','Room'],
+                    ReferencedCIClassName          =>  ['Standort','Haus','Raum'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5470,7 +5471,8 @@ DefaultValue: ''
                       Searchable => 1,
                       Input      => {
                           Type                           => 'CIClassReference',
-                          ReferencedCIClassName          => 'Network',
+                          #ReferencedCIClassName          => 'Network',
+                          ReferencedCIClassName          => 'Netzwerk',
                           ReferencedCIClassLinkType      => 'ConnectedTo',
                           ReferencedCIClassLinkDirection => 'Normal',
                           # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5703,7 +5705,8 @@ DefaultValue: ''
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          =>  ['Location','Building','Room'],
+                    #ReferencedCIClassName          =>  ['Location','Building','Room'],
+                    ReferencedCIClassName          =>  ['Standort','Haus','Raum'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5850,7 +5853,8 @@ DefaultValue: ''
                       Searchable => 1,
                       Input      => {
                           Type                           => 'CIClassReference',
-                          ReferencedCIClassName          => 'Network',
+                          #ReferencedCIClassName          => 'Network',
+                          ReferencedCIClassName          => 'Netzwerk',
                           ReferencedCIClassLinkType      => 'ConnectedTo',
                           ReferencedCIClassLinkDirection => 'Normal',
                           # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -6102,7 +6106,7 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
-<!-- CI class Gebäude -->
+<!-- CI class Haus -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">25</Data>
         <Data Key="configitem_definition" Type="Quote">[
@@ -6305,7 +6309,7 @@ DefaultValue: ''
                 Key => 'ParentLocation',
 
                 #Name       => 'Parent Location',
-                Name       => 'Gebäude',
+                Name       => 'Haus',
                 Searchable => 1,
                 Input      => {
                     Required                       => 1,
