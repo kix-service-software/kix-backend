@@ -81,7 +81,8 @@ sub ValueLookup {
     return {
         Filename    => $Attachment->{Filename},
         ContentType => $Attachment->{Preferences}->{Datatype},
-        Content     => ${$Attachment->{ContentRef}},
+        Content     => encode_base64(${$Attachment->{ContentRef}}),
+        Filesize    => (length ${$Attachment->{ContentRef}}),
     };
 }
 
