@@ -66,6 +66,7 @@
             <Hash>
                 <Item Key="Module">V1::ObjectIcon::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::ObjectIcon::ObjectIconGet</Item>
+                <Item Key="CacheType">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>
