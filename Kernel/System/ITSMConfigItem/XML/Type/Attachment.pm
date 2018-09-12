@@ -66,11 +66,11 @@ sub ValueLookup {
     
     return if !$Param{Value};
 
-    my $Attachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
+    my $StoredAttachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
         ID => $Param{Value},
     );
 
-    if (!$Attachment) {
+    if (!$StoredAttachment) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
@@ -78,12 +78,27 @@ sub ValueLookup {
         return;
     }
 
-    return {
-        Filename    => $Attachment->{Filename},
-        ContentType => $Attachment->{Preferences}->{Datatype},
-        Content     => encode_base64(${$Attachment->{ContentRef}}),
-        Filesize    => (length ${$Attachment->{ContentRef}}),
-    };
+    my %Attachment = (
+        Filename    => $StoredAttachment->{Filename},
+        ContentType => $StoredAttachment->{Preferences}->{Datatype},
+        Content     => MIME::Base64::encode_base64(${$StoredAttachment->{ContentRef}}),
+        FilesizeRaw => (bytes::length ${$StoredAttachment->{ContentRef}}),
+    );
+
+    # human readable file size
+    if ( $Attachment{FilesizeRaw} ) {
+        if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
+            $Attachment{Filesize} = sprintf "%.1f MBytes", ( $Attachment{FilesizeRaw} / ( 1024 * 1024 ) );
+        }
+        elsif ( $Attachment{FilesizeRaw} > 1024 ) {
+            $Attachment{Filesize} = sprintf "%.1f KBytes", ( ( $Attachment{FilesizeRaw} / 1024 ) );
+        }
+        else {
+            $Attachment{Filesize} = $Attachment{FilesizeRaw} . ' Bytes';
+        }
+    }
+
+    return \%Attachment;
 }
 
 =item InternalValuePrepare()
@@ -114,7 +129,7 @@ sub InternalValuePrepare {
         }
     }
 
-    my $Content = decode_base64($Param{Value}->{Content});
+    my $Content = MIME::Base64::decode_base64($Param{Value}->{Content});
 
     # store the attachment in the default storage backend....
     my $AttDirID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageAdd(
