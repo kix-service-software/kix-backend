@@ -346,6 +346,9 @@ sub Run {
             );
         }
 
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'Ticket');
+
         my %TicketData;
         my @DynamicFields;
 

@@ -1495,7 +1495,7 @@ sub _GetCacheKey {
 
     # sort some things to make sure you always get the same cache key independent of the given order 
     foreach my $What (qw(limit include expand)) {
-        next if !exists $RequestData{$What};
+        next if !$RequestData{$What};
 
         my @Parts = split(/,/, $RequestData{$What});
         $RequestData{$What} = join(',', sort @Parts);
