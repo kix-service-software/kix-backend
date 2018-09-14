@@ -139,7 +139,9 @@ perform TextModuleUpdate Operation. This will return the updated TypeID.
                 Language            => '...',       # optional
                 Category            => '...',       # optional
                 Comment             => '...',       # optional
-                Keywords            => '...',       # optional
+                Keywords            => [
+                    'some', 'keywords'
+                ],                                  # optional
                 Subject             => '...',       # optional
                 AgentFrontend       => 0|1,         # optional
                 CustomerFrontend    => 0|1,         # optional
@@ -204,7 +206,7 @@ sub Run {
         Category           => $TextModule->{Category} || $TextModuleData{Category},
         Language           => $TextModule->{Language} || $TextModuleData{Language},
         Subject            => $TextModule->{Subject} || $TextModuleData{Subject},
-        Keywords           => $TextModule->{Keywords} || $TextModuleData{Keywords},
+        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
         Comment            => $TextModule->{Comment} || $TextModuleData{Comment},
         AgentFrontend      => $TextModule->{AgentFrontend} || $TextModuleData{AgentFrontend},
         CustomerFrontend   => $TextModule->{CustomerFrontend} || $TextModuleData{CustomerFrontend},

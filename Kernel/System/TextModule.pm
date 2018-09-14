@@ -417,8 +417,8 @@ sub TextModuleList {
     my $Cache = $Self->{CacheObject}->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
-    );
-    return @{$Cache} if $Cache;
+    );    
+    return $Cache if $Cache;
 
     # set valid
     if ( exists( $Param{ValidID} ) ) {
