@@ -138,7 +138,9 @@ perform TextModuleCreate Operation. This will return the created TextModuleID.
                 Language            => '...',       # optional, if not given set to DefaultLanguage with fallback 'en'
                 Category            => '...',       # optional
                 Comment             => '...',       # optional
-                Keywords            => '...',       # optional
+                Keywords            => [
+                    'some', 'keyword'
+                ],                                  # optional
                 Subject             => '...',       # optional
                 AgentFrontend       => 0|1,         # optional
                 CustomerFrontend    => 0|1,         # optional
@@ -186,7 +188,7 @@ sub Run {
         Category           => $TextModule->{Category} || '',
         Language           => $TextModule->{Language} || '',
         Subject            => $TextModule->{Subject} || '',
-        Keywords           => $TextModule->{Keywords} || '',
+        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
         Comment            => $TextModule->{Comment} || '',
         AgentFrontend      => $TextModule->{AgentFrontend},
         CustomerFrontend   => $TextModule->{CustomerFrontend},

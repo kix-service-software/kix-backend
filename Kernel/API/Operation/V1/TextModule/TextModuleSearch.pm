@@ -91,10 +91,10 @@ sub Run {
 
     # prepare filter if given
     my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{TextModule}->{AND}) ) {
+    if ( IsArrayRefWithData($Self->{Filter}->{TextModule}->{AND}) && !defined $Self->{Filter}->{TextModule}->{OR} ) {
         foreach my $FilterItem ( @{$Self->{Filter}->{TextModule}->{AND}} ) {
             # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Field} !~ /^(Name|Category|Agent|Customer|Public|Language|ValidID)$/g);
+            next if ($FilterItem->{Field} !~ /^(Name|Category|AgentFrontend|CustomerFrontend|PublicFrontend|Language|ValidID)$/g);
             next if ($FilterItem->{Operator} ne 'EQ');
 
             $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};

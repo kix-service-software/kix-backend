@@ -146,6 +146,10 @@ sub Run {
             );
         }
         
+        # convert Keywords to array
+        my @Keywords = split(/\s+/, $TextModuleData{Keywords});
+        $TextModuleData{Keywords} = \@Keywords;
+
         # add
         push(@TextModuleList, \%TextModuleData);
     }
