@@ -230,3 +230,4 @@
 /cmdb/configitems/:ConfigItemID/images                                  |   POST            | V1::CMDB::ConfigItemImageCreate
 /cmdb/configitems/:ConfigItemID/images/:ImageID                         |   GET             | V1::CMDB::ConfigItemImageGet
 /cmdb/configitems/:ConfigItemID/images/:ImageID                         |   DELETE          | V1::CMDB::ConfigItemImageDelete
+/cmdb/configitems/attachments/:AttachmentID                             |   GET             | V1::CMDB::ConfigItemAttachmentGet
