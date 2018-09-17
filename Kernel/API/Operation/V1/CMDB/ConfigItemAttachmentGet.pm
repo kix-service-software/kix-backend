@@ -132,7 +132,7 @@ sub Run {
         }     
 
         my %Attachment = (
-            ID          => $Param{Value},
+            ID          => $AttachmentID,
             Filename    => $StoredAttachment->{Filename},
             ContentType => $StoredAttachment->{Preferences}->{Datatype},
             Content     => MIME::Base64::encode_base64(${$StoredAttachment->{ContentRef}}),                    
