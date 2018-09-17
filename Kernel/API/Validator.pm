@@ -141,6 +141,9 @@ sub Validate {
     # validate attributes
     ATTRIBUTE:
     foreach my $Attribute ( sort keys %{$Param{Data}} ) {
+        # ignore given but null values - we don't need to validate those 
+        next if !defined $Param{Data}->{$Attribute};
+
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
             $Result = $Self->_ValidateAttribute(
