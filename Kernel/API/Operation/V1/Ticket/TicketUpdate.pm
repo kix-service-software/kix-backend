@@ -484,110 +484,68 @@ sub _TicketUpdate {
         }
     }
 
-    # update Ticket->Service
-    # this might reset SLA if current SLA is not available for the new service
-    if ( $Ticket->{Service} || $Ticket->{ServiceID} ) {
+    # update Ticket->Service (allow removal)
+    my $Success;
 
-        # check if ticket has a SLA assigned
-        if ( $TicketData{SLAID} ) {
-
-            # check if old SLA is still valid
-            if (
-                !$Self->ValidateSLA(
-                    SLAID     => $TicketData{SLAID},
-                    Service   => $Ticket->{Service} || '',
-                    ServiceID => $Ticket->{ServiceID} || '',
-                )
-                )
-            {
-
-                # remove current SLA if is not compatible with new service
-                my $Success = $TicketObject->TicketSLASet(
-                    SLAID    => '',
-                    TicketID => $Param{TicketID},
-                    UserID   => $Param{UserID},
-                );
-            }
-        }
-
-        my $Success;
-
-        # prevent comparison errors on undefined values
-        if ( !defined $TicketData{Service} ) {
-            $TicketData{Service} = '';
-        }
-        if ( !defined $TicketData{ServiceID} ) {
-            $TicketData{ServiceID} = '';
-        }
-
-        if ( defined $Ticket->{Service} && $Ticket->{Service} ne $TicketData{Service} ) {
-            $Success = $TicketObject->TicketServiceSet(
-                Service  => $Ticket->{Service},
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-        elsif ( defined $Ticket->{ServiceID} && $Ticket->{ServiceID} ne $TicketData{ServiceID} )
-        {
-            $Success = $TicketObject->TicketServiceSet(
-                ServiceID => $Ticket->{ServiceID},
-                TicketID  => $Param{TicketID},
-                UserID    => $Param{UserID},
-            );
-        }
-        else {
-
-            # data is the same as in ticket nothing to do
-            $Success = 1;
-        }
-
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToUpdate',
-                Message => 'Unable to update ticket, please contact system administrator!',
-            );
-        }
+    # prevent comparison errors on undefined values
+    if ( !defined $TicketData{ServiceID} ) {
+        $TicketData{ServiceID} = '';
+    }
+    if ( !defined $Ticket->{ServiceID} ) {
+        $Ticket->{ServiceID} = '';
     }
 
-    # update Ticket->SLA
-    if ( $Ticket->{SLA} || $Ticket->{SLAID} ) {
-        my $Success;
+    if ( $Ticket->{ServiceID} ne $TicketData{ServiceID} )
+    {
+        $Success = $TicketObject->TicketServiceSet(
+            ServiceID => $Ticket->{ServiceID},
+            TicketID  => $Param{TicketID},
+            UserID    => $Param{UserID},
+        );
+    }
+    else {
 
-        # prevent comparison errors on undefined values
-        if ( !defined $TicketData{SLA} ) {
-            $TicketData{SLA} = '';
-        }
-        if ( !defined $TicketData{SLAID} ) {
-            $TicketData{SLAID} = '';
-        }
+        # data is the same as in ticket nothing to do
+        $Success = 1;
+    }
 
-        if ( defined $Ticket->{SLA} && $Ticket->{SLA} ne $TicketData{SLA} ) {
-            $Success = $TicketObject->TicketSLASet(
-                SLA      => $Ticket->{SLA},
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-        elsif ( defined $Ticket->{SLAID} && $Ticket->{SLAID} ne $TicketData{SLAID} )
-        {
-            $Success = $TicketObject->TicketSLASet(
-                SLAID    => $Ticket->{SLAID},
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-        else {
+    if ( !$Success ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToUpdate',
+            Message => 'Unable to update ticket, please contact system administrator!',
+        );
+    }
 
-            # data is the same as in ticket nothing to do
-            $Success = 1;
-        }
+    # update Ticket->SLA (allow removal)
+    my $Success;
 
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToUpdate',
-                Message => 'Unable to update ticket, please contact system administrator!',
-            );
-        }
+    # prevent comparison errors on undefined values
+    if ( !defined $TicketData{SLAID} ) {
+        $TicketData{SLAID} = '';
+    }
+    if ( !defined $Ticket->{SLAID} ) {
+        $Ticket->{SLAID} = '';
+    }
+
+    if ( $Ticket->{SLAID} ne $TicketData{SLAID} )
+    {
+        $Success = $TicketObject->TicketSLASet(
+            SLAID    => $Ticket->{SLAID},
+            TicketID => $Param{TicketID},
+            UserID   => $Param{UserID},
+        );
+    }
+    else {
+
+        # data is the same as in ticket nothing to do
+        $Success = 1;
+    }
+
+    if ( !$Success ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToUpdate',
+            Message => 'Unable to update ticket, please contact system administrator!',
+        );
     }
 
     # update Ticket->CustomerUserID && Ticket->CustomerID
