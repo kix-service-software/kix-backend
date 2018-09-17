@@ -79,9 +79,9 @@ sub ValueLookup {
     }
 
     my %Attachment = (
+        ID          => $Param{Value},
         Filename    => $StoredAttachment->{Filename},
         ContentType => $StoredAttachment->{Preferences}->{Datatype},
-        Content     => MIME::Base64::encode_base64(${$StoredAttachment->{ContentRef}}),
         FilesizeRaw => (bytes::length ${$StoredAttachment->{ContentRef}}),
     );
 

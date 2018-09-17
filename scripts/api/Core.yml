@@ -1624,6 +1624,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemImageDelete
+    V1::CMDB::ConfigItemAttachmentGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ConfigItemAttachmentGet
 
   Transport:
     Config:
@@ -2554,6 +2561,10 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /cmdb/configitems/:ConfigItemID/images/:ImageID
+        V1::CMDB::ConfigItemAttachmentGet:
+          RequestMethod:
+          - GET
+          Route: /cmdb/configitems/attachments/:AttachmentID
 
     Type: HTTP::REST
 RemoteSystem: ''
