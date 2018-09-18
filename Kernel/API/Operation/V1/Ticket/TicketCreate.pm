@@ -90,7 +90,7 @@ sub ParameterDefinition {
         'Ticket::Title' => {
             Required => 1
         },
-        'Ticket::CustomerUser' => {
+        'Ticket::CustomerUserID' => {
             Required => 1
         },
         'Ticket::State' => {
@@ -113,7 +113,7 @@ perform TicketCreate Operation. This will return the created TicketID.
         Data => {
             Ticket => {
                 Title           => 'some ticket title',
-                CustomerUser    => 'some customer user login',
+                CustomerUserID  => 'some customer user login',
                 StateID         => 123,                                           # StateID or State is required
                 State           => 'some state name',
                 PriorityID      => 123,                                           # PriorityID or Priority is required
@@ -274,7 +274,7 @@ sub _TicketCreate {
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
     my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket->{CustomerUser},
+        User => $Ticket->{CustomerUserID},
     );
 
     my $CustomerID = $CustomerUserData{UserCustomerID} || '';
