@@ -338,6 +338,44 @@ sub ValidateValue {
         return 'not a valid attachment'
     }
 
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    my $ForbiddenExtensions   = $ConfigObject->Get('FileUpload::ForbiddenExtensions');
+    my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');
+    my $AllowedExtensions     = $ConfigObject->Get('FileUpload::AllowedExtensions');
+    my $AllowedContentTypes   = $ConfigObject->Get('FileUpload::AllowedContentTypes');
+    
+    # check allowed size
+    if ( $Value->{Content} && bytes::length($Value->{Content}) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
+        return "size of attachment exceeds maximum allowed size (attachment: $Value->{Filename})";
+    }
+
+    # check forbidden file extension 
+    if ( $ForbiddenExtensions && $Value->{Filename} =~ /$ForbiddenExtensions/ ) {
+        return "file type not allowed (attachment: $Value->{Filename})";
+    }
+
+    # check forbidden content type
+    if ( $ForbiddenContentTypes && $Value->{ContentType} =~ /$ForbiddenContentTypes/ ) {
+        return "content type not allowed (attachment: $Value->{Filename})";
+    }
+
+    # check allowed file extension 
+    if ( $AllowedExtensions && $Value->{Filename} !~ /$AllowedExtensions/ ) {
+        # check allowed content type as fallback
+        if ( $AllowedContentTypes && $Value->{ContentType} !~ /$AllowedContentTypes/ ) {
+            return "content type not allowed (attachment: $Value->{Filename})";
+        }
+        elsif ( !$AllowedContentTypes ) {
+            return "file type not allowed (attachment: $Value->{Filename})";
+        }
+    }
+
+    # check allowed content type 
+    if ( $AllowedContentTypes && $Value->{ContentType} !~ /$AllowedContentTypes/ ) {
+        return "file type not allowed (attachment: $Value->{Filename})";
+    }
+
     return 1;
 }
 

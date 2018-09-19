@@ -106,6 +106,13 @@ sub Validate {
     if ( $Param{Attribute} eq 'Attachments' ) {
         # check if array ref
         if ( IsArrayRefWithData($Param{Data}->{$Param{Attribute}}) ) {
+            my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+            my $ForbiddenExtensions   = $ConfigObject->Get('FileUpload::ForbiddenExtensions');
+            my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');
+            my $AllowedExtensions     = $ConfigObject->Get('FileUpload::AllowedExtensions');
+            my $AllowedContentTypes   = $ConfigObject->Get('FileUpload::AllowedContentTypes');
+
             $Found = 1;
             # check each attachment
             ATTACHMENT:
@@ -119,6 +126,55 @@ sub Validate {
                         $Found = 0;
                         last ATTACHMENT;
                     }
+
+                    # check allowed size
+                    if ( $Attachment->{Content} && bytes::length($Attachment->{Content}) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
+                        return $Self->_Error(
+                            Code    => 'Validator.Failed',
+                            Message => "Size of attachment exceeds maximum allowed size (attachment: $Attachment->{Filename})!",
+                        );                        
+                    }
+
+                    # check forbidden file extension 
+                    if ( $ForbiddenExtensions && $Attachment->{Filename} =~ /$ForbiddenExtensions/ ) {
+                        return $Self->_Error(
+                            Code    => 'Validator.Failed',
+                            Message => "Forbidden file type (attachment: $Attachment->{Filename})!",
+                        );                        
+                    }
+
+                    # check forbidden content type
+                    if ( $ForbiddenContentTypes && $Attachment->{ContentType} =~ /$ForbiddenContentTypes/ ) {
+                        return $Self->_Error(
+                            Code    => 'Validator.Failed',
+                            Message => "Forbidden content type (attachment: $Attachment->{Filename})!",
+                        );                        
+                    }
+
+                    # check allowed file extension 
+                    if ( $AllowedExtensions && $Attachment->{Filename} !~ /$AllowedExtensions/ ) {
+                        # check allowed content type as fallback
+                        if ( $AllowedContentTypes && $Attachment->{ContentType} !~ /$AllowedContentTypes/ ) {
+                            return $Self->_Error(
+                                Code    => 'Validator.Failed',
+                                Message => "Content type not allowed (attachment: $Attachment->{Filename})!",
+                            );                        
+                        }
+                        elsif ( !$AllowedContentTypes ) {
+                            return $Self->_Error(
+                                Code    => 'Validator.Failed',
+                                Message => "File type not allowed (attachment: $Attachment->{Filename})!",
+                            );                        
+                        }
+                    }
+
+                    # check allowed content type 
+                    if ( $AllowedContentTypes && $Attachment->{ContentType} !~ /$AllowedContentTypes/ ) {
+                        return $Self->_Error(
+                            Code    => 'Validator.Failed',
+                            Message => "File type not allowed (attachment: $Attachment->{Filename})!",
+                        );                        
+                    }
                 }
             }
         }
@@ -126,14 +182,14 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => "AttachmentsValidator: cannot validate attribute $Param{Attribute}!",
+            Message => "Cannot validate attribute $Param{Attribute}!",
         );
     }
 
     if ( !$Found ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
+            Message => "Validation of attribute $Param{Attribute} failed (wrong structure or missing required values) !",
         );        
     }
 
