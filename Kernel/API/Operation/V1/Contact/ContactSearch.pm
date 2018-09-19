@@ -86,30 +86,77 @@ perform ContactSearch Operation. This will return a Contact ID list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my %ContactList;
 
     # prepare filter if given
     my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{Contact}->{AND}) ) {
-        foreach my $FilterItem ( @{$Self->{Filter}->{Contact}->{AND}} ) {
-            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Operator} ne 'EQ');
+    if ( IsHashRefWithData($Self->{Filter}->{Contact}) ) {
+        foreach my $FilterType ( keys %{$Self->{Filter}->{Contact}} ) {
+            my %FilterTypeResult;
+            foreach my $FilterItem ( @{$Self->{Filter}->{Contact}->{$FilterType}} ) {
+                my $Value = $FilterItem->{Value};
 
-            if ($FilterItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
-                $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+                if ( $FilterItem->{Operator} eq 'CONTAINS' ) {
+                   $Value = '*' . $Value . '*';
+                }
+                elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
+                   $Value = $Value . '*';
+                }
+                if ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
+                   $Value = '*' . $Value;
+                }
+
+                if ($FilterItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
+                    $SearchFilter{$FilterItem->{Field}} = $Value;
+                }
+                elsif ($FilterItem->{Field} =~ /^(ValidID)$/g) {
+                    $SearchFilter{Valid} = $Value;
+                }
+                else {
+                    $SearchFilter{Search} = $Value;
+                }
+
+                # perform Contact search
+                my %SearchResult = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+                   %SearchFilter,
+                );
+
+                if ( $FilterType eq 'AND' ) {
+                    if ( !%FilterTypeResult ) {
+                        %FilterTypeResult = %SearchResult;
+                    }
+                    else {
+                        # remove all IDs from type result that we don't have in this search
+                        foreach my $Key ( keys %FilterTypeResult ) {
+                            delete $FilterTypeResult{$Key} if !exists $SearchResult{$Key};
+                        }
+                    }
+                }
+                elsif ( $FilterType eq 'OR' ) {
+                    # merge results
+                    %FilterTypeResult = (
+                        %FilterTypeResult,
+                        %SearchResult,
+                    );
+                }
             }
-            elsif ($FilterItem->{Field} =~ /^(ValidID)$/g) {
-                $SearchFilter{Valid} = $FilterItem->{Value};
+
+            if ( !%ContactList ) {
+                %ContactList = %FilterTypeResult;
             }
             else {
-                $SearchFilter{Search} = $FilterItem->{Value};
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                foreach my $Key ( keys %ContactList ) {
+                    delete $ContactList{$Key} if !exists $FilterTypeResult{$Key};
+                }
             }
         }
     }
-
-    # perform Contact search
-    my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-        %SearchFilter,
-    );
+    else {
+        # perform Contact search without any filter
+        %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch();
+    }
 
     if (IsHashRefWithData(\%ContactList)) {
 
