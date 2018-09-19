@@ -10112,22 +10112,47 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="WebMaxFileUpload" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the maximal size (in bytes) for file uploads via the browser. Warning: Setting this option to a value which is too low could cause many masks in your OTRS instance to stop working (probably any mask which takes input from the user).</Description>
+    <ConfigItem Name="FileUpload::MaxAllowedSize" Required="1" Valid="1" ConfigLevel="200">
         <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
+        <SubGroup>Core::FileUpload</SubGroup>
+        <Description Translatable="1">Defines the maximal size (in bytes) for file uploads.</Description>
         <Setting>
             <String Regex="^[0-9]{1,11}$">24000000</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="WebUploadCacheModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Selects the module to handle uploads via the web interface. "DB" stores all uploads in the database, "FS" uses the file system.</Description>
+    <ConfigItem Name="FileUpload::AllowedExtensions" Required="1" Valid="1" ConfigLevel="200">
         <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
+        <SubGroup>Core::FileUpload</SubGroup>
+        <Description Translatable="1">Defines the allowed file extensions for file uploads (attachments) as RegEx pattern.</Description>
         <Setting>
-            <Option Location="Kernel/System/Web/UploadCache/*.pm" SelectedID="Kernel::System::Web::UploadCache::DB"></Option>
+            <String Regex=""></String>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="FileUpload::ForbiddenExtensions" Required="1" Valid="1" ConfigLevel="200">
+        <Group>Framework</Group>
+        <SubGroup>Core::FileUpload</SubGroup>
+        <Description Translatable="1">Defines the forbidden file extensions for file uploads (attachments) as RegEx pattern. This option has priority over FileUpload::AllowedExtensions.</Description>
+        <Setting>
+            <String Regex=""></String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="FileUpload::AllowedContentTypes" Required="1" Valid="1" ConfigLevel="200">
+        <Group>Framework</Group>
+        <SubGroup>Core::FileUpload</SubGroup>
+        <Description Translatable="1">Defines the allowed content types for file uploads (attachments) as RegEx pattern.</Description>
+        <Setting>
+            <String Regex=""></String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="FileUpload::ForbiddenContentTypes" Required="1" Valid="1" ConfigLevel="200">
+        <Group>Framework</Group>
+        <SubGroup>Core::FileUpload</SubGroup>
+        <Description Translatable="1">Defines the forbidden content types for file uploads (attachments) as RegEx pattern. This option has priority over FileUpload::AllowedContentTypes.</Description>
+        <Setting>
+            <String Regex=""></String>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem Name="CGILogPrefix" Required="1" Valid="1">
         <Description Translatable="1">Specifies the text that should appear in the log file to denote a CGI script entry.</Description>
         <Group>Framework</Group>
