@@ -112,11 +112,17 @@ sub Filter {
         'OR'  => 'FULL OUTER'
     );
 
+    my $IsStaticSearch = 0;
+    my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
+    if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+        $IsStaticSearch = 1;
+    }
+
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
+        # use appropriate table for selected search index module
         my $ArticleSearchTable = 'article';
-        if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+        if ( $IsStaticSearch ) {
             $ArticleSearchTable = 'article_search';
         }
         push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
@@ -180,7 +186,8 @@ sub Filter {
         }
 
         # check if database supports LIKE in large text types (in this case for body)
-        if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+        if ( !$IsStaticSearch && $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+            # lower attributes if we don't do a static search
             if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
                 $Field      = "LCASE($Field)";
                 $FieldValue = "LCASE('$FieldValue')";
@@ -192,6 +199,10 @@ sub Filter {
         }
         else {
             $FieldValue = "'$FieldValue'";
+            if ( $IsStaticSearch ) {
+                # lower search pattern if we use static search
+                $FieldValue = lc($FieldValue);
+            }
         }
 
         push( @SQLWhere, $Field.' LIKE '.$FieldValue );
