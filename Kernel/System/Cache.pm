@@ -548,25 +548,27 @@ $Self->PerfLogStart('Cache::_HandleDependingCacheTypes: deleting type');
 $Self->PerfLogStart('Cache::_HandleDependingCacheTypes: deleting key');
                 # remove key entry to make sure we don't end up in a recursive loop
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}->{$Key};
-                if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
-                    $Self->_Debug("        no keys left in dependend type $DependendType, deleting entry");
-                    # delete whole dependend type if all keys are deleted
-                    delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
-                }
-                if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
-                    $Self->_Debug("        no dependencies left for type $Param{Type}, deleting entry");
-                    # delete whole type if all keys are deleted
-                    delete $Self->{TypeDependencies}->{$Param{Type}};
-                }
-
                 $Self->Delete(
                     Type => $DependendType,
                     Key  => $Key
                 );
 $Self->PerfLogStop(1);
             }
+
+            if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
+                $Self->_Debug("        no keys left in dependend type $DependendType, deleting entry");
+                # delete whole dependend type if all keys are deleted
+                delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
+            }
 $Self->PerfLogStop(1);
         }
+
+        if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
+            $Self->_Debug("        no dependencies left for type $Param{Type}, deleting entry");
+            # delete whole type if all keys are deleted
+            delete $Self->{TypeDependencies}->{$Param{Type}};
+        }
+
 
         # Set persistent cache
         if ( $Self->{CacheInBackend} ) {
@@ -664,7 +666,7 @@ sub _Debug {
 
     return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') );
 
-    print STDERR "[Cache] $Message\n";
+    printf STDERR "%10s %s\n", "[Cache]", "$Message";
 }
 
 sub DESTROY {

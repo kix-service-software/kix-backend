@@ -101,7 +101,7 @@ sub RunOperation {
 
         if ( IsHashRefWithData($CacheResult) ) {
             if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
-                print STDERR $Self->{LevelIndent}."[Cache] return cached response\n";
+                $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."return cached response");
             }
             $Self->{'_CachedResponse'} = 1;
             return $Self->_Success(
@@ -658,7 +658,7 @@ sub ExecOperation {
         );
     }
 
-    print STDERR $Self->{LevelIndent}."[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
+    $Self->_Debug($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
 
     my $Result = $OperationObject->Run(
         Data    => {
@@ -677,7 +677,7 @@ sub ExecOperation {
             }
         }
         if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
-            print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."    type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}}));
         }
     }
 
@@ -1242,7 +1242,7 @@ sub _ApplyInclude {
                 $Self->{CacheDependencies}->{$GenericIncludes->{$Include}->{CacheType}} = 1;
             }
 
-            print STDERR $Self->{LevelIndent}."[API] GenericInclude: $Include\n";
+            $Self->_Debug($Self->{LevelIndent}."GenericInclude: $Include");
 
             # do it for every object in the response
             foreach my $Object ( keys %{$Param{Data}} ) {
@@ -1282,7 +1282,7 @@ sub _ApplyInclude {
             }
 
             if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
-                print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+                $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."    type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}}));
             }
         }
     }
@@ -1535,6 +1535,14 @@ sub _CacheRequest {
     }
 
     return 1;
+}
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
+
+    printf STDERR "%10s %s\n", "[API]", "$Message";
 }
 
 1;
