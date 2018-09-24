@@ -672,8 +672,6 @@ sub ConvertDataToExternal {
                 $AttributeName = $AttrDef->{Name};
             }
 
-print STDERR "Attributname: $RootHashKey = $AttributeName\n";
-
             if ( $AttrDef->{CountMax} > 1 ) {
 
                 # we have multiple items
