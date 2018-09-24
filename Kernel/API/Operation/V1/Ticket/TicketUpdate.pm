@@ -212,7 +212,6 @@ $Self->PerfLogStop('API::TicketUpdate: check ticket');
     );
 
 $Self->PerfLogStop('API::TicketUpdate');
-$Self->PerfLogOutput();
 
     return $Result;
 }

@@ -543,18 +543,18 @@ $Self->PerfLogStart('Cache::_HandleDependingCacheTypes');
         $Self->_Debug("type $Param{Type} of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
         foreach my $DependendType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
 $Self->PerfLogStart('Cache::_HandleDependingCacheTypes: deleting type');
-            $Self->_Debug("deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type $DependendType");
+            $Self->_Debug("    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type $DependendType");
             foreach my $Key ( keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}} ) {
 $Self->PerfLogStart('Cache::_HandleDependingCacheTypes: deleting key');
                 # remove key entry to make sure we don't end up in a recursive loop
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}->{$Key};
                 if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
-                    $Self->_Debug("no keys left in dependend type $DependendType, deleting entry");
+                    $Self->_Debug("        no keys left in dependend type $DependendType, deleting entry");
                     # delete whole dependend type if all keys are deleted
                     delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
                 }
                 if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
-                    $Self->_Debug("no dependencies left for type $Param{Type}, deleting entry");
+                    $Self->_Debug("        no dependencies left for type $Param{Type}, deleting entry");
                     # delete whole type if all keys are deleted
                     delete $Self->{TypeDependencies}->{$Param{Type}};
                 }
