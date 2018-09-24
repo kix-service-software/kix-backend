@@ -145,6 +145,9 @@ sub PerfLogOutput {
         print HANDLE "-----\n";
         close(HANDLE);
     }
+
+    # cleanup
+    delete $Kernel::System::PerfLog::Store->{Functions};
 }
 
 sub SQLLogSetMinTime {
