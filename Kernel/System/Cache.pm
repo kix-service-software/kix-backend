@@ -597,7 +597,7 @@ sub _UpdateCacheStats {
     my ( $Self, %Param ) = @_;
 
     # if cache stats are not disabled, manage them
-    return if $Kernel::OM->Get('Kernel::Config')->Get('DisableCacheStats');
+    return if $Kernel::OM->Get('Kernel::Config')->Get('Cache::DisableStats');
 
 $Self->PerfLogStart('Cache::_UpdateCacheStats');
 
@@ -662,7 +662,7 @@ $Self->PerfLogStop(1);
 sub _Debug {
     my ( $Self, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('CacheDebug') );
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') );
 
     print STDERR "[Cache] $Message\n";
 }
