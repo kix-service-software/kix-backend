@@ -211,7 +211,7 @@ $Self->PerfLogStop('API::TicketUpdate: check ticket');
         UserID   => $PermissionUserID,
     );
 
-$Self->PerfLogStop('API::TicketUpdate');
+$Self->PerfLogStop();
 
     return $Result;
 }
