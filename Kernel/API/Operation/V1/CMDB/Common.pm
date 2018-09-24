@@ -672,6 +672,8 @@ sub ConvertDataToExternal {
                 $AttributeName = $AttrDef->{Name};
             }
 
+print STDERR "Attributname: $RootHashKey = $AttributeName\n";
+
             if ( $AttrDef->{CountMax} > 1 ) {
 
                 # we have multiple items
@@ -785,12 +787,12 @@ sub ConvertDataToExternal {
                                 RootKey    => $RootHashKey,
                                 ForDisplay => $Param{ForDisplay},
                             );
-
+                            
                             if (ref $NewData->{$AttributeName} ne 'HASH') {
                                 # prepare hash for sub result
                                 if ( $NewData->{$AttributeName} ) {
                                     $NewData->{$AttributeName} = {
-                                        $RootHashKey = $NewData->{$AttributeName}
+                                        $RootHashKey => $NewData->{$AttributeName}
                                     };
                                 }
                                 else {
