@@ -100,7 +100,9 @@ sub RunOperation {
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            print STDERR $Self->{LevelIndent}."[Cache] return cached response\n";
+            if ( $Kernel::OM->Get('Kernel::Config')->Get('CacheDebug') ) {
+                print STDERR $Self->{LevelIndent}."[Cache] return cached response\n";
+            }
             $Self->{'_CachedResponse'} = 1;
             return $Self->_Success(
                 %{$CacheResult}
@@ -674,7 +676,9 @@ sub ExecOperation {
                 $Self->{CacheDependencies}->{$CacheDep} = 1;
             }
         }
-        print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+        if ( $Kernel::OM->Get('Kernel::Config')->Get('CacheDebug') ) {
+            print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+        }
     }
 
     return $Result;
@@ -1277,7 +1281,9 @@ sub _ApplyInclude {
                 }
             }
 
-            print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+            if ( $Kernel::OM->Get('Kernel::Config')->Get('CacheDebug') ) {
+                print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+            }
         }
     }
 
