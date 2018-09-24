@@ -78,6 +78,10 @@ sub PerfLogOutput {
     my ($Self) = @_;
     my ($sec,$min,$hour,$day,$mon,$year) = localtime();
     my $datestr = sprintf("%i/%02i/%02i %02i:%02i:%02i", $year+1900, $mon+1, $day, $hour, $min, $sec);
+    if (!$Self->{PerfLogFile}) {
+        # fallback
+        $Self->{PerfLogFile} = 'STDERR';
+    }
     if ($Self->{PerfLogFile} ne 'STDERR') {
         open(HANDLE, '>>'.($Self->{PerfLogFile}||'/tmp/kix.perflog'));
     }
