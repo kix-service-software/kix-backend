@@ -136,9 +136,213 @@ sub Run {
         }
     }
 
+    if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
+
+        # include tickets if requested
+        if ( $Param{Data}->{include}->{Tickets} ) {
+            my @TicketIDs;
+
+            # get tickets owned by user
+            my $Tickets = $Self->_GetOwnedTickets();
+            $UserData{Tickets}->{Owned}          = $Tickets->{All};
+            $UserData{Tickets}->{OwnedAndUnseen} = $Tickets->{Unseen};
+
+            # get tickets owned by user and locked
+            $Tickets = $Self->_GetOwnedAndLockedTickets();
+            $UserData{Tickets}->{OwnedAndLocked}          = $Tickets->{All};
+            $UserData{Tickets}->{OwnedAndLockedAndUnseen} = $Tickets->{Unseen};
+
+            # get tickets watched by user
+            $Tickets = $Self->_GetWatchedTickets();
+            $UserData{Tickets}->{Watched}          = $Tickets->{All};
+            $UserData{Tickets}->{WatchedAndUnseen} = $Tickets->{Unseen};
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'Ticket');
+        }
+    }
+
     return $Self->_Success(
         User => \%UserData,
     );    
+}
+
+sub _GetOwnedTickets {
+    my ( $Self, %Param ) = @_;
+    my %Tickets;
+
+    # execute ticket search
+    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        Filter => {
+            AND => [
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Self->{Authorization}->{UserID},
+                },
+            ]
+        },
+        UserID => $Self->{Authorization}->{UserID},
+        Result => 'ARRAY',
+    );
+    $Tickets{All} = \@TicketIDs;
+
+    # execute ticket search
+    my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        Filter => {
+            AND => [
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Self->{Authorization}->{UserID},
+                },
+                {
+                    Field    => 'TicketFlag',
+                    Operator => 'EQ',
+                    Value    => [ 
+                        {
+                            Flag   => 'Seen',
+                            Value  => '1',
+                            UserID => $Self->{Authorization}->{UserID},
+                        }
+                    ]
+                },
+            ]
+        },
+        UserID => $Self->{Authorization}->{UserID},
+        Result => 'ARRAY',
+    );
+    # extract all unseen tickets
+    my @UnseenTicketIDs;
+    foreach my $TicketID (@TicketIDs) {
+        next if grep(/^$TicketID$/, @SeenTicketIDs);
+        push(@UnseenTicketIDs, $TicketID);
+    }
+    $Tickets{Unseen} = \@UnseenTicketIDs;
+
+    return \%Tickets;
+}
+
+sub _GetOwnedAndLockedTickets {
+    my ( $Self, %Param ) = @_;
+    my %Tickets;
+
+    # execute ticket search
+    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        Filter => {
+            AND => [
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Self->{Authorization}->{UserID},
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => 1,
+                },
+            ]
+        },
+        UserID => $Self->{Authorization}->{UserID},
+        Result => 'ARRAY',
+    );
+    $Tickets{All} = \@TicketIDs;
+
+    # execute ticket search
+    my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        Filter => {
+            AND => [
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Self->{Authorization}->{UserID},
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => 1,
+                },
+                {
+                    Field    => 'TicketFlag',
+                    Operator => 'EQ',
+                    Value    => [ 
+                        {
+                            Flag   => 'Seen',
+                            Value  => '1',
+                            UserID => $Self->{Authorization}->{UserID},
+                        }
+                    ]
+                },
+            ]
+        },
+        UserID => $Self->{Authorization}->{UserID},
+        Result => 'ARRAY',
+    );
+    # extract all unseen tickets
+    my @UnseenTicketIDs;
+    foreach my $TicketID (@TicketIDs) {
+        next if grep(/^$TicketID$/, @SeenTicketIDs);
+        push(@UnseenTicketIDs, $TicketID);
+    }
+    $Tickets{Unseen} = \@UnseenTicketIDs;
+
+    return \%Tickets;
+}
+
+sub _GetWatchedTickets {
+    my ( $Self, %Param ) = @_;
+    my %Tickets;
+
+    # execute ticket search
+    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        Filter => {
+            AND => [
+                {
+                    Field    => 'WatcherUserID',
+                    Operator => 'EQ',
+                    Value    => $Self->{Authorization}->{UserID},
+                },
+            ]
+        },
+        UserID => $Self->{Authorization}->{UserID},
+        Result => 'ARRAY',
+    );
+    $Tickets{All} = \@TicketIDs;
+
+    # execute ticket search
+    my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        Filter => {
+            AND => [
+                {
+                    Field    => 'WatcherUserID',
+                    Operator => 'EQ',
+                    Value    => $Self->{Authorization}->{UserID},
+                },
+                {
+                    Field    => 'TicketFlag',
+                    Operator => 'EQ',
+                    Value    => [ 
+                        {
+                            Flag   => 'Seen',
+                            Value  => '1',
+                            UserID => $Self->{Authorization}->{UserID},
+                        }
+                    ]
+                },
+            ]
+        },
+        UserID => $Self->{Authorization}->{UserID},
+        Result => 'ARRAY',
+    );
+    # extract all unseen tickets
+    my @UnseenTicketIDs;
+    foreach my $TicketID (@TicketIDs) {
+        next if grep(/^$TicketID$/, @SeenTicketIDs);
+        push(@UnseenTicketIDs, $TicketID);
+    }
+    $Tickets{Unseen} = \@UnseenTicketIDs;
+
+    return \%Tickets;
 }
 
 1;
