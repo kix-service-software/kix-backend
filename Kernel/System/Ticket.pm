@@ -2484,6 +2484,7 @@ Events:
 sub TicketServiceSet {
     my ( $Self, %Param ) = @_;
 
+$Self->PerfLogStart('Ticket::TicketServiceSet');
     # service lookup
     if ( $Param{Service} && !$Param{ServiceID} ) {
         $Param{ServiceID} = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
@@ -2502,15 +2503,18 @@ sub TicketServiceSet {
         }
     }
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: get ticket');
     # get current ticket
     my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: get ticket');
 
     # update needed?
     return 1 if $Param{ServiceID} eq $Ticket{ServiceID};
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: checking permission');
     # permission check
     my %ServiceList = $Self->TicketServiceList(%Param);
     if ( $Param{ServiceID} ne '' && !$ServiceList{ $Param{ServiceID} } ) {
@@ -2520,6 +2524,7 @@ sub TicketServiceSet {
         );
         return;
     }
+$Self->PerfLogStop('Ticket::TicketServiceSet: checking permission');
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
     for my $Parameter (qw(ServiceID SLAID)) {
@@ -2528,15 +2533,20 @@ sub TicketServiceSet {
         }
     }
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: executing SQL');
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE ticket SET service_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [ \$Param{ServiceID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: executing SQL');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: clearing ticket cache');
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+$Self->PerfLogStop('Ticket::TicketServiceSet: clearing ticket cache');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: get ticket (after)');
     # get new ticket data
     my %TicketNew = $Self->TicketGet(
         %Param,
@@ -2546,7 +2556,9 @@ sub TicketServiceSet {
     $Param{ServiceID}   = $Param{ServiceID}   || '';
     $Ticket{Service}    = $Ticket{Service}    || 'NULL';
     $Ticket{ServiceID}  = $Ticket{ServiceID}  || '';
+$Self->PerfLogStop('Ticket::TicketServiceSet: get ticket (after)');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: adding history entry');
     # history insert
     $Self->HistoryAdd(
         TicketID    => $Param{TicketID},
@@ -2555,7 +2567,9 @@ sub TicketServiceSet {
             "\%\%$TicketNew{Service}\%\%$Param{ServiceID}\%\%$Ticket{Service}\%\%$Ticket{ServiceID}",
         CreateUserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: adding history entry');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: firing event NotificationServiceUpdate');
     # trigger notification event
     $Self->EventHandler(
         Event => 'NotificationServiceUpdate',
@@ -2565,7 +2579,9 @@ sub TicketServiceSet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: firing event NotificationServiceUpdate');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: firing event TicketServiceUpdate');
     # trigger event
     $Self->EventHandler(
         Event => 'TicketServiceUpdate',
@@ -2574,7 +2590,9 @@ sub TicketServiceSet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: firing event TicketServiceUpdate');
 
+$Self->PerfLogStop('Ticket::TicketServiceSet');
     return 1;
 }
 
@@ -5391,6 +5409,8 @@ Events:
 sub TicketPrioritySet {
     my ( $Self, %Param ) = @_;
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet');
+
     # get priority object
     my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
 
@@ -5416,10 +5436,12 @@ sub TicketPrioritySet {
             return;
         }
     }
+$Self->PerfLogStart('Ticket::TicketPrioritySet: get ticket');
     my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: get ticket');
 
     # check if update is needed
     if ( $Ticket{Priority} eq $Param{Priority} ) {
@@ -5428,6 +5450,7 @@ sub TicketPrioritySet {
         return 1;
     }
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: checking permission');
     # permission check
     my %PriorityList = $Self->PriorityList(%Param);
     if ( !$PriorityList{ $Param{PriorityID} } ) {
@@ -5437,7 +5460,9 @@ sub TicketPrioritySet {
         );
         return;
     }
+$Self->PerfLogStop('Ticket::TicketPrioritySet: checking permission');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: executing SQL');
     # db update
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE ticket SET ticket_priority_id = ?, '
@@ -5445,10 +5470,14 @@ sub TicketPrioritySet {
             . ' WHERE id = ?',
         Bind => [ \$Param{PriorityID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: executing SQL');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: clearing ticket cache');
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: clearing ticket cache');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: adding history entry');
     # add history
     $Self->HistoryAdd(
         TicketID     => $Param{TicketID},
@@ -5458,7 +5487,9 @@ sub TicketPrioritySet {
         Name         => "\%\%$Ticket{Priority}\%\%$Ticket{PriorityID}"
             . "\%\%$Param{Priority}\%\%$Param{PriorityID}",
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: adding history entry');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: firing event TicketPriorityUpdate');
     # trigger event
     $Self->EventHandler(
         Event => 'TicketPriorityUpdate',
@@ -5467,6 +5498,9 @@ sub TicketPrioritySet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: firing event TicketPriorityUpdate');
+
+$Self->PerfLogStop('Ticket::TicketPrioritySet');
 
     return 1;
 }
