@@ -12599,7 +12599,7 @@ Thanks for your help!
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="1">
+    <ConfigItem Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="0">
         <Description Translatable="1">Create new linked person on create new Article or Update Owner.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
