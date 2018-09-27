@@ -2915,6 +2915,18 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###3201" Required="0" Valid="1">
+        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'Includes' link type.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">ConfigItem</Item>
+                <Item Key="Object2">ConfigItem</Item>
+                <Item Key="Type">Includes</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###3202" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'DependsOn' link type.</Description>
         <Group>Framework</Group>
@@ -2924,6 +2936,18 @@
                 <Item Key="Object1">ConfigItem</Item>
                 <Item Key="Object2">ConfigItem</Item>
                 <Item Key="Type">DependsOn</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###3203" Required="0" Valid="1">
+        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'ConnectedTo' link type.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">ConfigItem</Item>
+                <Item Key="Object2">ConfigItem</Item>
+                <Item Key="Type">ConnectedTo</Item>
             </Hash>
         </Setting>
     </ConfigItem>
