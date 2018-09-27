@@ -309,11 +309,17 @@ sub _ObjectBuild {
 
     # check if we have to wrap a method for performance logging
     if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{Methods} && $Self->{PerfLogConfig}->{Methods}->{$Package} && ref $Self->{PerfLogConfig}->{Methods}->{$Package} eq 'HASH') {
-        print STDERR "preparing package $Package for performance logging\n";
+        my $PreparedCount = 0;
         foreach my $Method ( sort keys %{$Self->{PerfLogConfig}->{Methods}->{$Package}} ) {
+            my $PackageMethod = "$Package::$Method";
+            next if $PerfLogWrappedMethods{"$PackageMethod"};
+
+            if (!$PreparedCount++) {
+                print STDERR "preparing package $Package for performance logging\n";
+            }
+
             print STDERR "    hooking method $Method...";
 
-            my $PackageMethod = "$Package::$Method";
             my $ReturnType = $Self->{PerfLogConfig}->{Methods}->{$Package}->{$Method};
 
             $PerfLogWrappedMethods{"$PackageMethod"} = \&$PackageMethod;
