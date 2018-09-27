@@ -35,9 +35,15 @@ use Kernel::System::Time;
 use Kernel::System::Web::Request;
 use Kernel::System::User;
 
+use base qw(
+    Kernel::System::PerfLog
+);
+
 # Contains the top-level object being retrieved;
 # used to generate better error messages.
 our $CurrentObject;
+
+our %PerfLogWrappedMethods;
 
 =head1 NAME
 
@@ -142,6 +148,13 @@ sub new {
     #   already create an instance here to make sure it is always done and done
     #   at the beginning of things.
     $Self->Get('Kernel::System::Encode');
+
+    $Self->{PerfLogConfig} = $Self->Get('Kernel::Config')->Get('PerfLogConfig');
+
+    # init PerfLog
+    if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{OutputTo}) {
+        $Self->{PerfLogFile} = $Self->{PerfLogConfig}->{OutputTo};
+    }
 
     return $Self;
 }
@@ -293,6 +306,27 @@ sub _ObjectBuild {
     }
 
     $Self->{Objects}->{$Package} = $NewObject;
+
+    # check if we have to wrap a method for performance logging
+    if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{Methods} && $Self->{PerfLogConfig}->{Methods}->{$Package} && ref $Self->{PerfLogConfig}->{Methods}->{$Package} eq 'HASH') {
+        print STDERR "preparing package $Package for performance logging\n";
+        foreach my $Method ( sort keys %{$Self->{PerfLogConfig}->{Methods}->{$Package}} ) {
+            print STDERR "    hooking method $Method...";
+
+            my $PackageMethod = "$Package::$Method";
+            my $ReturnType = $Self->{PerfLogConfig}->{Methods}->{$Package}->{$Method};
+
+            $PerfLogWrappedMethods{"$PackageMethod"} = \&$PackageMethod;
+            no strict 'refs';
+            no warnings 'redefine';
+            *{$PackageMethod} = sub {
+                my ($ObjRef, %Param) = @_;
+                Kernel::System::ObjectManager::_PerfLogMethodWrapper($Self, "$PackageMethod", $ReturnType, $ObjRef, %Param);
+            };
+
+            print STDERR "OK\n";
+        }
+    }
 
     return $NewObject;
 }
@@ -591,6 +625,45 @@ sub _DieWithError {
 
     carp $Param{Error};
     confess $Param{Error};
+}
+
+sub _PerfLogMethodWrapper {
+    my ( $Self, $Method, $ReturnType, $ObjRef, %Param ) = @_;
+
+    $Self->PerfLogStart($Method);
+
+    if ($ReturnType eq 'HASH') {
+        my %Result = $PerfLogWrappedMethods{$Method}->($ObjRef, %Param);
+        $Self->PerfLogStop($Method);
+
+        if ( $Self->{PerfLogConfig}->{OutputInMethods}->{$Method} ) {
+            $Self->PerfLogOutput();
+        }
+
+        return %Result;
+    }
+    elsif ($ReturnType eq 'ARRAY') {
+        my @Result = $PerfLogWrappedMethods{$Method}->($ObjRef, %Param);
+        $Self->PerfLogStop($Method);
+
+        if ( $Self->{PerfLogConfig}->{OutputInMethods}->{$Method} ) {
+            $Self->PerfLogOutput();
+        }
+
+        return @Result;
+    }
+    elsif ($ReturnType =~ /SCALAR|REF/) {
+        my $Result = $PerfLogWrappedMethods{$Method}->($ObjRef, %Param);
+        $Self->PerfLogStop($Method);
+
+        if ( $Self->{PerfLogConfig}->{OutputInMethods}->{$Method} ) {
+            $Self->PerfLogOutput();
+        }
+
+        return $Result;
+    }
+
+    return;
 }
 
 sub DESTROY {

@@ -24,6 +24,12 @@ $VERSION = qw($Revision: 1.12 $) [1];
 
 local $Kernel::System::PerfLog::Store;
 
+sub Init {
+    my ($Self, %Param) = @_;
+
+    $Kernel::System::PerfLog::Store = {};
+}
+
 sub PerfLogStart {
     my ($Self, $Fnc) = @_;
 
@@ -147,7 +153,7 @@ sub PerfLogOutput {
     }
 
     # cleanup
-    delete $Kernel::System::PerfLog::Store->{Functions};
+    $Self->Init();
 }
 
 sub SQLLogSetMinTime {
