@@ -87,36 +87,82 @@ perform ConfigItemSearch Operation. This will return a class list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my @ConfigItemList;
 
     # prepare filter if given
     my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{ConfigItem}->{AND}) ) {
-        foreach my $FilterItem ( @{$Self->{Filter}->{ConfigItem}->{AND}} ) {
-            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Field} !~ /^(ClassID|Name|Number)$/g);
-            next if ($FilterItem->{Operator} ne 'EQ');
+    if ( IsHashRefWithData($Self->{Filter}->{ConfigItem}) ) {
+        foreach my $FilterType ( keys %{$Self->{Filter}->{ConfigItem}} ) {
+            my @FilterTypeResult;
+            foreach my $FilterItem ( @{$Self->{Filter}->{ConfigItem}->{$FilterType}} ) {
+                my $Value = $FilterItem->{Value};
 
-            if ($FilterItem->{Field} eq 'ClassID') {
-                $SearchFilter{ClassIDs} = [ $FilterItem->{Value} ];
+                if ( $FilterItem->{Operator} eq 'CONTAINS' ) {
+                   $Value = '*' . $Value . '*';
+                }
+                elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
+                   $Value = $Value . '*';
+                }
+                if ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
+                   $Value = '*' . $Value;
+                }
+
+                $SearchFilter{$FilterItem->{Field}} = $Value;
+
+                if ( $FilterType eq 'OR' ) {
+                    # perform search for every attribute
+                    my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+                        %SearchFilter,
+                        UserID  => $Self->{Authorization}->{UserID},
+                    );
+
+                    # merge results
+                    my @MergeResult = keys %{{map {($_ => 1)} (@FilterTypeResult, @{$SearchResult})}};
+                    @FilterTypeResult = @MergeResult;
+
+                    # clear filter
+                    %SearchFilter = ();
+                }
+            }
+
+            if ( $FilterType eq 'AND' ) {
+                # perform ConfigItem search
+                my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+                    %SearchFilter,
+                    UserID  => $Self->{Authorization}->{UserID},
+                );
+                @FilterTypeResult = @{$SearchResult};
+            }
+
+            if ( !@ConfigItemList ) {
+                @ConfigItemList = @FilterTypeResult;
             }
             else {
-                $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                my %FilterTypeResultHash = map { $_ => 1 } @FilterTypeResult;
+                my @Result;
+                foreach my $ConfigItemID ( @ConfigItemList ) {
+                    push(@Result, $ConfigItemID) if !exists $FilterTypeResultHash{$ConfigItemID};
+                }
+                @ConfigItemList = @Result;
             }
         }
     }
-
-    # execute ConfigItem search
-    my $ConfigItemList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
-        %SearchFilter,
-        UserID  => $Self->{Authorization}->{UserID},
-    );
+    else {
+        # perform ConfigItem search
+        my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+            UserID  => $Self->{Authorization}->{UserID},
+        );
+        @ConfigItemList = @{$SearchResult};
+    }
 
 	# get already prepared CI data from ConfigItemGet operation
-    if ( IsArrayRefWithData($ConfigItemList) ) {  	
+    if ( IsArrayRefWithData(\@ConfigItemList) ) {  	
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data      => {
-                ConfigItemID => join(',', sort @{$ConfigItemList}),
+                ConfigItemID => join(',', sort @ConfigItemList),
             }
         );    
 
