@@ -2963,6 +2963,18 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###3221" Required="0" Valid="1">
+        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Ticket' objects using the 'DependsOn' link type.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">ConfigItem</Item>
+                <Item Key="Object2">Ticket</Item>
+                <Item Key="Type">DependsOn</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###3222" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Ticket' objects using the 'RelevantTo' link type.</Description>
         <Group>Framework</Group>
