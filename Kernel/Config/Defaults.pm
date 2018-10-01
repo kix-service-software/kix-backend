@@ -1869,6 +1869,15 @@ sub new {
                     elsif ( $Line =~ /^VERSION\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
                         $Self->{Version} = $1;
                     }
+                    elsif ( $Line =~ /^BUILDDATE\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                        $Self->{BuildDate} = $1;
+                    }
+                    elsif ( $Line =~ /^BUILDHOST\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                        $Self->{BuildHost} = $1;
+                    }
+                    elsif ( $Line =~ /^BUILDNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                        $Self->{BuildNumber} = $1;
+                    }
                 }
             }
             close($Product);
