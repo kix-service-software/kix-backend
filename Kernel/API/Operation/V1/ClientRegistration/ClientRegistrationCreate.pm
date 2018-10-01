@@ -149,17 +149,23 @@ sub Run {
         Authentication => $ClientRegistration->{Authentication},
     );
 
-    if ( !$ClientRegistrationID ) {
+    if ( !$ClientID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create client registration, please contact the system administrator',
         );
     }
     
+    my %SystemInfo;
+    foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
+        $SystemInfo{$Key} = $Kernel::OM->Get('Kernel::Config')->Get($Key);
+    }
+
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
         ClientID => $ClientID,
+        SystemInfo => \%SystemInfo,
     );    
 }
 
