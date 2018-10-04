@@ -148,6 +148,9 @@ sub Run {
         
         # add
         push(@ObjectIconList, \%ObjectIconData);
+
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'ObjectIcon');
     }
   
     if ( scalar(@ObjectIconList) == 1 ) {
