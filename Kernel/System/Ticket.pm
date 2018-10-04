@@ -6841,6 +6841,9 @@ sub TicketWatchSubscribe {
         Bind => [ \$Param{TicketID}, \$Param{WatchUserID}, \$Param{UserID}, \$Param{UserID} ],
     );
 
+    # clear ticket cache
+    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+
     # get user data
     my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
         UserID => $Param{WatchUserID},
@@ -6918,6 +6921,9 @@ sub TicketWatchUnsubscribe {
             Bind => [ \$Param{TicketID} ],
         );
 
+        # clear ticket cache
+        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+
         for my $WatchUser (@WatchUsers) {
 
             my %User = $UserObject->GetUserData(
@@ -6946,6 +6952,9 @@ sub TicketWatchUnsubscribe {
             SQL  => 'DELETE FROM ticket_watcher WHERE ticket_id = ? AND user_id = ?',
             Bind => [ \$Param{TicketID}, \$Param{WatchUserID} ],
         );
+
+        # clear ticket cache
+        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
         my %User = $UserObject->GetUserData(
             UserID => $Param{WatchUserID},
