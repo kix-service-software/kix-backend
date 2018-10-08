@@ -1362,9 +1362,9 @@ via the Preferences button after logging in.
             #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
             #   Type - special storage type (array, int)
             #   DefaultValue - fallback value if source dosn't contain a value for this attribute
-            { Attribute => 'UserTitle',       Label => Translatable('Title or salutation'), MappedTo => 'title',        Exposed => 1},
-            { Attribute => 'UserFirstname',   Label => Translatable('Firstname'),           MappedTo => 'first_name',   Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'UserTitle',       Label => Translatable('Title or salutation'), MappedTo => 'title',        Exposed => 1, DisplayGroup => 'Stammdaten'},
             { Attribute => 'UserLastname',    Label => Translatable('Lastname'),            MappedTo => 'last_name',    Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'UserFirstname',   Label => Translatable('Firstname'),           MappedTo => 'first_name',   Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
             { Attribute => 'UserLogin',       Label => Translatable('Username'),            MappedTo => 'login',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
             { Attribute => 'UserPassword',    Label => Translatable('Password'),            MappedTo => 'pw',           Exposed => 0, DisplayGroup => 'Zugang' },
             { Attribute => 'UserCustomerID',  Label => Translatable('CustomerID'),          MappedTo => 'customer_id',  Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
