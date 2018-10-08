@@ -94,6 +94,11 @@ sub RunOperation {
 
     # check cache if CacheType is set for this operation
     if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::DisableCaching') && $Self->{OperationConfig}->{CacheType} ) {
+        # add own cache dependencies, if available
+        if ( $Self->{OperationConfig}->{CacheTypeDependency} ) {
+            $Self->AddCacheDependency(Type => $Self->{OperationConfig}->{CacheTypeDependency});
+        }
+
         my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{OperationConfig}->{CacheType},           
             Key  => $Self->_GetCacheKey(),
@@ -495,7 +500,14 @@ sub AddCacheDependency {
         }
     }
 
-    $Self->{CacheDependencies}->{$Param{Type}} = 1;
+    foreach my $Type (split(/,/, $Param{Type})) {
+        if ( exists $Self->{CacheDependencies}->{$Type} ) {
+            $Self->_Debug($Self->{LevelIndent}."adding cache type dependencies: $Type...already exists");
+            next;
+        }
+        $Self->_Debug($Self->{LevelIndent}."adding cache type dependencies: $Type");
+        $Self->{CacheDependencies}->{$Type} = 1;
+    }
 }
 
 =item _Success()
@@ -670,14 +682,14 @@ sub ExecOperation {
 
     # check result and add cachetype if neccessary
     if ( $Result->{Success} && $OperationObject->{OperationConfig}->{CacheType} && $Self->{OperationConfig}->{CacheType}) {
-        $Self->{CacheDependencies}->{$OperationObject->{OperationConfig}->{CacheType}} = 1;
+        $Self->AddCacheDependency(Type => $OperationObject->{OperationConfig}->{CacheType});
         if ( IsHashRefWithData($OperationObject->GetCacheDependencies()) ) {
             foreach my $CacheDep ( keys %{$OperationObject->GetCacheDependencies()} ) {
-                $Self->{CacheDependencies}->{$CacheDep} = 1;
+                $Self->AddCacheDependency(Type => $CacheDep);
             }
         }
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."    type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}}));
+        if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Debug') ) {
+            $Self->_Debug($Self->{LevelIndent}."    cache type $Self->{OperationConfig}->{CacheType} depends on: ".join(',', keys %{$Self->{CacheDependencies}}));
         }
     }
 
@@ -1542,7 +1554,7 @@ sub _Debug {
 
     return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
 
-    printf STDERR "%10s %s\n", "[API]", "$Message";
+    printf STDERR "%10s %15s: %s\n", "[API]", $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 1;

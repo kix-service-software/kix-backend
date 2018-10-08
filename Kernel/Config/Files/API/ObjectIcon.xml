@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ObjectIconID</Item>
                 <Item Key="CacheType">API_objecticons</Item>
+                <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">ObjectIcon</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_objecticons</Item>                
+                <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -66,7 +68,8 @@
             <Hash>
                 <Item Key="Module">V1::ObjectIcon::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::ObjectIcon::ObjectIconGet</Item>
-                <Item Key="CacheType">ObjectIcon</Item>
+                <Item Key="CacheType">API_objecticons</Item>
+                <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>

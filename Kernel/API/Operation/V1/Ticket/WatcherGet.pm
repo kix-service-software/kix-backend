@@ -151,9 +151,6 @@ sub Run {
         push(@WatcherList, $Watchers{$WatcherID});
     }
 
-    # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'Ticket');
-
     if ( scalar(@WatcherList) == 0 ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',

@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">TypeID</Item>
                 <Item Key="CacheType">API_tickettypes</Item>
+                <Item Key="CacheTypeDependency">Type</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">TicketType</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickettypes</Item>                
+                <Item Key="CacheTypeDependency">Type</Item>
             </Hash>
         </Setting>
     </ConfigItem>

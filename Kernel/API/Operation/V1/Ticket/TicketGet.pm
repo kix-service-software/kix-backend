@@ -461,9 +461,6 @@ sub Run {
         push(@TicketList, \%TicketData);
     }
 
-    # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'Ticket');
-
     if ( scalar(@TicketList) == 1 ) {
         return $Self->_Success(
             Ticket => $TicketList[0],

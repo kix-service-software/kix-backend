@@ -12,6 +12,7 @@
                 <Item Key="Permission">Group=admin:ro</Item>
                 <Item Key="ObjectID">UserID</Item>
                 <Item Key="CacheType">API_users</Item>
+                <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -25,6 +26,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="Permission">Group=admin:ro</Item>
                 <Item Key="CacheType">API_users</Item>
+                <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>

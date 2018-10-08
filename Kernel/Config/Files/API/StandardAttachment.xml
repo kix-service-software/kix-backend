@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">StandardAttachmentID</Item>
                 <Item Key="CacheType">API_standardattachments</Item>
+                <Item Key="CacheTypeDependency">StdAttachment</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">StandardAttachment</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_standardattachments</Item>                
+                <Item Key="CacheTypeDependency">StdAttachment</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">GeneralCatalogID</Item>
                 <Item Key="CacheType">API_generalcatalog</Item>
+                <Item Key="CacheTypeDependency">GeneralCatalog</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_generalcatalog</Item>
+                <Item Key="CacheTypeDependency">GeneralCatalog</Item>
             </Hash>
         </Setting>
     </ConfigItem>

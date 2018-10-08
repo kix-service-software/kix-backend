@@ -132,9 +132,6 @@ sub Run {
         TicketID => $Param{Data}->{TicketID},
     );
 
-    # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'Ticket');
-
     # get already prepared Watcher data from WatcherGet operation
     if ( IsHashRefWithData(\%Watcher) ) {     
         my $WatcherResult = $Self->ExecOperation(

@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">StateID</Item>
                 <Item Key="CacheType">API_ticketstates</Item>
+                <Item Key="CacheTypeDependency">State</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">TicketState</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_ticketstates</Item>
+                <Item Key="CacheTypeDependency">State</Item>
             </Hash>
         </Setting>
     </ConfigItem>

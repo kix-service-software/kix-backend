@@ -154,9 +154,6 @@ sub Run {
         push(@TextModuleList, \%TextModuleData);
     }
 
-    # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'TextModule');
-
     if ( scalar(@TextModuleList) == 1 ) {
         return $Self->_Success(
             TextModule => $TextModuleList[0],
