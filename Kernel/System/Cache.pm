@@ -17,10 +17,6 @@ use Storable qw();
 
 use Kernel::System::VariableCheck qw(:all);
 
-use base qw(
-    Kernel::System::PerfLog
-);
-
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Log',
@@ -73,8 +69,6 @@ sub new {
     $Self->{CacheObject}    = $Kernel::OM->Get($CacheModule);
     $Self->{CacheInMemory}  = $Kernel::OM->Get('Kernel::Config')->Get('Cache::InMemory') // 1;
     $Self->{CacheInBackend} = $Kernel::OM->Get('Kernel::Config')->Get('Cache::InBackend') // 1;
-
-    $Self->{PerfLogFile} = 'STDERR';
 
     return $Self;
 }
@@ -530,7 +524,6 @@ deletes relevant keys of depending cache types
 sub _HandleDependingCacheTypes {
     my ( $Self, %Param ) = @_;
 
-$Self->PerfLogStart('Cache::_HandleDependingCacheTypes');
     if ( !$Self->{TypeDependencies} ) {
         # load information from backend
         $Self->{TypeDependencies} = $Self->{CacheObject}->Get(
@@ -542,17 +535,14 @@ $Self->PerfLogStart('Cache::_HandleDependingCacheTypes');
     if ( $Self->{TypeDependencies} && exists $Self->{TypeDependencies}->{$Param{Type}} ) {
         $Self->_Debug("type $Param{Type} of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
         foreach my $DependendType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
-$Self->PerfLogStart('Cache::_HandleDependingCacheTypes: deleting type');
             $Self->_Debug("    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type $DependendType");
             foreach my $Key ( keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}} ) {
-$Self->PerfLogStart('Cache::_HandleDependingCacheTypes: deleting key');
                 # remove key entry to make sure we don't end up in a recursive loop
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}->{$Key};
                 $Self->Delete(
                     Type => $DependendType,
                     Key  => $Key
                 );
-$Self->PerfLogStop(1);
             }
 
             if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
@@ -560,7 +550,6 @@ $Self->PerfLogStop(1);
                 # delete whole dependend type if all keys are deleted
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
             }
-$Self->PerfLogStop(1);
         }
 
         if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
@@ -580,7 +569,6 @@ $Self->PerfLogStop(1);
             );
         }
     }
-$Self->PerfLogStop(1);
 
     return 1;
 }
@@ -601,12 +589,9 @@ sub _UpdateCacheStats {
     # if cache stats are not disabled, manage them
     return if $Kernel::OM->Get('Kernel::Config')->Get('Cache::DisableStats');
 
-$Self->PerfLogStart('Cache::_UpdateCacheStats');
-
     # read stats from disk if empty
     my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats.'.$$;
     if ( !$Self->{CacheStats} && -f $Filename ) {
-$Self->PerfLogStart('Cache::_UpdateCacheStats: read stats');
         my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
             Location        => $Filename,
             DisableWarnings => 1,
@@ -614,7 +599,6 @@ $Self->PerfLogStart('Cache::_UpdateCacheStats: read stats');
         if ($Content && $$Content) {
             $Self->{CacheStats} = eval { Storable::thaw( ${$Content} ) };
         }
-$Self->PerfLogStop(1);
     }
 
     # add to stats
@@ -641,8 +625,6 @@ $Self->PerfLogStop(1);
         }
     }
 
-$Self->PerfLogStart('Cache::_UpdateCacheStats: write stats');
-
     # store to disk
     my $Content = '';
     if ( $Self->{CacheStats} ) {
@@ -654,9 +636,6 @@ $Self->PerfLogStart('Cache::_UpdateCacheStats: write stats');
         Filename  => 'CacheStats.'.$$,
         Content   => \$Content,
     );
-$Self->PerfLogStop(1);
-
-$Self->PerfLogStop(1);
 
     return 1;
 }
@@ -668,15 +647,6 @@ sub _Debug {
 
     printf STDERR "%10s %s\n", "[Cache]", "$Message";
 }
-
-sub DESTROY {
-    my $Self = shift;
-
-    $Self->PerfLogOutput();
-
-    return 1;
-}
-
 
 =back
 
