@@ -578,7 +578,7 @@ sub FAQAdd {
     );
 
     # clear cache
-    $CacheObject->CleanUp(Type  => 'FAQ');
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(Type => 'FAQ');
 
     # check if approval feature is enabled
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
