@@ -577,6 +577,9 @@ sub FAQAdd {
         UserID => $Param{UserID},
     );
 
+    # clear cache
+    $CacheObject->CleanUp(Type  => 'FAQ');
+
     # check if approval feature is enabled
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
 
