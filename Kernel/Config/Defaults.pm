@@ -1371,14 +1371,14 @@ via the Preferences button after logging in.
             { Attribute => 'UserCustomerIDs', Label => Translatable('CustomerIDs'),         MappedTo => 'customer_ids', Exposed => 1, Required => 1, Type => 'array' },
             { Attribute => 'UserPhone',       Label => Translatable('Phone'),               MappedTo => 'phone',        Exposed => 1, DisplayGroup => 'Kommunikation' },
             { Attribute => 'UserMobile',      Label => Translatable('Mobile'),              MappedTo => 'mobile',       Exposed => 1, Searchable => 1, DisplayGroup => 'Kommunikation' },
-            { Attribute => 'UserFax',         Label => Translatable('Fax'),                 MappedTo => 'fax',          Exposed => 1, DisplayGroup => 'Kommunikation' },
+            { Attribute => 'UserFax',         Label => Translatable('Fax'),                 MappedTo => 'fax',          Exposed => 1, Searchable => 1, DisplayGroup => 'Kommunikation' },
             { Attribute => 'UserEmail',       Label => Translatable('Email'),               MappedTo => 'email',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Kommunikation' },
             { Attribute => 'UserStreet',      Label => Translatable('Street'),              MappedTo => 'street',       Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
             { Attribute => 'UserZip',         Label => Translatable('Zip'),                 MappedTo => 'zip',          Exposed => 1, DisplayGroup => 'Adresse' },
             { Attribute => 'UserCity',        Label => Translatable('City'),                MappedTo => 'city',         Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
             { Attribute => 'UserCountry',     Label => Translatable('Country'),             MappedTo => 'country',      Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
             { Attribute => 'UserComment',     Label => Translatable('Comment'),             MappedTo => 'comments',     Exposed => 1, DisplayGroup => 'Sonstiges' },
-            { Attribute => 'ValidID',         Label => Translatable('Valid'),               MappedTo => 'valid_id',     Exposed => 1, Required => 1, Searchable => 1, Type => 'int', DisplayGroup => 'Sonstiges' },
+            { Attribute => 'ValidID',         Label => Translatable('Valid'),               MappedTo => 'valid_id',     Exposed => 1, Required => 1, Type => 'int', DisplayGroup => 'Sonstiges' },
         ],
 
         # default selections
@@ -1520,7 +1520,7 @@ via the Preferences button after logging in.
             { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
             { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
             { Attribute => 'CustomerCompanyComment', Label => Translatable('Comment'),    MappedTo => 'comments',    Exposed => 1, DisplayGroup => 'Sonstiges' },
-            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Searchable => 1, Type => 'int', DisplayGroup => 'Sonstiges' },
+            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Type => 'int', DisplayGroup => 'Sonstiges' },
         ],
     };
 
