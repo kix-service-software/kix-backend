@@ -239,7 +239,7 @@ sub _GetOwnedAndLockedTickets {
                 {
                     Field    => 'LockID',
                     Operator => 'EQ',
-                    Value    => 1,
+                    Value    => 2,
                 },
             ]
         },
@@ -260,7 +260,7 @@ sub _GetOwnedAndLockedTickets {
                 {
                     Field    => 'LockID',
                     Operator => 'EQ',
-                    Value    => 1,
+                    Value    => 2,
                 },
                 {
                     Field    => 'TicketFlag',
