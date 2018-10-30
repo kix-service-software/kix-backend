@@ -94,7 +94,7 @@ sub Run {
 
     my @TicketIndex = $TicketObject->TicketSearch(
         Result     => 'ARRAY',
-        Filter     => $Self->{Filter}->{Ticket},
+        Search     => $Self->{Search}->{Ticket},
         Limit      => $Self->{Limit}->{Ticket} || $Self->{Limit}->{'__COMMON'},
         Sort       => $Self->{Sort}->{Ticket},
         UserType   => $Self->{Authorization}->{UserType},

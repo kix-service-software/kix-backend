@@ -41,7 +41,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -51,7 +51,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'TypeID',
         ],
         Sort => [
@@ -60,12 +60,12 @@ sub GetSupportedAttributes {
     };
 }
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -74,24 +74,24 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
 
     my @TypeIDs;
-    if ( $Param{Filter}->{Field} eq 'Type' ) {
-        my @TypeList = ( $Param{Filter}->{Value} );
-        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
-            @TypeList = @{$Param{Filter}->{Value}}
+    if ( $Param{Search}->{Field} eq 'Type' ) {
+        my @TypeList = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @TypeList = @{$Param{Search}->{Value}}
         }
         foreach my $Type ( @TypeList ) {
             my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
@@ -109,22 +109,22 @@ sub Filter {
         }
     }
     else {
-        @TypeIDs = ( $Param{Filter}->{Value} );
-        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
-            @TypeIDs = @{$Param{Filter}->{Value}}
+        @TypeIDs = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @TypeIDs = @{$Param{Search}->{Value}}
         }
     }
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.type_id = '.$TypeIDs[0] );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
+    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.type_id IN ('.(join(',', @TypeIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

@@ -89,23 +89,23 @@ perform LinkSearch Operation. This will return a Link ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # prepare filter if given
-    my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{Link}->{AND}) ) {
-        foreach my $FilterItem ( @{$Self->{Filter}->{Link}->{AND}} ) {
-            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Field} !~ /^(SourceObject|SourceKey|TargetObject|TargetKey|Type)$/g);
-            next if ($FilterItem->{Operator} ne 'EQ');
+    # prepare search if given
+    my %SearchParam;
+    if ( IsArrayRefWithData($Self->{Search}->{Link}->{AND}) ) {
+        foreach my $SearchItem ( @{$Self->{Search}->{Link}->{AND}} ) {
+            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API Searching)
+            next if ($SearchItem->{Field} !~ /^(SourceObject|SourceKey|TargetObject|TargetKey|Type)$/g);
+            next if ($SearchItem->{Operator} ne 'EQ');
 
-            $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+            $SearchParam{$SearchItem->{Field}} = $SearchItem->{Value};
         }
     }
 
     # perform Link search
     my $LinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
         UserID  => $Self->{Authorization}->{UserID},
-        Limit   => IsHashRefWithData(\%SearchFilter) ? undef : ($Self->{Limit}->{Link} || $Self->{Limit}->{'__COMMON'}),        # only apply DB side limit if no SearchFilter exists
-        %SearchFilter,
+        Limit   => IsHashRefWithData(\%SearchParam) ? undef : ($Self->{Limit}->{Link} || $Self->{Limit}->{'__COMMON'}),        # only apply DB side limit if no SearchParam exists
+        %SearchParam,
     );
 
 	# get already prepared Link data from LinkGet operation

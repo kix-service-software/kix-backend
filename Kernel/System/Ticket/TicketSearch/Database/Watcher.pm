@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,20 +49,20 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'WatcherUserID',
         ],
         Sort => []
     };
 }
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
+    my $Result = $Object->Search(
         BoolOperator => 'AND' | 'OR',
-        Filter       => {}
+        Search       => {}
     );
 
     $Result = {
@@ -71,16 +71,16 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
@@ -96,16 +96,16 @@ sub Filter {
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'tw.user_id = '.$Param{Filter}->{Value} );
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, 'tw.user_id = '.$Param{Search}->{Value} );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'tw.user_id IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
+        push( @SQLWhere, 'tw.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

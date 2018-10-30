@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'TicketNumber',
         ],
         Sort => [
@@ -58,12 +58,12 @@ sub GetSupportedAttributes {
     }
 }
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -72,43 +72,43 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, "st.tn = '$Param{Filter}->{Value}'" );
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, "st.tn = '$Param{Search}->{Value}'" );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
-        push( @SQLWhere, "st.tn LIKE '$Param{Filter}->{Value}%'" );
+    elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
+        push( @SQLWhere, "st.tn LIKE '$Param{Search}->{Value}%'" );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
-        push( @SQLWhere, "st.tn LIKE '%$Param{Filter}->{Value}'" );
+    elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
+        push( @SQLWhere, "st.tn LIKE '%$Param{Search}->{Value}'" );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
-        push( @SQLWhere, "st.tn LIKE '%$Param{Filter}->{Value}%'" );
+    elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
+        push( @SQLWhere, "st.tn LIKE '%$Param{Search}->{Value}%'" );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
-        my $Value = $Param{Filter}->{Value};
+    elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
+        my $Value = $Param{Search}->{Value};
         $Value =~ s/\*/%/g;
         push( @SQLWhere, "st.tn LIKE '$Value'" );
     }    
-    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Filter}->{Value}}))."')" );
+    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
+        push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }
