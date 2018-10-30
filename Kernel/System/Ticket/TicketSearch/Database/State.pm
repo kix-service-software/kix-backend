@@ -41,7 +41,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -51,7 +51,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'StateID',
             'StateType',
             'StateTypeID',
@@ -63,12 +63,12 @@ sub GetSupportedAttributes {
 }
 
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -77,25 +77,25 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
 
-    my $Operator = $Param{Filter}->{Operator};
-    my $Value    = $Param{Filter}->{Value};
+    my $Operator = $Param{Search}->{Operator};
+    my $Value    = $Param{Search}->{Value};
     my @StateIDs;
 
     # special handling for StateType
-    if ( $Param{Filter}->{Field} eq 'StateType' ) {
+    if ( $Param{Search}->{Field} eq 'StateType' ) {
 
         # get all StateIDs for the given StateTypes
         my @StateTypes = ( $Value );
@@ -151,7 +151,7 @@ sub Filter {
         # we have to do an IN seasrch in this case
         $Operator = 'IN';
     }
-    elsif ( $Param{Filter}->{Field} eq 'StateTypeID' ) {
+    elsif ( $Param{Search}->{Field} eq 'StateTypeID' ) {
 
         # get all StateIDs for the given StateTypeIDs
         my @StateTypeIDs = ( $Value );
@@ -186,10 +186,10 @@ sub Filter {
         # we have to do an IN seasrch in this case
         $Operator = 'IN';
     }
-    elsif ( $Param{Filter}->{Field} eq 'State' ) {
-        my @StateList = ( $Param{Filter}->{Value} );
-        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
-            @StateList = @{$Param{Filter}->{Value}}
+    elsif ( $Param{Search}->{Field} eq 'State' ) {
+        my @StateList = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @StateList = @{$Param{Search}->{Value}}
         }
         foreach my $State ( @StateList ) {
             my $StateID = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
@@ -207,9 +207,9 @@ sub Filter {
         }
     }
     else {
-        @StateIDs = ( $Param{Filter}->{Value} );
-        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
-            @StateIDs = @{$Param{Filter}->{Value}}
+        @StateIDs = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @StateIDs = @{$Param{Search}->{Value}}
         }
     }
 
@@ -222,7 +222,7 @@ sub Filter {
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

@@ -89,61 +89,68 @@ sub Run {
     my ( $Self, %Param ) = @_;
     my @ConfigItemList;
 
-    # prepare filter if given
-    my %SearchFilter;
-    if ( IsHashRefWithData($Self->{Filter}->{ConfigItem}) ) {
-        foreach my $FilterType ( keys %{$Self->{Filter}->{ConfigItem}} ) {
-            my @FilterTypeResult;
-            foreach my $FilterItem ( @{$Self->{Filter}->{ConfigItem}->{$FilterType}} ) {
-                my $Value = $FilterItem->{Value};
+    # prepare search if given
+    my %SearchParam;
+    if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
+        foreach my $SearchType ( keys %{$Self->{Search}->{ConfigItem}} ) {
+            my @SearchTypeResult;
+            foreach my $SearchItem ( @{$Self->{Search}->{ConfigItem}->{$SearchType}} ) {
+                my $Value = $SearchItem->{Value};
+                my $Field = $SearchItem->{Field};
 
-                if ( $FilterItem->{Operator} eq 'CONTAINS' ) {
+                # prepare field in case of sub-structure search
+                if ( $Field =~ /.*?\.(.*?)$/ ) {
+                    $Field = $1;
+                }
+
+                # prepare value
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
                    $Value = '*' . $Value . '*';
                 }
-                elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
+                elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
                    $Value = $Value . '*';
                 }
-                if ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
+                if ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                    $Value = '*' . $Value;
                 }
 
-                $SearchFilter{$FilterItem->{Field}} = $Value;
+                $SearchParam{$Field} = $Value;
 
-                if ( $FilterType eq 'OR' ) {
+                if ( $SearchType eq 'OR' ) {
                     # perform search for every attribute
                     my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
-                        %SearchFilter,
+                        %SearchParam,
                         UserID  => $Self->{Authorization}->{UserID},
                     );
 
                     # merge results
-                    my @MergeResult = keys %{{map {($_ => 1)} (@FilterTypeResult, @{$SearchResult})}};
-                    @FilterTypeResult = @MergeResult;
+                    my @MergeResult = keys %{{map {($_ => 1)} (@SearchTypeResult, @{$SearchResult})}};
+                    @SearchTypeResult = @MergeResult;
 
-                    # clear filter
-                    %SearchFilter = ();
+                    # clear SearchParam
+                    %SearchParam = ();
                 }
             }
 
-            if ( $FilterType eq 'AND' ) {
+            if ( $SearchType eq 'AND' ) {
                 # perform ConfigItem search
                 my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
-                    %SearchFilter,
+                    %SearchParam,
                     UserID  => $Self->{Authorization}->{UserID},
                 );
-                @FilterTypeResult = @{$SearchResult};
+                @SearchTypeResult = @{$SearchResult};
             }
 
             if ( !@ConfigItemList ) {
-                @ConfigItemList = @FilterTypeResult;
+                @ConfigItemList = @SearchTypeResult;
             }
             else {
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
-                my %FilterTypeResultHash = map { $_ => 1 } @FilterTypeResult;
+                my %SearchTypeResultHash = map { $_ => 1 } @SearchTypeResult;
                 my @Result;
                 foreach my $ConfigItemID ( @ConfigItemList ) {
-                    push(@Result, $ConfigItemID) if !exists $FilterTypeResultHash{$ConfigItemID};
+                    push(@Result, $ConfigItemID) if !exists $SearchTypeResultHash{$ConfigItemID};
                 }
                 @ConfigItemList = @Result;
             }
@@ -157,6 +164,8 @@ sub Run {
         @ConfigItemList = @{$SearchResult};
     }
 
+use Data::Dumper;
+print STDERR "ConfigItemSearch: ".Dumper(\@ConfigItemList);
 	# get already prepared CI data from ConfigItemGet operation
     if ( IsArrayRefWithData(\@ConfigItemList) ) {  	
         my $GetResult = $Self->ExecOperation(

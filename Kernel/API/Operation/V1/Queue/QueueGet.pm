@@ -222,7 +222,7 @@ sub Run {
         if ( $Param{Data}->{include}->{Tickets} ) {
             # execute ticket search
             my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
+                Search => {
                     AND => [
                         {
                             Field    => 'QueueID',
@@ -247,7 +247,7 @@ sub Run {
             my %TicketStats;
             # locked tickets
             $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
+                Search => {
                     AND => [
                         {
                             Field    => 'QueueID',
@@ -267,7 +267,7 @@ sub Run {
             
             # open tickets
             $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
+                Search => {
                     AND => [
                         {
                             Field    => 'QueueID',
@@ -287,7 +287,7 @@ sub Run {
             
             # escalated tickets
             $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
+                Search => {
                     AND => [
                         {
                             Field    => 'QueueID',

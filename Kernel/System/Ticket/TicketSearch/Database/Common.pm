@@ -68,7 +68,7 @@ empty method to be overridden by specific attribute module
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -78,17 +78,17 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [],
+        Search => [],
         Sort   => []
     };
 }
 
-=item Filter()
+=item Search()
 
 empty method to be overridden by specific attribute module
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -101,7 +101,7 @@ empty method to be overridden by specific attribute module
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
 
     return;        

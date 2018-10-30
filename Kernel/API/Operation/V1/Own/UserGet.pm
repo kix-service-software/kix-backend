@@ -173,7 +173,7 @@ sub _GetOwnedTickets {
 
     # execute ticket search
     my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-        Filter => {
+        Search => {
             AND => [
                 {
                     Field    => 'OwnerID',
@@ -189,7 +189,7 @@ sub _GetOwnedTickets {
 
     # execute ticket search
     my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-        Filter => {
+        Search => {
             AND => [
                 {
                     Field    => 'OwnerID',
@@ -229,7 +229,7 @@ sub _GetOwnedAndLockedTickets {
 
     # execute ticket search
     my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-        Filter => {
+        Search => {
             AND => [
                 {
                     Field    => 'OwnerID',
@@ -250,7 +250,7 @@ sub _GetOwnedAndLockedTickets {
 
     # execute ticket search
     my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-        Filter => {
+        Search => {
             AND => [
                 {
                     Field    => 'OwnerID',
@@ -295,7 +295,7 @@ sub _GetWatchedTickets {
 
     # execute ticket search
     my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-        Filter => {
+        Search => {
             AND => [
                 {
                     Field    => 'WatcherUserID',
@@ -311,7 +311,7 @@ sub _GetWatchedTickets {
 
     # execute ticket search
     my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-        Filter => {
+        Search => {
             AND => [
                 {
                     Field    => 'WatcherUserID',

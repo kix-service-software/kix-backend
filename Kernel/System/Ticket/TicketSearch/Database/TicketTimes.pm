@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'Age',
             'CreateTime',
             'PendingTime',
@@ -72,12 +72,12 @@ sub GetSupportedAttributes {
     }
 }
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -86,16 +86,16 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my $Value;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
@@ -114,16 +114,16 @@ sub Filter {
 
     # convert to unix time and check
     $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-        String => $Param{Filter}->{Value},
+        String => $Param{Search}->{Value},
     );
     if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
         # return in case of some format error or if the date is in the future
         return;
     }
 
-    if ( $Param{Filter}->{Field} !~ /^(Create|Pending|Escalation)/ ) {
+    if ( $Param{Search}->{Field} !~ /^(Create|Pending|Escalation)/ ) {
         # use original string value
-        $Value = "'".$Param{Filter}->{Value}."'";
+        $Value = "'".$Param{Search}->{Value}."'";
     }
 
     my %OperatorMap = (
@@ -134,22 +134,22 @@ sub Filter {
         'GTE' => '>='
     );
 
-    if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
+    if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }
 
-    push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' '.$OperatorMap{$Param{Filter}->{Operator}}.' '.$Value );
+    push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
 
     # some special handling
-    if ( $Param{Filter}->{Field} =~ /^Escalation/ ) {
+    if ( $Param{Search}->{Field} =~ /^Escalation/ ) {
         # in case of escalation time search, exclude tickets without escalations
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' != 0' );
+        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' != 0' );
     }
-    elsif ( $Param{Filter}->{Field} =~ /^Pending/ ) {
+    elsif ( $Param{Search}->{Field} =~ /^Pending/ ) {
         # in case of pending time search, restrict states to pending states
         my @List = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
             StateType => [ 'pending reminder', 'pending auto' ],

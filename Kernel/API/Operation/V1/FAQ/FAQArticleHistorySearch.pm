@@ -115,7 +115,7 @@ perform FAQArticleHistorySearch Operation. This will return a FAQArticleHistory 
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform FAQHistory search (at the moment without any filters - we do filtering in the API)
+    # perform FAQHistory search (at the moment without any search filters - instead we do filtering in the API)
     my $HistoryIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryList(
         ItemID => $Param{Data}->{FAQArticleID},
         UserID => $Self->{Authorization}->{UserID},
@@ -123,6 +123,9 @@ sub Run {
 
     # get already prepared FAQ data from FAQArticleHistoryGet operation
     if ( IsArrayRefWithData($HistoryIDs) ) {
+
+        # we don't do any core search filtering, inform the API to do it for us, based on the given search
+        $Self->HandleSearchInAPI();
 
         my $FAQArticleHistoryGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleHistoryGet',

@@ -89,21 +89,21 @@ perform TextModuleSearch Operation. This will return a TextModule ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # prepare filter if given
-    my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{TextModule}->{AND}) && !defined $Self->{Filter}->{TextModule}->{OR} ) {
-        foreach my $FilterItem ( @{$Self->{Filter}->{TextModule}->{AND}} ) {
-            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Field} !~ /^(Name|Category|AgentFrontend|CustomerFrontend|PublicFrontend|Language|ValidID)$/g);
-            next if ($FilterItem->{Operator} ne 'EQ');
+    # prepare search if given
+    my %SearchParam;
+    if ( IsArrayRefWithData($Self->{Search}->{TextModule}->{AND}) && !defined $Self->{Search}->{TextModule}->{OR} ) {
+        foreach my $SearchItem ( @{$Self->{Search}->{TextModule}->{AND}} ) {
+            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API Searching)
+            next if ($SearchItem->{Field} !~ /^(Name|Category|AgentFrontend|CustomerFrontend|PublicFrontend|Language|ValidID)$/g);
+            next if ($SearchItem->{Operator} ne 'EQ');
 
-            $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+            $SearchParam{$SearchItem->{Field}} = $SearchItem->{Value};
         }
     }
 
     # perform TextModule search
     my $TextModuleList = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleList(
-        %SearchFilter
+        %SearchParam
     );
 
 	# get already prepared TextModule data from TextModuleGet operation

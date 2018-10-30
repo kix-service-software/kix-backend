@@ -38,8 +38,8 @@ To find tickets in your system.
         # result limit
         Limit => 100,
 
-        # the filter
-        Filter => {
+        # the search params
+        Search => {
             AND => [        # optional, if not given, OR must be used
                 {
                     Field    => '...',      # see list of filterable fields

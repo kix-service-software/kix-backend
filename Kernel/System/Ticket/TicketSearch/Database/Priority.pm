@@ -41,7 +41,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -51,7 +51,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'Priority',
             'PriorityID' 
         ],
@@ -62,12 +62,12 @@ sub GetSupportedAttributes {
 }
 
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -76,24 +76,24 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
 
     my @PriorityIDs;
-    if ( $Param{Filter}->{Field} eq 'Priority' ) {
-        my @PriorityList = ( $Param{Filter}->{Value} );
-        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
-            @PriorityList = @{$Param{Filter}->{Value}}
+    if ( $Param{Search}->{Field} eq 'Priority' ) {
+        my @PriorityList = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @PriorityList = @{$Param{Search}->{Value}}
         }
         foreach my $Priority ( @PriorityList ) {
             my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
@@ -111,22 +111,22 @@ sub Filter {
         }
     }
     else {
-        @PriorityIDs = ( $Param{Filter}->{Value} );
-        if ( IsArrayRefWithData($Param{Filter}->{Value}) ) {
-            @PriorityIDs = @{$Param{Filter}->{Value}}
+        @PriorityIDs = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @PriorityIDs = @{$Param{Search}->{Value}}
         }
     }
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.ticket_priority_id = '.$PriorityIDs[0] );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
+    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.ticket_priority_id IN ('.(join(',', @PriorityIDs)).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

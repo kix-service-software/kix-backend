@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'CreatedTypeID',
             'CreatedUserID',
             'CreatedStateID',
@@ -71,13 +71,13 @@ sub GetSupportedAttributes {
 }
 
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
+    my $Result = $Object->Search(
         BoolOperator => 'AND' | 'OR',
-        Filter       => {}
+        Search       => {}
     );
 
     $Result = {
@@ -86,16 +86,16 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
@@ -120,11 +120,11 @@ sub Filter {
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
-    if ( $Param{Filter}->{Field} =~ /(Change|Close)Time/ ) {
+    if ( $Param{Search}->{Field} =~ /(Change|Close)Time/ ) {
 
         # convert to unix time
         my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-            String => $Param{Filter}->{Value},
+            String => $Param{Search}->{Value},
         );
 
         if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
@@ -140,17 +140,17 @@ sub Filter {
             'GTE' => '>='
         );
 
-        if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
+        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
             return;
         }
 
-        push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Filter}->{Operator}}." '".$Param{Filter}->{Value}."'" );
+        push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
 
-        if ( $Param{Filter}->{Field} eq 'CloseTime' ) {
+        if ( $Param{Search}->{Field} eq 'CloseTime' ) {
             # get close state ids
             my @List = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
                 StateType => ['closed'],
@@ -166,16 +166,16 @@ sub Filter {
     }
     else {
         # all other attributes
-        if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-            push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' = '.$Param{Filter}->{Value} );
+        if ( $Param{Search}->{Operator} eq 'EQ' ) {
+            push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
         }
-        elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-            push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+        elsif ( $Param{Search}->{Operator} eq 'IN' ) {
+            push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
             return;
         }
