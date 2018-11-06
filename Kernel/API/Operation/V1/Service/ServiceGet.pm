@@ -167,6 +167,9 @@ sub Run {
             $ServiceData{SubServices} = \@DirectSubServices;
         }
 
+        # save full service name
+        $ServiceData{Fullname} = $ServiceData{Name};
+
         # move NameShort to Name and delete NameShort
         $ServiceData{Name} = $ServiceData{NameShort};
         delete $ServiceData{NameShort};

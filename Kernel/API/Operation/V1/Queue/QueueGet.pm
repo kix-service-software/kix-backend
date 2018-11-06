@@ -205,6 +205,9 @@ sub Run {
             $QueueData{SubQueues} = \@DirectSubQueues;
         }
 
+        # save full queue name
+        $QueueData{Fullname} = $QueueData{Name};
+
         # remove hierarchy from name (use last element of name split)
         $QueueData{Name} = pop @ParentQueueParts;
 
