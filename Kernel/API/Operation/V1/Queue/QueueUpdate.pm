@@ -183,7 +183,8 @@ sub Run {
             # no ParentID given
             my @NameParts = split(/::/, $QueueData{Name});
             pop @NameParts;
-            $Queue->{Name} = join('::', @NameParts).'::'.$Queue->{Name};
+            push(@NameParts, $Queue->{Name});
+            $Queue->{Name} = join('::', @NameParts);
         }
     }
       

@@ -117,6 +117,9 @@ perform UserCreate Operation. This will return the created UserLogin.
                 UserPassword    => '...'                                        # optional                
                 UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
+                RoleIDs         => [                                            # optional          
+                    123
+                ]
             },
         },
     );
@@ -173,6 +176,26 @@ sub Run {
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create user, please contact the system administrator',
         );
+    }
+
+    # create checklist
+    if ( IsHashRefWithData($User->{RoleIDs}) ) {
+
+        foreach my $RoleID ( @{$User->{RoleIDs}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserRoleCreate',
+                Data          => {
+                    UserID => $UserID,
+                    RoleID => $RoleID,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    ${$Result},
+                )
+            }
+        }
     }
     
     return $Self->_Success(

@@ -165,7 +165,7 @@ sub Run {
     # check if ContactLogin already exists
     if ( IsStringWithData($Contact->{UserLogin}) ) {
         my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-            User => $Contact->{UserLogin},
+            UserLogin => $Contact->{UserLogin},
         );
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
             return $Self->_Error(
