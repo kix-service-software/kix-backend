@@ -133,12 +133,23 @@ sub Run {
         Data => $Param{Data}->{Service}
     );
 
+    # prepare full name for lookup
+    my $FullName = $Service->{Name};
+    if ( $Service->{ParentID} ) {
+        my $ParentName = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+            ServiceID => $Service->{ParentID},
+        );
+        if ($ParentName) {
+            $FullName = $ParentName . '::' . $Service->{Name};
+        }
+    }
+
     # check if Service exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
-        Name    => $Service->{Name},
-        UserID  => $Self->{Authorization}->{UserID},
+        Name    => $FullName,
+        UserID  => 1,
     );
-    
+
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',

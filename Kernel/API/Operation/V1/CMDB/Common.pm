@@ -264,7 +264,7 @@ sub _CheckData {
     my ( $Self, %Param ) = @_;
 
     my $Definition = $Param{Definition};
-    my $Data       = $Param{Data};
+    my $Data       = $Param{Data} || {};
     my $Parent     = $Param{Parent} || '';
 
     my $CheckValueResult;
@@ -289,7 +289,7 @@ sub _CheckData {
         }
 
         # don't look at details if we don't have any value for this
-        next if !$Data->{$ItemKey} && $DefItem->{Input}->{Type} ne 'Dummy';
+        next if ( !IsHashRefWithData($Data) || !$Data->{$ItemKey} );
 
         # check structure and values
         if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
@@ -373,7 +373,6 @@ sub _CheckData {
             if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
                 my $Counter = 0;
                 for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
-
                     # start recursion for each array item
                     my $DataCheck = $Self->_CheckData(
                         Definition => $DefItem->{Sub},
@@ -387,7 +386,6 @@ sub _CheckData {
                 }
             }
             elsif ( ref $Data->{$ItemKey} eq 'HASH' ) {
-
                 # start recursion
                 my $DataCheck = $Self->_CheckData(
                     Definition => $DefItem->{Sub},
