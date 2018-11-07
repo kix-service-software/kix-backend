@@ -1333,7 +1333,8 @@ sub _ApplyInclude {
 
             # if CacheType is set in config of GenericInclude
             if ( defined $GenericIncludes->{$Include}->{CacheType} ) {
-                $Self->{CacheDependencies}->{$GenericIncludes->{$Include}->{CacheType}} = 1;
+                $Self->AddCacheDependency(Type => $GenericIncludes->{$Include}->{CacheType});
+                $Self->AddCacheDependency(Type => $GenericIncludes->{$Include}->{CacheTypeDependency});
             }
 
             $Self->_Debug($Self->{LevelIndent}."GenericInclude: $Include");
