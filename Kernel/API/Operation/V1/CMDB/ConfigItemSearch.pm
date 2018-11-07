@@ -164,8 +164,6 @@ sub Run {
         @ConfigItemList = @{$SearchResult};
     }
 
-use Data::Dumper;
-print STDERR "ConfigItemSearch: ".Dumper(\@ConfigItemList);
 	# get already prepared CI data from ConfigItemGet operation
     if ( IsArrayRefWithData(\@ConfigItemList) ) {  	
         my $GetResult = $Self->ExecOperation(

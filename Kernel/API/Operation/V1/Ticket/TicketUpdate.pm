@@ -149,11 +149,6 @@ perform TicketUpdate Operation. This will return the updated TicketID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-use Data::Dumper;
-print STDERR "API::TicketUpdate: ".Dumper(\%Param);
-
-$Self->PerfLogStart('API::TicketUpdate');
-
     my $PermissionUserID = $Self->{Authorization}->{UserID};
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
@@ -161,8 +156,6 @@ $Self->PerfLogStart('API::TicketUpdate');
 
     # isolate ticket hash
     my $Ticket = $Param{Data}->{Ticket};
-
-$Self->PerfLogStart('API::TicketUpdate: check permission');
 
     # check update permission
     my $Permission = $Self->CheckUpdatePermission(
@@ -176,17 +169,10 @@ $Self->PerfLogStart('API::TicketUpdate: check permission');
         return $Permission;
     }
 
-$Self->PerfLogStop('API::TicketUpdate: check permission');
-
-$Self->PerfLogStart('API::TicketUpdate: get ticket');
-
     # get ticket
     my %TicketData = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
         TicketID => $Param{Data}->{TicketID}
     );
-$Self->PerfLogStop('API::TicketUpdate: get ticket');
-
-$Self->PerfLogStart('API::TicketUpdate: check ticket');
 
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket( 
@@ -195,8 +181,6 @@ $Self->PerfLogStart('API::TicketUpdate: check ticket');
             %{$Ticket},
         } 
     );
-
-$Self->PerfLogStop('API::TicketUpdate: check ticket');
 
     if ( !$TicketCheck->{Success} ) {
         return $Self->_Error(
@@ -210,8 +194,6 @@ $Self->PerfLogStop('API::TicketUpdate: check ticket');
         Ticket   => $Ticket,
         UserID   => $PermissionUserID,
     );
-
-$Self->PerfLogStop();
 
     return $Result;
 }
