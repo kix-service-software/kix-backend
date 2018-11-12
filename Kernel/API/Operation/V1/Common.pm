@@ -161,6 +161,8 @@ sub Init {
         );
     }
 
+    $Self->{CacheKeyExtensions} = [];
+
     # Search parameter is not handled in API by default
     $Self->{HandleSearchInAPI} = 0;
 
@@ -529,6 +531,41 @@ sub AddCacheDependency {
     }
 }
 
+=item AddCacheKeyExtension()
+
+add an extension to the cache key used to cache this request
+
+    $CommonObject->AddCacheKeyExtension(
+        Extension => []
+    );
+
+=cut
+
+sub AddCacheKeyExtension {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Extension)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'AddCacheKeyExtension.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    if ( !IsArrayRefWithData($Param{Extension}) ) {
+        return $Self->_Error(
+            Code    => 'AddCacheKeyExtension.WringParameter',
+            Message => "Extension is not an array reference!",
+        );
+    }
+
+    foreach my $Extension ( @{$Param{Extension}} ) {
+        push(@{$Self->{CacheKeyExtensions}}, $Extension);
+    }
+}
+
 =item HandleSearchInAPI()
 
 Tell the API core to handle the "search" parameter in the API. This is needed for operations that don't handle the "search" parameter and leave the work to the API core.
@@ -774,7 +811,6 @@ sub _ValidateFilter {
 
     # if we have a JSON string, we have to decode it
     if (IsStringWithData($FilterDef)) {
-        print STDERR "decoding JSON: $Param{Filter}\n";
         $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
             Data => $Param{Filter}
         );
@@ -1594,8 +1630,16 @@ sub _GetCacheKey {
     my %RequestData = %{$Self->{RequestData}};
     delete $RequestData{offset};
 
+    my @CacheKeyParts = qw(limit include expand);
+    if ( IsArrayRefWithData($Self->{CacheKeyExtensions}) ) {
+        @CacheKeyParts = (
+            @CacheKeyParts,
+            @{$Self->{CacheKeyExtensions}}
+        )
+    }
+
     # sort some things to make sure you always get the same cache key independent of the given order 
-    foreach my $What (qw(limit include expand)) {
+    foreach my $What (@CacheKeyParts) {
         next if !$RequestData{$What};
 
         my @Parts = split(/,/, $RequestData{$What});
