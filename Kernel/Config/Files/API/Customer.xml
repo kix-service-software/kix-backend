@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">CustomerID</Item>
+                <Item Key="CacheType">API_customers</Item>
+                <Item Key="CacheTypeDependency">CustomerCompany</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">API_customers</Item>                
+                <Item Key="CacheTypeDependency">CustomerCompany</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerSourceSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerSourceSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::V1::Customer::CustomerGet###AttributeWhitelist" Required="0" Valid="1">
+        <Description Translatable="1">Defines which attributes of the customer data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
+        <Setting>
+            <Hash>
+            </Hash>
+        </Setting>
+    </ConfigItem>    
+    <ConfigItem Name="API::Operation::V1::Customer::CustomerGet###AttributeBlacklist" Required="0" Valid="1">
+        <Description Translatable="1">Defines which attributes of the customer data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
+        <Setting>
+            <Hash>
+            </Hash>
+        </Setting>
+    </ConfigItem>  
+
+    <ConfigItem Name="API::Operation::GenericExpand###Customer.Tickets" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Ticket::TicketGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::GenericExpand###Customer.Contacts" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Contact::ContactGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>

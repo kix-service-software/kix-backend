@@ -1,0 +1,103 @@
+# --
+# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# based on the original work of:
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+use strict;
+use warnings;
+use utf8;
+
+use vars (qw($Self));
+
+# get selenium object
+my $Selenium = $Kernel::OM->Get('Kernel::System::UnitTest::Selenium');
+
+$Selenium->RunTest(
+    sub {
+
+        # get helper object
+        my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+
+        # create test user and login
+        my $TestUserLogin = $Helper->TestUserCreate(
+            Groups => [ 'admin', 'users' ],
+        ) || die "Did not get test user";
+
+        $Selenium->Login(
+            Type     => 'Agent',
+            User     => $TestUserLogin,
+            Password => $TestUserLogin,
+        );
+
+        # get ticket object
+        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+        # create test ticket
+        my $TicketID = $TicketObject->TicketCreate(
+            Title         => 'Selenium test ticket',
+            Queue         => 'Raw',
+            Lock          => 'unlock',
+            Priority      => '3 normal',
+            State         => 'open',
+            CustomerID    => 'SeleniumCustomerID',
+            CustomerUser  => 'test@localhost.com',
+            OwnerID       => 1,
+            UserID        => 1,
+            ResponsibleID => 1,
+        );
+
+        $Self->True(
+            $TicketID,
+            "Ticket is created - ID $TicketID"
+        );
+
+        my $ScriptAlias = $Kernel::OM->Get('Kernel::Config')->Get('ScriptAlias');
+
+        # go to AgentTicketZoom and check watcher feature - subscribe ticket to watch it
+        $Selenium->VerifiedGet("${ScriptAlias}index.pl?Action=AgentTicketZoom;TicketID=$TicketID");
+        $Selenium->find_element("//a[contains(\@href, \'Action=AgentTicketWatcher\' )]")->VerifiedClick();
+
+        # click on tool bar AgentTicketWatchView
+        $Selenium->find_element("//a[contains(\@title, \'Watched Tickets Total:\' )]")->VerifiedClick();
+
+        # verify that test is on the correct screen
+        my $ExpectedURL = "${ScriptAlias}index.pl?Action=AgentTicketWatchView";
+
+        $Self->True(
+            index( $Selenium->get_current_url(), $ExpectedURL ) > -1,
+            "ToolBar AgentTicketWatcherView shortcut - success",
+        );
+
+        # delete test ticket
+        my $Success = $TicketObject->TicketDelete(
+            TicketID => $TicketID,
+            UserID   => 1,
+        );
+        $Self->True(
+            $Success,
+            "Ticket is deleted - $TicketID"
+        );
+    }
+);
+
+1;
+
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<http://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+COPYING for license information (AGPL). If you did not receive this file, see
+
+<http://www.gnu.org/licenses/agpl.txt>.
+
+=cut

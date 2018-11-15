@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Validator::Module###ArticleValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ArticleValidator</Item>
+                <Item Key="Validates">ArticleID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ArticleGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###ArticleTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ArticleTypeValidator</Item>
+                <Item Key="Validates">ArticleType,ArticleTypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ArticleTypeGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###AutoResponseTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">AutoResponseTypeValidator</Item>
+                <Item Key="Validates">AutoResponseType</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###AttachmentsValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">AttachmentsValidator</Item>
+                <Item Key="Validates">Attachments</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###CharsetValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">CharsetValidator</Item>
+                <Item Key="Validates">Charset</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###CustomerValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">CustomerValidator</Item>
+                <Item Key="Validates">CustomerContact</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###DeploymentStateValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">DeploymentStateValidator</Item>
+                <Item Key="Validates">DeplStateID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###DynamicFieldsValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">DynamicFieldsValidator</Item>
+                <Item Key="Validates">DynamicFields</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###EmailAddressValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">EmailAddressValidator</Item>
+                <Item Key="Validates">From,Cc,Bcc,To</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###HistoryTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">HistoryTypeValidator</Item>
+                <Item Key="Validates">HistoryType,HistoryTypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###IncidentStateValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">IncidentStateValidator</Item>
+                <Item Key="Validates">InciStateID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###LockValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">LockValidator</Item>
+                <Item Key="Validates">Lock,LockID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">LockGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###MimeTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">MimeTypeValidator</Item>
+                <Item Key="Validates">MimeType</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###PriorityValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">PriorityValidator</Item>
+                <Item Key="Validates">Priority,PriorityID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriotityCreate|PriorityUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###QueueValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">QueueValidator</Item>
+                <Item Key="Validates">Queue,QueueID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(QueueGet|QueueCreate|QueueUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###RoleValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">RoleValidator</Item>
+                <Item Key="Validates">Role,RoleID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(RoleGet|RoleCreate|RoleUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###ServiceValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ServiceValidator</Item>
+                <Item Key="Validates">Service,ServiceID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(ServiceGet|ServiceCreate|ServiceUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###SenderTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">SenderTypeValidator</Item>
+                <Item Key="Validates">SenderType,SenderTypeID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(SenderTypeGet|SenderTypeSearch)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###SLAValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">SLAValidator</Item>
+                <Item Key="Validates">SLA,SLAID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(SLAGet|SLACreate|SLAUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###StateValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">StateValidator</Item>
+                <Item Key="Validates">State,StateID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(TicketStateGet|ChecklistCreate|ChecklistUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###StateTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">StateTypeValidator</Item>
+                <Item Key="Validates">Type,TypeID</Item>
+                <Item Key="ConsiderOperationRegEx">(TicketStateCreate|TicketStateUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###TimeUnitValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">TimeUnitValidator</Item>
+                <Item Key="Validates">TimeUnit</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###TicketValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">TicketValidator</Item>
+                <Item Key="Validates">TicketID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">TicketGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###TypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">TypeValidator</Item>
+                <Item Key="Validates">Type,TypeID</Item>
+                <Item Key="ConsiderOperationRegEx">(TicketCreate|TicketUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###UserValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">UserValidator</Item>
+                <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">UserGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###ValidValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ValidValidator</Item>
+                <Item Key="Validates">Valid,ValidID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ValidGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>
+    

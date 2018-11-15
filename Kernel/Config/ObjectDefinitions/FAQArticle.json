@@ -1,0 +1,311 @@
+{
+    "Object": "FAQArticle",
+    "Attributes": [
+        {
+            "Name": "Approved",
+            "Datatype": "INTEGER",
+            "PossibleValues": [
+                0, 1
+            ]
+        },
+        {
+            "Name": "CategoryID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "FAQCategory"
+        },        
+        {
+            "Name": "Changed",
+            "Datatype": "DATETIME"
+        },        
+        {
+            "Name": "ChangedBy",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User"
+        },        
+        {
+            "Name": "ContentType",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Created",
+            "Datatype": "DATETIME"
+        },        
+        {
+            "Name": "CreatedBy",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User"
+        },        
+        {
+            "Name": "Field1",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Field2",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Field3",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Field4",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Field5",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Field6",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "ID",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "Keywords",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Language",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Name",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Number",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Title",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "ValidID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Valid"
+        },        
+        {
+            "Name": "Visibility",
+            "Datatype": "STRING",
+            "PossibleValues": [
+                "internal", "external", "public"
+            ]
+        }
+    ],
+    "SearchAttributes": [
+        {
+            "Name": "Approved",
+            "CorrespondingAttribute": "Approved",
+            "Datatype": "INTEGER",
+            "PossibleValues": [
+                0, 1
+            ],
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },
+        {
+            "Name": "CategoryID",
+            "CorrespondingAttribute": "CategoryID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "FAQCategory",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },        
+        {
+            "Name": "Changed",
+            "CorrespondingAttribute": "Changed",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "ChangedBy",
+            "CorrespondingAttribute": "ChangedBy",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },        
+        {
+            "Name": "ContentType",
+            "CorrespondingAttribute": "ContentType",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Created",
+            "CorrespondingAttribute": "Created",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreatedBy",
+            "CorrespondingAttribute": "CreatedBy",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },        
+        {
+            "Name": "Field1",
+            "CorrespondingAttribute": "Field1",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Field2",
+            "CorrespondingAttribute": "Field2",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Field3",
+            "CorrespondingAttribute": "Field3",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Field4",
+            "CorrespondingAttribute": "Field4",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Field5",
+            "CorrespondingAttribute": "Field5",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Field6",
+            "CorrespondingAttribute": "Field6",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },          
+        {
+            "Name": "Keywords",
+            "CorrespondingAttribute": "Keywords",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Language",
+            "CorrespondingAttribute": "Language",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },        
+        {
+            "Name": "Name",
+            "CorrespondingAttribute": "Name",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Number",
+            "CorrespondingAttribute": "Number",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "Title",
+            "CorrespondingAttribute": "Title",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        },        
+        {
+            "Name": "ValidID",
+            "CorrespondingAttribute": "ValidID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Valid",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true            
+        },        
+        {
+            "Name": "Visibility",
+            "CorrespondingAttribute": "Visibility",
+            "Datatype": "STRING",
+            "PossibleValues": [
+                "internal", "external", "public"
+            ],
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": true,
+            "Sortable": true
+        }
+    ]
+}

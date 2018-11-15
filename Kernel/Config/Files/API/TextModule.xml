@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::TextModule::TextModuleGet" Required="0" Valid="1">
+        <Description TranTextModuletable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TextModuleGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TextModule</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">TextModuleID</Item>
+                <Item Key="CacheType">API_textmodules</Item>
+                <Item Key="CacheTypeDependency">TextModule</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::TextModule::TextModuleSearch" Required="0" Valid="1">
+        <Description TranTextModuletable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TextModuleSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TextModule</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">API_textmodules</Item>                
+                <Item Key="CacheTypeDependency">TextModule</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::TextModule::TextModuleCreate" Required="0" Valid="1">
+        <Description TranTextModuletable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TextModuleCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TextModule</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::TextModule::TextModuleUpdate" Required="0" Valid="1">
+        <Description TranTextModuletable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TextModuleUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TextModule</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::TextModule::TextModuleDelete" Required="0" Valid="1">
+        <Description TranTextModuletable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TextModuleDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TextModule</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::TextModule::TextModuleCategorySearch" Required="0" Valid="1">
+        <Description TranTextModuletable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TextModuleCategorySearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TextModule</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>

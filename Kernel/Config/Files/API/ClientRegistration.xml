@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::ClientRegistration::ClientRegistrationGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ClientRegistrationGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">ClientRegistration</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">ClientID</Item>
+                <Item Key="CacheType">API_clientregistration</Item>
+                <Item Key="CacheTypeDependency">ClientRegistration</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::ClientRegistration::ClientRegistrationSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ClientRegistrationSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">ClientRegistration</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="CacheType">API_clientregistration</Item>                
+                <Item Key="CacheTypeDependency">ClientRegistration</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::ClientRegistration::ClientRegistrationCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ClientRegistrationCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">ClientRegistration</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::ClientRegistration::ClientRegistrationDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ClientRegistrationDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">ClientRegistration</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>
