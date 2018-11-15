@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::Link::LinkGet" Required="0" Valid="1">
+        <Description TranLinktable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">LinkGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Link</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">LinkID</Item>
+                <Item Key="CacheType">API_links</Item>
+                <Item Key="CacheTypeDependency">LinkObject</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Link::LinkSearch" Required="0" Valid="1">
+        <Description TranLinktable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">LinkSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Link</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">API_links</Item>
+                <Item Key="CacheTypeDependency">LinkObject</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Link::LinkCreate" Required="0" Valid="1">
+        <Description TranLinktable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">LinkCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Link</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Link::LinkDelete" Required="0" Valid="1">
+        <Description TranLinktable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">LinkDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Link</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Link::LinkTypeSearch" Required="0" Valid="1">
+        <Description TranLinktable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">LinkTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Link</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::GenericInclude###Links" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">V1::Link::GenericIncludeHandler</Item>
+                <Item Key="IgnoreOperationRegEx">V1::Link::LinkGet</Item>
+                <Item Key="CacheType">API_links</Item>
+                <Item Key="CacheTypeDependency">LinkObject</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::GenericExpand###Links" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Link::LinkGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>

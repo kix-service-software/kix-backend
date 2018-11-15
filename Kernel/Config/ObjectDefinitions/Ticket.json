@@ -1,0 +1,528 @@
+{
+    "Object": "Ticket",
+    "Attributes": [
+        {
+            "Name": "Age",
+            "Datatype": "INTEGER"
+        },
+        {
+            "Name": "ArchiveFlag",
+            "Datatype": "STRING",
+            "PossibleValues": [
+                "y", "n"
+            ]
+        },        
+        {
+            "Name": "ChangeBy",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User"
+        },        
+        {
+            "Name": "Changed",
+            "Datatype": "DATETIME"
+        },        
+        {
+            "Name": "CreateBy",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User"
+        },        
+        {
+            "Name": "Created",
+            "Datatype": "DATETIME"
+        },        
+        {
+            "Name": "CreateTimeUnix",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "CustomerID",
+            "Datatype": "STRING",
+            "ReferencedObject": "Customer"
+        },        
+        {
+            "Name": "CustomerUserID",
+            "Datatype": "STRING",
+            "ReferencedObject": "Contact"
+        },        
+        {
+            "Name": "EscalationResponseTime",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "EscalationSolutionTime",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "EscalationTime",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "EscalationUpdateTime",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "LockID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Lock"
+        },        
+        {
+            "Name": "OwnerID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User"
+        },        
+        {
+            "Name": "PendingTime",
+            "Datatype": "DATETIME"
+        },        
+        {
+            "Name": "PendingTimeUnix",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "PriorityID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Priority"
+        },        
+        {
+            "Name": "QueueID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Queue"
+        },        
+        {
+            "Name": "ResponsibleID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User"
+        },        
+        {
+            "Name": "ServiceID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Service"
+        },        
+        {
+            "Name": "SLAID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "SLA"
+        },        
+        {
+            "Name": "StateID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "TicketState"
+        },        
+        {
+            "Name": "TicketID",
+            "Datatype": "INTEGER"
+        },        
+        {
+            "Name": "TicketNumber",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "Title",
+            "Datatype": "STRING"
+        },        
+        {
+            "Name": "TypeID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "TicketType"
+        }
+    ],
+    "SearchAttributes": [
+        {
+            "Name": "Age",
+            "CorrespondingAttribute": "Age",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },
+        {
+            "Name": "Archived",
+            "CorrespondingAttribute": "ArchiveFlag",
+            "Datatype": "STRING",
+            "PossibleValues": [
+                "y", "n"
+            ],
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "ArticleCreateTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "ArticleFlag",
+            "Datatype": "OBJECT",
+            "Operators": [
+                "EQ"
+            ],
+            "Not": true,
+            "Sortable": false
+        },        
+        {
+            "Name": "AttachmentName",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": false
+        },        
+        {
+            "Name": "Body",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "Cc",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "ChangeTime",
+            "CorrespondingAttribute": "Changed",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreateTime",
+            "CorrespondingAttribute": "Created",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreatedPriorityID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Priority",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreatedQueueID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Queue",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreatedStateID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "TicketState",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreatedTypeID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "TicketType",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CreatedUserID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CustomerID",
+            "CorrespondingAttribute": "CustomerID",
+            "Datatype": "STRING",
+            "ReferencedObject": "Customer",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "CustomerUserID",
+            "CorrespondingAttribute": "CustomerUserID",
+            "Datatype": "STRING",
+            "ReferencedObject": "Contact",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "EscalationResponseTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "EscalationSolutionTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "EscalationTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "EscalationUpdateTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "From",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "LastChangeTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "LockID",
+            "CorrespondingAttribute": "LockID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Lock",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "OwnerID",
+            "CorrespondingAttribute": "OwnerID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "PendingTime",
+            "CorrespondingAttribute": "PendingTime",
+            "Datatype": "DATETIME",
+            "Operators": [
+                "EQ", "LT", "GT", "LTE", "GTE"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "PriorityID",
+            "CorrespondingAttribute": "PriorityID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Priority",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "QueueID",
+            "CorrespondingAttribute": "QueueID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Queue",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "ResponsibleID",
+            "CorrespondingAttribute": "ResponsibleID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "ServiceID",
+            "CorrespondingAttribute": "ServiceID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "Service",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "SLAID",
+            "CorrespondingAttribute": "SLAID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "SLA",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "StateID",
+            "CorrespondingAttribute": "StateID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "TicketState",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "StateTypeID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "StateType",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": false
+        },        
+        {
+            "Name": "Subject",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+       {
+            "Name": "TicketID",
+            "Datatype": "INTEGER",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "TicketFlag",
+            "Datatype": "OBJECT",
+            "Operators": [
+                "EQ"
+            ],
+            "Not": true,
+            "Sortable": false
+        },        
+        {
+            "Name": "TicketNumber",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "Title",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "To",
+            "Datatype": "STRING",
+            "Operators": [
+                "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },        
+        {
+            "Name": "TypeID",
+            "CorrespondingAttribute": "TypeID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "TicketType",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": true
+        },
+        {
+            "Name": "WatcherUserID",
+            "Datatype": "INTEGER",
+            "ReferencedObject": "User",
+            "Operators": [
+                "EQ", "IN"
+            ],
+            "Not": false,
+            "Sortable": false
+        }
+    ]
+}

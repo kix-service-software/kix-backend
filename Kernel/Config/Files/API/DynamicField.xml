@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">ConfigItemID</Item>
+                <Item Key="CacheType">API_dynamicfields</Item>
+                <Item Key="CacheTypeDependency">DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">API_dynamicfields</Item>                
+                <Item Key="CacheTypeDependency">DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldConfigGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldConfigGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldConfigUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldConfigUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::DynamicField::DynamicFieldObjectTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DynamicFieldObjectTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">DynamicField</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>    
+
+</kix_config>

@@ -1,0 +1,20 @@
+---
+Debugger:
+  DebugThreshold: error
+  TestMode: 0
+Description: KIX Core API
+FrameworkVersion: __VERSION__
+Provider:
+  Operation:
+__OPERATIONS__
+  Transport:
+    Config:
+      KeepAlive: ''
+      MaxLength: '10485760'
+      RouteOperationMapping:
+__ROUTES__
+    Type: HTTP::REST
+RemoteSystem: ''
+Requester:
+  Transport:
+    Type: ''

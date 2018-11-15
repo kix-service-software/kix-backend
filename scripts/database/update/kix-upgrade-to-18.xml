@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    <TableAlter Name="customer_user">
+        <ColumnAdd Name="customer_ids" Required="false" Size="10000" Type="VARCHAR"/>
+    </TableAlter>
+    <TableAlter Name="article">
+        <ColumnAdd Name="a_bcc" Required="false" Size="3800" Type="VARCHAR"/>    
+    </TableAlter>
+    <Table Name="object_icon">
+        <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
+        <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
+        <Column Name="object_id" Required="true" Type="VARCHAR" Size="255"/>
+        <Column Name="content_type" Required="false" Size="255" Type="VARCHAR"/>
+        <Column Name="content" Required="true" Type="LONGBLOB"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Index Name="object_icon_id">
+            <IndexColumn Name="id"/>
+        </Index>
+        <Index Name="object_icon_object">
+            <IndexColumn Name="object"/>
+        </Index>
+        <Index Name="object_icon_object_id">
+            <IndexColumn Name="object_id"/>
+        </Index>
+    </Table>
+    <Table Name="client_registration">
+        <Column Name="client_id" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true"/>
+        <Column Name="callback_url" Required="true" Type="VARCHAR" Size="255"/>
+        <Column Name="authentication" Type="VARCHAR" Size="10000"/>
+    </Table>    
+    <TableDrop Name="faq_state_type"/>
+    <TableDrop Name="faq_state"/>
+    <TableAlter Name="faq_item">
+        <ColumnAdd Name="language" Required="true" Size="8" Type="VARCHAR"/>
+        <ColumnAdd Name="visibility" Required="true" Size="20" Type="VARCHAR"/>
+        <ColumnDrop Name="f_language_id"/>
+        <ColumnDrop Name="f_state_id"/>
+    </TableAlter>
+    <TableAlter Name="kix_text_module">
+        <ColumnAdd Name="category"    Required="false" Type="VARCHAR" Size="255"/>
+        <ColumnChange Name="subject"  Required="false" Type="VARCHAR" Size="255"/>
+        <ColumnChange NameOld="comment1" NameNew="comment"/>  
+        <ColumnDrop Name="comment2"/>  
+    </TableAlter>
+    <TableAlter Name="search_profile">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <ColumnAdd Name="type" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnChange NameOld="login" NameNew="user_login"/>  
+        <ColumnAdd Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
+        <ColumnAdd Name="subscribed_profile_id" Type="INTEGER"/>  
+        <IndexIndex Name="search_profile_profile_name"/>
+    </TableAlter>
+    <TableAlter Name="kix_search_profile">
+        <ColumnAdd Name="search_profile_id" Type="INTEGER"/>  
+        <ColumnDrop Name="name"/>  
+        <IndexDrop Name="kix_search_profile_nme_st_log"/>
+        <Index Name="kix_search_profile_st_log">
+            <IndexColumn Name="state"/>
+            <IndexColumn Name="login"/>
+        </Index>
+    </TableAlter>
+    <TableDrop Name="link_state"/>
+    <TableAlter Name="link_relation">
+        <ColumnDrop Name="state_id"/>
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <IndexAdd Name="link_relation_id">
+            <IndexColumn Name="id"/>
+        </IndexAdd>
+        <IndexDrop Name="link_relation_list_source"/>
+        <IndexDrop Name="link_relation_list_target"/>
+        <IndexDrop Name="link_relation_src_key"/>
+        <IndexDrop Name="link_relation_target_key"/>
+        <IndexDrop Name="link_relation_src_obj_id"/>
+        <IndexDrop Name="link_relation_target_obj_id"/>
+        <IndexDrop Name="link_relation_src_key_trgt_key"/>
+        <IndexAdd Name="link_relation_source">
+            <IndexColumn Name="source_object_id"/>
+            <IndexColumn Name="source_key"/>
+        </IndexAdd>
+        <IndexAdd Name="link_relation_target">
+            <IndexColumn Name="target_object_id"/>
+            <IndexColumn Name="target_key"/>
+        </IndexAdd>        
+    </TableAlter>
+    <TableAlter Name="dynamic_field">
+        <ColumnDrop Name="field_order"/>
+    </TableAlter>
+    <TableAlter Name="system_address">
+        <ColumnDrop Name="queue_id"/>
+    </TableAlter> 
+    <TableDrop Name="kix_ticket_notes"/>    
+
+    <!-- insert new FAQ categories -->
+    <Insert Table="faq_category">
+        <Data Key="name" Type="Quote">Infrastructure</Data>
+        <Data Key="comments" Type="Quote">Infrastructure Comment</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+        <Data Key="parent_id">0</Data>
+    </Insert>
+    <Insert Table="faq_category">
+        <Data Key="name" Type="Quote">Organisation</Data>
+        <Data Key="comments" Type="Quote">Organisation Comment</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+        <Data Key="parent_id">0</Data>
+    </Insert>
+    <Insert Table="faq_category">
+        <Data Key="name" Type="Quote">Software</Data>
+        <Data Key="comments" Type="Quote">Software Comment</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+        <Data Key="parent_id">0</Data>
+    </Insert>
+</database>
+

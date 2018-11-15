@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountGet" Required="0" Valid="1">
+        <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MailAccountGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">MailAccount</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">MailAccountID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountSearch" Required="0" Valid="1">
+        <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MailAccountSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">MailAccount</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountCreate" Required="0" Valid="1">
+        <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MailAccountCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">MailAccount</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountUpdate" Required="0" Valid="1">
+        <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MailAccountUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">MailAccount</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountDelete" Required="0" Valid="1">
+        <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MailAccountDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">MailAccount</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountTypeSearch" Required="0" Valid="1">
+        <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MailAccountTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">MailAccount</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>
