@@ -174,6 +174,7 @@ sub Run {
         LanguageID  => $FAQArticle->{LanguageID} || $FAQArticleData{LanguageID},
         Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : $FAQArticleData{Keywords},
         Approved    => $FAQArticle->{Approved} || $FAQArticleData{Approved},
+        Visibility  => $FAQArticle->{Visibility} || $FAQArticleData{Visibility},
         ContentType => $FAQArticle->{ContentType} || $FAQArticleData{ContentType},
         Title       => $FAQArticle->{Title} || $FAQArticleData{Title},,
         Field1      => $FAQArticle->{Field1} || $FAQArticleData{Field1},
