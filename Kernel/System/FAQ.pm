@@ -657,7 +657,7 @@ sub FAQUpdate {
         SQL => '
             UPDATE faq_item SET
                 f_name = ?, language = ?, f_subject = ?, category_id = ?,
-                visbility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
+                visibility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
                 f_field1 = ?, f_field2 = ?,
                 f_field3 = ?, f_field4 = ?,
                 f_field5 = ?, f_field6 = ?,
