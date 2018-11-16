@@ -168,10 +168,10 @@ sub Run {
 
     # update FAQArticle
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQUpdate(
-        ItemID => $Param{Data}->{FAQArticleID} || $FAQArticleData{FAQArticleID},
+        ItemID      => $Param{Data}->{FAQArticleID} || $FAQArticleData{FAQArticleID},
         StateID     => $FAQArticle->{StateID} || $FAQArticleData{StateID},
         CategoryID  => $FAQArticle->{FAQCategoryID} || $FAQArticleData{CategoryID},
-        LanguageID  => $FAQArticle->{LanguageID} || $FAQArticleData{LanguageID},
+        Language    => $FAQArticle->{Language} || $FAQArticleData{Language},
         Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : $FAQArticleData{Keywords},
         Approved    => $FAQArticle->{Approved} || $FAQArticleData{Approved},
         Visibility  => $FAQArticle->{Visibility} || $FAQArticleData{Visibility},
@@ -179,6 +179,10 @@ sub Run {
         Title       => $FAQArticle->{Title} || $FAQArticleData{Title},,
         Field1      => $FAQArticle->{Field1} || $FAQArticleData{Field1},
         Field2      => $FAQArticle->{Field2} || $FAQArticleData{Field2},
+        Field3      => $FAQArticle->{Field3} || $FAQArticleData{Field3},
+        Field4      => $FAQArticle->{Field4} || $FAQArticleData{Field4},
+        Field5      => $FAQArticle->{Field5} || $FAQArticleData{Field5},
+        Field6      => $FAQArticle->{Field6} || $FAQArticleData{Field6},
         ApprovalOff => $FAQArticle->{ApprovalOff} || $FAQArticleData{ApprovalOff} || 1, 
         ValidID     => $FAQArticle->{ValidID} || $FAQArticleData{ValidID},
         UserID      => $Self->{Authorization}->{UserID}
