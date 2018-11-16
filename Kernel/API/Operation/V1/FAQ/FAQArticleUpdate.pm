@@ -169,6 +169,7 @@ sub Run {
     # update FAQArticle
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQUpdate(
         ItemID      => $Param{Data}->{FAQArticleID} || $FAQArticleData{FAQArticleID},
+        Name        => $FAQArticle->{Name} || $FAQArticleData{Name},
         StateID     => $FAQArticle->{StateID} || $FAQArticleData{StateID},
         CategoryID  => $FAQArticle->{FAQCategoryID} || $FAQArticleData{CategoryID},
         Language    => $FAQArticle->{Language} || $FAQArticleData{Language},
