@@ -143,7 +143,7 @@ sub Run {
     if ( $Permission ne 'rw' ) {
         return $Self->_Error(
             Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
+            Message => "No permission to update FAQ article in given category!",
         );
     }
 
@@ -162,7 +162,7 @@ sub Run {
     if ( !%FAQArticleData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Cannot update FAQArticle. No FAQArticle with ID '$Param{Data}->{FAQArticleID}' found.",
+            Message => "Cannot update FAQ article. No FAQ article with ID '$Param{Data}->{FAQArticleID}' found.",
         );
     }
 
@@ -186,7 +186,7 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update FAQArticle, please contact the system administrator',
+            Message => 'Could not update FAQ article, please contact the system administrator',
         );
     }
 
