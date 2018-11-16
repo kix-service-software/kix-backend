@@ -134,24 +134,6 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check rw permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to update FAQ article in given category!",
-        );
-    }
-
-    # isolate and trim FAQArticle parameter
-    my $FAQArticle = $Self->_Trim(
-        Data => $Param{Data}->{FAQArticle}
-    );
-
     # check if FAQArticle exists 
     my %FAQArticleData = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
         ItemID     => $Param{Data}->{FAQArticleID},
@@ -163,6 +145,24 @@ sub Run {
         return $Self->_Error(
             Code    => 'Object.NotFound',
             Message => "Cannot update FAQ article. No FAQ article with ID '$Param{Data}->{FAQArticleID}' found.",
+        );
+    }
+
+    # isolate and trim FAQArticle parameter
+    my $FAQArticle = $Self->_Trim(
+        Data => $Param{Data}->{FAQArticle}
+    );
+
+    # check rw permissions
+    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $FAQArticle->{CategoryID} || $FAQArticleData{CategoryID},
+        UserID     => $Self->{Authorization}->{UserID},
+    );
+
+    if ( $Permission ne 'rw' ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to update FAQ article in given category!",
         );
     }
 
