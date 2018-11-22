@@ -1465,6 +1465,7 @@
 
 <!-- token -->
 <Table Name="token">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="token" Required="true" Size="10000" Type="VARCHAR"/>
     <Column Name="last_request_time" Required="false" Type="DATE"/>
 </Table>
