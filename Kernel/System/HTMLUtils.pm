@@ -1229,7 +1229,7 @@ sub EmbeddedImagesExtract {
         # compose new image tag
         $1 . "cid:$ContentID" . $6
 
-    }egxi;
+    }egsxi;
 
     return 1;
 }
