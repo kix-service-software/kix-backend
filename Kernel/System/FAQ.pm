@@ -813,6 +813,7 @@ sub AttachmentAdd {
     if ( $Param{ContentID} ) {
         $Param{ContentID} =~ s/^([^<].*[^>])$/<$1>/;
     }
+    $Param{ContentID} //= '';
 
     my $Disposition;
     my $Filename;
@@ -885,7 +886,7 @@ sub AttachmentAdd {
             ' (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{ItemID},  \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize}, \$Param{ContentID}, 
-            \$Param{Disposition}, \$Param{Content}, \$Param{UserID}, \$Param{UserID},
+            \$Disposition, \$Param{Content}, \$Param{UserID}, \$Param{UserID},
         ],
     );
 
@@ -899,7 +900,7 @@ sub AttachmentAdd {
             . 'AND created_by = ? AND changed_by = ?',
         Bind => [
             \$Param{ItemID}, \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize},
-            \$Param{ContentID}, \$Param{Disposition}, \$Param{UserID}, \$Param{UserID},
+            \$Param{ContentID}, \$Disposition, \$Param{UserID}, \$Param{UserID},
         ],
         Limit => 1,
     );
@@ -909,6 +910,7 @@ sub AttachmentAdd {
         $AttachmentID = $Row[0];
     }
 
+print STDERR "AttachmentID: $AttachmentID\n";
     return $AttachmentID;
 }
 
