@@ -89,7 +89,7 @@ sub ParameterDefinition {
         'TypeID' => {
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        },                
         'TicketType' => {
             Type     => 'HASH',
             Required => 1

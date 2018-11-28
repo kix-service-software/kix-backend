@@ -150,7 +150,7 @@ sub Run {
     # update Priority
     my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityUpdate(
         %{$Priority},
-        ValidID    => $Priority{ValidID} ||$PriorityData{ValidID} || 1,
+        ValidID    => $Priority->{ValidID} ||$PriorityData{ValidID} || 1,
         PriorityID => $Param{Data}->{PriorityID},
         UserID     => $Self->{Authorization}->{UserID},
     );

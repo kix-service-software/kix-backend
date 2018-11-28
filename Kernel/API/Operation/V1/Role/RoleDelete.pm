@@ -128,7 +128,7 @@ sub Run {
             );
         }
 
-        foreach my $Type ( @{\%PermissionTypeList}} ) {
+        foreach my $Type ( keys %PermissionTypeList ) {
 	        # search Role role       
 	        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleGroupGet(
 	            Type    => $Type,

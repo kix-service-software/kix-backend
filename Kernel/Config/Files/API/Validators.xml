@@ -151,7 +151,7 @@
                 <Item Key="Module">PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriotityCreate|PriorityUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriorityCreate|PriorityUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
