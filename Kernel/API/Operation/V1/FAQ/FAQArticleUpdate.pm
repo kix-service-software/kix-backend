@@ -16,7 +16,7 @@ package Kernel::API::Operation::V1::FAQ::FAQArticleUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -112,6 +112,10 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
                 Title       => 'Some Text',
                 Field1      => 'Problem...',
                 Field2      => 'Solution...',
+                Field3      => '...',
+                Field4      => '...',
+                Field5      => '...',
+                Field6      => '...',
                 UserID      => 1,
                 ApprovalOff => 1,               # optional, (if set to 1 approval is ignored. This is
                                                 #   important when called from FAQInlineAttachmentURLUpdate)
@@ -149,13 +153,13 @@ sub Run {
     }
 
     # isolate and trim FAQArticle parameter
-    my $FAQArticle = $Self->_Trim(
+    my $IncomingFAQArticle = $Self->_Trim(
         Data => $Param{Data}->{FAQArticle}
     );
 
     # check rw permissions
     my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $FAQArticle->{CategoryID} || $FAQArticleData{CategoryID},
+        CategoryID => $IncomingFAQArticle->{CategoryID} || $FAQArticleData{CategoryID},
         UserID     => $Self->{Authorization}->{UserID},
     );
 
@@ -166,26 +170,19 @@ sub Run {
         );
     }
 
+    # merge attributes
+    my %FAQArticle;
+    foreach my $Key ( qw(Name StateID CategoryID Language Approved Visibility ContentType Title Field1 Field2 Field3 Field4 Field5 Field6 ApprovalOff ValidID) ) {
+       $FAQArticle{$Key} = exists $IncomingFAQArticle->{$Key} ? $IncomingFAQArticle->{$Key} : $FAQArticleData{$Key};
+    }
+
+    # add keywords
+    $FAQArticle{Keywords} = IsArrayRefWithData($IncomingFAQArticle->{Keywords}) ? join(' ', @{$IncomingFAQArticle->{Keywords}}) : $FAQArticleData{Keywords};
+
     # update FAQArticle
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQUpdate(
-        ItemID      => $Param{Data}->{FAQArticleID} || $FAQArticleData{FAQArticleID},
-        Name        => $FAQArticle->{Name} || $FAQArticleData{Name},
-        StateID     => $FAQArticle->{StateID} || $FAQArticleData{StateID},
-        CategoryID  => $FAQArticle->{FAQCategoryID} || $FAQArticleData{CategoryID},
-        Language    => $FAQArticle->{Language} || $FAQArticleData{Language},
-        Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : $FAQArticleData{Keywords},
-        Approved    => $FAQArticle->{Approved} || $FAQArticleData{Approved},
-        Visibility  => $FAQArticle->{Visibility} || $FAQArticleData{Visibility},
-        ContentType => $FAQArticle->{ContentType} || $FAQArticleData{ContentType},
-        Title       => $FAQArticle->{Title} || $FAQArticleData{Title},,
-        Field1      => $FAQArticle->{Field1} || $FAQArticleData{Field1},
-        Field2      => $FAQArticle->{Field2} || $FAQArticleData{Field2},
-        Field3      => $FAQArticle->{Field3} || $FAQArticleData{Field3},
-        Field4      => $FAQArticle->{Field4} || $FAQArticleData{Field4},
-        Field5      => $FAQArticle->{Field5} || $FAQArticleData{Field5},
-        Field6      => $FAQArticle->{Field6} || $FAQArticleData{Field6},
-        ApprovalOff => $FAQArticle->{ApprovalOff} || $FAQArticleData{ApprovalOff} || 1, 
-        ValidID     => $FAQArticle->{ValidID} || $FAQArticleData{ValidID},
+        ItemID      => $Param{Data}->{FAQArticleID},
+        %FAQArticle,
         UserID      => $Self->{Authorization}->{UserID}
     );
 
