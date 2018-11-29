@@ -347,8 +347,30 @@ or
 sub TypeList {
     my ( $Self, %Param ) = @_;
 
+    # check needed stuff
+    my $Valid = 1;
+    if ( !$Param{Valid} && defined $Param{Valid} ) {
+        $Valid = 0;
+    }
+
+    # check cache
+    my $CacheKey = "TypeList::Valid::$Valid";
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    # create the valid list
+    my $ValidIDs = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+
     # build SQL
     my $SQL = 'SELECT id, name FROM ticket_type';
+
+    # add WHERE statement
+    if ($Valid) {
+        $SQL .= ' WHERE valid_id IN (' . $ValidIDs . ')';
+    }
 
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
@@ -363,6 +385,14 @@ sub TypeList {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $TypeList{ $Row[0] } = $Row[1];
     }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%TypeList,
+    );
 
     return %TypeList;
 }
