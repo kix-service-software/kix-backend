@@ -103,6 +103,7 @@ perform TicketTypeCreate Operation. This will return the created TypeID.
 	    	TicketType  => {
 	        	Name    => '...',
 	        	ValidID => '...',	
+                Comment => '...'            # optional
 	    	},
 	    },
     );
@@ -120,40 +121,6 @@ perform TicketTypeCreate Operation. This will return the created TypeID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketType' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'TicketType::Name' => {
-                Required => 1
-            },
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
 
     # isolate and trim TicketType parameter
     my $TicketType = $Self->_Trim(
@@ -175,6 +142,7 @@ sub Run {
     # create tickettype
     my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
         Name    => $TicketType->{Name},
+        Comment => $TicketType->{Comment},
         ValidID => $TicketType->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );

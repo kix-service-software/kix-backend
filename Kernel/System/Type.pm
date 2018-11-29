@@ -65,6 +65,7 @@ add a new ticket type
 
     my $ID = $TypeObject->TypeAdd(
         Name    => 'New Type',
+        Comment => '...',               # optional
         ValidID => 1,
         UserID  => 123,
     );
@@ -98,10 +99,10 @@ sub TypeAdd {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO ticket_type (name, valid_id, '
+        SQL => 'INSERT INTO ticket_type (name, valid_id, comments, '
             . ' create_time, create_by, change_time, change_by)'
-            . ' VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
-        Bind => [ \$Param{Name}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID} ],
+            . ' VALUES (?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        Bind => [ \$Param{Name}, \$Param{ValidID}, \$Param{Comment}, \$Param{UserID}, \$Param{UserID} ],
     );
 
     # get new type id
@@ -143,6 +144,7 @@ Returns:
     Type = (
         ID                  => '123',
         Name                => 'Service Request',
+        Comment             => '...',
         ValidID             => '1',
         CreateTime          => '2010-04-07 15:41:15',
         CreateBy            => '321',
@@ -200,7 +202,7 @@ sub TypeGet {
 
     # ask the database
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, name, valid_id, '
+        SQL => 'SELECT id, name, valid_id, comments, '
             . 'create_time, create_by, change_time, change_by '
             . 'FROM ticket_type WHERE id = ?',
         Bind => [ \$Param{ID} ],
@@ -212,10 +214,11 @@ sub TypeGet {
         $Type{ID}         = $Data[0];
         $Type{Name}       = $Data[1];
         $Type{ValidID}    = $Data[2];
-        $Type{CreateTime} = $Data[3];
-        $Type{CreateBy}   = $Data[4];
-        $Type{ChangeTime} = $Data[5];
-        $Type{ChangeBy}   = $Data[6];
+        $Type{Comment}    = $Data[3];
+        $Type{CreateTime} = $Data[4];
+        $Type{CreateBy}   = $Data[5];
+        $Type{ChangeTime} = $Data[6];
+        $Type{ChangeBy}   = $Data[7];
     }
 
     # no data found
@@ -245,6 +248,7 @@ update type attributes
     $TypeObject->TypeUpdate(
         ID      => 123,
         Name    => 'New Type',
+        Comment => '...',           # optional
         ValidID => 1,
         UserID  => 123,
     );
@@ -299,10 +303,10 @@ sub TypeUpdate {
 
     # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE ticket_type SET name = ?, valid_id = ?, '
+        SQL => 'UPDATE ticket_type SET name = ?, valid_id = ?, comments = ?, '
             . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
+            \$Param{Name}, \$Param{ValidID}, \$Param{Comment}, \$Param{UserID}, \$Param{ID},
         ],
     );
 
