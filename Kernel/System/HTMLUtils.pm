@@ -1214,7 +1214,7 @@ sub EmbeddedImagesExtract {
         my $Base64String = $5;
 
         my $FileName     = 'pasted-' . time() . '-' . int(rand(1000000)) . '.' . $3;
-        my $ContentType  = "image/$3; name=\"$FileName\"";
+        my $ContentType  = "image/$3";
         my $ContentID    = 'pasted.' . time() . '.' . int(rand(1000000)) . '@' . $FQDN;
 
         my $AttachmentData = {
