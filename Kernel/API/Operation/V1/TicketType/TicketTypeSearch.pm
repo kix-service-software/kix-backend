@@ -86,9 +86,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get tickettype list 
-    my %TicketTypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
-        Valid => 1,
-    );
+    my %TicketTypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList();
 
     # get already prepared tickettype data from TicketTypeGet operation
     if ( IsHashRefWithData(\%TicketTypeList) ) {
