@@ -334,7 +334,7 @@ sub ValidateValue {
     my ( $Self, %Param ) = @_;
 
     # return if AttachmentID is already set
-    return 1 if $Value->{AttachmentID};
+    return 1 if $Param{Value}->{AttachmentID};
 
     my $Value = $Param{Value};
 
