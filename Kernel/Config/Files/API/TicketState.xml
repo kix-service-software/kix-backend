@@ -50,5 +50,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
-
+    <ConfigItem Name="API::Operation::Module###V1::TicketState::TicketStateDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketStateDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">TicketState</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    
 </kix_config>

@@ -89,7 +89,7 @@ sub ParameterDefinition {
         'StateID' => {
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        },                
         'TicketState' => {
             Type  => 'HASH',
             Required => 1
