@@ -1800,7 +1800,7 @@ sub _FindChangedXMLValues {
 
     # the short names for new and old xml data are used in the 'eval' below
     # do a deep copy of the new data to prevent empty objects created in the check loop below
-    my @NewXMLData = $Param{NewXMLData} ? Storable::dclone($Param{NewXMLData}) : undef;
+    my @NewXMLData = @{ $Param{NewXMLData} ? Storable::dclone($Param{NewXMLData}) : [] };
     my $OldXMLData = $OldVersion->{XMLData};
 
     # get all tagkeys in new and old XML data
