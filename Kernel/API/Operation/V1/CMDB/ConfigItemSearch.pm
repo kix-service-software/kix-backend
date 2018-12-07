@@ -99,8 +99,8 @@ sub Run {
                 my $Field = $SearchItem->{Field};
 
                 # prepare field in case of sub-structure search
-                if ( $Field =~ /.*?\.(.*?)$/ ) {
-                    $Field = $1;
+                if ( $Field =~ /\./ ) {
+                    $Field = ( split(/\./, $Field) )[-1];
                 }
 
                 # prepare value
@@ -114,7 +114,37 @@ sub Run {
                    $Value = '*' . $Value;
                 }
 
-                $SearchParam{$Field} = $Value;
+                # do some special handling if field is an XML attribute
+                if ( $SearchItem->{Field} =~ /Data\./ ) {
+                    my %OperatorMapping = (
+                        'EQ'  => '=',
+                        'LT'  => '<',
+                        'LTE' => '<=',
+                        'GT'  => '>',
+                        'GTE' => '>=',
+                    );
+
+                    # build search key of given field
+                    my $SearchKey = "[1]{'Version'}[1]";
+                    my @Parts = split(/\./, $SearchItem->{Field});
+                    foreach my $Part ( @Parts[2..$#Parts] ) {
+                        $SearchKey .= "{'" . $Part . "\'}[%]";
+                    }
+
+                    $Value =~ s/\*/%/g;
+
+                    my @What = IsArrayRefWithData($SearchParam{What}) ? @{$SearchParam{What}} : (); 
+                    if ( $OperatorMapping{$SearchItem->{Operator}} ) {
+                        push(@What, { $SearchKey."{'Content'}" => { $OperatorMapping{$SearchItem->{Operator}}, $Value } });
+                    }
+                    else {
+                        push(@What, { $SearchKey."{'Content'}" => $Value });
+                    }
+                    $SearchParam{What} = \@What;
+                } 
+                else {
+                    $SearchParam{$Field} = $Value;
+                }
 
                 if ( $SearchType eq 'OR' ) {
                     # perform search for every attribute
