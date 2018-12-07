@@ -16,6 +16,8 @@ package Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentCreate;
 use strict;
 use warnings;
 
+use MIME::Base64;
+
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
@@ -141,7 +143,7 @@ sub Run {
     # create Attachment
     my $AttachmentID = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentAdd(
         ItemID      => $Param{Data}->{FAQArticleID},
-        Content     => $Attachment->{Content},
+        Content     => MIME::Base64::decode_base64($Attachment->{Content}),
         ContentType => $Attachment->{ContentType},
         Filename    => $Attachment->{Filename},
         Inline      => $Attachment->{Inline} || 0,
