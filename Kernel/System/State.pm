@@ -148,10 +148,12 @@ returns
         ID         => 1,
         TypeName   => "new",
         TypeID     => 1,
-        ValidID    => 1,
-        CreateTime => "2010-11-29 11:04:04",
-        ChangeTime => "2010-11-29 11:04:04",
         Comment    => "New ticket created by customer.",
+        ValidID    => 1,
+        CreateTime => '2010-04-07 15:41:15',
+        CreateBy   => '321',
+        ChangeTime => '2010-04-07 15:59:45',
+        ChangeBy   => '223',
     );
 
 =cut
@@ -187,8 +189,8 @@ sub StateGet {
 
     # sql
     my @Bind;
-    my $SQL = 'SELECT ts.id, ts.name, ts.valid_id, ts.comments, ts.type_id, tst.name,'
-        . ' ts.change_time, ts.create_time'
+    my $SQL = 'SELECT ts.id, ts.name, ts.valid_id, ts.comments, ts.type_id, tst.name, '
+        . ' ts.create_by, ts.create_time, ts.change_by, ts.change_time '
         . ' FROM ticket_state ts, ticket_state_type tst WHERE ts.type_id = tst.id AND ';
     if ( $Param{Name} ) {
         $SQL .= ' ts.name = ?';
@@ -215,8 +217,10 @@ sub StateGet {
             ValidID    => $Data[2],
             TypeID     => $Data[4],
             TypeName   => $Data[5],
-            ChangeTime => $Data[6],
+            CreateBy   => $Data[6],
             CreateTime => $Data[7],
+            ChangeBy   => $Data[8],
+            ChangeTime => $Data[9],
         );
     }
 
