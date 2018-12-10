@@ -144,6 +144,7 @@ sub Run {
     # create Priority
     $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityAdd(
         Name    => $Priority->{Name},
+        Comment => $Priority->{Comment},
         ValidID => $Priority->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
     );
