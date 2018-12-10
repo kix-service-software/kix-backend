@@ -158,7 +158,7 @@ sub PriorityGet {
 
     # ask database
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, name, valid_id, create_time, create_by, change_time, change_by '
+        SQL => 'SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by '
             . 'FROM ticket_priority WHERE id = ?',
         Bind  => [ \$Param{PriorityID} ],
         Limit => 1,
@@ -169,11 +169,12 @@ sub PriorityGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Data{ID}         = $Row[0];
         $Data{Name}       = $Row[1];
-        $Data{ValidID}    = $Row[2];
-        $Data{CreateTime} = $Row[3];
-        $Data{CreateBy}   = $Row[4];
-        $Data{ChangeTime} = $Row[5];
-        $Data{ChangeBy}   = $Row[6];
+        $Data{Comments}   = $Row[2];
+        $Data{ValidID}    = $Row[3];
+        $Data{CreateTime} = $Row[4];
+        $Data{CreateBy}   = $Row[5];
+        $Data{ChangeTime} = $Row[6];
+        $Data{ChangeBy}   = $Row[7];
     }
 
     # set cache
@@ -216,11 +217,11 @@ sub PriorityAdd {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO ticket_priority (name, valid_id, create_time, create_by, '
+        SQL => 'INSERT INTO ticket_priority (name, comments, valid_id, create_time, create_by, '
             . 'change_time, change_by) VALUES '
             . '(?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
+            \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
         ],
     );
 
@@ -283,10 +284,10 @@ sub PriorityUpdate {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Do(
-        SQL => 'UPDATE ticket_priority SET name = ?, valid_id = ?, '
+        SQL => 'UPDATE ticket_priority SET name = ?, comments = ?, valid_id = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{ValidID}, \$Param{UserID}, \$Param{PriorityID},
+            \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{PriorityID},
         ],
     );
 
