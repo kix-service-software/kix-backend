@@ -135,7 +135,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete Priority. A Ticket with this Priority already exists.',
+                Message => 'Cannot delete priority. A ticket with this priority already exists.',
             );
         }
 
