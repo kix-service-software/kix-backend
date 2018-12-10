@@ -92,10 +92,7 @@ sub ParameterDefinition {
         'Priority' => {
             Type => 'HASH',
             Required => 1
-        },
-        'Priority::Name' => {
-            Required => 1
-        },
+        }
     }
 }
 
@@ -107,8 +104,7 @@ perform PriorityUpdate Operation. This will return the updated Priority.
         Data => {
             PriorityID => 123,
     	    Priority   => {
-    	        Name    => '...',
-    	        ValidID => '...',       # optional
+                ...
     	    },
         }
     );
@@ -149,9 +145,10 @@ sub Run {
 
     # update Priority
     my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityUpdate(
-        %{$Priority},
-        ValidID    => $Priority->{ValidID} ||$PriorityData{ValidID} || 1,
         PriorityID => $Param{Data}->{PriorityID},
+        Name       => $Priority->{Name} || $PriorityData{Name},
+        Comment    => exists $Priority->{Comment} ? $Priority->{Comment} : $PriorityData{Comment},
+        ValidID    => $Priority->{ValidID} || $PriorityData{ValidID} || 1,
         UserID     => $Self->{Authorization}->{UserID},
     );
 

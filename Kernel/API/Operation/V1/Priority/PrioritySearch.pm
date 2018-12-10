@@ -93,7 +93,7 @@ sub Run {
 
     # perform Priority search
     my %PriorityList = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList(
-        ValidID => 1,
+        Valid => 0
     );
 
     if (IsHashRefWithData(\%PriorityList)) {
