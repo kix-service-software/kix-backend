@@ -169,7 +169,7 @@ sub PriorityGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Data{ID}         = $Row[0];
         $Data{Name}       = $Row[1];
-        $Data{Comments}   = $Row[2];
+        $Data{Comment}    = $Row[2];
         $Data{ValidID}    = $Row[3];
         $Data{CreateTime} = $Row[4];
         $Data{CreateBy}   = $Row[5];
@@ -219,7 +219,7 @@ sub PriorityAdd {
     return if !$DBObject->Do(
         SQL => 'INSERT INTO ticket_priority (name, comments, valid_id, create_time, create_by, '
             . 'change_time, change_by) VALUES '
-            . '(?, ?, current_timestamp, ?, current_timestamp, ?)',
+            . '(?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
         ],

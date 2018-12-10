@@ -93,10 +93,7 @@ sub ParameterDefinition {
         'TicketType' => {
             Type     => 'HASH',
             Required => 1
-        },
-        'TicketType::Name' => {
-            Required => 1
-        },
+        }
     }
 }
 
@@ -109,9 +106,7 @@ perform TicketTypeUpdate Operation. This will return the updated TypeID.
             ID      => '...',
         }
 	    TicketType => {
-	        Name    => '...',
-            Comment => '...',
-	        ValidID => '...',
+            ...
 	    },
 	);
     
