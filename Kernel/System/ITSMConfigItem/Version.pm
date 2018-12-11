@@ -1799,13 +1799,14 @@ sub _FindChangedXMLValues {
     );
 
     # the short names for new and old xml data are used in the 'eval' below
-    my $NewXMLData = $Param{NewXMLData};
+    # do a deep copy of the new data to prevent empty objects created in the check loop below
+    my @NewXMLData = @{ $Param{NewXMLData} ? Storable::dclone($Param{NewXMLData}) : [] };
     my $OldXMLData = $OldVersion->{XMLData};
 
     # get all tagkeys in new and old XML data
     # use a side effect of XMLHash2D(), which adds the tag keys to the passed in data structure
-    $Kernel::OM->Get('Kernel::System::XML')->XMLHash2D( XMLHash => $NewXMLData );
-    my @TagKeys = $Self->_GrabTagKeys( Data => [ $OldXMLData, $NewXMLData ] );
+    $Kernel::OM->Get('Kernel::System::XML')->XMLHash2D( XMLHash => \@NewXMLData );
+    my @TagKeys = $Self->_GrabTagKeys( Data => [ $OldXMLData, \@NewXMLData ] );
 
     # get an unique list of all tag keys
     my %UniqueTagKeys = map { $_ => 1 } @TagKeys;
@@ -1813,7 +1814,7 @@ sub _FindChangedXMLValues {
     # do the check
     my %UpdateValues;
     for my $TagKey ( sort keys %UniqueTagKeys ) {
-        my $NewContent = eval '$NewXMLData->' . $TagKey . '->{Content}' || '';    ## no critic
+        my $NewContent = eval '$NewXMLData' . $TagKey . '->{Content}' || '';      ## no critic
         my $OldContent = eval '$OldXMLData->' . $TagKey . '->{Content}' || '';    ## no critic
 
         if ( $NewContent ne $OldContent ) {

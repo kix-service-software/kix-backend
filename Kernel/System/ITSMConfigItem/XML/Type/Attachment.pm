@@ -118,6 +118,9 @@ prepare "external" value to "internal"
 sub InternalValuePrepare {
     my ( $Self, %Param ) = @_;
 
+    # return if AttachmentID is already given, because it's an existing attachment
+    return $Param{Value}->{AttachmentID} if $Param{Value}->{AttachmentID};
+
     # check needed stuff
     foreach (qw(Filename ContentType Content)) {
         if ( !$Param{Value}->{$_} ) {
@@ -329,6 +332,9 @@ validate given value for this particular attribute type
 
 sub ValidateValue {
     my ( $Self, %Param ) = @_;
+
+    # return if AttachmentID is already set
+    return 1 if $Param{Value}->{AttachmentID};
 
     my $Value = $Param{Value};
 

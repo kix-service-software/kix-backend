@@ -132,7 +132,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete Queue. A Ticket with this Queue already exists.',
+                Message => 'Cannot delete queue. A ticket with this queue already exists.',
             );
         }
          
@@ -145,7 +145,7 @@ sub Run {
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete Queue, please contact the system administrator',
+                Message => 'Could not delete queue, please contact the system administrator',
             );
         }
     }

@@ -474,6 +474,15 @@ sub FAQAdd {
         $Param{Approved} = 1;
     }
 
+    # check for base64 encoded images in fields and store them
+    my @AttachmentConvert;
+    foreach my $Field ( qw(Field1 Field2 Field3 Field4 Field5 Field6) ) {
+        $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
+            DocumentRef    => \$Param{$Field},
+            AttachmentsRef => \@AttachmentConvert,
+        );
+    }
+
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             INSERT INTO faq_item
@@ -570,6 +579,15 @@ sub FAQAdd {
         Bind => [ \$Number, \$ID ],
     );
 
+    # add converted attachments
+    for my $Attachment (@AttachmentConvert) {
+        $Self->AttachmentAdd(
+            %{$Attachment},
+            ItemID => $ID,
+            UserID => $Param{UserID},
+        );
+    }
+
     # add history
     $Self->FAQHistoryAdd(
         Name   => 'Created',
@@ -653,11 +671,20 @@ sub FAQUpdate {
         }
     }
 
+    # check for base64 encoded images in fields and store them
+    my @AttachmentConvert;
+    foreach my $Field ( qw(Field1 Field2 Field3 Field4 Field5 Field6) ) {
+        $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
+            DocumentRef    => \$Param{$Field},
+            AttachmentsRef => \@AttachmentConvert,
+        );
+    }
+
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             UPDATE faq_item SET
-                f_name = ?, f_language = ?, f_subject = ?, category_id = ?,
-                visbility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
+                f_name = ?, language = ?, f_subject = ?, category_id = ?,
+                visibility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
                 f_field1 = ?, f_field2 = ?,
                 f_field3 = ?, f_field4 = ?,
                 f_field5 = ?, f_field6 = ?,
@@ -674,6 +701,20 @@ sub FAQUpdate {
             \$Param{ItemID},
         ],
     );
+
+    # delete existing inline attachments
+    $Self->AttachmentInlineDelete(
+        ItemID => $Param{ItemID},
+        UserID => $Param{UserID},
+    );
+    # add converted attachments
+    for my $Attachment (@AttachmentConvert) {
+        $Self->AttachmentAdd(
+            %{$Attachment},
+            ItemID => $Param{ItemID},
+            UserID => $Param{UserID},
+        );
+    }
 
     # delete cache
     $Self->_DeleteFromFAQCache(%Param);
@@ -741,8 +782,9 @@ add article attachments, returns the attachment id
         ItemID      => 123,
         Content     => $Content,
         ContentType => 'text/xml',
+        ContentID   => 'cid-1234',   # optional
+        Disposition => 'attachment', # or 'inline'
         Filename    => 'somename.xml',
-        Inline      => 1,   (0|1, default 0)
         UserID      => 1,
     );
 
@@ -767,10 +809,18 @@ sub AttachmentAdd {
         }
     }
 
-    # set default
-    if ( !$Param{Inline} ) {
-        $Param{Inline} = 0;
+    # set content id in angle brackets
+    if ( $Param{ContentID} ) {
+        $Param{ContentID} =~ s/^([^<].*[^>])$/<$1>/;
     }
+    $Param{ContentID} //= '';
+
+    my $Disposition;
+    my $Filename;
+    if ( $Param{Disposition} ) {
+        ( $Disposition, $Filename ) = split ';', $Param{Disposition};
+    }
+    $Disposition //= '';
 
     # get attachment size
     {
@@ -831,12 +881,12 @@ sub AttachmentAdd {
     # write attachment to db
     return if !$DBObject->Do(
         SQL => 'INSERT INTO faq_attachment ' .
-            ' (faq_id, filename, content_type, content_size, content, inlineattachment, ' .
+            ' (faq_id, filename, content_type, content_size, content_id, disposition, content, ' .
             ' created, created_by, changed, changed_by) VALUES ' .
-            ' (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            ' (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{ItemID},  \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize},
-            \$Param{Content}, \$Param{Inline},   \$Param{UserID},      \$Param{UserID},
+            \$Param{ItemID},  \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize}, \$Param{ContentID}, 
+            \$Disposition, \$Param{Content}, \$Param{UserID}, \$Param{UserID},
         ],
     );
 
@@ -846,11 +896,11 @@ sub AttachmentAdd {
             . 'FROM faq_attachment '
             . 'WHERE faq_id = ? AND filename = ? '
             . 'AND content_type = ? AND content_size = ? '
-            . 'AND inlineattachment = ? '
+            . 'AND content_id = ? AND disposition = ? '
             . 'AND created_by = ? AND changed_by = ?',
         Bind => [
             \$Param{ItemID}, \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize},
-            \$Param{Inline}, \$Param{UserID}, \$Param{UserID},
+            \$Param{ContentID}, \$Disposition, \$Param{UserID}, \$Param{UserID},
         ],
         Limit => 1,
     );
@@ -860,6 +910,7 @@ sub AttachmentAdd {
         $AttachmentID = $Row[0];
     }
 
+print STDERR "AttachmentID: $AttachmentID\n";
     return $AttachmentID;
 }
 
@@ -880,6 +931,8 @@ Returns:
         ContentType => 'image/jpeg',
         Filename    => 'Error.jpg',
         Content     => '...'                    # file binary content
+        ContentID   => '...',                   # empty if no inline image
+        Disposition => 'attachment',            # or 'inline'
     );
 
 =cut
@@ -903,7 +956,7 @@ sub AttachmentGet {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Prepare(
-        SQL => 'SELECT filename, content_type, content_size, content, inlineattachment, '
+        SQL => 'SELECT filename, content_type, content_size, content, content_id, disposition, '
             . 'created, created_by, changed, changed_by '
             . 'FROM faq_attachment '
             . 'WHERE id = ? AND faq_id = ? '
@@ -926,11 +979,12 @@ sub AttachmentGet {
         $File{ContentType} = $Row[1];
         $File{Filesize}    = $Row[2];
         $File{Content}     = $Row[3];
-        $File{Inline}      = $Row[4];
-        $File{Created}     = $Row[5];
-        $File{CreatedBy}   = $Row[6];
-        $File{Changed}     = $Row[7];
-        $File{ChangedBy}   = $Row[8];
+        $File{ContentID}   = $Row[4];
+        $File{Disposition} = $Row[5];
+        $File{Created}     = $Row[6];
+        $File{CreatedBy}   = $Row[7];
+        $File{Changed}     = $Row[8];
+        $File{ChangedBy}   = $Row[9];
     }
 
     return %File;
@@ -975,13 +1029,50 @@ sub AttachmentDelete {
     return 1;
 }
 
+=item AttachmentInlineDelete()
+
+delete inline content attachments of article
+
+    my $Success = $FAQObject->AttachmentInlineDelete(
+        ItemID => 123,
+        UserID => 1,
+    );
+
+Returns:
+
+    $Success = 1 ;              # or undef if inline attachments could not be deleted
+
+=cut
+
+sub AttachmentInlineDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(ItemID UserID)) {
+        if ( !defined $Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+
+            return;
+        }
+    }
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL  => 'DELETE FROM faq_attachment WHERE disposition = \'inline\' AND faq_id = ? ',
+        Bind => [ \$Param{ItemID} ],
+    );
+
+    return 1;
+}
+
 =item AttachmentIndex()
 
 return an attachment index of an article
 
     my @Index = $FAQObject->AttachmentIndex(
         ItemID     => 123,
-        ShowInline => 0,   ( 0|1, default 1)
         UserID     => 1,
     );
 
@@ -994,7 +1085,8 @@ Returns:
             Filename    => 'Error.jpg',
             FilesizeRaw => 540286,
             FileID      => 6,
-            Inline      => 0,
+            ContentID   => '...',                   # empty if no inline image
+            Disposition => 'attachment',            # or 'inline'
         },
         {,
             Filesize => '430.0 KBytes',
@@ -1002,7 +1094,8 @@ Returns:
             Filename => 'Solution.jpg',
             FilesizeRaw => 440286,
             FileID => 5,
-            Inline => 1,
+            ContentID   => '...',                   # empty if no inline image
+            Disposition => 'attachment',            # or 'inline'
         },
         {
             Filesize => '296 Bytes',
@@ -1010,7 +1103,8 @@ Returns:
             Filename => 'AdditionalComments.txt',
             FilesizeRaw => 296,
             FileID => 7,
-            Inline => 0,
+            ContentID   => '...',                   # empty if no inline image
+            Disposition => 'attachment',            # or 'inline'
         },
     );
 
@@ -1034,7 +1128,7 @@ sub AttachmentIndex {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, filename, content_type, content_size, inlineattachment '
+        SQL => 'SELECT id, filename, content_type, content_size, content_id, disposition '
             . 'FROM faq_attachment '
             . 'WHERE faq_id = ? '
             . 'ORDER BY filename',
@@ -1050,12 +1144,8 @@ sub AttachmentIndex {
         my $Filename    = $Row[1];
         my $ContentType = $Row[2];
         my $Filesize    = $Row[3];
-        my $Inline      = $Row[4];
-
-        # do not show inline attachments
-        if ( defined $Param{ShowInline} && !$Param{ShowInline} && $Inline ) {
-            next ATTACHMENT;
-        }
+        my $ContentID   = $Row[4];
+        my $Disposition = $Row[5];
 
         # convert to human readable file size
         my $FileSizeRaw = $Filesize;
@@ -1077,7 +1167,8 @@ sub AttachmentIndex {
             ContentType => $ContentType,
             Filesize    => $Filesize,
             FilesizeRaw => $FileSizeRaw,
-            Inline      => $Inline,
+            ContentID   => $ContentID,
+            Disposition => $Disposition,
         };
     }
 
@@ -1952,102 +2043,6 @@ sub FAQTop10Get {
     }
 
     return \@Result;
-}
-
-=item FAQInlineAttachmentURLUpdate()
-
-Updates the URLs of uploaded inline attachments.
-
-    my $Success = $FAQObject->FAQInlineAttachmentURLUpdate(
-        ItemID     => 12,
-        FormID     => 456,
-        FileID     => 5,
-        Attachment => \%Attachment,
-        UserID     => 1,
-    );
-
-Returns:
-
-    $Success = 1;               # of undef if attachment URL could not be updated
-
-=cut
-
-sub FAQInlineAttachmentURLUpdate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(ItemID Attachment FormID FileID UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # check if attachment is a hash reference
-    if ( ref $Param{Attachment} ne 'HASH' && !%{ $Param{Attachment} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Attachment must be a hash reference!",
-        );
-
-        return;
-    }
-
-    # only consider inline attachments here (they have a content id)
-    return 1 if !$Param{Attachment}->{ContentID};
-
-    # get FAQ data
-    my %FAQData = $Self->FAQGet(
-        ItemID     => $Param{ItemID},
-        ItemFields => 1,
-        UserID     => $Param{UserID},
-    );
-
-    # picture URL in upload cache
-    my $Search = "Action=PictureUpload . FormID=\Q$Param{FormID}\E . "
-        . "ContentID=\Q$Param{Attachment}->{ContentID}\E";
-
-    # picture URL in FAQ attachment
-    my $Replace = "Action=AgentFAQZoom;Subaction=DownloadAttachment;"
-        . "ItemID=$Param{ItemID};FileID=$Param{FileID}";
-
-    # rewrite picture URLs
-    FIELD:
-    for my $Number ( 1 .. 6 ) {
-
-        # check if field contains something
-        next FIELD if !$FAQData{"Field$Number"};
-
-        # remove newlines
-        $FAQData{"Field$Number"} =~ s{ [\n\r]+ }{}gxms;
-
-        # replace URL
-        $FAQData{"Field$Number"} =~ s{$Search}{$Replace}xms;
-    }
-
-    # update FAQ article without writing a history entry
-    my $Success = $Self->FAQUpdate(
-        %FAQData,
-        HistoryOff  => 1,
-        ApprovalOff => 1,
-        UserID      => $Param{UserID},
-    );
-
-    # check if update was successful
-    if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Could not update FAQ Item# '$Param{ItemID}'!",
-        );
-
-        return;
-    }
-
-    return 1;
 }
 
 =item FAQArticleTitleClean()

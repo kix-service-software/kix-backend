@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="ticket_type">
+        <ColumnAdd Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>

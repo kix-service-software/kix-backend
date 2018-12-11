@@ -205,10 +205,17 @@ sub Run {
         UserID       => $Self->{Authorization}->{UserID},
     );
 
+    # check if new VersionID has been created, if not, return 200
+    if ( $VersionID > $ConfigItem->{LastVersionID} ) {
+        return $Self->_Success(
+            Code      => 'Object.Created',
+            VersionID => $VersionID,
+        )
+    }
+
     return $Self->_Success(
-        Code      => 'Object.Created',
         VersionID => $VersionID,
-    )
+    );
 }
 
 1;

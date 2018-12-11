@@ -475,6 +475,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
@@ -493,6 +494,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
@@ -1465,6 +1467,7 @@
 
 <!-- token -->
 <Table Name="token">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="token" Required="true" Size="10000" Type="VARCHAR"/>
     <Column Name="last_request_time" Required="false" Type="DATE"/>
 </Table>
@@ -2332,8 +2335,9 @@
     <Column Name="filename" Required="false" Size="250" Type="VARCHAR" />
     <Column Name="content_size" Required="false" Size="30" Type="VARCHAR" />
     <Column Name="content_type" Required="false" Size="250" Type="VARCHAR" />
+    <Column Name="content_id" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="disposition" Required="false" Size="15" Type="VARCHAR"/>
     <Column Name="content" Required="true" Type="LONGBLOB" />
-    <Column Name="inlineattachment" Required="true" Default="0" Type="SMALLINT" />
     <Column Name="created" Required="true" Type="DATE" />
     <Column Name="created_by" Required="true" Type="INTEGER" />
     <Column Name="changed" Required="true" Type="DATE" />

@@ -149,6 +149,9 @@ sub Run {
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $Attachment{Content};
         }
+        else {
+            $Attachment{Content} = MIME::Base64::encode_base64($Attachment{Content});
+        }
 
         # rename ItemID to ArticleID
         $Attachment{ArticleID} = $Attachment{ItemID};

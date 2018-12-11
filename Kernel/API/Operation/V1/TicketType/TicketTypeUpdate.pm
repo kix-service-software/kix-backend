@@ -89,14 +89,11 @@ sub ParameterDefinition {
         'TypeID' => {
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        },                
         'TicketType' => {
             Type     => 'HASH',
             Required => 1
-        },
-        'TicketType::Name' => {
-            Required => 1
-        },
+        }
     }
 }
 
@@ -109,8 +106,7 @@ perform TicketTypeUpdate Operation. This will return the updated TypeID.
             ID      => '...',
         }
 	    TicketType => {
-	        Name    => '...',
-	        ValidID => '...',
+            ...
 	    },
 	);
     
@@ -145,11 +141,30 @@ sub Run {
         );
     }
 
+    # isolate and trim TicketType parameter
+    my $TicketType = $Self->_Trim(
+        Data => $Param{Data}->{TicketType},
+    );
+
+    # check if tickettype exists
+    my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
+        Name => $TicketType->{Name},
+        ID   => $Param{Data}->{TypeID},
+    );
+    
+    if ( $Exists ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Can not update ticket type. A ticket type with the same name '$TicketType->{Name}' already exists.",
+        );
+    }
+
     # update tickettype
     my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeUpdate(
         ID      => $Param{Data}->{TypeID},
-        Name    => $Param{Data}->{TicketType}->{Name} || $TicketTypeData{Name},
-        ValidID => $Param{Data}->{TicketType}->{ValidID} || $TicketTypeData{ValidID},
+        Name    => $TicketType->{Name} || $TicketTypeData{Name},
+        Comment => exists $TicketType->{Comment} ? $TicketType->{Comment} : $TicketTypeData{Comment},
+        ValidID => $TicketType->{ValidID} || $TicketTypeData{ValidID},
         UserID  => $Self->{Authorization}->{UserID},
     );
 

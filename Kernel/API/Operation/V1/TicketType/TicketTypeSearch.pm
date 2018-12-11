@@ -87,7 +87,7 @@ sub Run {
 
     # get tickettype list 
     my %TicketTypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
-        Valid => 1,
+        Valid => 0
     );
 
     # get already prepared tickettype data from TicketTypeGet operation

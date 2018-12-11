@@ -88,7 +88,7 @@ sub Run {
     # perform TicketState search
     my %TicketStateList = $Kernel::OM->Get('Kernel::System::State')->StateList(
         UserID => $Self->{Authorization}->{UserID},
-        Valid => 1,
+        Valid => 0,
     );
 
 	# get already prepared ticketstate data from TicketStateGet operation

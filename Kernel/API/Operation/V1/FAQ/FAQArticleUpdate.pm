@@ -16,7 +16,7 @@ package Kernel::API::Operation::V1::FAQ::FAQArticleUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -112,6 +112,10 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
                 Title       => 'Some Text',
                 Field1      => 'Problem...',
                 Field2      => 'Solution...',
+                Field3      => '...',
+                Field4      => '...',
+                Field5      => '...',
+                Field6      => '...',
                 UserID      => 1,
                 ApprovalOff => 1,               # optional, (if set to 1 approval is ignored. This is
                                                 #   important when called from FAQInlineAttachmentURLUpdate)
@@ -134,24 +138,6 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check rw permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $Param{Data}->{FAQCategoryID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
-
-    # isolate and trim FAQArticle parameter
-    my $FAQArticle = $Self->_Trim(
-        Data => $Param{Data}->{FAQArticle}
-    );
-
     # check if FAQArticle exists 
     my %FAQArticleData = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
         ItemID     => $Param{Data}->{FAQArticleID},
@@ -162,31 +148,48 @@ sub Run {
     if ( !%FAQArticleData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Cannot update FAQArticle. No FAQArticle with ID '$Param{Data}->{FAQArticleID}' found.",
+            Message => "Cannot update FAQ article. No FAQ article with ID '$Param{Data}->{FAQArticleID}' found.",
         );
     }
 
+    # isolate and trim FAQArticle parameter
+    my $IncomingFAQArticle = $Self->_Trim(
+        Data => $Param{Data}->{FAQArticle}
+    );
+
+    # check rw permissions
+    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
+        CategoryID => $IncomingFAQArticle->{CategoryID} || $FAQArticleData{CategoryID},
+        UserID     => $Self->{Authorization}->{UserID},
+    );
+
+    if ( $Permission ne 'rw' ) {
+        return $Self->_Error(
+            Code    => 'Object.NoPermission',
+            Message => "No permission to update FAQ article in given category!",
+        );
+    }
+
+    # merge attributes
+    my %FAQArticle;
+    foreach my $Key ( qw(Name StateID CategoryID Language Approved Visibility ContentType Title Field1 Field2 Field3 Field4 Field5 Field6 ApprovalOff ValidID) ) {
+       $FAQArticle{$Key} = exists $IncomingFAQArticle->{$Key} ? $IncomingFAQArticle->{$Key} : $FAQArticleData{$Key};
+    }
+
+    # add keywords
+    $FAQArticle{Keywords} = IsArrayRefWithData($IncomingFAQArticle->{Keywords}) ? join(' ', @{$IncomingFAQArticle->{Keywords}}) : $FAQArticleData{Keywords};
+
     # update FAQArticle
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQUpdate(
-        ItemID => $Param{Data}->{FAQArticleID} || $FAQArticleData{FAQArticleID},
-        StateID     => $FAQArticle->{StateID} || $FAQArticleData{StateID},
-        CategoryID  => $FAQArticle->{FAQCategoryID} || $FAQArticleData{CategoryID},
-        LanguageID  => $FAQArticle->{LanguageID} || $FAQArticleData{LanguageID},
-        Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : $FAQArticleData{Keywords},
-        Approved    => $FAQArticle->{Approved} || $FAQArticleData{Approved},
-        ContentType => $FAQArticle->{ContentType} || $FAQArticleData{ContentType},
-        Title       => $FAQArticle->{Title} || $FAQArticleData{Title},,
-        Field1      => $FAQArticle->{Field1} || $FAQArticleData{Field1},
-        Field2      => $FAQArticle->{Field2} || $FAQArticleData{Field2},
-        ApprovalOff => $FAQArticle->{ApprovalOff} || $FAQArticleData{ApprovalOff} || 1, 
-        ValidID     => $FAQArticle->{ValidID} || $FAQArticleData{ValidID},
+        ItemID      => $Param{Data}->{FAQArticleID},
+        %FAQArticle,
         UserID      => $Self->{Authorization}->{UserID}
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update FAQArticle, please contact the system administrator',
+            Message => 'Could not update FAQ article, please contact the system administrator',
         );
     }
 
