@@ -87,36 +87,119 @@ perform ConfigItemSearch Operation. This will return a class list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my @ConfigItemList;
 
-    # prepare filter if given
-    my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{ConfigItem}->{AND}) ) {
-        foreach my $FilterItem ( @{$Self->{Filter}->{ConfigItem}->{AND}} ) {
-            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Field} !~ /^(ClassID|Name|Number)$/g);
-            next if ($FilterItem->{Operator} ne 'EQ');
+    # prepare search if given
+    my %SearchParam;
+    if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
+        foreach my $SearchType ( keys %{$Self->{Search}->{ConfigItem}} ) {
+            my @SearchTypeResult;
+            foreach my $SearchItem ( @{$Self->{Search}->{ConfigItem}->{$SearchType}} ) {
+                my $Value = $SearchItem->{Value};
+                my $Field = $SearchItem->{Field};
 
-            if ($FilterItem->{Field} eq 'ClassID') {
-                $SearchFilter{ClassIDs} = [ $FilterItem->{Value} ];
+                # prepare field in case of sub-structure search
+                if ( $Field =~ /\./ ) {
+                    $Field = ( split(/\./, $Field) )[-1];
+                }
+
+                # prepare value
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                   $Value = '*' . $Value . '*';
+                }
+                elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                   $Value = $Value . '*';
+                }
+                if ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                   $Value = '*' . $Value;
+                }
+
+                # do some special handling if field is an XML attribute
+                if ( $SearchItem->{Field} =~ /Data\./ ) {
+                    my %OperatorMapping = (
+                        'EQ'  => '=',
+                        'LT'  => '<',
+                        'LTE' => '<=',
+                        'GT'  => '>',
+                        'GTE' => '>=',
+                    );
+
+                    # build search key of given field
+                    my $SearchKey = "[1]{'Version'}[1]";
+                    my @Parts = split(/\./, $SearchItem->{Field});
+                    foreach my $Part ( @Parts[2..$#Parts] ) {
+                        $SearchKey .= "{'" . $Part . "\'}[%]";
+                    }
+
+                    $Value =~ s/\*/%/g;
+
+                    my @What = IsArrayRefWithData($SearchParam{What}) ? @{$SearchParam{What}} : (); 
+                    if ( $OperatorMapping{$SearchItem->{Operator}} ) {
+                        push(@What, { $SearchKey."{'Content'}" => { $OperatorMapping{$SearchItem->{Operator}}, $Value } });
+                    }
+                    else {
+                        push(@What, { $SearchKey."{'Content'}" => $Value });
+                    }
+                    $SearchParam{What} = \@What;
+                } 
+                else {
+                    $SearchParam{$Field} = $Value;
+                }
+
+                if ( $SearchType eq 'OR' ) {
+                    # perform search for every attribute
+                    my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+                        %SearchParam,
+                        UserID  => $Self->{Authorization}->{UserID},
+                    );
+
+                    # merge results
+                    my @MergeResult = keys %{{map {($_ => 1)} (@SearchTypeResult, @{$SearchResult})}};
+                    @SearchTypeResult = @MergeResult;
+
+                    # clear SearchParam
+                    %SearchParam = ();
+                }
+            }
+
+            if ( $SearchType eq 'AND' ) {
+                # perform ConfigItem search
+                my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+                    %SearchParam,
+                    UserID  => $Self->{Authorization}->{UserID},
+                );
+                @SearchTypeResult = @{$SearchResult};
+            }
+
+            if ( !@ConfigItemList ) {
+                @ConfigItemList = @SearchTypeResult;
             }
             else {
-                $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                my %SearchTypeResultHash = map { $_ => 1 } @SearchTypeResult;
+                my @Result;
+                foreach my $ConfigItemID ( @ConfigItemList ) {
+                    push(@Result, $ConfigItemID) if !exists $SearchTypeResultHash{$ConfigItemID};
+                }
+                @ConfigItemList = @Result;
             }
         }
     }
-
-    # execute ConfigItem search
-    my $ConfigItemList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
-        %SearchFilter,
-        UserID  => $Self->{Authorization}->{UserID},
-    );
+    else {
+        # perform ConfigItem search
+        my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+            UserID  => $Self->{Authorization}->{UserID},
+        );
+        @ConfigItemList = @{$SearchResult};
+    }
 
 	# get already prepared CI data from ConfigItemGet operation
-    if ( IsArrayRefWithData($ConfigItemList) ) {  	
+    if ( IsArrayRefWithData(\@ConfigItemList) ) {  	
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data      => {
-                ConfigItemID => join(',', sort @{$ConfigItemList}),
+                ConfigItemID => join(',', sort @ConfigItemList),
             }
         );    
 

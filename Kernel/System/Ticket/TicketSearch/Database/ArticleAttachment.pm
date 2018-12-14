@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,19 +49,19 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [ 'AttachmentName' ],
+        Search => [ 'AttachmentName' ],
         Sort   => []
     }
 }
 
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
+    my $Result = $Object->Search(
         BoolOperator => 'AND' | 'OR',
-        Filter       => {}
+        Search       => {}
     );
 
     $Result = {
@@ -71,16 +71,16 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
@@ -107,27 +107,27 @@ sub Filter {
     }
 
     my $Field      = 'att.filename';
-    my $FieldValue = $Param{Filter}->{Value};
+    my $FieldValue = $Param{Search}->{Value};
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
         # no special handling
     }
-    elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
+    elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
         $FieldValue = $FieldValue.'%';
     }
-    elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
+    elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
         $FieldValue = '%'.$FieldValue;
     }
-    elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
+    elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
         $FieldValue = '%'.$FieldValue.'%';
     }
-    elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+    elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
         $FieldValue =~ s/\*/%/g;
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

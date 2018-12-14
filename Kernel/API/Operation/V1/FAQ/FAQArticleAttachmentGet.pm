@@ -124,49 +124,68 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @FAQAttachmentData;
+    my @AttachmentData;
 
     # start loop
-    foreach my $FAQAttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
+    foreach my $AttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
         # get the FAQCategory data
-        my %FAQAttachment = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentGet(
-            FileID => $FAQAttachmentID,
+        my %Attachment = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentGet(
+            FileID => $AttachmentID,
             ItemID => $Param{Data}->{FAQArticleID},
             UserID => $Self->{Authorization}->{UserID},
         );
 
-        if ( !IsHashRefWithData( \%FAQAttachment ) ) {
+        if ( !IsHashRefWithData( \%Attachment ) ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No data found for FAQAttachmentID $FAQAttachmentID.",
+                Message => "No data found for FAQAttachmentID $AttachmentID.",
             );
         }
 
         # add ID to result
-        $FAQAttachment{ID} = $FAQAttachmentID;
+        $Attachment{ID} = $AttachmentID;
 
         if ( !$Param{Data}->{include}->{Content} ) {
-            delete $FAQAttachment{Content};
+            delete $Attachment{Content};
+        }
+        else {
+            $Attachment{Content} = MIME::Base64::encode_base64($Attachment{Content});
         }
 
-        # rename ItemID in ArticleID
-        $FAQAttachment{ArticleID} = $FAQAttachment{ItemID};
-        delete $FAQAttachment{ItemID};
+        # rename ItemID to ArticleID
+        $Attachment{ArticleID} = $Attachment{ItemID};
+        delete $Attachment{ItemID};
+
+        # rename Filesize to FilesizeRaw
+        $Attachment{FilesizeRaw} = $Attachment{Filesize};
+
+        # human readable file size
+        if ( $Attachment{FilesizeRaw} ) {
+            if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
+                $Attachment{Filesize} = sprintf "%.1f MBytes", ( $Attachment{FilesizeRaw} / ( 1024 * 1024 ) );
+            }
+            elsif ( $Attachment{FilesizeRaw} > 1024 ) {
+                $Attachment{Filesize} = sprintf "%.1f KBytes", ( ( $Attachment{FilesizeRaw} / 1024 ) );
+            }
+            else {
+                $Attachment{Filesize} = $Attachment{FilesizeRaw} . ' Bytes';
+            }
+        }
         
         # add
-        push(@FAQAttachmentData, \%FAQAttachment);
+        push(@AttachmentData, \%Attachment);
     }
 
-    if ( scalar(@FAQAttachmentData) == 1 ) {
+    if ( scalar(@AttachmentData) == 1 ) {
         return $Self->_Success(
-            Attachment => $FAQAttachmentData[0],
+            Attachment => $AttachmentData[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        Attachment => \@FAQAttachmentData,
+        Attachment => \@AttachmentData,
     );
 }
 

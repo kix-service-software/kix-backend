@@ -117,7 +117,7 @@ sub Run {
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
-            Filter       => {
+            Search       => {
                 AND => [ 
                     {
                         Field => 'TypeID',
@@ -133,7 +133,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete TicketType. A ticket with this TicketType already exists.',
+                Message => 'Cannot delete type. A ticket with this type already exists.',
             );
         }
 
@@ -146,7 +146,7 @@ sub Run {
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete TicketType, please contact the system administrator',
+                Message => 'Could not delete type, please contact the system administrator',
             );
         }
     }

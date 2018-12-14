@@ -138,7 +138,7 @@ sub Run {
     # check if Service exists 
     my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
         ServiceID => $Param{Data}->{ServiceID},
-        UserID      => $Self->{Authorization}->{UserID},        
+        UserID    => 1,        
     );
  
     if ( !%ServiceData ) {
@@ -148,9 +148,34 @@ sub Run {
         );
     }
 
+    # check if Service exists
+    # prepare full name for lookup
+    my $FullName = $Service->{Name};
+    if ( $Service->{ParentID} ) {
+        my $ParentName = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+            ServiceID => $Service->{ParentID} || $ServiceData{ParentID},
+        );
+        if ($ParentName) {
+            $FullName = $ParentName . '::' . $Service->{Name};
+        }
+    }
+
+    # check if Service exists
+    my $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        Name    => $FullName,
+        UserID  => 1,
+    );
+    
+    if ( $ServiceID != $ServiceData{ServiceID} ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Cannot update Service. Service with same name '$Service->{Name}' already exists.",
+        );
+    }
+
     # update Service
     my $Success = $Kernel::OM->Get('Kernel::System::Service')->ServiceUpdate(
-        ServiceID   => $Param{Data}->{ServiceID} || $ServiceData{ServiceID},    
+        ServiceID   => $Service->{ServiceID} || $ServiceData{ServiceID},    
         Name        => $Service->{Name} || $ServiceData{Name},
         Comment     => $Service->{Comment} || $ServiceData{Comment},
         ValidID     => $Service->{ValidID} || $ServiceData{ValidID},

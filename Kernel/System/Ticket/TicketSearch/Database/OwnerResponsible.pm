@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'OwnerID',
             'ResponsibleID',
         ],
@@ -61,12 +61,12 @@ sub GetSupportedAttributes {
 }
 
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
-        Filter => {}
+    my $Result = $Object->Search(
+        Search => {}
     );
 
     $Result = {
@@ -75,15 +75,15 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
@@ -93,16 +93,16 @@ sub Filter {
         'ResponsibleID' => 'st.responsible_user_id',
     );
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' = '.$Param{Filter}->{Value} );
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
     }
-    elsif ( $Param{Filter}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Filter}->{Field}}.' IN ('.(join(',', @{$Param{Filter}->{Value}})).')' );
+    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
+        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

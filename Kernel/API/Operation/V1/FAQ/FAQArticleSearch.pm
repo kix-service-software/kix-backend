@@ -97,6 +97,9 @@ sub Run {
     # get already prepared FAQ data from FAQArticleGet operation
     if ( @ArticleIDs ) {
 
+        # we don't do any core search filtering, inform the API to do it for us, based on the given search
+        $Self->HandleSearchInAPI();
+
         my $FAQArticleGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleGet',
             Data      => {

@@ -185,7 +185,7 @@ sub CustomerSearch {
     my $Valid = defined $Param{Valid} ? $Param{Valid} : 1;
 
     # check cache
-    my $CacheKey = join '::', map { $_ . '=' . $Param{$_} } sort keys %Param;
+    my $CacheKey = "CustomerSearch::".(join '::', map { $_ . '=' . $Param{$_} } sort keys %Param);
 
     if ( $Self->{CacheObject} ) {
         my $Users = $Self->{CacheObject}->Get(

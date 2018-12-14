@@ -90,9 +90,6 @@ sub Run {
     # get category list
     my $CategoryList = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleCategoryList();
 
-    # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'TextModule');
-
     if ( IsArrayRefWithData($CategoryList) ) {
         return $Self->_Success(
             TextModuleCategory => $CategoryList,

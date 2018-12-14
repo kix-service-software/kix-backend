@@ -184,16 +184,15 @@ sub Run {
             }
 
             # include XMLData if requested
-            if ( $Param{Data}->{include}->{DisplayData} ) {
+            if ( $Param{Data}->{include}->{PreparedData} ) {
                 my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
                     VersionID  => $VersionID,
                     XMLDataGet => 1,
                 );
 
-                $Version->{DisplayData} = $Self->ConvertDataToExternal(
+                $Version->{PreparedData} = $Self->_PrepareData(
                     Definition => $VersionData->{XMLDefinition},
-                    Data       => $VersionData->{XMLData}->[1]->{Version},
-                    ForDisplay => 1
+                    Data       => $Version->{Data},
                 );
             }
 
@@ -220,6 +219,154 @@ sub Run {
     return $Self->_Success(
         ConfigItemVersion => \@VersionList,
     );
+}
+
+sub _PrepareData {
+    my ( $Self, %Param ) = @_;
+
+    my $Definition = $Param{Definition};
+    my $Data       = $Param{Data};
+
+    # create sorted structure with data
+    my @Result = ();
+    for my $DefItem ( @{$Definition} ) {
+        my $ItemKey = $DefItem->{Key};
+
+        # don't look at details if we don't have any value for this
+        next if !$Data->{$ItemKey};
+
+        if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
+            for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
+                my $ResultItem = {
+                    Key   => $ItemKey,
+                    Label => $DefItem->{Name},
+                    Type  => $DefItem->{Input}->{Type}
+                };
+
+                if ( ref $ArrayItem eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
+                    $ResultItem->{Value} = $ArrayItem->{$ItemKey},
+                    $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                        Item  => $DefItem,
+                        Value => $ArrayItem->{$ItemKey},
+                    );
+                    if ( defined $DefItem->{Sub} ) {
+                        # start recursion for each array item
+                        my $PreparedResult = $Self->_PrepareData(
+                            Definition => $DefItem->{Sub},
+                            Data       => $ArrayItem,
+                        );
+                        if ( IsArrayRefWithData($PreparedResult) ) {
+                            $ResultItem->{Sub} = $PreparedResult;
+                        }
+                    }
+                }
+                elsif ( ref $ArrayItem eq '' || $DefItem->{Input}->{Type} eq 'Attachment' ) {        # attribute type Attachment needs some special handling
+                    $ResultItem->{Value} = $ArrayItem;
+                    if ( $DefItem->{Input}->{Type} ne 'Attachment' ) {
+                        $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                            Item  => $DefItem,
+                            Value => $ArrayItem,
+                        );
+                    }
+                    if ( defined $DefItem->{Sub} ) {
+                        # start recursion for each array item
+                        my $PreparedResult = $Self->_PrepareData(
+                            Definition => $DefItem->{Sub},
+                            Data       => $ArrayItem,
+                        );
+                        if ( IsArrayRefWithData($PreparedResult) ) {
+                            $ResultItem->{Sub} = $PreparedResult;
+                        }
+                    }
+                }
+                else {
+                    # error
+                    return;
+                }
+
+                push(@Result, $ResultItem);
+            }
+        }
+        elsif ( ref $Data->{$ItemKey} eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
+            my $ResultItem = {
+                Key   => $ItemKey,
+                Label => $DefItem->{Name},
+                Type  => $DefItem->{Input}->{Type}
+            };
+            if (exists $Data->{$ItemKey}->{$ItemKey}) {
+                $ResultItem->{Value} = $Data->{$ItemKey}->{$ItemKey};
+                $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                    Item  => $DefItem,
+                    Value => $Data->{$ItemKey}->{$ItemKey},
+                );
+            }
+            if ( defined $DefItem->{Sub} ) {
+                # start recursion for each array item
+                my $PreparedResult = $Self->_PrepareData(
+                    Definition => $DefItem->{Sub},
+                    Data       => $Data->{$ItemKey},
+                );
+                if ( IsArrayRefWithData($PreparedResult) ) {
+                    $ResultItem->{Sub} = $PreparedResult;
+                }
+            }
+            push(@Result, $ResultItem);
+        }
+        else {
+            my $ResultItem = {
+                Key   => $ItemKey,
+                Label => $DefItem->{Name},
+                Value => $Data->{$ItemKey},
+                Type  => $DefItem->{Input}->{Type}
+            };
+            if ( $DefItem->{Input}->{Type} ne 'Attachment' ) {
+                $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                    Item  => $DefItem,
+                    Value => $Data->{$ItemKey},
+                );
+            }
+            if ( defined $DefItem->{Sub} ) {
+                # start recursion for each array item
+                my $PreparedResult = $Self->_PrepareData(
+                    Definition => $DefItem->{Sub},
+                    Data       => $Data->{ItemKey},
+                );
+                if ( IsArrayRefWithData($PreparedResult) ) {
+                    $ResultItem->{Sub} = $PreparedResult;
+                }
+            }
+            push(@Result, $ResultItem);
+        }
+    }
+
+    return \@Result;
+}
+
+sub _GetDisplayValue {
+    my ($Self, %Param) = @_;
+    my $Result;
+
+    # check if we have already created an instance of this type
+    if ( !$Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}} ) {
+        # create module instance
+        my $Module = 'Kernel::System::ITSMConfigItem::XML::Type::'.$Param{Item}->{Input}->{Type};
+        my $Object = $Kernel::OM->Get($Module);
+
+        if (ref $Object ne $Module) {
+            return;
+        }
+        $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}} = $Object;
+    }
+
+    # check if we have a special handling method to prepare the value
+    if ( $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}}->can('ValueLookup') ) {
+        $Result = $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}}->ValueLookup(
+            Item  => $Param{Item},
+            Value => $Param{Value},
+        );
+    }
+
+    return $Result;
 }
 
 1;

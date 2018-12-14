@@ -119,14 +119,14 @@ sub Run {
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                FAQAttachment => \@ResultList,
+                Attachment => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        FAQAttachment => [],
+        Attachment => [],
     );
 }
 

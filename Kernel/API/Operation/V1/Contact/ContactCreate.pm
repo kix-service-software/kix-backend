@@ -151,7 +151,7 @@ sub Run {
 
     # check Userlogin exists
     my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Contact->{UserLogin},
+        UserLogin => $Contact->{UserLogin},
     );
     if ( %ContactData ) {
         return $Self->_Error(

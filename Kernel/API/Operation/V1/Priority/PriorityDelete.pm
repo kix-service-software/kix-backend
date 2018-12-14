@@ -119,7 +119,7 @@ sub Run {
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
-            Filter       => {
+            Search       => {
                 AND => [ 
                     {
                         Field => 'PriorityID',
@@ -135,7 +135,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete Priority. A Ticket with this Priority already exists.',
+                Message => 'Cannot delete priority. A ticket with this priority already exists.',
             );
         }
 

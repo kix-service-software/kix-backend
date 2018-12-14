@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ServiceID</Item>
                 <Item Key="CacheType">API_services</Item>
+                <Item Key="CacheTypeDependency">Service</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">Service</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_services</Item>                
+                <Item Key="CacheTypeDependency">Service</Item>
             </Hash>
         </Setting>
     </ConfigItem>

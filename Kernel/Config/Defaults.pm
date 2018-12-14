@@ -1362,23 +1362,23 @@ via the Preferences button after logging in.
             #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
             #   Type - special storage type (array, int)
             #   DefaultValue - fallback value if source dosn't contain a value for this attribute
-            { Attribute => 'UserTitle',       Label => Translatable('Title or salutation'), MappedTo => 'title',        Exposed => 1},
-            { Attribute => 'UserFirstname',   Label => Translatable('Firstname'),           MappedTo => 'first_name',   Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'UserLastname',    Label => Translatable('Lastname'),            MappedTo => 'last_name',    Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'UserLogin',       Label => Translatable('Username'),            MappedTo => 'login',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'UserPassword',    Label => Translatable('Password'),            MappedTo => 'pw',           Exposed => 0 },
-            { Attribute => 'UserCustomerID',  Label => Translatable('CustomerID'),          MappedTo => 'customer_id',  Exposed => 1, Required => 1, Searchable => 1 },
+            { Attribute => 'UserTitle',       Label => Translatable('Title or salutation'), MappedTo => 'title',        Exposed => 1, DisplayGroup => 'Stammdaten'},
+            { Attribute => 'UserLastname',    Label => Translatable('Lastname'),            MappedTo => 'last_name',    Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'UserFirstname',   Label => Translatable('Firstname'),           MappedTo => 'first_name',   Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'UserLogin',       Label => Translatable('Username'),            MappedTo => 'login',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'UserPassword',    Label => Translatable('Password'),            MappedTo => 'pw',           Exposed => 0, DisplayGroup => 'Zugang' },
+            { Attribute => 'UserCustomerID',  Label => Translatable('CustomerID'),          MappedTo => 'customer_id',  Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
             { Attribute => 'UserCustomerIDs', Label => Translatable('CustomerIDs'),         MappedTo => 'customer_ids', Exposed => 1, Required => 1, Type => 'array' },
-            { Attribute => 'UserPhone',       Label => Translatable('Phone'),               MappedTo => 'phone',        Exposed => 1, DisplayGroup => 'Communication' },
-            { Attribute => 'UserFax',         Label => Translatable('Fax'),                 MappedTo => 'fax',          Exposed => 1, DisplayGroup => 'Communication' },
-            { Attribute => 'UserEmail',       Label => Translatable('Email'),               MappedTo => 'email',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Communication' },
-            { Attribute => 'UserMobile',      Label => Translatable('Mobile'),              MappedTo => 'mobile',       Exposed => 1, Searchable => 1 },
-            { Attribute => 'UserStreet',      Label => Translatable('Street'),              MappedTo => 'street',       Exposed => 1, Searchable => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'UserZip',         Label => Translatable('Zip'),                 MappedTo => 'zip',          Exposed => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'UserCity',        Label => Translatable('City'),                MappedTo => 'city',         Exposed => 1, Searchable => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'UserCountry',     Label => Translatable('Country'),             MappedTo => 'country',      Exposed => 1, Searchable => 1 },
-            { Attribute => 'UserComment',     Label => Translatable('Comment'),             MappedTo => 'comments',     Exposed => 1 },
-            { Attribute => 'ValidID',         Label => Translatable('Valid'),               MappedTo => 'valid_id',     Exposed => 1, Required => 1, Searchable => 1, Type => 'int' },
+            { Attribute => 'UserPhone',       Label => Translatable('Phone'),               MappedTo => 'phone',        Exposed => 1, DisplayGroup => 'Kommunikation' },
+            { Attribute => 'UserMobile',      Label => Translatable('Mobile'),              MappedTo => 'mobile',       Exposed => 1, Searchable => 1, DisplayGroup => 'Kommunikation' },
+            { Attribute => 'UserFax',         Label => Translatable('Fax'),                 MappedTo => 'fax',          Exposed => 1, Searchable => 1, DisplayGroup => 'Kommunikation' },
+            { Attribute => 'UserEmail',       Label => Translatable('Email'),               MappedTo => 'email',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Kommunikation' },
+            { Attribute => 'UserStreet',      Label => Translatable('Street'),              MappedTo => 'street',       Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'UserZip',         Label => Translatable('Zip'),                 MappedTo => 'zip',          Exposed => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'UserCity',        Label => Translatable('City'),                MappedTo => 'city',         Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'UserCountry',     Label => Translatable('Country'),             MappedTo => 'country',      Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'UserComment',     Label => Translatable('Comment'),             MappedTo => 'comments',     Exposed => 1, DisplayGroup => 'Sonstiges' },
+            { Attribute => 'ValidID',         Label => Translatable('Valid'),               MappedTo => 'valid_id',     Exposed => 1, Required => 1, Type => 'int', DisplayGroup => 'Sonstiges' },
         ],
 
         # default selections
@@ -1512,15 +1512,15 @@ via the Preferences button after logging in.
             #   Exposed - if set to 1 the attribute will be expose in the API, if set to 0 it won't
             #   Required - if set to 1 the attribute will be needed in the API during Creation or Update, if set to 0 it won't
             #   ReadOnly - if set to 1 the attribute can't be updated in the API during an Update, if set to 0 it won't
-            { Attribute => 'CustomerID',             Label => Translatable('CustomerID'), MappedTo => 'customer_id', Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'CustomerCompanyName',    Label => Translatable('Customer'),   MappedTo => 'name',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Basic Data' },
-            { Attribute => 'CustomerCompanyStreet',  Label => Translatable('Street'),     MappedTo => 'street',      Exposed => 1, Searchable => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'CustomerCompanyZIP',     Label => Translatable('Zip'),        MappedTo => 'zip',         Exposed => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1, Searchable => 1, DisplayGroup => 'Postal Address' },
-            { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1, Searchable => 1 },
-            { Attribute => 'CustomerCompanyURL',     Label => Translatable('URL'),        MappedTo => 'url',         Exposed => 1, DisplayGroup => 'Web' },
-            { Attribute => 'CustomerCompanyComment', Label => Translatable('Comment'),    MappedTo => 'comments',    Exposed => 1 },
-            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Searchable => 1, Type => 'int' },
+            { Attribute => 'CustomerID',             Label => Translatable('CustomerID'), MappedTo => 'customer_id', Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'CustomerCompanyName',    Label => Translatable('Customer'),   MappedTo => 'name',        Exposed => 1, Required => 1, Searchable => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'CustomerCompanyURL',     Label => Translatable('URL'),        MappedTo => 'url',         Exposed => 1, DisplayGroup => 'Stammdaten' },
+            { Attribute => 'CustomerCompanyStreet',  Label => Translatable('Street'),     MappedTo => 'street',      Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'CustomerCompanyZIP',     Label => Translatable('Zip'),        MappedTo => 'zip',         Exposed => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'CustomerCompanyCity',    Label => Translatable('City'),       MappedTo => 'city',        Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'CustomerCompanyCountry', Label => Translatable('Country'),    MappedTo => 'country',     Exposed => 1, Searchable => 1, DisplayGroup => 'Adresse' },
+            { Attribute => 'CustomerCompanyComment', Label => Translatable('Comment'),    MappedTo => 'comments',    Exposed => 1, DisplayGroup => 'Sonstiges' },
+            { Attribute => 'ValidID',                Label => Translatable('Valid'),      MappedTo => 'valid_id',    Exposed => 1, Required => 1, Type => 'int', DisplayGroup => 'Sonstiges' },
         ],
     };
 
@@ -1868,6 +1868,15 @@ sub new {
                     }
                     elsif ( $Line =~ /^VERSION\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
                         $Self->{Version} = $1;
+                    }
+                    elsif ( $Line =~ /^BUILDDATE\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                        $Self->{BuildDate} = $1;
+                    }
+                    elsif ( $Line =~ /^BUILDHOST\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                        $Self->{BuildHost} = $1;
+                    }
+                    elsif ( $Line =~ /^BUILDNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                        $Self->{BuildNumber} = $1;
                     }
                 }
             }

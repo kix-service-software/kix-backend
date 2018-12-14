@@ -89,21 +89,21 @@ perform SearchProfileSearch Operation. This will return a SearchProfile ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # prepare filter if given
-    my %SearchFilter;
-    if ( IsArrayRefWithData($Self->{Filter}->{SearchProfile}->{AND}) ) {
-        foreach my $FilterItem ( @{$Self->{Filter}->{SearchProfile}->{AND}} ) {
-            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API filtering)
-            next if ($FilterItem->{Field} !~ /^(Type|UserLogin|UserType|SubscribeProfileID|Category)$/g);
-            next if ($FilterItem->{Operator} ne 'EQ');
+    # prepare search if given
+    my %SearchParam;
+    if ( IsArrayRefWithData($Self->{Search}->{SearchProfile}->{AND}) ) {
+        foreach my $SearchItem ( @{$Self->{Search}->{SearchProfile}->{AND}} ) {
+            # ignore everything that we don't support in the core DB search (the rest will be done in the generic API Searching)
+            next if ($SearchItem->{Field} !~ /^(Type|UserLogin|UserType|SubscribeProfileID|Category)$/g);
+            next if ($SearchItem->{Operator} ne 'EQ');
 
-            $SearchFilter{$FilterItem->{Field}} = $FilterItem->{Value};
+            $SearchParam{$SearchItem->{Field}} = $SearchItem->{Value};
         }
     }
 
     # perform SearchProfile search
     my @SearchProfileList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
-        %SearchFilter
+        %SearchParam
     );
 
 	# get already prepared SearchProfile data from SearchProfileGet operation

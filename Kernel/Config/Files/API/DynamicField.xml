@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ConfigItemID</Item>
                 <Item Key="CacheType">API_dynamicfields</Item>
+                <Item Key="CacheTypeDependency">DynamicField</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_dynamicfields</Item>                
+                <Item Key="CacheTypeDependency">DynamicField</Item>
             </Hash>
         </Setting>
     </ConfigItem>

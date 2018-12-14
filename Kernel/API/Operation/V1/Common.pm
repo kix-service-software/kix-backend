@@ -93,14 +93,21 @@ sub RunOperation {
     }
 
     # check cache if CacheType is set for this operation
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && $Self->{OperationConfig}->{CacheType} ) {
+    if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::DisableCaching') && $Self->{OperationConfig}->{CacheType} ) {
+        # add own cache dependencies, if available
+        if ( $Self->{OperationConfig}->{CacheTypeDependency} ) {
+            $Self->AddCacheDependency(Type => $Self->{OperationConfig}->{CacheTypeDependency});
+        }
+
         my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{OperationConfig}->{CacheType},           
             Key  => $Self->_GetCacheKey(),
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            print STDERR $Self->{LevelIndent}."[Cache] return cached response\n";
+            if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
+                $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."return cached response");
+            }
             $Self->{'_CachedResponse'} = 1;
             return $Self->_Success(
                 %{$CacheResult}
@@ -153,6 +160,11 @@ sub Init {
                 . ' in Kernel::API::Operation::V1::Common::Init()',
         );
     }
+
+    $Self->{CacheKeyExtensions} = [];
+
+    # Search parameter is not handled in API by default
+    $Self->{HandleSearchInAPI} = 0;
 
     # calculate LevelIndent for Logging
     $Self->{Level} = $Self->{Level} || 0;
@@ -208,15 +220,31 @@ sub PrepareData {
         }
     }
 
-    # prepare field filter
+    # prepare filter
     if ( exists($Param{Data}->{filter}) ) {
         my $Result = $Self->_ValidateFilter(
             Filter => $Param{Data}->{filter},
+            Type   => 'filter',
         );
-        if ( IsHashRefWithData($Result) ) {
+        if ( IsHashRefWithData($Result) && exists $Result->{Success} && $Result->{Success} == 0 ) {
             # error occured
             return $Result;
         }
+        $Self->{Filter} = $Result;
+    }
+
+    # prepare search
+    if ( exists($Param{Data}->{search}) ) {
+        # we use the same syntax like the filter, so we can you the same validation method
+        my $Result = $Self->_ValidateFilter(
+            Filter => $Param{Data}->{search},
+            Type   => 'search',
+        );
+        if ( IsHashRefWithData($Result) && exists $Result->{Success} && $Result->{Success} == 0 ) {
+            # error occured
+            return $Result;
+        }
+        $Self->{Search} = $Result;
     }
 
     # prepare field selector
@@ -493,7 +521,63 @@ sub AddCacheDependency {
         }
     }
 
-    $Self->{CacheDependencies}->{$Param{Type}} = 1;
+    foreach my $Type (split(/,/, $Param{Type})) {
+        if ( exists $Self->{CacheDependencies}->{$Type} ) {
+            $Self->_Debug($Self->{LevelIndent}."adding cache type dependencies: $Type...already exists");
+            next;
+        }
+        $Self->_Debug($Self->{LevelIndent}."adding cache type dependencies: $Type");
+        $Self->{CacheDependencies}->{$Type} = 1;
+    }
+}
+
+=item AddCacheKeyExtension()
+
+add an extension to the cache key used to cache this request
+
+    $CommonObject->AddCacheKeyExtension(
+        Extension => []
+    );
+
+=cut
+
+sub AddCacheKeyExtension {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Extension)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'AddCacheKeyExtension.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    if ( !IsArrayRefWithData($Param{Extension}) ) {
+        return $Self->_Error(
+            Code    => 'AddCacheKeyExtension.WringParameter',
+            Message => "Extension is not an array reference!",
+        );
+    }
+
+    foreach my $Extension ( @{$Param{Extension}} ) {
+        push(@{$Self->{CacheKeyExtensions}}, $Extension);
+    }
+}
+
+=item HandleSearchInAPI()
+
+Tell the API core to handle the "search" parameter in the API. This is needed for operations that don't handle the "search" parameter and leave the work to the API core.
+
+    $CommonObject->HandleSearchInAPI();
+
+=cut
+
+sub HandleSearchInAPI {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{HandleSearchInAPI} = 1;
 }
 
 =item _Success()
@@ -510,6 +594,14 @@ sub _Success {
     my ( $Self, %Param ) = @_;
 
     # ignore cached calues if we have a cached response (see end of Init method)
+
+    # handle Search parameter if we have to
+    if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData($Self->{Search}) ) {
+        $Self->_ApplyFilter(
+            Data   => \%Param,
+            Filter => $Self->{Search}
+        );
+    }
 
     # honor a filter, if we have one
     if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Filter}) ) {
@@ -561,7 +653,7 @@ sub _Success {
     }
 
     # cache request without offset and limit if CacheType is set for this operation
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableAPICaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
+    if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::DisableCaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
         $Self->_CacheRequest(
             Data => \%Param,
         );
@@ -656,7 +748,7 @@ sub ExecOperation {
         );
     }
 
-    print STDERR $Self->{LevelIndent}."[API] ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}\n";
+    $Self->_Debug($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
 
     my $Result = $OperationObject->Run(
         Data    => {
@@ -668,13 +760,15 @@ sub ExecOperation {
 
     # check result and add cachetype if neccessary
     if ( $Result->{Success} && $OperationObject->{OperationConfig}->{CacheType} && $Self->{OperationConfig}->{CacheType}) {
-        $Self->{CacheDependencies}->{$OperationObject->{OperationConfig}->{CacheType}} = 1;
+        $Self->AddCacheDependency(Type => $OperationObject->{OperationConfig}->{CacheType});
         if ( IsHashRefWithData($OperationObject->GetCacheDependencies()) ) {
             foreach my $CacheDep ( keys %{$OperationObject->GetCacheDependencies()} ) {
-                $Self->{CacheDependencies}->{$CacheDep} = 1;
+                $Self->AddCacheDependency(Type => $CacheDep);
             }
         }
-        print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+        if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Debug') ) {
+            $Self->_Debug($Self->{LevelIndent}."    cache type $Self->{OperationConfig}->{CacheType} depends on: ".join(',', keys %{$Self->{CacheDependencies}}));
+        }
     }
 
     return $Result;
@@ -725,7 +819,7 @@ sub _ValidateFilter {
     if ( !IsHashRefWithData($FilterDef) ) {
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "JSON parse error in filter!",
+            Message => "JSON parse error in $Param{Type}!",
         );
     }
 
@@ -733,24 +827,24 @@ sub _ValidateFilter {
         # do we have a object definition ?
         if ( !IsHashRefWithData($FilterDef->{$Object}) ) {
             return $Self->_Error(
-                Code    => 'PrepareData.InvalidFilter',
-                Message => "Invalid filter for object $Object!",
+                Code    => 'BadRequest',
+                Message => "Invalid $Param{Type} for object $Object!",
             );                
         }
 
         foreach my $BoolOperator ( keys %{$FilterDef->{$Object}} ) {
             if ( $BoolOperator !~ /^(AND|OR)$/g ) {
                 return $Self->_Error(
-                    Code    => 'PrepareData.InvalidFilter',
-                    Message => "Invalid filter for object $Object!",
+                    Code    => 'BadRequest',
+                    Message => "Invalid $Param{Type} for object $Object!",
                 );                
             }
 
             # do we have a valid boolean operator
             if ( !IsArrayRefWithData($FilterDef->{$Object}->{$BoolOperator}) ) {
                 return $Self->_Error(
-                    Code    => 'PrepareData.InvalidFilter',
-                    Message => "Invalid filter for object $Object!, operator $BoolOperator",
+                    Code    => 'BadRequest',
+                    Message => "Invalid $Param{Type} for object $Object!, operator $BoolOperator",
                 );                
             }
 
@@ -762,28 +856,28 @@ sub _ValidateFilter {
                 # check if filter field is valid
                 if ( !$Filter->{Field} ) {
                     return $Self->_Error(
-                        Code    => 'PrepareData.InvalidFilter',
+                        Code    => 'BadRequest',
                         Message => "No field in $Object.$Filter->{Field}!",
                     );
                 }
                 # check if filter Operator is valid
                 if ( $Filter->{Operator} !~ /^($ValidOperators)$/g ) {
                     return $Self->_Error(
-                        Code    => 'PrepareData.InvalidFilter',
+                        Code    => 'BadRequest',
                         Message => "Unknown filter operator $Filter->{Operator} in $Object.$Filter->{Field}!",
                     );
                 }
                 # check if type is valid
                 if ( !$ValidTypes{$Filter->{Type}} ) {
                     return $Self->_Error(
-                        Code    => 'PrepareData.InvalidFilter',
+                        Code    => 'BadRequest',
                         Message => "Unknown type $Filter->{Type} in $Object.$Filter->{Field}!",
                     );                
                 }
                 # check if combination of filter Operator and type is valid
                 if ( !$OperatorTypeMapping{$Filter->{Operator}}->{$Filter->{Type}} ) {
                     return $Self->_Error(
-                        Code    => 'PrepareData.InvalidFilter',
+                        Code    => 'BadRequest',
                         Message => "Type $Filter->{Type} not valid for operator $Filter->{Operator} in $Object.$Filter->{Field}!",
                     );                                
                 }
@@ -791,7 +885,7 @@ sub _ValidateFilter {
                 # check DATE value
                 if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
                     return $Self->_Error(
-                        Code    => 'PrepareData.InvalidFilter',
+                        Code    => 'BadRequest',
                         Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
                     );
                 }
@@ -799,18 +893,15 @@ sub _ValidateFilter {
                 # check DATETIME value
                 if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
                     return $Self->_Error(
-                        Code    => 'PrepareData.InvalidFilter',
+                        Code    => 'BadRequest',
                         Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
                     );
                 }
             }
         }
-
-        # filter is ok
-        $Self->{Filter} = $FilterDef;
     }
 
-    return 1;
+    return $FilterDef;
 }
 
 sub _ApplyFilter {
@@ -821,8 +912,10 @@ sub _ApplyFilter {
         return;
     }    
 
+    my $Filter = $Param{Filter} || $Self->{Filter};
+
     OBJECT:
-    foreach my $Object ( keys %{$Self->{Filter}} ) {
+    foreach my $Object ( keys %{$Filter} ) {
         if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
             # filter each contained hash
             my @FilteredResult;
@@ -833,150 +926,191 @@ sub _ApplyFilter {
                     my $Match = 1;
 
                     BOOLOPERATOR:
-                    foreach my $BoolOperator ( keys %{$Self->{Filter}->{$Object}} ) {
+                    foreach my $BoolOperator ( keys %{$Filter->{$Object}} ) {
                         my $BoolOperatorMatch = 1;
 
                         FILTER:
-                        foreach my $Filter ( @{$Self->{Filter}->{$Object}->{$BoolOperator}} ) {
+                        foreach my $FilterItem ( @{$Filter->{$Object}->{$BoolOperator}} ) {
                             my $FilterMatch = 1;
 
-                            # ignore filter attributes that are not contained in the response (otherwise the filter will fail)
-                            next if (!exists($ObjectItem->{$Filter->{Field}}));
+                            # if filter attributes are not contained in the response, check if it references a sub-structure
+                            if ( !exists($ObjectItem->{$FilterItem->{Field}}) ) {
 
-                            my $FieldValue = $ObjectItem->{$Filter->{Field}};
-                            my $FilterValue = $Filter->{Value};
-                            my $Type = $Filter->{Type};
+                                if ( $FilterItem->{Field} =~ /^.*?\..*?$/g ) {
+                                    # yes it does, filter sub-structure
+                                    my ($SubObject, $SubField) = split(/\./, $FilterItem->{Field}, 2);
+                                    my $SubData = {
+                                        $SubObject => IsArrayRefWithData($ObjectItem->{$SubObject}) ? $ObjectItem->{$SubObject} : [ $ObjectItem->{$SubObject} ]
+                                    };
+                                    my %SubFilter = %{$FilterItem};
+                                    $SubFilter{Field} = $SubField;
 
-                            # check if the value references a field in our hash and take its value in this case
-                            if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
-                                $FilterValue =  exists($ObjectItem->{$1}) ? $ObjectItem->{$1} : undef;
-                            }
-                            elsif ( $FilterValue ) {
-                                # replace wildcards with valid RegEx in FilterValue
-                                $FilterValue =~ s/\*/.*?/g;
+                                    # continue if the sub-structure attribute exists
+                                    if ( exists($ObjectItem->{$SubObject}) ) {
+                                        # execute filter on sub-structure
+                                        $Self->_ApplyFilter(
+                                            Data => $SubData,
+                                            Filter => {
+                                                $SubObject => {
+                                                    OR => [
+                                                        \%SubFilter
+                                                    ]
+                                                }
+                                            }
+                                        );
+
+                                        # check filtered SubData
+                                        if ( !IsArrayRefWithData($SubData->{$SubObject}) ) {
+                                            # the filter didn't match the sub-structure
+                                            $FilterMatch = 0;
+                                        }
+                                    }
+                                    else {
+                                        # the sub-structure attribute doesn't exist, ignore this item
+                                        $FilterMatch = 0;
+                                    }
+                                }
+                                else {
+                                    # filtered attribute not found, ignore this item 
+                                    $FilterMatch = 0;
+                                }
                             }
                             else {
-                                $FilterValue = undef;
-                            }
+                                my $FieldValue = $ObjectItem->{$FilterItem->{Field}};
+                                my $FilterValue = $FilterItem->{Value};
+                                my $Type = $FilterItem->{Type};
 
-                            my @FieldValues = ( $FieldValue );
-                            if ( IsArrayRefWithData($FieldValue) ) {
-                                @FieldValues = @{$FieldValue}
-                            }
-
-                            # handle multiple FieldValues (array)
-                            FIELDVALUE:
-                            foreach my $FieldValue ( @FieldValues ) {
-                                $FilterMatch = 1;
-
-                                # prepare date compare
-                                if ( $Type eq 'DATE' ) {
-                                    # convert values to unixtime
-                                    my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
-                                    $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                                        String => $DatePart.' 12:00:00',
-                                    );
-                                    # handle this as a numeric compare
-                                    $Type = 'NUMERIC';
+                                # check if the value references a field in our hash and take its value in this case
+                                if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
+                                    $FilterValue =  exists($ObjectItem->{$1}) ? $ObjectItem->{$1} : undef;
                                 }
-                                # prepare datetime compare
-                                elsif ( $Type eq 'DATETIME' ) {
-                                    # convert values to unixtime
-                                    $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-                                        String => $FieldValue,
-                                    );
-                                    # handle this as a numeric compare
-                                    $Type = 'NUMERIC';
+                                elsif ( $FilterValue ) {
+                                    # replace wildcards with valid RegEx in FilterValue
+                                    $FilterValue =~ s/\*/.*?/g;
+                                }
+                                else {
+                                    $FilterValue = undef;
                                 }
 
-                                # equal (=)
-                                if ( $Filter->{Operator} eq 'EQ' ) {
-                                    if ( !$FilterValue && $FieldValue ) {
-                                        $FilterMatch = 0
+                                my @FieldValues = ( $FieldValue );
+                                if ( IsArrayRefWithData($FieldValue) ) {
+                                    @FieldValues = @{$FieldValue}
+                                }
+
+                                # handle multiple FieldValues (array)
+                                FIELDVALUE:
+                                foreach my $FieldValue ( @FieldValues ) {
+                                    $FilterMatch = 1;
+
+                                    # prepare date compare
+                                    if ( $Type eq 'DATE' ) {
+                                        # convert values to unixtime
+                                        my ($DatePart, $TimePart) = split(/\s+/, $FieldValue);
+                                        $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                            String => $DatePart.' 12:00:00',
+                                        );
+                                        # handle this as a numeric compare
+                                        $Type = 'NUMERIC';
                                     }
-                                    elsif ( $Type eq 'STRING' && ($FieldValue||'') ne ($FilterValue||'') ) {
-                                        $FilterMatch = 0;
+                                    # prepare datetime compare
+                                    elsif ( $Type eq 'DATETIME' ) {
+                                        # convert values to unixtime
+                                        $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                            String => $FieldValue,
+                                        );
+                                        # handle this as a numeric compare
+                                        $Type = 'NUMERIC';
                                     }
-                                    elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') != ($FilterValue||'') ) {
-                                        $FilterMatch = 0;
-                                    }                                
-                                }
-                                # not equal (!=)
-                                elsif ( $Filter->{Operator} eq 'NE' ) {                        
-                                    if ( !$FilterValue && !$FieldValue ) {
-                                        $FilterMatch = 0
-                                    }
-                                    elsif ( $Type eq 'STRING' && ($FieldValue||'') eq ($FilterValue||'') ) {
-                                        $FilterMatch = 0;
-                                    }
-                                    elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') == ($FilterValue||'') ) {
-                                        $FilterMatch = 0;
-                                    }                                
-                                }
-                                # less than (<)
-                                elsif ( $Filter->{Operator} eq 'LT' ) {                        
-                                    if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
-                                        $FilterMatch = 0;
-                                    }                                
-                                }
-                                # greater than (>)
-                                elsif ( $Filter->{Operator} eq 'GT' ) {                        
-                                    if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
-                                        $FilterMatch = 0;
-                                    }                                
-                                }
-                                # less than or equal (<=)
-                                elsif ( $Filter->{Operator} eq 'LTE' ) {                        
-                                    if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
-                                        $FilterMatch = 0;
-                                    }                                
-                                }
-                                # greater than or equal (>=)
-                                elsif ( $Filter->{Operator} eq 'GTE' ) {                        
-                                    if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
-                                        $FilterMatch = 0;
-                                    }                                
-                                }
-                                # value is contained in an array or values
-                                elsif ( $Filter->{Operator} eq 'IN' ) {
-                                    $FilterMatch = 0;
-                                    foreach $FilterValue ( @{$FilterValue} ) {
-                                        if ( $Type eq 'NUMERIC' ) {                                    
-                                            next if $FilterValue != $FieldValue + 0;
+
+                                    # equal (=)
+                                    if ( $FilterItem->{Operator} eq 'EQ' ) {
+                                        if ( !$FilterValue && $FieldValue ) {
+                                            $FilterMatch = 0
                                         }
-                                        next if $FilterValue ne $FieldValue;
-                                        $FilterMatch = 1;
+                                        elsif ( $Type eq 'STRING' && ($FieldValue||'') ne ($FilterValue||'') ) {
+                                            $FilterMatch = 0;
+                                        }
+                                        elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') != ($FilterValue||'') ) {
+                                            $FilterMatch = 0;
+                                        }                                
                                     }
-                                }
-                                # the string contains a part
-                                elsif ( $Filter->{Operator} eq 'CONTAINS' ) {                        
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                    # not equal (!=)
+                                    elsif ( $FilterItem->{Operator} eq 'NE' ) {                        
+                                        if ( !$FilterValue && !$FieldValue ) {
+                                            $FilterMatch = 0
+                                        }
+                                        elsif ( $Type eq 'STRING' && ($FieldValue||'') eq ($FilterValue||'') ) {
+                                            $FilterMatch = 0;
+                                        }
+                                        elsif ( $Type eq 'NUMERIC' && ($FieldValue||'') == ($FilterValue||'') ) {
+                                            $FilterMatch = 0;
+                                        }                                
+                                    }
+                                    # less than (<)
+                                    elsif ( $FilterItem->{Operator} eq 'LT' ) {                        
+                                        if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                            $FilterMatch = 0;
+                                        }                                
+                                    }
+                                    # greater than (>)
+                                    elsif ( $FilterItem->{Operator} eq 'GT' ) {                        
+                                        if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                            $FilterMatch = 0;
+                                        }                                
+                                    }
+                                    # less than or equal (<=)
+                                    elsif ( $FilterItem->{Operator} eq 'LTE' ) {                        
+                                        if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                            $FilterMatch = 0;
+                                        }                                
+                                    }
+                                    # greater than or equal (>=)
+                                    elsif ( $FilterItem->{Operator} eq 'GTE' ) {                        
+                                        if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                            $FilterMatch = 0;
+                                        }                                
+                                    }
+                                    # value is contained in an array or values
+                                    elsif ( $FilterItem->{Operator} eq 'IN' ) {
                                         $FilterMatch = 0;
+                                        foreach $FilterValue ( @{$FilterValue} ) {
+                                            if ( $Type eq 'NUMERIC' ) {                                    
+                                                next if $FilterValue != $FieldValue + 0;
+                                            }
+                                            next if $FilterValue ne $FieldValue;
+                                            $FilterMatch = 1;
+                                        }
                                     }
-                                }
-                                # the string starts with the part
-                                elsif ( $Filter->{Operator} eq 'STARTSWITH' ) {                        
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
-                                        $FilterMatch = 0;
+                                    # the string contains a part
+                                    elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {                        
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                            $FilterMatch = 0;
+                                        }
                                     }
-                                }
-                                # the string ends with the part
-                                elsif ( $Filter->{Operator} eq 'ENDSWITH' ) {                        
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
-                                        $FilterMatch = 0;
+                                    # the string starts with the part
+                                    elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {                        
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
+                                            $FilterMatch = 0;
+                                        }
                                     }
-                                }
-                                # the string matches the pattern
-                                elsif ( $Filter->{Operator} eq 'LIKE' ) {                        
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
-                                        $FilterMatch = 0;
+                                    # the string ends with the part
+                                    elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {                        
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
+                                            $FilterMatch = 0;
+                                        }
                                     }
-                                }
+                                    # the string matches the pattern
+                                    elsif ( $FilterItem->{Operator} eq 'LIKE' ) {                        
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
+                                            $FilterMatch = 0;
+                                        }
+                                    }
 
-                                last FIELDVALUE if $FilterMatch;
+                                    last FIELDVALUE if $FilterMatch;
+                                }
                             }
 
-                            if ( $Filter->{Not} ) {
+                            if ( $FilterItem->{Not} ) {
                                 # negate match result
                                 $FilterMatch = !$FilterMatch;
                             }
@@ -1235,10 +1369,11 @@ sub _ApplyInclude {
 
             # if CacheType is set in config of GenericInclude
             if ( defined $GenericIncludes->{$Include}->{CacheType} ) {
-                $Self->{CacheDependencies}->{$GenericIncludes->{$Include}->{CacheType}} = 1;
+                $Self->AddCacheDependency(Type => $GenericIncludes->{$Include}->{CacheType});
+                $Self->AddCacheDependency(Type => $GenericIncludes->{$Include}->{CacheTypeDependency});
             }
 
-            print STDERR $Self->{LevelIndent}."[API] GenericInclude: $Include\n";
+            $Self->_Debug($Self->{LevelIndent}."GenericInclude: $Include");
 
             # do it for every object in the response
             foreach my $Object ( keys %{$Param{Data}} ) {
@@ -1277,7 +1412,9 @@ sub _ApplyInclude {
                 }
             }
 
-            print STDERR $Self->{LevelIndent}."    [Cache] type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}})."\n";
+            if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
+                $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."    type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}}));
+            }
         }
     }
 
@@ -1493,8 +1630,16 @@ sub _GetCacheKey {
     my %RequestData = %{$Self->{RequestData}};
     delete $RequestData{offset};
 
+    my @CacheKeyParts = qw(limit include expand);
+    if ( IsArrayRefWithData($Self->{CacheKeyExtensions}) ) {
+        @CacheKeyParts = (
+            @CacheKeyParts,
+            @{$Self->{CacheKeyExtensions}}
+        )
+    }
+
     # sort some things to make sure you always get the same cache key independent of the given order 
-    foreach my $What (qw(limit include expand)) {
+    foreach my $What (@CacheKeyParts) {
         next if !$RequestData{$What};
 
         my @Parts = split(/,/, $RequestData{$What});
@@ -1529,6 +1674,14 @@ sub _CacheRequest {
     }
 
     return 1;
+}
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
+
+    printf STDERR "%10s %15s: %s\n", "[API]", $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 1;

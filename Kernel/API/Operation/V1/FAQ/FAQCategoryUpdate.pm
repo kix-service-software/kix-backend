@@ -134,13 +134,27 @@ sub Run {
     # check if FAQCategory exists 
     my %FAQCategoryData = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGet(
         CategoryID  => $Param{Data}->{FAQCategoryID},
-        UserID      => $Self->{Authorization}->{UserID},
+        UserID      => 1
     );
  
     if ( !%FAQCategoryData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
             Message => "Cannot update FAQCategory. No FAQCategory with ID '$Param{Data}->{FAQCategoryID}' found.",
+        );
+    }
+
+    # check for duplicated
+    my $Exists = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDuplicateCheck(
+        CategoryID => $Param{Data}->{FAQCategoryID},
+        Name       => $FAQCategory->{Name},
+        ParentID   => $FAQCategory->{ParentID},
+        UserID     => 1
+    );
+    if ( $Exists ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Cannot create FAQCategory. Another FAQCategory with the same name and parent already exists.",
         );
     }
 

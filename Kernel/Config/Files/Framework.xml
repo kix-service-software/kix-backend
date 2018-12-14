@@ -1485,42 +1485,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9910" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a "Ticket" object can be linked with persons using the "agent" link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">Person</Item>
-                <Item Key="Type">Agent</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9911" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a "Ticket" object can be linked with persons using the "customer" link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">Person</Item>
-                <Item Key="Type">Customer</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9912" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a "Ticket" object can be linked with persons using the "3rd party" link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">Person</Item>
-                <Item Key="Type">3rdParty</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Loader::Agent::CommonJS###200-KIX4OTRSLinkedPersons" Required="1" Valid="1">
         <Description Translatable="1">List of JS files to always be loaded for the agent interface.</Description>
         <Group>Framework</Group>
@@ -2952,14 +2916,14 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###3201" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'ConnectedTo' link type.</Description>
+        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'Includes' link type.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="Object1">ConfigItem</Item>
                 <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">ConnectedTo</Item>
+                <Item Key="Type">Includes</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2976,14 +2940,14 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###3203" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'Includes' link type.</Description>
+        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with other 'ConfigItem' objects using the 'ConnectedTo' link type.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="Object1">ConfigItem</Item>
                 <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">Includes</Item>
+                <Item Key="Type">ConnectedTo</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2996,18 +2960,6 @@
                 <Item Key="Object1">ConfigItem</Item>
                 <Item Key="Object2">ConfigItem</Item>
                 <Item Key="Type">RelevantTo</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3220" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Ticket' objects using the 'AlternativeTo' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ConfigItem</Item>
-                <Item Key="Object2">Ticket</Item>
-                <Item Key="Type">AlternativeTo</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3035,39 +2987,15 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3240" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Service' objects using the 'AlternativeTo' link type.</Description>
+    <ConfigItem Name="LinkObject::PossibleLink###3223" Required="0" Valid="1">
+        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Ticket' objects using the 'RelevantTo' link type.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="Object1">ConfigItem</Item>
-                <Item Key="Object2">Service</Item>
-                <Item Key="Type">AlternativeTo</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3241" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Service' objects using the 'DependsOn' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ConfigItem</Item>
-                <Item Key="Object2">Service</Item>
-                <Item Key="Type">DependsOn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3242" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'Service' objects using the 'RelevantTo' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ConfigItem</Item>
-                <Item Key="Object2">Service</Item>
-                <Item Key="Type">RelevantTo</Item>
+                <Item Key="Object2">Ticket</Item>
+                <Item Key="Type">Normal</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3083,18 +3011,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3261" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'FAQ' objects using the 'ParentChild' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ConfigItem</Item>
-                <Item Key="Object2">FAQArticle</Item>
-                <Item Key="Type">ParentChild</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###3262" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with 'FAQ' objects using the 'RelevantTo' link type.</Description>
         <Group>Framework</Group>
@@ -3104,114 +3020,6 @@
                 <Item Key="Object1">ConfigItem</Item>
                 <Item Key="Object2">FAQArticle</Item>
                 <Item Key="Type">RelevantTo</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3280" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'Service' object can be linked with 'FAQ' objects using the 'Normal' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Service</Item>
-                <Item Key="Object2">FAQArticle</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3281" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'Service' object can be linked with 'FAQ' objects using the 'ParentChild' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Service</Item>
-                <Item Key="Object2">FAQArticle</Item>
-                <Item Key="Type">ParentChild</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3282" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'Service' object can be linked with 'FAQ' objects using the 'RelevantTo' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Service</Item>
-                <Item Key="Object2">FAQArticle</Item>
-                <Item Key="Type">RelevantTo</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3400" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMWorkOrder' object can be linked with 'Service' objects using the 'Normal' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMWorkOrder</Item>
-                <Item Key="Object2">Service</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3401" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMWorkOrder' object can be linked with 'Service' objects using the 'DependsOn' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMWorkOrder</Item>
-                <Item Key="Object2">Service</Item>
-                <Item Key="Type">DependsOn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3410" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMWorkOrder' object can be linked with 'ConfigItem' objects using the 'Normal' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMWorkOrder</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3411" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMWorkOrder' object can be linked with 'ConfigItem' objects using the 'DependsOn' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMWorkOrder</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">DependsOn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3412" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMWorkOrder' object can be linked with 'Ticket' objects using the 'Normal' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMWorkOrder</Item>
-                <Item Key="Object2">Ticket</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###3420" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMChange' object can be linked with 'Ticket' objects using the 'Normal' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMChange</Item>
-                <Item Key="Object2">Ticket</Item>
-                <Item Key="Type">Normal</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3621,78 +3429,6 @@
             <Hash>
                 <Item Key="SourceName">DocumentLink</Item>
                 <Item Key="TargetName">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9902" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'Ticket' object can be linked with documents using the 'DocumentLink' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">Document</Item>
-                <Item Key="Type">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9904" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'Service' object can be linked with documents using the 'DocumentLink' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Service</Item>
-                <Item Key="Object2">Document</Item>
-                <Item Key="Type">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9905" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'SLA' object can be linked with documents using the 'DocumentLink' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">SLA</Item>
-                <Item Key="Object2">Document</Item>
-                <Item Key="Type">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9906" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ConfigItem' object can be linked with documents using the 'DocumentLink' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ConfigItem</Item>
-                <Item Key="Object2">Document</Item>
-                <Item Key="Type">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9907" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMWorkOrder' object can be linked with documents using the 'DocumentLink' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMWorkOrder</Item>
-                <Item Key="Object2">Document</Item>
-                <Item Key="Type">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###9908" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'ITSMChange' object can be linked with documents using the 'DocumentLink' link type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">ITSMChange</Item>
-                <Item Key="Object2">Document</Item>
-                <Item Key="Type">DocumentLink</Item>
             </Hash>
         </Setting>
     </ConfigItem>

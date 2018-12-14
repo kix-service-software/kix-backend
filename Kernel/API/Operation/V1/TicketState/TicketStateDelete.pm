@@ -118,7 +118,7 @@ sub Run {
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
-            Filter       => {
+            Search       => {
                 AND => [ 
                     {
                         Field => 'TicketStateID',
@@ -134,7 +134,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete TicketState. A Ticket with this TicketState already exists.',
+                Message => 'Cannot delete state. A ticket with this state already exists.',
             );
         }
 	    
@@ -147,7 +147,7 @@ sub Run {
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete TicketState, please contact the system administrator',
+                Message => 'Could not delete state, please contact the system administrator',
             );
         }
     }

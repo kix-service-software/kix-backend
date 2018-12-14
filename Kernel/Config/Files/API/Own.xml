@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">UserID</Item>
                 <Item Key="CacheType">API_user</Item>
+                <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ContactID</Item>
                 <Item Key="CacheType">API_contacts</Item>
+                <Item Key="CacheTypeDependency">CustomerUser</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">Contact</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_contacts</Item>                
+                <Item Key="CacheTypeDependency">CustomerUser</Item>
             </Hash>
         </Setting>
     </ConfigItem>

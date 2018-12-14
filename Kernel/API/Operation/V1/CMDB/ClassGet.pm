@@ -178,7 +178,7 @@ sub Run {
             my $Response = $Self->ExecOperation(
                 OperationType => 'V1::GeneralCatalog::GeneralCatalogItemSearch',
                 Data          => {
-                    filter => {
+                    search => {
                         GeneralCatalogItem => {
                             AND => [
                                 {

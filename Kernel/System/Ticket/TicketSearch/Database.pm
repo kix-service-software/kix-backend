@@ -110,7 +110,7 @@ sub new {
             next MODULE;
         }
 
-        foreach my $Type ( qw(Filter Sort) ) {
+        foreach my $Type ( qw(Search Sort) ) {
             if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
@@ -138,8 +138,8 @@ To find tickets in your system.
         # result limit
         Limit => 100,
 
-        # the filter
-        Filter => {
+        # the search params
+        Search => {
             AND => [        # optional, if not given, OR must be used
                 {
                     Field    => '...',      # see list of filterable fields
@@ -172,7 +172,7 @@ To find tickets in your system.
     );
 
 Filterable fields and possible operators, values and sortablility:
-    => see manual of REST-API (look for "Search Tickets")
+    => see manual of REST API
     
 Returns:
 
@@ -259,8 +259,8 @@ sub TicketSearch {
     my $Result = $Param{Result} || 'HASH';
 
     # init attribute backend modules
-    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Filter}} ) {
-        $Self->{AttributeModules}->{Filter}->{$SearchableAttribute}->Init();
+    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
+        $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->Init();
     }
 
     # create basic SQL
@@ -283,7 +283,7 @@ sub TicketSearch {
     $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
 
     # filter
-    if ( IsHashRefWithData($Param{Filter}) ) {
+    if ( IsHashRefWithData($Param{Search}) ) {
         my %Result = $Self->_CreateAttributeSQL(
             SQLPartsDef => \@SQLPartsDef,
             %Param,
@@ -507,7 +507,7 @@ generate SQL for attribute filtering
 
     my $SQLWhere = $Object->_CreateAttributeSQL(
         SQLPartsDef => []                      # required
-        Filter      => {},                     # required
+        Search      => {},                     # required
         UserID      => ...,                    # required
         UserType    => 'Agent' | 'Customer'    # required       
     );
@@ -526,10 +526,10 @@ sub _CreateAttributeSQL {
         return;
     }
 
-    if ( !IsHashRefWithData($Param{Filter}) ) {
+    if ( !IsHashRefWithData($Param{Search}) ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'No Filter definition given!',
+            Message  => 'No Search definition given!',
         );
         return;
     }
@@ -537,60 +537,60 @@ sub _CreateAttributeSQL {
     if ( !$Param{UserID} && !$Param{UserType} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'No user information for attribute filters!',
+            Message  => 'No user information for attribute search!',
         );
         return;
     }    
 
     # generate SQL from attribute modules
-    foreach my $BoolOperator ( keys %{$Param{Filter}} ) {
-        if ( !IsArrayRefWithData($Param{Filter}->{$BoolOperator}) ) {
+    foreach my $BoolOperator ( keys %{$Param{Search}} ) {
+        if ( !IsArrayRefWithData($Param{Search}->{$BoolOperator}) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Invalid filter for $BoolOperator!",
+                Message  => "Invalid Search for $BoolOperator!",
             );
             return;            
         }
 
         my %SQLDefBoolOperator;
 
-        foreach my $Filter ( @{$Param{Filter}->{$BoolOperator}} ) {
+        foreach my $Search ( @{$Param{Search}->{$BoolOperator}} ) {
             my $AttributeModule;
 
             # check if we have a handling module for this field
-            if ( !$Self->{AttributeModules}->{Filter}->{$Filter->{Field}} ) {
+            if ( !$Self->{AttributeModules}->{Search}->{$Search->{Field}} ) {
                 # we don't have any directly registered handling module for this field, check if we have a handling module matching a pattern
-                foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Filter}} ) {
-                    next if $Filter->{Field} !~ /$SearchableAttribute/g;
-                    $AttributeModule = $Self->{AttributeModules}->{Filter}->{$SearchableAttribute};
+                foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
+                    next if $Search->{Field} !~ /$SearchableAttribute/g;
+                    $AttributeModule = $Self->{AttributeModules}->{Search}->{$SearchableAttribute};
                     last;
                 }
             }
             else {
-                $AttributeModule = $Self->{AttributeModules}->{Filter}->{$Filter->{Field}};
+                $AttributeModule = $Self->{AttributeModules}->{Search}->{$Search->{Field}};
             }
 
             # ignore this attribute if we don't have a module for it
             if ( !$AttributeModule ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => "Unable to search for attribute $Filter->{Field}. Don't know how to handle it!",
+                    Message  => "Unable to search for attribute $Search->{Field}. Don't know how to handle it!",
                 );
                 return;            
             }
 
             # execute attribute module to prepare SQL
-            my $Result = $AttributeModule->Filter(
+            my $Result = $AttributeModule->Search(
                 UserID       => $Param{UserID},
                 UserType     => $Param{UserType},
                 BoolOperator => $BoolOperator,            
-                Filter       => $Filter,
+                Search       => $Search,
             );
 
             if ( !IsHashRefWithData($Result) ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => "Attribute module for $Filter->{Field} returned an error!",
+                    Message  => "Attribute module for $Search->{Field} returned an error!",
                 );
                 return;
             }

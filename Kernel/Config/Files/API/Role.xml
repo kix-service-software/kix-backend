@@ -10,7 +10,8 @@
                 <Item Key="Controller">Role</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">RoleID</Item>
-                <Item Key="CacheType">API_groups</Item>                
+                <Item Key="CacheType">API_roles</Item>                
+                <Item Key="CacheTypeDependency">Group</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -22,7 +23,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Role</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="CacheType">API_groups</Item>                
+                <Item Key="CacheType">API_roles</Item>                
+                <Item Key="CacheTypeDependency">Group</Item>
             </Hash>
         </Setting>
     </ConfigItem>

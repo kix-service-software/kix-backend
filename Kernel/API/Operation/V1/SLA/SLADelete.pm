@@ -116,7 +116,7 @@ sub Run {
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
-            Filter       => {
+            Search       => {
                 AND => [ 
                     {
                         Field => 'SLAID',
@@ -132,7 +132,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete SLA. A Ticket with this SLA already exists.',
+                Message => 'Cannot delete SLA. A ticket with this SLA already exists.',
             );
         }
       

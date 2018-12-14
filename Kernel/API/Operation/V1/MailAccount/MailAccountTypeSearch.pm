@@ -92,8 +92,6 @@ sub Run {
 
     if ( IsHashRefWithData(\%BackendList) ) {
         my @TypeList = sort keys %BackendList;
-        use Data::Dumper;
-        print STDERR Dumper();
         return $Self->_Success(
             MailAccountType => \@TypeList,
         )

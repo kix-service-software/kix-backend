@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AddressID</Item>
                 <Item Key="CacheType">API_addressbook</Item>
+                <Item Key="CacheTypeDependency">AddressBook</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">AddressBook</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_addressbook</Item>
+                <Item Key="CacheTypeDependency">AddressBook</Item>
             </Hash>
         </Setting>
     </ConfigItem>

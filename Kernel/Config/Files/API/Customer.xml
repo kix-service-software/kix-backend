@@ -11,6 +11,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">CustomerID</Item>
                 <Item Key="CacheType">API_customers</Item>
+                <Item Key="CacheTypeDependency">CustomerCompany</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="Controller">Customer</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_customers</Item>                
+                <Item Key="CacheTypeDependency">CustomerCompany</Item>
             </Hash>
         </Setting>
     </ConfigItem>

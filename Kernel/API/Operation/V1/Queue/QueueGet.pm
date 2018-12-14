@@ -205,6 +205,9 @@ sub Run {
             $QueueData{SubQueues} = \@DirectSubQueues;
         }
 
+        # save full queue name
+        $QueueData{Fullname} = $QueueData{Name};
+
         # remove hierarchy from name (use last element of name split)
         $QueueData{Name} = pop @ParentQueueParts;
 
@@ -222,7 +225,7 @@ sub Run {
         if ( $Param{Data}->{include}->{Tickets} ) {
             # execute ticket search
             my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
+                Search => {
                     AND => [
                         {
                             Field    => 'QueueID',
@@ -242,65 +245,95 @@ sub Run {
 
         # include TicketStats if requested
         if ( $Param{Data}->{include}->{TicketStats} ) {
-        
+
+            my $TicketStatsFilter;
+            if ( $Param{Data}->{'TicketStats.StateType'} ) {
+                $TicketStatsFilter = {
+                    Field    => 'StateType',
+                    Operator => 'IN',
+                    Value    => [ split(/,/, $Param{Data}->{'TicketStats.StateType'}) ],
+                };
+            }
+            elsif ( $Param{Data}->{'TicketStats.StateID'} ) {
+                $TicketStatsFilter = {
+                    Field    => 'StateID',
+                    Operator => 'IN',
+                    Value    => [ split(/,/, $Param{Data}->{'TicketStats.StateID'}) ],
+                };
+            }
+
+            # add TicketStatsFilter to cache key to make this request specific
+            $Self->AddCacheKeyExtension(
+                Extension => [ $TicketStatsFilter ]
+            );
+
             # execute ticket searches
             my %TicketStats;
+            my @Filter;
+            
             # locked tickets
+            @Filter = (
+                {
+                    Field    => 'QueueID',
+                    Operator => 'EQ',
+                    Value    => $QueueID,
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => '2',
+                },
+            );
+            if ( IsHashRefWithData($TicketStatsFilter) ) {
+                push(@Filter, $TicketStatsFilter);
+            }
             $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
-                    AND => [
-                        {
-                            Field    => 'QueueID',
-                            Operator => 'EQ',
-                            Value    => $QueueID,
-                        },
-                        {
-                            Field    => 'LockID',
-                            Operator => 'EQ',
-                            Value    => '2',
-                        },
-                    ]
+                Search => {
+                    AND => \@Filter
                 },
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
-            
+
             # open tickets
+            @Filter = (
+                {
+                    Field    => 'QueueID',
+                    Operator => 'EQ',
+                    Value    => $QueueID,
+                },
+            );
+            if ( IsHashRefWithData($TicketStatsFilter) ) {
+                push(@Filter, $TicketStatsFilter);
+            }
             $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
-                    AND => [
-                        {
-                            Field    => 'QueueID',
-                            Operator => 'EQ',
-                            Value    => $QueueID,
-                        },
-                        {
-                            Field    => 'StateType',
-                            Operator => 'EQ',
-                            Value    => 'Open',
-                        },
-                    ]
+                Search => {
+                    AND => \@Filter
                 },
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
             
             # escalated tickets
+            @Filter = (
+                {
+                    Field    => 'QueueID',
+                    Operator => 'EQ',
+                    Value    => $QueueID,
+                },
+                {
+                    Field    => 'EscalationTime',
+                    Operator => 'LT',
+                    DataType => 'NUMERIC',
+                    Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                },
+            );
+            if ( IsHashRefWithData($TicketStatsFilter) ) {
+                push(@Filter, $TicketStatsFilter);
+            }
             $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Filter => {
-                    AND => [
-                        {
-                            Field    => 'QueueID',
-                            Operator => 'EQ',
-                            Value    => $QueueID,
-                        },
-                        {
-                            Field    => 'EscalationTime',
-                            Operator => 'LT',
-                            DataType => 'NUMERIC',
-                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
-                        },
-                    ]
+                Search => {
+                    AND => \@Filter
                 },
                 
                 UserID => $Self->{Authorization}->{UserID},

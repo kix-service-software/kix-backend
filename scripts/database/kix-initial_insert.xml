@@ -5061,6 +5061,16 @@ DefaultValue: ''
     </Insert>
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">99</Data>
+        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
+        <Data Key="name" Type="Quote">Open Source</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+    </Insert>
+    <Insert Table="general_catalog">
+        <Data Key="id" Type="AutoIncrement">100</Data>
         <Data Key="general_catalog_class" Type="Quote">DynamicField::DisplayGroup</Data>
         <Data Key="name" Type="Quote">Default</Data>
         <Data Key="valid_id">1</Data>
@@ -5087,16 +5097,6 @@ DefaultValue: ''
         <Data Key="pref_value" Type="Quote">incident</Data>
     </Insert>
     <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">27</Data>
-        <Data Key="pref_key" Type="Quote">Functionality</Data>
-        <Data Key="pref_value" Type="Quote">productive</Data>
-    </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">28</Data>
-        <Data Key="pref_key" Type="Quote">Functionality</Data>
-        <Data Key="pref_value" Type="Quote">postproductive</Data>
-    </Insert>
-    <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">29</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
@@ -5104,12 +5104,12 @@ DefaultValue: ''
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">30</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
-        <Data Key="pref_value" Type="Quote">productive</Data>
+        <Data Key="pref_value" Type="Quote">postproductive</Data>
     </Insert>
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">31</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
-        <Data Key="pref_value" Type="Quote">preproductive</Data>
+        <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">32</Data>
@@ -5119,12 +5119,12 @@ DefaultValue: ''
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">33</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
-        <Data Key="pref_value" Type="Quote">productive</Data>
+        <Data Key="pref_value" Type="Quote">preproductive</Data>
     </Insert>
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">34</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
-        <Data Key="pref_value" Type="Quote">postproductive</Data>
+        <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">35</Data>
@@ -5133,6 +5133,16 @@ DefaultValue: ''
     </Insert>
     <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">36</Data>
+        <Data Key="pref_key" Type="Quote">Functionality</Data>
+        <Data Key="pref_value" Type="Quote">postproductive</Data>
+    </Insert>
+    <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">37</Data>
+        <Data Key="pref_key" Type="Quote">Functionality</Data>
+        <Data Key="pref_value" Type="Quote">productive</Data>
+    </Insert>
+    <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">38</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">preproductive</Data>
     </Insert>
@@ -5318,7 +5328,7 @@ DefaultValue: ''
             {
                 Key        => 'Location',
                 #Name       => 'Asset Location',
-                Name       => 'Location',
+                Name       => 'Lokation',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
@@ -5608,6 +5618,9 @@ DefaultValue: ''
                     # enables detailed CI-search (not just auto complete on CI-name/-number)
                     #ActivateExtendedSearch => 1,
                 },
+                CountMin     => 0,
+                CountMax     => 25,
+                CountDefault => 1,
             },
         ],
     },
@@ -5701,7 +5714,7 @@ DefaultValue: ''
             {
                 Key        => 'Location',
                 #Name       => 'Asset Location',
-                Name       => 'Location',
+                Name       => 'Lokation',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
@@ -6128,7 +6141,8 @@ DefaultValue: ''
                 Input      => {
                     Required                       => 1,
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          => 'Location',
+                    #ReferencedCIClassName          => 'Location',
+                    ReferencedCIClassName          => 'Standort',
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -6314,7 +6328,8 @@ DefaultValue: ''
                 Input      => {
                     Required                       => 1,
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          => 'Building',
+                    #ReferencedCIClassName          => 'Building',
+                    ReferencedCIClassName          => 'Haus',
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -6351,16 +6366,6 @@ DefaultValue: ''
                 Key        => 'RoomLabel',
                 #Name       => 'Room Label',
                 Name       => 'Raumbeschriftung',
-                Searchable => 1,
-                Input      => {
-                    Type => 'Text',
-                    MaxLength => 50,
-                },
-            },
-            {
-                Key        => 'RoomType',
-                #Name       => 'Room Type',
-                Name       => 'Raumtyp',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -6651,7 +6656,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'LicenceKey',
-                #Name       => 'Licence Key',
+                #Name       => 'License Key',
                 Name       => 'Lizenzschlüssel',
                 Searchable => 1,
                 Input      => {
@@ -6670,8 +6675,9 @@ DefaultValue: ''
                         Input => {
                             Type => 'Text',
                             # enforce integer input by using regex...
-                            RegEx             => '^(?:(?:\d))$',
-                            RegExErrorMessage => 'Please enter decimal numbers only.',
+                            RegEx             => '^(?:(?:\d*))$',
+                            #RegExErrorMessage => 'Please enter decimal numbers only.',
+                            RegExErrorMessage => 'Bitte geben Sie nur Dezimalzahlen an.',
                             MaxLength         => 20,
                             Required          => 1,
                         },

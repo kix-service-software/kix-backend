@@ -88,73 +88,73 @@ sub Run {
     my ( $Self, %Param ) = @_;
     my %ContactList;
 
-    # prepare filter if given
-    my %SearchFilter;
-    if ( IsHashRefWithData($Self->{Filter}->{Contact}) ) {
-        foreach my $FilterType ( keys %{$Self->{Filter}->{Contact}} ) {
-            my %FilterTypeResult;
-            foreach my $FilterItem ( @{$Self->{Filter}->{Contact}->{$FilterType}} ) {
-                my $Value = $FilterItem->{Value};
+    # prepare search if given
+    my %SearchParam;
+    if ( IsHashRefWithData($Self->{Search}->{Contact}) ) {
+        foreach my $SearchType ( keys %{$Self->{Search}->{Contact}} ) {
+            my %SearchTypeResult;
+            foreach my $SearchItem ( @{$Self->{Search}->{Contact}->{$SearchType}} ) {
+                my $Value = $SearchItem->{Value};
 
-                if ( $FilterItem->{Operator} eq 'CONTAINS' ) {
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
                    $Value = '*' . $Value . '*';
                 }
-                elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
+                elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
                    $Value = $Value . '*';
                 }
-                if ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
+                if ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                    $Value = '*' . $Value;
                 }
 
-                if ($FilterItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
-                    $SearchFilter{$FilterItem->{Field}} = $Value;
+                if ($SearchItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
+                    $SearchParam{$SearchItem->{Field}} = $Value;
                 }
-                elsif ($FilterItem->{Field} =~ /^(ValidID)$/g) {
-                    $SearchFilter{Valid} = $Value;
+                elsif ($SearchItem->{Field} =~ /^(ValidID)$/g) {
+                    $SearchParam{Valid} = $Value;
                 }
                 else {
-                    $SearchFilter{Search} = $Value;
+                    $SearchParam{Search} = $Value;
                 }
 
                 # perform Contact search
                 my %SearchResult = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-                   %SearchFilter,
+                   %SearchParam,
                 );
 
-                if ( $FilterType eq 'AND' ) {
-                    if ( !%FilterTypeResult ) {
-                        %FilterTypeResult = %SearchResult;
+                if ( $SearchType eq 'AND' ) {
+                    if ( !%SearchTypeResult ) {
+                        %SearchTypeResult = %SearchResult;
                     }
                     else {
                         # remove all IDs from type result that we don't have in this search
-                        foreach my $Key ( keys %FilterTypeResult ) {
-                            delete $FilterTypeResult{$Key} if !exists $SearchResult{$Key};
+                        foreach my $Key ( keys %SearchTypeResult ) {
+                            delete $SearchTypeResult{$Key} if !exists $SearchResult{$Key};
                         }
                     }
                 }
-                elsif ( $FilterType eq 'OR' ) {
+                elsif ( $SearchType eq 'OR' ) {
                     # merge results
-                    %FilterTypeResult = (
-                        %FilterTypeResult,
+                    %SearchTypeResult = (
+                        %SearchTypeResult,
                         %SearchResult,
                     );
                 }
             }
 
             if ( !%ContactList ) {
-                %ContactList = %FilterTypeResult;
+                %ContactList = %SearchTypeResult;
             }
             else {
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
                 foreach my $Key ( keys %ContactList ) {
-                    delete $ContactList{$Key} if !exists $FilterTypeResult{$Key};
+                    delete $ContactList{$Key} if !exists $SearchTypeResult{$Key};
                 }
             }
         }
     }
     else {
-        # perform Contact search without any filter
+        # perform Contact search without any search params
         %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch();
     }
 

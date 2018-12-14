@@ -151,7 +151,7 @@
                 <Item Key="Module">PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriotityCreate|PriorityUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriorityCreate|PriorityUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -260,8 +260,8 @@
             <Hash>
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
-                <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(TicketTypeGet|TicketStateCreate|TicketStateUpdate|LinkCreate|MailAccountCreate|MailAccountUpdate|SearchProfileCreate|ConfigItemCreate|ConfigItemVersionCreate|ClassDefinitionCreate)</Item>
+                <Item Key="ConsiderOperationRegEx">(TicketCreate|TicketUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
     </ConfigItem>

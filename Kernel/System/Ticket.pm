@@ -97,6 +97,7 @@ sub new {
         Kernel::System::Ticket::TicketChecklist
         Kernel::System::Ticket::TicketSearch
         Kernel::System::EventHandler
+        Kernel::System::PerfLog
     );
 
     # init of event handler
@@ -2007,6 +2008,8 @@ Events:
 sub TicketQueueSet {
     my ( $Self, %Param ) = @_;
 
+$Self->PerfLogStart('Ticket::TicketQueueSet');
+
     # get queue object
     my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
 
@@ -2026,11 +2029,13 @@ sub TicketQueueSet {
         }
     }
 
+$Self->PerfLogStart('Ticket::TicketQueueSet: get ticket');
     # get current ticket
     my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
+$Self->PerfLogStop('Ticket::TicketQueueSet: get ticket');
 
     # move needed?
     if ( $Param{QueueID} == $Ticket{QueueID} && !$Param{Comment} ) {
@@ -2038,6 +2043,8 @@ sub TicketQueueSet {
         # update not needed
         return 1;
     }
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: checking permission');
 
     # permission check
     my %MoveList = $Self->MoveList( %Param, Type => 'move_into' );
@@ -2048,18 +2055,31 @@ sub TicketQueueSet {
         );
         return;
     }
+$Self->PerfLogStop('Ticket::TicketQueueSet: checking permission');
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: executing SQL');
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE ticket SET queue_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [ \$Param{QueueID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+$Self->PerfLogStop('Ticket::TicketQueueSet: executing SQL');
+
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: queue lookup');
 
     # queue lookup
     my $Queue = $QueueObject->QueueLookup( QueueID => $Param{QueueID} );
+$Self->PerfLogStop('Ticket::TicketQueueSet: queue lookup');
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: clearing ticket cache');
 
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+$Self->PerfLogStop('Ticket::TicketQueueSet: clearing ticket cache');
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: adding history entry');
 
     # history insert
     $Self->HistoryAdd(
@@ -2069,6 +2089,7 @@ sub TicketQueueSet {
         Name         => "\%\%$Queue\%\%$Param{QueueID}\%\%$Ticket{Queue}\%\%$Ticket{QueueID}",
         CreateUserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketQueueSet: adding history entry');
 
     # send move notify to queue subscriber
     if ( !$Param{SendNoNotification} && $Ticket{StateType} ne 'closed' ) {
@@ -2078,6 +2099,8 @@ sub TicketQueueSet {
         if ( $Param{ForceNotificationToUserID} ) {
             push @UserIDs, @{ $Param{ForceNotificationToUserID} };
         }
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: firing event NotificationMove');
 
         # trigger notification event
         $Self->EventHandler(
@@ -2091,7 +2114,10 @@ sub TicketQueueSet {
             },
             UserID => $Param{UserID},
         );
+$Self->PerfLogStop('Ticket::TicketQueueSet: firing event NotificationMove');
     }
+
+$Self->PerfLogStart('Ticket::TicketQueueSet: firing event TicketQueueUpdate');
 
     # trigger event, OldTicketData is needed for escalation events
     $Self->EventHandler(
@@ -2102,6 +2128,9 @@ sub TicketQueueSet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketQueueSet: firing event TicketQueueUpdate');
+
+$Self->PerfLogStop('Ticket::TicketQueueSet');
 
     return 1;
 }
@@ -2455,6 +2484,7 @@ Events:
 sub TicketServiceSet {
     my ( $Self, %Param ) = @_;
 
+$Self->PerfLogStart('Ticket::TicketServiceSet');
     # service lookup
     if ( $Param{Service} && !$Param{ServiceID} ) {
         $Param{ServiceID} = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
@@ -2473,15 +2503,18 @@ sub TicketServiceSet {
         }
     }
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: get ticket');
     # get current ticket
     my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: get ticket');
 
     # update needed?
     return 1 if $Param{ServiceID} eq $Ticket{ServiceID};
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: checking permission');
     # permission check
     my %ServiceList = $Self->TicketServiceList(%Param);
     if ( $Param{ServiceID} ne '' && !$ServiceList{ $Param{ServiceID} } ) {
@@ -2491,6 +2524,7 @@ sub TicketServiceSet {
         );
         return;
     }
+$Self->PerfLogStop('Ticket::TicketServiceSet: checking permission');
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
     for my $Parameter (qw(ServiceID SLAID)) {
@@ -2499,15 +2533,20 @@ sub TicketServiceSet {
         }
     }
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: executing SQL');
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE ticket SET service_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [ \$Param{ServiceID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: executing SQL');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: clearing ticket cache');
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+$Self->PerfLogStop('Ticket::TicketServiceSet: clearing ticket cache');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: get ticket (after)');
     # get new ticket data
     my %TicketNew = $Self->TicketGet(
         %Param,
@@ -2517,7 +2556,9 @@ sub TicketServiceSet {
     $Param{ServiceID}   = $Param{ServiceID}   || '';
     $Ticket{Service}    = $Ticket{Service}    || 'NULL';
     $Ticket{ServiceID}  = $Ticket{ServiceID}  || '';
+$Self->PerfLogStop('Ticket::TicketServiceSet: get ticket (after)');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: adding history entry');
     # history insert
     $Self->HistoryAdd(
         TicketID    => $Param{TicketID},
@@ -2526,7 +2567,9 @@ sub TicketServiceSet {
             "\%\%$TicketNew{Service}\%\%$Param{ServiceID}\%\%$Ticket{Service}\%\%$Ticket{ServiceID}",
         CreateUserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: adding history entry');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: firing event NotificationServiceUpdate');
     # trigger notification event
     $Self->EventHandler(
         Event => 'NotificationServiceUpdate',
@@ -2536,7 +2579,9 @@ sub TicketServiceSet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: firing event NotificationServiceUpdate');
 
+$Self->PerfLogStart('Ticket::TicketServiceSet: firing event TicketServiceUpdate');
     # trigger event
     $Self->EventHandler(
         Event => 'TicketServiceUpdate',
@@ -2545,7 +2590,9 @@ sub TicketServiceSet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketServiceSet: firing event TicketServiceUpdate');
 
+$Self->PerfLogStop('Ticket::TicketServiceSet');
     return 1;
 }
 
@@ -4432,6 +4479,8 @@ Events:
 sub TicketStateSet {
     my ( $Self, %Param ) = @_;
 
+$Self->PerfLogStart('Ticket::TicketStateSet');
+
     my %State;
     my $ArticleID = $Param{ArticleID} || '';
 
@@ -4464,10 +4513,12 @@ sub TicketStateSet {
         );
     }
 
+$Self->PerfLogStart('Ticket::TicketStateSet: get ticket');
     my %Ticket = $Self->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 0,
     );
+$Self->PerfLogStop('Ticket::TicketStateSet: get ticket');
 
     # use fallback if previous state could not be replaced
     if ( defined( $Param{State} ) && ( $Param{State} eq '0' || $Param{State} eq '_PREVIOUS_' ) )
@@ -4528,6 +4579,7 @@ sub TicketStateSet {
         # EO KIX4OTRS-capeIT
     }
 
+$Self->PerfLogStart('Ticket::TicketStateSet: checking permission');
     # permission check
     my %StateList = $Self->StateList(%Param);
     if ( !$StateList{ $State{ID} } ) {
@@ -4537,6 +4589,9 @@ sub TicketStateSet {
         );
         return;
     }
+$Self->PerfLogStop('Ticket::TicketStateSet: checking permission');
+
+$Self->PerfLogStart('Ticket::TicketStateSet: executing SQL');
 
     # db update
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
@@ -4544,9 +4599,15 @@ sub TicketStateSet {
             . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [ \$State{ID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+$Self->PerfLogStop('Ticket::TicketStateSet: executing SQL');
+
+$Self->PerfLogStart('Ticket::TicketStateSet: clearing ticket cache');
 
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+$Self->PerfLogStop('Ticket::TicketStateSet: clearing ticket cache');
+
+$Self->PerfLogStart('Ticket::TicketStateSet: adding history entry');
 
     # add history
     $Self->HistoryAdd(
@@ -4557,6 +4618,9 @@ sub TicketStateSet {
         HistoryType  => 'StateUpdate',
         CreateUserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketStateSet: adding history entry');
+
+$Self->PerfLogStart('Ticket::TicketStateSet: firing event TicketStateUpdate');
 
     # trigger event, OldTicketData is needed for escalation events
     $Self->EventHandler(
@@ -4567,6 +4631,9 @@ sub TicketStateSet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketStateSet: firing event TicketStateUpdate');
+
+$Self->PerfLogStop('Ticket::TicketStateSet');
 
     # KIX4OTRS-capeIT
     # return 1;
@@ -5342,6 +5409,8 @@ Events:
 sub TicketPrioritySet {
     my ( $Self, %Param ) = @_;
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet');
+
     # get priority object
     my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
 
@@ -5367,10 +5436,12 @@ sub TicketPrioritySet {
             return;
         }
     }
+$Self->PerfLogStart('Ticket::TicketPrioritySet: get ticket');
     my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: get ticket');
 
     # check if update is needed
     if ( $Ticket{Priority} eq $Param{Priority} ) {
@@ -5379,6 +5450,7 @@ sub TicketPrioritySet {
         return 1;
     }
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: checking permission');
     # permission check
     my %PriorityList = $Self->PriorityList(%Param);
     if ( !$PriorityList{ $Param{PriorityID} } ) {
@@ -5388,7 +5460,9 @@ sub TicketPrioritySet {
         );
         return;
     }
+$Self->PerfLogStop('Ticket::TicketPrioritySet: checking permission');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: executing SQL');
     # db update
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE ticket SET ticket_priority_id = ?, '
@@ -5396,10 +5470,14 @@ sub TicketPrioritySet {
             . ' WHERE id = ?',
         Bind => [ \$Param{PriorityID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: executing SQL');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: clearing ticket cache');
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: clearing ticket cache');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: adding history entry');
     # add history
     $Self->HistoryAdd(
         TicketID     => $Param{TicketID},
@@ -5409,7 +5487,9 @@ sub TicketPrioritySet {
         Name         => "\%\%$Ticket{Priority}\%\%$Ticket{PriorityID}"
             . "\%\%$Param{Priority}\%\%$Param{PriorityID}",
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: adding history entry');
 
+$Self->PerfLogStart('Ticket::TicketPrioritySet: firing event TicketPriorityUpdate');
     # trigger event
     $Self->EventHandler(
         Event => 'TicketPriorityUpdate',
@@ -5418,6 +5498,9 @@ sub TicketPrioritySet {
         },
         UserID => $Param{UserID},
     );
+$Self->PerfLogStop('Ticket::TicketPrioritySet: firing event TicketPriorityUpdate');
+
+$Self->PerfLogStop('Ticket::TicketPrioritySet');
 
     return 1;
 }
@@ -6758,6 +6841,9 @@ sub TicketWatchSubscribe {
         Bind => [ \$Param{TicketID}, \$Param{WatchUserID}, \$Param{UserID}, \$Param{UserID} ],
     );
 
+    # clear ticket cache
+    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+
     # get user data
     my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
         UserID => $Param{WatchUserID},
@@ -6835,6 +6921,9 @@ sub TicketWatchUnsubscribe {
             Bind => [ \$Param{TicketID} ],
         );
 
+        # clear ticket cache
+        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+
         for my $WatchUser (@WatchUsers) {
 
             my %User = $UserObject->GetUserData(
@@ -6863,6 +6952,9 @@ sub TicketWatchUnsubscribe {
             SQL  => 'DELETE FROM ticket_watcher WHERE ticket_id = ? AND user_id = ?',
             Bind => [ \$Param{TicketID}, \$Param{WatchUserID} ],
         );
+
+        # clear ticket cache
+        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
         my %User = $UserObject->GetUserData(
             UserID => $Param{WatchUserID},

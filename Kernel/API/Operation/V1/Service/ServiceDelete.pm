@@ -116,7 +116,7 @@ sub Run {
         my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
-            Filter       => {
+            Search       => {
                 AND => [ 
                     {
                         Field => 'ServiceID',
@@ -132,7 +132,7 @@ sub Run {
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete Service. A Ticket with this Service already exists.',
+                Message => 'Cannot delete service. A ticket with this service already exists.',
             );
         }
       
@@ -145,7 +145,7 @@ sub Run {
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete Service, please contact the system administrator',
+                Message => 'Could not delete service, please contact the system administrator',
             );
         }
     }

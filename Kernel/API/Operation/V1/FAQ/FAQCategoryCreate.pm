@@ -135,6 +135,19 @@ sub Run {
         Data => $Param{Data}->{FAQCategory}
     );
 
+    # check if exists
+    my $Exists = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDuplicateCheck(
+        Name     => $FAQCategory->{Name},
+        ParentID => $FAQCategory->{ParentID},
+        UserID   => 1
+    );
+    if ( $Exists ) {
+        return $Self->_Error(
+            Code    => 'Object.AlreadyExists',
+            Message => "Cannot create FAQCategory. Another FAQCategory with the same name and parent already exists.",
+        );
+    }
+
     # create FAQCategory
     my $FAQCategoryID = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryAdd(
         Name     => $FAQCategory->{Name},

@@ -680,7 +680,7 @@
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Ticket/ArticleSearchIndex/*.pm" SelectedID="Kernel::System::Ticket::ArticleSearchIndex::RuntimeDB">
+            <Option Location="Kernel/System/Ticket/ArticleSearchIndex/*.pm" SelectedID="Kernel::System::Ticket::ArticleSearchIndex::StaticDB">
             </Option>
         </Setting>
     </ConfigItem>
@@ -10577,7 +10577,7 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###0200" Required="0" Valid="1">
-        <Description Translatable="1">Links 2 tickets with a "Normal" type link.</Description>
+        <Description Translatable="1">Links 2 tickets using a "Normal" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
@@ -10589,7 +10589,7 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LinkObject::PossibleLink###0201" Required="0" Valid="1">
-        <Description Translatable="1">Links 2 tickets with a "ParentChild" type link.</Description>
+        <Description Translatable="1">Links 2 tickets using a "ParentChild" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
         <Setting>
@@ -10597,6 +10597,66 @@ Thanks for your help!
                 <Item Key="Object1">Ticket</Item>
                 <Item Key="Object2">Ticket</Item>
                 <Item Key="Type">ParentChild</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###0202" Required="0" Valid="1">
+        <Description Translatable="1">Links a ticket with an FAQArticle using a "Normal" type link.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">Ticket</Item>
+                <Item Key="Object2">FAQArticle</Item>
+                <Item Key="Type">Normal</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###0203" Required="0" Valid="1">
+        <Description Translatable="1">Links ticket with an FAQArticle using a "ParentChild" type link.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">Ticket</Item>
+                <Item Key="Object2">FAQArticle</Item>
+                <Item Key="Type">ParentChild</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###0204" Required="0" Valid="1">
+        <Description Translatable="1">Links a ticket with a ConfigItem using a "DependsOn" type link.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">Ticket</Item>
+                <Item Key="Object2">ConfigItem</Item>
+                <Item Key="Type">DependsOn</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###0205" Required="0" Valid="1">
+        <Description Translatable="1">Links ticket with a ConfigItem using a "RelevantTo" type link.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">Ticket</Item>
+                <Item Key="Object2">ConfigItem</Item>
+                <Item Key="Type">RelevantTo</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="LinkObject::PossibleLink###0206" Required="0" Valid="1">
+        <Description Translatable="1">Links a ticket with a ConfigItem using a "Normal" type link.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::LinkObject</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Object1">Ticket</Item>
+                <Item Key="Object2">ConfigItem</Item>
+                <Item Key="Type">Normal</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -12551,7 +12611,7 @@ Thanks for your help!
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="1">
+    <ConfigItem Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="0">
         <Description Translatable="1">Create new linked person on create new Article or Update Owner.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>

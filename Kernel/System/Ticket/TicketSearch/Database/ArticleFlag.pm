@@ -41,7 +41,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -51,19 +51,19 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [ 'ArticleFlag' ],
+        Search => [ 'ArticleFlag' ],
         Sort   => []
     };
 }
 
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
+    my $Result = $Object->Search(
         BoolOperator => 'AND' | 'OR',
-        Filter       => {}
+        Search       => {}
     );
 
     $Result = {
@@ -73,24 +73,24 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
 
-    if ( !IsArrayRefWithData($Param{Filter}->{Value}) ) {
+    if ( !IsArrayRefWithData($Param{Search}->{Value}) ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Invalid filter value!",
+            Message  => "Invalid Search value!",
         );
         return;
     }
@@ -100,45 +100,45 @@ sub Filter {
         'OR'  => 'FULL OUTER'
     );
 
-    if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
         my $Index = 1;
-        foreach my $FilterValue ( sort @{ $Param{Filter}->{Value} } ) {
-            if ( !IsHashRefWithData($FilterValue) ) {
+        foreach my $SearchValue ( sort @{ $Param{Search}->{Value} } ) {
+            if ( !IsHashRefWithData($SearchValue) ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => "Invalid filter value!",
+                    Message  => "Invalid Search value!",
                 );
                 return;
             }
             
-            if ( !$Param{Filter}->{Not} ) {
+            if ( !$Param{Search}->{Not} ) {
                 push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
                 push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag$Index.id = af$Index.article_id" );
-                push( @SQLWhere, "af$Index.article_key = '$FilterValue->{Flag}'" );
+                push( @SQLWhere, "af$Index.article_key = '$SearchValue->{Flag}'" );
             }
             else {
                 push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
                 push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag$Index.id = af$Index.article_id" );
-                push( @SQLWhere, "naf$Index.article_key = '$FilterValue->{Flag}'" );
+                push( @SQLWhere, "naf$Index.article_key = '$SearchValue->{Flag}'" );
             }
 
             # add value restriction if given
-            if ( $FilterValue->{Value} ) {
-                if ( !$Param{Filter}->{Not} ) {
-                    push( @SQLWhere, "af$Index.article_value = '$FilterValue->{Value}'" );
+            if ( $SearchValue->{Value} ) {
+                if ( !$Param{Search}->{Not} ) {
+                    push( @SQLWhere, "af$Index.article_value = '$SearchValue->{Value}'" );
                 }
                 else {
-                    push( @SQLWhere, "(naf$Index.article_value IS NULL OR naf$Index.article_value <> '$FilterValue->{Value}')" );
+                    push( @SQLWhere, "(naf$Index.article_value IS NULL OR naf$Index.article_value <> '$SearchValue->{Value}')" );
                 }
             }
 
             # add user restriction if given
-            if ( $FilterValue->{UserID} ) {
-                if ( !$Param{Filter}->{Not} ) {
-                    push( @SQLWhere, "af$Index.create_by = $FilterValue->{UserID}" );
+            if ( $SearchValue->{UserID} ) {
+                if ( !$Param{Search}->{Not} ) {
+                    push( @SQLWhere, "af$Index.create_by = $SearchValue->{UserID}" );
                 }
                 else {
-                    push( @SQLWhere, "naf$Index.create_by = $FilterValue->{UserID}" );                    
+                    push( @SQLWhere, "naf$Index.create_by = $SearchValue->{UserID}" );                    
                 }
             }
             $Index++;
@@ -147,7 +147,7 @@ sub Filter {
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
         return;
     }

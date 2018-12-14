@@ -39,7 +39,7 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Filter => [ ],
+        Search => [ ],
         Sort   => [ ],
     };
 
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Filter => [
+        Search => [
             'From',
             'To',
             'Cc',
@@ -68,13 +68,13 @@ sub GetSupportedAttributes {
     }
 }
 
-=item Filter()
+=item Search()
 
 run this module and return the SQL extensions
 
-    my $Result = $Object->Filter(
+    my $Result = $Object->Search(
         BoolOperator => 'AND' | 'OR',
-        Filter       => {}
+        Search       => {}
     );
 
     $Result = {
@@ -84,16 +84,16 @@ run this module and return the SQL extensions
 
 =cut
 
-sub Filter {
+sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Filter} ) {
+    if ( !$Param{Search} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Need Filter!",
+            Message  => "Need Search!",
         );
         return;
     }
@@ -112,21 +112,27 @@ sub Filter {
         'OR'  => 'FULL OUTER'
     );
 
+    my $IsStaticSearch = 0;
+    my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
+    if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+        $IsStaticSearch = 1;
+    }
+
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
+        # use appropriate table for selected search index module
         my $ArticleSearchTable = 'article';
-        if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+        if ( $IsStaticSearch ) {
             $ArticleSearchTable = 'article_search';
         }
         push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
-    if ( $Param{Filter}->{Field} =~ /ArticleCreateTime/ ) {
+    if ( $Param{Search}->{Field} =~ /ArticleCreateTime/ ) {
         # convert to unix time
         my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
-            String => $Param{Filter}->{Value},
+            String => $Param{Search}->{Value},
         );
 
         if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
@@ -142,45 +148,46 @@ sub Filter {
             'GTE' => '>='
         );
 
-        if ( !$OperatorMap{$Param{Filter}->{Operator}} ) {
+        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
             return;
         }
 
-        push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Filter}->{Operator}}.' '.$Value );
+        push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
     }
     else {
-        my $Field      = $AttributeMapping{$Param{Filter}->{Field}};
-        my $FieldValue = $Param{Filter}->{Value};
+        my $Field      = $AttributeMapping{$Param{Search}->{Field}};
+        my $FieldValue = $Param{Search}->{Value};
 
-        if ( $Param{Filter}->{Operator} eq 'EQ' ) {
+        if ( $Param{Search}->{Operator} eq 'EQ' ) {
             # no special handling
         }
-        elsif ( $Param{Filter}->{Operator} eq 'STARTSWITH' ) {
+        elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
             $FieldValue = $FieldValue.'%';
         }
-        elsif ( $Param{Filter}->{Operator} eq 'ENDSWITH' ) {
+        elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
             $FieldValue = '%'.$FieldValue;
         }
-        elsif ( $Param{Filter}->{Operator} eq 'CONTAINS' ) {
+        elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
             $FieldValue = '%'.$FieldValue.'%';
         }
-        elsif ( $Param{Filter}->{Operator} eq 'LIKE' ) {
+        elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
             $FieldValue =~ s/\*/%/g;
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unsupported Operator $Param{Filter}->{Operator}!",
+                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
             return;
         }
 
         # check if database supports LIKE in large text types (in this case for body)
-        if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+        if ( !$IsStaticSearch && $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+            # lower attributes if we don't do a static search
             if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
                 $Field      = "LCASE($Field)";
                 $FieldValue = "LCASE('$FieldValue')";
@@ -192,6 +199,10 @@ sub Filter {
         }
         else {
             $FieldValue = "'$FieldValue'";
+            if ( $IsStaticSearch ) {
+                # lower search pattern if we use static search
+                $FieldValue = lc($FieldValue);
+            }
         }
 
         push( @SQLWhere, $Field.' LIKE '.$FieldValue );

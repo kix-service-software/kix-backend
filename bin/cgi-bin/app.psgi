@@ -111,6 +111,8 @@ builder {
     enable "Deflater",
         content_type => ['application/json'],
         vary_user_agent => 1;
+    enable "Plack::Middleware::AccessLog::Timed",
+        format => "%h %l %u %t \"%r\" %>s %b %D";        
     $App;
 };
 

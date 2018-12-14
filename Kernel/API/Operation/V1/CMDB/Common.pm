@@ -264,7 +264,7 @@ sub _CheckData {
     my ( $Self, %Param ) = @_;
 
     my $Definition = $Param{Definition};
-    my $Data       = $Param{Data};
+    my $Data       = $Param{Data} || {};
     my $Parent     = $Param{Parent} || '';
 
     my $CheckValueResult;
@@ -289,7 +289,7 @@ sub _CheckData {
         }
 
         # don't look at details if we don't have any value for this
-        next if !$Data->{$ItemKey} && $DefItem->{Input}->{Type} ne 'Dummy';
+        next if ( !IsHashRefWithData($Data) || !$Data->{$ItemKey} );
 
         # check structure and values
         if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
@@ -373,7 +373,6 @@ sub _CheckData {
             if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
                 my $Counter = 0;
                 for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
-
                     # start recursion for each array item
                     my $DataCheck = $Self->_CheckData(
                         Definition => $DefItem->{Sub},
@@ -387,7 +386,6 @@ sub _CheckData {
                 }
             }
             elsif ( ref $Data->{$ItemKey} eq 'HASH' ) {
-
                 # start recursion
                 my $DataCheck = $Self->_CheckData(
                     Definition => $DefItem->{Sub},
@@ -638,7 +636,6 @@ Creates a readible Data.
     my $NewData = $CommonObject->ConvertDataToExternal(
         Definition => $DefinitionHashRef,
         Data       => $DataHashRef,
-        ForDisplay => 1,                    # or 0, optional - use display values and attribute labels instead of keys
     );
 
     returns:
@@ -668,9 +665,6 @@ sub ConvertDataToExternal {
             );
 
             my $AttributeName = $RootHashKey;
-            if ( $Param{ForDisplay} ) {
-                $AttributeName = $AttrDef->{Name};
-            }
 
             if ( $AttrDef->{CountMax} > 1 ) {
 
@@ -686,7 +680,7 @@ sub ConvertDataToExternal {
 
                     # look if we have a sub structure
                     if ( $AttrDef->{Sub} ) {
-                        $NewData->{$AttributeName}->[$Counter]->{$RootHashKey} = $Content;
+                        $NewData->{$RootHashKey}->[$Counter]->{$RootHashKey} = $Content;
 
                         # start recursion
                         for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
@@ -698,7 +692,7 @@ sub ConvertDataToExternal {
                                 ForDisplay => $Param{ForDisplay},
                             );
                             for my $Key ( sort keys %{$NewDataPart} ) {
-                                $NewData->{$AttributeName}->[$Counter]->{$Key} = $NewDataPart->{$Key};
+                                $NewData->{$RootHashKey}->[$Counter]->{$Key} = $NewDataPart->{$Key};
                             }
                         }
                     }
@@ -729,7 +723,7 @@ sub ConvertDataToExternal {
                             }
                         }
 
-                        $NewData->{$AttributeName}->[$Counter] = $Content;
+                        $NewData->{$RootHashKey}->[$Counter] = $Content;
                     }
 
                     $Counter++;
@@ -772,7 +766,7 @@ sub ConvertDataToExternal {
                         }
                     }
 
-                    $NewData->{$AttributeName} = $Content;
+                    $NewData->{$RootHashKey} = $Content;
 
                     # look if we have a sub structure
                     if ( $AttrDef->{Sub} ) {
@@ -785,21 +779,21 @@ sub ConvertDataToExternal {
                                 RootKey    => $RootHashKey,
                                 ForDisplay => $Param{ForDisplay},
                             );
-
-                            if (ref $NewData->{$AttributeName} ne 'HASH') {
+                            
+                            if (ref $NewData->{$RootHashKey} ne 'HASH') {
                                 # prepare hash for sub result
-                                if ( $NewData->{$AttributeName} ) {
-                                    $NewData->{$AttributeName} = {
-                                        $RootHashKey = $NewData->{$AttributeName}
+                                if ( $NewData->{$RootHashKey} ) {
+                                    $NewData->{$RootHashKey} = {
+                                        $RootHashKey => $NewData->{$RootHashKey}
                                     };
                                 }
                                 else {
-                                    $NewData->{$AttributeName} = {};
+                                    $NewData->{$RootHashKey} = {};
                                 }
                             }
 
                             for my $Key ( sort keys %{$NewDataPart} ) {
-                                $NewData->{$AttributeName}->{$Key} = $NewDataPart->{$Key};
+                                $NewData->{$RootHashKey}->{$Key} = $NewDataPart->{$Key};
                             }
                         }
                     }

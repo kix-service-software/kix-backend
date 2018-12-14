@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="faq_attachment">
+        <ColumnAdd Name="content_id" Required="false" Size="250" Type="VARCHAR"/>
+        <ColumnAdd Name="disposition" Required="false" Size="15" Type="VARCHAR"/>
+        <ColumnDrop Name="inlineattachment"/>
+    </TableAlter>
+
+</database>

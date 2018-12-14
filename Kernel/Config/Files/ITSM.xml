@@ -1439,7 +1439,7 @@
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
-            <String Regex="">ConfigItem#</String>
+            <String Regex="">CI#</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ITSMConfigItem::Frontend::AgentITSMConfigItemSearch###SearchLimit" Required="1" Valid="1">

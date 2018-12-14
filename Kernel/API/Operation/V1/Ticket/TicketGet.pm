@@ -346,6 +346,13 @@ sub Run {
             );
         }
 
+        # add unseen information
+        my %Flags = $TicketObject->TicketFlagGet(
+            TicketID => $TicketID,
+            UserID   => $Self->{Authorization}->{UserID},  
+        );
+        $TicketRaw{Unseen} = (!exists($Flags{Seen}) || !$Flags{Seen}) ? 1 : 0;
+
         my %TicketData;
         my @DynamicFields;
 
@@ -453,9 +460,6 @@ sub Run {
         # add
         push(@TicketList, \%TicketData);
     }
-
-    # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'Ticket');
 
     if ( scalar(@TicketList) == 1 ) {
         return $Self->_Success(

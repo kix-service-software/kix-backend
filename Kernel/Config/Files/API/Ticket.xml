@@ -11,7 +11,8 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">TicketID</Item>
                 <Item Key="CacheType">API_tickets</Item>
-                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy]</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
+                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy; Unseen]</Item>
                 <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
             </Hash>
         </Setting>
@@ -20,11 +21,12 @@
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">TicketGet</Item>
+                <Item Key="Name">TicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -100,6 +102,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ArticleID</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -112,6 +115,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -183,6 +187,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -195,6 +200,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -220,6 +226,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FlagName</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -232,6 +239,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -268,6 +276,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">HistoryID</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -280,6 +289,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -294,6 +304,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ArticleID</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -306,6 +317,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -352,6 +364,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -364,6 +377,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -399,6 +413,7 @@
                 <Item Key="Controller">Ticket</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_tickets</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>

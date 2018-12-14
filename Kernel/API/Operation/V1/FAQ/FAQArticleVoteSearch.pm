@@ -124,6 +124,9 @@ sub Run {
     # get already prepared FAQ data from FAQArticleVoteGet operation
     if ( IsArrayRefWithData($VoteIDs) ) {
 
+        # we don't do any core search filtering, inform the API to do it for us, based on the given search
+        $Self->HandleSearchInAPI();
+
         my $FAQArticleVoteGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleVoteGet',
             Data      => {
