@@ -16,6 +16,8 @@ use lib "$RealBin/../..";
 use lib "$RealBin/../../Kernel/cpan-lib";
 use lib "$RealBin/../../Custom";
 
+use Kernel::System::VariableCheck qw(:all);
+
 use Kernel::System::ObjectManager;
 
 # create object manager
@@ -42,14 +44,16 @@ foreach my $File (sort @FileList) {
 
     print STDERR ++$Count . ": checking file $File...\n";
 
-    my $Content = $MainObject->FileRead(
+    my $ContentRef = $MainObject->FileRead(
         Location => $File,
     );
 
-    if ( !$$Content ) {
+    if ( !$$ContentRef ) {
         print STDERR "unable to read file!\n";
         next;
     }
+
+    my $Content = $$ContentRef;
 
     foreach my $ConfigItem ( @{ $SysConfigObject->{XMLConfig} } ) {
         next if !$ConfigItem->{Name};
@@ -66,22 +70,76 @@ foreach my $File (sort @FileList) {
             $SubKey = $2;
         }
 
-        if ( $$Content =~ /$Key/g ) {
-            if ( $SubKey && $$Content =~ /$SubKey/g ) {
-                print STDERR "    $ConfigItem->{Name}\n";
+        if ( $Content =~ /$Key/m ) {
+            if ( $SubKey && $Content =~ /$SubKey/m ) {
+                print STDERR "     subkey $SubKey found\n";
                 $ConfigItemUsage{$ConfigItem->{Name}}->{$File} = 1;                
             }
             else {
-                print STDERR "    $Key\n";                
+                print STDERR "     key $Key found\n";
                 $ConfigItemUsage{$Key}->{$File} = 1;
             }
         }
     }
 }
 
-use Data::Dumper;
-$Data::Dumper::Sortkeys = 1;
-print Dumper(\%ConfigItemUsage);
+my $HTML = "<html>
+<head>
+<style>
+table,td {
+    width: 100%;
+    border: 1px solid #a0a0a0;
+    vertical-align: top;
+}
+th:first-child, td:first-child {
+    width: 50px;
+    text-align: right;
+}
+.used {
+    background-color: #cbf774;
+}
+.unused {
+    background-color: #ffaaaa;
+}
+.parentused {
+    background-color: #fffc84;
+}
+</style>
+</head>
+<body>
+<table cellspacing='0'>
+<thead>
+<tr>
+<th>LfdNr.</th>
+<th>Key</th>
+<th>verwendet in</th>
+</tr>
+</thead>
+<tbody>";
+my $Index = 1;
+foreach my $Key (sort keys %ConfigItemUsage) {
+    my $Class = 'used';
+    if (!IsHashRefWithData($ConfigItemUsage{$Key})) {
+        $Class = "unused";
+    }
+
+    if ( $Key =~ /^(.*?)###(.*?)$/g ) {
+        my $ParentKey = $1;
+        if ($Class eq 'unused' && IsHashRefWithData($ConfigItemUsage{$ParentKey})) {
+            # key is not explicitely used but the parent part of the key is used
+            $Class = 'parentused';
+        }
+    }
+    
+    $HTML .= '<tr class="'.$Class.'">
+<td>'.$Index++.'</td>
+<td>'.$Key.'</td>
+<td>'.(join('<br/>', sort keys %{$ConfigItemUsage{$Key}})).'</td>
+</tr>';
+}
+$HTML .= '</tbody></table></body></html>';
+
+print $HTML;
 
 =back
 
