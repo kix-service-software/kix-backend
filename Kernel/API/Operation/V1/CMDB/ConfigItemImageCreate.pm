@@ -94,6 +94,9 @@ sub ParameterDefinition {
         'Image::Filename' => {
             Required => 1,
         },
+        'Image::ContentType' => {
+            Required => 1,
+        },
         'Image::Content' => {
             Required => 1,
         },
@@ -150,6 +153,7 @@ sub Run {
         ConfigItemID => $Param{Data}->{ConfigItemID},
         Filename     => $Image->{Filename},
         Content      => $Image->{Content},
+        ContentType  => $Image->{ContentType},
         Comment      => $Image->{Comment},
         UserID       => $Self->{Authorization}->{UserID},
     );
