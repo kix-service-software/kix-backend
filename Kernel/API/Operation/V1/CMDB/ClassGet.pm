@@ -204,10 +204,10 @@ sub Run {
             my @PreProductiveDeplStateIDs;
             my @ProductiveDeplStateIDs;
             foreach my $Item  (@{$Response->{Data}->{GeneralCatalogItem}}) {
-                if ($Item->{Functionality} eq 'preproductive') {
+                if ($Item->{Functionality} && $Item->{Functionality} eq 'preproductive') {
                     push(@PreProductiveDeplStateIDs, $Item->{ItemID});
                 }
-                if ($Item->{Functionality} eq 'productive') {
+                elsif ($Item->{Functionality} && $Item->{Functionality} eq 'productive') {
                     push(@ProductiveDeplStateIDs, $Item->{ItemID});
                 }
             }
