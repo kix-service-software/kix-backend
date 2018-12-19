@@ -1491,6 +1491,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ClassSearch
+    V1::CMDB::ClassCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassCreate
     V1::CMDB::ClassGet:
         Description: ''
         MappingInbound:
@@ -1498,6 +1505,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ClassGet
+    V1::CMDB::ClassUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassUpdate
+    V1::CMDB::ClassDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::CMDB::ClassDelete
     V1::CMDB::ClassDefinitionSearch:
         Description: ''
         MappingInbound:
@@ -2485,9 +2506,21 @@ Provider:
           RequestMethod:
           - GET
           Route: /cmdb/classes
+        V1::CMDB::ClassCreate:
+          RequestMethod:
+          - POST
+          Route: /cmdb/classes
         V1::CMDB::ClassGet:
           RequestMethod:
           - GET
+          Route: /cmdb/classes/:ClassID
+        V1::CMDB::ClassUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /cmdb/classes/:ClassID
+        V1::CMDB::ClassDelete:
+          RequestMethod:
+          - DELETE
           Route: /cmdb/classes/:ClassID
         V1::CMDB::ClassDefinitionSearch:
           RequestMethod:

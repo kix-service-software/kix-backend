@@ -211,7 +211,10 @@
 /objectdefinitions                                                      |   GET             | V1::ObjectDefinition::ObjectDefinitionSearch
 /objectdefinitions/:ObjectType                                          |   GET             | V1::ObjectDefinition::ObjectDefinitionGet
 /cmdb/classes                                                           |   GET             | V1::CMDB::ClassSearch
+/cmdb/classes                                                           |   POST            | V1::CMDB::ClassCreate
 /cmdb/classes/:ClassID                                                  |   GET             | V1::CMDB::ClassGet
+/cmdb/classes/:ClassID                                                  |   PATCH           | V1::CMDB::ClassUpdate
+/cmdb/classes/:ClassID                                                  |   DELETE          | V1::CMDB::ClassDelete
 /cmdb/classes/:ClassID/definitions                                      |   GET             | V1::CMDB::ClassDefinitionSearch
 /cmdb/classes/:ClassID/definitions/:DefinitionID                        |   GET             | V1::CMDB::ClassDefinitionGet
 /cmdb/classes/:ClassID/definitions                                      |   POST            | V1::CMDB::ClassDefinitionCreate
