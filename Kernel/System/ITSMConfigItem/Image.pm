@@ -48,6 +48,7 @@ Returns:
 
     %Image = (
         Filename    => '20180817004645.jpg',
+        ContentType => '...',
         Content     => '...'                    # file content, base64 coded
         Comment     => '...'
     );
@@ -77,7 +78,7 @@ sub ImageGet {
     if (IsArrayRefWithData($ImageFiles)) {
 
         foreach my $File (@{$ImageFiles}) {
-            next if ($File =~ /.*?\.txt$/g);
+            next if ($File =~ /.*?\.(txt|content_type)$/g);
 
             my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
                 Location => $File,
@@ -94,9 +95,23 @@ sub ImageGet {
 
             my($Filename, $Dir, $Suffix) = fileparse($File, qr/\.[^.]*/);
 
-            $Image{Filename} = $Filename . $Suffix;
-            $Image{Content}  = encode_base64($$Content);
-            $Image{Comment}  = '';
+            $Image{Filename}    = $Filename . $Suffix;
+            $Image{Content}     = encode_base64($$Content);
+            $Image{ContentType} = '';
+            $Image{Comment}     = '';
+
+            if ( -e $Dir.$Filename.'.content_type') {
+                # read comment file
+                my $ContentType = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                    Directory => $Dir,
+                    Filename  => $Filename . '.content_type',
+                    Silent    => 1,
+                );
+
+                if ($ContentType) {
+                    $Image{ContentType} = $$ContentType;
+                }
+            }
 
             if ( -e $Dir.$Filename.'.txt') {
                 # read comment file
@@ -107,7 +122,7 @@ sub ImageGet {
                 );
 
                 if ($Content) {
-                    $Image{Comment}  = $$Content;
+                    $Image{Comment} = $$Content;
                 }
             }
 
@@ -125,6 +140,7 @@ Adds a single image to the config item.
     my $ImageID = $ConfigItemObject->ImageAdd(
         ConfigItemID  => 1234,          # required
         Filename      => '...',         # required
+        ContentType   => '...',         # required
         Content       => '...'          # required, base64 coded
         Comment       => '...'
         UserID        => 1,
@@ -136,7 +152,7 @@ sub ImageAdd {
     my $Filename;
 
     # check needed stuff
-    for my $Needed (qw(ConfigItemID Filename Content)) {
+    for my $Needed (qw(ConfigItemID Filename ContentType Content)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -181,6 +197,20 @@ sub ImageAdd {
             );
             return;            
         }
+
+        $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+            Directory => $Directory,
+            Filename  => $Filename . '.content_type',
+            Content   => \$Param{ContentType},
+        );
+
+        if (!$FileLocation) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to store content type file $Directory/$Filename.content_type!",
+            );
+            return;            
+        }    
 
         if ($Param{Comment}) {
             my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
@@ -284,7 +314,7 @@ sub ImageList {
 
         my %ImageIDs;
         foreach my $File (@{$ImageFiles}) {
-            next if ($File =~ /.*?\.txt$/g);
+            next if ($File =~ /.*?\.(txt|content_type)$/g);
             my($Filename, $Dirs, $Suffix) = fileparse($File, qr/\.[^.]*/);
             $ImageIDs{$Filename} = 1;
         }
