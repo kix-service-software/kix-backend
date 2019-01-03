@@ -156,6 +156,24 @@ sub Run {
         );
     }
     
+    if ( $ConfigItemClass->{DefinitionString} ) {
+        my $Result = $Self->ExecOperation(
+            OperationType => 'V1::CMDB::ClassDefinitionCreate',
+            Data          => {
+                ClassID                   => $GeneralCatalogItemID,
+                ConfigItemClassDefinition => {
+                    DefinitionString => $ConfigItemClass->{DefinitionString}
+                }
+            }
+        );
+        
+        if ( !$Result->{Success} ) {
+            return $Self->_Error(
+                ${$Result},
+            )
+        }
+    }
+
     # return result    
     return $Self->_Success(
         Code              => 'Object.Created',
