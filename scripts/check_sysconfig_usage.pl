@@ -116,7 +116,13 @@ th:first-child, td:first-child {
 </tr>
 </thead>
 <tbody>";
-my $Index = 1;
+
+my $Index = 0;
+
+my @Rows = (
+    'LfdNr,Key,Verwendung,verwendet in'
+);
+
 foreach my $Key (sort keys %ConfigItemUsage) {
     my $Class = 'used';
     if (!IsHashRefWithData($ConfigItemUsage{$Key})) {
@@ -132,14 +138,21 @@ foreach my $Key (sort keys %ConfigItemUsage) {
     }
     
     $HTML .= '<tr class="'.$Class.'">
-<td>'.$Index++.'</td>
+<td>'.++$Index.'</td>
 <td>'.$Key.'</td>
 <td>'.(join('<br/>', sort keys %{$ConfigItemUsage{$Key}})).'</td>
 </tr>';
+
+    push(@Rows, "$Index,\"$Key\",\"$Class\",\"".(join("\n", sort keys %{$ConfigItemUsage{$Key}})).'"');
 }
 $HTML .= '</tbody></table></body></html>';
 
 print $HTML;
+
+$Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    Location => './sysconfig_usage.csv',
+    Content  => \(join("\n", @Rows))
+);
 
 =back
 
