@@ -1,0 +1,19 @@
+#%RAML 1.0 DataType
+
+schema: |
+  { "$schema": "http://json-schema.org/schema",
+    "type": "object",
+    "description": "An authorization object.",
+    "properties": {
+      "UserLogin": { "type": "string" },
+      "UserType": { "type": "string", "enum": [ "Agent", "Customer" ] },
+      "Password": { "type": "string" }
+    },
+    "required": [ "UserLogin", "UserType", "Password" ]
+  }
+example: |
+  {
+    "UserLogin": "root@localhost",
+    "UserType": "Agent",
+    "Password": "root"
+  }

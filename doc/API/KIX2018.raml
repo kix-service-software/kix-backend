@@ -1,0 +1,28 @@
+#%RAML 1.0
+title: KIX 2018 REST API
+version: v1
+protocols: [ HTTP, HTTPS ]
+baseUri: http://{fqdn}:{port}/api.pl/webservice/core:{version}
+baseUriParameters:
+  fqdn:
+    description: |
+      The FQDN of the KIX backend server.
+  port:
+    description: |
+      The port the KIX backend server uses.
+mediaType: application/json
+
+# security
+securedBy: webToken
+securitySchemes:
+  webToken: !include securitySchemes/webToken.raml
+
+# some definitions
+types: !include lib/types.raml
+traits: !include lib/traits.raml
+resourceTypes: !include lib/resourceTypes.raml
+
+# resources
+/session: !include resources/session.raml
+/sessions: !include resources/sessions.raml
+/user: !include resources/user.raml

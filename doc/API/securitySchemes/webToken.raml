@@ -1,0 +1,16 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  Each request must contain an Authorization header
+type: x-webToken
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        Used to send the token
+        type: string
+        pattern: Token <Token>
+  responses:
+    401:
+      description: |
+        Unauthorized. The given token is invalid.
