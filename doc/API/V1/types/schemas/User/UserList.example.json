@@ -1,0 +1,31 @@
+{
+    "User": [
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "UserEmail": "john.doe@example.com",
+            "UserFirstname": "John",
+            "UserFullname": "John Doe",
+            "UserID": 3,
+            "UserLastname": "Doe",
+            "UserLogin": "jdoe",
+            "UserTitle": "Dr.",
+            "ValidID": 1
+        },
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 08:12:17",
+            "CreateBy": 1,
+            "CreateTime": "2018-10-28 08:10:01",
+            "UserEmail": "max.mustermann@example.com",
+            "UserFirstname": "Max",
+            "UserFullname": "Max Mustermann",
+            "UserID": 4,
+            "UserLastname": "Mustermann",
+            "UserLogin": "mamu",
+            "ValidID": 1
+        }        
+    ]
+}

@@ -1,0 +1,15 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#Lock",
+    "type": "object",
+    "description": "The ticket lock object.",
+    "properties": {
+      "ChangeBy": { "type": "number" },
+      "ChangeTime": { "type": "string" },
+      "CreateBy": { "type": "number" },
+      "CreateTime": { "type": "string" },
+      "ID": { "type": "number" },
+      "Name": { "type": "string" },
+      "ValidID": { "type": "number" }
+    }
+}

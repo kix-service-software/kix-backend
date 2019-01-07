@@ -1,0 +1,15 @@
+  usage: Use this resourceType to represent a collection of items
+  description: A collection of <<resourcePathName|!uppercamelcase>>
+  get:
+    description: |
+      Get all <<resourcePathName|!uppercamelcase>>,
+      optionally filtered
+    is: [ hasResponseCollection: { typeName: <<typeName>> }, hasBadRequest, filterable, pageable, sortable ]
+  post:
+    description: |
+      Create a new <<resourcePathName|!uppercamelcase|!singularize>>
+    is: [ hasRequestItem: { typeName: <<typeName>>PostRequest }, hasBadRequest, hasConflict ]
+    responses:
+      201:
+        body:
+          application/json: !include ../types/<<typeName>>PostResponse.raml

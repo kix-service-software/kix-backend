@@ -1,0 +1,7 @@
+  type: { collection: { typeName: TicketState } }
+  /{stateId}:
+    type: { item: { typeName: TicketState } }
+    uriParameters:
+      lockId:
+        displayName: TicketStateID
+        type: integer

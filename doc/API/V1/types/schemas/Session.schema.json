@@ -1,0 +1,22 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#Session",
+    "type": "object",
+    "description": "The extracted web token data.",
+    "properties": {
+      "AllowedOperations": { "type": "array", "items": { "type": "string" } },
+      "CreateTime": { "type": "string" },
+      "CreateTimeUnix": { "type": "number" },
+      "DeniedOperations": { "type": "array", "items": { "type": "string" } },
+      "Description": { "type": "string" },
+      "IgnoreMaxIdleTime": { "type": "number" },
+      "LastRequestTime": { "type": "string" },
+      "LastRequestTimeUnix": { "type": "number" },
+      "RemoteIP": { "type": "string" },
+      "TokenType": { "type": "string" },
+      "UserID": { "type": "number" },
+      "UserType": { "type": "string", "enum": [ "Agent", "Customer" ] },
+      "ValidUntilTime": { "type": "string" },
+      "ValidUntilTimeUnix": { "type": "number" }
+    }
+}

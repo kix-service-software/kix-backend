@@ -1,0 +1,7 @@
+  type: { collection: { typeName: User } }
+  /{userId}:
+    type: { item: { typeName: User } }
+    uriParameters:
+      userId:
+        displayName: UserID
+        type: integer

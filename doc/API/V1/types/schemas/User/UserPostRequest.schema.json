@@ -1,0 +1,16 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#UserPostRequest",
+    "type": "object",
+    "description": "The user request object for creation.",
+    "properties": {
+      "UserEmail": { "type": "string" },
+      "UserFirstname": { "type": "string" },
+      "UserLastname": { "type": "string" },
+      "UserLogin": { "type": "string" },
+      "UserPw": { "type": "string" },
+      "UserTitle": { "type": "string" },
+      "ValidID": { "type": "number" }
+    },
+    "required": [ "UserLogin", "UserFirstname", "UserLastname", "UserEmail" ]
+}

@@ -1,0 +1,254 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>{{ title }} API documentation</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="generator" content="https://github.com/kevinrenskers/raml2html {{ config.raml2HtmlVersion }}">
+    <link rel="shortcut icon" type="image/png" href="https://d35ll89fr5oblf.cloudfront.net/static/favicon.png">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/default.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('.page-header pre code, .top-resource-description pre code').each(function(i, block) {
+          hljs.highlightBlock(block);
+        });
+
+        $('[data-toggle]').click(function() {
+          var selector = $(this).data('target') + ' pre code';
+          $(selector).each(function(i, block) {
+            hljs.highlightBlock(block);
+          });
+        });
+
+        // open modal on hashes like #_action_get
+        $(window).bind('hashchange', function(e) {
+          var anchor_id = document.location.hash.substr(1); //strip #
+          var element = $('#' + anchor_id);
+
+          // do we have such element + is it a modal?  --> show it
+          if (element.length && element.hasClass('modal')) {
+            element.modal('show');
+          }
+        });
+
+        // execute hashchange on first page load
+        $(window).trigger('hashchange');
+
+        // remove url fragment on modal hide
+        $('.modal').on('hidden.bs.modal', function() {
+          try {
+            if (history && history.replaceState) {
+                history.replaceState({}, '', '#');
+            }
+          } catch(e) {}
+        });
+      });
+    </script>
+
+    <style>
+      .hljs {
+        background: transparent;
+      }
+      .parent {
+        color: #999;
+      }
+      .panel-title > .methods {
+        float: right;
+      }
+      .badge {
+        border-radius: 0;
+        text-transform: uppercase;
+        width: 70px;
+        font-weight: normal;
+        color: #f3f3f6;
+        line-height: normal;
+      }
+      .badge_get {
+        background-color: #63a8e2;
+      }
+      .badge_post {
+        background-color: #6cbd7d;
+      }
+      .badge_put {
+        background-color: #22bac4;
+      }
+      .badge_delete {
+        background-color: #d26460;
+      }
+      .badge_patch {
+        background-color: #ccc444;
+      }
+      .tab-pane ul {
+        padding-left: 2em;
+      }
+      .tab-pane h2 {
+        font-size: 1.2em;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #ddd;
+      }
+      .tab-pane h3 {
+        font-size: 1.1em;
+      }
+      .tab-content {
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+      }
+
+      .top-resource-description {
+      }
+
+      .resource-description {
+        margin-bottom: 15px;
+      }
+
+      .resource-description p:last-child {
+        margin: 0;
+      }
+
+      .method-description {
+        margin-top: 10px;
+      }
+
+      .site-header {
+        background-color: black;
+      }
+
+      .brand-logo {
+        padding-left: 15px;
+      }
+
+      .brand-logo img {
+        max-height: 60px;
+      }
+
+      .api-header {
+        display: inline;
+        margin-left: 10px;
+        line-height: 60px;
+        vertical-align: middle;
+      }
+
+      .nav-pills>li>a {
+        border-radius: 0;
+      }
+
+      .panel  {
+        box-shadow: none;
+      }
+
+      .resource-header {
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+      }
+
+      .logo-header {
+        white-space: nowrap;
+        border-bottom: 1px solid #eee;
+        padding-right: 15px;
+      }
+
+      #sidebar {
+        height: 100%;
+        border-right: 1px solid #eee;
+      }
+
+      #sidebar .nav {
+        overflow: auto;
+        position: absolute;
+        bottom: 0;
+        top: 80px;
+        left: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+
+  <body data-spy="scroll" data-target="#sidebar">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 hidden-xs">
+          <div id="sidebar" class="hidden-print affix" role="complementary">
+            <div class="logo-header">
+              <a href="https://officernd.com" class="brand-logo">
+                  <img src="https://d35ll89fr5oblf.cloudfront.net/static/logos/LogoHeader.png" alt="OfficeR&amp;D">
+              </a>
+              <a href="#"><h3 class="api-header">API</h3></a>
+            </div>
+            <ul class="nav nav-pills nav-stacked">
+                <li><a href="#Getting-started">Introduction</a></li>
+              {% for resource in resources %}
+                <li><a href="#{{ resource.uniqueId}}">{% if resource.displayName %}{{ resource.displayName}}{% else %}{{ resource.relativeUri }}{% endif %}</a></li>
+              {% endfor %}
+                <li><a href="#Hosted-Payment-Gateway">Hosted Payment Gateway</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-sm-9" role="main">
+          <div class="row">
+          <div class="col-sm-8">
+            <h1>API Reference{% if version %} <small>version {{ version }}</small>{% endif %}</h1>
+            <p>{{ baseUri }}</p>
+
+            {% for chapter in documentation %}
+              {% if 'Hosted Payment Gateway' not in chapter.title %} 
+              <h3 id="{{ chapter.uniqueId }}"><a href="#{{ chapter.uniqueId }}">{{ chapter.title }}</a></h3>
+              {% markdown %}{{ chapter.content }}{% endmarkdown %}
+              {% endif %}
+            {% endfor %}
+
+            {% for securedById in securedBy %}
+              {% set securityScheme = securitySchemeWithName(securedById) %}
+              {# {% set exp = new RegExp('_', 'g') %}
+              {% set schemeName = securedById.replace(exp, ' ') %} #}
+              <h3 id="{{ securedById }}"><a href="#{{ securedById }}">{{ securedById | replace('_', ' ') | capitalize }}</a></h3>
+              {% if securityScheme.description %}
+                {% markdown %}{{ securityScheme.description }}{% endmarkdown %}
+              {% endif %}
+
+              {% if securityScheme.describedBy.headers %}
+                {% for header, headerInfo in securityScheme.describedBy.headers %}
+                  <h4 id="{{ securedById }}_{{ header }}"><a href="#{{ securedById }}_{{ header }}">{{ header }} header</a></h4>
+                  {% markdown %}{{ headerInfo.description }}{% endmarkdown %}
+                {% endfor %}
+              {% endif %}
+              {% if securityScheme.describedBy.responses %}
+                <h4 id="{{ securedById }}_responses"><a href="#{{ securedById }}_respnses">HTTP responses</a></h5>
+                {% for code, response in securityScheme.describedBy.responses %}
+                  <h5 id="{{ securedById }}_{{ code }}"><a href="#{{ securedById }}_{{ header }}">{{ code }}</a></h5>
+                  {% markdown %}{{ response.description }}{% endmarkdown %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </div>
+          </div>
+
+          {% for resource in resources %}
+            <h2 class="resource-header" id="{{ resource.uniqueId }}">{% if resource.displayName %}{{ resource.displayName}}{% else %}{{ resource.relativeUri }}{% endif %}</h2>
+
+            {% if resource.description %}
+              <div class="top-resource-description">
+                {% markdown %}{{ resource.description }}{% endmarkdown %}
+              </div>
+            {% endif %}
+
+            {% include "./resource.nunjucks" %}
+          {% endfor %}
+
+            {% for chapter in documentation %}
+              {% if 'Hosted Payment Gateway' in chapter.title %} 
+              <h3 id="{{ chapter.uniqueId }}"><a href="#{{ chapter.uniqueId }}">{{ chapter.title }}</a></h3>
+              {% markdown %}{{ chapter.content }}{% endmarkdown %}
+              {% endif %}
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

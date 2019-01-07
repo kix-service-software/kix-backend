@@ -1,0 +1,20 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#User",
+    "type": "object",
+    "description": "The user object.",
+    "properties": {
+      "ChangeBy": { "type": "number" },
+      "ChangeTime": { "type": "string" },
+      "CreateBy": { "type": "number" },
+      "CreateTime": { "type": "string" },
+      "UserEmail": { "type": "string" },
+      "UserFirstname": { "type": "string" },
+      "UserFullname": { "type": "string" },
+      "UserID": { "type": "number" },
+      "UserLastname": { "type": "string" },
+      "UserLogin": { "type": "string" },
+      "UserTitle": { "type": "string" },
+      "ValidID": { "type": "number" }
+    }
+}

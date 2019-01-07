@@ -1,0 +1,7 @@
+  type: { collection-readonly: { typeName: Lock } }
+  /{lockId}:
+    type: { item-readonly: { typeName: Lock } }
+    uriParameters:
+      lockId:
+        displayName: LockID
+        type: integer

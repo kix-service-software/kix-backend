@@ -1,0 +1,17 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#TicketState",
+    "type": "object",
+    "description": "The ticket state object.",
+    "properties": {
+      "ChangeBy": { "type": "number" },
+      "ChangeTime": { "type": "string" },
+      "Comment": { "type": "string" },
+      "CreateBy": { "type": "number" },
+      "CreateTime": { "type": "string" },
+      "ID": { "type": "number" },
+      "Name": { "type": "string" },
+      "TypeID": { "type": "number" },
+      "ValidID": { "type": "number" }
+    }
+}
