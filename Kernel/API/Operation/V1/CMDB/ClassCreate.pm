@@ -140,6 +140,24 @@ sub Run {
     	}
     }
 
+    # validate definition if given
+    if ( $ConfigItemClass->{DefinitionString} ) {
+        my $Check = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionCheck(
+            Definition => $ConfigItemClass->{DefinitionString},
+        );
+
+        if ( !$Check ) {
+            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+                Type => 'error', 
+                What => 'Message',
+            );
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => $LogMessage || 'Cannot create class. The given definition string is invalid.',
+            );
+        }
+    }
+
     # create class
     my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
         Class    => 'ITSM::ConfigItem::Class',
