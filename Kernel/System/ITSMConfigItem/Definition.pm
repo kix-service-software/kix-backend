@@ -369,6 +369,14 @@ sub DefinitionCheck {
     }
     else {
         $Definition = eval $Param{Definition};    ## no critic
+        my $EvalFault = $@ || '';
+        if ( $EvalFault ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid Definition! You have an syntax error in the definition (' . $EvalFault. ').',
+            );
+            return;
+        }
     }
 
     # check if definition exists at all
