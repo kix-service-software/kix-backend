@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>{{ title }} API documentation</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="generator" content="https://github.com/raml2html/raml2html {{ config.raml2HtmlVersion }}">
+
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+    <script type="text/javascript">
+      {% include "./scripts.js" %}
+    </script>
+    <style>
+      {% include "./styles.css" %}
+    </style>
+  </head>
+
+  <body data-spy="scroll" data-target="#sidebar">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9" role="main">
+          <div class="page-header">
+            <h1>{{ title }}</h1>
+            <h2>{% if version %}<small>Version {{ version }}</small>{% endif %}</h2>
+
+            {% if description %}
+              <div class="chapter">
+                <h2 id="description"><a href="#description">Description</a></h2>                
+                {% markdown %}
+                {{ description }}
+                {% endmarkdown %}
+              </div>
+            {% endif %}
+
+            <div class="chapter">
+              <h2 id="base_uri"><a href="#base_uri">Base URI</a></h2>
+              <pre>{{ baseUri }}</pre>
+              {% if baseUriParameters %}
+                <ul>
+                  {% for item in baseUriParameters %}
+                    {% include "./item.nunjucks" %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+
+            {% for chapter in documentation %}
+              <div class="chapter">
+                <h2 id="{{ chapter.uniqueId }}"><a href="#{{ chapter.uniqueId }}">{{ chapter.title }}</a></h2>
+                {% markdown %}
+                {{ chapter.content }}
+                {% endmarkdown %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="chapter">
+            <h2 id="resources"><a href="#resources">Resources</a></h2>
+            {% for resource in resources %}
+              <div class="panel panel-default resource">
+                <div class="panel-heading">
+                  <h3 id="{{ resource.uniqueId }}" class="panel-title">{% if resource.displayName %}{{ resource.displayName}}{% else %}{{ resource.relativeUri }}{% endif %}</h3>
+                </div>
+
+                <div class="panel-body">
+                  {% if resource.description %}
+                    <div class="top-resource-description">
+                      {% markdown %}
+                      {{ resource.description }}
+                      {% endmarkdown %}
+                    </div>
+                  {% endif %}
+
+                  <div class="panel-group">
+                    {% include "./resource.nunjucks" %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div id="sidebar" class="hidden-print affix" role="complementary">
+            <ul class="nav nav-pills nav-stacked">
+              {% for resource in resources %}
+                <li><a href="#{{ resource.uniqueId}}">{% if resource.displayName %}{{ resource.displayName }}{% else %}{{ resource.relativeUri }}{% endif %}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

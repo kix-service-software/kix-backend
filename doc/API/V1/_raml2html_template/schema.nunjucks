@@ -1,0 +1,6 @@
+{% if parent.schema %}
+    <p><strong>Schema</strong>:</p>
+    <div class="schemas">
+        <pre><code>{{ parent.schema | escape }}</code></pre>
+    </div>
+{% endif %}

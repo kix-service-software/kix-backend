@@ -1,0 +1,1 @@
+Use this API to communicate with KIX 2018.

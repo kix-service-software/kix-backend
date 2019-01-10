@@ -1,5 +1,5 @@
 #%RAML 1.0
-title: KIX 2018 REST
+title: KIX 2018 REST API
 version: v1
 protocols: [ HTTP, HTTPS ]
 baseUri: http://{fqdn}:{port}/api.pl/webservice/core:{version}
@@ -12,14 +12,16 @@ baseUriParameters:
       The port the KIX backend server uses.
 mediaType: application/json
 
-documentation: 
-  title: Getting started
+description: !include descriptions/description.md
+
+documentation:
+  - title: Getting started
     content: !include descriptions/gettingStarted.md  
-  title: Populating queries
+  - title: Populating queries
     content: !include descriptions/populatingQueries.md
-  title: Selecting fields
+  - title: Selecting fields
     content: !include descriptions/selectingFields.md
-  title: Filtering results
+  - title: Filtering results
     content: !include descriptions/filteringResults.md
 
 # security
