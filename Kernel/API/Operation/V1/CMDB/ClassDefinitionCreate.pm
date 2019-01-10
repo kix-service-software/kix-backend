@@ -85,7 +85,7 @@ sub ParameterDefinition {
     # get valid ClassIDs
     my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
-        Valid => 1,
+        Valid => 0,
     );
 
     my @ClassIDs = sort keys %{$ItemList};
