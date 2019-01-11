@@ -91,7 +91,7 @@ sub Run {
     # get IDs of CI classes from General Catalog
     my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
         Class   => 'ITSM::ConfigItem::Class',
-        UserID  => $Self->{Authorization}->{UserID},
+        Valid   => 0
     );
 
 	# get already prepared CI Class data from ClassGet operation

@@ -3,36 +3,43 @@
     "Attributes": [
         {
             "Name": "Age",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },
         {
             "Name": "ArchiveFlag",
             "Datatype": "STRING",
             "PossibleValues": [
                 "y", "n"
-            ]
+            ],
+            "ReadOnly": true
         },        
         {
             "Name": "ChangeBy",
             "Datatype": "INTEGER",
-            "ReferencedObject": "User"
+            "ReferencedObject": "User",
+            "ReadOnly": true
         },        
         {
             "Name": "Changed",
-            "Datatype": "DATETIME"
+            "Datatype": "DATETIME",
+            "ReadOnly": true
         },        
         {
             "Name": "CreateBy",
             "Datatype": "INTEGER",
-            "ReferencedObject": "User"
+            "ReferencedObject": "User",
+            "ReadOnly": true
         },        
         {
             "Name": "Created",
-            "Datatype": "DATETIME"
+            "Datatype": "DATETIME",
+            "ReadOnly": true
         },        
         {
             "Name": "CreateTimeUnix",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "CustomerID",
@@ -46,19 +53,23 @@
         },        
         {
             "Name": "EscalationResponseTime",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "EscalationSolutionTime",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "EscalationTime",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "EscalationUpdateTime",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "LockID",
@@ -76,7 +87,8 @@
         },        
         {
             "Name": "PendingTimeUnix",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "PriorityID",
@@ -114,7 +126,8 @@
         },        
         {
             "Name": "TicketNumber",
-            "Datatype": "STRING"
+            "Datatype": "STRING",
+            "ReadOnly": true
         },        
         {
             "Name": "Title",
