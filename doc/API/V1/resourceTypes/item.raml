@@ -8,6 +8,4 @@
     is: [ hasRequestItem: { typeName: <<typeName>>PatchRequest }, hasResponseItem: { typeName: <<typeName>>PatchResponse }, hasBadRequest, hasNotFound, hasConflict ]
   delete:
     description: Delete a <<typeName>>
-    is: [ hasNotFound ]
-    responses:
-      204:
+    is: [ hasNotFound, hasConflict, hasNoContent ]

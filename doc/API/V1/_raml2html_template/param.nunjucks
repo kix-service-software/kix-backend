@@ -1,0 +1,60 @@
+<tr>
+  <td>{{ param.key }}</td>
+  <td><center>{%- if param.required -%} yes {% endif -%}</center></td>
+  <td>
+    {% if param.type !== nil and not param.structuredValue %}
+      {%- if param.enum -%}
+        {%- if param.enum.length === 1 -%}
+          {{ param.enum.join(', ') }}
+        {%- else -%}
+          one of {{ param.enum.join(', ') }}
+        {%- endif -%}
+      {%- else -%}
+        {%- if param.type === 'array' and param.items -%}
+          array of {{ param.items.originalType | d(param.items.type) }}
+        {%- elif param.type === 'union' and param.anyOf.length -%}
+          union of
+          {% for alt in param.anyOf -%}
+            {{ alt.originalType | d(alt.displayName) | d(alt.type) }}
+            {%- if not loop.last %} or {% endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          {{ param.type }}
+        {%- endif -%}
+      {%- endif -%}
+    {% endif %}
+  </td>
+  <td>
+    {% if param.type !== nil and not param.structuredValue %}
+      <ul>    
+        {%- if param.default or param.default == 0 or param.default == false %}<li>default: {{ param.default }}</li>{%- endif -%}
+        {%- if param.repeat %}<li>repeat: {{ param.repeat }}</li>{%- endif -%}
+        {%- if param.type == 'string' -%}
+          {%- if param.minLength or param.minLength == 0 %}<li>minLength: {{ param.minLength }}</li>{%- endif -%}
+          {%- if param.maxLength or param.maxLength == 0 %}<li>maxLength: {{ param.maxLength }}</li>{%- endif -%}
+        {%- else -%}
+          {%- if param.minItems or param.minItems == 0 %}<li>minItems: {{ param.minItems }}</li>{%- endif -%}
+          {%- if param.maxItems or param.maxItems == 0 %}<li>maxItems: {{ param.maxItems }}</li>{%- endif -%}
+          {%- if param.minimum or param.minimum == 0 %}<li>minimum: {{ param.minimum }}</li>{%- endif -%}
+          {%- if param.maximum or param.maximum == 0 %}<li>maximum: {{ param.maximum }}</li>{%- endif -%}
+        {%- endif -%}
+        {%- if param.pattern %}<li>pattern: {{ param.pattern }}</li>{%- endif -%}
+      </ul>
+    {% endif %}
+  </td>
+  <td>
+    {% markdown %}
+    {{ param.description }}
+    {% endmarkdown %}
+  </td>
+  <td>
+    {# Item Examples #}
+    {% set parent = param %}
+    {% set suppressHeading = true %}
+    {% include "./examples.nunjucks" %}
+    {% if param.structuredValue %}
+      <pre><code>{{ param.structuredValue | dump }}</code></pre>
+    {% endif %}
+  </td>
+
+</tr>

@@ -2,14 +2,16 @@
   description: A collection of <<resourcePathName|!uppercamelcase>>
   get:
     description: |
-      Get all <<resourcePathName|!uppercamelcase>>,
-      optionally filtered
+      Get all <<resourcePathName|!uppercamelcase>>.
     is: [ hasResponseCollection: { typeName: <<typeName>> }, hasBadRequest, filterable, pageable, sortable ]
   post:
     description: |
-      Create a new <<resourcePathName|!uppercamelcase|!singularize>>
+      Create a new <<resourcePathName|!uppercamelcase|!singularize>>.
     is: [ hasRequestItem: { typeName: <<typeName>>PostRequest }, hasBadRequest, hasConflict ]
     responses:
       201:
+        description: |
+          The <<typeName>> has been created successfully.
         body:
-          application/json: !include ../types/<<typeName>>PostResponse.raml
+          application/json: 
+            type: <<typeName>>PostResponse

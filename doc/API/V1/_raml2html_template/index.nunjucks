@@ -39,13 +39,10 @@
 
             <div class="chapter">
               <h2 id="base_uri"><a href="#base_uri">Base URI</a></h2>
-              <pre>{{ baseUri }}</pre>
+              <pre>{{ baseUri | replace(r/\$version/, version) }}</pre>
               {% if baseUriParameters %}
-                <ul>
-                  {% for item in baseUriParameters %}
-                    {% include "./item.nunjucks" %}
-                  {% endfor %}
-                </ul>
+                {% set parameterList = baseUriParameters %}
+                {% include "./paramtable.nunjucks" %}
               {% endif %}
             </div>
 

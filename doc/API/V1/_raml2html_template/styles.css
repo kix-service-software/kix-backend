@@ -1,8 +1,26 @@
 h1 {
   font-weight: bold;
 }
+.param-table {
+  border-collapse: collapse;  
+  border-color: #ddd;
+  border: 0;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.param-table thead th {
+  background-color: #fafafa;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-bottom: 2px solid #ddd;
+}
+.param-table tbody td {
+  vertical-align: top;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
 .container {
-  width: 1400px;
+  width: 75%;
 }
 .hljs {
   background: transparent;
@@ -16,6 +34,18 @@ h1 {
 }
 .resource {
   box-shadow: 2px 2px 2px rgba(0,0,0,.1);
+}
+.response {
+  margin-left: 20px;
+  margin-bottom: 40px;
+}
+.response-nav {
+  margin-bottom: 40px;
+}
+.response-nav .badge {
+  color: #000;
+  background-color: #d0d0d0;
+  margin-right: 10px;
 }
 .page-header {
   padding-bottom: 0px;
@@ -150,4 +180,7 @@ pre code {
 }
 .resource-modal li > ul {
   margin-bottom: 1em;
+}
+.modal-lg {
+  width: 70%;
 }

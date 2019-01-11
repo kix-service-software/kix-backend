@@ -4,6 +4,11 @@ $(document).ready(function() {
     $('#sidebar ul.nav-stacked').prepend('<li>' + chapter.innerHTML + '</li>');
   });
 
+  // add response codes to tabs
+  $('h2.response-title > a').each(function(i, response) {
+    $(this).parent().siblings('.response-nav').append('<a class="badge response-code" href="#' + $(this).parent().attr('id') + '">' + response.innerHTML + '</a>');
+  });
+  
   $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
     hljs.highlightBlock(block);
   });
