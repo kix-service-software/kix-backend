@@ -15,12 +15,14 @@
         },        
         {
             "Name": "Changed",
-            "Datatype": "DATETIME"
+            "Datatype": "DATETIME",
+            "ReadOnly": true
         },        
         {
             "Name": "ChangedBy",
             "Datatype": "INTEGER",
-            "ReferencedObject": "User"
+            "ReferencedObject": "User",
+            "ReadOnly": true
         },        
         {
             "Name": "ContentType",
@@ -28,12 +30,14 @@
         },        
         {
             "Name": "Created",
-            "Datatype": "DATETIME"
+            "Datatype": "DATETIME",
+            "ReadOnly": true
         },        
         {
             "Name": "CreatedBy",
             "Datatype": "INTEGER",
-            "ReferencedObject": "User"
+            "ReferencedObject": "User",
+            "ReadOnly": true
         },        
         {
             "Name": "Field1",
