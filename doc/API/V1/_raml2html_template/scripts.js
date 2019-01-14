@@ -10,13 +10,13 @@ $(document).ready(function() {
   });
   
   // add toggle of schema and examples
-  $('.schemas, .examples').each(function(i, item) {
+  $('.schemas.toggleable, .examples.toggleable').each(function(i, item) {
     $(this).hide();
     $(this).prev('p').append('<a class="badge toggle" href="#">' + ($(this).is(':visible') ? 'Hide' : 'Show') + '</a>');
   });
   $('.badge.toggle').click(function(e) {
     e.preventDefault();
-    var $toggleElement = $(this).parents('p').next('.schemas, .examples');
+    var $toggleElement = $(this).parents('p').next('.schemas.toggleable, .examples.toggleable');
 console.log('toggle ' + $toggleElement);
     $toggleElement.toggle();
     $(this).html($toggleElement.is(':visible') ? 'Hide' : 'Show');

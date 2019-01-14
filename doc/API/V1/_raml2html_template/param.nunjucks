@@ -51,6 +51,7 @@
     {# Item Examples #}
     {% set parent = param %}
     {% set suppressHeading = true %}
+    {% set noToggle = true %}
     {% include "./examples.nunjucks" %}
     {% if param.structuredValue %}
       <pre><code>{{ param.structuredValue | dump }}</code></pre>

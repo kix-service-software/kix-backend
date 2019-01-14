@@ -1,6 +1,6 @@
 {% if parent.examples.length %}
     {%- if not suppressHeading %}<p><strong>{{ 'Example' if parent.examples.length == 1 else 'Examples' }}</strong>:</p>{% endif %}
-    <div class="examples">
+    <div class="examples {%- if not noToggle %} toggleable {% endif %}">
         {% for example in parent.examples %}
             {% if example.displayName or example.description %}
                 <p>
