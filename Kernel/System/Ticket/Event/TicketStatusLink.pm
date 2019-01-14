@@ -159,7 +159,7 @@ sub Run {
         my %LinkKeyList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
             Object1 => 'Ticket',
             Key1    => $TicketID,
-            Object2 => 'ITSMConfigItem',
+            Object2 => 'ConfigItem',
             State   => 'Valid',
             UserID  => 1,
         );
@@ -497,7 +497,7 @@ sub _CheckTicketLinks {
     my %LinkKeyList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
         Object1   => 'Ticket',
         Key1      => $Param{TicketID},
-        Object2   => 'ITSMConfigItem',
+        Object2   => 'ConfigItem',
         State     => 'Valid',
         Type      => $LinkTypeLookup->{ $Param{Type} }->{Name},
         Direction => $LinkTypeLookup->{ $Param{Type} }->{Direction}->{Ticket},
@@ -526,7 +526,7 @@ sub _CheckConfigItemLinks {
     my $LinkTypeLookup = $Self->_LinkTypeLookupGet();
 
     my %LinkKeyList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-        Object1   => 'ITSMConfigItem',
+        Object1   => 'ConfigItem',
         Key1      => $Param{ConfigItemID},
         Object2   => 'Ticket',
         State     => 'Valid',

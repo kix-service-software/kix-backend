@@ -102,7 +102,7 @@ sub Run {
             #get current links from this CI..
             my @LinkedSrcRefereceIDs = @{
                 $Self->GetLinkedObjects(
-                    FromObject   => 'ITSMConfigItem',
+                    FromObject   => 'ConfigItem',
                     FromObjectID => $Param{ConfigItemID},
                     ToObject     => 'Ticket',
                     ToSubObject  => '',
@@ -116,7 +116,7 @@ sub Run {
                 $Self->GetLinkedObjects(
                     FromObject   => 'Ticket',
                     FromObjectID => $Param{ConfigItemID},
-                    ToObject     => 'ITSMConfigItem',
+                    ToObject     => 'ConfigItem',
                     ToSubObject  => '',
                     LinkType     => $RelAttr{$CurrKeyname}->[0]->{ReferencedTicketLinkType},
                     Direction    => 'Target',
@@ -142,7 +142,7 @@ sub Run {
                     for my $CurrLinkPartnerID (@LinkedSrcRefereceIDs) {
 
                         $Self->{LinkObject}->LinkDelete(
-                            Object1 => 'ITSMConfigItem',
+                            Object1 => 'ConfigItem',
                             Key1    => $Param{ConfigItemID},
                             Object2 => 'Ticket',
                             Key2    => $CurrLinkPartnerID,
@@ -156,7 +156,7 @@ sub Run {
                 for my $CurrLinkPartnerID (@LinkedTargetReferenceIDs) {
 
                     $Self->{LinkObject}->LinkDelete(
-                        Object1 => 'ITSMConfigItem',
+                        Object1 => 'ConfigItem',
                         Key1    => $Param{ConfigItemID},
                         Object2 => 'Ticket',
                         Key2    => $CurrLinkPartnerID,
@@ -184,7 +184,7 @@ sub Run {
                             $Self->{LinkObject}->LinkAdd(
                                 SourceObject => 'Ticket',
                                 SourceKey    => $CurrCIReferenceID,
-                                TargetObject => 'ITSMConfigItem',
+                                TargetObject => 'ConfigItem',
                                 TargetKey    => $Param{ConfigItemID},
                                 Type   => $RelAttr{$CurrKeyname}->[0]->{ReferencedTicketLinkType},
                                 UserID => 1,
@@ -195,7 +195,7 @@ sub Run {
                             $Self->{LinkObject}->LinkAdd(
                                 TargetObject => 'Ticket',
                                 TargetKey    => $CurrCIReferenceID,
-                                SourceObject => 'ITSMConfigItem',
+                                SourceObject => 'ConfigItem',
                                 SourceKey    => $Param{ConfigItemID},
                                 Type   => $RelAttr{$CurrKeyname}->[0]->{ReferencedTicketLinkType},
                                 UserID => 1,
@@ -328,9 +328,9 @@ sub _GetAttributeDataByKey {
    available !!!
 
    my @LinkedLocationIDs = @{$Self->GetLinkedObjects(
-       FromObject   => 'ITSMConfigItem',
+       FromObject   => 'ConfigItem',
        FromObjectID => 123,
-       ToObject     => 'ITSMConfigItem' | 'Ticket',
+       ToObject     => 'ConfigItem' | 'Ticket',
        ToSubObject  => 'Location-Some CI Class' | 'OrSomeTicketType',
        LinkType     => 'ParentChild',        #LinkType - optional
        Direction    => (Source|Target|Both), #LinkDirection - optional
@@ -350,7 +350,7 @@ sub GetLinkedObjects {
 
     #as long as it's not implemented...
     if (
-        ( $Param{ToObject} ne 'ITSMConfigItem' )
+        ( $Param{ToObject} ne 'ConfigItem' )
         && ( $Param{ToObject} ne 'Ticket' )
         && ( $Param{ToObject} ne 'Ticket' )
         )
@@ -379,11 +379,11 @@ sub GetLinkedObjects {
     );
 
     #---------------------------------------------------------------------------
-    # ToPartner "ITSMConfigItem"
-    if ( $Param{ToObject} eq 'ITSMConfigItem' ) {
+    # ToPartner "ConfigItem"
+    if ( $Param{ToObject} eq 'ConfigItem' ) {
 
         #for each existing link type
-        for my $LinkType ( keys( %{ $PartnerLinkList->{'ITSMConfigItem'} } ) ) {
+        for my $LinkType ( keys( %{ $PartnerLinkList->{'ConfigItem'} } ) ) {
 
             #if linked object is a source
             if (
@@ -435,7 +435,7 @@ sub GetLinkedObjects {
 
     }
 
-    # EO ToPartner "ITSMConfigItem"
+    # EO ToPartner "ConfigItem"
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------

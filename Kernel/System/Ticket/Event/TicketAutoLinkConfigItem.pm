@@ -310,7 +310,7 @@ sub Run {
                                 $Self->{LinkObject}->LinkAdd(
                                     SourceObject => 'Ticket',
                                     SourceKey    => $Param{Data}->{TicketID},
-                                    TargetObject => 'ITSMConfigItem',
+                                    TargetObject => 'ConfigItem',
                                     TargetKey    => $ConfigItemID,
                                     Type         => $LinkType,
                                     UserID       => 1,

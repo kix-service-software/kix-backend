@@ -43,7 +43,7 @@ sub KIXSidebarCISearch {
         my %LinkKeyList = $Self->{LinkObject}->LinkKeyList(
             Object1 => 'Ticket',
             Key1    => $Param{TicketID},
-            Object2 => 'ITSMConfigItem',
+            Object2 => 'ConfigItem',
             State   => $Param{LinkMode},
             UserID  => 1,
         );

@@ -146,9 +146,9 @@ sub Run {
                 {
                     for my $CurrPrevPartnerID ( @{ $CIReferenceAttrDataRef->{$CurrKeyname} } ) {
                         $Self->{LinkObject}->LinkDelete(
-                            Object1 => 'ITSMConfigItem',
+                            Object1 => 'ConfigItem',
                             Key1    => $Param{ConfigItemID},
-                            Object2 => 'ITSMConfigItem',
+                            Object2 => 'ConfigItem',
                             Key2    => $CurrPrevPartnerID,
                             Type    => $LastLinkType,
                             UserID  => 1,
@@ -187,9 +187,9 @@ sub Run {
                             )
                         {
                             $Self->{LinkObject}->LinkAdd(
-                                SourceObject => 'ITSMConfigItem',
+                                SourceObject => 'ConfigItem',
                                 SourceKey    => $CurrCIReferenceID,
-                                TargetObject => 'ITSMConfigItem',
+                                TargetObject => 'ConfigItem',
                                 TargetKey    => $Param{ConfigItemID},
                                 Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
                                     ->{ReferencedCIClassLinkType},
@@ -199,9 +199,9 @@ sub Run {
                         }
                         else {
                             $Self->{LinkObject}->LinkAdd(
-                                TargetObject => 'ITSMConfigItem',
+                                TargetObject => 'ConfigItem',
                                 TargetKey    => $CurrCIReferenceID,
-                                SourceObject => 'ITSMConfigItem',
+                                SourceObject => 'ConfigItem',
                                 SourceKey    => $Param{ConfigItemID},
                                 Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
                                     ->{ReferencedCIClassLinkType},

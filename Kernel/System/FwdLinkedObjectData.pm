@@ -81,7 +81,7 @@ sub BuildFwdContent {
         my $ArrayRef = $Self->_GetLinkedObjects(
             FromObject   => 'Ticket',
             FromObjectID => $Param{TicketID},
-            ToObject     => 'ITSMConfigItem',
+            ToObject     => 'ConfigItem',
             ToSubObject  => '',
         );
         $PartnerList{$LinkPartner} = $ArrayRef;
@@ -91,14 +91,14 @@ sub BuildFwdContent {
     #handle ITSMConfigItem-partners...
     my $ITSMConfigItemIsInstalled
         = $Kernel::OM->Get('Kernel::System::Main')->Require('Kernel::System::ITSMConfigItem');
-    if ( $PartnerList{'ITSMConfigItem'} && $ITSMConfigItemIsInstalled ) {
+    if ( $PartnerList{'ConfigItem'} && $ITSMConfigItemIsInstalled ) {
 
         my $ITSMConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
 
         #get attributes relevant to forwarding...
         my @RelevantLinkObjectAttributes =
-            split( ",", $FwdObjectClassesRef->{'ITSMConfigItem'} );
-        my @CIIDArray = @{ $PartnerList{'ITSMConfigItem'} };
+            split( ",", $FwdObjectClassesRef->{'ConfigItem'} );
+        my @CIIDArray = @{ $PartnerList{'ConfigItem'} };
 
         for my $CurrCIID (@CIIDArray) {
             $Count++;
@@ -124,9 +124,9 @@ sub BuildFwdContent {
             #-------------------------------------------------------------------
             #get linked locations....
             my $ArrayRef = $Self->_GetLinkedObjects(
-                FromObject   => 'ITSMConfigItem',
+                FromObject   => 'ConfigItem',
                 FromObjectID => $CurrCIID,
-                ToObject     => 'ITSMConfigItem',
+                ToObject     => 'ConfigItem',
                 ToSubObject  => 'Location',
             );
 
@@ -242,7 +242,7 @@ sub _GetLinkedObjects {
     }
 
     #as long as it's not implemented...
-    if ( $Param{ToObject} ne 'ITSMConfigItem' ) {
+    if ( $Param{ToObject} ne 'ConfigItem' ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
             Message  => "FwdLinkedObjectData::_GetLinkedObjects: "
@@ -266,11 +266,11 @@ sub _GetLinkedObjects {
     );
 
     #---------------------------------------------------------------------------
-    # ToPartner "ITSMConfigItem"
-    if ( $Param{ToObject} eq 'ITSMConfigItem' ) {
+    # ToPartner "ConfigItem"
+    if ( $Param{ToObject} eq 'ConfigItem' ) {
 
         #for each existing link type
-        for my $LinkType ( keys( %{ $PartnerLinkList->{'ITSMConfigItem'} } ) ) {
+        for my $LinkType ( keys( %{ $PartnerLinkList->{'ConfigItem'} } ) ) {
 
             #if linked object is a source
             if (
@@ -322,7 +322,7 @@ sub _GetLinkedObjects {
 
     }
 
-    # EO ToPartner "ITSMConfigItem"
+    # EO ToPartner "ConfigItem"
     #---------------------------------------------------------------------------
 
     return \@IDArr;
