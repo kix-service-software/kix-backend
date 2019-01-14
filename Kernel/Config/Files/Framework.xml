@@ -1351,7 +1351,7 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="ITSMConfigItem">Class,Name,InciState,DeplState</Item>
+                <Item Key="ConfigItem">Class,Name,InciState,DeplState</Item>
             </Hash>
         </Setting>
     </ConfigItem>

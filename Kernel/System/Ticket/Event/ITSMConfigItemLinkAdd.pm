@@ -74,7 +74,7 @@ sub Run {
                 my $Success = $Self->{LinkObject}->LinkAdd(
                     SourceObject => 'Ticket',
                     SourceKey    => $Param{Data}->{TicketID},
-                    TargetObject => 'ITSMConfigItem',
+                    TargetObject => 'ConfigItem',
                     TargetKey    => $Value,
                     Type         => $Param{Config}->{LinkType},
                     UserID       => $Param{UserID},
@@ -87,7 +87,7 @@ sub Run {
             my $Success = $Self->{LinkObject}->LinkAdd(
                 SourceObject => 'Ticket',
                 SourceKey    => $Param{Data}->{TicketID},
-                TargetObject => 'ITSMConfigItem',
+                TargetObject => 'ConfigItem',
                 TargetKey    => $Param{Data}->{Value},
                 Type         => $Param{Config}->{LinkType},
                 UserID       => $Param{UserID},

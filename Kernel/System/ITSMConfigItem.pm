@@ -634,7 +634,7 @@ sub ConfigItemDelete {
 
     # delete all links to this config item first, before deleting the versions
     return if !$Kernel::OM->Get('Kernel::System::LinkObject')->LinkDeleteAll(
-        Object => 'ITSMConfigItem',
+        Object => 'ConfigItem',
         Key    => $Param{ConfigItemID},
         UserID => $Param{UserID},
     );
@@ -1772,7 +1772,7 @@ sub CurInciStateRecalc {
 
             # find all linked services of this CI
             my %LinkedServiceIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-                Object1   => 'ITSMConfigItem',
+                Object1   => 'ConfigItem',
                 Key1      => $ConfigItemID,
                 Object2   => 'Service',
                 State     => 'Valid',
@@ -2448,12 +2448,12 @@ sub CountLinkedObjects {
     return '' if !$LinkObject;
 
     my %PossibleObjectsList = $LinkObject->PossibleObjectsList(
-        Object => 'ITSMConfigItem',
+        Object => 'ConfigItem',
         UserID => $Param{UserID} || 1,
     );
     for my $CurrObject ( keys(%PossibleObjectsList) ) {
         my %LinkList = $LinkObject->LinkKeyList(
-            Object1 => 'ITSMConfigItem',
+            Object1 => 'ConfigItem',
             Key1    => $Param{ConfigItemID},
             Object2 => $CurrObject,
             State   => 'Valid',
@@ -2503,9 +2503,9 @@ sub _FindInciConfigItems {
 
         # find all linked config items (childs)
         my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-            Object1 => 'ITSMConfigItem',
+            Object1 => 'ConfigItem',
             Key1    => $Param{ConfigItemID},
-            Object2 => 'ITSMConfigItem',
+            Object2 => 'ConfigItem',
             State   => 'Valid',
             Type    => $LinkType,
 
@@ -2599,9 +2599,9 @@ sub _FindWarnConfigItems {
 
     # find all linked config items
     my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-        Object1   => 'ITSMConfigItem',
+        Object1   => 'ConfigItem',
         Key1      => $Param{ConfigItemID},
-        Object2   => 'ITSMConfigItem',
+        Object2   => 'ConfigItem',
         State     => 'Valid',
         Type      => $Param{LinkType},
         Direction => $Param{Direction},

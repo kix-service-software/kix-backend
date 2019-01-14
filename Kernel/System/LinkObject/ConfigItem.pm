@@ -128,7 +128,7 @@ sub LinkListWithData {
 checks read permission for a given object and UserID.
 
     $Permission = $LinkObject->ObjectPermission(
-        Object  => 'ITSMConfigItem',
+        Object  => 'ConfigItem',
         Key     => 123,
         UserID  => 1,
     );
@@ -370,7 +370,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPre(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -380,7 +380,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPre(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -411,7 +411,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPost(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -421,7 +421,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPost(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -471,7 +471,7 @@ link delete pre event module
 
     $True = $LinkObject->LinkDeletePre(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -481,7 +481,7 @@ link delete pre event module
 
     $True = $LinkObject->LinkDeletePre(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -512,7 +512,7 @@ link delete post event module
 
     $True = $LinkObject->LinkDeletePost(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -522,7 +522,7 @@ link delete post event module
 
     $True = $LinkObject->LinkDeletePost(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,

@@ -1681,7 +1681,7 @@ sub _ServiceGetCurrentIncidentState {
                 my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyListWithData(
                     Object1   => 'Service',
                     Key1      => $ServiceData{ServiceID},
-                    Object2   => 'ITSMConfigItem',
+                    Object2   => 'ConfigItem',
                     State     => 'Valid',
                     Type      => $LinkType,
                     Direction => $LinkDirection,

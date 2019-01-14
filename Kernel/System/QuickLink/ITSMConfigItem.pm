@@ -175,7 +175,7 @@ sub Search {
     #    my $LinkList = $Self->{LinkObject}->LinkList(
     #        Object    => $Param{SourceObject},
     #        Key       => $Param{SourceKey},
-    #        Object2   => 'ITSMConfigItem',
+    #        Object2   => 'ConfigItem',
     #        State     => 'Valid',
     #        Type      => $Param{LinkType},
     #        Direction => $Param{LinkDirection},
@@ -196,13 +196,13 @@ sub Search {
 
         # do object search
         my $ResultHash = $Self->{LinkObject}->ObjectSearch(
-            Object       => 'ITSMConfigItem',
+            Object       => 'ConfigItem',
             SubObject    => $ClassID,
             SearchParams => \%SearchHash,
             UserID       => $Param{UserID},
         );
 
-        for my $LinkType ( keys %{ $ResultHash->{ITSMConfigItem} } ) {
+        for my $LinkType ( keys %{ $ResultHash->{ConfigItem} } ) {
 
             # extract link type List
             my $LinkTypeList = $ResultHash->{ITSMConfigItem}->{$LinkType};
