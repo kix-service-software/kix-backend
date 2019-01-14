@@ -4,12 +4,12 @@
     "type": "object",
     "description": "The ticket state object.",
     "properties": {
-      "ChangeBy": { "type": "number" },
-      "ChangeTime": { "type": "string" },
-      "Comment": { "type": "string" },
-      "CreateBy": { "type": "number" },
-      "CreateTime": { "type": "string" },
-      "ID": { "type": "number" },
+      "ChangeBy": { "type": "number", "readOnly": true },
+      "ChangeTime": { "type": "string", "readOnly": true },
+      "Comment": { "type": "string", "readOnly": true },
+      "CreateBy": { "type": "number", "readOnly": true },
+      "CreateTime": { "type": "string", "readOnly": true },
+      "ID": { "type": "number", "readOnly": true },
       "Name": { "type": "string" },
       "TypeID": { "type": "number" },
       "ValidID": { "type": "number" }

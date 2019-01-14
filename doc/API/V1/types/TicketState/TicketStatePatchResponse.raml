@@ -1,15 +1,4 @@
 #%RAML 1.0 DataType
 
-schema: |
-    { 
-        "$schema": "http://json-schema.org/schema",
-        "type": "object",
-        "description": "The ID of the updated ticket state.",
-        "properties": {
-            "TicketStateID": { "type": "number" }
-        }
-    }
-example: |
-    { 
-        "TicketStateID": 3
-    }
+schema: !include ../../schemas/TicketStatePatchResponse.json
+example: !include ../../examples/TicketStatePatchResponse.json

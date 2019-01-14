@@ -1,0 +1,12 @@
+{
+    "StateType": [
+        { 
+            "ID": 1,
+            "Name": "new"
+        },
+        {
+            "ID": 2,
+            "Name": "open"
+        }        
+    ]
+}

@@ -4,7 +4,7 @@
     "type": "object",
     "description": "An error object.",
     "properties": {
-      "Code": { "type": "string" },
-      "Message": { "type": "string" }
+      "Code": { "type": "string", "readOnly": true },
+      "Message": { "type": "string", "readOnly": true }
     }
   }

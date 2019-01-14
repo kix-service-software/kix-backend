@@ -1,0 +1,24 @@
+{
+    "Priority": [
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "Comment": "...", 
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "ID": 1,
+            "Name": "1 very low", 
+            "ValidID": 1
+        },
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 08:12:17",
+            "Comment": "...", 
+            "CreateBy": 1,
+            "CreateTime": "2018-10-28 08:10:01",
+            "ID": 2,
+            "Name": "2 low", 
+            "ValidID": 1
+        }        
+    ]
+}

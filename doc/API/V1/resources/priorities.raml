@@ -1,0 +1,9 @@
+  displayName: Priorities
+  description: !include ../descriptions/resources/priorities.md
+  type: { collection: { typeName: Priority } }
+  /{priorityId}:
+    type: { item: { typeName: Priority } }
+    uriParameters:
+      priorityId:
+        displayName: PriorityID
+        type: integer
