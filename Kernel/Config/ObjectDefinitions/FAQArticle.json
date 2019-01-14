@@ -65,7 +65,8 @@
         },        
         {
             "Name": "ID",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "Keywords",

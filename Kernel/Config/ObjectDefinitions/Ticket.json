@@ -122,7 +122,8 @@
         },        
         {
             "Name": "TicketID",
-            "Datatype": "INTEGER"
+            "Datatype": "INTEGER",
+            "ReadOnly": true
         },        
         {
             "Name": "TicketNumber",

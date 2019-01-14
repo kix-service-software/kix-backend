@@ -879,7 +879,7 @@ sub _LinkTicketWithCI {
     my $LinkResult = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
         SourceObject => 'Ticket',
         SourceKey    => $Param{TicketID},
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => $ConfigItemID,
         Type         => 'RelevantTo',
         UserID       => 1,
