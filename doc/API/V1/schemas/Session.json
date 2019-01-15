@@ -4,19 +4,19 @@
     "type": "object",
     "description": "The extracted web token data.",
     "properties": {
-      "AllowedOperations": { "type": "array", "items": { "type": "string" } },
-      "CreateTime": { "type": "string" },
-      "CreateTimeUnix": { "type": "number" },
-      "DeniedOperations": { "type": "array", "items": { "type": "string" } },
-      "Description": { "type": "string" },
-      "IgnoreMaxIdleTime": { "type": "number" },
-      "LastRequestTime": { "type": "string" },
-      "LastRequestTimeUnix": { "type": "number" },
-      "RemoteIP": { "type": "string" },
-      "TokenType": { "type": "string" },
-      "UserID": { "type": "number" },
-      "UserType": { "type": "string", "enum": [ "Agent", "Customer" ] },
-      "ValidUntilTime": { "type": "string" },
-      "ValidUntilTimeUnix": { "type": "number" }
+      "AllowedOperations": { "type": "array", "items": { "type": "string" }, "readOnly": true },
+      "CreateTime": { "type": "string", "readOnly": true },
+      "CreateTimeUnix": { "type": "number", "readOnly": true },
+      "DeniedOperations": { "type": "array", "items": { "type": "string" }, "readOnly": true },
+      "Description": { "type": "string", "readOnly": true },
+      "IgnoreMaxIdleTime": { "type": "number", "readOnly": true },
+      "LastRequestTime": { "type": "string", "readOnly": true },
+      "LastRequestTimeUnix": { "type": "number", "readOnly": true },
+      "RemoteIP": { "type": "string", "readOnly": true },
+      "TokenType": { "type": "string", "readOnly": true },
+      "UserID": { "type": "number", "readOnly": true },
+      "UserType": { "type": "string", "enum": [ "Agent", "Customer" ], "readOnly": true },
+      "ValidUntilTime": { "type": "string", "readOnly": true },
+      "ValidUntilTimeUnix": { "type": "number", "readOnly": true }
     }
 }

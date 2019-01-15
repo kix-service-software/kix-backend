@@ -4,6 +4,6 @@
     "type": "object",
     "description": "A list of ticket states.",
     "properties": {
-      "User": { "type": "array", "items": { "$ref": "#TicketState" } }
+      "TicketState": { "type": "array", "items": { "$ref": "#TicketState" } }
     }
   }

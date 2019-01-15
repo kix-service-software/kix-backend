@@ -1,0 +1,9 @@
+  displayName: Article Types
+  description: !include ../descriptions/resources/articletypes.md
+  type: { collection-readonly: { typeName: ArticleType } }
+  /{articleTypeId}:
+    type: { item-readonly: { typeName: ArticleType } }
+    uriParameters:
+      articleTypeId:
+        displayName: ArticleTypeID
+        type: integer

@@ -1,15 +1,5 @@
 #%RAML 1.0 DataType
 
-schema: |
-    { 
-        "$schema": "http://json-schema.org/schema",
-        "type": "object",
-        "description": "The ID of the created user.",
-        "properties": {
-            "UserID": { "type": "number" }
-        }
-    }
-example: |
-    { 
-        "UserID": 3
-    }
+schema: !include ../../schemas/UserPostResponse.json
+example: !include ../../examples/UserPostResponse.json
+

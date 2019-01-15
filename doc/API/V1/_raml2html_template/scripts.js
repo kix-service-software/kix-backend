@@ -9,6 +9,19 @@ $(document).ready(function() {
     $(this).parent().siblings('.response-nav').append('<a class="badge response-code" href="#' + $(this).parent().attr('id') + '">' + response.innerHTML + '</a>');
   });
   
+  // add toggle of schema and examples
+  $('.schemas.toggleable, .examples.toggleable').each(function(i, item) {
+    $(this).hide();
+    $(this).prev('p').append('<a class="badge toggle" href="#">' + ($(this).is(':visible') ? 'Hide' : 'Show') + '</a>');
+  });
+  $('.badge.toggle').click(function(e) {
+    e.preventDefault();
+    var $toggleElement = $(this).parents('p').next('.schemas.toggleable, .examples.toggleable');
+console.log('toggle ' + $toggleElement);
+    $toggleElement.toggle();
+    $(this).html($toggleElement.is(':visible') ? 'Hide' : 'Show');
+  });
+
   $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
     hljs.highlightBlock(block);
   });

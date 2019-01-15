@@ -1,0 +1,9 @@
+  displayName: State Types
+  description: !include ../descriptions/resources/statetypes.md
+  type: { collection-readonly: { typeName: StateType } }
+  /{stateTypeId}:
+    type: { item-readonly: { typeName: StateType } }
+    uriParameters:
+      stateTypeId:
+        displayName: StateTypeID
+        type: integer

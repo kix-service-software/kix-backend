@@ -3,6 +3,6 @@
     "type": "object",
     "description": "The auth response.",
     "properties": {
-        "Token": { "type": "string" }
+        "Token": { "type": "string", "readOnly": true }
     }
 }

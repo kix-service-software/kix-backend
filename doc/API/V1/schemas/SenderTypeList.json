@@ -1,0 +1,9 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#SenderTypeList",
+    "type": "object",
+    "description": "A list of sender types.",
+    "properties": {
+      "SenderType": { "type": "array", "items": { "$ref": "#SenderType" } }
+    }
+  }
