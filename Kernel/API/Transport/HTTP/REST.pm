@@ -135,13 +135,13 @@ sub ProviderProcessRequest {
         # remove question mark '?' in the beginning
         substr $QueryParamsStr, 0, 1, '';
 
-        # convert query parameters into a hash
+        # convert query parameters into a hash (support & and ; as well)
         # e.g. from UserLogin=user&Password=secret
         # to (
         #       UserLogin => 'user',
         #       Password  => 'secret',
         #    );
-        for my $QueryParam ( split '&', $QueryParamsStr ) {
+        for my $QueryParam ( split '&|;', $QueryParamsStr ) {
             my ( $Key, $Value ) = split '=', $QueryParam;
 
             # Convert + characters to its encoded representation, see bug#11917
