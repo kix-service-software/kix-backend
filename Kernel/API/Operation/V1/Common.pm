@@ -938,7 +938,7 @@ sub _ApplyFilter {
                             # if filter attributes are not contained in the response, check if it references a sub-structure
                             if ( !exists($ObjectItem->{$FilterItem->{Field}}) ) {
 
-                                if ( $FilterItem->{Field} =~ /^.*?\..*?$/g ) {
+                                if ( $FilterItem->{Field} =~ /\./ ) {
                                     # yes it does, filter sub-structure
                                     my ($SubObject, $SubField) = split(/\./, $FilterItem->{Field}, 2);
                                     my $SubData = {
