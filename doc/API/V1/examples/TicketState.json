@@ -1,0 +1,13 @@
+{
+    "TicketState": { 
+        "ChangeBy": 1,
+        "ChangeTime": "2018-09-28 09:17:03",
+        "Comment": "...", 
+        "CreateBy": 1,
+        "CreateTime": "2018-08-28 11:34:55",
+        "ID": 1,
+        "Name": "new", 
+        "TypeID": 1, 
+        "ValidID": 1
+    }
+}

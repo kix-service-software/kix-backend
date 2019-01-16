@@ -1,0 +1,19 @@
+{% if parameterList.length %}
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th><center>Required</center></th>
+                <th>Type</th>
+                <th>Special</th>
+                <th>Description</th>
+                <th>Examples</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for param in parameterList %}
+                {% include "./param.nunjucks" %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

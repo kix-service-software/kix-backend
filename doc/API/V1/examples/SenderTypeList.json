@@ -1,0 +1,12 @@
+{
+    "SenderType": [
+        { 
+            "ID": 1,
+            "Name": "system"
+        },
+        {
+            "ID": 2,
+            "Name": "agent"
+        }        
+    ]
+}

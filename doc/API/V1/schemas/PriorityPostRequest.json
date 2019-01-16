@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PriorityPostRequest",
+  "type": "object",
+  "description": "The priority request object for creation.",
+  "properties": {
+    "Name": { "type": "string" },
+    "Comment": { "type": "string" },
+    "ValidID": { "type": "number" }
+  },
+  "required": [ "Name" ]
+}

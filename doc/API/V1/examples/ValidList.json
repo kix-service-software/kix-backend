@@ -1,0 +1,12 @@
+{
+    "Valid": [
+        { 
+            "ID": 1,
+            "Name": "valid"
+        },
+        {
+            "ID": 2,
+            "Name": "invalid"
+        }        
+    ]
+}

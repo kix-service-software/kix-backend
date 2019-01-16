@@ -1,0 +1,11 @@
+{ 
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PriorityPatchRequest",
+  "type": "object",
+  "description": "The priority request object for update.",
+  "properties": {
+    "Name": { "type": "string" },
+    "Comment": { "type": "string" },
+    "ValidID": { "type": "number" }
+  }
+}

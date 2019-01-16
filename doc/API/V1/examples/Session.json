@@ -1,0 +1,16 @@
+{  
+    "AllowedOperations": [],
+    "CreateTime": "2018-08-28 11:34:55",
+    "CreateTimeUnix": 1535456095,
+    "DeniedOperations": [],
+    "Description": "",
+    "IgnoreMaxIdleTime": 0,
+    "LastRequestTime": "2018-08-28 13:10:31",
+    "LastRequestTimeUnix": 1535461831,
+    "RemoteIP": "::ffff:172.17.0.1",
+    "TokenType": "Normal",
+    "UserID": 1,
+    "UserType": "Agent",
+    "ValidUntilTime": "2018-08-29 03:34:55",
+    "ValidUntilTimeUnix": 1535513695
+}

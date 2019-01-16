@@ -413,7 +413,10 @@ sub ProviderGenerateResponse {
         if ( IsHashRefWithData($Result) ) {
             return $Self->_Output(
                 HTTPCode => 500,
-                Content  => $Result->{Message},
+                Content  => {
+                    Code    => $Param{Code},
+                    Message => $Result->{Message},
+                }
             );            
         }
         else {
@@ -426,7 +429,10 @@ sub ProviderGenerateResponse {
         # return message directly
         return $Self->_Output(
             HTTPCode  => $MappedCode,
-            Content   => $Param{Message},
+            Content   => {
+                Code    => $Param{Code},
+                Message => $Param{Message},
+            },
             AddHeader => $AddHeader,
         );
     }
@@ -435,7 +441,10 @@ sub ProviderGenerateResponse {
     if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
         return $Self->_Output(
             HTTPCode => 500,
-            Content  => 'Invalid data',
+            Content  => {
+                Code    => 'Transport.REST.InternalError',
+                Message => 'Invalid data',
+            }
         );
     }
 
@@ -452,15 +461,21 @@ sub ProviderGenerateResponse {
     }
 
     # prepare data
-    my $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
-        Data => $Param{Data},
-    );
-
-    if ( !$JSONString ) {
-        return $Self->_Output(
-            HTTPCode => 500,
-            Content  => 'Error while encoding return JSON structure.',
+    my $JSONString = '';
+    if ( IsHashRefWithData($Param{Data}) ) {
+        $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+            Data => $Param{Data},
         );
+
+        if ( !$JSONString ) {
+            return $Self->_Output(
+                HTTPCode => 500,
+                Content  => {
+                    Code    => 'Transport.REST.InternalError',
+                    Message => 'Error while encoding return JSON structure.',
+                }
+            );
+        }
     }
 
     # no error - return output
@@ -904,21 +919,46 @@ Returns structure to be passed to provider.
 
 sub _Output {
     my ( $Self, %Param ) = @_;
-
-    # check params
     my $Success = 1;
     my $Message;
+
+    if ( IsHashRefWithData($Param{Content}) ) {
+        $Param{Content} = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+            Data => $Param{Content},
+        );
+
+        if ( !$Param{Content} ) {
+            $Param{HTTPCode} = 500;
+            $Param{Content}  = '
+{ 
+    "Code": "Transport.REST.InternalError",
+    "Message": "Error while encoding return JSON structure."
+}';
+            $Success         = 0;
+            $Message         = 'Error while encoding return JSON structure.';            
+        }
+    }
+
+    # check params
     if ( defined $Param{HTTPCode} && !IsInteger( $Param{HTTPCode} ) ) {
         $Param{HTTPCode} = 500;
-        $Param{Content}  = 'Invalid internal HTTPCode';
+        $Param{Content}  = '
+{ 
+    "Code": "Transport.REST.InternalError",
+    "Message": "Invalid internal HTTPCode"
+}';
         $Success         = 0;
-        $Message    = 'Invalid internal HTTPCode';
+        $Message         = 'Invalid internal HTTPCode';
     }
     elsif ( defined $Param{Content} && !IsString( $Param{Content} ) ) {
         $Param{HTTPCode} = 500;
-        $Param{Content}  = 'Invalid Content';
+        $Param{Content}  = '
+{ 
+    "Code": "Transport.REST.InternalError",
+    "Message": "Invalid Content"
+}';
         $Success         = 0;
-        $Message    = 'Invalid Content';
+        $Message         = 'Invalid Content';
     }
 
     # prepare protocol
@@ -973,11 +1013,15 @@ sub _Output {
     # reproducible, and not tested in this solution).
     binmode STDOUT, ':utf8';    ## no critic
 
-
+    # adjust HTTP code
+    my $HTTPCode = $Param{HTTPCode};
+    if ( $Param{HTTPCode} eq 200 && !$Param{Content} ) {
+        $HTTPCode = 204;        # No Content
+    }
 
     # print data to http - '\r' is required according to HTTP RFCs
-    my $StatusMessage = HTTP::Status::status_message( $Param{HTTPCode} );
-    print STDOUT "Status: $Param{HTTPCode} $StatusMessage\r\n";
+    my $StatusMessage = HTTP::Status::status_message( $HTTPCode );
+    print STDOUT "Status: $HTTPCode $StatusMessage\r\n";
     print STDOUT "Content-Type: $ContentType; charset=UTF-8\r\n";
     print STDOUT "Content-Length: $ContentLength\r\n";
     print STDOUT "Connection: $Connection\r\n";
