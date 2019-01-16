@@ -1,0 +1,12 @@
+#%RAML 1.0 Trait
+
+responses:
+  409:
+    description: |
+      The request could not be finished to to a conflict. 
+      Common causes:
+        * PATCH: some data that is already in use by another item but the attribute value has to be unique
+        * DELETE: the item could not be deleted because depending items exist.
+    body:
+      application/json:
+        type: Error

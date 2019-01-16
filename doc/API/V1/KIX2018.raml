@@ -1,0 +1,49 @@
+#%RAML 1.0
+title: KIX 2018 REST API
+version: v1
+protocols: [ HTTP, HTTPS ]
+baseUri: http://{fqdn}:{port}/api.pl/webservice/core:$version
+baseUriParameters:
+  fqdn:
+    description: |
+      The FQDN of the KIX backend server.
+  port:
+    description: |
+      The port the KIX backend server uses.
+mediaType: application/json
+
+description: !include descriptions/description.md
+
+documentation:
+  - title: Getting started
+    content: !include descriptions/gettingStarted.md  
+  - title: Populating queries
+    content: !include descriptions/populatingQueries.md
+  - title: Selecting fields
+    content: !include descriptions/selectingFields.md
+  - title: Filtering results
+    content: !include descriptions/filteringResults.md
+
+# security
+securedBy: webToken
+securitySchemes:
+  webToken: !include securitySchemes/webToken.raml
+
+# some definitions
+types: !include lib/types.raml
+traits: !include lib/traits.raml
+resourceTypes: !include lib/resourceTypes.raml
+
+# resources
+/articletypes: !include resources/articletypes.raml
+/priorities: !include resources/priorities.raml
+/sendertypes: !include resources/sendertypes.raml
+/session: !include resources/session.raml
+/sessions: !include resources/sessions.raml
+/statetypes: !include resources/statetypes.raml
+/ticketlocks: !include resources/ticketlocks.raml
+/ticketstates: !include resources/ticketstates.raml
+/tickettypes: !include resources/tickettypes.raml
+/user: !include resources/user.raml
+/users: !include resources/users.raml
+/valid: !include resources/valid.raml

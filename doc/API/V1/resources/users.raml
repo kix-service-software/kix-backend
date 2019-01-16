@@ -1,0 +1,9 @@
+  displayName: Users
+  description: !include ../descriptions/resources/users.md
+  type: { collection: { typeName: User } }
+  /{userId}:
+    type: { item: { typeName: User } }
+    uriParameters:
+      userId:
+        displayName: UserID
+        type: integer

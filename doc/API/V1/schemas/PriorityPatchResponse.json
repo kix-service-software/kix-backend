@@ -1,0 +1,9 @@
+{ 
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PriorityPatchResponse",
+  "type": "object",
+  "description": "The ID of the updated priority.",
+  "properties": {
+      "PriorityID": { "type": "number" }
+  }
+}

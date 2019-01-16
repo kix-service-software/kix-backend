@@ -1,0 +1,10 @@
+{ 
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#ArticleType",
+    "type": "object",
+    "description": "The article type object.",
+    "properties": {
+      "ID": { "type": "number", "readOnly": true },
+      "Name": { "type": "string", "readOnly": true }
+    }
+}

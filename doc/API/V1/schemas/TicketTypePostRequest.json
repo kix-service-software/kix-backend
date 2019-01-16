@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#TicketTypePostRequest",
+    "type": "object",
+    "description": "The ticket type request object for creation.",
+    "properties": {
+      "Name": { "type": "string" },
+      "Comment": { "type": "string" },
+      "ValidID": { "type": "number" }
+    },
+    "required": [ "Name" ]
+}

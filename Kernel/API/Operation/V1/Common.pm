@@ -666,14 +666,18 @@ sub _Success {
     delete $Param{Message};
 
     # return structure
-    return {
-        Success      => 1,
-        Code         => $Code,
-        Message      => $Message,
-        Data         => {
-            %Param
-        },
+    my $Result = {
+        Success => 1,
+        Code    => $Code,
+        Message => $Message,
     };
+    if ( IsHashRefWithData(\%Param) ) {
+        $Result->{Data} = {
+            %Param
+        };
+    }
+
+    return $Result;
 }
 
 =item _Error()
@@ -700,8 +704,6 @@ sub _Error {
         Success => 0,
         Code    => $Param{Code},
         Message => $Param{Message},
-        Data    => {
-        },
     };
 }
 

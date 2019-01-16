@@ -1,0 +1,12 @@
+{
+    "ArticleType": [
+        { 
+            "ID": 1,
+            "Name": "webrequest"
+        },
+        {
+            "ID": 2,
+            "Name": "email"
+        }        
+    ]
+}
