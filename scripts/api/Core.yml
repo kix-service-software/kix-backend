@@ -42,27 +42,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Own::SessionGet
-    V1::User::UserRoleSearch :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserRoleSearch 
-    V1::User::UserRoleCreate :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserRoleCreate 
-    V1::User::UserRoleDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserRoleDelete
     V1::User::UserSearch:
         Description: ''
         MappingInbound:
@@ -91,6 +70,62 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::User::UserUpdate
+    V1::User::UserRoleSearch :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleSearch 
+    V1::User::UserRoleCreate :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleCreate 
+    V1::User::UserRoleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleDelete
+    V1::User::UserPreferenceSearch :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceSearch 
+    V1::User::UserPreferenceCreate :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceCreate 
+    V1::User::UserPreferenceGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceGet
+    V1::User::UserPreferenceUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceUpdate
+    V1::User::UserPreferenceDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceDelete
     V1::Own::UserGet:
         Description: ''
         MappingInbound:
@@ -105,6 +140,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Own::UserRoleSearch
+    V1::Own::UserPreferenceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Own::UserPreferenceSearch
     V1::TicketType::TicketTypeSearch:
         Description: ''
         MappingInbound:
@@ -1678,18 +1720,6 @@ Provider:
           RequestMethod:
           - GET
           Route: /session
-        V1::User::UserRoleSearch :
-          RequestMethod:
-          - GET
-          Route: /users/:UserID/roleids
-        V1::User::UserRoleCreate :
-          RequestMethod:
-          - POST
-          Route: /users/:UserID/roleids
-        V1::User::UserRoleDelete:
-          RequestMethod:
-          - DELETE
-          Route: /users/:UserID/roleids/:RoleID
         V1::User::UserSearch:
           RequestMethod:
           - GET
@@ -1706,6 +1736,38 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /users/:UserID
+        V1::User::UserRoleSearch :
+          RequestMethod:
+          - GET
+          Route: /users/:UserID/roleids
+        V1::User::UserRoleCreate :
+          RequestMethod:
+          - POST
+          Route: /users/:UserID/roleids
+        V1::User::UserRoleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /users/:UserID/roleids/:RoleID
+        V1::User::UserPreferenceSearch :
+          RequestMethod:
+          - GET
+          Route: /users/:UserID/preferences
+        V1::User::UserPreferenceCreate :
+          RequestMethod:
+          - POST
+          Route: /users/:UserID/preferences
+        V1::User::UserPreferenceGet:
+          RequestMethod:
+          - GET
+          Route: /users/:UserID/preferences/:UserPreferenceID
+        V1::User::UserPreferenceUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /users/:UserID/preferences/:UserPreferenceID
+        V1::User::UserPreferenceDelete:
+          RequestMethod:
+          - DELETE
+          Route: /users/:UserID/preferences/:UserPreferenceID
         V1::Own::UserGet:
           RequestMethod:
           - GET
@@ -1714,6 +1776,10 @@ Provider:
           RequestMethod:
           - GET
           Route: /user/roleids
+        V1::Own::UserPreferenceSearch:
+          RequestMethod:
+          - GET
+          Route: /user/preferences
         V1::TicketType::TicketTypeSearch:
           RequestMethod:
           - GET

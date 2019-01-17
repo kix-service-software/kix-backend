@@ -138,7 +138,8 @@ sub Run {
 
         # get the user data
         my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $UserID,
+            UserID        => $UserID,
+            NoPreferences => 1
         );
 
         if ( !IsHashRefWithData( \%UserData ) ) {
@@ -147,6 +148,20 @@ sub Run {
                 Code    => 'Object.NotFound',
                 Message => "No user data found for UserID $UserID.",
             );
+        }
+
+        # include preferences if requested
+        if ( $Param{Data}->{include}->{Preferences} ) {
+            # get already prepared preferences data from UserPreferenceSearch operation
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserPreferenceSearch',
+                Data          => {
+                    UserID => $UserID
+                }
+            );
+            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                $UserData{Preferences} = $Result->{Data}->{UserPreference};
+            }
         }
 
         # filter valid attributes

@@ -1,9 +1,14 @@
-{ 
+{
     "$schema": "http://json-schema.org/schema",
     "$id": "#TicketTypePatchResponse",
     "type": "object",
     "description": "The ID of the updated ticket type.",
     "properties": {
-        "TicketTypeID": { "type": "number" }
-    }
+        "TicketTypeID": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "TicketTypeID"
+    ]
 }

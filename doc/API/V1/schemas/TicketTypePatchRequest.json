@@ -1,11 +1,25 @@
-{ 
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#TicketTypePatchRequest",
-    "type": "object",
-    "description": "The ticket type request object for update.",
-    "properties": {
-      "Name": { "type": "string" },
-      "Comment": { "type": "string" },
-      "ValidID": { "type": "number" }
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TicketTypePatchRequest",
+  "type": "object",
+  "description": "The ticket type request object for update.",
+  "properties": {
+    "UserPreference": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "number"
+        }
+      }
     }
+  },
+  "required": [
+    "UserPreference"
+  ]
 }

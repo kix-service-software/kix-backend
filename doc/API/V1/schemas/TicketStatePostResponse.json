@@ -1,9 +1,14 @@
-{ 
+{
   "$schema": "http://json-schema.org/schema",
   "$id": "#TicketStatePostResponse",
   "type": "object",
   "description": "The ID of the created ticket state.",
   "properties": {
-    "TicketStateID": { "type": "number" }
-  }
+    "TicketStateID": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "TicketStateID"
+  ]
 }
