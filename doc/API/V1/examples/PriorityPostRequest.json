@@ -1,5 +1,7 @@
-{ 
-    "Name": "lowest",
-    "Comment": "just for testing purposes",
-    "ValidID": 1
+{
+    "Priority": {
+        "Name": "lowest",
+        "Comment": "just for testing purposes",
+        "ValidID": 1
+    }
 }

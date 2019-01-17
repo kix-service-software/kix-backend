@@ -1,4 +1,6 @@
-{ 
-    "UserEmail": "john.miller@example.com",
-    "ValidID": 2
+{
+    "User": {
+        "UserEmail": "john.miller@example.com",
+        "ValidID": 2
+    }
 }

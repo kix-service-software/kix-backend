@@ -1,5 +1,7 @@
-{ 
-    "Name": "Change Request",
-    "Comment": "just for testing purposes",
-    "ValidID": 1
+{
+    "TicketType": {
+        "Name": "Change Request",
+        "Comment": "just for testing purposes",
+        "ValidID": 1
+    }
 }

@@ -99,14 +99,17 @@ sub RunOperation {
             $Self->AddCacheDependency(Type => $Self->{OperationConfig}->{CacheTypeDependency});
         }
 
+        my $CacheKey = $Self->_GetCacheKey();
+
         my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{OperationConfig}->{CacheType},           
-            Key  => $Self->_GetCacheKey(),
+            Key  => $CacheKey,
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
             if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
                 $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."return cached response");
+                print STDERR "CacheKey: $CacheKey\n";
             }
             $Self->{'_CachedResponse'} = 1;
             return $Self->_Success(

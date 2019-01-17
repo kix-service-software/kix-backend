@@ -7671,131 +7671,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###RefreshTime" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the RefreshTime object in the preference view of the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Overview Refresh Time</Item>
-                <Item Key="Desc" Translatable="1">If enabled, the different overviews (Dashboard, LockedView, QueueView) will automatically refresh after the specified time.</Item>
-                <Item Key="Key" Translatable="1">After</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="0" Translatable="1">off</Item>
-                        <Item Key="2" Translatable="1"> 2 minutes</Item>
-                        <Item Key="5" Translatable="1"> 5 minutes</Item>
-                        <Item Key="7" Translatable="1"> 7 minutes</Item>
-                        <Item Key="10" Translatable="1">10 minutes</Item>
-                        <Item Key="15" Translatable="1">15 minutes</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">0</Item>
-                <Item Key="PrefKey">UserRefreshTime</Item>
-                <Item Key="Prio">2000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###TicketOverviewSmallPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the tickets are shown) of the small ticket overview.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Ticket Overview "Small" Limit</Item>
-                <Item Key="Key" Translatable="1">Ticket limit per page for Ticket Overview "Small"</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">UserTicketOverviewSmallPageShown</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###TicketOverviewFilterSettings" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the column filters of the small ticket overview.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::ColumnFilters</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Enabled filters.</Item>
-                <Item Key="Key" Translatable="1">Column ticket filters for Ticket Overviews type "Small".</Item>
-                <Item Key="PrefKey">UserFilterColumnsEnabled</Item>
-                <Item Key="Prio">8100</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###TicketOverviewMediumPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the tickets are shown) of the medium ticket overview.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Ticket Overview "Medium" Limit</Item>
-                <Item Key="Key" Translatable="1">Ticket limit per page for Ticket Overview "Medium"</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">20</Item>
-                <Item Key="PrefKey">UserTicketOverviewMediumPageShown</Item>
-                <Item Key="Prio">8100</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###TicketOverviewPreviewPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the tickets are shown) of the ticket preview overview.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Ticket Overview "Preview" Limit</Item>
-                <Item Key="Key" Translatable="1">Ticket limit per page for Ticket Overview "Preview"</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">15</Item>
-                <Item Key="PrefKey">UserTicketOverviewPreviewPageShown</Item>
-                <Item Key="Prio">8200</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="PreferencesGroups###CreateNextMask" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the CreateNextMask object in the preference view of the agent interface.</Description>
         <Group>Ticket</Group>
@@ -15341,22 +15216,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###LinkedObjectFilterSettings" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for .</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::ColumnFilters</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Enabled filters.</Item>
-                <Item Key="Key" Translatable="1">Column ticket filters for linked objects.</Item>
-                <Item Key="PrefKey">UserFilterColumnsEnabled</Item>
-                <Item Key="Prio">8100</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::Frontend::AgentTicketZoomTabEditDynamicFields###Permission" Required="1" Valid="1">
         <Description Translatable="1">Required permissions to use the ticket note screen in the agent interface.</Description>
         <Group>Ticket</Group>
@@ -15696,33 +15555,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###KIXSidebarCILinksShow" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to show CILinks and be shown in the preferences view.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Linked config items</Item>
-                <Item Key="Key" Translatable="1">Number of Linked ConfigItems per Page</Item>
-                <Item Key="Block">Option</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="05">05</Item>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">10</Item>
-                <Item Key="PrefKey">KIXSidebarCILinksShow</Item>
-                <Item Key="Prio">6100</Item>
-                <Item Key="Active">10</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::Frontend::CustomerTicketMessage###TicketTypeFix" Required="1" Valid="1">
         <Description Translatable="1">Used ticket type, if ticket type selection is disabled.</Description>
         <Group>Ticket</Group>
@@ -15786,29 +15618,6 @@ Thanks for your help!
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::NotificationToOutOfOfficeSubstitute</Item>
                 <Item Key="Event">(ArticleAgentNotification)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###KIXSidebarCustomerEmailSelection" Required="0" Valid="1">
-        <Description Translatable="1">Defines parameters for user preference to set behavior of KIXSidebar contact selection.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Behavior of KIXSidebar "ContactInfo" contact selection</Item>
-                <Item Key="Key" Translatable="1">Behavior of KIXSidebar "ContactInfo" contact selection</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="LinkedPersons">Linked Persons</Item>
-                        <Item Key="ArticleContacts">Article Contacts</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">LinkedPersons</Item>
-                <Item Key="PrefKey">UserKIXSidebarCustomerEmailSelection</Item>
-                <Item Key="Prio">8001</Item>
-                <Item Key="Active">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -1,10 +1,20 @@
-{ 
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#Error",
-    "type": "object",
-    "description": "An error object.",
-    "properties": {
-      "Code": { "type": "string", "readOnly": true },
-      "Message": { "type": "string", "readOnly": true }
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
     }
-  }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}

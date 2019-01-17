@@ -1,6 +1,8 @@
-{ 
-    "Name": "closed with workaround",
-    "Comment": "just for testing purposes",
-    "TypeID": 3,
-    "ValidID": 1
+{
+    "TicketState": {
+        "Name": "closed with workaround",
+        "Comment": "just for testing purposes",
+        "TypeID": 3,
+        "ValidID": 1
+    }
 }
