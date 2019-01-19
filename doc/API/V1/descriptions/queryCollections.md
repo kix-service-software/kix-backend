@@ -1,0 +1,1 @@
+When querying collections you oft have support the query parameter '''search''' which defines the  

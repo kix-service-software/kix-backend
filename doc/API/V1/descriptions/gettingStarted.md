@@ -1,1 +1,3 @@
-getting started content
+First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a [```POST```](#sessions_post) request to the [```/sessions```](#sessions) resource including an ```AuthRequest``` object.
+
+If the system was able to authenticate the user it will respond with an ```AuthResponse``` object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description. 
