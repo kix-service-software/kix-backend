@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#TranslationPostPatchResponse",
+    "type": "object",
+    "description": "The ID of the created or updated translation.",
+    "properties": {
+        "TranslationID": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "TranslationID"
+    ]
+}

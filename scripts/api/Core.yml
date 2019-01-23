@@ -1694,6 +1694,76 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ConfigItemAttachmentGet
+    V1::I18n::TranslationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationSearch
+    V1::I18n::TranslationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationCreate
+    V1::I18n::TranslationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationGet
+    V1::I18n::TranslationUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationUpdate
+    V1::I18n::TranslationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationDelete
+    V1::I18n::TranslationLanguageSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageSearch
+    V1::I18n::TranslationLanguageGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageGet
+    V1::I18n::TranslationLanguageCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageCreate
+    V1::I18n::TranslationLanguageUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageUpdate
+    V1::I18n::TranslationLanguageDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageDelete
 
   Transport:
     Config:
@@ -2664,6 +2734,46 @@ Provider:
           RequestMethod:
           - GET
           Route: /cmdb/configitems/attachments/:AttachmentID
+        V1::I18n::TranslationSearch:
+          RequestMethod:
+          - GET
+          Route: /i18n/translations
+        V1::I18n::TranslationCreate:
+          RequestMethod:
+          - POST
+          Route: /i18n/translations
+        V1::I18n::TranslationGet:
+          RequestMethod:
+          - GET
+          Route: /i18n/translations/:TranslationID
+        V1::I18n::TranslationUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /i18n/translations/:TranslationID
+        V1::I18n::TranslationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /i18n/translations/:TranslationID
+        V1::I18n::TranslationLanguageSearch:
+          RequestMethod:
+          - GET
+          Route: /i18n/translations/:TranslationID/languages
+        V1::I18n::TranslationLanguageGet:
+          RequestMethod:
+          - GET
+          Route: /i18n/translations/:TranslationID/languages/:Language
+        V1::I18n::TranslationLanguageCreate:
+          RequestMethod:
+          - POST
+          Route: /i18n/translations/:TranslationID/languages
+        V1::I18n::TranslationLanguageUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /i18n/translations/:TranslationID/languages/:Language
+        V1::I18n::TranslationLanguageDelete:
+          RequestMethod:
+          - DELETE
+          Route: /i18n/translations/:TranslationID/languages/:Language
 
     Type: HTTP::REST
 RemoteSystem: ''

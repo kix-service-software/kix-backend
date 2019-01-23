@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TranslationPostRequest",
+  "type": "object",
+  "description": "The translation request object for creation.",
+  "properties": {
+    "Translation": {
+      "type": "object",
+      "properties": {
+        "Pattern": {
+          "type": "string"
+        },
+        "Languages": {
+          "type": "array",
+          "items": {
+            "$ref": "#TranslationLanguage"
+          }
+        }    
+      },
+      "required": [
+        "Pattern"
+      ]
+    }
+  },
+  "required": [
+    "Translation"
+  ]
+}
