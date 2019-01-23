@@ -1,0 +1,14 @@
+{
+    "TranslationLanguage": [
+        { 
+            "TranslationID": 3,
+            "Language": "de",
+            "Value": "Das ist ein Test."
+        },
+        { 
+            "TranslationID": 3,
+            "Language": "en",
+            "Value": "This is a test."
+        }        
+    ]
+}

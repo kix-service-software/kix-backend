@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ObjectID">PatternID</Item>
+                <Item Key="CacheType">API_i18n_translations</Item>
+                <Item Key="CacheTypeDependency">Translation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="CacheType">API_i18n_translations</Item>
+                <Item Key="CacheTypeDependency">Translation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationLanguageGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationLanguageGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ObjectID">TranslationID</Item>
+                <Item Key="CacheType">API_i18n_translations</Item>
+                <Item Key="CacheTypeDependency">Translation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationLanguageSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationLanguageSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="CacheType">API_i18n_translations</Item>
+                <Item Key="CacheTypeDependency">Translation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationLanguageCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationLanguageCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationLanguageUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationLanguageUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationLanguageDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationLanguageDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">I18n</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    
+</kix_config>

@@ -2880,4 +2880,45 @@
     </Index>
 </Table>
 
+<!-- kix_translation_language - translations -->
+<Table Name="kix_translation_language">
+    <Column Name="pattern_id" Required="true" Type="INTEGER" />
+    <Column Name="language" Required="true" Type="VARCHAR" Size="8" />
+    <Column Name="value" Required="true" Type="VARCHAR" Size="10000" />
+    <Column Name="create_time" Required="true" Type="DATE" />
+    <Column Name="create_by" Required="true" Type="INTEGER" />
+    <Column Name="change_time" Required="true" Type="DATE" />
+    <Column Name="change_by" Required="true" Type="INTEGER" />
+    <Unique Name="kix_translation_lang_unique">
+        <UniqueColumn Name="pattern_id"/>
+        <UniqueColumn Name="language"/>
+    </Unique>
+    <ForeignKey ForeignTable="kix_translation_pattern">
+        <Reference Local="pattern_id" Foreign="id"/>
+    </ForeignKey>
+    <Index Name="kix_translation_lang_pattid_lang">
+        <IndexColumn Name="pattern_id"/>
+        <IndexColumn Name="language"/>
+    </Index>
+</Table>
+
+<!-- kix_translation - the base texts for translations -->
+<Table Name="kix_translation_pattern">
+    <Column Name="id" Required="true" Type="INTEGER" AutoIncrement="true" PrimaryKey="true" />
+    <Column Name="value" Required="true" Type="VARCHAR" Size="10000" />
+    <Column Name="create_time" Required="true" Type="DATE" />
+    <Column Name="create_by" Required="true" Type="INTEGER" />
+    <Column Name="change_time" Required="true" Type="DATE" />
+    <Column Name="change_by" Required="true" Type="INTEGER" />
+    <Unique Name="kix_translation_pattern_uvalue">
+        <UniqueColumn Name="value"/>
+    </Unique>
+    <Index Name="kix_translation_pattern_id">
+        <IndexColumn Name="id"/>
+    </Index>
+    <Index Name="kix_translation_pattern_value">
+        <IndexColumn Name="value"/>
+    </Index>
+</Table>
+
 </database>

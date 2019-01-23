@@ -1,0 +1,18 @@
+  displayName: i18n
+  description: !include ../descriptions/resources/i18n.md
+  /translations:
+    type: { collection: { typeName: Translation } }
+    /{translationId}:
+      type: { item: { typeName: Translation } }
+      uriParameters:
+        translationId:
+          displayName: TranslationID
+          type: integer
+      /languages:
+        type: { collection: { typeName: TranslationLanguage } }
+        /{languageId}:
+          type: { item: { typeName: TranslationLanguage } }
+          uriParameters:
+            languageId:
+              displayName: TranslationLanguageID
+              type: string

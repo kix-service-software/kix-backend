@@ -96,6 +96,7 @@ sub new {
         );
     }
 
+print STDERR "OperationType: $Param{OperationType}\n";
     $Self->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
     if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(

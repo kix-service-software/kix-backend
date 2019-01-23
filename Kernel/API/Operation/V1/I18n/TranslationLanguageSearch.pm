@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserPreferenceSearch;
+package Kernel::API::Operation::V1::I18n::TranslationLanguageSearch;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::UserRoleSearch - API UserPreference Search Operation backend
+Kernel::API::Operation::V1::I18n::TranslationLanguageSearch - API I18n TranslationLanguage Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -82,7 +82,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'UserID' => {
+        'TranslationID' => {
             Required => 1
         },
     }
@@ -90,11 +90,11 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform UserPreferenceSearch Operation. This will return a list of preferences.
+perform TranslationLanguageSearch Operation. This will return a list of preferences.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID  => 123
+            TranslationID  => 123
         }
     );
 
@@ -103,7 +103,7 @@ perform UserPreferenceSearch Operation. This will return a list of preferences.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            UserPreference => [
+            TranslationLanguage => [
                 ...
             ]
         },
@@ -114,37 +114,48 @@ perform UserPreferenceSearch Operation. This will return a list of preferences.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # get the user data
-    my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        UserID => $Param{Data}->{UserID},
+    # check if pattern already exists
+    my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+        ID => $Param{Data}->{TranslationID},
     );
-
-    if ( !IsHashRefWithData( \%UserData ) ) {
-
+    if ( !%PatternData ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "No user data found.",
+            Message => "No translation with ID '$Param{Data}->{TranslationID}' found.",
         );
     }
 
-    my @PrefList;
-    foreach my $Pref ( sort keys %{$UserData{Preferences}} ) {
-        push(@PrefList, {
-            UserID => $Param{Data}->{UserID},
-            ID     => $Pref,
-            Value  => $UserData{Preferences}->{$Pref}
-        });
-    }
+    # perform translation search
+    my %TranslationList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageList(
+        PatternID => $Param{Data}->{TranslationID},
+    );
 
-    if ( IsArrayRefWithData(\@PrefList) ) {
-        return $Self->_Success(
-            UserPreference => \@PrefList,
-        )
-    }
+    if (IsHashRefWithData(\%TranslationList)) {
+
+        # get already prepared Translation data from TranslationLanguageGet operation
+        my $TranslationLanguageGetResult = $Self->ExecOperation(
+            OperationType => 'V1::I18n::TranslationLanguageGet',
+            Data          => {
+                TranslationID         => $Param{Data}->{TranslationID},
+                TranslationLanguageID => join(',', sort keys %TranslationList),
+            }
+        );
+        if ( !IsHashRefWithData($TranslationLanguageGetResult) || !$TranslationLanguageGetResult->{Success} ) {
+            return $TranslationLanguageGetResult;
+        }
+
+        my @ResultList = IsArrayRefWithData($TranslationLanguageGetResult->{Data}->{TranslationLanguage}) ? @{$TranslationLanguageGetResult->{Data}->{TranslationLanguage}} : ( $TranslationLanguageGetResult->{Data}->{TranslationLanguage} );
+        
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                TranslationLanguage => \@ResultList,
+            )
+        }
+    }    
 
     # return result
     return $Self->_Success(
-        UserPreference => [],
+        TranslationLanguage => [],
     );
 }
 

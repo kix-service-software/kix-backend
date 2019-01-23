@@ -464,7 +464,8 @@ sub ProviderGenerateResponse {
     my $JSONString = '';
     if ( IsHashRefWithData($Param{Data}) ) {
         $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
-            Data => $Param{Data},
+            Data     => $Param{Data},
+            SortKeys => 1
         );
 
         if ( !$JSONString ) {
