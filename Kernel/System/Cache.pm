@@ -180,6 +180,7 @@ sub Set {
             );
         }
         foreach my $Type (@{$Param{Depends}}) {
+            $Self->_Debug('', "adding cache key to depending cache type \"$Type\": $Param{Key}");
             $Self->{TypeDependencies}->{$Type}->{$Param{Type}}->{$Param{Key}} = 1;
         }
     }
@@ -544,10 +545,10 @@ sub _HandleDependingCacheTypes {
     }
 
     if ( $Self->{TypeDependencies} && exists $Self->{TypeDependencies}->{$Param{Type}} ) {
-        $Self->_Debug($Param{Indent}, "type $Param{Type} of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
+        $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
         
         foreach my $DependendType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
-            $Self->_Debug($Param{Indent}, "    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type $DependendType");
+            $Self->_Debug($Param{Indent}, "    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type \"$DependendType\"");
             
             foreach my $Key ( keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}} ) {
                 $Self->_Debug($Param{Indent}, "        deleting key: $Key");
@@ -561,7 +562,7 @@ sub _HandleDependingCacheTypes {
             }
 
             if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
-                $Self->_Debug($Param{Indent}, "        no keys left in dependend type $DependendType, deleting entry");
+                $Self->_Debug($Param{Indent}, "        no keys left in dependend type \"$DependendType\", deleting entry");
                 # delete whole dependend type if all keys are deleted
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
             }

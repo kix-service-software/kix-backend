@@ -1650,7 +1650,7 @@ sub _GetCacheKey {
         $RequestData{$What} = join(',', sort @Parts);
     }
 
-    my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{Operation}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
+    my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{OperationType}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
         \%RequestData,
         'ascii+noindent'        
     );
