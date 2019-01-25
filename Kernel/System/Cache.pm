@@ -334,15 +334,21 @@ sub Delete {
         }
     }
 
+    $Param{Indent} = $Param{Indent} || '';
+
     # Delete and cleanup operations should also be done if the cache is disabled
     #   to avoid inconsistent states.
 
     # delete from in-memory cache
     delete $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} };
 
+    # delete from persistent cache
+    return if !$Self->{CacheObject}->Delete(%Param);
+
     # check and delete depending caches
     $Self->_HandleDependingCacheTypes(
-        Type => $Param{Type}
+        Type   => $Param{Type},
+        Indent => $Param{Indent}.'    '
     );
 
     $Self->_UpdateCacheStats(
@@ -350,8 +356,7 @@ sub Delete {
         %Param,
     );
 
-    # delete from persistent cache
-    return $Self->{CacheObject}->Delete(%Param);
+    return 1;
 }
 
 =item CleanUp()
@@ -391,6 +396,8 @@ be executed both in memory and in the backend to avoid inconsistent cache states
 sub CleanUp {
     my ( $Self, %Param ) = @_;
 
+    $Param{Indent} = $Param{Indent} || '';
+
     # cleanup in-memory cache
     # We don't have TTL/expiry information here, so just always delete to be sure.
     if ( $Param{Type} ) {
@@ -398,7 +405,8 @@ sub CleanUp {
 
         # check and delete depending caches
         $Self->_HandleDependingCacheTypes(
-            Type => $Param{Type}
+            Type   => $Param{Type},
+            Indent => $Param{Indent}.'    '
         );
 
         $Self->_UpdateCacheStats(
@@ -416,7 +424,8 @@ sub CleanUp {
 
             # check and delete depending caches
             $Self->_HandleDependingCacheTypes(
-                Type => $Type
+                Type   => $Type,
+                Indent => $Param{Indent}.'    '
             );
 
             $Self->_UpdateCacheStats(
@@ -524,6 +533,8 @@ deletes relevant keys of depending cache types
 sub _HandleDependingCacheTypes {
     my ( $Self, %Param ) = @_;
 
+    $Param{Indent} = $Param{Indent} || '';
+
     if ( !$Self->{TypeDependencies} ) {
         # load information from backend
         $Self->{TypeDependencies} = $Self->{CacheObject}->Get(
@@ -533,31 +544,35 @@ sub _HandleDependingCacheTypes {
     }
 
     if ( $Self->{TypeDependencies} && exists $Self->{TypeDependencies}->{$Param{Type}} ) {
-        $Self->_Debug("type $Param{Type} of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
+        $Self->_Debug($Param{Indent}, "type $Param{Type} of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
+        
         foreach my $DependendType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
-            $Self->_Debug("    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type $DependendType");
+            $Self->_Debug($Param{Indent}, "    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type $DependendType");
+            
             foreach my $Key ( keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}} ) {
+                $Self->_Debug($Param{Indent}, "        deleting key: $Key");
                 # remove key entry to make sure we don't end up in a recursive loop
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}->{$Key};
                 $Self->Delete(
                     Type => $DependendType,
-                    Key  => $Key
+                    Key  => $Key,
+                    Indent => $Param{Indent}.'    ',
                 );
             }
 
             if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
-                $Self->_Debug("        no keys left in dependend type $DependendType, deleting entry");
+                $Self->_Debug($Param{Indent}, "        no keys left in dependend type $DependendType, deleting entry");
                 # delete whole dependend type if all keys are deleted
                 delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
             }
+
         }
 
         if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
-            $Self->_Debug("        no dependencies left for type $Param{Type}, deleting entry");
+            $Self->_Debug($Param{Indent}, "        no dependencies left for type $Param{Type}, deleting entry");
             # delete whole type if all keys are deleted
             delete $Self->{TypeDependencies}->{$Param{Type}};
         }
-
 
         # Set persistent cache
         if ( $Self->{CacheInBackend} ) {
@@ -641,11 +656,11 @@ sub _UpdateCacheStats {
 }
 
 sub _Debug {
-    my ( $Self, $Message ) = @_;
+    my ( $Self, $Indent, $Message ) = @_;
 
     return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') );
 
-    printf STDERR "%10s %s\n", "[Cache]", "$Message";
+    printf STDERR "%10s %s%s\n", "[Cache]", $Indent, $Message;
 }
 
 =back

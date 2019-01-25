@@ -525,10 +525,10 @@ sub AddCacheDependency {
 
     foreach my $Type (split(/,/, $Param{Type})) {
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
-            $Self->_Debug($Self->{LevelIndent}."adding cache type dependencies: $Type...already exists");
+            $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies: $Type...already exists");
             next;
         }
-        $Self->_Debug($Self->{LevelIndent}."adding cache type dependencies: $Type");
+        $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies: $Type");
         $Self->{CacheDependencies}->{$Type} = 1;
     }
 }
@@ -752,7 +752,7 @@ sub ExecOperation {
         );
     }
 
-    $Self->_Debug($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
+    ($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
 
     my $Result = $OperationObject->Run(
         Data    => {
@@ -771,7 +771,7 @@ sub ExecOperation {
             }
         }
         if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Debug') ) {
-            $Self->_Debug($Self->{LevelIndent}."    cache type $Self->{OperationConfig}->{CacheType} depends on: ".join(',', keys %{$Self->{CacheDependencies}}));
+            $Self->_Debug($Self->{LevelIndent},"    cache type $Self->{OperationConfig}->{CacheType} now depends on: ".join(',', keys %{$Self->{CacheDependencies}}));
         }
     }
 
@@ -1377,7 +1377,7 @@ sub _ApplyInclude {
                 $Self->AddCacheDependency(Type => $GenericIncludes->{$Include}->{CacheTypeDependency});
             }
 
-            $Self->_Debug($Self->{LevelIndent}."GenericInclude: $Include");
+            $Self->_Debug($Self->{LevelIndent}, "GenericInclude: $Include");
 
             # do it for every object in the response
             foreach my $Object ( keys %{$Param{Data}} ) {
@@ -1652,7 +1652,7 @@ sub _GetCacheKey {
 
     my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{Operation}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
         \%RequestData,
-        'ascii'
+        'ascii+noindent'        
     );
 
     return $CacheKey;
@@ -1681,11 +1681,11 @@ sub _CacheRequest {
 }
 
 sub _Debug {
-    my ( $Self, $Message ) = @_;
+    my ( $Self, $Indent, $Message ) = @_;
 
     return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
 
-    printf STDERR "%10s %15s: %s\n", "[API]", $Self->{OperationConfig}->{Name}, "$Message";
+    printf STDERR "%10s %s%s: %s\n", "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 1;
