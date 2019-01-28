@@ -150,6 +150,10 @@ sub Run {
             );
         }
 
+        # replace Value with Pattern
+        $TranslationData{Pattern} = $TranslationData{Value};
+        delete $TranslationData{Value};
+
         # include languages if requested
         if ( $Param{Data}->{include}->{Languages} ) {
             # get already prepared preferences data from TranslationLanguageSearch operation
