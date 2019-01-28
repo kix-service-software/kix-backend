@@ -1,11 +1,11 @@
   usage: Use this resourceType to represent any single item
-  description: A single <<typeName>>.
+  description: A single <<typeName>> item.
   get:
-    description: Get a <<typeName>>.
+    description: Get a <<typeName>> item.
     is: [ hasResponseItem: { typeName: <<typeName>> }, hasNotFound, supportingFieldSelection ]
   patch:
-    description: Partially update a <<typeName>>.
+    description: Partially update a <<typeName>> item.
     is: [ hasRequestItem: { typeName: <<typeName>>PatchRequest }, hasResponseItem: { typeName: <<typeName>>PostPatchResponse }, hasBadRequest, hasNotFound, hasConflict ]
   delete:
-    description: Delete a <<typeName>>.
+    description: Delete a <<typeName>> item.
     is: [ hasNotFound, hasConflict, hasNoContent ]
