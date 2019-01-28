@@ -1,9 +1,17 @@
-{ 
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#TicketStateList",
-    "type": "object",
-    "description": "A list of ticket states.",
-    "properties": {
-      "TicketState": { "type": "array", "items": { "$ref": "#TicketState" } }
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TicketStateList",
+  "type": "object",
+  "description": "A list of ticket states.",
+  "properties": {
+    "TicketState": {
+      "type": "array",
+      "items": {
+        "$ref": "#TicketState"
+      }
     }
-  }
+  },
+  "required": [
+    "TicketStateID"
+  ]
+}

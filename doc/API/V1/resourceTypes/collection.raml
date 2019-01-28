@@ -1,17 +1,14 @@
   usage: Use this resourceType to represent a collection of items
-  description: A collection of <<resourcePathName|!uppercamelcase>>
+  description: A collection of <<typeName>> items.
   get:
-    description: |
-      Get all <<resourcePathName|!uppercamelcase>>.
+    description: Get all <<typeName>> items.
     is: [ hasResponseCollection: { typeName: <<typeName>> }, hasBadRequest, filterable, pageable, sortable ]
   post:
-    description: |
-      Create a new <<resourcePathName|!uppercamelcase|!singularize>>.
+    description: Create a new <<typeName>>.
     is: [ hasRequestItem: { typeName: <<typeName>>PostRequest }, hasBadRequest, hasConflict ]
     responses:
       201:
-        description: |
-          The <<typeName>> has been created successfully.
+        description: The <<typeName>> has been created successfully.
         body:
           application/json: 
-            type: <<typeName>>PostResponse
+            type: <<typeName>>PostPatchResponse

@@ -97,6 +97,8 @@ get user data (UserLogin, UserFirstname, UserLastname, UserEmail, ...)
                                   # returns only data if user is valid
         NoOutOfOffice => 1,       # not required -> 0|1 (default 0)
                                   # returns data without out of office infos
+        NoPreferences => 1,       # not required -> 0|1 (default 0)
+                                  # returns data without preferences
     );
 
 =cut
@@ -132,6 +134,12 @@ sub GetUserData {
     else {
         $Param{NoOutOfOffice} = 0;
     }
+    if ( $Param{NoPreferences} ) {
+        $Param{NoPreferences} = 1;
+    }
+    else {
+        $Param{NoPreferences} = 0;
+    }
 
     my $CacheKey;
     if ( $Param{User} ) {
@@ -139,14 +147,16 @@ sub GetUserData {
             $Param{User},
             $Param{Valid},
             $FirstnameLastNameOrder,
-            $Param{NoOutOfOffice};
+            $Param{NoOutOfOffice},
+            $Param{NoPreferences};
     }
     else {
         $CacheKey = join '::', 'GetUserData', 'UserID',
             $Param{UserID},
             $Param{Valid},
             $FirstnameLastNameOrder,
-            $Param{NoOutOfOffice};
+            $Param{NoOutOfOffice},
+            $Param{NoPreferences};
     }
 
     # check cache
@@ -253,18 +263,6 @@ sub GetUserData {
 
     my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
 
-    # add last login timestamp
-    if ( $Preferences{UserLastLogin} ) {
-        $Preferences{UserLastLoginTimestamp} = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $Preferences{UserLastLogin},
-        );
-    }
-
-    # check compat stuff
-    if ( !$Preferences{UserEmail} ) {
-        $Preferences{UserEmail} = $Data{UserLogin};
-    }
-
     # out of office check
     if ( !$Param{NoOutOfOffice} ) {
         if ( $Preferences{OutOfOffice} ) {
@@ -289,8 +287,7 @@ sub GetUserData {
                     $Preferences{OutOfOfficeEndDay}
                 );
                 my $Till = int( ( $TimeEnd - $Time ) / 60 / 60 / 24 );
-                $Preferences{OutOfOfficeMessage} = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
-                $Data{UserLastname} .= ' ' . $Preferences{OutOfOfficeMessage};
+                $Data{OutOfOfficeMessage} = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
             }
 
             # Reduce CacheTTL to one hour for users that are out of office to make sure the cache expires timely
@@ -299,24 +296,39 @@ sub GetUserData {
         }
     }
 
-    # merge hash
-    %Data = ( %Data, %Preferences );
+    if ( !$Param{NoPreferences} ) {
 
-    # add preferences defaults
-    my $Config = $ConfigObject->Get('PreferencesGroups');
-    if ( $Config && ref $Config eq 'HASH' ) {
-
-        KEY:
-        for my $Key ( sort keys %{$Config} ) {
-
-            next KEY if !defined $Config->{$Key}->{DataSelected};
-
-            # check if data is defined
-            next KEY if defined $Data{ $Config->{$Key}->{PrefKey} };
-
-            # set default data
-            $Data{ $Config->{$Key}->{PrefKey} } = $Config->{$Key}->{DataSelected};
+        # add last login timestamp
+        if ( $Preferences{UserLastLogin} ) {
+            $Preferences{UserLastLoginTimestamp} = $TimeObject->SystemTime2TimeStamp(
+                SystemTime => $Preferences{UserLastLogin},
+            );
         }
+
+        # check compat stuff
+        if ( !$Preferences{UserEmail} ) {
+            $Preferences{UserEmail} = $Data{UserLogin};
+        }
+
+        # add preferences defaults
+        my $Config = $ConfigObject->Get('PreferencesGroups');
+        if ( $Config && ref $Config eq 'HASH' ) {
+
+            KEY:
+            for my $Key ( sort keys %{$Config} ) {
+
+                next KEY if !defined $Config->{$Key}->{DataSelected};
+
+                # check if data is defined
+                next KEY if defined $Preferences{ $Config->{$Key}->{PrefKey} };
+
+                # set default data
+                $Preferences{ $Config->{$Key}->{PrefKey} } = $Config->{$Key}->{DataSelected};
+            }
+        }
+
+        # add preferences to data hash
+        $Data{Preferences} = \%Preferences;
     }
 
     # set cache
@@ -1239,39 +1251,6 @@ sub SetPreferences {
     # get configuration for the full name order
     my $FirstnameLastNameOrder = $ConfigObject->Get('FirstnameLastnameOrder') || 0;
 
-    # create cachekey
-    my $Login = $Self->UserLookup( UserID => $Param{UserID} );
-    my @CacheKeys = (
-        'GetUserData::User::' . $Login . '::0::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::User::' . $Login . '::0::' . $FirstnameLastNameOrder . '::1',
-        'GetUserData::User::' . $Login . '::1::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::User::' . $Login . '::1::' . $FirstnameLastNameOrder . '::1',
-        'GetUserData::UserID::' . $Param{UserID} . '::0::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::UserID::' . $Param{UserID} . '::0::' . $FirstnameLastNameOrder . '::1',
-        'GetUserData::UserID::' . $Param{UserID} . '::1::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::UserID::' . $Param{UserID} . '::1::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Short::0::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Short::0::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Short::1::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Short::1::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Long::0::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Long::0::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Long::1::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Long::1::' . $FirstnameLastNameOrder . '::1',
-    );
-
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
-    # delete cache
-    for my $CacheKey (@CacheKeys) {
-
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-    }
-
     # get user preferences config
     my $GeneratorModule = $ConfigObject->Get('User::PreferencesModule')
         || 'Kernel::System::User::Preferences::DB';
@@ -1304,6 +1283,30 @@ sub GetPreferences {
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
     return $PreferencesObject->GetPreferences(%Param);
+}
+
+=item DeletePreferences()
+
+delete a user preference
+
+    my $Succes = $UserObject->DeletePreferences(
+        UserID => 123,
+        Key    => 'UserEmail',
+    );
+
+=cut
+
+sub DeletePreferences {
+    my $Self = shift;
+
+    # get user preferences config
+    my $GeneratorModule = $Kernel::OM->Get('Kernel::Config')->Get('User::PreferencesModule')
+        || 'Kernel::System::User::Preferences::DB';
+
+    # get generator preferences module
+    my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+    return $PreferencesObject->DeletePreferences(@_);
 }
 
 =item SearchPreferences()

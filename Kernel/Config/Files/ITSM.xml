@@ -1394,33 +1394,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###ConfigItemOverviewSmallPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the configuration items are shown).</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Configuration Item Limit</Item>
-                <Item Key="Key" Translatable="1">Configuration Item limit per page</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">UserConfigItemOverviewSmallPageShown</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ITSMConfigItem::Frontend::Overview###Small" Required="0" Valid="1">
         <Description Translatable="1">Defines an overview module to show the small view of a configuration item list.</Description>
         <Group>ITSM</Group>
@@ -1866,72 +1839,6 @@
                 <Item Key="Name">Custom</Item>
                 <Item Key="ModulePriority">400</Item>
                 <Item Key="NameShort">C</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###ConfigItemOverviewCustomColumnValue" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the CIs are shown) of the custom config item overview. This is a list of available column values can be chosen.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::ConfigItemOverviewColumn</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Config Item Overview "Custom" ColumnValue</Item>
-                <Item Key="Key" Translatable="1">CI limit per page for CI Overview "Small"</Item>
-                <Item Key="PrefKey">UserCustomCILVColumnValue</Item>
-                <Item Key="Prio">8011</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###ConfigItemOverviewCustomPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the configuration items are shown).</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Configuration Item Limit</Item>
-                <Item Key="Key" Translatable="1">Configuration Item limit per page</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">UserConfigItemOverviewCustomPageShown</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###ConfigItemSearchAllBehavior" Required="0" Valid="1">
-        <Description Translatable="1">Defines parameters for user preference to set ConfigItemSearch behavior for search over all config item classes.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">ConfigItemSearch behavior for search over all config item classes</Item>
-                <Item Key="Key" Translatable="1">ConfigItemSearch behavior for search over all config item classes</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="AllAttributes">All Attributes</Item>
-                        <Item Key="EqualAttributes">Common Attributes</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">EqualAttributes</Item>
-                <Item Key="PrefKey">UserConfigItemSearchAllBehavior</Item>
-                <Item Key="Prio">8001</Item>
-                <Item Key="Active">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>

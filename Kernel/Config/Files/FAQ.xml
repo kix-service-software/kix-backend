@@ -1038,33 +1038,6 @@ Your OTRS Notification Master
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###FAQOverviewSmallPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the FAQ items are shown) of the small FAQ overview.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">FAQ Overview "Small" Limit</Item>
-                <Item Key="Key" Translatable="1">FAQ limit per page for FAQ Overview "Small"</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">UserFAQOverviewSmallPageShown</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###AgentFAQZoom" Required="0" Valid="1">
         <Description Translatable="1">Frontend module registration for the agent interface.</Description>
         <Group>FAQ</Group>
@@ -1468,33 +1441,6 @@ Your OTRS Notification Master
         <SubGroup>Frontend::Agent::FAQ::ViewJournal</SubGroup>
         <Setting>
             <String Regex="^[0-9]{1,3}$">50</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###FAQJournalOverviewSmallPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the FAQ items are shown) of the small FAQ journal overview.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">FAQ Journal Overview "Small" Limit</Item>
-                <Item Key="Key" Translatable="1">FAQ limit per page for FAQ Journal Overview "Small"</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">UserFAQJournalOverviewSmallPageShown</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="FAQ::Frontend::JournalOverview###Small" Required="0" Valid="1">

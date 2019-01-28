@@ -1,4 +1,6 @@
-{ 
-    "Name": "highest",
-    "ValidID": 1
+{
+    "Priority": {
+        "Name": "highest",
+        "ValidID": 1
+    }
 }

@@ -119,6 +119,12 @@ perform UserCreate Operation. This will return the created UserLogin.
                 UserTitle       => '...'                                        # optional
                 RoleIDs         => [                                            # optional          
                     123
+                ],
+                Preferences     => [                                            # optional
+                    {
+                        ID    => '...',
+                        Value => '...'
+                    }
                 ]
             },
         },
@@ -178,7 +184,27 @@ sub Run {
         );
     }
 
-    # create checklist
+    # add preferences
+    if ( IsHashRefWithData($User->{Preferences}) ) {
+
+        foreach my $Pref ( @{$User->{Preferences}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserPreferenceCreate',
+                Data          => {
+                    UserID     => $UserID,
+                    Preference => $Pref
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    ${$Result},
+                )
+            }
+        }
+    }
+
+    # create roles
     if ( IsHashRefWithData($User->{RoleIDs}) ) {
 
         foreach my $RoleID ( @{$User->{RoleIDs}} ) {

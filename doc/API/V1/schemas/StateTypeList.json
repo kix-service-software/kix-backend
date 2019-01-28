@@ -1,9 +1,17 @@
-{ 
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#StateTypeList",
-    "type": "object",
-    "description": "A list of state types.",
-    "properties": {
-      "StateType": { "type": "array", "items": { "$ref": "#StateType" } }
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#StateTypeList",
+  "type": "object",
+  "description": "A list of state types.",
+  "properties": {
+    "StateType": {
+      "type": "array",
+      "items": {
+        "$ref": "#StateType"
+      }
     }
-  }
+  },
+  "required": [
+    "StateType"
+  ]
+}

@@ -773,7 +773,7 @@ sub Dump {
     if ( !$Type ) {
         $Type = 'binary';
     }
-    if ( $Type ne 'ascii' && $Type ne 'binary' ) {
+    if ( $Type !~ /^ascii/ && $Type ne 'binary' ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "Invalid Type '$Type'!"
@@ -786,6 +786,11 @@ sub Dump {
 
     # sort hash keys
     $Data::Dumper::Sortkeys = 1;
+
+    # suppress indention if requests
+    if ( $Type =~ /noindent$/ ) {
+        $Data::Dumper::Indent = 0;
+    }
 
     # This Dump() is using Data::Dumper with a utf8 workarounds to handle
     # the bug [rt.cpan.org #28607] Data::Dumper::Dumper is dumping utf8
