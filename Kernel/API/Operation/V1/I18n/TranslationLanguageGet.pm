@@ -95,7 +95,7 @@ sub ParameterDefinition {
             DataType => 'NUMERIC',
             Required => 1
         },
-        'TranslationLanguageID' => {
+        'Language' => {
             Type     => 'ARRAY',
             Required => 1
         }                
@@ -149,12 +149,12 @@ sub Run {
     my @TranslationLanguageList;
 
     # start loop
-    foreach my $TranslationLanguageID ( @{$Param{Data}->{TranslationLanguageID}} ) {
+    foreach my $Language ( @{$Param{Data}->{Language}} ) {
 
         # get the Translation data
         my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageGet(
             PatternID => $Param{Data}->{TranslationID},
-            Language  => $TranslationLanguageID,
+            Language  => $Language,
             UserID    => $Self->{Authorization}->{UserID}
         );
 
@@ -162,7 +162,7 @@ sub Run {
 
             return $Self->_Error(
                 Code    => 'Object.NotFound',
-                Message => "No translation with ID '$TranslationLanguageID' found.",
+                Message => "No translation with ID '$Language' found.",
             );
         }
 

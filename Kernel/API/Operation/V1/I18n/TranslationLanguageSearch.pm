@@ -136,8 +136,8 @@ sub Run {
         my $TranslationLanguageGetResult = $Self->ExecOperation(
             OperationType => 'V1::I18n::TranslationLanguageGet',
             Data          => {
-                TranslationID         => $Param{Data}->{TranslationID},
-                TranslationLanguageID => join(',', sort keys %TranslationList),
+                TranslationID => $Param{Data}->{TranslationID},
+                Language      => join(',', sort keys %TranslationList),
             }
         );
         if ( !IsHashRefWithData($TranslationLanguageGetResult) || !$TranslationLanguageGetResult->{Success} ) {

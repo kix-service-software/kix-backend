@@ -10,9 +10,9 @@
           type: integer
       /languages:
         type: { collection: { typeName: TranslationLanguage } }
-        /{languageId}:
+        /{language}:
           type: { item: { typeName: TranslationLanguage } }
           uriParameters:
-            languageId:
-              displayName: TranslationLanguageID
+            language:
+              displayName: Language
               type: string
