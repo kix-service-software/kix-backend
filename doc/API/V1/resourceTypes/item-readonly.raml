@@ -1,5 +1,5 @@
   usage: Use this resourceType to represent any single readonly item
-  description: A single <<typeName>>.
+  description: A single <<typeName>> item.
   get:
-    description: Get a <<typeName>>.
+    description: Get a <<typeName>> item.
     is: [ hasResponseItem: { typeName: <<typeName>> }, hasNotFound, supportingFieldSelection ]
