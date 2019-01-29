@@ -1,15 +1,43 @@
-{ 
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#Lock",
-    "type": "object",
-    "description": "The ticket lock object.",
-    "properties": {
-      "ChangeBy": { "type": "number", "readOnly": true },
-      "ChangeTime": { "type": "string", "readOnly": true },
-      "CreateBy": { "type": "number", "readOnly": true },
-      "CreateTime": { "type": "string", "readOnly": true },
-      "ID": { "type": "number", "readOnly": true },
-      "Name": { "type": "string" },
-      "ValidID": { "type": "number" }
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Lock",
+  "type": "object",
+  "description": "The ticket lock object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "number",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "number",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "number",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string"
+    },
+    "ValidID": {
+      "type": "number"
     }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Name",
+    "ValidID"
+  ]
 }

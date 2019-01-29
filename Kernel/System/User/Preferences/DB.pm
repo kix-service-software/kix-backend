@@ -89,9 +89,8 @@ sub SetPreferences {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $Self->{CachePrefix} . $Param{UserID},
     );
 
     return 1;
@@ -144,6 +143,39 @@ sub GetPreferences {
     );
 
     return %Data;
+}
+
+sub DeletePreferences {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(UserID Key)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # delete old data
+    return if !$DBObject->Do(
+        SQL => "
+            DELETE FROM $Self->{PreferencesTable}
+            WHERE $Self->{PreferencesTableUserID} = ?
+                AND $Self->{PreferencesTableKey} = ?",
+        Bind => [ \$Param{UserID}, \$Param{Key} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
 }
 
 sub SearchPreferences {

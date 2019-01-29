@@ -100,12 +100,14 @@ sub Run {
     my %UserData;
     if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
         %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $Self->{Authorization}->{UserID},
+            UserID        => $Self->{Authorization}->{UserID},
+            NoPreferences => 1
         );
     }
     elsif ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         %UserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $Self->{Authorization}->{UserID},
+            User          => $Self->{Authorization}->{UserID},
+            NoPreferences => 1
         );        
     }
     else {
@@ -130,13 +132,25 @@ sub Run {
     }
 
     # filter valid attributes
-    if ( IsHashRefWithData($Self->{Config}->{AttributeBacklist}) ) {
+    if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
         foreach my $Attr (sort keys %UserData) {
             delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
         }
     }
 
     if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
+
+        # include preferences if requested
+        if ( $Param{Data}->{include}->{Preferences} ) {
+            # get already prepared preferences data from UserPreferenceSearch operation
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Own::UserPreferenceSearch',
+                Data          => {}
+            );
+            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                $UserData{Preferences} = $Result->{Data}->{UserPreference};
+            }
+        }
 
         # include tickets if requested
         if ( $Param{Data}->{include}->{Tickets} ) {
