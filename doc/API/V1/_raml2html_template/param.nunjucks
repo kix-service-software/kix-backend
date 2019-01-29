@@ -1,5 +1,5 @@
 <tr>
-  <td>{{ param.key }}</td>
+  <td class="uri">{{ param.key }}</td>
   <td><center>{%- if param.required -%} yes {% endif -%}</center></td>
   <td>
     {% if param.type !== nil and not param.structuredValue %}
