@@ -353,8 +353,15 @@ sub PatternDelete {
         }
     }
 
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    # delete pattern
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'DELETE FROM kix_translation_pattern WHERE id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    # delete assigned languages
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'DELETE FROM kix_translation_language WHERE pattern_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
