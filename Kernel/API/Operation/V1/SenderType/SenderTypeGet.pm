@@ -141,8 +141,7 @@ sub Run {
 
         if ( !$SenderTypeName ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for SenderTypeID $SenderTypeID.",
+                Code => 'Object.NotFound',
             );
         }
        

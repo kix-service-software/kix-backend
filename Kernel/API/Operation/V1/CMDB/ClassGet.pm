@@ -126,8 +126,7 @@ sub Run {
 
         if (!IsHashRefWithData($ItemData) || $ItemData->{Class} ne 'ITSM::ConfigItem::Class') {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ClassID $ClassID",
+                Code => 'Object.NotFound',
             );
         }        
 
@@ -237,8 +236,7 @@ sub Run {
 
     if ( scalar(@ClassList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ClassID ".join(',', $Param{Data}->{ClassID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@ClassList) == 1 ) {

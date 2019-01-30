@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%RoleData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for RoleID $RoleID.",
+                Code => 'Object.NotFound',
             );
         }
         

@@ -145,8 +145,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%Vote ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for FAQVoteID $VoteID.",
+                Code => 'Object.NotFound',
             );
         }
 

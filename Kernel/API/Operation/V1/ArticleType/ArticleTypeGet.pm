@@ -141,8 +141,7 @@ sub Run {
 
         if ( !$ArticleTypeName ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for ArticleTypeID $ArticleTypeID.",
+                Code => 'Object.NotFound',
             );
         }
        

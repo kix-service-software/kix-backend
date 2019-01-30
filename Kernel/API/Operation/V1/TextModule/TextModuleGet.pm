@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%TextModuleData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for TextModuleID $TextModuleID.",
+                Code => 'Object.NotFound',
             );
         }
         

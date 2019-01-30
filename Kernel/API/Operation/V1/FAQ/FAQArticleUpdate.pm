@@ -147,8 +147,7 @@ sub Run {
  
     if ( !%FAQArticleData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update FAQ article. No FAQ article with ID '$Param{Data}->{FAQArticleID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -188,8 +187,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update FAQ article, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

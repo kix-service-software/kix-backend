@@ -139,8 +139,7 @@ sub Run {
 
     if ( !$GeneralCatalogData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update class. No class with ID '$Param{Data}->{ClassID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 

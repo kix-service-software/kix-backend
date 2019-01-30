@@ -155,9 +155,7 @@ sub Run {
         );
     }
 
-    return $Self->_Success(
-        TicketID => $Param{Data}->{TicketID},
-    );
+    return $Self->_Success();
 }
 
 1;

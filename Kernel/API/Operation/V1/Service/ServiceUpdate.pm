@@ -143,8 +143,7 @@ sub Run {
  
     if ( !%ServiceData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update Service. No Service with ID '$Param{Data}->{ServiceID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -168,8 +167,7 @@ sub Run {
     
     if ( $ServiceID != $ServiceData{ServiceID} ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Cannot update Service. Service with same name '$Service->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
 
@@ -187,8 +185,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Service, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

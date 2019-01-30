@@ -129,8 +129,7 @@ sub Run {
 
     if (!IsHashRefWithData($ConfigItem)) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ConfigItemID $Param{Data}->{ConfigItemID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -143,8 +142,7 @@ sub Run {
 
         if (!IsHashRefWithData($HistoryItem)) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for HistoryID $HistoryID in ConfigItemID $Param{Data}->{ConfigItemID}",
+                Code    => 'Object.NotFound'
             );
         }     
 
@@ -153,8 +151,7 @@ sub Run {
 
     if ( scalar(@HistoryList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for HistoryID ".join(',', $Param{Data}->{HistoryID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@HistoryList) == 1 ) {

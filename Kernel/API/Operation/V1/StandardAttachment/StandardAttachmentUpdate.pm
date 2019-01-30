@@ -141,8 +141,7 @@ sub Run {
  
     if ( !IsHashRefWithData(\%StandardAttachmentData) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update StandardAttachment. No StandardAttachment with ID '$Param{Data}->{StandardAttachmentID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -154,8 +153,7 @@ sub Run {
         
         if ( $ID && $ID != $Param{Data}->{AttachmentID}) {
             return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Can not update StandardAttachment entry. Another StandardAttachment with same name already exists.",
+                Code => 'Object.AlreadyExists',
             );
         }
     }
@@ -174,8 +172,7 @@ sub Run {
     
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update StandardAttachment, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

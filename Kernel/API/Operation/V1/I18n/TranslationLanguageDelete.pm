@@ -123,8 +123,7 @@ sub Run {
     );
     if ( !%PatternData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No translation with ID '$Param{Data}->{TranslationID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -134,8 +133,7 @@ sub Run {
     );
     if ( !IsHashRefWithData(\%TranslationList) || !$TranslationList{$Param{Data}->{Language}} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No language '$Param{Data}->{Language}' for given translation found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -147,8 +145,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToDelete',
-            Message => 'Could not delete translation language, please contact the system administrator',
+            Code => 'Object.UnableToDelete',
         );
     }
     

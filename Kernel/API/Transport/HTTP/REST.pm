@@ -241,7 +241,6 @@ sub ProviderProcessRequest {
 
         return $Self->_Error(
             Code       => 'NotAllowed',
-            Message    => HTTP::Status::status_message(405),
             Additional => {
                 AddHeader => {
                     Allow => join(', ', @AllowedMethods),
@@ -395,6 +394,7 @@ The HTTP code is set accordingly
 sub ProviderGenerateResponse {
     my ( $Self, %Param ) = @_;
     my $MappedCode;
+    my $MappedMessage;
 
     # add headers if given
     my $AddHeader;
@@ -404,10 +404,12 @@ sub ProviderGenerateResponse {
 
     # do we have to return an http error code
     if ( IsStringWithData( $Param{Code} ) ) {
+        print STDERR "Code: $Param{Code}\n";
         # map error code to HTTP code
         my $Result = $Self->_MapReturnCode(
             Transport    => 'HTTP::REST',
             Code         => $Param{Code},
+            Message      => $Param{Message}
         );
 
         if ( IsHashRefWithData($Result) ) {
@@ -420,18 +422,23 @@ sub ProviderGenerateResponse {
             );            
         }
         else {
-            $MappedCode = $Result;
+            print STDERR "Result: $Result\n";
+            ($MappedCode, $MappedMessage) = split(/:/, $Result);
+            print STDERR "MappedCode: $MappedCode, MappedMessage: $MappedMessage\n";
+            if ( !$MappedMessage ) {
+                $MappedMessage = $Param{Message};
+            }
         }
     }
 
     # do we have to return an error message
-    if ( IsStringWithData( $Param{Message} ) ) {
+    if ( IsStringWithData( $MappedMessage ) ) {
         # return message directly
         return $Self->_Output(
             HTTPCode  => $MappedCode,
             Content   => {
                 Code    => $Param{Code},
-                Message => $Param{Message},
+                Message => $MappedMessage,
             },
             AddHeader => $AddHeader,
         );
@@ -453,10 +460,10 @@ sub ProviderGenerateResponse {
     if ( !$Param{Success} ) {
 
         # create Fault structure
-        my $FaultString = $Param{Message} || 'Unknown';
+        my $FaultString = $MappedMessage || 'Unknown';
         $Param{Data} = {
-            faultcode   => 'Server',
-            faultstring => $FaultString,
+            Code    => 'Unknown',
+            Message => $FaultString,
         };
     }
 

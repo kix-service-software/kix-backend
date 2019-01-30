@@ -203,8 +203,7 @@ sub Run {
 
     if ( !%Ticket ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Ticket $Param{Data}->{TicketID} not found!",
+            Code => 'ParentObject.NotFound',
         );
     }
 

@@ -156,8 +156,7 @@ sub Run {
     );
     if ( !%UserData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not update user. No user with ID '$Param{Data}->{UserID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -196,8 +195,7 @@ sub Run {
     );    
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update user, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
     

@@ -179,8 +179,7 @@ sub Run {
  
     if ( !%TextModuleData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update TextModule. No TextModule with ID '$Param{Data}->{TextModuleID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -192,8 +191,7 @@ sub Run {
         
         if ( IsArrayRefWithData($ExistingProfileIDs) && $ExistingProfileIDs->[0] != $TextModuleData{ID}) {
             return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Cannot update TextModule. Another TextModule with the same name already exists.",
+                Code => 'Object.AlreadyExists',
             );
         }
     }
@@ -217,8 +215,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update TextModule, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

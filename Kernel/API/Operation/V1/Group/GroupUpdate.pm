@@ -143,8 +143,7 @@ sub Run {
   
     if ( !$GroupData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update group. No group with ID '$Param{Data}->{GroupID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -159,8 +158,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update group, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

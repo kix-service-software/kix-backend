@@ -140,8 +140,7 @@ sub Run {
   
     if ( !%ObjectIconData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update ObjectIcon. No ObjectIcon with ObjectIconID $Param{Data}->{ObjectIconID} found",
+            Code => 'Object.NotFound',
         );
     }
     
@@ -153,8 +152,7 @@ sub Run {
 
     if ( IsArrayRefWithData($ObjectIconList) && $ObjectIconList->[0] != $Param{Data}->{ObjectIconID} ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not create ObjectIcon. Another ObjectIcon with the same Object and ObjectID already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
     
@@ -170,8 +168,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update ObjectIcon, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

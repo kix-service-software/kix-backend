@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%ObjectIconData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for ObjectIconID $ObjectIconID.",
+                Code => 'Object.NotFound',
             );
         }
         

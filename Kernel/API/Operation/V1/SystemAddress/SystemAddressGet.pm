@@ -139,8 +139,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%SystemAddressData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for SystemAddressID $SystemAddressID.",
+                Code => 'Object.NotFound',
             );
         }
         

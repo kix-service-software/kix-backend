@@ -147,8 +147,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%LinkData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for LinkID $LinkID.",
+                Code => 'Object.NotFound',
             );
         }
         

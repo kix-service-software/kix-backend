@@ -141,8 +141,7 @@ sub Run {
  
     if ( !%SignatureData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update Signature. No Signature with ID '$Param{Data}->{SignatureID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -151,8 +150,7 @@ sub Run {
 
     if ( $SignatureList{$Signature->{Name}} && $SignatureList{$Signature->{Name}} ne $Param{Data}->{SignatureID} ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not create Signature. Signature with same name '$Signature->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }   
 
@@ -169,8 +167,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Signature, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

@@ -143,8 +143,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%ServiceData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for ServiceID $ServiceID.",
+                Code => 'Object.NotFound',
             );
         }
         

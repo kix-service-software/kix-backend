@@ -145,8 +145,7 @@ sub Run {
     );
     if ( !%ContactData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not update Contact. No Contact with ID '$Param{Data}->{ContactID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -158,7 +157,7 @@ sub Run {
     if ( !$SourceList{$ContactData{Source}} ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => 'Can not update Contact. Corresponding backend is not writable or does not exist.',
+            Message => 'Cannot update contact. Corresponding backend is not writable or does not exist.',
         );        
     }
 
@@ -170,7 +169,7 @@ sub Run {
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Can not update Contact. Another Contact with same login already exists.',
+                Message => 'Cannot update contact. Another contact with same login already exists.',
             );
         }
     }
@@ -184,7 +183,7 @@ sub Run {
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Can not update Contact. Another Contact with same email address already exists.',
+                Message => 'Cannot update contact. Another contact with same email address already exists.',
             );
         }
     }
@@ -200,7 +199,7 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Contact, please contact the system administrator',
+            Message => 'Could not update contact, please contact the system administrator',
         );
     }
     

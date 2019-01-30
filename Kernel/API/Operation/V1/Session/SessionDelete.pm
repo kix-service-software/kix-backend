@@ -113,8 +113,7 @@ sub Run {
     # check result
     if ( !$Result ) {
         return $Self->_Error(
-            Code    => 'SessionDelete.DeleteError',
-            Message => 'SessionDelete: unable to remove token!',
+            Code => 'Object.UnableToDelete',
         );
     }
 

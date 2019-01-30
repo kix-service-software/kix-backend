@@ -145,8 +145,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%StandardAttachmentData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for AttachmentID $AttachmentID.",
+                Code => 'Object.NotFound',
             );
         }
         

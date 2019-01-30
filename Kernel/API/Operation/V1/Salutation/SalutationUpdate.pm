@@ -142,8 +142,7 @@ sub Run {
  
     if ( !%SalutationData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update Salutation. No Salutation with ID '$Param{Data}->{SalutationID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -152,8 +151,7 @@ sub Run {
 
     if ( $SalutationList{$Salutation->{Name}} && $SalutationList{$Salutation->{Name}} ne $Param{Data}->{SalutationID} ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not create Salutation. Salutation with same name '$Salutation->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }        
 
@@ -170,8 +168,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Salutation, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

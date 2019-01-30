@@ -164,15 +164,14 @@ sub Run {
     # check if article exists
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
         );
     }

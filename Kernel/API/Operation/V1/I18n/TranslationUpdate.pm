@@ -140,8 +140,7 @@ sub Run {
     );
     if ( !%PatternData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update translation. No translation with ID '$Param{Data}->{TranslationID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -166,8 +165,7 @@ sub Run {
     );    
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update translation, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
     
