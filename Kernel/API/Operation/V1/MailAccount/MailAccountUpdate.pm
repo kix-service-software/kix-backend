@@ -167,8 +167,7 @@ sub Run {
  
     if ( !%MailAccountData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update MailAccount. No MailAccount with ID '$Param{Data}->{MailAccountID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -197,8 +196,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update MailAccount, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

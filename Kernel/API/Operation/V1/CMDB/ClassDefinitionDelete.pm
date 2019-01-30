@@ -129,8 +129,7 @@ sub Run {
 
         if ( !IsHashRefWithData($Definition) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not delete class definition $Param{Data}->{DefinitionID}"
+                Code => 'Object.NotFound'
             );
         }
         

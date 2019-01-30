@@ -128,8 +128,7 @@ sub Run {
 
     if ( !IsHashRefWithData( $DynamicFieldData ) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No data found for DynamicFieldID $Param{Data}->{DynamicFieldID}.",
+            Code => 'Object.NotFound',
         );
     }
 

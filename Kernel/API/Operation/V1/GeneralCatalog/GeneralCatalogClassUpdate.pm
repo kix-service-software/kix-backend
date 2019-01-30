@@ -132,8 +132,7 @@ sub Run {
 
     if ( !%ClassList || !$ClassList{$Param{Data}->{GeneralCatalogClass}} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update GeneralCatalog class. No GeneralCatalog class '$Param{Data}->{GeneralCatalogClass}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -146,8 +145,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update GeneralCatalog class, please contact the system administrator',
+            Code => 'Object.UnableToUpdate'
         );
     }
 

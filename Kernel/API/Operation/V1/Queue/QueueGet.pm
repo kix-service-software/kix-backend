@@ -184,8 +184,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%QueueData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for QueueID $QueueID.",
+                Code => 'Object.NotFound',
             );
         }
         # include SubQueues if requested

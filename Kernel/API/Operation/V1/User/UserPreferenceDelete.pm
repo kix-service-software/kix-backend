@@ -123,14 +123,12 @@ sub Run {
     );
     if ( !%UserData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot Delete user preference. No user with ID '$Param{Data}->{UserID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
     if ( !exists $UserData{Preferences}->{$Param{Data}->{UserPreferenceID}} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot Delete user preference. No user preference with ID '$Param{Data}->{UserPreferenceID}' found for user.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -142,8 +140,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToDelete',
-            Message => 'Could not delete user preference, please contact the system administrator',
+            Code => 'Object.UnableToDelete',
         );
     }
     

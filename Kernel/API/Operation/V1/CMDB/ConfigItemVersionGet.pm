@@ -131,8 +131,7 @@ sub Run {
 
     if (!IsHashRefWithData($ConfigItem)) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "ConfigItem $Param{Data}->{ConfigItemID} does not exist",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -150,8 +149,7 @@ sub Run {
 
             if (!IsHashRefWithData($Version)) {
                 return $Self->_Error(
-                    Code    => 'Object.NotFound',
-                    Message => "Could not get data for VersionID $VersionID in ConfigItemID $Param{Data}->{ConfigItemID}",
+                    Code => 'Object.NotFound',
                 );
             }     
 
@@ -205,8 +203,7 @@ sub Run {
 
         if ( scalar(@VersionList) == 0 ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for VersionID ".join(',', $Param{Data}->{VersionID}),
+                Code => 'Object.NotFound'
             );
         }
         elsif ( scalar(@VersionList) == 1 ) {

@@ -147,8 +147,7 @@ sub Run {
   
     if ( !IsHashRefWithData($DynamicFieldData) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update DynamicField config. No DynamicField with ID '$Param{Data}->{DynamicFieldID}' found.",
+            Code => 'Object.NotFound',
         );
     }
     
@@ -166,8 +165,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update DynamicField config, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

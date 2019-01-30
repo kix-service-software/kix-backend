@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%SignatureData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for SignatureID $SignatureID.",
+                Code => 'Object.NotFound',
             );
         }
         

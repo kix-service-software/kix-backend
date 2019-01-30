@@ -140,7 +140,7 @@ sub Run {
     if ( !$SourceList{$Param{Data}->{SourceID}} ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => 'Can not create Contact. Backend with given SourceID is not writable or does not exist.',
+            Message => 'Cannot create contact. Backend with given SourceID is not writable or does not exist.',
         );        
     }
 
@@ -156,7 +156,7 @@ sub Run {
     if ( %ContactData ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Contact. Another Contact with same login already exists.",
+            Message => "Cannot create contact. Another contact with same login already exists.",
         );
     }
 

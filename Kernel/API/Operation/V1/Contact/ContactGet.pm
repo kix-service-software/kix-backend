@@ -144,8 +144,7 @@ sub Run {
         if ( !IsHashRefWithData( \%ContactData ) ) {
 
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No Contact data found for ContactID $ContactID.",
+                Code => 'Object.NotFound',
             );
         }
 

@@ -140,8 +140,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%TicketTypeData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for TypeID $TypeID.",
+                Code => 'Object.NotFound',
             );
         }
         

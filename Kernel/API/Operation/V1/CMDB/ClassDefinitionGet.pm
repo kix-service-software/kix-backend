@@ -131,8 +131,7 @@ sub Run {
 
         if (!IsHashRefWithData($DefinitionRef) || $DefinitionRef->{ClassID} != $Param{Data}->{ClassID}) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for DefinitionID $DefinitionID in ClassID $Param{Data}->{ClassID}",
+                Code => 'Object.NotFound',
             );
         }     
 
@@ -148,8 +147,7 @@ sub Run {
 
     if ( scalar(@DefinitionList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for DefinitionID ".join(',', $Param{Data}->{DefinitionID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@DefinitionList) == 1 ) {

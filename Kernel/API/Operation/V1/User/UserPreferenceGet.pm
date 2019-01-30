@@ -126,15 +126,13 @@ sub Run {
     );
     if ( !%UserData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update user preference. No user with ID '$Param{Data}->{UserID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
 
     if ( !exists $UserData{Preferences}->{$Param{Data}->{UserPreferenceID}} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot get user preference. No user preference with ID '$Param{Data}->{UserPreferenceID}' found for user.",
+            Code => 'Object.NotFound',
         );
     }
 

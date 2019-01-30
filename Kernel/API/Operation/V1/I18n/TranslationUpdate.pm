@@ -140,15 +140,14 @@ sub Run {
     );
     if ( !%PatternData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update translation. No translation with ID '$Param{Data}->{TranslationID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
     # check if pattern already exists
     if ( IsStringWithData($Translation->{Pattern}) ) {
         my $PatternID = $Kernel::OM->Get('Kernel::System::Translation')->PatternExistsCheck(
-            Pattern => $Translation->{Pattern},
+            Value => $Translation->{Pattern},
         );
         if ( $PatternID && $PatternID != $Param{Data}->{TranslationID} ) {        
             return $Self->_Error(
@@ -166,8 +165,7 @@ sub Run {
     );    
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update translation, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
     

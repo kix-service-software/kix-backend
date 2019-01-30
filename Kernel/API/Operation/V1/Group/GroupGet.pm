@@ -146,8 +146,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%GroupData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for GroupID $GroupID.",
+                Code => 'Object.NotFound',
             );
         }
         

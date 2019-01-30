@@ -127,8 +127,7 @@ sub Run {
 
     if (!IsHashRefWithData($ItemData) || $ItemData->{Class} ne 'ITSM::ConfigItem::Class') {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ClassID $Param{Data}->{ClassID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 

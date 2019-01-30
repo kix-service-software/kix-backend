@@ -141,8 +141,7 @@ sub Run {
 
         if ( !$StateTypeName ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for StateTypeID $StateTypeID.",
+                Code => 'Object.NotFound',
             );
         }	
 

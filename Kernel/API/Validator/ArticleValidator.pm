@@ -117,8 +117,7 @@ sub Validate {
 
     if ( !$Found ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Article not found!",
+            Code => 'Object.NotFound',
         );        
     }
 

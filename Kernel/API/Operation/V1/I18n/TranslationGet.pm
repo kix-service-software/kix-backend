@@ -145,8 +145,7 @@ sub Run {
         if ( !IsHashRefWithData( \%TranslationData ) ) {
 
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No translation with ID '$TranslationID' found.",
+                Code => 'Object.NotFound',
             );
         }
 

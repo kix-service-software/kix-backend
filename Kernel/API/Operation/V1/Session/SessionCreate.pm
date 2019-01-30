@@ -154,8 +154,7 @@ sub Run {
     if ( !$User ) {
 
         return $Self->_Error(
-            Code    => 'SessionCreate.AuthFail',
-            Message => "SessionCreate: Authorization failing!",
+            Code => 'SessionCreate.AuthFail'
         );
     }
 
@@ -170,8 +169,7 @@ sub Run {
     if ( !$Token ) {
 
         return $Self->_Error(
-            Code    => 'SessionCreate.AuthFail',
-            Message => "SessionCreate: Authorization failing!",
+            Code => 'SessionCreate.AuthFail'
         );
     }
 

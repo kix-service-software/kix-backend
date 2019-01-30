@@ -141,8 +141,7 @@ sub Run {
     if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         # customers are not allowed to update articles
         return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'No permission to update article flag!',
+            Code => 'Forbidden'
         );        
     }
 
@@ -155,8 +154,7 @@ sub Run {
 
     if ( !$Permission ) {
         return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to update checkliste item",
+            Code => 'Forbidden'
         );
     }
 
@@ -169,8 +167,7 @@ sub Run {
 
     if ( !IsHashRefWithData($Checklist) || !$Checklist->{$Param{Data}->{ChecklistItemID}}) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Checklist item $Param{Data}->{ChecklistItemID} not found in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound'
         );
     }
 
@@ -190,8 +187,7 @@ sub Run {
 
     if ( !$ChecklistItemID ) {
         return $Self->_Error(
-            Code         => 'Object.UnableToUpdate',
-            Message      => "Unable to update checklist item $Param{Data}->{ChecklistItemID}",
+            Code => 'Object.UnableToUpdate'
         );
     }
 

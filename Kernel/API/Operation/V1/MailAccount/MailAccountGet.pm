@@ -140,8 +140,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%MailAccountData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for MailAccountID $MailAccountID.",
+                Code => 'Object.NotFound',
             );
         }
         

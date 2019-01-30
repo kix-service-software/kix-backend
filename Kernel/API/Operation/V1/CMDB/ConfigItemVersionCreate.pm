@@ -143,8 +143,7 @@ sub Run {
     # check if ConfigItem exists
     if ( !$ConfigItem ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -157,8 +156,7 @@ sub Run {
 
     if ( !$Permission ) {
         return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create a version for this ConfigItem!",
+            Code => 'Object.NoPermission',
         );
     }
 

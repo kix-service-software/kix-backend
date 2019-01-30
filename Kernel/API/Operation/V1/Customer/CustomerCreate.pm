@@ -140,7 +140,7 @@ sub Run {
     if ( !$SourceList{$Param{Data}->{SourceID}} ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => 'Can not create Customer. Backend with given SourceID is not writable or does not exist.',
+            Message => 'Cannot create customer. Backend with given SourceID is not writable or does not exist.',
         );        
     }
 
@@ -156,7 +156,7 @@ sub Run {
     if ( %CustomerList ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Can not create Customer. Another Customer with same name already exists.',
+            Message => 'Cannot create customer. Another customer with same name already exists.',
         );
     }
     
@@ -170,7 +170,7 @@ sub Run {
     if ( !$CustomerID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Customer, please contact the system administrator',
+            Message => 'Could not create customer, please contact the system administrator',
         );
     }
     

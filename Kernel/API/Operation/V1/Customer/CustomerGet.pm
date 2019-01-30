@@ -143,8 +143,7 @@ sub Run {
         if ( !IsHashRefWithData( \%CustomerData ) ) {
 
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No Customer data found for CustomerID $CustomerID.",
+                Code => 'Object.NotFound'
             );
         }
 

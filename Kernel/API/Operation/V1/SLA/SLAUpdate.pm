@@ -149,8 +149,7 @@ sub Run {
  
     if ( !%SLAData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update SLA. No SLA with ID '$Param{Data}->{SLAID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -174,8 +173,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update SLA, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

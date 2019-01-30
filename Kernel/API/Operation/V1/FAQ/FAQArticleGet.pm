@@ -142,8 +142,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%FAQArticle ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for FAQArticleID $FAQArticleID.",
+                Code => 'Object.NotFound',
             );
         }
 

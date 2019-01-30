@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%AddressData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for AddressID $AddressID.",
+                Code => 'Object.NotFound'
             );
         }
         

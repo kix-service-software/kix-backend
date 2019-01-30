@@ -142,8 +142,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%SLAData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for SLAID $SLAID.",
+                Code => 'Object.NotFound',
             );
         }
         

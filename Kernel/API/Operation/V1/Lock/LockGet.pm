@@ -140,8 +140,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%LockData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for LockID $LockID.",
+                Code => 'Object.NotFound',
             );
         }
                 

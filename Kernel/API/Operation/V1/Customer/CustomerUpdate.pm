@@ -135,8 +135,7 @@ sub Run {
     );
     if ( !%CustomerData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not update Customer. No Customer with ID '$Param{Data}->{CustomerID}' found.",
+            Code => 'Object.NotFound'
         );
     }
 
@@ -147,7 +146,7 @@ sub Run {
     if ( !$SourceList{$CustomerData{Source}} ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => 'Can not update Customer. Corresponding backend is not writable or does not exist.',
+            Message => 'Cannot update Customer. Corresponding backend is not writable or does not exist.',
         );        
     }
 
@@ -159,7 +158,7 @@ sub Run {
         if ( %CustomerList && (scalar(keys %CustomerList) > 1 || !$CustomerList{$CustomerData{CustomerID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Can not update Customer. Another Customer with same name already exists.',
+                Message => 'Cannot update Customer. Another customer with same name already exists.',
             );
         }
     }
@@ -174,7 +173,7 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Customer, please contact the system administrator',
+            Message => 'Could not update customer, please contact the system administrator',
         );
     }
     

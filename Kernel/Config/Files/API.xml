@@ -184,40 +184,37 @@
     </ConfigItem>
 
     <ConfigItem Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
-        <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code</Description>
+        <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code[:DefaultMessage]</Description>
         <Setting>
             <Hash>
                 <Item Key="DEFAULT">200</Item>
-                <Item Key="Authorization.NoHeader">403</Item>
-                <Item Key="Authorization.NoToken">403</Item>
+                <Item Key="Authorization.NoHeader">403:No "Authorization" header found.</Item>
+                <Item Key="Authorization.NoToken">403:No token in "Authorization" header found. </Item>
                 <Item Key="BadRequest">400</Item>
                 <Item Key="Conflict">409</Item>                
-                <Item Key="ContactCreate.EmailExists">409</Item>
-                <Item Key="ContactCreate.LoginExists">409</Item>
                 <Item Key="ExecOperation.MissingParameter">500</Item>
-                <Item Key="ExecOperation.OperationNotFound">500</Item>
-                <Item Key="Forbidden">403</Item>
+                <Item Key="Forbidden">403:No permission to execute this operation.</Item>
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
-                <Item Key="NotAllowed">405</Item>
-                <Item Key="Object.AlreadyExists">409</Item>
+                <Item Key="NotAllowed">405:The resource doen't support the requested method. Please have a look into the "Allow" header which methods are supported by this resource.</Item>
+                <Item Key="Object.AlreadyExists">409:Cannot create or update item, because it already exists.</Item>
                 <Item Key="Object.Created">201</Item>
-                <Item Key="Object.DependingObjectExists">409</Item>
-                <Item Key="Object.NoPermission">403</Item>
-                <Item Key="Object.NotFound">404</Item>
-                <Item Key="Object.UnableToCreate">400</Item>
-                <Item Key="Object.UnableToUpdate">400</Item>
-                <Item Key="Object.UnableToDelete">400</Item>
+                <Item Key="Object.DependingObjectExists">409:Depending objects prevent this operation.</Item>
+                <Item Key="Object.NoPermission">403:No permission to execute this operation.</Item>
+                <Item Key="Object.NotFound">404:The requested item cannot be found.</Item>
+                <Item Key="Object.Invalid">404:The requested item cannot be found or is invalid.</Item>
+                <Item Key="Object.UnableToCreate">400:Could not create item, please contact the system administrator.</Item>
+                <Item Key="Object.UnableToUpdate">400:Could not update item, please contact the system administrator.</Item>
+                <Item Key="Object.UnableToDelete">400:Could not delete item, please contact the system administrator.</Item>
                 <Item Key="OK">200</Item>
                 <Item Key="Operation.InternalError">500</Item>
                 <Item Key="Operation.PrepareDataError">400</Item>
+                <Item Key="ParentObject.NotFound">404:The parent item(s) cannot be found.</Item>
                 <Item Key="PrepareData.InvalidFilter">400</Item>
                 <Item Key="PrepareData.InvalidSort">400</Item>
                 <Item Key="PrepareData.InvalidExpand">400</Item>
                 <Item Key="Provider.InternalError">500</Item>
-                <Item Key="SessionCreate.AuthFail">401</Item>
-                <Item Key="SessionDelete.DeleteError">404</Item>
-                <Item Key="SessionGet.TokenError">404</Item>
+                <Item Key="SessionCreate.AuthFail">401:Authorization not possible, please contact the system administrator.</Item>
                 <Item Key="Transport.InternalError">500</Item>
                 <Item Key="Transport.OperationNotFound">501</Item>
                 <Item Key="Transport.REST.DataMissing">400</Item>
@@ -232,11 +229,7 @@
                 <Item Key="Transport.REST.OperationNotFound">501</Item>
                 <Item Key="Transport.REST.RequestTooBig">413</Item>
                 <Item Key="Transport.REST.TransportConfigInvalid">500</Item>
-                <Item Key="Unauthorized">401</Item>
-                <Item Key="UserGet.NoUserData">400</Item>
-                <Item Key="UserGet.InvalidUserID">400</Item>
-                <Item Key="UserGet.InalidUserType">400</Item>
-                <Item Key="UserUpdate.LoginExists">409</Item>                
+                <Item Key="Unauthorized">401:User is not authorized. The requested operation cannot be executed.</Item>
                 <Item Key="Validator.InternalError">500</Item>
                 <Item Key="Validator.UnknownAttribute">500</Item>
                 <Item Key="Validator.Failed">400</Item>
@@ -244,6 +237,5 @@
             </Hash>
         </Setting>
     </ConfigItem>
-   
+
 </kix_config>
-    

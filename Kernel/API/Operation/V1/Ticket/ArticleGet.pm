@@ -212,24 +212,21 @@ sub Run {
         # check if article exists
         if ( !%ArticleRaw ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for article $Param{Data}->{ArticleID}",
+                Code => 'Object.NotFound',
             );
         }
         
 	    # check if article belongs to the given ticket
 	    if ( $ArticleRaw{TicketID} != $Param{Data}->{TicketID} ) {
 	        return $Self->_Error(
-	            Code    => 'Object.NotFound',
-	            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+	            Code => 'Object.NotFound',
 	        );
 	    }
     
         # restrict article sender types
         if ( $Self->{Authorization}->{UserType} eq 'Customer' && $ArticleRaw{ArticleSenderType} ne 'customer') {
             return $Self->_Error(
-                Code    => 'Object.NoPermission',
-                Message => "No permission to access article $ArticleID.",
+                Code => 'Object.NoPermission',
             );
         }
 

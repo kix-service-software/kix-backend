@@ -118,8 +118,7 @@ sub Validate {
 
     if ( !$Found ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Ticket not found!",
+            Code => 'Object.NotFound',
         );        
     }
 
