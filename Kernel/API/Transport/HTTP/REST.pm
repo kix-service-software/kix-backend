@@ -404,7 +404,6 @@ sub ProviderGenerateResponse {
 
     # do we have to return an http error code
     if ( IsStringWithData( $Param{Code} ) ) {
-        print STDERR "Code: $Param{Code}\n";
         # map error code to HTTP code
         my $Result = $Self->_MapReturnCode(
             Transport    => 'HTTP::REST',
@@ -422,9 +421,7 @@ sub ProviderGenerateResponse {
             );            
         }
         else {
-            print STDERR "Result: $Result\n";
             ($MappedCode, $MappedMessage) = split(/:/, $Result);
-            print STDERR "MappedCode: $MappedCode, MappedMessage: $MappedMessage\n";
             if ( !$MappedMessage ) {
                 $MappedMessage = $Param{Message};
             }
@@ -981,13 +978,7 @@ sub _Output {
     # prepare data
     $Param{Content}  ||= '';
     $Param{HTTPCode} ||= 500;
-    my $ContentType;
-    if ( $Param{HTTPCode} =~ /^2/ ) {
-        $ContentType = 'application/json';
-    }
-    else {
-        $ContentType = 'text/plain';
-    }
+    my $ContentType =  'application/json';
 
     # calculate content length (based on the bytes length not on the characters length)
     my $ContentLength = bytes::length( $Param{Content} );
