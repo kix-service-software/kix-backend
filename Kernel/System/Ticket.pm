@@ -1344,54 +1344,9 @@ sub TicketGet {
 sub _TicketCacheClear {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed (qw(TicketID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
-    # TicketGet()
-    my $CacheKey = 'Cache::GetTicket' . $Param{TicketID};
-    $CacheObject->Delete(
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-
-    # delete extended cache for TicketGet()
-    for my $Extended ( 0 .. 1 ) {
-        for my $FetchDynamicFields ( 0 .. 1 ) {
-            my $CacheKeyDynamicFields = $CacheKey . '::' . $Extended . '::' . $FetchDynamicFields;
-
-            $CacheObject->Delete(
-                Type => $Self->{CacheType},
-                Key  => $CacheKeyDynamicFields,
-            );
-        }
-    }
-
-    # ArticleIndex()
-    $CacheObject->Delete(
-        Type => $Self->{CacheType},
-        Key  => 'ArticleIndex::' . $Param{TicketID} . '::agent'
-    );
-    $CacheObject->Delete(
-        Type => $Self->{CacheType},
-        Key  => 'ArticleIndex::' . $Param{TicketID} . '::customer'
-    );
-    $CacheObject->Delete(
-        Type => $Self->{CacheType},
-        Key  => 'ArticleIndex::' . $Param{TicketID} . '::system'
-    );
-    $CacheObject->Delete(
-        Type => $Self->{CacheType},
-        Key  => 'ArticleIndex::' . $Param{TicketID} . '::ALL'
     );
 
     return 1;

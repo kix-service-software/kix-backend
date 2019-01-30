@@ -120,8 +120,7 @@ sub Run {
     );
     if ( !%PatternData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No translation with ID '$Param{Data}->{TranslationID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
 

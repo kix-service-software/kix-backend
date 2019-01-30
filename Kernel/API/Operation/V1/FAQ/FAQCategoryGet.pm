@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%FAQCategory ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for FAQCategoryID $FAQCategoryID.",
+                Code => 'Object.NotFound',
             );
         }
 

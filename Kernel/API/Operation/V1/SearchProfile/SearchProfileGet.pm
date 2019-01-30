@@ -144,8 +144,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%SearchProfileData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for SearchProfileID $SearchProfileID.",
+                Code => 'Object.NotFound',
             );
         }
         

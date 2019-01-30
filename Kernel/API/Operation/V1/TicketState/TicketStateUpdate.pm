@@ -151,8 +151,7 @@ sub Run {
     
     if ( !%TicketStateData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not upgrade ticketState. TicketState with this ID '$Param{Data}->{TicketStateID}' not exists.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -164,8 +163,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update TicketState, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
     

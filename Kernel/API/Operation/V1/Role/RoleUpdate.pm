@@ -139,8 +139,7 @@ sub Run {
   
     if ( !$RoleData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update Role. No Role with ID '$Param{Data}->{RoleID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -155,8 +154,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Role, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

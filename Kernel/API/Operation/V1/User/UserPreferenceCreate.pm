@@ -139,14 +139,12 @@ sub Run {
     );
     if ( !%UserData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update user preference. No user with ID '$Param{Data}->{UserID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
     if ( exists $UserData{Preferences}->{$Preference->{ID}} ) {
         return $Self->_Error(
-            Code    => 'Conflict',
-            Message => "Cannot add user preference. A user preference with the same ID already exists for user.",
+            Code => 'Object.AlreadyExists',
         );
     }
 
@@ -159,8 +157,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not add user preference, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
     

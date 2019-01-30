@@ -139,8 +139,7 @@ sub Run {
     );
     if ( !%PatternData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot add language. No translation with ID '$Param{Data}->{TranslationID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -166,8 +165,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not add language, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
     

@@ -128,8 +128,7 @@ sub Run {
 
     if (!IsHashRefWithData($ConfigItem)) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "ConfigItem $Param{Data}->{ConfigItemID} does not exist",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -143,8 +142,7 @@ sub Run {
 
         if (!IsHashRefWithData(\%Image)) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "ConfigItem image $ImageID does not exist",
+                Code => 'Object.NotFound',
             );
         }
 

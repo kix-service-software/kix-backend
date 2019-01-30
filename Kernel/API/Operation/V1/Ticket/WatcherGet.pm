@@ -153,8 +153,7 @@ sub Run {
 
     if ( scalar(@WatcherList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for watcher ".join(',', $Param{Data}->{WatcherID})." in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@WatcherList) == 1 ) {

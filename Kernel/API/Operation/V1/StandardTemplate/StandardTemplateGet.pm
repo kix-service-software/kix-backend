@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%StandardTemplateData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for StandardTemplateID $TemplateID.",
+                Code => 'Object.NotFound',
             );
         }
         

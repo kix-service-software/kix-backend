@@ -142,8 +142,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%PriorityData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for PriorityID $PriorityID.",
+                Code => 'Object.NotFound',
             );
         }
         

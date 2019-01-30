@@ -166,8 +166,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Cannot create Queue. Queue '$Queue->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
 
@@ -196,8 +195,7 @@ sub Run {
 
     if ( !$QueueID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Queue, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
     

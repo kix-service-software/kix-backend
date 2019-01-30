@@ -140,8 +140,7 @@ sub Run {
 
         if ( !$ValidName ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for ValidID $ValidID.",
+                Code => 'Object.NotFound',
             );
         }
        

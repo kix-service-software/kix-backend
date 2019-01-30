@@ -140,8 +140,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%TicketStateData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for StateID $StateID.",
+                Code => 'Object.NotFound',
             );
         }
         

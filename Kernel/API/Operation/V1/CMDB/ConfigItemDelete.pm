@@ -118,8 +118,7 @@ sub Run {
 
         if (!IsHashRefWithData($ConfigItem)) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ConfigItemID $ConfigItemID",
+                Code => 'Object.NotFound',
             );
         }     
 
@@ -130,8 +129,7 @@ sub Run {
 
         if ( !$Success ) {
             return $Self->_Error(
-                Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete ConfigItem, please contact the system administrator',
+                Code => 'Object.UnableToDelete',
             );
         }
     }

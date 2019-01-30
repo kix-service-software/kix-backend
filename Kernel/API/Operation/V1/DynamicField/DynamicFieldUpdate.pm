@@ -184,8 +184,7 @@ sub Run {
   
     if ( !IsHashRefWithData($DynamicFieldData) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update DynamicField. No DynamicField with ID '$Param{Data}->{DynamicFieldID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -193,7 +192,7 @@ sub Run {
     if ( $DynamicFieldData->{InternalField} == 1 ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => "Can not update DynamicField. DynamicField with ID '$Param{Data}->{DynamicFieldID}' is internal and cannot be changed.",
+            Message => "Cannot update DynamicField. DynamicField with ID '$Param{Data}->{DynamicFieldID}' is internal and cannot be changed.",
         );        
     }
 
@@ -220,8 +219,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update DynamicField, please contact the system administrator',
+            Code => 'Object.UnableToUpdate'
         );
     }
 

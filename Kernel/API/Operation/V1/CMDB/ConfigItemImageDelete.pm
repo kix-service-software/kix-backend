@@ -122,7 +122,7 @@ sub Run {
     # check if ConfigItem exists
     if ( !$ConfigItem ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
         );
     }

@@ -139,8 +139,7 @@ sub Run {
  
     if ( !%FAQCategoryData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update FAQCategory. No FAQCategory with ID '$Param{Data}->{FAQCategoryID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -154,7 +153,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Cannot create FAQCategory. Another FAQCategory with the same name and parent already exists.",
+            Message => "Cannot update FAQ category. Another FAQ category with the same name and parent already exists.",
         );
     }
 
@@ -170,8 +169,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update FAQCategory, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

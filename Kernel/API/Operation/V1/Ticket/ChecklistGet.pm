@@ -133,8 +133,7 @@ sub Run {
 
     if ( !$Permission ) {
         return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
+            Code => 'Object.NoPermission',
         );
     }
 
@@ -154,8 +153,7 @@ sub Run {
 
     if ( scalar(@ItemList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for checklist item $Param{Data}->{ChecklistItemID} in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@ItemList) == 1 ) {

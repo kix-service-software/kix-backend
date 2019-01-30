@@ -140,8 +140,7 @@ sub Run {
 
     if ( !$GeneralCatalogData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update GeneralCatalog. No GeneralCatalog item with ID '$Param{Data}->{GeneralCatalogID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -157,8 +156,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update GeneralCatalog, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

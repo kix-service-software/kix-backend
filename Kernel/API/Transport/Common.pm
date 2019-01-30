@@ -62,9 +62,7 @@ Map the internal return code to transport specific response
         Code      => 'Code'        # texttual return code
     );
 
-    $Result = {
-        Code    => ...
-    };
+    $Result = ...
 
 =cut
 
@@ -74,14 +72,14 @@ sub _MapReturnCode {
     # check needed params
     if ( !IsString( $Param{Code} ) ) {
         return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'Need Code!',
+            Code    => 'Transport.InternalError',
+            Message => 'Need Code!',
         );
     }
     if ( !IsString( $Param{Transport} ) ) {
         return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'Need Transport!',
+            Code    => 'Transport.InternalError',
+            Message => 'Need Transport!',
         );
     }
 
@@ -89,8 +87,8 @@ sub _MapReturnCode {
     my $Mapping = $Kernel::OM->Get('Kernel::Config')->Get('API::Transport::ReturnCodeMapping');
     if ( !IsHashRefWithData($Mapping) ) {
         return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'No ReturnCodeMapping config!',
+            Code    => 'Transport.InternalError',
+            Message => 'No ReturnCodeMapping config!',
         );        
     }
 
@@ -100,16 +98,21 @@ sub _MapReturnCode {
     }
     my $TransportMapping = $Mapping->{$Param{Transport}};
 
-    # map code
-    my $MappedCode = $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'};
+    # get map entry
+    my ($MappedCode, $MappedMessage) = split(/:/, $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'});
+    
+    # override defualt message from mapping if we have some special message
+    if ( $Param{Message} ) {
+        $MappedMessage = $Param{MappedMessage};
+    }
 
     # log to debugger
     $Self->{DebuggerObject}->Error(
-        Summary => $MappedCode.': '.($Param{Message} || ''),
+        Summary => $MappedCode.': '.($MappedMessage || ''),
     );
 
     # return
-    return $MappedCode;
+    return "$MappedCode:$MappedMessage";
 }
 
 1;

@@ -141,8 +141,7 @@ sub Run {
  
     if ( !%SystemAddressData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update SystemAddress. No SystemAddress with ID '$Param{Data}->{SystemAddressID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -158,8 +157,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update SystemAddress, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

@@ -136,8 +136,7 @@ sub Run {
     
     if ( !%TicketTypeData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not update TicketType. No TicketType with ID '$Param{Data}->{TypeID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -154,8 +153,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not update ticket type. A ticket type with the same name '$TicketType->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
 
@@ -170,8 +168,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update TicketType, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

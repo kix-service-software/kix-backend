@@ -139,8 +139,7 @@ sub Run {
     );
     if ( !%PatternData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No translation with ID '$Param{Data}->{TranslationID}' found.",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -154,8 +153,7 @@ sub Run {
     if ( !IsHashRefWithData( \%TranslationData ) ) {
 
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No translation language found for ID '$Param{Data}->{Language}'.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -169,8 +167,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update translation language, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
     

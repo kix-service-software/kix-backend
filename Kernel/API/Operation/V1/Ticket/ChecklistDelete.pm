@@ -126,8 +126,7 @@ sub Run {
 
     if ( !$Permission ) {
         return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to delete checklist item.",
+            Code => 'Object.NoPermission',
         );
     }
 
@@ -139,8 +138,7 @@ sub Run {
 
     if ( !IsHashRefWithData($Checklist) || !$Checklist->{$Param{Data}->{ChecklistItemID}}) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Checklist item $Param{Data}->{ChecklistItemID} not found in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -150,8 +148,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToDelete',
-            Message => 'Unable to to delete checklist item, please contact system administrator!',
+            Code => 'Object.UnableToDelete',
         );
     }
 

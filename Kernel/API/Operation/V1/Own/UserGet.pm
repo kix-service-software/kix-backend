@@ -110,17 +110,11 @@ sub Run {
             NoPreferences => 1
         );        
     }
-    else {
-        return $Self->_Error(
-            Code    => 'UserGet.InvalidUserType',
-            Message => "Unknown UserType $Self->{Authorization}->{UserType}",
-        );        
-    }
+
     if ( !IsHashRefWithData( \%UserData ) ) {
 
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "No user data found.",
+            Code => 'Object.NotFound',
         );
     }
 

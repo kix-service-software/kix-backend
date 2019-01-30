@@ -144,8 +144,7 @@ sub Run {
  
     if ( !%SearchProfileData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update SearchProfile. No SearchProfile with ID '$Param{Data}->{SearchProfileID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 

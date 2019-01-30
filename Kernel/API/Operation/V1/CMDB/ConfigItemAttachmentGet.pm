@@ -126,8 +126,7 @@ sub Run {
 
         if (!$StoredAttachment->{Filename}) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for AttachmentID $AttachmentID",
+                Code => 'Object.NotFound',
             );
         }     
 
@@ -157,8 +156,7 @@ sub Run {
 
     if ( scalar(@AttachmentList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for AttachmentID ".join(',', $Param{Data}->{AttachmentID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@AttachmentList) == 1 ) {

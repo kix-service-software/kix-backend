@@ -113,8 +113,7 @@ sub new {
         );
         if ( !$Permission ) {
             return $Self->_Error(
-                Code    => 'Forbidden',
-                Message => 'No permission to execute this operation!',
+                Code => 'Forbidden'
             );
         }
     }

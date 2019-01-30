@@ -140,8 +140,7 @@ sub Run {
 
     if ( !IsHashRefWithData(\%StandardTemplateData) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update StandardTemplate. No StandardTemplate with ID '$Param{Data}->{StandardTemplateID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -154,8 +153,7 @@ sub Run {
         
         if ( $Exist ) {
             return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Can not create StandardTemplate entry. Another StandardTemplate with same name already exists.",
+                Code => 'Object.AlreadyExists',
             );
         }
     }
@@ -173,8 +171,7 @@ sub Run {
     
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update StandardTemplate, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

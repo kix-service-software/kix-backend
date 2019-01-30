@@ -141,8 +141,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%SalutationData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for SalutationID $SalutationID.",
+                Code => 'Object.NotFound',
             );
         }
         

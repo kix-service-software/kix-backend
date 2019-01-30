@@ -138,8 +138,7 @@ sub Run {
     
     if ( !%PriorityData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not update Priority. Priority with ID '$Param{Data}->{PriorityID}' does not exist.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -154,8 +153,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Priority, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 

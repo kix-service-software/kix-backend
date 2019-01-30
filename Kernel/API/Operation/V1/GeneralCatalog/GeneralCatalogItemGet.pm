@@ -141,8 +141,7 @@ sub Run {
 
         if ( !$ItemData ) {         
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for ItemID $GeneralCatalogItemID.",
+                Code => 'Object.NotFound',
             );
         }
 

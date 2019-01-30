@@ -123,8 +123,7 @@ sub Run {
 
     if (!IsHashRefWithData($ConfigItem)) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ConfigItemID $Param{Data}->{ConfigItemID}",
+            Code => 'ParentObject.NotFound'
         );
     }
 

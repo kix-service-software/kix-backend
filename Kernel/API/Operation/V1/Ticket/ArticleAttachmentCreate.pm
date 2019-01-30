@@ -163,7 +163,7 @@ sub Run {
 
     if ( !%Ticket ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code => 'ParentObject.NotFound',
             Message => "Ticket $Param{Data}->{TicketID} not found!",
         );
     }
@@ -175,7 +175,7 @@ sub Run {
 
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found!",
         );
     }
@@ -183,7 +183,7 @@ sub Run {
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
@@ -209,8 +209,7 @@ sub Run {
 
     if ( !$AttachmentID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create attachment, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
 

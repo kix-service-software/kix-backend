@@ -137,8 +137,7 @@ sub Run {
   
     if ( !%AddressData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update address book entry. No entry with AddressID $Param{Data}->{AddressID} found",
+            Code => 'Object.NotFound'
         );
     }
     

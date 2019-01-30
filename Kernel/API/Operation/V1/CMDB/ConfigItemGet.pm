@@ -126,8 +126,7 @@ sub Run {
 
         if (!IsHashRefWithData($ConfigItem)) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ConfigItemID $ConfigItemID",
+                Code => 'Object.NotFound',
             );
         }     
 
@@ -193,8 +192,7 @@ sub Run {
 
     if ( scalar(@ConfigItemList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ConfigItemID ".join(',', $Param{Data}->{ConfigItemID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@ConfigItemList) == 1 ) {

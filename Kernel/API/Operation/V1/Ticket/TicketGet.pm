@@ -317,8 +317,7 @@ sub Run {
         next TICKET if $Permission;
 
         return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $TicketID.",
+            Code => 'Object.NoPermission',
         );
     }
 
@@ -341,8 +340,7 @@ sub Run {
         if ( !IsHashRefWithData( \%TicketRaw ) ) {
 
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ticket $TicketID",
+                Code => 'Object.NotFound',
             );
         }
 
