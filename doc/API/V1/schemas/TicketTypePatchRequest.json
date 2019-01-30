@@ -4,7 +4,7 @@
   "type": "object",
   "description": "The ticket type request object for update.",
   "properties": {
-    "UserPreference": {
+    "TicketType": {
       "type": "object",
       "properties": {
         "Name": {
@@ -20,6 +20,6 @@
     }
   },
   "required": [
-    "UserPreference"
+    "TicketType"
   ]
 }

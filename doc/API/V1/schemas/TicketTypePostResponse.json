@@ -1,9 +1,0 @@
-{ 
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#TicketTypePostResponse",
-    "type": "object",
-    "description": "The ID of the created ticket type.",
-    "properties": {
-        "TicketTypeID": { "type": "number" }
-    }
-}

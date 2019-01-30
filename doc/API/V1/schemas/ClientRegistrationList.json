@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ClientRegistrationList",
+  "type": "object",
+  "description": "A list of client registrations.",
+  "properties": {
+    "ClientRegistration": {
+      "type": "array",
+      "items": {
+        "$ref": "#ClientRegistration"
+      }
+    }
+  },
+  "required": [
+    "ClientRegistration"
+  ]
+}

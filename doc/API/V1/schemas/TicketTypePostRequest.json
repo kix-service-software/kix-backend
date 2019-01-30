@@ -23,6 +23,6 @@
     }
   },
   "required": [
-    "UserPreference"
+    "TicketType"
   ]
 }

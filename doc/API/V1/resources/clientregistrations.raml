@@ -1,0 +1,9 @@
+  displayName: Client Registrations
+  description: !include ../descriptions/resources/clientregistrations.md
+  type: { collection: { typeName: ClientRegistration } }
+  /{clientId}:
+    type: { item: { typeName: ClientRegistration } }
+    uriParameters:
+      clientId:
+        displayName: ClientID
+        type: string
