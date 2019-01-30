@@ -10,8 +10,8 @@ Every collection resource supports the sorting of items in the response. This ca
 
 |Parameter|Required?|Description|
 |-|:-:|-|
-|```<Object>```|X|The object in the JSON response to be sorted.|
-|```<Fieldname>```|X|The attribute in each item of the response to be sorted by. If the fieldname starts with ```-``` the attribute will be sorted in descending order.|
+|```<Object>```|yes|The object in the JSON response to be sorted.|
+|```<Fieldname>```|yes|The attribute in each item of the response to be sorted by. If the fieldname starts with ```-``` the attribute will be sorted in descending order.|
 |```<Type>```||The type of data that should be used to compare the value. If not given, the the value will be sorted as ASCII text and case-insensitive.|
 
 

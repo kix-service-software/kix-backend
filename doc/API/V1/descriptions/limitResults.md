@@ -15,7 +15,7 @@ By using the optional query parameter ```offset``` a collection resource can be 
 |Parameter|Required?|Description|
 |-|:-:|-|
 |```<Object>```||The object in the JSON response to apply an offset to. If omitted the offset will be applied to all object lists in the response (if the response contains such).|
-|```<Offset>```|X|The numeric offset to apply.|
+|```<Offset>```|yes|The numeric offset to apply.|
 
 If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma. 
 
@@ -42,7 +42,7 @@ The optional query parameter ```limit``` allows to limit the number objects cont
 |Parameter|Required?|Description|
 |-|:-:|-|
 |```<Object>```||The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).|
-|```<Limit>```|X|The numeric limit to apply.|
+|```<Limit>```|yes|The numeric limit to apply.|
 
 If a response contains different objects in different lists, separate limits can be applied by separating them the with comma. 
 

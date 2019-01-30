@@ -10,7 +10,7 @@ When requesting items it is possible to include more information into the respon
 
 |Parameter|Required?|Description|
 |-|:-:|-|
-|```<What>```|X|The additional data to include into the response. You can separate multiple ones by comma.|
+|```<What>```|yes|The additional data to include into the response. You can separate multiple ones by comma.|
 
 There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are: 
 

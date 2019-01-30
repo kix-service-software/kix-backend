@@ -38,10 +38,10 @@ The filter definition is a JSON object in the following form:
 
 |Parameter|Required?|Description|
 |-|:-:|-|
-|```<Object>```|X|The object in the JSON response to be filtered.|
-|```<Fieldname>```|X|The attribute in each item of the response to be filtered.|
-|```<Operator>```|X|The compare operator to be used.|
-|```<Value>```|X|The value to compare to. Filters are working case-insensitive. If the value starts with a ```$``` character it will be interpreted as a reference to another attribute and the actual value will be taken from the referenced attribute.|
+|```<Object>```|yes|The object in the JSON response to be filtered.|
+|```<Fieldname>```|yes|The attribute in each item of the response to be filtered.|
+|```<Operator>```|yes|The compare operator to be used.|
+|```<Value>```|yes|The value to compare to. Filters are working case-insensitive. If the value starts with a ```$``` character it will be interpreted as a reference to another attribute and the actual value will be taken from the referenced attribute.|
 |```<Type>```||The type of data that should be used to compare the value. If not given, the value will be interpreted as a string.|
 |```<Not>```||To negate the comparison set this to ```true```.|
 

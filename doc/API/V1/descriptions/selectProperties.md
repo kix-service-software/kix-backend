@@ -24,8 +24,8 @@ Fieldset:
 
 |Parameter|Required?|Description|
 |-|:-:|-|
-|```<Object>```|X|The object in the JSON response for which the properties should be selected.|
-|```<Property>```|X|The name of the property that should be included in the response.|
+|```<Object>```|yes|The object in the JSON response for which the properties should be selected.|
+|```<Property>```|yes|The name of the property that should be included in the response.|
 
 When using the general style, multiple properties can be selected by multiplying the whole <Object>.<Property> part and separating it with comma. In the compact style the object has to be specified only once and the relevant properties are separated by semicolon in the array part.
 

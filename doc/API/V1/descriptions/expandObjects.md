@@ -10,7 +10,7 @@ When requesting items and using the optional function [```include```](#include_m
 
 |Parameter|Required?|Description|
 |-|:-:|-|
-|```<What>```|X|The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.|
+|```<What>```|yes|The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.|
 
 
 ** Example **
