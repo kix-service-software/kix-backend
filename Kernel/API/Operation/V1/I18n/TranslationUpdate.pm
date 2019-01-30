@@ -148,7 +148,7 @@ sub Run {
     # check if pattern already exists
     if ( IsStringWithData($Translation->{Pattern}) ) {
         my $PatternID = $Kernel::OM->Get('Kernel::System::Translation')->PatternExistsCheck(
-            Pattern => $Translation->{Pattern},
+            Value => $Translation->{Pattern},
         );
         if ( $PatternID && $PatternID != $Param{Data}->{TranslationID} ) {        
             return $Self->_Error(
