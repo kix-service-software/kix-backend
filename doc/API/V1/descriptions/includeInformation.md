@@ -19,7 +19,7 @@ There are some generic includes that can be used in every query regardless of a 
 |```Links```|Include all the the linked objects of this item.|
 |```ObjectIcon```|Include the icon for this item.|
 
-Please note that the include extends each item in the response with an additional attribute that is named like the include itself. 
+Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of depending resources results in a list of IDs of the relevant objects. Please see the optional function [```expand```](#expand_objects) for information on how to tranform these IDs to actual objects.
 
 
 ** Example **
