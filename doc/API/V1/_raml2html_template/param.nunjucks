@@ -47,6 +47,7 @@
     {{ param.description }}
     {% endmarkdown %}
   </td>
+{%- if not suppressExamples %}  
   <td>
     {# Item Examples #}
     {% set parent = param %}
@@ -57,5 +58,6 @@
       <pre><code>{{ param.structuredValue | dump }}</code></pre>
     {% endif %}
   </td>
+{% endif %}
 
 </tr>

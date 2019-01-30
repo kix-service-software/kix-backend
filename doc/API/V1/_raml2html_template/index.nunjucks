@@ -42,6 +42,7 @@
               <pre>{{ baseUri | replace(r/\$version/, version) }}</pre>
               {% if baseUriParameters %}
                 {% set parameterList = baseUriParameters %}
+                {% set suppressExamples = true %}
                 {% include "./paramtable.nunjucks" %}
               {% endif %}
             </div>
