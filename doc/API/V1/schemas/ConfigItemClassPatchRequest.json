@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemClassPatchRequest",
+  "type": "object",
+  "description": "The config item class object for update.",
+  "properties": {
+    "ConfigItemClass": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },    
+        "Name": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "ConfigItemClass"
+  ]
+}

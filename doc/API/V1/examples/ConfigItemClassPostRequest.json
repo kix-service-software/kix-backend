@@ -1,0 +1,6 @@
+{
+    "ConfigItemClass": {
+         "Name": "test ci class",
+         "Comment": "for testing purposes"
+    }
+}   

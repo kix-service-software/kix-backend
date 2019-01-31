@@ -1,0 +1,50 @@
+  displayName: CMDB
+  description: !include ../descriptions/resources/cmdb.md
+  /classes:
+    type: { collection: { typeName: ConfigItemClass } }
+    /{classId}:
+      type: { item: { typeName: ConfigItemClass } }
+      uriParameters:
+        classId:
+          displayName: ClassID
+          type: integer
+      /definitions:
+        type: { collection: { typeName: ConfigItemClassDefinition } }
+        /{definitionId}:
+          type: { item-nopatch: { typeName: ConfigItemClassDefinition } }
+          uriParameters:
+            definitionId:
+              displayName: DefinitionID
+              type: integer
+  /configitems:
+    type: { collection: { typeName: ConfigItem } }
+    /{configItemId}:
+      type: { item: { typeName: ConfigItem } }
+      uriParameters:
+        configItemId:
+          displayName: ConfigItemID
+          type: integer
+      /history:
+        type: { collection-readonly: { typeName: ConfigItemHistory } }
+        /{historyId}:
+          type: { item-readonly: { typeName: ConfigItemHistory } }
+          uriParameters:
+            historyId:
+              displayName: HistoryID
+              type: integer
+      /images:
+        type: { collection: { typeName: ConfigItemImage } }
+        /{imageId}:
+          type: { item-nopatch: { typeName: ConfigItemImage } }
+          uriParameters:
+            imageId:
+              displayName: ImageID
+              type: integer
+      /versions:
+        type: { collection: { typeName: ConfigItemVersion } }
+        /{versionId}:
+          type: { item-readonly: { typeName: ConfigItemVersion } }
+          uriParameters:
+            versionId:
+              displayName: VersionID
+              type: integer
