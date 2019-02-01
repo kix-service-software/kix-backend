@@ -192,3 +192,7 @@ pre code {
 .nav > li > a.nav-resource {
   padding-left: 40px;
 }
+.uri {
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+  font-size: 95%;
+}

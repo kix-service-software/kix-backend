@@ -150,8 +150,7 @@ sub Run {
     );
     if ( %TranslationData ) {
         return $Self->_Error(
-            Code    => 'Conflict',
-            Message => "Cannot add language. Language already exists for this translation.",
+            Code => 'Object.AlreadyExists',
         );
     }
 

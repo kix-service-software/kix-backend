@@ -1,16 +1,16 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "#TicketTypePatchRequest",
+  "$id": "#ConfigItemClassPatchRequest",
   "type": "object",
-  "description": "The ticket type request object for update.",
+  "description": "The config item class object for update.",
   "properties": {
-    "TicketType": {
+    "ConfigItemClass": {
       "type": "object",
       "properties": {
-        "Name": {
-          "type": "string"
-        },
         "Comment": {
+          "type": "string"
+        },    
+        "Name": {
           "type": "string"
         },
         "ValidID": {
@@ -20,6 +20,6 @@
     }
   },
   "required": [
-    "TicketType"
+    "ConfigItemClass"
   ]
 }

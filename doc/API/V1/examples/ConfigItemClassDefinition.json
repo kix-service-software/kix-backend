@@ -1,0 +1,266 @@
+{
+    "ConfigItemClassDefinition": {
+        "ClassID": "22",
+        "Version": 1,
+        "CreateBy": 1,
+        "CreateTime": "2017-08-18 22:47:00",
+        "DefinitionString": "[ { 'Input' => { 'MaxLength' => 50, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'Vendor', 'Name' => 'Vendor', 'Searchable' => 1 }, { 'Input' => { 'MaxLength' => 50, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'Model', 'Name' => 'Model', 'Searchable' => 1 }, { 'Input' => { 'Type' => 'TextArea' }, 'Key' => 'Description', 'Name' => 'Description', 'Searchable' => 1 }, { 'Input' => { 'Class' => 'ITSM::ConfigItem::Computer::Type', 'Translation' => 1, 'Type' => 'GeneralCatalog' }, 'Key' => 'Type', 'Name' => 'Type', 'Searchable' => 1 }, { 'Input' => { 'Type' => 'Customer' }, 'Key' => 'Owner', 'Name' => 'Assigned owner', 'Searchable' => 1 }, { 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'SerialNumber', 'Name' => 'Serial Number', 'Searchable' => 1 }, { 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'OperatingSystem', 'Name' => 'Operating System' }, { 'CountMax' => 16, 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'CPU', 'Name' => 'CPU' }, { 'CountMax' => 10, 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'Ram', 'Name' => 'Ram' }, { 'CountMax' => 10, 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'HardDisk', 'Name' => 'Hard Disk', 'Sub' => [ { 'Input' => { 'MaxLength' => 10, 'Size' => 20, 'Type' => 'Text' }, 'Key' => 'Capacity', 'Name' => 'Capacity' } ] }, { 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'FQDN', 'Name' => 'FQDN', 'Searchable' => 1 }, { 'CountDefault' => 1, 'CountMax' => 10, 'CountMin' => 0, 'Input' => { 'MaxLength' => 100, 'Required' => 1, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'NIC', 'Name' => 'Network Adapter', 'Sub' => [ { 'Input' => { 'Class' => 'ITSM::ConfigItem::YesNo', 'Required' => 1, 'Translation' => 1, 'Type' => 'GeneralCatalog' }, 'Key' => 'IPoverDHCP', 'Name' => 'IP over DHCP' }, { 'CountDefault' => 0, 'CountMax' => 20, 'CountMin' => 0, 'Input' => { 'MaxLength' => 40, 'Required' => 1, 'Size' => 40, 'Type' => 'Text' }, 'Key' => 'IPAddress', 'Name' => 'IP Address', 'Searchable' => 1 } ] }, { 'Input' => { 'MaxLength' => 100, 'Size' => 50, 'Type' => 'Text' }, 'Key' => 'GraphicAdapter', 'Name' => 'Graphic Adapter' }, { 'CountDefault' => 0, 'CountMin' => 0, 'Input' => { 'Required' => 1, 'Type' => 'TextArea' }, 'Key' => 'OtherEquipment', 'Name' => 'Other Equipment' }, { 'Input' => { 'Type' => 'Date', 'YearPeriodFuture' => 10, 'YearPeriodPast' => 20 }, 'Key' => 'WarrantyExpirationDate', 'Name' => 'Warranty Expiration Date', 'Searchable' => 1 }, { 'CountDefault' => 0, 'CountMin' => 0, 'Input' => { 'Required' => 1, 'Type' => 'Date', 'YearPeriodFuture' => 10, 'YearPeriodPast' => 20 }, 'Key' => 'InstallDate', 'Name' => 'Install Date', 'Searchable' => 1 }, { 'CountDefault' => 0, 'CountMin' => 0, 'Input' => { 'Required' => 1, 'Type' => 'TextArea' }, 'Key' => 'Note', 'Name' => 'Note', 'Searchable' => 1}  ];",
+        "Definition": [
+            {
+                "Input": {
+                    "Type": "Text",
+                    "MaxLength": 50,
+                    "Size": 50
+                },
+                "CountMax": 1,
+                "CountMin": 1,
+                "Name": "Vendor",
+                "Key": "Vendor",
+                "CountDefault": 1,
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 1,
+                "Searchable": 1,
+                "Key": "Model",
+                "Name": "Model",
+                "Input": {
+                    "Type": "Text",
+                    "Size": 50,
+                    "MaxLength": 50
+                },
+                "CountMax": 1,
+                "CountMin": 1
+            },
+            {
+                "CountDefault": 1,
+                "Searchable": 1,
+                "Key": "Description",
+                "Name": "Description",
+                "Input": {
+                    "Type": "TextArea"
+                },
+                "CountMax": 1,
+                "CountMin": 1
+            },
+            {
+                "Searchable": 1,
+                "CountDefault": 1,
+                "Key": "Type",
+                "Name": "Type",
+                "Input": {
+                    "Type": "GeneralCatalog",
+                    "Translation": 1,
+                    "Class": "ITSM::ConfigItem::Computer::Type"
+                },
+                "CountMax": 1,
+                "CountMin": 1
+            },
+            {
+                "Searchable": 1,
+                "CountDefault": 1,
+                "Key": "Owner",
+                "Name": "Assigned owner",
+                "CountMax": 1,
+                "Input": {
+                    "Type": "Customer"
+                },
+                "CountMin": 1
+            },
+            {
+                "Key": "SerialNumber",
+                "CountDefault": 1,
+                "Searchable": 1,
+                "CountMin": 1,
+                "CountMax": 1,
+                "Input": {
+                    "Type": "Text",
+                    "MaxLength": 100,
+                    "Size": 50
+                },
+                "Name": "Serial Number"
+            },
+            {
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                },
+                "CountMax": 1,
+                "CountMin": 1,
+                "Name": "Operating System",
+                "Key": "OperatingSystem",
+                "CountDefault": 1
+            },
+            {
+                "Name": "CPU",
+                "Input": {
+                    "Type": "Text",
+                    "Size": 50,
+                    "MaxLength": 100
+                },
+                "CountMax": 16,
+                "CountMin": 1,
+                "CountDefault": 1,
+                "Key": "CPU"
+            },
+            {
+                "Key": "Ram",
+                "CountDefault": 1,
+                "CountMin": 1,
+                "CountMax": 10,
+                "Input": {
+                    "Size": 50,
+                    "MaxLength": 100,
+                    "Type": "Text"
+                },
+                "Name": "Ram"
+            },
+            {
+                "Name": "Hard Disk",
+                "Sub": [
+                    {
+                        "Name": "Capacity",
+                        "CountMax": 1,
+                        "Input": {
+                            "MaxLength": 10,
+                            "Size": 20,
+                            "Type": "Text"
+                        },
+                        "CountMin": 1,
+                        "CountDefault": 1,
+                        "Key": "Capacity"
+                    }
+                ],
+                "Input": {
+                    "Size": 50,
+                    "MaxLength": 100,
+                    "Type": "Text"
+                },
+                "CountMax": 10,
+                "CountMin": 1,
+                "CountDefault": 1,
+                "Key": "HardDisk"
+            },
+            {
+                "Name": "FQDN",
+                "CountMin": 1,
+                "CountMax": 1,
+                "Input": {
+                    "Type": "Text",
+                    "MaxLength": 100,
+                    "Size": 50
+                },
+                "CountDefault": 1,
+                "Searchable": 1,
+                "Key": "FQDN"
+            },
+            {
+                "CountDefault": 1,
+                "Key": "NIC",
+                "Name": "Network Adapter",
+                "CountMin": 0,
+                "Sub": [
+                    {
+                        "Key": "IPoverDHCP",
+                        "CountDefault": 1,
+                        "CountMax": 1,
+                        "Input": {
+                            "Type": "GeneralCatalog",
+                            "Required": 1,
+                            "Translation": 1,
+                            "Class": "ITSM::ConfigItem::YesNo"
+                        },
+                        "CountMin": 1,
+                        "Name": "IP over DHCP"
+                    },
+                    {
+                        "Name": "IP Address",
+                        "CountMin": 0,
+                        "CountMax": 20,
+                        "Input": {
+                            "Required": 1,
+                            "Type": "Text",
+                            "MaxLength": 40,
+                            "Size": 40
+                        },
+                        "Searchable": 1,
+                        "CountDefault": 0,
+                        "Key": "IPAddress"
+                    }
+                ],
+                "CountMax": 10,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text",
+                    "Required": 1
+                }
+            },
+            {
+                "CountDefault": 1,
+                "Key": "GraphicAdapter",
+                "Name": "Graphic Adapter",
+                "CountMin": 1,
+                "CountMax": 1,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                }
+            },
+            {
+                "CountDefault": 0,
+                "Key": "OtherEquipment",
+                "Name": "Other Equipment",
+                "CountMax": 1,
+                "Input": {
+                    "Type": "TextArea",
+                    "Required": 1
+                },
+                "CountMin": 0
+            },
+            {
+                "Searchable": 1,
+                "CountDefault": 1,
+                "Key": "WarrantyExpirationDate",
+                "Name": "Warranty Expiration Date",
+                "Input": {
+                    "YearPeriodFuture": 10,
+                    "YearPeriodPast": 20,
+                    "Type": "Date"
+                },
+                "CountMax": 1,
+                "CountMin": 1
+            },
+            {
+                "Input": {
+                    "YearPeriodFuture": 10,
+                    "YearPeriodPast": 20,
+                    "Type": "Date",
+                    "Required": 1
+                },
+                "CountMax": 1,
+                "CountMin": 0,
+                "Name": "Install Date",
+                "Key": "InstallDate",
+                "Searchable": 1,
+                "CountDefault": 0
+            },
+            {
+                "Name": "Note",
+                "CountMin": 0,
+                "CountMax": 1,
+                "Input": {
+                    "Required": 1,
+                    "Type": "TextArea"
+                },
+                "CountDefault": 0,
+                "Searchable": 1,
+                "Key": "Note"
+            }
+        ],
+        "Class": "Computer",
+        "DefinitionID": "1"
+    }
+}

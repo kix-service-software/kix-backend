@@ -1,0 +1,24 @@
+{
+    "ConfigItemClass": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2017-08-18 22:47:00",
+            "ID": 22,
+            "CreateBy": 1,
+            "Comment": "",
+            "CreateTime": "2017-08-18 22:47:00",
+            "ValidID": 1,
+            "Name": "Computer"
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2017-08-18 22:47:00",
+            "Name": "Hardware",
+            "ValidID": 1,
+            "ID": 23,
+            "CreateBy": 1,
+            "CreateTime": "2017-08-18 22:47:00",
+            "Comment": ""
+        }
+    ]
+}
