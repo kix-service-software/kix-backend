@@ -1,6 +1,7 @@
   displayName: CMDB
   description: !include ../descriptions/resources/cmdb.md
   /classes:
+    description: !include ../descriptions/resources/cmdb/classes.md
     type: { collection: { typeName: ConfigItemClass } }
     /{classId}:
       type: { item: { typeName: ConfigItemClass } }
@@ -17,6 +18,7 @@
               displayName: DefinitionID
               type: integer
   /configitems:
+    description: !include ../descriptions/resources/cmdb/configitems.md
     type: { collection: { typeName: ConfigItem } }
     /{configItemId}:
       type: { item: { typeName: ConfigItem } }
