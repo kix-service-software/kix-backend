@@ -102,8 +102,8 @@ sub _MapReturnCode {
     my ($MappedCode, $MappedMessage) = split(/:/, $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'});
     
     # override defualt message from mapping if we have some special message
-    if ( $Param{Message} ) {
-        $MappedMessage = $Param{MappedMessage};
+    if ( !$MappedMessage || $Param{Message} ) {
+        $MappedMessage = $Param{Message} || ''; 
     }
 
     # log to debugger

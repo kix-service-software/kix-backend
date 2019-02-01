@@ -88,17 +88,9 @@ sub _Error {
         );
     }
 
-    # check needed params
-    if ( !IsString( $Param{Message} ) ) {
-        return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'Need Message!',
-        );
-    }
-
     # log to debugger
     $Self->{DebuggerObject}->Error(
-        Summary => $Param{Code}.': '.$Param{Message},
+        Summary => $Param{Code}.': '.($Param{Message} || ''),
     );
     
     # return to provider/requester
