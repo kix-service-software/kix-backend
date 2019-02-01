@@ -152,7 +152,6 @@ sub Run {
         if ( $PatternID && $PatternID != $Param{Data}->{TranslationID} ) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update translation. Another translation with the same pattern already exists.',
             );
         }
     }

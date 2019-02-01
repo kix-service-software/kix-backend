@@ -17,16 +17,22 @@ description: !include descriptions/description.md
 documentation:
   - title: Getting started
     content: !include descriptions/gettingStarted.md  
-  - title: Populating queries
-    content: !include descriptions/populatingQueries.md
-  - title: Query collections
-    content: !include descriptions/queryCollections.md
-  - title: Selecting fields
-    content: !include descriptions/selectingFields.md
-  - title: Expanding objects
-    content: !include descriptions/expandingObjects.md
-  - title: Filtering results
-    content: !include descriptions/filteringResults.md
+  - title: Populate queries
+    content: !include descriptions/populateQueries.md
+  - title: Search objects
+    content: !include descriptions/searchObjects.md
+  - title: Filter results
+    content: !include descriptions/filterResults.md
+  - title: Sort results
+    content: !include descriptions/sortResults.md
+  - title: Limit results
+    content: !include descriptions/limitResults.md
+  - title: Select properties
+    content: !include descriptions/selectProperties.md
+  - title: Include more information
+    content: !include descriptions/includeInformation.md
+  - title: Expand objects
+    content: !include descriptions/expandObjects.md
 
 # security
 securedBy: webToken
@@ -40,6 +46,8 @@ resourceTypes: !include lib/resourceTypes.raml
 
 # resources
 /articletypes: !include resources/articletypes.raml
+/cmdb: !include resources/cmdb.raml
+/clientregistrations: !include resources/clientregistrations.raml
 /i18n: !include resources/i18n.raml
 /priorities: !include resources/priorities.raml
 /sendertypes: !include resources/sendertypes.raml

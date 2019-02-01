@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemClass",
+  "type": "object",
+  "description": "The config item class object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "number",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string"
+    },    
+    "CreateBy": {
+      "type": "number",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string"
+    },    
+    "ValidID": {
+      "type": "number"
+    },
+    "Definitions": {
+      "type": "array",
+      "item": {
+        "$ref": "#ConfigItemClassDefinition"
+      }
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Name",
+    "ValidID"
+  ]
+}

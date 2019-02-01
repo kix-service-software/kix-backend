@@ -1,0 +1,7 @@
+{
+    "ClientRegistration": { 
+        "ClientID": "KIX-Frontend",
+        "Authentication": "test123", 
+        "CallbackURL": "https://kix.example.org/backendfeedback"
+    }
+}

@@ -7,7 +7,9 @@
                 <th>Type</th>
                 <th>Special</th>
                 <th>Description</th>
+{%- if not suppressExamples %}  
                 <th>Examples</th>
+{% endif %}
             </tr>
         </thead>
         <tbody>

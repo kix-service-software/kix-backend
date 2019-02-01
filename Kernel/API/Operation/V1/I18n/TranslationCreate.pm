@@ -138,8 +138,7 @@ sub Run {
     );
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Cannot create translation. Another translation with the same pattern already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
     
@@ -150,8 +149,7 @@ sub Run {
     );    
     if ( !$PatternID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create translation, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
 

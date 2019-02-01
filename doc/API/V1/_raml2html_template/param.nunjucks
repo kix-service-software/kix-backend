@@ -1,5 +1,5 @@
 <tr>
-  <td>{{ param.key }}</td>
+  <td class="uri">{{ param.key }}</td>
   <td><center>{%- if param.required -%} yes {% endif -%}</center></td>
   <td>
     {% if param.type !== nil and not param.structuredValue %}
@@ -47,6 +47,7 @@
     {{ param.description }}
     {% endmarkdown %}
   </td>
+{%- if not suppressExamples %}  
   <td>
     {# Item Examples #}
     {% set parent = param %}
@@ -57,5 +58,6 @@
       <pre><code>{{ param.structuredValue | dump }}</code></pre>
     {% endif %}
   </td>
+{% endif %}
 
 </tr>
