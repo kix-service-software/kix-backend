@@ -261,7 +261,8 @@ $Self->True(
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'webrequest',
+    Channel        => 'note',
+    CustomerVisible => 1,
     SenderType     => 'customer',
     From           => 'customerOne@example.com',
     To             => 'Some Agent A <agent-a@example.com>',
@@ -301,11 +302,6 @@ $Self->True(
 
 my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
 my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
-
-# get article types email-notification-int ID
-my $ArticleTypeIntID = $TicketObject->ArticleTypeLookup(
-    ArticleType => 'email-notification-int',
-);
 
 my @Tests = (
     {

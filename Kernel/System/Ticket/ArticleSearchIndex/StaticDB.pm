@@ -72,13 +72,13 @@ sub ArticleIndexBuild {
     # insert search index
     $DBObject->Do(
         SQL => '
-            INSERT INTO article_search (id, ticket_id, article_type_id,
+            INSERT INTO article_search (id, ticket_id, channel_id, customer_visible,
                 article_sender_type_id, a_from, a_to,
                 a_cc, a_subject, a_body,
                 incoming_time)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         Bind => [
-            \$Article{ArticleID},    \$Article{TicketID}, \$Article{ArticleTypeID},
+            \$Article{ArticleID},    \$Article{TicketID}, \$Article{ChannelID}, \$Article{CustomerVisible},
             \$Article{SenderTypeID}, \$Article{From},     \$Article{To},
             \$Article{Cc},           \$Article{Subject},  \$Article{Body},
             \$Article{IncomingTime},

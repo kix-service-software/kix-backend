@@ -46,7 +46,7 @@ my @ArticleIDs;
 for my $Item ( 0 .. 1 ) {
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketID,
-        ArticleType    => 'note-internal',
+        Channels       => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',

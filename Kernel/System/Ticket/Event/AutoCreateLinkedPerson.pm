@@ -89,7 +89,7 @@ sub Run {
             ArticleID => $Data{ArticleID},
         );
 
-        if ( $Article{ArticleTypeID} && $Article{ArticleTypeID} <= 5 ) {
+        if ( $Article{Channel} eq 'email' ) {
 
             # extract all receipients mail addresses...
             my @SplitAddresses;

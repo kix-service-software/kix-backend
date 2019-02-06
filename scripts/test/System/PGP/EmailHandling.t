@@ -554,7 +554,7 @@ for my $Test (@TestVariations) {
     my $ArticleID = $TicketObject->ArticleSend(
         %{ $Test->{ArticleData} },
         TicketID       => $TicketID,
-        ArticleType    => 'email-external',
+        Channel        => 'email',
         SenderType     => 'customer',
         HistoryType    => 'AddNote',
         HistoryComment => 'note',

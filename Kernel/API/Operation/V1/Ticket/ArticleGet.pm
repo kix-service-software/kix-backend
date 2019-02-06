@@ -130,8 +130,7 @@ one or more ticket entries in one call.
                     References
                     SenderType
                     SenderTypeID
-                    ArticleType
-                    ArticleTypeID
+                    ChannelID
                     ContentType
                     Charset
                     MimeType

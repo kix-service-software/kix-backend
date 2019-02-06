@@ -223,7 +223,7 @@ for my $Test (@Tests) {
     if ( $Test->{ACLFile} ) {
 
         $FileRef = $MainObject->FileRead(
-            Location => $Home . '/scripts/test/sample/ACL/' . $Test->{ACLFile},
+            Location => $Home . '/scripts/test/System/sample/ACL/' . $Test->{ACLFile},
         );
 
         my $RandomID = $Helper->GetRandomID();

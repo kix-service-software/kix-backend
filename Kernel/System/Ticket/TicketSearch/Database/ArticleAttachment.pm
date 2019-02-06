@@ -151,15 +151,7 @@ sub Search {
 
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {
-        my %CustomerArticleTypes = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeList(
-            Result => 'HASH',
-            Type   => 'Customer',
-        );
-        my @CustomerArticleTypeIDs = keys %CustomerArticleTypes;
-
-        if ( @CustomerArticleTypeIDs ) {
-            push( @SQLWhere, 'art_for_att.article_type_id IN ('.(join(', ', sort @CustomerArticleTypeIDs)).')' );
-        }
+        push( @SQLWhere, 'art_for_att.customer_visible = 1)' );
     }
     
     return {

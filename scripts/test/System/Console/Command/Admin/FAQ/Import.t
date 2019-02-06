@@ -33,7 +33,7 @@ $Self->Is(
     "Option - without source-path argument",
 );
 
-my $SourcePath = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/scripts/test/sample/FAQ.csv";
+my $SourcePath = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/scripts/test/System/sample/FAQ.csv";
 
 # test command with source argument
 $ExitCode = $CommandObject->Execute( '--separator', ';', '--quote', '', $SourcePath );

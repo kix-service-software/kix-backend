@@ -679,18 +679,20 @@ sub GetEmailParams {
 
 #rbo - T2016121190001552 - renamed X-KIX headers
     # set article type if not given
-    for my $Key (qw(X-KIX-ArticleType X-KIX-FollowUp-ArticleType X-OTRS-ArticleType X-OTRS-FollowUp-ArticleType)) {
+    for my $Key (qw(X-KIX-Channel X-KIX-FollowUp-Channel X-OTRS-Channel X-OTRS-FollowUp-Channel)) {
         if ( !$GetParam{$Key} ) {
-            $GetParam{$Key} = 'email-external';
+            $GetParam{$Key} = 'email';
+            $GetParam{CustomerVisible} = 1;
         }
 
-        # check if X-KIX-ArticleType exists, if not, set 'email'
-        if ( !$TicketObject->ArticleTypeLookup( ArticleType => $GetParam{$Key} ) ) {
+        # check if X-KIX-Channel exists, if not, set 'email'
+        if ( !$Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $GetParam{$Key} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Can't find article type '$GetParam{$Key}' in db, take 'email-external'",
+                Message  => "Can't find channel '$GetParam{$Key}' in db, take 'email' and set 'visible for customer'",
             );
-            $GetParam{$Key} = 'email-external';
+            $GetParam{$Key} = 'email';
+            $GetParam{CustomerVisible} = 1;
         }
     }
 

@@ -44,7 +44,7 @@ my $TicketID = $TicketObject->TicketCreate(
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'note-internal',
+    Channel        => 'note',
     SenderType     => 'agent',
     From           => 'Agent Some Agent Some Agent <email@example.com>',
     To             => 'Customer A <customer-a@example.com>',

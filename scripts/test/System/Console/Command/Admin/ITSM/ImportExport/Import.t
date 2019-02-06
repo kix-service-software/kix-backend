@@ -124,7 +124,7 @@ for my $ObjectDataValue (qw( Name DeplState InciState )) {
 
 # make directory for export file
 my $SourcePath
-    = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/scripts/test/sample/ImportExport/TemplateExport.csv";
+    = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/scripts/test/System/sample/ImportExport/TemplateExport.csv";
 
 # test command with wrong template number
 $ExitCode = $CommandObject->Execute( '--template-number', $Helper->GetRandomID(), $SourcePath . 'TemplateExport.csv' );

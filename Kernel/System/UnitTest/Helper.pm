@@ -274,6 +274,7 @@ sub TestCustomerUserCreate {
             UserFirstname  => $TestUserLogin,
             UserLastname   => $TestUserLogin,
             UserCustomerID => $TestUserLogin,
+            UserCustomerIDs => $TestUserLogin,
             UserLogin      => $TestUserLogin,
             UserPassword   => $TestUserLogin,
             UserEmail      => $TestUserLogin . '@localunittest.com',

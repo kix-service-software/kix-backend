@@ -52,7 +52,7 @@ for my $IDCount ( 0 .. $Limit ) {
         # create the article
         $TicketObject->ArticleCreate(
             TicketID       => $TicketIDs[$IDCount],
-            ArticleType    => 'note-internal',
+            Channel        => 'note',
             SenderType     => 'agent',
             From           => 'Some Agent <email@example.com>',
             To             => 'Some Customer A <customer-a@example.com>',

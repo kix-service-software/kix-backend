@@ -48,7 +48,7 @@ my @Tests = (
             },
             {
                 ArticleCreate => {
-                    ArticleType    => 'note-internal',
+                    Channel        => 'note',
                     SenderType     => 'agent',
                     From           => 'Some Agent <email@example.com>',
                     To             => 'Some Customer A <customer-a@example.com>',
@@ -63,7 +63,7 @@ my @Tests = (
             },
             {
                 ArticleCreate => {
-                    ArticleType    => 'note-internal',
+                    Channel        => 'note',
                     SenderType     => 'agent',
                     From           => 'Some other Agent <email2@example.com>',
                     To             => 'Some Customer A <customer-a@example.com>',

@@ -352,7 +352,8 @@ sub Run {
 
     my $SentArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSend(
         TicketID       => $Ticket{TicketID},
-        ArticleType    => $Self->{ConfigObject}->Get('ExternalSupplierForwarding::ArticleType') || 'email-internal',
+        Channel        => $Self->{ConfigObject}->Get('ExternalSupplierForwarding::Channel') || 'email',
+        CustomerVisible => $Self->{ConfigObject}->Get('ExternalSupplierForwarding::VisibleForCustomer') || 0,
         SenderType     => 'system',
         From           => $MyJobDefinition{Params}->{FromMailAddress},
         To             => $MyJobDefinition{Params}->{DestMailAddress},

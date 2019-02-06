@@ -42,7 +42,7 @@ $Self->Is(
 $ExitCode = $CommandObject->Execute(
     '--user-name', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--customer-id', 'Test'
+    '--primary-customer-id', 'Test', '--customer-ids', 'Test'
 );
 $Self->Is(
     $ExitCode,
@@ -54,7 +54,7 @@ $Self->Is(
 $ExitCode = $CommandObject->Execute(
     '--user-name', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--customer-id', 'Test'
+    '--primary-customer-id', 'Test', '--customer-ids', 'Test'
 );
 $Self->Is(
     $ExitCode,

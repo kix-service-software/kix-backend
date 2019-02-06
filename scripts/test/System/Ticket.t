@@ -196,7 +196,7 @@ $Self->Is(
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID    => $TicketID,
-    ArticleType => 'note-internal',
+    Channel     => 'note',
     SenderType  => 'agent',
     From =>
         'Some Agent Some Agent Some Agent Some Agent Some Agent Some Agent Some Agent Some Agent Some Agent Some Agent Some Agent <email@example.com>',

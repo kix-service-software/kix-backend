@@ -64,9 +64,6 @@ sub Run {
     my $CISearchPatternRef =
         $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::CISearchPattern');
 
-    my @ArticleTypes =
-        @{ $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::ArticleTypesCISearchPattern') };
-
     my $OnlyFirstArticle =
         $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::FirstArticleOnly');
 
@@ -103,9 +100,6 @@ sub Run {
             ArticleID => $Param{Data}->{ArticleID},
             UserID    => 1,
         );
-
-        # check article type...
-        return 0 if ( join( ',', @ArticleTypes ) !~ /(^|.*,)$ArticleData{ArticleType}(,.*|$)/ );
 
         # check if it's the first article...
         if ($OnlyFirstArticle) {

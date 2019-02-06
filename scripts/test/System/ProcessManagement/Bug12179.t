@@ -88,7 +88,7 @@ my %Process = (
             Name   => 'Create Copy',
             Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketCreate',
             Config => {
-                ArticleType       => 'phone',
+                Channel           => 'phone',
                 Body              => 'Ticket Copy',
                 ContentType       => 'text/plain; charset=UTF8',
                 CustomerID        => '',
@@ -203,7 +203,7 @@ $Self->IsNot(
 
 # Create articles.
 my %ArticleTemplate = (
-    ArticleType    => 'phone',
+    Channel        => 'note',
     SenderType     => 'agent',
     Subject        => 'some short description',
     Body           => 'Ticket Original',

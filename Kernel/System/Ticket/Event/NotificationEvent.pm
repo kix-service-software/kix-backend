@@ -362,12 +362,12 @@ sub Run {
             }
         }
 
-        if ( %AlreadySent && $Param{Data}->{ArticleID} && $Param{Data}->{ArticleType} ) {
+        if ( %AlreadySent && $Param{Data}->{ArticleID} && $Param{Data}->{Channel} ) {
 
             # update to field
             my $UpdateToSuccess = $Self->_ArticleToUpdate(
                 ArticleID   => $Param{Data}->{ArticleID},
-                ArticleType => $Param{Data}->{ArticleType},
+                Channel     => $Param{Data}->{Channel},
                 UserIDs     => \%AlreadySent,
                 UserID      => $Param{UserID},
             );
@@ -411,12 +411,12 @@ sub _NotificationFilter {
         next KEY if $Key eq 'RecipientRoles';
         next KEY if $Key eq 'TransportEmailTemplate';
         next KEY if $Key eq 'Events';
-        next KEY if $Key eq 'ArticleTypeID';
+        next KEY if $Key eq 'ChannelID';
         next KEY if $Key eq 'ArticleSenderTypeID';
         next KEY if $Key eq 'ArticleSubjectMatch';
         next KEY if $Key eq 'ArticleBodyMatch';
         next KEY if $Key eq 'ArticleAttachmentInclude';
-        next KEY if $Key eq 'NotificationArticleTypeID';
+        next KEY if $Key eq 'NotificationChannelID';
         next KEY if $Key eq 'Transports';
         next KEY if $Key eq 'OncePerDay';
         next KEY if $Key eq 'MarkAsSeenForAgents';
@@ -493,7 +493,7 @@ sub _NotificationFilter {
             }
             else {
 
-                if ( $Value eq $Param{Ticket}->{$Key} ) {
+                if ( $Param{Ticket}->{$Key} && $Value eq $Param{Ticket}->{$Key} ) {
                     $Match = 1;
                     last VALUE;
                 }
@@ -516,16 +516,16 @@ sub _NotificationFilter {
             DynamicFields => 0,
         );
 
-        # check article type
-        if ( $Notification{Data}->{ArticleTypeID} ) {
+        # check channel
+        if ( $Notification{Data}->{ChannelID} ) {
 
             my $Match = 0;
             VALUE:
-            for my $Value ( @{ $Notification{Data}->{ArticleTypeID} } ) {
+            for my $Value ( @{ $Notification{Data}->{ChannelID} } ) {
 
                 next VALUE if !$Value;
 
-                if ( $Value == $Article{ArticleTypeID} ) {
+                if ( $Value == $Article{ChannelID} ) {
                     $Match = 1;
                     last VALUE;
                 }
@@ -1146,7 +1146,7 @@ sub _ArticleToUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed params
-    for my $Needed (qw(ArticleID ArticleType UserIDs UserID)) {
+    for my $Needed (qw(ArticleID Channel UserIDs UserID)) {
         return if !$Param{$Needed};
     }
 
@@ -1158,7 +1158,7 @@ sub _ArticleToUpdate {
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
     # not update if its not a note article
-    return 1 if $Param{ArticleType} !~ /^note\-/;
+    return 1 if $Param{Channel} ne 'note';
 
     my $NewTo = $Param{To} || '';
     for my $UserID ( sort keys %{ $Param{UserIDs} } ) {

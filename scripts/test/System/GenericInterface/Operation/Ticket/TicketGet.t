@@ -481,7 +481,7 @@ $Self->True(
 # first article
 my $ArticleID41 = $TicketObject->ArticleCreate(
     TicketID       => $TicketID4,
-    ArticleType    => 'phone',
+    Channel        => 'phone-outbound',
     SenderType     => 'agent',
     From           => 'Agent Some Agent Some Agent <email@example.com>',
     To             => 'Customer A <customer-a@example.com>',
@@ -499,7 +499,7 @@ my $ArticleID41 = $TicketObject->ArticleCreate(
 # second article
 my $ArticleID42 = $TicketObject->ArticleCreate(
     TicketID    => $TicketID4,
-    ArticleType => 'phone',
+    Channel     => 'phone-inbound',
     SenderType  => 'customer',
     From        => 'A not Real Agent <email@example.com>',
     To          => 'Customer A <customer-a@example.com>',
@@ -519,7 +519,8 @@ my $ArticleID42 = $TicketObject->ArticleCreate(
 # third article
 my $ArticleID43 = $TicketObject->ArticleCreate(
     TicketID    => $TicketID4,
-    ArticleType => 'note-internal',
+    Channel     => 'note',
+    CustomerVisible => 1,
     SenderType  => 'customer',
     From        => 'A not Real Agent <email@example.com>',
     To          => 'Customer A <customer-a@example.com>',
@@ -631,11 +632,10 @@ my @ArticleBoxDF = $TicketObject->ArticleGet(
     DynamicFields => 1,
 );
 
-my $CustomerArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
 my @ArticleBoxTypeCustomer = $TicketObject->ArticleGet(
     TicketID    => $TicketID4,
     UserID      => 1,
-    ArticleType => $CustomerArticleTypes,
+    CustomerVisible => 1,
 );
 
 my @ArticleBoxSenderAgent = $TicketObject->ArticleGet(
@@ -828,7 +828,7 @@ for my $Key ( sort keys %TicketEntryFive ) {
 # first article
 my $ArticleID51 = $TicketObject->ArticleCreate(
     TicketID    => $TicketID5,
-    ArticleType => 'phone',
+    Channel     => 'phone-outbound',
     SenderType  => 'agent',
     From        => 'Agent Some Agent Some Agent <email@example.com>',
     To          => 'Customer A <customer-a@example.com>',
@@ -847,7 +847,7 @@ my $ArticleID51 = $TicketObject->ArticleCreate(
 );
 my $ArticleID52 = $TicketObject->ArticleCreate(
     TicketID       => $TicketID5,
-    ArticleType    => 'phone',
+    Channel        => 'phone-outbound',
     SenderType     => 'agent',
     From           => 'Agent Some Agent Some Agent <email@example.com>',
     To             => 'Customer A <customer-a@example.com>',

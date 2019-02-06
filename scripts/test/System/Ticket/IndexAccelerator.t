@@ -307,7 +307,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
 
             my $ArticleID = $TicketObject->ArticleCreate(
                 TicketID       => $TicketID,
-                ArticleType    => 'note-internal',
+                Channnel       => 'note',
                 SenderType     => 'agent',
                 From           => 'Some Agent <email@example.com>',
                 To             => 'Some Customer A <customer-a@example.com>',

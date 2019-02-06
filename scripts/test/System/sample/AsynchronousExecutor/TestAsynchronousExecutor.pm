@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package scripts::test::sample::AsynchronousExecutor::TestAsynchronousExecutor;
+package scripts::test::System::sample::AsynchronousExecutor::TestAsynchronousExecutor;
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ our @ObjectDependencies = ( );
 
 =head1 NAME
 
-scripts::test::sample::AsynchronousExecutor::TestAsynchronousExecutor - sample of a module with AsynchronousExecutor base class
+scripts::test::System::sample::AsynchronousExecutor::TestAsynchronousExecutor - sample of a module with AsynchronousExecutor base class
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ scripts::test::sample::AsynchronousExecutor::TestAsynchronousExecutor - sample o
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
 
-    my $ModuleObject = $Kernel::OM->Get('scripts::test::sample::AsynchronousExecutor::TestAsynchronousExecutor');
+    my $ModuleObject = $Kernel::OM->Get('scripts::test::System::sample::AsynchronousExecutor::TestAsynchronousExecutor');
 
 =cut
 
@@ -96,7 +96,7 @@ sub ExecuteAsycWithObjectName {
 
     # create a new task for the scheduler daemon
     $Self->AsyncCall(
-        ObjectName               => 'scripts::test::sample::AsynchronousExecutor::TestAsynchronousExecutor',
+        ObjectName               => 'scripts::test::System::sample::AsynchronousExecutor::TestAsynchronousExecutor',
         FunctionName             => 'Execute',
         FunctionParams           => \%Param,
         Attempts                 => 3,

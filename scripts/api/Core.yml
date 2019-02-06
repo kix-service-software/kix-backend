@@ -483,20 +483,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Valid::ValidGet
-    V1::ArticleType::ArticleTypeSearch:
+    V1::Channel::ChannelSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::ArticleType::ArticleTypeSearch
-    V1::ArticleType::ArticleTypeGet:
+        Type: V1::Channel::ChannelSearch
+    V1::Channel::ChannelGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::ArticleType::ArticleTypeGet
+        Type: V1::Channel::ChannelGet
     V1::Group::GroupSearch:
         Description: ''
         MappingInbound:
@@ -2042,14 +2042,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /valid/:ValidID
-        V1::ArticleType::ArticleTypeSearch:
+        V1::Channel::ChannelSearch:
           RequestMethod:
           - GET
-          Route: /articletypes
-        V1::ArticleType::ArticleTypeGet:
+          Route: /channels
+        V1::Channel::ChannelGet:
           RequestMethod:
           - GET
-          Route: /articletypes/:ArticleTypeID
+          Route: /channels/:ChannelID
         V1::Group::GroupSearch:
           RequestMethod:
           - GET

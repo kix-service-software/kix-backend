@@ -233,7 +233,7 @@ sub Run {
             if ( $WFConfigRef->{FallbackOnErrorNote} ) {
                 $Self->{TicketObject}->ArticleCreate(
                     TicketID    => $Param{Data}->{TicketID},
-                    ArticleType => 'note-internal',
+                    Channel     => 'note',
                     SenderType  => 'system',
                     From        => 'KIX4OTRS Systeminformation',
                     Subject     => 'Automatic move failed due to a misconfiguration.',

@@ -602,7 +602,7 @@ sub ArticleCopy {
     delete $Self->{ 'Cache::GetTicket' . $Param{TicketID} };
 
     # copy plain article if exists
-    if ( $Article{ArticleType} =~ /email/i ) {
+    if ( $Article{Channel} =~ /email/i ) {
         my $Data = $Self->ArticlePlain(
             ArticleID => $Param{ArticleID}
         );

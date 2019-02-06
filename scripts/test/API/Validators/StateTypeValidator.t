@@ -39,63 +39,63 @@ $Kernel::OM->ObjectParamAdd(
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
 my $ValidData = {
-    StateType => 'open'
+    Type => 'open'
 };
 
 my $InvalidData = {
-    StateType => 'Unclassified-unittest'
+    Type => 'Unclassified-unittest'
 };
 
 my $ValidData_ID = {
-    StateTypeID => '1'
+    TypeID => '1'
 };
 
 my $InvalidData_ID = {
-    StateTypeID => '9999'
+    TypeID => '9999'
 };
 
-# validate valid StateType
+# validate valid Type
 my $Result = $ValidatorObject->Validate(
-    Attribute => 'StateType',
+    Attribute => 'Type',
     Data      => $ValidData,
 );
 
 $Self->True(
     $Result->{Success},
-    'Validate() - valid StateType',
+    'Validate() - valid Type',
 );
 
-# validate invalid StateType
+# validate invalid Type
 $Result = $ValidatorObject->Validate(
-    Attribute => 'StateType',
+    Attribute => 'Type',
     Data      => $InvalidData,
 );
 
 $Self->False(
     $Result->{Success},
-    'Validate() - invalid StateType',
+    'Validate() - invalid Type',
 );
 
-# validate valid StateTypeID
+# validate valid TypeID
 $Result = $ValidatorObject->Validate(
-    Attribute => 'StateTypeID',
+    Attribute => 'TypeID',
     Data      => $ValidData_ID,
 );
 
 $Self->True(
     $Result->{Success},
-    'Validate() - valid StateTypeID',
+    'Validate() - valid TypeID',
 );
 
-# validate invalid StateTypeID
+# validate invalid TypeID
 $Result = $ValidatorObject->Validate(
-    Attribute => 'StateTypeID',
+    Attribute => 'TypeID',
     Data      => $InvalidData_ID,
 );
 
 $Self->False(
     $Result->{Success},
-    'Validate() - invalid StateTypeID',
+    'Validate() - invalid TypeID',
 );
 
 # validate invalid attribute

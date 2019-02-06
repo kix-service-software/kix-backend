@@ -46,7 +46,7 @@ my @Tests = (
         AutoResponseTypeID => 1,
         AutoResponseType   => 'auto reply',
         TicketState        => 'open',
-        ArticleType        => 'phone',
+        Channel            => 'email',
     },
     {
         Subject            => 'AutoResponse Follow Up',
@@ -54,7 +54,7 @@ my @Tests = (
         AutoResponseTypeID => 3,
         AutoResponseType   => 'auto follow up',
         TicketState        => 'open',
-        ArticleType        => 'webrequest',
+        Channel            => 'email',
     },
     {
         Subject            => 'AutoResponse Reject',
@@ -62,7 +62,7 @@ my @Tests = (
         AutoResponseTypeID => 2,
         AutoResponseType   => 'auto reject',
         TicketState        => 'closed successful',
-        ArticleType        => 'webrequest',
+        Channel            => 'email',
     },
     {
         Subject            => 'AutoResponse Reply/New Ticket',
@@ -70,14 +70,14 @@ my @Tests = (
         AutoResponseTypeID => 4,
         AutoResponseType   => 'auto reply/new ticket',
         TicketState        => 'closed successful',
-        ArticleType        => 'webrequest',
+        Channel            => 'email',
     },
     {
         Subject            => 'AutoResponse Remove',
         AutoResponseTypeID => 5,
         AutoResponseType   => 'auto remove',
         TicketState        => 'removed',
-        ArticleType        => 'webrequest',
+        Channel            => 'email',
     },
 );
 
@@ -169,7 +169,8 @@ for my $Test (@Tests) {
     # create article for test ticket one
     my $ArticleIDOne = $TicketObject->ArticleCreate(
         TicketID         => $TicketIDOne,
-        ArticleType      => $Test->{ArticleType},
+        Channel          => $Test->{Channel},
+        CustomerVisible  => 1,
         SenderType       => 'customer',
         Subject          => 'UnitTest article one',
         From             => '"test" <test@localunittest.com>',
@@ -256,7 +257,8 @@ for my $Test (@Tests) {
     # create article two for test ticket two
     my $ArticleIDTwo = $TicketObject->ArticleCreate(
         TicketID         => $TicketIDTwo,
-        ArticleType      => $Test->{ArticleType},
+        Channel          => $Test->{Channel},
+        CustomerVisible  => 1,
         SenderType       => 'customer',
         Subject          => 'UnitTest article two',
         From             => '"test" <test@localunittest.com>',

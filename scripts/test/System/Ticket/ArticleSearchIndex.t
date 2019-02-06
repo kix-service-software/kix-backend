@@ -62,7 +62,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID    => $TicketID,
-        ArticleType => 'note-internal',
+        Channels    => 'note',
         SenderType  => 'agent',
         From        => 'Some Agent <email@example.com>',
         To          => 'Some Customer <customer@example.com>',
@@ -95,7 +95,7 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
 
     $ArticleID = $TicketObject->ArticleCreate(
         TicketID    => $TicketID,
-        ArticleType => 'note-internal',
+        Channels    => 'note',
         SenderType  => 'agent',
         From        => 'Some Agent <email@example.com>',
         To          => 'Some Customer <customer@example.com>',
@@ -156,7 +156,7 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     # see bug #11791 ( http://bugs.otrs.org/show_bug.cgi?id=11791 )
     $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketID,
-        ArticleType    => 'note-internal',
+        Channels       => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer@example.com>',

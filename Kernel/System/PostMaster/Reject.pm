@@ -67,7 +67,7 @@ sub Run {
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $Param{TicketID},
 #rbo - T2016121190001552 - renamed X-KIX headers
-        ArticleType      => $GetParam{'X-KIX-ArticleType'} || $GetParam{'X-OTRS-ArticleType'},
+        Channel          => $GetParam{'X-KIX-Channel'} || $GetParam{'X-OTRS-Channel'},
         SenderType       => $GetParam{'X-KIX-SenderType'} || $GetParam{'X-OTRS-SenderType'},
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},

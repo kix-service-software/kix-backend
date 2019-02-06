@@ -612,7 +612,7 @@ if ( open( my $DATA, "<", "$Path/$File" ) ) {    ## no critic
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID    => $TicketID,
-        ArticleType => 'note-internal',
+        Channel     => 'note',
         SenderType  => 'agent',
         From        => 'Some Agent <email@example.com>',
         To          => 'Some Customer <customer-a@example.com>',
