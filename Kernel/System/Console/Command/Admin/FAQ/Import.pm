@@ -109,12 +109,7 @@ sub Run {
     my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
 
     # get all FAQ language ids
-    my %LanguageID = reverse $FAQObject->LanguageList(
-        UserID => 1,
-    );
-
-    # get all state type ids
-    my %StateTypeID = reverse %{ $FAQObject->StateTypeList( UserID => 1 ) };
+    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
 
     # get group id for FAQ group
     my $FAQGroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
@@ -131,19 +126,13 @@ sub Run {
         $LineCounter++;
 
         my (
-            $Title, $CategoryString, $Language, $StateType,
+            $Title, $CategoryString, $Language, $Visibility,
             $Field1, $Field2, $Field3, $Field4, $Field5, $Field6, $Keywords
         ) = @{$RowRef};
 
         # check language
-        if ( !$LanguageID{$Language} ) {
+        if ( !$Languages->{$Language} ) {
             $Self->PrintError("Error: Could not import line $LineCounter. Language '$Language' does not exist.\n");
-            next ROWREF;
-        }
-
-        # check state type
-        if ( !$StateTypeID{$StateType} ) {
-            $Self->PrintError("Error: Could not import line $LineCounter. State '$StateType' does not exist.\n");
             next ROWREF;
         }
 
@@ -201,18 +190,6 @@ sub Run {
             next ROW;
         }
 
-        # convert StateType to State
-        my %StateLookup = reverse $FAQObject->StateList( UserID => 1 );
-        my $StateID;
-
-        STATENAME:
-        for my $StateName ( sort keys %StateLookup ) {
-            if ( $StateName =~ m{\A $StateType }msxi ) {
-                $StateID = $StateLookup{$StateName};
-                last STATENAME;
-            }
-        }
-
         # get config object
         my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
@@ -226,8 +203,8 @@ sub Run {
         my $FAQID = $FAQObject->FAQAdd(
             Title       => $Title,
             CategoryID  => $CategoryID,
-            StateID     => $StateID,
-            LanguageID  => $LanguageID{$Language},
+            Language    => $Language,
+            Visibility  => $Visibility,
             Field1      => $Field1,
             Field2      => $Field2,
             Field3      => $Field3,

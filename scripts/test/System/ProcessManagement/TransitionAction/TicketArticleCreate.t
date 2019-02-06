@@ -212,7 +212,7 @@ my @Tests = (
             UserID => undef,
             Ticket => \%Ticket,
             Config => {
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -242,7 +242,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => undef,
             Config => {
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -312,7 +312,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -341,7 +341,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
@@ -372,7 +372,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
@@ -403,7 +403,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
@@ -434,7 +434,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
@@ -465,7 +465,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
@@ -496,7 +496,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
@@ -527,7 +527,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>

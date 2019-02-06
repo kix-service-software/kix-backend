@@ -70,13 +70,13 @@ sub new {
         DynamicFieldState   => 'SysMonXState',
 
         AcknowledgeName         => 'Nagios1',
-        OTRSCreateTicketType    => 'Incident',
-        OTRSCreateTicketQueue   => '',
-        OTRSCreateTicketState   => '',
-        OTRSCreateTicketService => '',
-        OTRSCreateTicketSLA     => '',
-        OTRSCreateSenderType    => 'system',
-        OTRSCreateArticleType   => 'note-report',
+        CreateTicketType    => 'Incident',
+        CreateTicketQueue   => '',
+        CreateTicketState   => '',
+        CreateTicketService => '',
+        CreateTicketSLA     => '',
+        CreateSenderType    => 'system',
+        CreateChannel       => 'note',
 
         CloseNotIfLocked => 0,
         StopAfterMatch   => 1,
@@ -530,8 +530,8 @@ sub _TicketUpdate {
 
 #rbo - T2016121190001552 - renamed X-OTRS headers
     # set sender type and article type
-    $Param->{GetParam}->{'X-KIX-FollowUp-SenderType'}  = $Self->{Config}->{OTRSCreateSenderType};
-    $Param->{GetParam}->{'X-KIX-FollowUp-ArticleType'} = $Self->{Config}->{OTRSCreateArticleType};
+    $Param->{GetParam}->{'X-KIX-FollowUp-SenderType'} = $Self->{Config}->{CreateSenderType};
+    $Param->{GetParam}->{'X-KIX-FollowUp-Channel'}    = $Self->{Config}->{CreateChannel};
 
     # Set Article Free Field for State
     my $ArticleDFNumber = $Self->{Config}->{'DynamicFieldState'};
@@ -660,20 +660,20 @@ sub _TicketCreate {
 
 #rbo - T2016121190001552 - renamed X-OTRS headers
     # set sender type and article type
-    $Param->{GetParam}->{'X-KIX-SenderType'} = $Self->{Config}->{OTRSCreateSenderType}
+    $Param->{GetParam}->{'X-KIX-SenderType'} = $Self->{Config}->{CreateSenderType}
         || $Param->{GetParam}->{'X-KIX-SenderType'};
-    $Param->{GetParam}->{'X-KIX-ArticleType'} = $Self->{Config}->{OTRSCreateArticleType}
-        || $Param->{GetParam}->{'X-KIX-ArticleType'};
+    $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
+        || $Param->{GetParam}->{'X-KIX-Channel'};
 
-    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{OTRSCreateTicketQueue}
+    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
         || $Param->{GetParam}->{'X-KIX-Queue'};
-    $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{OTRSCreateTicketState}
+    $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
         || $Param->{GetParam}->{'X-KIX-State'};
-    $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{OTRSCreateTicketType}
+    $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
         || $Param->{GetParam}->{'X-KIX-Type'};
-    $Param->{GetParam}->{'X-KIX-Service'} = $Self->{Config}->{OTRSCreateTicketService}
+    $Param->{GetParam}->{'X-KIX-Service'} = $Self->{Config}->{CreateTicketService}
         || $Param->{GetParam}->{'X-KIX-Service'};
-    $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{OTRSCreateTicketSLA}
+    $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{CreateTicketSLA}
         || $Param->{GetParam}->{'X-KIX-SLA'};
 
     # AcknowledgeNameField

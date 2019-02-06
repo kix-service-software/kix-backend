@@ -529,7 +529,7 @@ $Self->True(
 # first article
 my $ArticleID41 = $TicketObject->ArticleCreate(
     TicketID       => $TicketID4,
-    ArticleType    => 'phone',
+    Channel        => 'phone-outbound',
     SenderType     => 'agent',
     From           => 'Agent Some Agent Some Agent <email@example.com>',
     To             => 'Customer A <customer-a@example.com>',
@@ -547,7 +547,7 @@ my $ArticleID41 = $TicketObject->ArticleCreate(
 # second article
 my $ArticleID42 = $TicketObject->ArticleCreate(
     TicketID    => $TicketID4,
-    ArticleType => 'phone',
+    Channel     => 'phone-outbound',
     SenderType  => 'agent',
     From        => 'Anot Real Agent <email@example.com>',
     To          => 'Customer A <customer-a@example.com>',

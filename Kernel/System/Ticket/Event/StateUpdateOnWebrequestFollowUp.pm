@@ -67,7 +67,7 @@ sub Run {
         UserID    => 1,
     );
 
-    return 1 if ( $ThisArticle{ArticleType} ne 'webrequest' );
+    return 1 if ( $ThisArticle{Channel} ne 'note' && $ThisArticle{SenderType} ne 'customer');
 
     if ( !$Param{Data}->{TicketID} ) {
         $Self->{LogObject}->Log( Priority => 'error', Message => "Need TicketID!" );

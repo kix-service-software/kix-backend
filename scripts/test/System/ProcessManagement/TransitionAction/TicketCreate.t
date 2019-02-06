@@ -224,7 +224,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -270,7 +270,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -356,7 +356,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -403,7 +403,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -450,7 +450,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -497,7 +497,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType => 'note-internal',
+                Channel     => 'note',
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject     => 'some short description',
@@ -540,7 +540,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -583,7 +583,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -625,7 +625,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -755,7 +755,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
@@ -800,7 +800,7 @@ my @Tests = (
                 TypeID        => 1,
                 ResponsibleID => 1,
 
-                ArticleType    => 'note-internal',
+                Channel        => 'note',
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',

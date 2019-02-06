@@ -71,8 +71,8 @@ sub new {
         TransitionActionEntityID => 'TA123',
         Config                   => {
             # required:
-            ArticleType      => 'note-internal',                        # note-external|phone|fax|sms|...
-                                                                        #   excluding any email type
+            Channel          => 'note',                                 # ...
+            CustomerVisible  => 0|1                                     # optional
             SenderType       => 'agent',                                # agent|system|customer
             ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
             Subject          => 'some short description',               # required
@@ -148,12 +148,12 @@ sub Run {
         }
     }
 
-    # check ArticleType
-    if ( $Param{Config}->{ArticleType} =~ m{\A email }msxi ) {
+    # check Channel
+    if ( $Param{Config}->{Channel} =~ m{\A email }msxi ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
-                . "ArticleType $Param{Config}->{ArticleType} is not supported",
+                . "Channel $Param{Config}->{Channel} is not supported",
         );
         return;
     }

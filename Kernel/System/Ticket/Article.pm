@@ -41,7 +41,7 @@ create an article
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
-        ArticleType      => 'note-internal',                        # email-external|email-internal|phone|fax|...
+        Channel          => 'note',                                 # ...
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
@@ -87,7 +87,7 @@ example with "Charset & MimeType" and no "ContentType"
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
-        ArticleType      => 'note-internal',                        # email-external|email-internal|phone|fax|...
+        Channel          => 'note-internal',                        # ...
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
@@ -129,15 +129,15 @@ sub ArticleCreate {
     }
 
     # lookups if no ids are passed
-    if ( $Param{ArticleType} && !$Param{ArticleTypeID} ) {
-        $Param{ArticleTypeID} = $Self->ArticleTypeLookup( ArticleType => $Param{ArticleType} );
+    if ( $Param{Channel} && !$Param{ChannelID} ) {
+        $Param{ChannelID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $Param{Channel} );
     }
     if ( $Param{SenderType} && !$Param{SenderTypeID} ) {
         $Param{SenderTypeID} = $Self->ArticleSenderTypeLookup( SenderType => $Param{SenderType} );
     }
 
     # check needed stuff
-    for (qw(TicketID UserID ArticleTypeID SenderTypeID HistoryType HistoryComment)) {
+    for (qw(TicketID UserID ChannelID SenderTypeID HistoryType HistoryComment)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -304,13 +304,13 @@ sub ArticleCreate {
     # do db insert
     return if !$DBObject->Do(
         SQL => 'INSERT INTO article '
-            . '(ticket_id, article_type_id, article_sender_type_id, a_from, a_reply_to, a_to, '
+            . '(ticket_id, channel_id, customer_visible, article_sender_type_id, a_from, a_reply_to, a_to, '
             . 'a_cc, a_bcc, a_subject, a_message_id, a_message_id_md5, a_in_reply_to, a_references, a_body, a_content_type, '
             . 'content_path, valid_id, incoming_time, create_time, create_by, change_time, change_by) '
             . 'VALUES '
-            . '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            . '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{TicketID}, \$Param{ArticleTypeID}, \$Param{SenderTypeID},
+            \$Param{TicketID}, \$Param{ChannelID}, \$Param{CustomerVisible}, \$Param{SenderTypeID},
             \$Param{From},     \$Param{ReplyTo},       \$Param{To},
             \$Param{Cc},       \$Param{Bcc},           \$Param{Subject},
             \$ArticleInsertFingerprint,    # just for next search; will be updated with correct MessageID
@@ -446,8 +446,8 @@ sub ArticleCreate {
     if ( !$Param{SenderType} ) {
         $Param{SenderType} = $Self->ArticleSenderTypeLookup( SenderTypeID => $Param{SenderTypeID} );
     }
-    if ( !$Param{ArticleType} ) {
-        $Param{ArticleType} = $Self->ArticleTypeLookup( ArticleTypeID => $Param{ArticleTypeID} );
+    if ( !$Param{Channel} ) {
+        $Param{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $Param{ChannelID} );
     }
 
     # reset unlock time if customer sent an update
@@ -476,11 +476,7 @@ sub ArticleCreate {
     }
 
     # check if latest article is sent to customer
-    elsif (
-        $Param{SenderType} eq 'agent'
-        && $Param{ArticleType} =~ /email-ext|phone|fax|sms|note-ext/
-        )
-    {
+    elsif ( $Param{SenderType} eq 'agent'&& $Param{CustomerVisible} ) {
         $Self->TicketUnlockTimeoutUpdate(
             UnlockTimeout => $TimeObject->SystemTime(),
             TicketID      => $Param{TicketID},
@@ -495,7 +491,8 @@ sub ArticleCreate {
             TicketID         => $Param{TicketID},
             UserID           => $Param{UserID},
             AutoResponseType => $Param{AutoResponseType},
-            ArticleType      => $Param{ArticleType}
+            Channel          => $Param{Channel},
+            CustomerVisible  => $Param{CustomerVisible}
         );
     }
 
@@ -546,7 +543,8 @@ sub ArticleCreate {
             Data  => {
                 TicketID              => $Param{TicketID},
                 ArticleID             => $ArticleID,
-                ArticleType           => $Param{ArticleType},
+                Channel               => $Param{Channel},
+                CustomerVisible       => $Param{CustomerVisible},
                 Queue                 => $Param{Queue},
                 Recipients            => $ExtraRecipients,
                 SkipRecipients        => \@SkipRecipients,
@@ -565,7 +563,8 @@ sub ArticleCreate {
             Data  => {
                 TicketID              => $Param{TicketID},
                 ArticleID             => $ArticleID,
-                ArticleType           => $Param{ArticleType},
+                Channel               => $Param{Channel},
+                CustomerVisible       => $Param{CustomerVisible},
                 Queue                 => $Param{Queue},
                 Recipients            => $ExtraRecipients,
                 SkipRecipients        => \@SkipRecipients,
@@ -584,7 +583,8 @@ sub ArticleCreate {
             Data  => {
                 TicketID              => $Param{TicketID},
                 ArticleID             => $ArticleID,
-                ArticleType           => $Param{ArticleType},
+                Channel               => $Param{Channel},
+                CustomerVisible       => $Param{CustomerVisible},
                 Queue                 => $Param{Queue},
                 Recipients            => $ExtraRecipients,
                 SkipRecipients        => \@SkipRecipients,
@@ -863,147 +863,6 @@ sub ArticleSenderTypeLookup {
     return $Result;
 }
 
-=item ArticleTypeLookup()
-
-article type lookup
-
-    my $ArticleTypeID = $TicketObject->ArticleTypeLookup(
-        ArticleType => 'webrequest-customer', # note-internal|...
-    );
-
-    my $ArticleType = $TicketObject->ArticleTypeLookup(
-        ArticleTypeID => 1,
-    );
-
-=cut
-
-sub ArticleTypeLookup {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ArticleType} && !$Param{ArticleTypeID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ArticleType or ArticleTypeID!',
-        );
-        return;
-    }
-
-    # get key
-    my $Key;
-    my $CacheKey;
-    if ( $Param{ArticleType} ) {
-        $Key      = $Param{ArticleType};
-        $CacheKey = 'ArticleTypeLookup::ArticleType::' . $Param{ArticleType};
-    }
-    else {
-        $Key      = $Param{ArticleTypeID};
-        $CacheKey = 'ArticleTypeLookup::ArticleTypeID::' . $Param{ArticleTypeID};
-    }
-
-    # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return $Cache if $Cache;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # get data
-    if ( $Param{ArticleType} ) {
-        return if !$DBObject->Prepare(
-            SQL  => 'SELECT id FROM article_type WHERE name = ?',
-            Bind => [ \$Param{ArticleType} ],
-        );
-    }
-    else {
-        return if !$DBObject->Prepare(
-            SQL  => 'SELECT name FROM article_type WHERE id = ?',
-            Bind => [ \$Param{ArticleTypeID} ],
-        );
-    }
-
-    # store result
-    my $Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Result = $Row[0];
-    }
-
-    # check if data exists
-    if ( !$Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Found no ArticleType(ID) for $Key!",
-        );
-        return;
-    }
-
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Result,
-    );
-
-    # return
-    return $Result;
-}
-
-=item ArticleTypeList()
-
-get a article type list
-
-    my @ArticleTypeList = $TicketObject->ArticleTypeList(
-        Result => 'ARRAY', # optional, ARRAY|HASH
-    );
-
-    # to get only article types visible for customers
-    my @ArticleTypeList = $TicketObject->ArticleTypeList(
-        Result => 'ARRAY',    # optional, ARRAY|HASH
-        Type   => 'Customer', # optional to get only customer viewable article types
-    );
-
-=cut
-
-sub ArticleTypeList {
-    my ( $Self, %Param ) = @_;
-
-    # get needed objects
-    my $DBObject    = $Kernel::OM->Get('Kernel::System::DB');
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
-
-    return if !$DBObject->Prepare(
-        SQL => "SELECT id, name FROM article_type WHERE "
-            . "valid_id IN (${\(join ', ', $ValidObject->ValidIDsGet())})",
-    );
-
-    my @Array;
-    my %Hash;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        if ( $Param{Type} && $Param{Type} eq 'Customer' ) {
-
-            # Skip internal articles.
-            if ( $Row[1] !~ /-int/i ) {
-                push @Array, $Row[1];
-                $Hash{ $Row[0] } = $Row[1];
-            }
-        }
-        else {
-            push @Array, $Row[1];
-            $Hash{ $Row[0] } = $Row[1];
-        }
-    }
-
-    if ( $Param{Result} && $Param{Result} eq 'HASH' ) {
-        return %Hash;
-    }
-
-    return @Array;
-}
-
 =item ArticleLastCustomerArticle()
 
 get last customer article
@@ -1032,11 +891,7 @@ sub ArticleLastCustomerArticle {
     my @Index = $Self->ArticleIndex(
         TicketID   => $Param{TicketID},
         SenderType => 'customer',
-
-        # KIX4OTRS-capeIT
-        ArticleTypeNotLike => '%internal',
-
-        # EO KIX4OTRS-capeIT
+        CustomerVisible => 1,
     );
 
     # get article data
@@ -1059,7 +914,7 @@ sub ArticleLastCustomerArticle {
             Extended      => $Param{Extended},
             DynamicFields => $Param{DynamicFields},
         );
-        if ( $Article{StateType} eq 'merged' || $Article{ArticleType} !~ /-int/ ) {
+        if ( ( $Article{StateType} && $Article{StateType} eq 'merged' ) || $Article{CustomerVisible} ) {
             return %Article;
         }
     }
@@ -1164,23 +1019,19 @@ sub ArticleIndex {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     # db query
-    # KIX4OTRS-capeIT
-    if ( $Param{SenderType} && $Param{ArticleTypeNotLike} ) {
+    if ( $Param{SenderType} && $Param{CustomerVisible} ) {
         return if !$DBObject->Prepare(
             SQL => '
-                    SELECT art.id FROM article art, article_sender_type ast, article_type at
+                    SELECT art.id FROM article art, article_sender_type ast
                     WHERE art.ticket_id = ?
                         AND art.article_sender_type_id = ast.id
-                        AND art.article_type_id = at.id AND ast.name = ?
-                        AND NOT (at.name LIKE ?)
+                        AND ast.name = ?
+                        AND art.customer_visible = 1
                     ORDER BY art.id',
-            Bind => [ \$Param{TicketID}, \$Param{SenderType}, \$Param{ArticleTypeNotLike} ],
+            Bind => [ \$Param{TicketID}, \$Param{SenderType} ],
         );
     }
     elsif ( $Param{SenderType} ) {
-
-        # if ( $Param{SenderType} ) {
-        # EO KIX4OTRS-capeIT
         return if !$DBObject->Prepare(
             SQL => '
                 SELECT art.id FROM article art, article_sender_type ast
@@ -1254,9 +1105,9 @@ only with given article types
     my @ArticleBox = $TicketObject->ArticleContentIndex(
         TicketID    => 123,
         UserID      => 1,
-        ArticleType => [ $ArticleType1, $ArticleType2 ],
+        Channel     => [ $Channel1, $Channel2 ],
         # or
-        ArticleTypeID => [ $ArticleTypeID1, $ArticleTypeID2 ],
+        ChannelID   => [ $ChannelID1, $ChannelID2 ],
     );
 
 Likewise C<ArticleSenderTypeID> allows filtering of only articles with
@@ -1299,12 +1150,13 @@ sub ArticleContentIndex {
 
     my @ArticleBox = $Self->ArticleGet(
         TicketID            => $Param{TicketID},
-        ArticleType         => $Param{ArticleType},
+        Channel             => $Param{Channel},
         UserID              => $Param{UserID},
         DynamicFields       => $Param{DynamicFields},
         Page                => $Param{Page},
         Limit               => $Param{Limit},
-        ArticleTypeID       => $Param{ArticleTypeID},
+        ChannelID           => $Param{ChannelID},
+        CustomerVisible     => $Param{CustomerVisible},
         ArticleSenderTypeID => $Param{ArticleSenderTypeID},
         Order               => $Param{Order},
     );
@@ -1349,8 +1201,8 @@ Article:
     References
     SenderType
     SenderTypeID
-    ArticleType
-    ArticleTypeID
+    Channel
+    ChannelID
     ContentType
     Charset
     MimeType
@@ -1375,9 +1227,9 @@ only requested article types
 
     my @ArticleIndex = $TicketObject->ArticleGet(
         TicketID      => 123,
-        ArticleType   => [ $ArticleType1, $ArticleType2 ],
+        Channel       => [ $Channel1, $Channel2 ],
         # or
-        ArticleTypeID => [ $ArticleTypeID1, $ArticleTypeID2 ],
+        ChannelID     => [ $ChannelID1, $ChannelID2 ],
         UserID        => 123,
     );
 
@@ -1442,30 +1294,30 @@ sub ArticleGet {
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # article type lookup
-    my $ArticleTypeSQL = '';
-    if ( $Param{ArticleType} && ref $Param{ArticleType} eq 'ARRAY' ) {
-        for ( @{ $Param{ArticleType} } ) {
-            if ( $Self->ArticleTypeLookup( ArticleType => $_ ) ) {
-                if ($ArticleTypeSQL) {
-                    $ArticleTypeSQL .= ',';
+    # channel lookup
+    my $ChannelSQL = '';
+    if ( $Param{Channel} && ref $Param{Channel} eq 'ARRAY' ) {
+        for ( @{ $Param{Channel} } ) {
+            if ( $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $_ ) ) {
+                if ($ChannelSQL) {
+                    $ChannelSQL .= ',';
                 }
-                $ArticleTypeSQL .= $DBObject->Quote(
-                    $Self->ArticleTypeLookup( ArticleType => $_ ),
+                $ChannelSQL .= $DBObject->Quote(
+                    $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $_ ),
                     'Integer',
                 );
             }
         }
-        if ($ArticleTypeSQL) {
-            $ArticleTypeSQL = " AND sa.article_type_id IN ($ArticleTypeSQL)";
+        if ($ChannelSQL) {
+            $ChannelSQL = " AND sa.channel_id IN ($ChannelSQL)";
         }
     }
-    my $ArticleTypeIDSQL = '';
-    if ( IsArrayRefWithData( $Param{ArticleTypeID} ) ) {
+    my $ChannelIDSQL = '';
+    if ( IsArrayRefWithData( $Param{ChannelID} ) ) {
         my $QuotedIDs = join ', ',
             map { $DBObject->Quote( $_, 'Integer' ) }
-            @{ $Param{ArticleTypeID} };
-        $ArticleTypeIDSQL = " AND sa.article_type_id IN ($QuotedIDs)";
+            @{ $Param{ChannelID} };
+        $ChannelIDSQL = " AND sa.channel_id IN ($QuotedIDs)";
     }
 
     # sender type lookup
@@ -1517,7 +1369,7 @@ sub ArticleGet {
         SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
             sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
             sa.create_time, sa.a_content_type, sa.create_by, article_sender_type_id,
-            sa.article_type_id, sa.incoming_time, sa.id
+            sa.channel_id, sa.incoming_time, sa.id, sa.change_time, sa.change_by, sa.customer_visible
         FROM article sa
         WHERE ';
 
@@ -1531,11 +1383,11 @@ sub ArticleGet {
     }
 
     # add article types
-    if ($ArticleTypeSQL) {
-        $SQL .= $ArticleTypeSQL;
+    if ($ChannelSQL) {
+        $SQL .= $ChannelSQL;
     }
-    if ($ArticleTypeIDSQL) {
-        $SQL .= $ArticleTypeIDSQL;
+    if ($ChannelIDSQL) {
+        $SQL .= $ChannelIDSQL;
     }
 
     # add sender types
@@ -1589,11 +1441,12 @@ sub ArticleGet {
         $Data{ContentType}      = $Row[12];
         $Data{CreatedBy}        = $Row[13];
         $Data{SenderTypeID}     = $Row[14];
-        $Data{ArticleTypeID}    = $Row[15];
+        $Data{ChannelID}        = $Row[15];
         $Data{IncomingTime}     = $Row[16];
         $Data{ArticleID}        = $Row[17];
         $Data{ChangeTime}       = $Row[18];
         $Data{ChangedBy}        = $Row[19];
+        $Data{CustomerVisible}  = $Row[20];
 
         if ( $Data{ContentType} && $Data{ContentType} =~ /charset=/i ) {
             $Data{Charset} = $Data{ContentType};
@@ -1664,7 +1517,7 @@ sub ArticleGet {
     if ( !@Content ) {
 
         # Log an error only if a specific article was requested and there is no filter active.
-        if ( $Param{ArticleID} && !$ArticleTypeSQL && !$SenderTypeSQL ) {
+        if ( $Param{ArticleID} && !$ChannelSQL && !$SenderTypeSQL ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "No such article for ArticleID ($Param{ArticleID})!",
@@ -1688,8 +1541,8 @@ sub ArticleGet {
         );
 
         # get article type
-        $Part->{ArticleType} = $Self->ArticleTypeLookup(
-            ArticleTypeID => $Part->{ArticleTypeID},
+        $Part->{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+            ID => $Part->{ChannelID},
         );
 
         # add real name lines
@@ -1739,11 +1592,11 @@ sub ArticleGet {
 =item ArticleCount()
 
 Returns the number of articles for a ticket, possibly filtered by
-ArticleSenderTypeID and ArticleTypeID
+ArticleSenderTypeID and ChannelID
 
     my $ArticleCount = $TicketID->ArticleCount(
         TicketID            => 123,
-        ArticleTypeID       => [1, 2], # optional
+        ChannelID           => [1, 2], # optional
         ArticleSenderTypeID => [1, 2], # optional
     );
 
@@ -1767,10 +1620,10 @@ sub ArticleCount {
 
     my $SQL  = 'SELECT COUNT(id) FROM article WHERE ticket_id = ?';
     my @Bind = ( \$Param{TicketID} );
-    if ( IsArrayRefWithData( $Param{ArticleTypeID} ) ) {
-        $SQL .= sprintf ' AND article_type_id IN (%s) ',
-            join ', ', ('?') x @{ $Param{ArticleTypeID} };
-        push @Bind, map { \$_ } @{ $Param{ArticleTypeID} };
+    if ( IsArrayRefWithData( $Param{ChannelID} ) ) {
+        $SQL .= sprintf ' AND channel_id IN (%s) ',
+            join ', ', ('?') x @{ $Param{ChannelID} };
+        push @Bind, map { \$_ } @{ $Param{ChannelID} };
     }
     if ( IsArrayRefWithData( $Param{ArticleSenderTypeID} ) ) {
         $SQL .= sprintf ' AND article_sender_type_id IN (%s) ',
@@ -1825,7 +1678,7 @@ Get the page number of a given article when pagination is active
         TicketID            => 123,
         ArticleID           => 4242,
         RowsPerPage         => 20,
-        ArticleTypeID       => [1, 2], # optional
+        ChannelID           => [1, 2], # optional
         ArticleSenderTypeID => [1],    # optional
         Order               => 'DESC', # optional, 'ASC' or 'DESC'
     );
@@ -1849,7 +1702,7 @@ sub ArticlePage {
         TicketID            => $Param{TicketID},
         UpToArticleID       => $Param{ArticleID},
         ArticleSenderTypeID => $Param{ArticleSenderTypeID},
-        ArticleTypeID       => $Param{ArticleTypeID},
+        ChannelID           => $Param{ChannelID},
         Order               => $Param{Order},
     );
 
@@ -1916,7 +1769,7 @@ sub _ArticleGetId {
 
 update an article
 
-Note: Keys "Body", "Subject", "From", "To", "Cc", "ReplyTo", "ArticleType" and "SenderType" are implemented.
+Note: Keys "Body", "Subject", "From", "To", "Cc", "ReplyTo", "CustomerVisible" and "SenderType" are implemented.
 
     my $Success = $TicketObject->ArticleUpdate(
         ArticleID => 123,
@@ -1928,8 +1781,8 @@ Note: Keys "Body", "Subject", "From", "To", "Cc", "ReplyTo", "ArticleType" and "
 
     my $Success = $TicketObject->ArticleUpdate(
         ArticleID => 123,
-        Key       => 'ArticleType',
-        Value     => 'email-internal',
+        Key       => 'CustomerVisible',
+        Value     => 1,
         UserID    => 123,
         TicketID  => 123,
     );
@@ -1962,14 +1815,6 @@ sub ArticleUpdate {
         return;
     }
 
-    # lookup for ArticleType
-    if ( $Param{Key} eq 'ArticleType' ) {
-        $Param{Key}   = 'ArticleTypeID';
-        $Param{Value} = $Self->ArticleTypeLookup(
-            ArticleType => $Param{Value},
-        );
-    }
-
     # lookup for SenderType
     if ( $Param{Key} eq 'SenderType' ) {
         $Param{Key}   = 'SenderTypeID';
@@ -1986,7 +1831,7 @@ sub ArticleUpdate {
         ReplyTo       => 'a_reply_to',
         To            => 'a_to',
         Cc            => 'a_cc',
-        ArticleTypeID => 'article_type_id',
+        CustomerVisible => 'customer_visible',
         SenderTypeID  => 'article_sender_type_id',
     );
 
@@ -2018,7 +1863,7 @@ send article via email and create article with attachments
 
     my $ArticleID = $TicketObject->ArticleSend(
         TicketID    => 123,
-        ArticleType => 'note-internal',                                        # email-external|email-internal|phone|fax|...
+        Channel     => 'email',                                                # ...
         SenderType  => 'agent',                                                # agent|system|customer
         From        => 'Some Agent <email@example.com>',                       # not required but useful
         To          => 'Some Customer A <customer-a@example.com>',             # not required but useful
@@ -2086,10 +1931,10 @@ sub ArticleSend {
         }
     }
 
-    if ( !$Param{ArticleType} && !$Param{ArticleTypeID} ) {
+    if ( !$Param{Channel} && !$Param{ChannelID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need ArticleType or ArticleTypeID!',
+            Message  => 'Need Channel or ChannelID!',
         );
         return;
     }
@@ -2266,7 +2111,7 @@ send an auto response to a customer via email
             Subject => 'For the message!',
         },
         UserID          => 123,
-        ArticleType     => 'email-internal'  # optional
+        Channel         => 'email'  # optional
     );
 
 Events:
@@ -2449,11 +2294,11 @@ sub SendAutoResponse {
             User => $Ticket{CustomerUserID},
         );
 
-        $Param{ArticleType} //= '';
+        $Param{Channel} //= '';
         if (
             $CustomerUser{UserEmail}
             && $OrigHeader{From} !~ /\Q$CustomerUser{UserEmail}\E/i
-            && $Param{ArticleType} ne 'email-internal'
+            && $Param{Channel} ne 'email'
             )
         {
             $Cc = $CustomerUser{UserEmail};
@@ -2489,7 +2334,7 @@ sub SendAutoResponse {
 
     # send email
     my $ArticleID = $Self->ArticleSend(
-        ArticleType    => 'email-external',
+        Channel        => 'email',
         SenderType     => 'system',
         TicketID       => $Param{TicketID},
         HistoryType    => $HistoryType,

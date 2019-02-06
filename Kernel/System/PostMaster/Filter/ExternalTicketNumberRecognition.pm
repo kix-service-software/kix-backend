@@ -36,7 +36,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # checking mandatory configuration options
-    for my $Option (qw(NumberRegExp DynamicFieldName SenderType ArticleType)) {
+    for my $Option (qw(NumberRegExp DynamicFieldName SenderType Channel)) {
         if ( !defined $Param{JobConfig}->{$Option} && !$Param{JobConfig}->{$Option} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -211,13 +211,14 @@ sub Run {
 #rbo - T2016121190001552 - renamed X-OTRS headers
         # set sender type and article type.
         $Param{GetParam}->{'X-KIX-FollowUp-SenderType'}  = $Param{JobConfig}->{SenderType};
-        $Param{GetParam}->{'X-KIX-FollowUp-ArticleType'} = $Param{JobConfig}->{ArticleType};
+        $Param{GetParam}->{'X-KIX-FollowUp-Channel'} = $Param{JobConfig}->{Channel};
+        $Param{GetParam}->{'X-KIX-FollowUp-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer};
 
         # also set these parameters. It could be that the follow up is rejected by Reject.pm
         #   (follow-ups not allowed), but the original article will still be attached to the ticket.
         $Param{GetParam}->{'X-KIX-SenderType'}  = $Param{JobConfig}->{SenderType};
-        $Param{GetParam}->{'X-KIX-ArticleType'} = $Param{JobConfig}->{ArticleType};
-
+        $Param{GetParam}->{'X-KIX-Channel'} = $Param{JobConfig}->{Channel};
+        $Param{GetParam}->{'X-KIX-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer};
     }
     else {
         if ( $Self->{Debug} >= 1 ) {
@@ -234,7 +235,8 @@ sub Run {
 
         # set sender type and article type
         $Param{GetParam}->{'X-KIX-SenderType'}  = $Param{JobConfig}->{SenderType};
-        $Param{GetParam}->{'X-KIX-ArticleType'} = $Param{JobConfig}->{ArticleType};
+        $Param{GetParam}->{'X-KIX-Channel'} = $Param{JobConfig}->{Channel};
+        $Param{GetParam}->{'X-KIX-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer};
     }
 
     return 1;

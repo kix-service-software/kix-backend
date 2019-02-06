@@ -56,6 +56,7 @@ my $CustomerUserLogin = $Kernel::OM->Get('Kernel::System::CustomerUser')->Custom
     UserFirstname  => $RandomName,
     UserLastname   => $RandomName,
     UserCustomerID => $RandomName,
+    UserCustomerIDs => $RandomName,
     UserLogin      => $RandomName,
     UserEmail      => $RandomName . '@example.com',
     ValidID        => 1,

@@ -101,6 +101,7 @@ Run all tests located in scripts/test/*.t and print result to stdout.
 
     $UnitTestObject->Run(
         Name                   => 'JSON:User:Auth',  # optional, control which tests to select
+        Exclude                => '(Cache|Auth)',    # optional, which tests should not be executed
         Directory              => 'Selenium',        # optional, control which tests to select
         SubmitURL              => $URL,              # optional, send results to unit test result server
         SubmitResultAsExitCode => $URL,              # optional, specify if exit code should not indicate if
@@ -158,6 +159,10 @@ sub Run {
                 next FILE;
             }
         }
+
+        # check if we have to exclude something
+        next FILE if ($Param{Exclude} && $File =~ /$Param{Exclude}/);
+
         $Self->{TestCount} = 0;
         my $UnitTestFile = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $File );
         if ( !$UnitTestFile ) {

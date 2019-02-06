@@ -99,7 +99,8 @@ $Self->True(
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'webrequest',
+    Channel        => 'note',
+    CustomerVisible => 1,
     SenderType     => 'customer',
     From           => $CustomerUserData{UserEmail},
     To             => $UserData{UserEmail},
@@ -183,8 +184,8 @@ my %Article = $TicketObject->ArticleGet(
 );
 
 $Self->Is(
-    $Article{ArticleType},
-    'email-notification-ext',
+    $Article{Channel}.'-'.$Article{CustomerVisible},
+    'email-1',
     'ArticleGet() should return external notification',
 );
 

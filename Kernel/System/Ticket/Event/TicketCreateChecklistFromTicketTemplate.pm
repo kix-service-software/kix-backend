@@ -67,8 +67,7 @@ sub Run {
 
         # get checklist config
         my $KIXSidebarChecklistConfig
-            = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')
-            ;
+            = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist');
 
         my %TicketTemplateData = $Self->{TicketObject}->TicketTemplateGet(
             ID => $Param{DefaultSet}
@@ -77,7 +76,7 @@ sub Run {
 
         # insert checklist data for this ticket id
         if ( defined $KIXSidebarChecklistStrg && $KIXSidebarChecklistStrg ) {
-            foreach my $Item (split(/\n/, KIXSidebarChecklistStrg)) {
+            foreach my $Item (split(/\n/, $KIXSidebarChecklistStrg)) {
                 my $ItemID = $Self->{TicketObject}->TicketChecklistItemAdd(
                     TicketID => $Param{TicketID},
                     Text     => $Item,

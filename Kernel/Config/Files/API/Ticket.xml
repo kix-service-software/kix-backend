@@ -164,10 +164,10 @@
             <String Regex="">%%</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleCreate###ArticleType" Required="1" Valid="1">
+    <ConfigItem Name="API::Operation::V1::ArticleCreate###Channel" Required="1" Valid="1">
         <Description Translatable="1">Defines the default type of the article for this operation.</Description>
         <Setting>
-            <String Regex="">note-internal</String>
+            <String Regex="">note</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::V1::ArticleCreate###AutoResponseType" Required="1" Valid="1">

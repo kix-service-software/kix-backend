@@ -81,8 +81,8 @@ sub Run {
         Attachment     => \@Attachments,
         To             => scalar $Param{New}->{'TargetAddress'},
         From           => "$FromQueue{RealName} <$FromQueue{Email}>",
-        ArticleType    => 'email-internal',
-        ArticleTypeID  => undef,                                        # overwrite from %Article
+        Channel        => 'email',
+        ChannelID      => undef,                                        # overwrite from %Article
         SenderType     => 'system',
         SenderTypeID   => undef,                                        # overwrite from %Article
         HistoryType    => 'Forward',

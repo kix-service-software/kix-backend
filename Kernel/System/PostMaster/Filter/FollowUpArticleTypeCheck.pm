@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck;
+package Kernel::System::PostMaster::Filter::FollowUpChannelCheck;
 
 use strict;
 use warnings;
@@ -104,8 +104,8 @@ sub Run {
         # just check agent sent article
         next ARTICLE if $Article->{SenderType} ne 'agent';
 
-        # just check email-internal
-        next ARTICLE if $Article->{ArticleType} ne 'email-internal';
+        # just check email internal
+        next ARTICLE if $Article->{Channel} ne 'email' || !$Article->{CustomerVisible};
 
         # check recipients
         next ARTICLE if !$Article->{To};
@@ -147,7 +147,8 @@ sub Run {
 
 #rbo - T2016121190001552 - renamed X-OTRS headers
     # get latest customer article (current arrival)
-    $Param{GetParam}->{'X-KIX-FollowUp-ArticleType'} = $Param{JobConfig}->{ArticleType} || 'email-internal';
+    $Param{GetParam}->{'X-KIX-FollowUp-Channel'} = $Param{JobConfig}->{Channel} || 'email';
+    $Param{GetParam}->{'X-KIX-FollowUp-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer} || 'email';
 
     # set article type to email-internal
     $Param{GetParam}->{'X-KIX-FollowUp-SenderType'} = $Param{JobConfig}->{SenderType} || 'customer';

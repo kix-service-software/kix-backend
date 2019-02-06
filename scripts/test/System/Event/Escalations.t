@@ -362,7 +362,7 @@ for my $Hours ( sort keys %WorkingHours ) {
         # first response
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID       => $TicketID,
-            ArticleType    => 'phone',
+            Channel        => 'phone-outbound',
             SenderType     => 'agent',
             From           => 'Agent Some Agent Some Agent <email@example.com>',
             To             => 'Customer A <customer-a@example.com>',
@@ -429,7 +429,7 @@ for my $Hours ( sort keys %WorkingHours ) {
         # a note internal does not make the update time escalation go away
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID       => $TicketID,
-            ArticleType    => 'note-internal',
+            Channel        => 'note',
             SenderType     => 'agent',
             From           => 'Agent Some Agent Some Agent <email@example.com>',
             To             => 'Customer A <customer-a@example.com>',

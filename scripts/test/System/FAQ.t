@@ -28,8 +28,8 @@ my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 my $FAQID = $FAQObject->FAQAdd(
     Title       => 'Some Text',
     CategoryID  => 1,
-    StateID     => 1,
-    LanguageID  => 1,
+    Visibility  => 'internal',
+    Language    => 'en',
     Keywords    => 'some keywords',
     Field1      => 'Problem...',
     Field2      => 'Solution...',
@@ -51,8 +51,8 @@ my %FAQ = $FAQObject->FAQGet(
 my %FAQTest = (
     Title       => 'Some Text',
     CategoryID  => 1,
-    StateID     => 1,
-    LanguageID  => 1,
+    Visibility  => 'internal',
+    Language    => 'en',
     Keywords    => 'some keywords',
     Field1      => 'Problem...',
     Field2      => 'Solution...',
@@ -70,8 +70,8 @@ for my $Test ( sort keys %FAQTest ) {
 my $FAQUpdate = $FAQObject->FAQUpdate(
     ItemID      => $FAQID,
     CategoryID  => 1,
-    StateID     => 2,
-    LanguageID  => 2,
+    Visibility  => 'external',
+    Language    => 'de',
     Approved    => 1,
     Title       => 'Some Text2',
     Keywords    => 'some keywords2',
@@ -90,8 +90,8 @@ my $FAQUpdate = $FAQObject->FAQUpdate(
 %FAQTest = (
     Title       => 'Some Text2',
     CategoryID  => 1,
-    StateID     => 2,
-    LanguageID  => 2,
+    Visibility  => 'external',
+    Language    => 'de',
     Keywords    => 'some keywords2',
     Field1      => 'Problem...2',
     Field2      => 'Solution found...2',
@@ -136,8 +136,8 @@ $Self->Is(
 
 my $FAQID2 = $FAQObject->FAQAdd(
     Title       => 'Title',
-    CategoryID  => 1,
-    StateID     => 1,
+    Visibility  => 'internal',
+    Language    => 'en',
     LanguageID  => 1,
     Keywords    => '',
     Field1      => 'Problem Description 1...',
@@ -168,7 +168,7 @@ my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
 for my $AttachmentTest (@AttachmentTests) {
     my $ContentSCALARRef = $MainObject->FileRead(
-        Location => $Home . '/scripts/test/sample/' . $AttachmentTest->{File},
+        Location => $Home . '/scripts/test/System/sample/' . $AttachmentTest->{File},
     );
     my $Add = $FAQObject->AttachmentAdd(
         ItemID      => $FAQID2,
@@ -777,8 +777,8 @@ $Self->Is(
 my $FAQItemID1 = $FAQObject->FAQAdd(
     Title       => 'Some Text',
     CategoryID  => 1,
-    StateID     => 1,
-    LanguageID  => 1,
+    Visibility  => 'internal'
+    Language    => 'en',
     Field1      => 'Symptom...',    # (optional)
     ValidID     => 1,
     ContentType => 'text/plain',    # or 'text/html'

@@ -129,15 +129,10 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    my $ArticleTypes;
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $ArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
-    }
-
     my @ArticleIndex = $TicketObject->ArticleIndex(
-        TicketID   => $Param{Data}->{TicketID},
-        SenderType => $ArticleTypes,
-        UserID     => $Self->{Authorization}->{UserID},
+        TicketID        => $Param{Data}->{TicketID},
+        CustomerVisible => $Self->{Authorization}->{UserType} eq 'Customer' ? 1 : 0,
+        UserID          => $Self->{Authorization}->{UserID},
     );
 
     if ( @ArticleIndex ) {

@@ -166,7 +166,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: phone
+            Channel: note
           DefaultValue: ''
           DescriptionLong: Insert RMA Information
           DescriptionShort: Insert RMA Information
@@ -261,7 +261,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: note-internal
+            Channel: note
           DefaultValue: ''
           DescriptionLong: insert repair information
           DescriptionShort: repair information
@@ -287,7 +287,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: note-internal
+            Channel: note
           DefaultValue: ''
           DescriptionLong: needed spare parts
           DescriptionShort: needed spare parts
@@ -341,7 +341,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: note-internal
+            Channel: note
           DefaultValue: ''
           DescriptionLong: ''
           DescriptionShort: ''
@@ -572,7 +572,8 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: note-external
+            Channel: note
+            CustomerVisible: 1
           DefaultValue: ''
           DescriptionLong: ''
           DescriptionShort: ''
@@ -700,7 +701,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: note-internal
+            Channel: note
           DefaultValue: ''
           DescriptionLong: please insert spare parts
           DescriptionShort: spare parts

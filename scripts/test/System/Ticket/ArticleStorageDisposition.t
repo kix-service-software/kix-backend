@@ -439,7 +439,7 @@ for my $Backend (qw(DB FS)) {
         # create an article
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID       => $TicketID,
-            ArticleType    => 'note-internal',
+            Channels       => 'note',
             SenderType     => 'agent',
             From           => 'Some Agent <email@example.com>',
             To             => 'Some Customer <customer-a@example.com>',

@@ -1394,15 +1394,12 @@ sub _TicketGetFirstResponse {
 
     # KIX4OTRS-capeIT
     my $SQL =
-        'SELECT a.create_time, a.id FROM article a, article_sender_type ast, article_type art'
-        . ' WHERE a.article_sender_type_id = ast.id AND a.article_type_id = art.id AND'
+        'SELECT a.create_time, a.id FROM article a, article_sender_type ast'
+        . ' WHERE a.article_sender_type_id = ast.id AND a.customer_visible = 1 AND'
         . ' a.ticket_id = ? AND ( ';
 
     my $SQL1 =
-        '( ast.name = \'agent\' AND'
-        . ' (art.name LIKE \'email-ext%\' OR art.name LIKE \'note-ext%\' '
-        . ' OR art.name = \'phone\' OR art.name = \'fax\' OR art.name = \'sms\')'
-        . ')';
+        '( ast.name = \'agent\' )';
 
     my $SQL2 = ') ORDER BY a.create_time';
 
@@ -1430,7 +1427,7 @@ sub _TicketGetFirstResponse {
         )
         )
     {
-        $SQL1 .= ' OR ( ast.name = \'customer\' AND art.name = \'phone\')';
+        $SQL1 .= ' OR ( ast.name = \'customer\' AND a.customer_visible = 1)';
     }
 
     # response time set by auto reply
@@ -1457,7 +1454,7 @@ sub _TicketGetFirstResponse {
         )
         )
     {
-        $SQL1 .= ' OR ( ast.name = \'system\' AND art.name LIKE \'email%-ext%\')';
+        $SQL1 .= ' OR ( ast.name = \'system\' AND a.customer_visible = 1 )';
     }
 
     $SQL .= $SQL1 . $SQL2;
@@ -2999,14 +2996,14 @@ sub TicketEscalationIndexBuild {
         # check if update escalation should be set
         my @SenderHistory;
         return if !$DBObject->Prepare(
-            SQL => 'SELECT article_sender_type_id, article_type_id, create_time FROM '
+            SQL => 'SELECT article_sender_type_id, channel_id, create_time FROM '
                 . 'article WHERE ticket_id = ? ORDER BY create_time ASC',
             Bind => [ \$Param{TicketID} ],
         );
         while ( my @Row = $DBObject->FetchrowArray() ) {
             push @SenderHistory, {
                 SenderTypeID  => $Row[0],
-                ArticleTypeID => $Row[1],
+                ChannelID     => $Row[1],
                 Created       => $Row[2],
             };
         }
@@ -3019,9 +3016,9 @@ sub TicketEscalationIndexBuild {
                 SenderTypeID => $Row->{SenderTypeID},
             );
 
-            # get article type
-            $Row->{ArticleType} = $Self->ArticleTypeLookup(
-                ArticleTypeID => $Row->{ArticleTypeID},
+            # get channel
+            $Row->{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+                ChannelID => $Row->{ChannelID},
             );
         }
 
@@ -3039,8 +3036,8 @@ sub TicketEscalationIndexBuild {
             # do not use locked tickets for calculation
             #last ROW if $Ticket{Lock} eq 'lock';
 
-            # do not use internal article types for calculation
-            next ROW if $Row->{ArticleType} =~ /-int/i;
+            # do not use internal articles for calculation
+            next ROW if !$Row->{CustomerVisible};
 
             # only use 'agent' and 'customer' sender types for calculation
             next ROW if $Row->{SenderType} !~ /^(agent|customer)$/;
@@ -6424,7 +6421,7 @@ sub TicketMerge {
     $Self->ArticleCreate(
         TicketID       => $Param{MergeTicketID},
         SenderType     => 'agent',
-        ArticleType    => 'note-external',
+        Channel        => 'note',
         ContentType    => "text/plain; charset=ascii",
         UserID         => $Param{UserID},
         HistoryType    => 'AddNote',

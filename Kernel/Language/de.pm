@@ -1806,7 +1806,6 @@ sub Data {
         'Available Fields' => 'Verfügbare Felder',
         'Name: %s' => 'Name: %s',
         'Assigned Fields' => 'Zugewiesene Felder',
-        'ArticleType' => 'Artikeltyp',
         'Display' => 'Anzeige',
         'Edit Field Details' => 'Feld-Details bearbeiten',
         'Customer interface does not support internal article types.' => 'Die Kundenoberfläche unterstützt keine internen Artikeltypen.',

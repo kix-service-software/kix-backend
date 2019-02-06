@@ -67,6 +67,7 @@ my $CustomerUserID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerU
     UserFirstname  => 'John',
     UserLastname   => 'Doe',
     UserCustomerID => "Customer#$RandomID",
+    UserCustomerIDs => "Customer#$RandomID",
     UserLogin      => "CustomerLogin#$RandomID",
     UserEmail      => "customer$RandomID\@example.com",
     UserPassword   => 'some_pass',
@@ -227,7 +228,7 @@ $Self->IsNot(
 
 my $ArticleID1 = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'email-internal',
+    Channel        => 'email',
     SenderType     => 'agent',
     From           => 'Some Agent <otrs@example.com>',
     To             => 'Suplier<suplier@example.com>',
@@ -253,7 +254,7 @@ $Self->True(
 
 my $ArticleID2 = $TicketObject->ArticleCreate(
     TicketID         => $TicketID,
-    ArticleType      => 'email-internal',
+    Channel          => 'email',
     SenderType       => 'customer',
     From             => 'Suplier<suplier@example.com>',
     To               => 'Some Agent <otrs@example.com>',

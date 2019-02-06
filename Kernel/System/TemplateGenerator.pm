@@ -853,7 +853,7 @@ sub NotificationEvent {
         $Notification{$Attribute} = $Notification{Message}->{$Language}->{$Attribute};
     }
 
-    for my $Key (qw(From To Cc Subject Body ContentType ArticleType)) {
+    for my $Key (qw(From To Cc Subject Body ContentType Channel)) {
         if ( !$Param{CustomerMessageParams}->{$Key} ) {
             $Param{CustomerMessageParams}->{$Key} = $Article{$Key} || '';
         }
@@ -1491,7 +1491,7 @@ sub _Replace {
             if ( $Data{'ContentType'} && $Data{'ContentType'} =~ /application\/json/ ) {
 
                 # if article is chat related
-                if ( $Data{'ArticleType'} =~ /chat/ ) {
+                if ( $Data{'Channel'} =~ /chat/ ) {
 
                     # remove spaces
                     $Data{Body} =~ s/\n/ /gms;

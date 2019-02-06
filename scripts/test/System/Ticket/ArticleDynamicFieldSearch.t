@@ -144,7 +144,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketIDs[0],
-        ArticleType    => 'note-internal',
+        Channels       => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',
@@ -173,7 +173,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
 
     $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketIDs[0],
-        ArticleType    => 'note-internal',
+        Channels       => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',
@@ -202,7 +202,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
 
     $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketIDs[1],
-        ArticleType    => 'note-internal',
+        Channels       => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',
@@ -231,7 +231,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
 
     $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketIDs[1],
-        ArticleType    => 'note-internal',
+        Channels       => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',

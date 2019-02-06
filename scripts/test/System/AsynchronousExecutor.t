@@ -104,7 +104,7 @@ for my $Seconds ( 1 .. $SleepTime ) {
 
 # get needed objects
 my $AsynchronousExecutorObject
-    = $Kernel::OM->Get('scripts::test::sample::AsynchronousExecutor::TestAsynchronousExecutor');
+    = $Kernel::OM->Get('scripts::test::System::sample::AsynchronousExecutor::TestAsynchronousExecutor');
 
 my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 

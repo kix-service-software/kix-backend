@@ -125,8 +125,8 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 Charset                         => 'some charset',           
 
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
-                ArticleTypeID                   => 123,                        # optional
-                ArticleType                     => 'some article type name',   # optional
+                ChannelID                       => 123,                        # optional
+                Channel                         => 'some channel name',        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 AutoResponseType                => 'some auto response type',  # optional
@@ -210,15 +210,15 @@ sub Run {
     # isolate Article parameter
     my $Article = $Param{Data}->{Article};
 
-    # add UserType to Validate ArticleType
+    # add UserType
     $Article->{UserType} = $Self->{Authorization}->{UserType};
 
     # set defaults from operation config
     if ( !$Article->{AutoResponseType} ) {
         $Article->{AutoResponseType} = $Self->{Config}->{AutoResponseType} || '';
     }
-    if ( !$Article->{ArticleTypeID} && !$Article->{ArticleType} ) {
-        $Article->{ArticleType} = $Self->{Config}->{ArticleType} || '';
+    if ( !$Article->{ChannelID} && !$Article->{Channel} ) {
+        $Article->{Channel} = $Self->{Config}->{Channel} || '';
     }
     if ( !$Article->{SenderTypeID} && !$Article->{SenderType} ) {
         $Article->{SenderType} = lc($Self->{Authorization}->{UserType});
@@ -370,8 +370,8 @@ sub _ArticleCreate {
     my $ArticleID = $TicketObject->ArticleCreate(
         NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
         TicketID       => $Ticket->{TicketID},
-        ArticleTypeID  => $Article->{ArticleTypeID}  || '',
-        ArticleType    => $Article->{ArticleType}    || '',
+        ChannelID      => $Article->{ChannelID}      || '',
+        Channel        => $Article->{Channel}        || '',
         SenderTypeID   => $Article->{SenderTypeID}   || '',
         SenderType     => $Article->{SenderType}     || '',
         From           => $From,

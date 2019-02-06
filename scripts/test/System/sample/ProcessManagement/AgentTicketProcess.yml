@@ -43,7 +43,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: phone
+            Channel: note
           DefaultValue: ''
           DescriptionLong: ''
           DescriptionShort: ''
@@ -75,7 +75,7 @@ ActivityDialogs:
       Fields:
         Article:
           Config:
-            ArticleType: note-internal
+            Channel: note
           DefaultValue: ''
           DescriptionLong: ''
           DescriptionShort: ''

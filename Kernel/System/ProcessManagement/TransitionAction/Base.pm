@@ -68,10 +68,10 @@ sub ReplaceExtended {
 
     # Extension Placeholder
     # additionel Placeholder KIX_LAST_...
-    # PriorityID, To, ArticleType, AgeTimeUnix, Body, MimeType, InReplyTo, TicketNumber,
+    # PriorityID, To, Channel, AgeTimeUnix, Body, MimeType, InReplyTo, TicketNumber,
     # SenderTypeID, ContentCharset, ResponsibleID, ReplyTo, EscalationSolutionTime,
     # SLA, EscalationUpdateTime, CreateTimeUnix, EscalationResponseTime, UntilTime,
-    # ArticleTypeID, ServiceID, FromRealname, From, Changed, MessageID, State,
+    # ChannelID, ServiceID, FromRealname, From, Changed, MessageID, State,
     # References, TypeID, Subject, ContentType, SenderType, QueueID, Title,
     # Responsible, LockID, Age, Owner, TicketID, Priority, Created, Lock, Queue,
     # CustomerUserID, CreatedBy, StateType, OwnerID, Service, ArticleID, Cc,

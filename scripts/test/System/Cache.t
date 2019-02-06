@@ -72,6 +72,16 @@ for my $ModuleFile (@BackendModuleFiles) {
             CacheInMemory => 0,
         );
 
+        # initiate mock memcached server
+        if ( $Module eq 'Memcached' ) {
+            my $MockObject = $Kernel::OM->Get('Kernel::System::UnitTest::MemcachedMock');
+            $CacheObject->{CacheObject}->{MemcachedObject} = $MockObject;
+        }
+        elsif ( $Module eq 'Redis' ) {
+            my $MockObject = $Kernel::OM->Get('Kernel::System::UnitTest::RedisMock');
+            $CacheObject->{CacheObject}->{RedisObject} = $MockObject;
+        }
+
         # set fixed time
         if ( $FixedTimeCompatibleBackends{$Module} ) {
             $Helper->FixedTimeSet();

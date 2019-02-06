@@ -11,14 +11,7 @@ package Kernel::System::Translation;
 use strict;
 use warnings;
 
-use Cwd;
-use File::Basename;
-use File::Find;
-use FindBin qw($Bin);
-use XML::Simple qw(:strict);
-
 use Kernel::System::VariableCheck qw(:all);
-use Kernel::System::Main;
 
 our @ObjectDependencies = (
     'Kernel::Config',

@@ -43,10 +43,10 @@ $Self->True(
 
 my @ArticleIDs;
 
-my %ArticleTypes = $TicketObject->ArticleTypeList(
+my %Channels = $Kernel::OM->Get('Kernel::System::Channel')->ChannelList(
     Result => 'HASH',
 );
-my @ArticleTypeIDs     = ( sort keys %ArticleTypes )[ 0 .. 4 ];
+my @ChannelIDs         = sort keys %Channels;
 my %ArticleSenderTypes = $TicketObject->ArticleSenderTypeList(
     Result => 'HASH',
 );
@@ -55,7 +55,7 @@ my @SenderTypeIDs = ( sort keys %ArticleSenderTypes )[ 0 .. 1 ];
 for my $Number ( 1 .. 15 ) {
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID       => $TicketID,
-        ArticleTypeID  => $ArticleTypeIDs[ $Number % 5 ],
+        ChannelID      => $ChannelIDs[ $Number % 2 ],
         SenderTypeID   => $SenderTypeIDs[ $Number % 2 ],
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',
@@ -144,22 +144,22 @@ $Self->Is(
     TicketID          => $TicketID,
     DynamicFieldields => 0,
     UserID            => 1,
-    ArticleTypeID     => [ @ArticleTypeIDs[ 0, 1 ] ],
+    ChannelID     => [ @ChannelIDs[ 0, 1 ] ],
 );
 
 $Self->Is(
     scalar(@ArticleBox),
     6,
-    'Filtering by ArticleTypeID',
+    'Filtering by ChannelID',
 );
 
 $Self->Is(
     $TicketObject->ArticleCount(
-        TicketID      => $TicketID,
-        ArticleTypeID => [ @ArticleTypeIDs[ 0, 1 ] ],
+        TicketID  => $TicketID,
+        ChannelID => [ @ChannelIDs[ 0, 1 ] ],
     ),
     6,
-    'ArticleCount is consistent with ArticleContentIndex (ArticleTypeID)',
+    'ArticleCount is consistent with ArticleContentIndex (ChannelID)',
 );
 
 @ArticleBox = $TicketObject->ArticleContentIndex(
@@ -182,32 +182,6 @@ $Self->Is(
     ),
     7,
     'ArticleCount is consistent with ArticleContentIndex (ArticleSenderTypeID)',
-);
-
-@ArticleBox = $TicketObject->ArticleContentIndex(
-    TicketID            => $TicketID,
-    DynamicFieldields   => 0,
-    UserID              => 1,
-    ArticleSenderTypeID => [ $SenderTypeIDs[0] ],
-    Limit               => 4,
-    Page                => 2,
-);
-
-$Self->Is(
-    scalar(@ArticleBox),
-    3,
-    'Filtering by ArticleSenderTypeID plus pagination',
-);
-
-$Self->Is(
-    $TicketObject->ArticlePage(
-        TicketID      => $TicketID,
-        ArticleID     => $ArticleIDs[13],
-        ArticleTypeID => [ $ArticleTypeIDs[ 13 % 5 ] ],
-        RowsPerPage   => 2,
-    ),
-    2,
-    'ArticlePage with filtering by ArticleTypeID',
 );
 
 # cleanup is done by RestoreDatabase.

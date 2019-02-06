@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableCreate Name="channel">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+        <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+        <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+        <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Unique Name="channel_channel_name">
+            <UniqueColumn Name="name"/>
+        </Unique>
+        <ForeignKey ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+    <TableAlter Name="article">
+        <ColumnAdd Name="channel_id" Required="true" Type="SMALLINT" />
+        <ColumnAdd Name="customer_visible" Required="false" Type="SMALLINT"/>
+        <ColumnDrop Name="article_type_id"/>
+        <IndexCreate Name="article_channel_id">
+            <IndexColumn Name="channel_id"/>
+        </IndexCreate>
+        <IndexDrop Name="article_article_type_id"/>
+        <ForeignKeyCreate ForeignTable="channel">
+            <Reference Local="channel_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+    <TableAlter Name="article_search">
+        <ColumnAdd Name="channel_id" Required="true" Type="SMALLINT" />
+        <ColumnAdd Name="customer_visible" Required="false" Type="SMALLINT"/>
+        <ColumnDrop Name="article_type_id"/>
+        <IndexCreate Name="article_search_channel_id">
+            <IndexColumn Name="channel_id"/>
+        </IndexCreate>
+        <IndexDrop Name="article_search_article_type_id"/>
+        <ForeignKeyCreate ForeignTable="channel">
+            <Reference Local="channel_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+    <TableDrop Name="article_type"/>
+
+</database>
