@@ -28,7 +28,6 @@
         <IndexCreate Name="article_channel_id">
             <IndexColumn Name="channel_id"/>
         </IndexCreate>
-        <IndexDrop Name="article_article_type_id"/>
         <ForeignKeyCreate ForeignTable="channel">
             <Reference Local="channel_id" Foreign="id"/>
         </ForeignKeyCreate>
@@ -40,7 +39,6 @@
         <IndexCreate Name="article_search_channel_id">
             <IndexColumn Name="channel_id"/>
         </IndexCreate>
-        <IndexDrop Name="article_search_article_type_id"/>
         <ForeignKeyCreate ForeignTable="channel">
             <Reference Local="channel_id" Foreign="id"/>
         </ForeignKeyCreate>
