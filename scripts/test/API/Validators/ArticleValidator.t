@@ -57,7 +57,7 @@ $Self->True(
 
 my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
     TicketID        => $TicketID,
-    ArticleTypeID   => 1,
+    ChannelID       => 1,
     SenderTypeID    => 1,
     MimeType        => 'text/plain',
     Charset         => 'utf8',

@@ -1333,15 +1333,13 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ExternalSupplierForwarding::RelevantFwdArticleTypes" Required="0" Valid="1">
-        <Description Translatable="1">Defines article types which are forwarded if added to tickets in Fwd-Queues (note-report will NOT be considered!).</Description>
+    <ConfigItem Name="ExternalSupplierForwarding::RelevantFwdChannels" Required="0" Valid="1">
+        <Description Translatable="1">Defines channel which are forwarded if added to tickets in Fwd-Queues (note-report will NOT be considered!).</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
             <Array>
-                <Item>note-supplier-external</Item>
-                <Item>note-supplier-internal</Item>
-                <Item>phone</Item>
+                <Item>note</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -1363,12 +1361,23 @@
             <String Regex=""></String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ExternalSupplierForwarding::ArticleType" Required="1" Valid="1">
-        <Description Translatable="1">Defines article type for generated message. Do not use article types which trigger an external supplier forwarding itself.</Description>
+    <ConfigItem Name="ExternalSupplierForwarding::Channel" Required="1" Valid="1">
+        <Description Translatable="1">Defines the channel for generated message.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
-            <String Regex="">email-internal</String>
+            <String Regex="">email</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="ExternalSupplierForwarding::VisibleForCustomer" Required="1" Valid="1">
+        <Description Translatable="1">Defines if the generated message should be visible for the customer.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ExternalSupplierForwarding::CustomerUserAttrBlacklist" Required="0" Valid="1">
@@ -2763,20 +2772,6 @@
             <String Regex="">RelevantTo</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TicketAutoLinkConfigItem::ArticleTypesCISearchPattern" Required="0" Valid="1">
-        <Description Lang="en">Defines article types which are considered.</Description>
-        <Description Lang="de">Definiert Artikeltypen, die betrachtet werden.</Description>
-        <Group>Framework</Group>
-        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
-        <Setting>
-            <Array>
-                <Item>email-external</Item>
-                <Item>note-internal</Item>
-                <Item>note-external</Item>
-                <Item>note-report</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchInClassesPerRecipient" Required="0" Valid="1">
         <Description Lang="en">Restricts CI-classes which are searched for certain article to-address (comma separated).</Description>
         <Description Lang="de">Schraenkt zu durchsuchende CI-Klassen nach Artikelempfaenger ein (To-Adresse, komma-getrennt).</Description>
@@ -3683,13 +3678,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3727,13 +3722,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3771,13 +3766,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3815,13 +3810,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3859,13 +3854,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3903,13 +3898,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3947,13 +3942,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -3991,13 +3986,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4035,13 +4030,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4079,13 +4074,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4123,13 +4118,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4167,13 +4162,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4211,13 +4206,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4255,13 +4250,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -4299,13 +4294,13 @@
                 <Item Key="DynamicFieldState">SysMonXState</Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
-                <Item Key="OTRSCreateTicketType">Incident</Item>
-                <Item Key="OTRSCreateTicketQueue"></Item>
-                <Item Key="OTRSCreateTicketState"></Item>
-                <Item Key="OTRSCreateTicketService"></Item>
-                <Item Key="OTRSCreateTicketSLA"></Item>
-                <Item Key="OTRSCreateSenderType">system</Item>
-                <Item Key="OTRSCreateArticleType">note-report</Item>
+                <Item Key="CreateTicketType">Incident</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketState"></Item>
+                <Item Key="CreateTicketService"></Item>
+                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateSenderType">system</Item>
+                <Item Key="CreateChannel">note-report</Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>

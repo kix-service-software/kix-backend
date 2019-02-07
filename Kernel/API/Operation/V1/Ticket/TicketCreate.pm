@@ -142,8 +142,8 @@ perform TicketCreate Operation. This will return the created TicketID.
                         MimeType                        => 'some mime type',
                         Charset                         => 'some charset',
 
-                        ArticleTypeID                   => 123,                        # optional
-                        ArticleType                     => 'some article type name',   # optional
+                        ChannelID                       => 123,                        # optional
+                        Channel                         => 'some channel name',        # optional
                         SenderTypeID                    => 123,                        # optional
                         SenderType                      => 'some sender type name',    # optional
                         AutoResponseType                => 'some auto response type',  # optional

@@ -327,9 +327,9 @@ $Self->True(
     "TicketWatchSubscribe() successful for Ticket ID $TicketID",
 );
 
-# get article types email-notification-int ID
-my $ArticleTypeIntID = $TicketObject->ArticleTypeLookup(
-    ArticleType => 'email-notification-int',
+# get channel ID of 'email' channel
+my $ChannelID = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+    Name => 'email',
 );
 
 my @Tests = (
@@ -866,11 +866,11 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name => 'RecipientCustomer + NotificationArticleType email-notification-int',
+        Name => 'RecipientCustomer + NotificationChannel email',
         Data => {
             Events                    => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             Recipients                => ['Customer'],
-            NotificationArticleTypeID => [$ArticleTypeIntID],
+            NotificationChannelID     => [$ChannelID],
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -1161,12 +1161,12 @@ for my $Test (@Tests) {
         my @ArticleBox = $TicketObject->ArticleContentIndex(
             TicketID      => $TicketID,
             UserID        => 1,
-            ArticleTypeID => [$ArticleTypeIntID],
+            ChannelID     => [$ChannelID],
         );
         $Self->Is(
             scalar @ArticleBox,
             1,
-            "$Test->{Name} - Article Type email-notification-int created for Customer recipient",
+            "$Test->{Name} - Channel email created for Customer recipient",
         );
     }
 }

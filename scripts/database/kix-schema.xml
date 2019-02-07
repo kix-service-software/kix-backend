@@ -948,8 +948,8 @@
     </Index>
 </Table>
 
-<!-- article_type - all types of articles (e. g. email, fax, phone, ...) -->
-<Table Name="article_type">
+<!-- channel - all channels to "send" articles -->
+<Table Name="channel">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
@@ -958,7 +958,7 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="article_type_name">
+    <Unique Name="channel_channel_name">
         <UniqueColumn Name="name"/>
     </Unique>
     <ForeignKey ForeignTable="valid">
@@ -1028,7 +1028,8 @@
 <Table Name="article">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
-    <Column Name="article_type_id" Required="true" Type="SMALLINT"/>
+    <Column Name="channel_id" Required="true" Type="SMALLINT"/>
+    <Column Name="customer_visible" Required="false" Type="SMALLINT"/>
     <Column Name="article_sender_type_id" Required="true" Type="SMALLINT"/>
     <Column Name="a_from" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_reply_to" Required="false" Size="500" Type="VARCHAR"/>
@@ -1052,8 +1053,8 @@
     <Index Name="article_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
-    <Index Name="article_article_type_id">
-        <IndexColumn Name="article_type_id"/>
+    <Index Name="article_channel_id">
+        <IndexColumn Name="channel_id"/>
     </Index>
     <Index Name="article_article_sender_type_id">
         <IndexColumn Name="article_sender_type_id"/>
@@ -1067,8 +1068,8 @@
     <ForeignKey ForeignTable="ticket">
         <Reference Local="ticket_id" Foreign="id"/>
     </ForeignKey>
-    <ForeignKey ForeignTable="article_type">
-        <Reference Local="article_type_id" Foreign="id"/>
+    <ForeignKey ForeignTable="channel">
+        <Reference Local="channel_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="article_sender_type">
         <Reference Local="article_sender_type_id" Foreign="id"/>
@@ -1083,7 +1084,8 @@
 <Table Name="article_search">
     <Column Name="id" Required="true" PrimaryKey="true" Type="BIGINT"/>
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
-    <Column Name="article_type_id" Required="true" Type="SMALLINT"/>
+    <Column Name="channel_id" Required="true" Type="SMALLINT"/>
+    <Column Name="customer_visible" Required="false" Type="SMALLINT"/>
     <Column Name="article_sender_type_id" Required="true" Type="SMALLINT"/>
     <Column Name="a_from" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_to" Required="false" Size="3800" Type="VARCHAR"/>
@@ -1094,8 +1096,8 @@
     <Index Name="article_search_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
-    <Index Name="article_search_article_type_id">
-        <IndexColumn Name="article_type_id"/>
+    <Index Name="article_channel_id">
+        <IndexColumn Name="channel_id"/>
     </Index>
     <Index Name="article_search_article_sender_type_id">
         <IndexColumn Name="article_sender_type_id"/>
@@ -1106,8 +1108,8 @@
     <ForeignKey ForeignTable="ticket">
         <Reference Local="ticket_id" Foreign="id"/>
     </ForeignKey>
-    <ForeignKey ForeignTable="article_type">
-        <Reference Local="article_type_id" Foreign="id"/>
+    <ForeignKey ForeignTable="channel">
+        <Reference Local="channel_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="article_sender_type">
         <Reference Local="article_sender_type_id" Foreign="id"/>

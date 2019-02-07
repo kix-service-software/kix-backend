@@ -594,11 +594,10 @@ sub Run {
         }
     }
 
-    # get article type
-    my $ArticleType;
-    if ( defined $TicketTemplate{ArticleType} ) {
-        $ArticleType = $TicketObject
-            ->ArticleTypeLookup( ArticleTypeID => $TicketTemplate{ArticleType} );
+    # get channel
+    my $Channel;
+    if ( defined $TicketTemplate{Channel} ) {
+        $Channel = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $TicketTemplate{Channel} );
     }
 
     # EO KIX4OTRS-capeIT
@@ -609,8 +608,7 @@ sub Run {
 
         # KIX4OTRS-capeIT
 #rbo - T2016121190001552 - renamed X-KIX headers
-        # ArticleType      => $GetParam{'X-KIX-ArticleType'},
-        ArticleType => $GetParam{'X-KIX-ArticleType'} || $GetParam{'X-OTRS-ArticleType'} || $ArticleType,
+        Channel => $GetParam{'X-KIX-Channel'} || $GetParam{'X-OTRS-Channel'} || $Channel,
 
         # EO KIX4OTRS-capeIT
         SenderType       => $GetParam{'X-KIX-SenderType'} || $GetParam{'X-OTRS-SenderType'},

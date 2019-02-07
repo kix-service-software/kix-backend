@@ -2439,7 +2439,7 @@ sub _FAQApprovalTicketCreate {
         # create article
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID    => $TicketID,
-            ArticleType => 'note-internal',
+            Channel     => 'note',
             SenderType  => 'agent',
             From        => $From,
             Subject     => $Subject,

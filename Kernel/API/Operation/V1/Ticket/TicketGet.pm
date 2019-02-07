@@ -223,8 +223,8 @@ one or more ticket entries in one call.
                             References
                             SenderType
                             SenderTypeID
-                            ArticleType
-                            ArticleTypeID
+                            Channel
+                            ChannelID
                             ContentType
                             Charset
                             MimeType
@@ -392,15 +392,10 @@ sub Run {
 
         # include articles if requested
         if ( $Param{Data}->{include}->{Articles} ) {
-            my $ArticleTypes;
-            if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-                $ArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
-            }
-
             my @ArticleIndex = $TicketObject->ArticleIndex(
-                TicketID   => $TicketID,
-                SenderType => $ArticleTypes,
-                UserID     => $Self->{Authorization}->{UserID},
+                TicketID        => $TicketID,
+                CustomerVisible => $Self->{Authorization}->{UserType} eq 'Customer' ? 1 : 0,
+                UserID          => $Self->{Authorization}->{UserID},
             );
 
             $TicketData{Articles} = \@ArticleIndex;

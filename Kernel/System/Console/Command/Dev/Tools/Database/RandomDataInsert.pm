@@ -199,7 +199,8 @@ sub Run {
             for ( 1 .. $Self->GetOption('articles-per-ticket') // 10 ) {
                 my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
                     TicketID       => $TicketID,
-                    ArticleType    => 'note-external',
+                    Channel        => 'note',
+                    CustomerVisible => 1,
                     SenderType     => 'customer',
                     From           => RandomAddress(),
                     To             => RandomAddress(),

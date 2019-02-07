@@ -54,9 +54,9 @@ sub Run {
     my $FwdQueueRef =
         $Kernel::OM->Get('Kernel::Config')->Get('ExternalSupplierForwarding::ForwardQueues');
     my $FwdQueueNames = keys( %{$FwdQueueRef} );
-    my $RelevantFwdArticleTypesRef =
+    my $RelevantFwdChannelsRef =
         $Kernel::OM->Get('Kernel::Config')
-        ->Get('ExternalSupplierForwarding::RelevantFwdArticleTypes');
+        ->Get('ExternalSupplierForwarding::RelevantFwdChannels');
 
     #get ticket data...
     my %Ticket = $TicketObject->TicketGet(
@@ -71,9 +71,9 @@ sub Run {
         my %ArticleOfInterest = ();
         my @ArticleIDs        = qw{};
         my @Articles          = $TicketObject->ArticleContentIndex(
-            TicketID    => $Param{Data}->{TicketID},
-            ArticleType => $RelevantFwdArticleTypesRef,
-            UserID      => $Self->{UserID} || 1,
+            TicketID => $Param{Data}->{TicketID},
+            Channel  => $RelevantFwdChannelsRef,
+            UserID   => $Self->{UserID} || 1,
         );
         return if ( !@Articles );
         for my $CurrArticle (@Articles) {

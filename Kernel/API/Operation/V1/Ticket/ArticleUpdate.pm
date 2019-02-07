@@ -113,8 +113,8 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
                 TicketID                        => 123,                        # optional, used to move the article to another ticket
-                ArticleTypeID                   => 123,                        # optional
-                ArticleType                     => 'some article type name',   # optional
+                ChannelID                       => 123,                        # optional
+                Channel                         => 'some channel name',        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 From                            => 'some from string',         # optional
@@ -233,7 +233,7 @@ sub _ArticleUpdate {
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # update normal attributes
-    foreach my $Attribute ( qw(Subject Body From ArticleType ArticleTypeID SenderType SenderTypeID) ) {
+    foreach my $Attribute ( qw(Subject Body From ChannelID Channel SenderType SenderTypeID) ) {
         next if !$Article->{$Attribute};
 
         my $Success = $TicketObject->ArticleUpdate(

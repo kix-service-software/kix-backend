@@ -44,33 +44,33 @@ my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
 );
 
 my $ValidData = {
-    DeploymentStateID => $ItemData->{ItemID},
+    DeplStateID => $ItemData->{ItemID},
 };
 
 my $InvalidData = {
-    DeploymentStateID => '99999999999999999'
+    DeplStateID => '99999999999999999'
 };
 
-# validate valid DeploymentStateID
+# validate valid DeplStateID
 my $Result = $ValidatorObject->Validate(
-    Attribute => 'DeploymentStateID',
+    Attribute => 'DeplStateID',
     Data      => $ValidData,
 );
 
 $Self->True(
     $Result->{Success},
-    'Validate() - valid DeploymentStateID',
+    'Validate() - valid DeplStateID',
 );
 
-# validate invalid DeploymentStateID
+# validate invalid DeplStateID
 $Result = $ValidatorObject->Validate(
-    Attribute => 'DeploymentStateID',
+    Attribute => 'DeplStateID',
     Data      => $InvalidData,
 );
 
 $Self->False(
     $Result->{Success},
-    'Validate() - invalid DeploymentStateID',
+    'Validate() - invalid DeplStateID',
 );
 
 # validate invalid attribute

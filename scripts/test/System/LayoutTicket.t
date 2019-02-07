@@ -60,7 +60,7 @@ Special case from Lotus Notes:
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'note-internal',
+    Channel        => 'note',
     SenderType     => 'agent',
     From           => 'Some Agent <email@example.com>',
     To             => 'Some Customer <customer@example.com>',

@@ -57,10 +57,17 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'customer-id',
+        Name        => 'primary-customer-id',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "Customer ID for the new contact.",
+        Description => "The primary customer ID for the new contact.",
         Required    => 1,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'customer-ids',
+        Description => "All customer IDs for the new contact. Separate multiple values by comma.",
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -88,7 +95,8 @@ sub Run {
             UserLogin      => $Self->GetOption('user-name'),
             UserFirstname  => $Self->GetOption('first-name'),
             UserLastname   => $Self->GetOption('last-name'),
-            UserCustomerID => $Self->GetOption('customer-id'),
+            UserCustomerID => $Self->GetOption('primary-customer-id'),
+            UserCustomerIDs => $Self->GetOption('customer-ids') || $Self->GetOption('primary-customer-id'),
             UserPassword   => $Self->GetOption('password'),
             UserEmail      => $Self->GetOption('email-address'),
             UserID         => 1,

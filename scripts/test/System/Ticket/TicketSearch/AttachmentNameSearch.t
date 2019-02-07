@@ -95,7 +95,8 @@ for my $TicketID (@TicketIDs) {
     for my $ArticleCounter ( 1 .. 2 ) {
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID       => $TicketID,
-            ArticleType    => 'note-external',
+            Channel        => 'note',
+            CustomerVisible => 1,
             SenderType     => 'agent',
             From           => 'Agent Some Agent Some Agent <email@example.com>',
             To             => 'Customer A <customer-a@example.com>',
@@ -146,7 +147,7 @@ for my $TicketID (@TicketIDs) {
 # add an internal article
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketIDs[1],
-    ArticleType    => 'note-internal',
+    Channel        => 'note',
     SenderType     => 'agent',
     From           => 'Agent Some Agent Some Agent <email@example.com>',
     To             => 'Customer A <customer-a@example.com>',

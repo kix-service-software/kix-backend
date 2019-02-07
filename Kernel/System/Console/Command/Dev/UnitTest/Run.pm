@@ -32,6 +32,13 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
+        Name        => 'exclude',
+        Description => "Exclude one or more test. You can give a RegEx pattern.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
         Name        => 'directory',
         Description => "Run all test files in specified directory.",
         Required    => 0,
@@ -95,6 +102,7 @@ sub Run {
 
     my $FunctionResult = $Kernel::OM->Get('Kernel::System::UnitTest')->Run(
         Name                   => $Self->GetOption('test')                       || '',
+        Exclude                => $Self->GetOption('exclude')                    || '',
         Directory              => $Self->GetOption('directory')                  || '',
         Product                => $Self->GetOption('product')                    || '',
         SubmitURL              => $Self->GetOption('submit-url')                 || '',

@@ -453,7 +453,7 @@ sub Run {
     if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom') )
     {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-        $GetParam{'X-KIX-FollowUp-ArticleType'} = 'email-internal';
+        $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
         for my $FromAddress (@SplitFrom) {
             my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
             my %UserListCustomer = $CustomerUserObject->CustomerSearch(
@@ -471,7 +471,8 @@ sub Run {
                         )
                     {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-                        $GetParam{'X-KIX-FollowUp-ArticleType'} = 'email-external';
+                        $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
+                        $GetParam{CustomerVisible} = 1;
                         last;
                     }
                 }
@@ -479,12 +480,13 @@ sub Run {
             # seems to be a customer user not existing in the database -> check if this one is identical to Ticket{CustomerUserID}
             elsif ($FromAddress && $Ticket{CustomerUserID} && $Ticket{CustomerUserID} eq $FromAddress) {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-                $GetParam{'X-KIX-FollowUp-ArticleType'} = 'email-external';
+                $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
+                $GetParam{CustomerVisible} = 1;
                 last;
             }
 
 #rbo - T2016121190001552 - renamed X-OTRS headers
-            last if ( $GetParam{'X-KIX-FollowUp-ArticleType'} eq 'email-external' );
+            last if ( $GetParam{'X-KIX-FollowUp-Channel'} eq 'email' );
         }
     }
 
@@ -494,7 +496,8 @@ sub Run {
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $Param{TicketID},
 #rbo - T2016121190001552 - renamed X-OTRS headers
-        ArticleType      => $GetParam{'X-KIX-FollowUp-ArticleType'} || $GetParam{'X-OTRS-FollowUp-ArticleType'},
+        Channel          => $GetParam{'X-KIX-FollowUp-Channel'} || $GetParam{'X-OTRS-FollowUp-Channel'},
+        CustomerVisible  => $GetParam{CustomerVisible},
         SenderType       => $GetParam{'X-KIX-FollowUp-SenderType'} || $GetParam{'X-OTRS-FollowUp-SenderType'},
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},

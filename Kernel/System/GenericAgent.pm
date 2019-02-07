@@ -981,7 +981,7 @@ sub _JobRunTicket {
         }
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID    => $Param{TicketID},
-            ArticleType => $Param{Config}->{New}->{Note}->{ArticleType} || 'note-internal',
+            Channel     => $Param{Config}->{New}->{Note}->{Channel} || 'note',
             SenderType  => 'agent',
             From        => $Param{Config}->{New}->{Note}->{From}
                 || $Param{Config}->{New}->{NoteFrom}

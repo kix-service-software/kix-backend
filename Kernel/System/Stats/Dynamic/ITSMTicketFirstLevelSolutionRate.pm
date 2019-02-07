@@ -452,7 +452,7 @@ sub GetStatElement {
         next TICKETID if @{$ArticleDataList} > 2;
 
         # first article is a phone article
-        if ( $ArticleDataList->[0]->{ArticleTypeID} eq $Self->{PhoneTypeID} ) {
+        if ( $ArticleDataList->[0]->{ChannelID} eq $Self->{PhoneTypeID} ) {
 
             if ( !$ArticleDataList->[1] ) {
                 $FirstLevelSolutionTickets++;
@@ -462,7 +462,7 @@ sub GetStatElement {
         }
 
         # first article is an external email article
-        if ( $ArticleDataList->[0]->{ArticleTypeID} eq $Self->{EmailExternalTypeID} ) {
+        if ( $ArticleDataList->[0]->{ChannelID} eq $Self->{EmailExternalTypeID} ) {
 
             # first article comes from an agent (Email-Ticket)
             if (
@@ -499,17 +499,17 @@ sub _ArticleDataGet {
 
     return if !$Param{TicketID};
 
-    # get id of article type 'phone'
+    # get id of channel 'phone'
     if ( !$Self->{PhoneTypeID} ) {
-        $Self->{PhoneTypeID} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeLookup(
-            ArticleType => 'phone',
+        $Self->{PhoneTypeID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+            Name => 'phone-outbound',
         );
     }
 
-    # get id of article type 'email-external'
-    if ( !$Self->{EmailExternalTypeID} ) {
-        $Self->{EmailExternalTypeID} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeLookup(
-            ArticleType => 'email-external',
+    # get id of article type 'email'
+    if ( !$Self->{EmailTypeID} ) {
+        $Self->{EmailTypeID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+            Name => 'email',
         );
     }
 
@@ -529,8 +529,8 @@ sub _ArticleDataGet {
 
     # ask database
     $Self->{DBSlaveObject}->Prepare(
-        SQL => 'SELECT article_type_id, article_sender_type_id FROM article '
-            . 'WHERE ticket_id = ? AND article_type_id IN ( ?, ? ) AND '
+        SQL => 'SELECT channel_id, article_sender_type_id FROM article '
+            . 'WHERE ticket_id = ? AND channel_id IN ( ?, ? ) AND '
             . 'article_sender_type_id IN ( ?, ? ) '
             . 'ORDER BY create_time',
         Bind => [
@@ -548,7 +548,7 @@ sub _ArticleDataGet {
     while ( my @Row = $Self->{DBSlaveObject}->FetchrowArray() ) {
 
         my %ArticleData;
-        $ArticleData{ArticleTypeID}       = $Row[0];
+        $ArticleData{ChannelID}           = $Row[0];
         $ArticleData{ArticleSenderTypeID} = $Row[1];
 
         push @ArticleDataList, \%ArticleData;

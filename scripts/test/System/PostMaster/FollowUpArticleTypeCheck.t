@@ -58,7 +58,8 @@ $Self->True(
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'email-external',
+    Channel        => 'email',
+    CustomerVisible => 1,
     MessageID      => 'message-id-email-external',
     SenderType     => 'customer',
     From           => "Customer <$CustomerAddress>",
@@ -79,7 +80,7 @@ $Self->True(
 
 $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'email-internal',
+    Channel        => 'email',
     MessageID      => 'message-id-email-internal',
     SenderType     => 'agent',
     From           => "Agent <$AgentAddress>",
@@ -101,7 +102,7 @@ $Self->True(
 # Accidential internal forward to the customer to test that customer replies are still external.
 $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'email-internal',
+    Channel        => 'email',
     MessageID      => 'message-id-email-internal-customer',
     SenderType     => 'agent',
     From           => "Agent <$AgentAddress>",
@@ -141,12 +142,13 @@ Subject: $Subject
 
 Some Content in Body",
         Check => {
-            ArticleType => 'email-external',
+            Channel     => 'email',
+            CustomerVisible => 1,            
             SenderType  => 'customer',
         },
         JobConfig => {
-            ArticleType => 'email-internal',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck',
+            Channel     => 'email',
+            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'customer',
         },
     },
@@ -160,12 +162,12 @@ Subject: $Subject
 
 Some Content in Body",
         Check => {
-            ArticleType => 'email-internal',
+            Channel     => 'email',
             SenderType  => 'customer',
         },
         JobConfig => {
-            ArticleType => 'email-internal',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck',
+            Channel     => 'email',
+            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'customer',
         },
     },
@@ -180,12 +182,12 @@ Subject: $Subject
 
 Some Content in Body",
         Check => {
-            ArticleType => 'email-internal',
+            Channel     => 'email',
             SenderType  => 'customer',
         },
         JobConfig => {
-            ArticleType => 'email-internal',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck',
+            Channel     => 'email',
+            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'customer',
         },
     },
@@ -199,12 +201,13 @@ Subject: $Subject
 
 Some Content in Body",
         Check => {
-            ArticleType => 'email-external',
+            Channel     => 'email',
+            CustomerVisible => 1,
             SenderType  => 'customer',
         },
         JobConfig => {
-            ArticleType => 'email-internal',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck',
+            Channel     => 'email',
+            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'customer',
         },
     },
@@ -216,18 +219,18 @@ Some Content in Body",
 #rbo - T2016121190001552 - renamed X-KIX headers
         Email => "From: Provider <$InternalAddress>
 To: Agent <$AgentAddress>
-X-KIX-FollowUp-ArticleType: note-report
+X-KIX-FollowUp-Channel: note
 X-KIX-FollowUp-SenderType: system
 Subject: $Subject
 
 Some Content in Body",
         Check => {
-            ArticleType => 'note-report',
+            Channel     => 'note',
             SenderType  => 'system',
         },
         JobConfig => {
-            ArticleType => 'email-internal',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck',
+            Channel     => 'email',
+            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'customer',
         },
     },
@@ -242,12 +245,12 @@ Subject: $Subject
 
 Some Content in Body",
         Check => {
-            ArticleType => 'email-internal',
+            Channel     => 'email',
             SenderType  => 'customer',
         },
         JobConfig => {
-            ArticleType => 'email-internal',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck',
+            Channel     => 'email',
+            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'customer',
         },
     },
@@ -264,7 +267,7 @@ my $RunTest = sub {
     $ConfigObject->Set(
         Key   => 'PostMaster::PreCreateFilterModule',
         Value => {
-            '000-FollowUpArticleTypeCheck' => {
+            '000-FollowUpChannelCheck' => {
                 %{ $Test->{JobConfig} }
             },
         },

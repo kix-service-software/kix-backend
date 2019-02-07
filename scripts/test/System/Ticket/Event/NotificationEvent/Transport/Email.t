@@ -108,7 +108,8 @@ $Self->True(
 
 my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'webrequest',
+    Channel        => 'note',
+    CustomerVisible => 1,
     SenderType     => 'customer',
     From           => 'customerOne@example.com, customerTwo@example.com',
     To             => 'Some Agent A <agent-a@example.com>',

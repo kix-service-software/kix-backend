@@ -44,6 +44,7 @@ $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
     UserFirstname  => 'ValidatorTestCustomer',
     UserLastname   => 'ValidatorTestCustomer',
     UserCustomerID => 'ValidatorTestCustomer',
+    UserCustomerIDs =>'ValidatorTestCustomer',
     UserLogin      => 'ValidatorTestCustomer',
     UserEmail      => 'ValidatorTestCustomer@validatortest.kix',
     ValidID        => 1,

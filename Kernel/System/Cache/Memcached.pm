@@ -187,6 +187,10 @@ sub CleanUp {
         }
         return 1;
     }
+    elsif ( $Param{Expired} ) {
+        # do nothing because Memcached will handle this
+        return 1;
+    }
     else {
         return $Self->{MemcachedObject}->flush_all();
     }

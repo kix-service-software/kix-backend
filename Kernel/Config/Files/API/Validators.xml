@@ -12,14 +12,14 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###ArticleTypeValidator" Required="0" Valid="1">
+    <ConfigItem Name="API::Validator::Module###ChannelValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ArticleTypeValidator</Item>
-                <Item Key="Validates">ArticleType,ArticleTypeID</Item>
+                <Item Key="Module">ChannelValidator</Item>
+                <Item Key="Validates">Channel,ChannelID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">ArticleTypeGet</Item>
+                <Item Key="IgnoreOperationRegEx">ChannelGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>

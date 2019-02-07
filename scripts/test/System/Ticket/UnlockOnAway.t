@@ -56,7 +56,7 @@ $Self->True( $TicketID, 'Could create ticket' );
 
 $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'note-internal',
+    Channel        => 'note',
     SenderType     => 'agent',
     Subject        => 'Should not unlock',
     Body           => '.',
@@ -125,7 +125,7 @@ $UserObject->SetPreferences(
 
 $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
-    ArticleType    => 'note-internal',
+    Channel        => 'note',
     SenderType     => 'agent',
     Subject        => 'Should now unlock',
     Body           => '.',

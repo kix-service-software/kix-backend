@@ -69,7 +69,7 @@ my @ArticleTests = (
     {
         Name        => 'First article',
         ArticleData => {
-            ArticleType    => 'note-internal',
+            Channels       => 'note',
             SenderType     => 'agent',
             From           => 'Some Agent <email@example.com>',
             To             => 'Some Customer A <customer-a@example.com>',
@@ -90,7 +90,7 @@ my @ArticleTests = (
     {
         Name        => 'With base64-encoded image',
         ArticleData => {
-            ArticleType => 'note-internal',
+            Channels    => 'note',
             SenderType  => 'agent',
             From        => 'Some Agent <email@example.com>',
             To          => 'Some Customer A <customer-a@example.com>',
@@ -112,7 +112,7 @@ my @ArticleTests = (
     {
         Name        => 'With normal attachment (image)',
         ArticleData => {
-            ArticleType => 'note-internal',
+            Channels    => 'note',
             SenderType  => 'agent',
             From        => 'Some Agent <email@example.com>',
             To          => 'Some Customer A <customer-a@example.com>',
