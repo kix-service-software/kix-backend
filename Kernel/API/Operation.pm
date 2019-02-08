@@ -63,6 +63,7 @@ create an object.
         Operation       => 'TicketCreate',                # the name of the operation in the web service
         OperationType   => 'V1::Ticket::TicketCreate',    # the local operation backend to use
         WebserviceID    => $WebserviceID,                 # ID of the currently used web service
+        OperationRouteMapping => {},                      # optional
         NoAuthorizationNeeded => 1                        # optional
     );
 
@@ -150,9 +151,10 @@ sub new {
     $Self->{BackendObject}->{Authorization}   = $Param{Authorization};
 
     # pass operation information to backend
-    $Self->{BackendObject}->{Operation}       = $Param{Operation};
-    $Self->{BackendObject}->{OperationType}   = $Param{OperationType};
-    $Self->{BackendObject}->{OperationConfig} = $Self->{OperationConfig};
+    $Self->{BackendObject}->{Operation}             = $Param{Operation};
+    $Self->{BackendObject}->{OperationType}         = $Param{OperationType};
+    $Self->{BackendObject}->{OperationConfig}       = $Self->{OperationConfig};
+    $Self->{BackendObject}->{OperationRouteMapping} = $Param{OperationRouteMapping};
 
     # add call level
     $Self->{Level} = $Param{Level};

@@ -149,20 +149,6 @@ sub Run {
             );
         }
 
-        # include preferences if requested
-        if ( $Param{Data}->{include}->{Preferences} ) {
-            # get already prepared preferences data from UserPreferenceSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::User::UserPreferenceSearch',
-                Data          => {
-                    UserID => $UserID
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $UserData{Preferences} = $Result->{Data}->{UserPreference};
-            }
-        }
-
         # filter valid attributes
         if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
             foreach my $Attr (sort keys %UserData) {

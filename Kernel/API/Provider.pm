@@ -188,6 +188,9 @@ sub Run {
         Summary => "Detected operation '$Operation'",
     );
 
+    # store route mapping for later use
+    my $ResourceOperationRouteMapping = $FunctionResult->{ResourceOperationRouteMapping};
+
     #
     # Map the incoming data based on the configured mapping
     #
@@ -270,6 +273,7 @@ sub Run {
         Operation               => $Operation,
         OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
         WebserviceID            => $WebserviceID,
+        OperationRouteMapping   => $ResourceOperationRouteMapping,
         Authorization           => $Authorization,
     );
 

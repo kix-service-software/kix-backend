@@ -741,6 +741,7 @@ sub ExecOperation {
         Operation               => (split(/::/, $Param{OperationType}))[-1],
         OperationType           => $Param{OperationType},
         WebserviceID            => $Self->{WebserviceID},
+        OperationRouteMapping   => $Self->{OperationRouteMapping},
         Authorization           => $Self->{Authorization},
         Level                   => $Self->{Level} + 1,
     );
@@ -1349,6 +1350,48 @@ sub _ApplyInclude {
         return;
     }
 
+    # check if a given include can be matched to a sub-resource
+    if ( IsHashRefWithData($Self->{OperationRouteMapping}) ) {
+        my %ReverseOperationRouteMapping = reverse %{$Self->{OperationRouteMapping}};
+        foreach my $Include ( keys %{$Self->{Include}} ) {
+            my $IncludeOperation = $ReverseOperationRouteMapping{"$Self->{OperationRouteMapping}->{$Self->{OperationType}}/" . lc($Include)};
+            next if !$IncludeOperation;
+
+            foreach my $Object ( keys %{$Param{Data}} ) {
+                if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
+                    my $Index = 0;
+                    foreach my $ObjectID ( split(/\s*,\s*/, $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}}) ) {
+                        # we found a sub-resource include
+                        my $Result = $Self->ExecOperation(
+                            OperationType => $IncludeOperation,
+                            Data          => {
+                                $Self->{OperationConfig}->{ObjectID} => $ObjectID
+                            }
+                        );
+                        if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                            # get first response object as the include - this is not the perfect solution but it works for the moment
+                            $Param{Data}->{$Object}->[$Index++]->{$Include} = $Result->{Data}->{ (keys %{$Result->{Data}})[0] };
+                        }
+                    }
+                }
+                else {
+                    # we found a sub-resource include
+                    my $Result = $Self->ExecOperation(
+                        OperationType => $IncludeOperation,
+                        Data          => {
+                            $Self->{OperationConfig}->{ObjectID} => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}}
+                        }
+                    );
+                    if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                        # get first response object as the include - this is not the perfect solution but it works for the moment
+                        $Param{Data}->{$Object}->{$Include} = $Result->{Data}->{(keys %{$Result->{Data}})[0]};
+                    }
+                }
+            }
+        }
+    }
+
+    # handle generic includes
     my $GenericIncludes = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::GenericInclude');
     if ( IsHashRefWithData($GenericIncludes) ) {
         foreach my $Include ( keys %{$Self->{Include}} ) {
@@ -1652,7 +1695,7 @@ sub _GetCacheKey {
 
     my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{OperationType}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
         \%RequestData,
-        'ascii+noindent'        
+        'ascii+noindent'
     );
 
     return $CacheKey;

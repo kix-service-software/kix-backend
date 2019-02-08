@@ -422,34 +422,6 @@ sub Run {
             );
         }
 
-        # include Checklist if requested
-        if ( $Param{Data}->{include}->{Checklist} ) {
-            # get already prepared Checklist data from ChecklistSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::ChecklistSearch',
-                Data          => {
-                    TicketID  => $TicketID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $TicketData{Checklist} = $Result->{Data}->{ChecklistItem};
-            }
-        }
-
-        # include Watchers if requested
-        if ( $Param{Data}->{include}->{Watchers} ) {
-            # get already prepared Watchers data from WatcherSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::WatcherSearch',
-                Data          => {
-                    TicketID  => $TicketID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $TicketData{Watchers} = $Result->{Data}->{Watcher};
-            }
-        }
-
         # add
         push(@TicketList, \%TicketData);
     }
