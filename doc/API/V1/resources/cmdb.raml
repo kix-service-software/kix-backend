@@ -2,7 +2,7 @@
   description: !include ../descriptions/resources/cmdb.md
   /classes:
     description: !include ../descriptions/resources/cmdb/classes.md
-    type: { collection: { typeName: ConfigItemClass } }
+    type: { collection-nopatch: { typeName: ConfigItemClass } }
     /{classId}:
       type: { item: { typeName: ConfigItemClass } }
       uriParameters:
@@ -10,6 +10,7 @@
           displayName: ClassID
           type: integer
       /definitions:
+        description: !include ../descriptions/resources/cmdb/classes/definitions.md
         type: { collection: { typeName: ConfigItemClassDefinition } }
         /{definitionId}:
           type: { item-nopatch: { typeName: ConfigItemClassDefinition } }
@@ -27,6 +28,7 @@
           displayName: ConfigItemID
           type: integer
       /history:
+        description: !include ../descriptions/resources/cmdb/configitems/history.md
         type: { collection-readonly: { typeName: ConfigItemHistory } }
         /{historyId}:
           type: { item-readonly: { typeName: ConfigItemHistory } }
@@ -35,7 +37,8 @@
               displayName: HistoryID
               type: integer
       /images:
-        type: { collection: { typeName: ConfigItemImage } }
+        description: !include ../descriptions/resources/cmdb/configitems/images.md
+        type: { collection-nopatch: { typeName: ConfigItemImage } }
         /{imageId}:
           type: { item-nopatch: { typeName: ConfigItemImage } }
           uriParameters:
@@ -43,10 +46,18 @@
               displayName: ImageID
               type: integer
       /versions:
-        type: { collection: { typeName: ConfigItemVersion } }
+        description: !include ../descriptions/resources/cmdb/configitems/versions.md
+        type: { collection-nopatch: { typeName: ConfigItemVersion } }
         /{versionId}:
           type: { item-readonly: { typeName: ConfigItemVersion } }
           uriParameters:
             versionId:
               displayName: VersionID
               type: integer
+    /attachments/{attachmentId}:
+        description: !include ../descriptions/resources/cmdb/configitems/attachments.md
+        type: { item-readonly: { typeName: ConfigItemAttachment } }
+        uriParameters:
+          attachmentId:
+            displayName: AttachmentID
+            type: integer

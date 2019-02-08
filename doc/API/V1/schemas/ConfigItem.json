@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItem",
+  "type": "object",
+  "description": "The config item object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "number",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Class": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "ClassID": {
+      "type": "number",
+      "readOnly": true
+    },    
+    "ConfigItemID": {
+      "type": "number",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "number",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CurDeplStateID": {
+      "type": "number"
+    },    
+    "CurInciStateID": {
+      "type": "number"
+    },    
+    "CurrentVersion": {
+      "type": "object"
+    },    
+    "LastVersionID": {
+      "type": "number",
+      "readOnly": true
+    },
+    "Number": {
+      "type": "string"
+    },    
+    "History": {
+      "type": "array",
+      "item": {
+        "$ref": "#ConfigItemHistoryItem"
+      }
+    },
+    "Images": {
+      "type": "array",
+      "item": {
+        "$ref": "#ConfigItemImage"
+      }
+    },
+    "Versions": {
+      "type": "array",
+      "item": {
+        "$ref": "#ConfigItemVersion"
+      }
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "Class",
+    "ClassID",
+    "CreateBy",
+    "CreateTime",
+    "ConfigItemID",
+    "CurInciStateID",
+    "CurDeplStateID",
+    "Number"
+  ]
+}
