@@ -1,6 +1,11 @@
 h1 {
   font-weight: bold;
 }
+h5 {
+  font-size: 16px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
 .param-table {
   border-collapse: collapse;  
   border-color: #ddd;
@@ -131,15 +136,13 @@ h1 {
 }
 .top-resource-description {
   border-bottom: 1px solid #ddd;
-  background: #fcfcfc;
-  padding: 15px 15px 0 15px;
-  margin: -15px -15px 10px -15px;
+  padding: 10px 15px;
 }
 .resource-description {
-  border-bottom: 1px solid #fcfcfc;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   background: #fcfcfc;
-  padding: 15px 15px 0 15px;
-  margin: -15px -15px 10px -15px;
+  padding: 10px 15px;
 }
 .resource-description p:last-child {
   margin: 0;
@@ -147,10 +150,10 @@ h1 {
 .list-group .badge {
   float: left;
 }
-.method_description {
+.method-description {
   margin-left: 85px;
 }
-.method_description p:last-child {
+.method-description p:last-child {
   margin: 0;
 }
 .list-group-item {

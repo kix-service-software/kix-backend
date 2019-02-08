@@ -1,0 +1,33 @@
+{
+    "ConfigItem": {
+        "ClassID": 22,
+        "Version": {
+            "Name": "test ci 1",
+            "DeplStateID": 35,
+            "InciStateID": 2,
+            "Data": {
+                "Vendor": "testvendor",
+                "NIC": [
+                    {
+                        "NIC": "e1000",
+                        "IPoverDHCP": [
+                            38
+                        ],
+                        "IPAddress": [
+                            "192.168.1.0",
+                            "192.168.1.1",
+                            "192.168.1.2",
+                            "192.168.1.3"
+                        ]
+                    }
+                ]
+            }
+        },
+        "Images": [
+            {
+                "Filename": "SomeImage.jpg",
+                "Content": "..."
+            }
+        ]
+    }
+}

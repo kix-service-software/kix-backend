@@ -6,7 +6,7 @@ You can use an optional ```filter``` function to filter the items in the respons
 ```
 
 The filter definition is a JSON object in the following form:
-``` json
+``` bash
     {
         "<Object>": {
             "AND": [

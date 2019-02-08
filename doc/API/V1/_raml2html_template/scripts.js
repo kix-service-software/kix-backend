@@ -17,9 +17,20 @@ $(document).ready(function() {
   $('.badge.toggle').click(function(e) {
     e.preventDefault();
     var $toggleElement = $(this).parents('p').next('.schemas.toggleable, .examples.toggleable');
-console.log('toggle ' + $toggleElement);
     $toggleElement.toggle();
     $(this).html($toggleElement.is(':visible') ? 'Hide' : 'Show');
+  });
+
+  // add toggle of resource descriptions
+  $('.resource-description > h4').each(function(i, item) {
+    $(this).parent().hide();
+    $(this).closest('.panel').prepend('<a class="description-toggle toggle" href="#" title="Show or hide description">')
+    $(this).closest('.panel').children('a.description-toggle').append($(this).detach());
+  });
+  $('a.description-toggle').click(function(e) {
+    e.preventDefault();
+    var $toggleElement = $(this).parents('.panel').children('.resource-description');
+    $toggleElement.toggle();
   });
 
   $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {

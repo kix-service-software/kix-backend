@@ -1,0 +1,11 @@
+  usage: Use this resourceType to represent a collection of items
+  get:
+    is: [ hasResponseCollection: { typeName: <<typeName>> }, hasBadRequest, filterable, pageable, sortable ]
+  post:
+    is: [ hasRequestItem: { typeName: <<typeName>>PostRequest }, hasBadRequest, hasConflict ]
+    responses:
+      201:
+        description: The <<typeName>> has been created successfully.
+        body:
+          application/json: 
+            type: <<typeName>>PostResponse
