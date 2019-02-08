@@ -8,6 +8,7 @@
         displayName: UserID
         type: integer
     /preferences:
+      description: !include ../descriptions/resources/users/preferences.md
       type: { collection: { typeName: UserPreference } }
       /{preferenceId}:
         type: { item: { typeName: UserPreference } }

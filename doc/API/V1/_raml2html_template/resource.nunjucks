@@ -1,10 +1,21 @@
 {% if (resource.methods or (resource.description and resource.parentUrl)) %}
   <div class="panel panel-white resource-modal">
+
+    <div id="panel_{{ resource.uniqueId }}" class="panel">
+      {% if resource.parentUrl %}
+        {% if resource.description %}
+          <div class="resource-description">
+            {% markdown %}
+            {{ resource.description }}
+            {% endmarkdown %}
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+
     <div class="panel-heading">
       <h4 class="panel-title">
-        <a class="collapsed" data-toggle="collapse" href="#panel_{{ resource.uniqueId }}">
-          <span class="parent uri">{{ resource.parentUrl }}</span><span class="uri">{{ resource.relativeUri }}</span>
-        </a>
+        <span class="parent uri">{{ resource.parentUrl }}</span><span class="uri">{{ resource.relativeUri }}</span>
 
         <span class="methods">
           {% for method in resource.methods %}
@@ -14,34 +25,6 @@
           {% endfor %}
         </span>
       </h4>
-    </div>
-
-    <div id="panel_{{ resource.uniqueId }}" class="panel-collapse collapse">
-      <div class="panel-body">
-        {% if resource.parentUrl %}
-          {% if resource.description %}
-            <div class="resource-description">
-              {% markdown %}
-              {{ resource.description }}
-              {% endmarkdown %}
-            </div>
-          {% endif %}
-        {% endif %}
-
-        <div class="list-group">
-          {% for method in resource.methods %}
-            <div onclick="window.location.href = '#{{ resource.uniqueId }}_{{ method.method }}'" class="list-group-item">
-              <span class="badge badge_{{ method.method }}">{{ method.method }}{% if method.securedBy.length %} <span class="glyphicon glyphicon-lock" title="Authentication required"></span>{% endif %}</span>
-              <div class="method_description">
-                {% markdown %}
-                {{ method.description}}
-                {% endmarkdown %}
-              </div>
-              <div class="clearfix"></div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
     </div>
 
     {% for method in resource.methods %}

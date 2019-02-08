@@ -15,6 +15,23 @@
     "Comment": {
       "type": "string"
     },    
+    "ConfigItemStats": {
+      "type": "object",
+      "properties": {
+        "PostProductiveCount": {
+          "type": "number",
+          "readOnly": true
+        },
+        "ProductiveCount": {
+          "type": "number",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "PostProductiveCount",
+        "ProductiveCount"
+      ]
+    },
     "CreateBy": {
       "type": "number",
       "readOnly": true
@@ -22,6 +39,10 @@
     "CreateTime": {
       "type": "string",
       "readOnly": true
+    },
+    "CurrentDefinition": {
+      "type": "object",
+      "$ref": "#ConfigItemClassDefinition"
     },
     "ID": {
       "type": "string",

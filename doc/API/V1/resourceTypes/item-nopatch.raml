@@ -1,8 +1,5 @@
   usage: Use this resourceType to represent any single item
-  description: A single <<typeName>>.
   get:
-    description: Get a <<typeName>>.
     is: [ hasResponseItem: { typeName: <<typeName>> }, hasNotFound, supportingFieldSelection ]
   delete:
-    description: Delete a <<typeName>>.
     is: [ hasNotFound, hasConflict, hasNoContent ]

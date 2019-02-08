@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemImageList",
+  "type": "object",
+  "description": "A list of config item images.",
+  "properties": {
+    "ConfigItemImage": {
+      "type": "array",
+      "items": {
+        "$ref": "#ConfigItemImage"
+      }
+    }
+  },
+  "required": [
+    "ConfigItemImage"
+  ]
+}

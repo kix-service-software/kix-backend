@@ -1,0 +1,1 @@
+The top-level ```/cmdb``` resource is no collection resource itself. It's purpose is to act as a container for all the CMDB resources.
