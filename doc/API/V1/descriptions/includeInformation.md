@@ -1,4 +1,4 @@
-When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter ```include```. What exactly can be included depends on the actual resource you are querying. Therefore it will be documented in the description of the resource.
+When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter ```include```. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource. 
 
 ** Usage in URL **
 ``` bash

@@ -2,6 +2,8 @@
 
 ##### Supported Includes
 
+In addition to its sub-resources (as far as they exist), this resource supports the following includes.
+
 |Include|Description|
 |-|-|
 |```Content```|Adds the base64 encoded content of the image to the response.|

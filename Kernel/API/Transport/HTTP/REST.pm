@@ -254,6 +254,21 @@ sub ProviderProcessRequest {
     $Operation = $PossibleOperations{$CurrentRoute}->{Operation};
     %URIData   = %{$PossibleOperations{$CurrentRoute}->{URIParams}};
 
+    # get direct sub-resource for generic including
+    my %ResourceOperationRouteMapping = (
+        $Operation => $CurrentRoute
+    );
+    for my $Op ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+        # ignore invalid config
+        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$Op} );
+        # ignore non-search operations
+        next if $Op !~ /Search$/;
+        # ignore anything that has nothing to do with the current Ops route
+        next if "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\//;
+
+        $ResourceOperationRouteMapping{$Op} = $Config->{RouteOperationMapping}->{$Op}->{Route};
+    }
+
     # combine query params with URIData params, URIData has more precedence
     if (%QueryParams) {
         %URIData = ( %QueryParams, %URIData, );
@@ -272,6 +287,7 @@ sub ProviderProcessRequest {
     if ( !$Length ) {
         return $Self->_Success(
             Operation => $Operation,
+            ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             Data      => {
                 %URIData,
                 RequestMethod => $RequestMethod,
@@ -360,6 +376,7 @@ sub ProviderProcessRequest {
     return $Self->_Success(
         Operation => $Operation,
         Data      => $ReturnData,
+        ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
     );
 }
 

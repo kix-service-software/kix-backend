@@ -6,9 +6,8 @@ Since the properties of the version (i.e. the name) don't belong to the Config I
 
 ##### Supported Includes
 
+In addition to its sub-resources (as far as they exist), this resource supports the following includes.
+
 |Include|Description|
 |-|-|
 |```CurrentVersion```|Adds the current version of the Config Item to the response. See sub-resource ["versions"](#cmdb_configitems__configitemid__versions_get).|
-|```History```|Adds the history of the Config Item to the response. See sub-resource ["history"](#cmdb_configitems__configitemid__history_get).|
-|```Images```|Adds the list of images of the Config Item to the response. See sub-resource ["images"](#cmdb_configitems__configitemid__images_get).|
-|```Versions```|Adds the list of all version of the Config Item to the response. See sub-resource ["versions"](#cmdb_configitems__configitemid__versions_get).|

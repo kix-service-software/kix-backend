@@ -145,48 +145,6 @@ sub Run {
             }
         }
 
-        # include Versions if requested
-        if ( $Param{Data}->{include}->{Versions} ) {
-            # get already prepared Versions data from VersionSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ConfigItemVersionSearch',
-                Data          => {
-                    ConfigItemID  => $ConfigItemID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{Versions} = $Result->{Data}->{ConfigItemVersion};
-            }
-        }
-
-        # include History if requested
-        if ( $Param{Data}->{include}->{History} ) {
-            # get already prepared History data from HistorySearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ConfigItemHistorySearch',
-                Data          => {
-                    ConfigItemID  => $ConfigItemID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{History} = $Result->{Data}->{ConfigItemHistoryItem};
-            }
-        }
-
-        # include Images if requested
-        if ( $Param{Data}->{include}->{Images} ) {
-            # get already prepared Images data from ImageSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ConfigItemImageSearch',
-                Data          => {
-                    ConfigItemID  => $ConfigItemID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{Images} = $Result->{Data}->{Image};
-            }
-        }
-
         push(@ConfigItemList, $ConfigItem);
     }
 
