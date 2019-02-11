@@ -134,7 +134,7 @@ sub Run {
 
     if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
 
-        # include preferences if requested
+        # include preferences if requested - we can't do that with our generic sub-resource include function, because we don't have a UserID in our request
         if ( $Param{Data}->{include}->{Preferences} ) {
             # get already prepared preferences data from UserPreferenceSearch operation
             my $Result = $Self->ExecOperation(

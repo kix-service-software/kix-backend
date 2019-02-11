@@ -154,21 +154,7 @@ sub Run {
             }
         }
 
-        # include Definitions if requested
-        if ( $Param{Data}->{include}->{Definitions} ) {
-            # get already prepared Definitions data from ClassDefinitionSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ClassDefinitionSearch',
-                Data          => {
-                    ClassID   => $ClassID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $Class{Definitions} = $Result->{Data}->{ConfigItemClassDefinition};
-            }
-        }
-
-                # include ConfigItemStats if requested
+        # include ConfigItemStats if requested
         if ( $Param{Data}->{include}->{ConfigItemStats} ) {
             # execute CI searches
             my %ConfigItemStats;

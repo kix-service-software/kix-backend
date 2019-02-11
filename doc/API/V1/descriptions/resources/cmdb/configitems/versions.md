@@ -2,6 +2,8 @@
 
 ##### Supported Includes
 
+In addition to its sub-resources (as far as they exist), this resource supports the following includes.
+
 |Include|Description|
 |-|-|
 |```Definition```|Adds the corresponding definition of the Config Item class to the response. See sub-resource ["definitions"](#cmdb_classes__classid__classes_get).|
