@@ -5,7 +5,7 @@
   "description": "The user object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -13,7 +13,7 @@
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -30,7 +30,7 @@
       "type": "string"
     },
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserLastname": {
@@ -43,7 +43,7 @@
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     },
     "Preferences": {
       "type": "array",

@@ -5,7 +5,7 @@
   "description": "The valid object.",
   "properties": {
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {

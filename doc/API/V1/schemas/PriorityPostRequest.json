@@ -14,7 +14,7 @@
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [

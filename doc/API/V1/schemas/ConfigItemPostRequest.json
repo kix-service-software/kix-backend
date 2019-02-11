@@ -8,7 +8,7 @@
       "type": "object",
       "properties": {
         "ClassID": {
-          "type": "number"
+          "type": "integer"
         },    
         "Version": {
           "type": "object",

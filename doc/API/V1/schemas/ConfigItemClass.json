@@ -5,7 +5,7 @@
   "description": "The config item class object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -19,11 +19,11 @@
       "type": "object",
       "properties": {
         "PostProductiveCount": {
-          "type": "number",
+          "type": "integer",
           "readOnly": true
         },
         "ProductiveCount": {
-          "type": "number",
+          "type": "integer",
           "readOnly": true
         }
       },
@@ -33,7 +33,7 @@
       ]
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -52,7 +52,7 @@
       "type": "string"
     },    
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     },
     "Definitions": {
       "type": "array",

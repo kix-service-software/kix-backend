@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Priority",
+  "type": "object",
+  "description": "The priority object.",
+  "properties": {
+    "Calendar": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "DefaultSignKey": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FirstResponseNotify": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FirstResponseTime": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FollowUpID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FollowUpLock": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "GroupID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Fullname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ParentID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "RealName": {
+      "type": "string",
+      "readOnly": true
+    },
+    "SalutationID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SignatureID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SolutionNotify": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SolutionTime": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SubQueues": {
+      "type": "object",
+      "readOnly": true
+    },
+    "SystemAddressID": {
+      "type": "integer"
+    },
+    "TicketStats": {
+      "type": "object",
+      "readOnly": true,
+      "properties": {
+        "EscalatedCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "LockCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "OpenCount": {
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "Tickets": {
+      "type": "array",
+      "readOnly": true
+    },
+    "UnlockTimeout": {
+      "type": "integer"
+    },
+    "UpdateNotify": {
+      "type": "integer"
+    },
+    "UpdateTime": {
+      "type": "integer"
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "Fullname",
+    "GroupID",
+    "ID",
+    "Name",
+    "RealName",
+    "ValidID"
+  ]
+}

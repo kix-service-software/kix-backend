@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServicePostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated service.",
+  "properties": {
+    "ServiceID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ServiceID"
+  ]
+}

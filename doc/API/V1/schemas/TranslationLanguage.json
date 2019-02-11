@@ -5,7 +5,7 @@
   "description": "The translation language object.",
   "properties": {
     "TranslationID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Language": {

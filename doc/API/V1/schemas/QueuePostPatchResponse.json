@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueuePostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated queue.",
+  "properties": {
+    "QueueID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "QueueID"
+  ]
+}

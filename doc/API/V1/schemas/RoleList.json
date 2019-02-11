@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#RoleList",
+  "type": "object",
+  "description": "A list of roles.",
+  "properties": {
+    "User": {
+      "type": "array",
+      "items": {
+        "$ref": "#Role"
+      }
+    }
+  }
+}

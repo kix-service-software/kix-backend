@@ -5,7 +5,7 @@
     "description": "The ID of the created config item version.",
     "properties": {
         "VersionID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [

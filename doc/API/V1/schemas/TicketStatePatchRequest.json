@@ -14,10 +14,10 @@
           "type": "string"
         },
         "TypeID": {
-          "type": "number"
+          "type": "integer"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }

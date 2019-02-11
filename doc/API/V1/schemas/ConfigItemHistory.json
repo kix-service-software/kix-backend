@@ -9,7 +9,7 @@
       "readOnly": true
     },    
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -17,11 +17,11 @@
       "readOnly": true
     },
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "HistoryEntryID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },    
     "HistoryType": {
@@ -29,11 +29,11 @@
       "readOnly": true
     },    
     "HistoryTypeID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },    
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserFirstname": {

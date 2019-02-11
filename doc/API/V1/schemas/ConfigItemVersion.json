@@ -9,15 +9,15 @@
       "readOnly": true
     },
     "ClassID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -29,7 +29,7 @@
       "readOnly": true
     },
     "CurDeplStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CurDeplStateType": {
@@ -41,7 +41,7 @@
       "readOnly": true
     },
     "CurInciStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CurInciStateType": {
@@ -53,7 +53,7 @@
       "readOnly": true
     },
     "DeplStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "DeplStateType": {
@@ -65,7 +65,7 @@
       "readOnly": true
     },
     "InciStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "InciStateType": {
@@ -76,12 +76,12 @@
       "type": "string",
       "readOnly": true
     },
-    "Number": {
+    "integer": {
       "type": "string",
       "readOnly": true
     },
     "VersionID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     }
   },
@@ -104,7 +104,7 @@
     "InciStateID",
     "InciStateType",
     "Name",
-    "Number",
+    "integer",
     "VersionID"
   ]
 }

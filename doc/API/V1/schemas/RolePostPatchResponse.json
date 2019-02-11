@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#RolePatchResponse",
+    "type": "object",
+    "description": "The ID of the created or updated role.",
+    "properties": {
+        "RoleID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "RoleID"
+    ]
+}

@@ -9,11 +9,11 @@
       "readOnly": true
     },
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ContentType": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Filename": {

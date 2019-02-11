@@ -5,7 +5,7 @@
     "description": "The ID of the created or updated ticket type.",
     "properties": {
         "TicketTypeID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [

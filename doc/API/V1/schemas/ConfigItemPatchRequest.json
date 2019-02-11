@@ -8,10 +8,10 @@
       "type": "object",
       "properties": {
         "DeplStateID": {
-          "type": "number"
+          "type": "integer"
         },    
         "InciStateID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }

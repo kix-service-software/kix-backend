@@ -11,10 +11,10 @@
           "type": "string"
         },
         "DeplStateID": {
-          "type": "number"
+          "type": "integer"
         },
         "InciStateID": {
-          "type": "number"
+          "type": "integer"
         },
         "Data": {
           "type": "object"

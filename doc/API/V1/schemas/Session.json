@@ -16,7 +16,7 @@
       "readOnly": true
     },
     "CreateTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "DeniedOperations": {
@@ -31,7 +31,7 @@
       "readOnly": true
     },
     "IgnoreMaxIdleTime": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "LastRequestTime": {
@@ -39,7 +39,7 @@
       "readOnly": true
     },
     "LastRequestTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "RemoteIP": {
@@ -51,7 +51,7 @@
       "readOnly": true
     },
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserType": {
@@ -67,7 +67,7 @@
       "readOnly": true
     },
     "ValidUntilTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     }
   },

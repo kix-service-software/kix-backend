@@ -39,7 +39,7 @@
 
             <div class="chapter">
               <h2 id="base_uri"><a href="#base_uri">Base URI</a></h2>
-              <pre>{{ baseUri | replace(r/\$version/, version) }}</pre>
+              <pre class="base-uri">{{ baseUri | replace(r/\$version/, version) }}</pre>
               {% if baseUriParameters %}
                 {% set parameterList = baseUriParameters %}
                 {% set suppressExamples = true %}

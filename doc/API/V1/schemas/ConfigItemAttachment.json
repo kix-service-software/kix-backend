@@ -5,7 +5,7 @@
   "description": "The config item attachment object.",
   "properties": {
     "AttachmentID": {
-      "type": "number"
+      "type": "integer"
     },    
     "Content": {
       "type": "string",
@@ -20,7 +20,7 @@
       "readOnly": true
     },
     "FilesizeRaw": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Filename": {
