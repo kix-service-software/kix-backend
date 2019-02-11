@@ -77,6 +77,16 @@ h5 {
   margin-top: 30px;
   margin-bottom: 10px;
 }
+code {
+  color: #000;
+  background-color: #f0f0f0;
+}
+pre {
+  margin-left: 8px;
+}
+pre.base-uri {
+  margin-left: 0px;
+}
 .param-table {
   border-collapse: collapse;  
   border-color: #ddd;
@@ -207,7 +217,6 @@ h5 {
 }
 .top-resource-description {
   border-bottom: 1px solid #ddd;
-  padding: 10px 15px;
 }
 .resource-description {
   border: 1px solid #ddd;
@@ -217,6 +226,10 @@ h5 {
 }
 .resource-description p:last-child {
   margin: 0;
+}
+.top-resource-description > h5:first-child,
+.resource-description > h5:first-child {
+  margin-top: 5px;
 }
 .list-group .badge {
   float: left;
@@ -270,7 +283,7 @@ pre code {
   font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
   font-size: 95%;
 }
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX 2018 REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre>http://{fqdn}:{port}/api.pl/webservice/core:v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#sessions"><code>/sessions</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In constract to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function is based on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?search={...}
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX 2018 REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api.pl/webservice/core:v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#sessions"><code>/sessions</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In constract to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function is based on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?search={...}
 </code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be execute at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?filter={...}
 </code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="lang-bash">{
 "&lt;Object&gt;": {
@@ -403,7 +416,7 @@ pre code {
   "description": "The channel object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -415,7 +428,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -423,14 +436,14 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -552,7 +565,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         },
         "DefinitionString": {
           "type": "string"
@@ -623,7 +636,7 @@ pre code {
   "description": "The config item class object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -637,11 +650,11 @@ pre code {
       "type": "object",
       "properties": {
         "PostProductiveCount": {
-          "type": "number",
+          "type": "integer",
           "readOnly": true
         },
         "ProductiveCount": {
-          "type": "number",
+          "type": "integer",
           "readOnly": true
         }
       },
@@ -651,7 +664,7 @@ pre code {
       ]
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -670,7 +683,7 @@ pre code {
       "type": "string"
     },    
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     },
     "Definitions": {
       "type": "array",
@@ -737,7 +750,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -756,7 +769,7 @@ pre code {
     "description": "The ID of the created or updated config item class.",
     "properties": {
         "ConfigItemClassID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -1256,11 +1269,11 @@ pre code {
       "readOnly": true
     },
     "ClassID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -1275,7 +1288,7 @@ pre code {
       }
     },    
     "DefinitionID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "DefinitionString": {
@@ -1283,7 +1296,7 @@ pre code {
       "readOnly": true
     },
     "Version": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     }
   },
@@ -1705,7 +1718,7 @@ pre code {
       "type": "object",
       "properties": {
         "ClassID": {
-          "type": "number"
+          "type": "integer"
         },    
         "Version": {
           "type": "object",
@@ -1766,7 +1779,7 @@ pre code {
     "description": "The ID of the created or updated config item.",
     "properties": {
         "ConfigItemID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -1825,7 +1838,7 @@ pre code {
   "description": "The config item object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -1837,15 +1850,15 @@ pre code {
       "readOnly": true
     },    
     "ClassID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },    
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -1853,19 +1866,19 @@ pre code {
       "readOnly": true
     },
     "CurDeplStateID": {
-      "type": "number"
+      "type": "integer"
     },    
     "CurInciStateID": {
-      "type": "number"
+      "type": "integer"
     },    
     "CurrentVersion": {
       "type": "object"
     },    
     "LastVersionID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
-    "Number": {
+    "integer": {
       "type": "string"
     },    
     "History": {
@@ -1897,7 +1910,7 @@ pre code {
     "ConfigItemID",
     "CurInciStateID",
     "CurDeplStateID",
-    "Number"
+    "integer"
   ]
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItem": {
@@ -1945,10 +1958,10 @@ pre code {
       "type": "object",
       "properties": {
         "DeplStateID": {
-          "type": "number"
+          "type": "integer"
         },    
         "InciStateID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -1968,7 +1981,7 @@ pre code {
     "description": "The ID of the created or updated config item.",
     "properties": {
         "ConfigItemID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -2151,7 +2164,7 @@ pre code {
       "readOnly": true
     },    
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -2159,11 +2172,11 @@ pre code {
       "readOnly": true
     },
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "HistoryEntryID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },    
     "HistoryType": {
@@ -2171,11 +2184,11 @@ pre code {
       "readOnly": true
     },    
     "HistoryTypeID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },    
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserFirstname": {
@@ -2410,11 +2423,11 @@ pre code {
       "readOnly": true
     },
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ContentType": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Filename": {
@@ -2636,10 +2649,10 @@ pre code {
           "type": "string"
         },
         "DeplStateID": {
-          "type": "number"
+          "type": "integer"
         },
         "InciStateID": {
-          "type": "number"
+          "type": "integer"
         },
         "Data": {
           "type": "object"
@@ -2685,7 +2698,7 @@ pre code {
     "description": "The ID of the created config item version.",
     "properties": {
         "VersionID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -2748,15 +2761,15 @@ pre code {
       "readOnly": true
     },
     "ClassID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ConfigItemID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -2768,7 +2781,7 @@ pre code {
       "readOnly": true
     },
     "CurDeplStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CurDeplStateType": {
@@ -2780,7 +2793,7 @@ pre code {
       "readOnly": true
     },
     "CurInciStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CurInciStateType": {
@@ -2792,7 +2805,7 @@ pre code {
       "readOnly": true
     },
     "DeplStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "DeplStateType": {
@@ -2804,7 +2817,7 @@ pre code {
       "readOnly": true
     },
     "InciStateID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "InciStateType": {
@@ -2815,12 +2828,12 @@ pre code {
       "type": "string",
       "readOnly": true
     },
-    "Number": {
+    "integer": {
       "type": "string",
       "readOnly": true
     },
     "VersionID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     }
   },
@@ -2843,7 +2856,7 @@ pre code {
     "InciStateID",
     "InciStateType",
     "Name",
-    "Number",
+    "integer",
     "VersionID"
   ]
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
@@ -2898,7 +2911,7 @@ pre code {
   "description": "The config item attachment object.",
   "properties": {
     "AttachmentID": {
-      "type": "number"
+      "type": "integer"
     },    
     "Content": {
       "type": "string",
@@ -2913,7 +2926,7 @@ pre code {
       "readOnly": true
     },
     "FilesizeRaw": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Filename": {
@@ -3272,7 +3285,7 @@ pre code {
     "description": "The ID of the created or updated translation.",
     "properties": {
         "TranslationID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -3331,7 +3344,7 @@ pre code {
   "description": "The translation object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -3339,7 +3352,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -3347,7 +3360,7 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number"
+      "type": "integer"
     },
     "Pattern": {
       "type": "string"
@@ -3426,7 +3439,7 @@ pre code {
     "description": "The ID of the created or updated translation.",
     "properties": {
         "TranslationID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -3691,7 +3704,7 @@ pre code {
   "description": "The translation language object.",
   "properties": {
     "TranslationID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Language": {
@@ -3879,7 +3892,664 @@ pre code {
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="i18n_translations__translationid__languages__language__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="i18n_translations__translationid__languages__language__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="priorities" class="panel-title">Priorities</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/priorities.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_priorities" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/priorities</span> <span class="methods"><a href="#priorities_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#priorities_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="priorities_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/priorities</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#priorities_get_request" data-toggle="tab">Request</a></li><li><a href="#priorities_get_response" data-toggle="tab">Response</a></li><li><a href="#priorities_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="priorities_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="priorities_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="priorities_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PriorityList</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="i18n_translations__translationid__languages__language__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="i18n_translations__translationid__languages__language__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="queues" class="panel-title">Queues</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>SubQueues</code></td><td>Adds the die tree of sub-queues to the response.</td></tr><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets in this queue. It will contain the number of tickets that are in a state of type "open", the number of locked ticket and the number of escalated tickets.</td></tr><tr><td><code>Tickets</code></td><td>Adds the list of tickets to the response.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_queues" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/queues</span> <span class="methods"><a href="#queues_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="queues_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/queues</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues_get_request" data-toggle="tab">Request</a></li><li><a href="#queues_get_response" data-toggle="tab">Response</a></li><li><a href="#queues_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="queues_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueueList</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueueList",
+  "type": "object",
+  "description": "A list of queues.",
+  "properties": {
+    "Priority": {
+      "type": "array",
+      "items": {
+        "$ref": "#Queue"
+      }
+    }
+  },
+  "required": [
+    "Queue"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+	"Queue": [
+		{
+			"Calendar": "",
+			"ChangeBy": 1,
+			"ChangeTime": "2018-11-08 09:37:53",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2018-11-08 09:37:53",
+			"DefaultSignKey": "0",
+			"Email": "kix@localhost",
+			"FirstResponseNotify": 0,
+			"FirstResponseTime": 0,
+			"FollowUpID": 3,
+			"FollowUpLock": 0,
+			"Fullname": "2nd-Level",
+			"GroupID": 1,
+			"Name": "2nd-Level",
+			"ParentID": null,
+			"QueueID": 7,
+			"RealName": "KIX System",
+			"SalutationID": 1,
+			"SignatureID": 1,
+			"SolutionNotify": 0,
+			"SolutionTime": 0,
+			"SystemAddressID": 1,
+			"UnlockTimeout": 0,
+			"UpdateNotify": 0,
+			"UpdateTime": 0,
+			"ValidID": 1
+		},
+		{
+			"Calendar": "",
+			"ChangeBy": 1,
+			"ChangeTime": "2018-11-08 09:37:53",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2018-11-08 09:37:53",
+			"DefaultSignKey": "0",
+			"Email": "kix@localhost",
+			"FirstResponseNotify": 0,
+			"FirstResponseTime": 0,
+			"FollowUpID": 3,
+			"FollowUpLock": 0,
+			"Fullname": "2nd-Level::Application Support",
+			"GroupID": 1,
+			"Name": "Application Support",
+			"ParentID": 7,
+			"QueueID": 8,
+			"RealName": "KIX System",
+			"SalutationID": 1,
+			"SignatureID": 1,
+			"SolutionNotify": 0,
+			"SolutionTime": 0,
+			"SystemAddressID": 1,
+			"UnlockTimeout": 0,
+			"UpdateNotify": 0,
+			"UpdateTime": 0,
+			"ValidID": 1
+		}
+	]
+}</code></pre></div></div><h2 class="response-title" id="queues_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="queues_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="queues_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/queues</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues_post_request" data-toggle="tab">Request</a></li><li><a href="#queues_post_response" data-toggle="tab">Response</a></li><li><a href="#queues_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueuePostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueuePostRequest",
+  "type": "object",
+  "description": "The queue request object for creation.",
+  "properties": {
+    "Queue": {
+      "type": "object",
+      "properties": {
+        "Calendar": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "DefaultSignKey": {
+          "type": "integer"
+        },
+        "FirstResponseNotify": {
+          "type": "integer"
+        },
+        "FirstResponseTime": {
+          "type": "integer"
+        },
+        "FollowUpID": {
+          "type": "integer"
+        },
+        "FollowUpLock": {
+          "type": "integer"
+        },
+        "GroupID": {
+          "type": "integer"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "SalutationID": {
+          "type": "integer"
+        },
+        "SignatureID": {
+          "type": "integer"
+        },
+        "SolutionNotify": {
+          "type": "integer"
+        },
+        "SolutionTime": {
+          "type": "integer"
+        },
+        "SystemAddressID": {
+          "type": "integer"
+        },
+        "UnlockTimeout": {
+          "type": "integer"
+        },
+        "UpdateNotify": {
+          "type": "integer"
+        },
+        "UpdateTime": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "GroupID",
+        "Name",
+        "ValidID"
+      ]
+    }
+  },
+  "required": [
+    "Queue"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Queue": {
+        "Calendar": "",
+        "Comment": "Postmaster queue.",
+        "DefaultSignKey": null,
+        "FirstResponseNotify": null,
+        "FirstResponseTime": null,
+        "FollowUpID": 1,
+        "FollowUpLock": 0,
+        "GroupID": 1,
+        "Name": "Postmaster",
+        "ParentID": 1,
+        "RealName": "KIX System",
+        "SalutationID": 1,
+        "SignatureID": 1,
+        "SolutionNotify": null,
+        "SolutionTime": null,
+        "SystemAddressID": 1,
+        "UnlockTimeout": 0,
+        "UpdateNotify": null,
+        "UpdateTime": null,
+        "ValidID": 1
+    }
+}</code></pre></div></div><div class="tab-pane" id="queues_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Queue has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueuePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueuePostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated queue.",
+  "properties": {
+    "QueueID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "QueueID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "QueueID": 1
+}</code></pre></div></div><h2 class="response-title" id="queues_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="queues_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="queues_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_queues__queueid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/queues</span><span class="uri">/{queueId}</span> <span class="methods"><a href="#queues__queueid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues__queueid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues__queueid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="queues__queueid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/queues</span><span class="uri">/{queueId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues__queueid__get_request" data-toggle="tab">Request</a></li><li><a href="#queues__queueid__get_response" data-toggle="tab">Response</a></li><li><a href="#queues__queueid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues__queueid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">queueId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="queues__queueid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Queue</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Priority",
+  "type": "object",
+  "description": "The priority object.",
+  "properties": {
+    "Calendar": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "DefaultSignKey": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FirstResponseNotify": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FirstResponseTime": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FollowUpID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "FollowUpLock": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "GroupID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Fullname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ParentID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "RealName": {
+      "type": "string",
+      "readOnly": true
+    },
+    "SalutationID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SignatureID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SolutionNotify": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SolutionTime": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SubQueues": {
+      "type": "object",
+      "readOnly": true
+    },
+    "SystemAddressID": {
+      "type": "integer"
+    },
+    "TicketStats": {
+      "type": "object",
+      "readOnly": true,
+      "properties": {
+        "EscalatedCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "LockCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "OpenCount": {
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "Tickets": {
+      "type": "array",
+      "readOnly": true
+    },
+    "UnlockTimeout": {
+      "type": "integer"
+    },
+    "UpdateNotify": {
+      "type": "integer"
+    },
+    "UpdateTime": {
+      "type": "integer"
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "Fullname",
+    "GroupID",
+    "ID",
+    "Name",
+    "RealName",
+    "ValidID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+	"Queue": {
+        "Calendar": "",
+        "ChangeBy": 1,
+        "ChangeTime": "2018-11-08 10:35:37",
+        "Comment": "Postmaster queue.",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-08 10:35:37",
+        "DefaultSignKey": null,
+        "Email": "kix@localhost",
+        "FirstResponseNotify": null,
+        "FirstResponseTime": null,
+        "FollowUpID": 1,
+        "FollowUpLock": 0,
+        "Fullname": "Postmaster",
+        "GroupID": 1,
+        "Name": "Postmaster",
+        "ParentID": null,
+        "QueueID": 1,
+        "RealName": "KIX System",
+        "SalutationID": 1,
+        "SignatureID": 1,
+        "SolutionNotify": null,
+        "SolutionTime": null,
+        "SystemAddressID": 1,
+        "UnlockTimeout": 0,
+        "UpdateNotify": null,
+        "UpdateTime": null,
+        "ValidID": 1
+	}
+}</code></pre></div></div><h2 class="response-title" id="queues__queueid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="queues__queueid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="queues__queueid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/queues</span><span class="uri">/{queueId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues__queueid__patch_request" data-toggle="tab">Request</a></li><li><a href="#queues__queueid__patch_response" data-toggle="tab">Response</a></li><li><a href="#queues__queueid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues__queueid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">queueId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueuePatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueuePatchRequest",
+  "type": "object",
+  "description": "The queue request object for creation.",
+  "properties": {
+    "Queue": {
+      "type": "object",
+      "properties": {
+        "Calendar": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "DefaultSignKey": {
+          "type": "integer"
+        },
+        "FirstResponseNotify": {
+          "type": "integer"
+        },
+        "FirstResponseTime": {
+          "type": "integer"
+        },
+        "FollowUpID": {
+          "type": "integer"
+        },
+        "FollowUpLock": {
+          "type": "integer"
+        },
+        "GroupID": {
+          "type": "integer"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "SalutationID": {
+          "type": "integer"
+        },
+        "SignatureID": {
+          "type": "integer"
+        },
+        "SolutionNotify": {
+          "type": "integer"
+        },
+        "SolutionTime": {
+          "type": "integer"
+        },
+        "SystemAddressID": {
+          "type": "integer"
+        },
+        "UnlockTimeout": {
+          "type": "integer"
+        },
+        "UpdateNotify": {
+          "type": "integer"
+        },
+        "UpdateTime": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "Queue"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Queue": {
+        "Comment": "Some new queue.",
+        "Name": "New Queue"
+    }
+}</code></pre></div></div><div class="tab-pane" id="queues__queueid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueuePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueuePostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated queue.",
+  "properties": {
+    "QueueID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "QueueID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "QueueID": 1
+}</code></pre></div></div><h2 class="response-title" id="queues__queueid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="queues__queueid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="queues__queueid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="queues__queueid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="queues__queueid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/queues</span><span class="uri">/{queueId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues__queueid__delete_request" data-toggle="tab">Request</a></li><li><a href="#queues__queueid__delete_response" data-toggle="tab">Response</a></li><li><a href="#queues__queueid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues__queueid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">queueId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="queues__queueid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="queues__queueid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="queues__queueid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="queues__queueid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="priorities" class="panel-title">Priorities</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/priorities.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_priorities" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/priorities</span> <span class="methods"><a href="#priorities_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#priorities_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="priorities_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/priorities</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#priorities_get_request" data-toggle="tab">Request</a></li><li><a href="#priorities_get_response" data-toggle="tab">Response</a></li><li><a href="#priorities_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="priorities_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="priorities_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="priorities_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PriorityList</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#PriorityList",
   "type": "object",
@@ -3956,7 +4626,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [
@@ -3980,7 +4650,7 @@ pre code {
   "description": "The ID of the created or updated priority.",
   "properties": {
     "PriorityID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -4040,7 +4710,7 @@ pre code {
   "description": "The priority object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -4052,7 +4722,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -4060,14 +4730,14 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -4128,7 +4798,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -4148,7 +4818,7 @@ pre code {
   "description": "The ID of the created or updated priority.",
   "properties": {
     "PriorityID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -4280,7 +4950,30 @@ pre code {
       }
     }
   }
-}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/RoleList.json</code></pre></div></div><h2 class="response-title" id="roles_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Role": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "Comment": "the admin role",
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "ID": 1,
+            "Name": "admin",
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 10:17:03",
+            "Comment": "the user role",
+            "CreateBy": 1,
+            "CreateTime": "2018-11-20 12:34:55",
+            "ID": 2,
+            "Name": "user",
+            "ValidID": 1
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="roles_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Error",
   "type": "object",
@@ -4318,7 +5011,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [
@@ -4330,7 +5023,14 @@ pre code {
   "required": [
     "Role"
   ]
-}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/RolePostRequest.json</code></pre></div></div><div class="tab-pane" id="roles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Role has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/RolePatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/RolePostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="roles_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Role": {
+        "Name": "the new stats role",
+        "ValidID": 1
+    }
+}</code></pre></div></div><div class="tab-pane" id="roles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Role has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/RolePatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+    "RoleID": 3
+}</code></pre></div></div><h2 class="response-title" id="roles_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Error",
   "type": "object",
@@ -4381,7 +5081,7 @@ pre code {
   "description": "The role object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -4393,7 +5093,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -4401,14 +5101,14 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -4420,7 +5120,18 @@ pre code {
     "Name",
     "ValidID"
   ]
-}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/Role.json</code></pre></div></div><h2 class="response-title" id="roles__roleid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Role": {
+        "ChangeBy": 1,
+        "ChangeTime": "2018-09-28 09:17:03",
+        "Comment": "the admin role",
+        "CreateBy": 1,
+        "CreateTime": "2018-08-28 11:34:55",
+        "ID": 1,
+        "Name": "admin",
+        "ValidID": 1
+    }
+}</code></pre></div></div><h2 class="response-title" id="roles__roleid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Error",
   "type": "object",
@@ -4458,7 +5169,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -4466,7 +5177,14 @@ pre code {
   "required": [
     "Role"
   ]
-}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/RolePatchRequest.json</code></pre></div></div><div class="tab-pane" id="roles__roleid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/RolePatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/RolePostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="roles__roleid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Role": {
+        "Name": "my special user role",
+        "ValidID": 2
+    }
+}</code></pre></div></div><div class="tab-pane" id="roles__roleid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/RolePatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+    "RoleID": 3
+}</code></pre></div></div><h2 class="response-title" id="roles__roleid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Error",
   "type": "object",
@@ -4576,23 +5294,29 @@ pre code {
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_roles__roleid__userids" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/roles/userids.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/roles/{roleId}</span><span class="uri">/userids</span> <span class="methods"><a href="#roles__roleid__userids_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#roles__roleid__userids_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="roles__roleid__userids_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/userids</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__userids_get_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__userids_get_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__userids_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__userids_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="roles__roleid__userids_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RoleUserIDsList</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_roles__roleid__userids" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/roles/userids.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/roles/{roleId}</span><span class="uri">/userids</span> <span class="methods"><a href="#roles__roleid__userids_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#roles__roleid__userids_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="roles__roleid__userids_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/userids</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__userids_get_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__userids_get_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__userids_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__userids_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="roles__roleid__userids_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RoleUserIDList</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
-  "$id": "#RoleUserList",
+  "$id": "#RoleUserIDList",
   "type": "object",
   "description": "A list of user IDs.",
   "properties": {
     "UserIDs": {
       "type": "array",
       "items": {
-        "type": "number"
+        "type": "integer"
       }
     }
   },
   "required": [
     "UserIDs"
   ]
-}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/RoleUserIDsList.json</code></pre></div></div><h2 class="response-title" id="roles__roleid__userids_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "UserID": [
+        1,
+        2,
+        3
+    ]
+}</code></pre></div></div><h2 class="response-title" id="roles__roleid__userids_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Error",
   "type": "object",
@@ -4614,7 +5338,37 @@ pre code {
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__userids_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="roles__roleid__userids_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/userids</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__userids_post_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__userids_post_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__userids_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__userids_post_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><div class="tab-pane" id="roles__roleid__userids_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The RoleUserIDs has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="roles__roleid__userids_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__userids_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="roles__roleid__userids_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/userids</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__userids_post_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__userids_post_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__userids_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__userids_post_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RoleUserIDPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#RoleUserIDPostRequest",
+  "type": "object",
+  "description": "The role user request object for creation.",
+  "properties": {
+    "UserID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "UserID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "UserID": 2
+}</code></pre></div></div><div class="tab-pane" id="roles__roleid__userids_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The RoleUserID has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RoleUserIDPostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#RoleUserIDPostResponse",
+    "type": "object",
+    "description": "The UserID of the created role user.",
+    "properties": {
+        "UserID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "UserID"
+    ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "UserID": 2
+}</code></pre></div></div><h2 class="response-title" id="roles__roleid__userids_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Error",
   "type": "object",
@@ -4758,7 +5512,7 @@ pre code {
   "description": "The sender type object.",
   "properties": {
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
@@ -4797,7 +5551,456 @@ pre code {
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="sendertypes__sendertypeid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="sendertypes__sendertypeid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="session" class="panel-title">Current Session</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/session.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_session" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/session</span> <span class="methods"><a href="#session_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/session</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_get_request" data-toggle="tab">Request</a></li><li><a href="#session_get_response" data-toggle="tab">Response</a></li><li><a href="#session_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Session</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="sendertypes__sendertypeid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="sendertypes__sendertypeid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="services" class="panel-title">Services</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>SubServices</code></td><td>Adds the die tree of sub-services to the response.</td></tr><tr><td><code>IncidentState</code></td><td>Adds the information about the incident state of the service.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_services" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/services</span> <span class="methods"><a href="#services_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#services_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="services_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/services</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_get_request" data-toggle="tab">Request</a></li><li><a href="#services_get_response" data-toggle="tab">Response</a></li><li><a href="#services_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="services_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ServiceList</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServiceList",
+  "type": "object",
+  "description": "A list of service.",
+  "properties": {
+    "Priority": {
+      "type": "array",
+      "items": {
+        "$ref": "#Service"
+      }
+    }
+  },
+  "required": [
+    "Service"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+	"Service": [
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2018-11-08 09:37:30",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2018-11-08 09:37:30",
+			"Criticality": "3 normal",
+			"CurInciStateTypeFromCIs": "operational",
+			"Fullname": "Unklassifiziert",
+			"Name": "Unklassifiziert",
+			"ParentID": null,
+			"ServiceID": 1,
+			"TypeID": 14,
+			"ValidID": 1
+		},
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2018-11-08 09:37:32",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2018-11-08 09:37:32",
+			"Criticality": "2 low",
+			"CurInciStateTypeFromCIs": "operational",
+			"Fullname": "Client-/Desktop Services::Media Mount",
+			"Name": "Media Mount",
+			"ParentID": 2,
+			"ServiceID": 10,
+			"TypeID": 4,
+			"ValidID": 1
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="services_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="services_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="services_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/services</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services_post_request" data-toggle="tab">Request</a></li><li><a href="#services_post_response" data-toggle="tab">Response</a></li><li><a href="#services_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ServicePostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServicePostRequest",
+  "type": "object",
+  "description": "The service request object for creation.",
+  "properties": {
+    "Service": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Criticality": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "TypeID": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Criticality",
+        "Name",
+        "TypeID",
+        "ValidID"
+      ]
+    }
+  },
+  "required": [
+    "Service"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Service": {
+        "Comment": "",
+        "Criticality": "3 normal",
+        "Name": "testservice1",
+        "ParentID": 1,
+        "TypeID": 1,
+        "ValidID": 1
+    }
+}</code></pre></div></div><div class="tab-pane" id="services_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Service has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ServicePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServicePostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated service.",
+  "properties": {
+    "ServiceID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ServiceID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ServiceID": 1
+}</code></pre></div></div><h2 class="response-title" id="services_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="services_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="services_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_services__serviceid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/services</span><span class="uri">/{serviceId}</span> <span class="methods"><a href="#services__serviceid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#services__serviceid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#services__serviceid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="services__serviceid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/services</span><span class="uri">/{serviceId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services__serviceid__get_request" data-toggle="tab">Request</a></li><li><a href="#services__serviceid__get_response" data-toggle="tab">Response</a></li><li><a href="#services__serviceid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services__serviceid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">serviceId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="services__serviceid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Service</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Service",
+  "type": "object",
+  "description": "The service object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Criticality": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CurInciStateTypeFromCIs": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Fullame": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ParentID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ServiceID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "TypeID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "Criticality",
+    "Fullname",
+    "Name",
+    "ServiceID",
+    "TypeID",
+    "ValidID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Service": {
+        "ChangeBy": 1,
+        "ChangeTime": "2018-11-08 09:37:33",
+        "Comment": "",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-08 09:37:33",
+        "Criticality": "3 normal",
+        "CurInciStateTypeFromCIs": "operational",
+        "Fullname": "Software-/Application Services",
+        "Name": "Software-/Application Services",
+        "ParentID": null,
+        "ServiceID": 18,
+        "TypeID": 4,
+        "ValidID": 1
+    }
+}</code></pre></div></div><h2 class="response-title" id="services__serviceid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="services__serviceid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="services__serviceid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/services</span><span class="uri">/{serviceId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services__serviceid__patch_request" data-toggle="tab">Request</a></li><li><a href="#services__serviceid__patch_response" data-toggle="tab">Response</a></li><li><a href="#services__serviceid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services__serviceid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">serviceId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ServicePatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServicePatchRequest",
+  "type": "object",
+  "description": "The service request object for update.",
+  "properties": {
+    "Service": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Criticality": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "TypeID": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "Service"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Service": {
+        "Name": "testservice2"
+    }
+}</code></pre></div></div><div class="tab-pane" id="services__serviceid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ServicePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServicePostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated service.",
+  "properties": {
+    "ServiceID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ServiceID"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ServiceID": 1
+}</code></pre></div></div><h2 class="response-title" id="services__serviceid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="services__serviceid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="services__serviceid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="services__serviceid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="services__serviceid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/services</span><span class="uri">/{serviceId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#services__serviceid__delete_request" data-toggle="tab">Request</a></li><li><a href="#services__serviceid__delete_response" data-toggle="tab">Response</a></li><li><a href="#services__serviceid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="services__serviceid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">serviceId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="services__serviceid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="services__serviceid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="services__serviceid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Error",
+  "type": "object",
+  "description": "An error object.",
+  "properties": {
+    "Code": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Code",
+    "Message"
+  ]
+}</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="services__serviceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="session" class="panel-title">Current Session</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/session.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_session" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/session</span> <span class="methods"><a href="#session_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/session</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_get_request" data-toggle="tab">Request</a></li><li><a href="#session_get_response" data-toggle="tab">Response</a></li><li><a href="#session_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Session</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
   "$schema": "http://json-schema.org/schema",
   "$id": "#Session",
   "type": "object",
@@ -4815,7 +6018,7 @@ pre code {
       "readOnly": true
     },
     "CreateTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "DeniedOperations": {
@@ -4830,7 +6033,7 @@ pre code {
       "readOnly": true
     },
     "IgnoreMaxIdleTime": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "LastRequestTime": {
@@ -4838,7 +6041,7 @@ pre code {
       "readOnly": true
     },
     "LastRequestTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "RemoteIP": {
@@ -4850,7 +6053,7 @@ pre code {
       "readOnly": true
     },
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserType": {
@@ -4866,7 +6069,7 @@ pre code {
       "readOnly": true
     },
     "ValidUntilTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     }
   },
@@ -4966,7 +6169,7 @@ pre code {
       "readOnly": true
     },
     "CreateTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "DeniedOperations": {
@@ -4981,7 +6184,7 @@ pre code {
       "readOnly": true
     },
     "IgnoreMaxIdleTime": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "LastRequestTime": {
@@ -4989,7 +6192,7 @@ pre code {
       "readOnly": true
     },
     "LastRequestTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "RemoteIP": {
@@ -5001,7 +6204,7 @@ pre code {
       "readOnly": true
     },
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserType": {
@@ -5017,7 +6220,7 @@ pre code {
       "readOnly": true
     },
     "ValidUntilTimeUnix": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     }
   },
@@ -5104,7 +6307,7 @@ pre code {
   "description": "The state type object.",
   "properties": {
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
@@ -5209,7 +6412,7 @@ pre code {
   "description": "The ticket lock object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -5217,7 +6420,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -5225,14 +6428,14 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -5355,10 +6558,10 @@ pre code {
           "type": "string"
         },
         "TypeID": {
-          "type": "number"
+          "type": "integer"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [
@@ -5384,7 +6587,7 @@ pre code {
     "description": "The ID of the created or updated ticket state.",
     "properties": {
         "TicketStateID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -5443,7 +6646,7 @@ pre code {
   "description": "The ticket state object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -5455,7 +6658,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -5463,17 +6666,17 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
       "type": "string"
     },
     "TypeID": {
-      "type": "number"
+      "type": "integer"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -5536,10 +6739,10 @@ pre code {
           "type": "string"
         },
         "TypeID": {
-          "type": "number"
+          "type": "integer"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -5559,7 +6762,7 @@ pre code {
     "description": "The ID of the created or updated ticket state.",
     "properties": {
         "TicketStateID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -5754,7 +6957,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [
@@ -5778,7 +6981,7 @@ pre code {
     "description": "The ID of the created or updated ticket type.",
     "properties": {
         "TicketTypeID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -5838,7 +7041,7 @@ pre code {
   "description": "The ticket type object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -5850,7 +7053,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -5858,14 +7061,14 @@ pre code {
       "readOnly": true
     },
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [
@@ -5926,7 +7129,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -5946,7 +7149,7 @@ pre code {
     "description": "The ID of the created or updated ticket type.",
     "properties": {
         "TicketTypeID": {
-            "type": "number"
+            "type": "integer"
         }
     },
     "required": [
@@ -6072,7 +7275,7 @@ pre code {
   "description": "The user object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -6080,7 +7283,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -6097,7 +7300,7 @@ pre code {
       "type": "string"
     },
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserLastname": {
@@ -6110,7 +7313,7 @@ pre code {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     },
     "Preferences": {
       "type": "array",
@@ -6310,7 +7513,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "required": [
@@ -6387,7 +7590,7 @@ pre code {
   "description": "The user object.",
   "properties": {
     "ChangeBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "ChangeTime": {
@@ -6395,7 +7598,7 @@ pre code {
       "readOnly": true
     },
     "CreateBy": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "CreateTime": {
@@ -6412,7 +7615,7 @@ pre code {
       "type": "string"
     },
     "UserID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "UserLastname": {
@@ -6425,7 +7628,7 @@ pre code {
       "type": "string"
     },
     "ValidID": {
-      "type": "number"
+      "type": "integer"
     },
     "Preferences": {
       "type": "array",
@@ -6509,7 +7712,7 @@ pre code {
           "type": "string"
         },
         "ValidID": {
-          "type": "number"
+          "type": "integer"
         }
       }
     }
@@ -7021,7 +8224,7 @@ pre code {
   "description": "The valid object.",
   "properties": {
     "ID": {
-      "type": "number",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
@@ -7056,4 +8259,4 @@ pre code {
 }</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#channels">Communication Channels</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#priorities">Priorities</a></li><li><a class="nav-resource" href="#roles">Roles</a></li><li><a class="nav-resource" href="#sendertypes">Sender Types</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#sessions">Sessions</a></li><li><a class="nav-resource" href="#statetypes">State Types</a></li><li><a class="nav-resource" href="#ticketlocks">Ticket Locks</a></li><li><a class="nav-resource" href="#ticketstates">Ticket States</a></li><li><a class="nav-resource" href="#tickettypes">Ticket Types</a></li><li><a class="nav-resource" href="#user">Current User</a></li><li><a class="nav-resource" href="#users">Users</a></li><li><a class="nav-resource" href="#valid">Valid</a></li></ul></div></div></div></div></body></html>
+}</code></pre></div></div></div><div class="tab-pane" id="valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#channels">Communication Channels</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#queues">Queues</a></li><li><a class="nav-resource" href="#priorities">Priorities</a></li><li><a class="nav-resource" href="#roles">Roles</a></li><li><a class="nav-resource" href="#sendertypes">Sender Types</a></li><li><a class="nav-resource" href="#services">Services</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#sessions">Sessions</a></li><li><a class="nav-resource" href="#statetypes">State Types</a></li><li><a class="nav-resource" href="#ticketlocks">Ticket Locks</a></li><li><a class="nav-resource" href="#ticketstates">Ticket States</a></li><li><a class="nav-resource" href="#tickettypes">Ticket Types</a></li><li><a class="nav-resource" href="#user">Current User</a></li><li><a class="nav-resource" href="#users">Users</a></li><li><a class="nav-resource" href="#valid">Valid</a></li></ul></div></div></div></div></body></html>
