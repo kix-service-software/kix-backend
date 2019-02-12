@@ -1353,7 +1353,10 @@ sub _ApplyInclude {
     # check if a given include can be matched to a sub-resource
     if ( IsHashRefWithData($Self->{OperationRouteMapping}) ) {
         my %ReverseOperationRouteMapping = reverse %{$Self->{OperationRouteMapping}};
+
         foreach my $Include ( keys %{$Self->{Include}} ) {
+            next if !$Self->{OperationRouteMapping}->{$Self->{OperationType}};
+
             my $IncludeOperation = $ReverseOperationRouteMapping{"$Self->{OperationRouteMapping}->{$Self->{OperationType}}/" . lc($Include)};
             next if !$IncludeOperation;
 
@@ -1365,7 +1368,8 @@ sub _ApplyInclude {
                         my $Result = $Self->ExecOperation(
                             OperationType => $IncludeOperation,
                             Data          => {
-                                $Self->{OperationConfig}->{ObjectID} => $ObjectID
+                                %{$Self->{RequestData}},
+                                $Self->{OperationConfig}->{ObjectID} => $ObjectID,
                             }
                         );
                         if ( IsHashRefWithData($Result) && $Result->{Success} ) {
@@ -1379,6 +1383,7 @@ sub _ApplyInclude {
                     my $Result = $Self->ExecOperation(
                         OperationType => $IncludeOperation,
                         Data          => {
+                            %{$Self->{RequestData}},
                             $Self->{OperationConfig}->{ObjectID} => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}}
                         }
                     );
@@ -1444,16 +1449,20 @@ sub _ApplyInclude {
                     }
                 }
                 else {
-                    $Param{Data}->{$Object}->{$Include} = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
+                    my $Result = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
                         Object   => $Object,
                         ObjectID => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
                         UserID   => $Self->{Authorization}->{UserID},
                     );
 
-                    # add specific cache dependencies after exec if available
-                    if ( $Self->{IncludeHandler}->{$IncludeHandler}->can('GetCacheDependencies') ) {
-                        foreach my $CacheDep ( keys %{$Self->{IncludeHandler}->{$IncludeHandler}->GetCacheDependencies()} ) {
-                            $Self->{CacheDependencies}->{$CacheDep} = 1;
+                    if ( $Result ) {
+                        $Param{Data}->{$Object}->{$Include} = $Result;
+
+                        # add specific cache dependencies after exec if available
+                        if ( $Self->{IncludeHandler}->{$IncludeHandler}->can('GetCacheDependencies') ) {
+                            foreach my $CacheDep ( keys %{$Self->{IncludeHandler}->{$IncludeHandler}->GetCacheDependencies()} ) {
+                                $Self->{CacheDependencies}->{$CacheDep} = 1;
+                            }
                         }
                     }
                 }

@@ -229,20 +229,20 @@ sub Run {
             );
         }
 
-        if ( $Param{Data}->{include}->{Attachments} ) {
-            # get attachment index (without attachments)
-            my %AtmIndex = $TicketObject->ArticleAttachmentIndex(
-                ContentPath                => $ArticleRaw{ContentPath},
-                ArticleID                  => $ArticleID,
-                StripPlainBodyAsAttachment => $StripPlainBodyAsAttachment,
-                UserID                     => $Self->{Authorization}->{UserID},
-            );
+        # if ( $Param{Data}->{include}->{Attachments} ) {
+        #     # get attachment index (without attachments)
+        #     my %AtmIndex = $TicketObject->ArticleAttachmentIndex(
+        #         ContentPath                => $ArticleRaw{ContentPath},
+        #         ArticleID                  => $ArticleID,
+        #         StripPlainBodyAsAttachment => $StripPlainBodyAsAttachment,
+        #         UserID                     => $Self->{Authorization}->{UserID},
+        #     );
 
-            my @Attachments = sort keys %AtmIndex;
+        #     my @Attachments = sort keys %AtmIndex;
 
-            # set Attachments data
-            $ArticleRaw{Attachments} = \@Attachments;
-        }
+        #     # set Attachments data
+        #     $ArticleRaw{Attachments} = \@Attachments;
+        # }
 
         my %ArticleData;
         my @DynamicFields;
