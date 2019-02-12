@@ -1,1 +1,1 @@
-A session identifies the user against the API and the backend application. It is represented by a WebToken containing the relevant information in a secured manner.
+A session identifies the user against the API and the backend application. It is represented by a [WebToken](https://jwt.io/) containing the relevant information in a secured manner.

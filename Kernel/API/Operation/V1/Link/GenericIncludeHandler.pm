@@ -94,6 +94,12 @@ sub Run {
         }
     }
 
+    # check if the requested object is supported
+    my %PossibleObjects = $Kernel::OM->Get('Kernel::System::LinkObject')->PossibleObjectsList(
+        Object => $Param{Object}
+    );
+    return if !%PossibleObjects;
+
     # perform Link search
     my $LinkListSource = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
         SourceObject => $Param{Object},

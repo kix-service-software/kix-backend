@@ -261,8 +261,8 @@ sub ProviderProcessRequest {
     for my $Op ( sort keys %{ $Config->{RouteOperationMapping} } ) {
         # ignore invalid config
         next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$Op} );
-        # ignore non-search operations
-        next if $Op !~ /Search$/;
+        # ignore non-search or -get operations
+        next if $Op !~ /(Search|Get)$/;
         # ignore anything that has nothing to do with the current Ops route
         next if "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\//;
 
