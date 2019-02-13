@@ -1087,25 +1087,28 @@ sub _ApplyFilter {
                                         }
                                     }
                                     # the string contains a part
-                                    elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {                        
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue/ ) {
+                                    elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {               
+                                        my $FilterValueQuoted = quotemeta $FilterValue;
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/ ) {
                                             $FilterMatch = 0;
                                         }
                                     }
                                     # the string starts with the part
                                     elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {                        
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue/ ) {
+                                        my $FilterValueQuoted = quotemeta $FilterValue;
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/ ) {
                                             $FilterMatch = 0;
                                         }
                                     }
                                     # the string ends with the part
                                     elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {                        
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValue$/ ) {
+                                        my $FilterValueQuoted = quotemeta $FilterValue;
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/ ) {
                                             $FilterMatch = 0;
                                         }
                                     }
                                     # the string matches the pattern
-                                    elsif ( $FilterItem->{Operator} eq 'LIKE' ) {                        
+                                    elsif ( $FilterItem->{Operator} eq 'LIKE' ) {  
                                         if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
                                             $FilterMatch = 0;
                                         }
