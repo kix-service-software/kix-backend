@@ -155,12 +155,16 @@ sub Run {
 
             # include Definition if requested
             if ( $Param{Data}->{include}->{Definition} ) {
+                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                    VersionID  => $VersionID,
+                );
+
                 # get already prepared Definition data from ClassDefinitionGet operation
                 my $Result = $Self->ExecOperation(
                     OperationType => 'V1::CMDB::ClassDefinitionGet',
                     Data          => {
                         ClassID      => $ConfigItem->{ClassID},
-                        DefinitionID => $Version->{DefinitionID},
+                        DefinitionID => $VersionData->{DefinitionID},
                     }
                 );
                 if ( IsHashRefWithData($Result) && $Result->{Success} ) {
