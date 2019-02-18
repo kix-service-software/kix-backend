@@ -42,6 +42,7 @@ create an article
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
         Channel          => 'note',                                 # ...
+        CustomerVisible  => 0|1,                                    # optional
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
@@ -87,7 +88,8 @@ example with "Charset & MimeType" and no "ContentType"
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
-        Channel          => 'note-internal',                        # ...
+        Channel          => 'note',                                 # ...
+        CustomerVisible  => 0|1,                                    # optional
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
