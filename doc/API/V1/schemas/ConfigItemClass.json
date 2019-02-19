@@ -42,7 +42,7 @@
     },
     "CurrentDefinition": {
       "type": "object",
-      "$ref": "#ConfigItemClassDefinition"
+      "$ref": "ConfigItemClassDefinition.json"
     },
     "ID": {
       "type": "string",
@@ -57,7 +57,7 @@
     "Definitions": {
       "type": "array",
       "item": {
-        "$ref": "#ConfigItemClassDefinition"
+        "$ref": "ConfigItemClassDefinition.json"
       }
     }
   },

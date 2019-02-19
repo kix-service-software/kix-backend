@@ -1,6 +1,6 @@
   usage: Use this resourceType to represent a collection of items
   get:
-    is: [ hasResponseCollection: { typeName: <<typeName>> }, hasBadRequest, filterable, pageable, sortable ]
+    is: [ hasResponseCollection: { typeName: <<typeName>>CollectionResponse }, hasBadRequest, filterable, pageable, sortable ]
   post:
     is: [ hasRequestItem: { typeName: <<typeName>>PostRequest }, hasBadRequest, hasConflict ]
     responses:

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#UserResponse",
+  "type": "object",
+  "description": "A response for user GET request.",
+  "properties": {
+    "User": {
+      "$ref": "User.json"
+    }
+  },
+  "required": [
+    "User"
+  ]
+}

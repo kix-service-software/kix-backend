@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TicketStateCollectionResponse",
+  "type": "object",
+  "description": "A list of ticket states.",
+  "properties": {
+    "TicketState": {
+      "type": "array",
+      "items": {
+        "$ref": "TicketState.json"
+      }
+    }
+  },
+  "required": [
+    "TicketStateID"
+  ]
+}

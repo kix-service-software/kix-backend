@@ -48,7 +48,7 @@
     "Preferences": {
       "type": "array",
       "item": {
-        "$ref": "#UserPreference"
+        "$ref": "UserPreference.json"
       }
     }
   },

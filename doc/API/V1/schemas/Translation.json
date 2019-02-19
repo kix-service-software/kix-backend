@@ -29,7 +29,7 @@
     "Languages": {
       "type": "array",
       "item": {
-        "$ref": "#TranslationLanguage"
+        "$ref": "TranslationLanguage.json"
       }
     }
   },

@@ -13,7 +13,7 @@
         "Languages": {
           "type": "array",
           "items": {
-            "$ref": "#TranslationLanguage"
+            "$ref": "TranslationLanguage.json"
           }
         }    
       },

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServiceResponse",
+  "type": "object",
+  "description": "A response for service GET request.",
+  "properties": {
+    "Priority": {
+      "$ref": "Service.json"
+    }
+  },
+  "required": [
+    "Service"
+  ]
+}

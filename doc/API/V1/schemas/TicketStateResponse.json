@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TicketStateResponse",
+  "type": "object",
+  "description": "A response for ticket state GET request.",
+  "properties": {
+    "TicketState": {
+      "$ref": "TicketState.json"
+    }
+  },
+  "required": [
+    "TicketStateID"
+  ]
+}

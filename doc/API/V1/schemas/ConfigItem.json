@@ -51,19 +51,19 @@
     "History": {
       "type": "array",
       "item": {
-        "$ref": "#ConfigItemHistoryItem"
+        "$ref": "ConfigItemHistoryItem.json"
       }
     },
     "Images": {
       "type": "array",
       "item": {
-        "$ref": "#ConfigItemImage"
+        "$ref": "ConfigItemImage.json"
       }
     },
     "Versions": {
       "type": "array",
       "item": {
-        "$ref": "#ConfigItemVersion"
+        "$ref": "ConfigItemVersion.json"
       }
     }
   },

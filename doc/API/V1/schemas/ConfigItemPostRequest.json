@@ -12,12 +12,12 @@
         },    
         "Version": {
           "type": "object",
-          "$ref": "#ConfigItemVersionPostRequest"
+          "$ref": "ConfigItemVersionPostRequest.json"
         },
         "Images": {
           "type": "array",
           "item": {
-            "$ref": "#ConfigItemImagePostRequest"
+            "$ref": "ConfigItemImagePostRequest.json"
           }
         }
       },
