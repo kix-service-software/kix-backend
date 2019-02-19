@@ -127,6 +127,7 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
                 ChannelID                       => 123,                        # optional
                 Channel                         => 'some channel name',        # optional
+                CustomerVisible                 => 0|1,                        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 AutoResponseType                => 'some auto response type',  # optional
@@ -372,6 +373,7 @@ sub _ArticleCreate {
         TicketID       => $Ticket->{TicketID},
         ChannelID      => $Article->{ChannelID}      || '',
         Channel        => $Article->{Channel}        || '',
+        CustomerVisible => $Article->{CustomerVisible} || 0,
         SenderTypeID   => $Article->{SenderTypeID}   || '',
         SenderType     => $Article->{SenderType}     || '',
         From           => $From,
