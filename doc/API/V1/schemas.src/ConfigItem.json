@@ -51,7 +51,7 @@
     "History": {
       "type": "array",
       "item": {
-        "$ref": "ConfigItemHistoryItem.json"
+        "$ref": "ConfigItemHistory.json"
       }
     },
     "Images": {

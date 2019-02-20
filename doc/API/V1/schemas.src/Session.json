@@ -75,7 +75,6 @@
     "AllowedOperations",
     "CreateTime",
     "CreateTimeUnix",
-    "CreateTime",
     "DeniedOperations",
     "TokenType",
     "UserID",

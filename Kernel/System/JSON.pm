@@ -68,6 +68,7 @@ Encode a perl data structure to a JSON string.
     my $JSONString = $JSONObject->Encode(
         Data     => $Data,
         SortKeys => 1,          # (optional) (0|1) default 0, to sort the keys of the json data
+        Pretty   => 1,          # (optional) (0|1) default 0, to pretty print the json data
     );
 
 =cut
@@ -92,6 +93,11 @@ sub Encode {
     # sort the keys of the JSON data
     if ( $Param{SortKeys} ) {
         $JSONObject->canonical( [1] );
+    }
+
+    # pretty print the JSON data
+    if ( $Param{Pretty} ) {
+        $JSONObject->pretty( [1,1,1] );
     }
 
     # get JSON-encoded presentation of perl structure

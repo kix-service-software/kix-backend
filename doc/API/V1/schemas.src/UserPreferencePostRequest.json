@@ -13,12 +13,12 @@
         "Value": {
           "type": "string"
         }
-      }
-    },
-    "required": [
-      "ID",
-      "Value"
-    ]
+      },
+      "required": [
+        "ID",
+        "Value"
+      ]
+    }
   },
   "required": [
     "UserPreference"

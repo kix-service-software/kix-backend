@@ -13,12 +13,12 @@
         "Value": {
           "type": "string"
         }
-      }
-    },
-    "required": [
-      "Language",
-      "Value"
-    ]
+      },
+      "required": [
+        "Language",
+        "Value"
+      ]
+    }
   },
   "required": [
     "TranslationLanguage"
