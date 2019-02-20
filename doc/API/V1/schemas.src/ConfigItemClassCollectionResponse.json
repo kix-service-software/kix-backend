@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemClassCollectionResponse",
+  "type": "object",
+  "description": "A list of config item class objects.",
+  "properties": {
+    "ConfigItemClass": {
+      "type": "array",
+      "items": {
+        "$ref": "ConfigItemClass.json"
+      }
+    }
+  },
+  "required": [
+    "ConfigItemClass"
+  ]
+}

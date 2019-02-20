@@ -1,14 +1,15 @@
 {
-    "$schema": "http://json-schema.org/schema",
-    "type": "object",
-    "description": "The auth response.",
-    "properties": {
-        "Token": {
-            "type": "string",
-            "readOnly": true
-        }
-    },
-    "required": [
-        "Token"
-    ]
+   "$id" : "#AuthResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The auth response.",
+   "type" : "object",
+   "properties" : {
+      "Token" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Token"
+   ]
 }

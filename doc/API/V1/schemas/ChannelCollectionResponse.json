@@ -1,0 +1,66 @@
+{
+   "$id" : "#ChannelCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of channels.",
+   "type" : "object",
+   "definitions" : {
+      "Channel" : {
+         "$id" : "#Channel",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The channel object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "properties" : {
+      "Channel" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Channel"
+         }
+      }
+   },
+   "required" : [
+      "Channel"
+   ]
+}

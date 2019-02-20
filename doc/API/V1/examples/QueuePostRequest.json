@@ -1,0 +1,17 @@
+{
+    "Queue": {
+        "Calendar": "",
+        "Comment": "Postmaster queue.",
+        "FollowUpID": 1,
+        "FollowUpLock": 0,
+        "GroupID": 1,
+        "Name": "Postmaster",
+        "ParentID": 1,
+        "RealName": "KIX System",
+        "SalutationID": 1,
+        "SignatureID": 1,
+        "SystemAddressID": 1,
+        "UnlockTimeout": 0,
+        "ValidID": 1
+    }
+}

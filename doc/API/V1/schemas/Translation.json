@@ -1,44 +1,71 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#Translation",
-  "type": "object",
-  "description": "The translation object.",
-  "properties": {
-    "ChangeBy": {
-      "type": "number",
-      "readOnly": true
-    },
-    "ChangeTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CreateBy": {
-      "type": "number",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ID": {
-      "type": "number"
-    },
-    "Pattern": {
-      "type": "string"
-    },
-    "Languages": {
-      "type": "array",
-      "item": {
-        "$ref": "#TranslationLanguage"
+   "$id" : "#Translation",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The translation object.",
+   "type" : "object",
+   "definitions" : {
+      "TranslationLanguage" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TranslationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "TranslationID",
+            "Language",
+            "Value"
+         ]
       }
-    }
-  },
-  "required": [
-    "ChangeBy",
-    "ChangeTime",
-    "CreateBy",
-    "CreateTime",
-    "ID",
-    "Pattern"
-  ]
+   },
+   "properties" : {
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ID" : {
+         "type" : "integer"
+      },
+      "Languages" : {
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/TranslationLanguage"
+         }
+      },
+      "Pattern" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Pattern"
+   ]
 }

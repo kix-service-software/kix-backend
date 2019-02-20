@@ -1031,7 +1031,7 @@ sub QueueGet {
         . 'q.first_response_time, q.first_response_notify, '
         . 'q.update_time, q.update_notify, q.solution_time, q.solution_notify, '
         . 'q.follow_up_id, q.follow_up_lock, sa.value0, sa.value1, q.id, '
-        . 'q.default_sign_key, q.calendar_name, q.create_time, q.change_time FROM queue q, '
+        . 'q.default_sign_key, q.calendar_name, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
         . 'system_address sa WHERE q.system_address_id = sa.id AND ';
 
     if ( $Param{ID} ) {
@@ -1077,8 +1077,10 @@ sub QueueGet {
             RealName            => $Data[17],
             DefaultSignKey      => $Data[19],
             Calendar            => $Data[20] || '',
-            CreateTime          => $Data[21],
-            ChangeTime          => $Data[22],
+            CreateBy            => $Data[21],
+            CreateTime          => $Data[22],
+            ChangeBy            => $Data[23],
+            ChangeTime          => $Data[24],
         );
     }
 

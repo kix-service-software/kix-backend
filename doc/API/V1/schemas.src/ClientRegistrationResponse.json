@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ClientRegistrationResponse",
+  "type": "object",
+  "description": "A response for client registration GET request.",
+  "properties": {
+    "ClientRegistration": {
+      "$ref": "ClientRegistration.json"
+    }
+  },
+  "required": [
+    "ClientRegistration"
+  ]
+}

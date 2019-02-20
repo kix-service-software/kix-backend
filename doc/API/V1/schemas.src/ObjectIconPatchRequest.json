@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ObjectIconPatchRequest",
+  "type": "object",
+  "description": "The object icon request object for update.",
+  "properties": {
+    "ObjectIcon": {
+      "type": "object",
+      "properties": {
+        "Content": {
+          "type": "string"
+        },
+        "ContentType": {
+          "type": "string"
+        },
+        "Object": {
+          "type": "string"
+        },
+        "ObjectID": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "ObjectIcon"
+  ]
+}

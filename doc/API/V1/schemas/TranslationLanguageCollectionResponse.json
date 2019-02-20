@@ -1,0 +1,44 @@
+{
+   "$id" : "#TranslationLanguageCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of translation languages.",
+   "type" : "object",
+   "definitions" : {
+      "TranslationLanguage" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TranslationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "TranslationID",
+            "Language",
+            "Value"
+         ]
+      }
+   },
+   "properties" : {
+      "TranslationLanguage" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TranslationLanguage"
+         }
+      }
+   },
+   "required" : [
+      "TranslationLanguage"
+   ]
+}

@@ -1,20 +1,20 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#StateType",
-  "type": "object",
-  "description": "The state type object.",
-  "properties": {
-    "ID": {
-      "type": "number",
-      "readOnly": true
-    },
-    "Name": {
-      "type": "string",
-      "readOnly": true
-    }
-  },
-  "required": [
-    "ID",
-    "Name"
-  ]
+   "$id" : "#StateType",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The state type object.",
+   "type" : "object",
+   "properties" : {
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ID",
+      "Name"
+   ]
 }

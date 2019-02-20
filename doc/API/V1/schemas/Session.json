@@ -1,86 +1,85 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#Session",
-  "type": "object",
-  "description": "The extracted web token data.",
-  "properties": {
-    "AllowedOperations": {
-      "type": "array",
-      "items": {
-        "type": "string"
+   "$id" : "#Session",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The extracted web token data.",
+   "type" : "object",
+   "properties" : {
+      "AllowedOperations" : {
+         "type" : "array",
+         "items" : {
+            "type" : "string"
+         },
+         "readOnly" : true
       },
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CreateTimeUnix": {
-      "type": "number",
-      "readOnly": true
-    },
-    "DeniedOperations": {
-      "type": "array",
-      "items": {
-        "type": "string"
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
       },
-      "readOnly": true
-    },
-    "Description": {
-      "type": "string",
-      "readOnly": true
-    },
-    "IgnoreMaxIdleTime": {
-      "type": "number",
-      "readOnly": true
-    },
-    "LastRequestTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "LastRequestTimeUnix": {
-      "type": "number",
-      "readOnly": true
-    },
-    "RemoteIP": {
-      "type": "string",
-      "readOnly": true
-    },
-    "TokenType": {
-      "type": "string",
-      "readOnly": true
-    },
-    "UserID": {
-      "type": "number",
-      "readOnly": true
-    },
-    "UserType": {
-      "type": "string",
-      "enum": [
-        "Agent",
-        "Customer"
-      ],
-      "readOnly": true
-    },
-    "ValidUntilTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ValidUntilTimeUnix": {
-      "type": "number",
-      "readOnly": true
-    }
-  },
-  "required": [
-    "AllowedOperations",
-    "CreateTime",
-    "CreateTimeUnix",
-    "CreateTime",
-    "DeniedOperations",
-    "TokenType",
-    "UserID",
-    "UserType",
-    "ValidUntilTime",
-    "ValidUntilTimeUnix"
-  ]
+      "CreateTimeUnix" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "DeniedOperations" : {
+         "type" : "array",
+         "items" : {
+            "type" : "string"
+         },
+         "readOnly" : true
+      },
+      "Description" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "IgnoreMaxIdleTime" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "LastRequestTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "LastRequestTimeUnix" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "RemoteIP" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "TokenType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "UserID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "UserType" : {
+         "type" : "string",
+         "enum" : [
+            "Agent",
+            "Customer"
+         ],
+         "readOnly" : true
+      },
+      "ValidUntilTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ValidUntilTimeUnix" : {
+         "type" : "integer",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "AllowedOperations",
+      "CreateTime",
+      "CreateTimeUnix",
+      "DeniedOperations",
+      "TokenType",
+      "UserID",
+      "UserType",
+      "ValidUntilTime",
+      "ValidUntilTimeUnix"
+   ]
 }

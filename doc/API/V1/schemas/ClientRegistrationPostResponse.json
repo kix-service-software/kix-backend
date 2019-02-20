@@ -1,14 +1,14 @@
 {
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#ClientRegistrationPostResponse",
-    "type": "object",
-    "description": "The ID of the created client registration.",
-    "properties": {
-        "ClientID": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "ClientID"
-    ]
+   "$id" : "#ClientRegistrationPostResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created client registration.",
+   "type" : "object",
+   "properties" : {
+      "ClientID" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "ClientID"
+   ]
 }

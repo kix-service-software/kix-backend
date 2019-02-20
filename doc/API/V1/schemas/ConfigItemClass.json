@@ -1,73 +1,130 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#ConfigItemClass",
-  "type": "object",
-  "description": "The config item class object.",
-  "properties": {
-    "ChangeBy": {
-      "type": "number",
-      "readOnly": true
-    },
-    "ChangeTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Comment": {
-      "type": "string"
-    },    
-    "ConfigItemStats": {
-      "type": "object",
-      "properties": {
-        "PostProductiveCount": {
-          "type": "number",
-          "readOnly": true
-        },
-        "ProductiveCount": {
-          "type": "number",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "PostProductiveCount",
-        "ProductiveCount"
-      ]
-    },
-    "CreateBy": {
-      "type": "number",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CurrentDefinition": {
-      "type": "object",
-      "$ref": "#ConfigItemClassDefinition"
-    },
-    "ID": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Name": {
-      "type": "string"
-    },    
-    "ValidID": {
-      "type": "number"
-    },
-    "Definitions": {
-      "type": "array",
-      "item": {
-        "$ref": "#ConfigItemClassDefinition"
+   "$id" : "#ConfigItemClass",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item class object.",
+   "type" : "object",
+   "definitions" : {
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
       }
-    }
-  },
-  "required": [
-    "ChangeBy",
-    "ChangeTime",
-    "CreateBy",
-    "CreateTime",
-    "ID",
-    "Name",
-    "ValidID"
-  ]
+   },
+   "properties" : {
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Comment" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ConfigItemStats" : {
+         "type" : "object",
+         "properties" : {
+            "PostProductiveCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ProductiveCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "PostProductiveCount",
+            "ProductiveCount"
+         ]
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurrentDefinition" : {
+         "$ref" : "#/definitions/ConfigItemClassDefinition"
+      },
+      "Definitions" : {
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/ConfigItemClassDefinition"
+         }
+      },
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ValidID" : {
+         "type" : "integer",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Name",
+      "ValidID"
+   ]
 }

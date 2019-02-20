@@ -1,0 +1,101 @@
+{
+   "$id" : "#SessionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for session GET request.",
+   "type" : "object",
+   "definitions" : {
+      "Session" : {
+         "$id" : "#Session",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The extracted web token data.",
+         "type" : "object",
+         "properties" : {
+            "AllowedOperations" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DeniedOperations" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "IgnoreMaxIdleTime" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "LastRequestTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "LastRequestTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "RemoteIP" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TokenType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserType" : {
+               "type" : "string",
+               "enum" : [
+                  "Agent",
+                  "Customer"
+               ],
+               "readOnly" : true
+            },
+            "ValidUntilTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidUntilTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "AllowedOperations",
+            "CreateTime",
+            "CreateTimeUnix",
+            "DeniedOperations",
+            "TokenType",
+            "UserID",
+            "UserType",
+            "ValidUntilTime",
+            "ValidUntilTimeUnix"
+         ]
+      }
+   },
+   "properties" : {
+      "Session" : {
+         "$ref" : "#/definitions/Session"
+      }
+   },
+   "required" : [
+      "Session"
+   ]
+}

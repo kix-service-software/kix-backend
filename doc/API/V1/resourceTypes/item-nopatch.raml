@@ -1,5 +1,5 @@
   usage: Use this resourceType to represent any single item
   get:
-    is: [ hasResponseItem: { typeName: <<typeName>> }, hasNotFound, supportingFieldSelection ]
+    is: [ hasResponseItem: { typeName: <<typeName>>Response }, hasNotFound, supportingFieldSelection ]
   delete:
     is: [ hasNotFound, hasConflict, hasNoContent ]

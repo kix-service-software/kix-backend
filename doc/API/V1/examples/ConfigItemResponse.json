@@ -1,0 +1,15 @@
+{
+    "ConfigItem": {
+        "ChangeBy": 1,
+        "ChangeTime": "2018-07-31 16:07:38",
+        "Class": "Computer",
+        "CurInciStateID": null,
+        "ClassID": 22,
+        "CurDeplStateID": null,
+        "ConfigItemID": 61,
+        "Number": "1022000001",
+        "CreateBy": 1,
+        "LastVersionID": null,
+        "CreateTime": "2018-07-31 16:07:38"
+    }
+}

@@ -1,0 +1,9 @@
+  displayName: Queues
+  description: !include ../descriptions/resources/queues.md
+  type: { collection: { typeName: Queue } }
+  /{queueId}:
+    type: { item: { typeName: Queue } }
+    uriParameters:
+      queueId:
+        displayName: QueueID
+        type: integer

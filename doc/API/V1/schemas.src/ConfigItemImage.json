@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemImage",
+  "type": "object",
+  "description": "The config item image object.",
+  "properties": {
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ConfigItemID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ContentType": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Filename": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "ID": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Content": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Comment",
+    "ConfigItemID",
+    "ContentType",
+    "Filename",
+    "ID"
+  ]
+}

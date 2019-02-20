@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SenderTypeResponse",
+  "type": "object",
+  "description": "A response for sender type GET request.",
+  "properties": {
+    "SenderType": {
+      "$ref": "SenderType.json"
+    }
+  },
+  "required": [
+    "SenderType"
+  ]
+}

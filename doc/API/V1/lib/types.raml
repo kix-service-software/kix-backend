@@ -1,41 +1,41 @@
 # Channel
-  Channel: !include ../types/Channel/Channel.raml
-  ChannelList: !include ../types/Channel/ChannelList.raml
+  ChannelResponse: !include ../types/Channel/ChannelResponse.raml
+  ChannelCollectionResponse: !include ../types/Channel/ChannelCollectionResponse.raml
 
 # Auth
   AuthRequest: !include ../types/Auth/AuthRequest.raml
   AuthResponse: !include ../types/Auth/AuthResponse.raml
 
 # ConfigItemClass
-  ConfigItemClass: !include ../types/ConfigItemClass/ConfigItemClass.raml
-  ConfigItemClassList: !include ../types/ConfigItemClass/ConfigItemClassList.raml
+  ConfigItemClassResponse: !include ../types/ConfigItemClass/ConfigItemClassResponse.raml
+  ConfigItemClassCollectionResponse: !include ../types/ConfigItemClass/ConfigItemClassCollectionResponse.raml
   ConfigItemClassPostRequest: !include ../types/ConfigItemClass/ConfigItemClassPostRequest.raml
   ConfigItemClassPatchRequest: !include ../types/ConfigItemClass/ConfigItemClassPatchRequest.raml
   ConfigItemClassPostPatchResponse: !include ../types/ConfigItemClass/ConfigItemClassPostPatchResponse.raml
-  ConfigItemClassDefinition: !include ../types/ConfigItemClassDefinition/ConfigItemClassDefinition.raml
-  ConfigItemClassDefinitionList: !include ../types/ConfigItemClassDefinition/ConfigItemClassDefinitionList.raml
+  ConfigItemClassDefinitionResponse: !include ../types/ConfigItemClassDefinition/ConfigItemClassDefinitionResponse.raml
+  ConfigItemClassDefinitionCollectionResponse: !include ../types/ConfigItemClassDefinition/ConfigItemClassDefinitionCollectionResponse.raml
   ConfigItemClassDefinitionPostRequest: !include ../types/ConfigItemClassDefinition/ConfigItemClassDefinitionPostRequest.raml
   ConfigItemClassDefinitionPostResponse: !include ../types/ConfigItemClassDefinition/ConfigItemClassDefinitionPostResponse.raml
-  ConfigItem: !include ../types/ConfigItem/ConfigItem.raml
-  ConfigItemList: !include ../types/ConfigItem/ConfigItemList.raml
+  ConfigItemResponse: !include ../types/ConfigItem/ConfigItemResponse.raml
+  ConfigItemCollectionResponse: !include ../types/ConfigItem/ConfigItemCollectionResponse.raml
   ConfigItemPostRequest: !include ../types/ConfigItem/ConfigItemPostRequest.raml
   ConfigItemPatchRequest: !include ../types/ConfigItem/ConfigItemPatchRequest.raml
   ConfigItemPostPatchResponse: !include ../types/ConfigItem/ConfigItemPostPatchResponse.raml
-  ConfigItemAttachment: !include ../types/ConfigItemAttachment/ConfigItemAttachment.raml
-  ConfigItemHistory: !include ../types/ConfigItemHistory/ConfigItemHistory.raml
-  ConfigItemHistoryList: !include ../types/ConfigItemHistory/ConfigItemHistoryList.raml
-  ConfigItemImage: !include ../types/ConfigItemImage/ConfigItemImage.raml
-  ConfigItemImageList: !include ../types/ConfigItemImage/ConfigItemImageList.raml
+  ConfigItemAttachmentResponse: !include ../types/ConfigItemAttachment/ConfigItemAttachmentResponse.raml
+  ConfigItemHistoryResponse: !include ../types/ConfigItemHistory/ConfigItemHistoryResponse.raml
+  ConfigItemHistoryCollectionResponse: !include ../types/ConfigItemHistory/ConfigItemHistoryCollectionResponse.raml
+  ConfigItemImageResponse: !include ../types/ConfigItemImage/ConfigItemImageResponse.raml
+  ConfigItemImageCollectionResponse: !include ../types/ConfigItemImage/ConfigItemImageCollectionResponse.raml
   ConfigItemImagePostRequest: !include ../types/ConfigItemImage/ConfigItemImagePostRequest.raml
   ConfigItemImagePostResponse: !include ../types/ConfigItemImage/ConfigItemImagePostResponse.raml
-  ConfigItemVersion: !include ../types/ConfigItemVersion/ConfigItemVersion.raml
-  ConfigItemVersionList: !include ../types/ConfigItemVersion/ConfigItemVersionList.raml
+  ConfigItemVersionResponse: !include ../types/ConfigItemVersion/ConfigItemVersionResponse.raml
+  ConfigItemVersionCollectionResponse: !include ../types/ConfigItemVersion/ConfigItemVersionCollectionResponse.raml
   ConfigItemVersionPostRequest: !include ../types/ConfigItemVersion/ConfigItemVersionPostRequest.raml
   ConfigItemVersionPostResponse: !include ../types/ConfigItemVersion/ConfigItemVersionPostResponse.raml
 
 # ClientRegistration
-  ClientRegistration: !include ../types/ClientRegistration/ClientRegistration.raml
-  ClientRegistrationList: !include ../types/ClientRegistration/ClientRegistrationList.raml
+  ClientRegistrationResponse: !include ../types/ClientRegistration/ClientRegistrationResponse.raml
+  ClientRegistrationCollectionResponse: !include ../types/ClientRegistration/ClientRegistrationCollectionResponse.raml
   ClientRegistrationPostRequest: !include ../types/ClientRegistration/ClientRegistrationPostRequest.raml
   ClientRegistrationPostResponse: !include ../types/ClientRegistration/ClientRegistrationPostResponse.raml
 
@@ -43,65 +43,96 @@
   Error: !include ../types/Error/Error.raml
 
 # Lock
-  Lock: !include ../types/Lock/Lock.raml
-  LockList: !include ../types/Lock/LockList.raml
+  LockResponse: !include ../types/Lock/LockResponse.raml
+  LockCollectionResponse: !include ../types/Lock/LockCollectionResponse.raml
+
+# ObjectIcon
+  ObjectIconResponse: !include ../types/ObjectIcon/ObjectIconResponse.raml
+  ObjectIconCollectionResponse: !include ../types/ObjectIcon/ObjectIconCollectionResponse.raml
+  ObjectIconPostRequest: !include ../types/ObjectIcon/ObjectIconPostRequest.raml
+  ObjectIconPatchRequest: !include ../types/ObjectIcon/ObjectIconPatchRequest.raml
+  ObjectIconPostPatchResponse: !include ../types/ObjectIcon/ObjectIconPostPatchResponse.raml
 
 # Priority 
-  Priority: !include ../types/Priority/Priority.raml
-  PriorityList: !include ../types/Priority/PriorityList.raml
+  PriorityResponse: !include ../types/Priority/PriorityResponse.raml
+  PriorityCollectionResponse: !include ../types/Priority/PriorityCollectionResponse.raml
   PriorityPostRequest: !include ../types/Priority/PriorityPostRequest.raml
   PriorityPatchRequest: !include ../types/Priority/PriorityPatchRequest.raml
   PriorityPostPatchResponse: !include ../types/Priority/PriorityPostPatchResponse.raml
-  
+
+# Queue 
+  QueueResponse: !include ../types/Queue/QueueResponse.raml
+  QueueCollectionResponse: !include ../types/Queue/QueueCollectionResponse.raml
+  QueuePostRequest: !include ../types/Queue/QueuePostRequest.raml
+  QueuePatchRequest: !include ../types/Queue/QueuePatchRequest.raml
+  QueuePostPatchResponse: !include ../types/Queue/QueuePostPatchResponse.raml
+
+# Role 
+  RoleResponse: !include ../types/Role/RoleResponse.raml
+  RoleCollectionResponse: !include ../types/Role/RoleCollectionResponse.raml
+  RolePostRequest: !include ../types/Role/RolePostRequest.raml
+  RolePatchRequest: !include ../types/Role/RolePatchRequest.raml
+  RolePostPatchResponse: !include ../types/Role/RolePostPatchResponse.raml
+  RoleUserIDCollectionResponse: !include ../types/Role/RoleUserIDCollectionResponse.raml
+  RoleUserIDPostRequest: !include ../types/Role/RoleUserIDPostRequest.raml
+  RoleUserIDPostResponse: !include ../types/Role/RoleUserIDPostResponse.raml
+
 # SenderType
-  SenderType: !include ../types/SenderType/SenderType.raml
-  SenderTypeList: !include ../types/SenderType/SenderTypeList.raml
+  SenderTypeResponse: !include ../types/SenderType/SenderTypeResponse.raml
+  SenderTypeCollectionResponse: !include ../types/SenderType/SenderTypeCollectionResponse.raml
+
+# Service 
+  ServiceResponse: !include ../types/Service/ServiceResponse.raml
+  ServiceCollectionResponse: !include ../types/Service/ServiceCollectionResponse.raml
+  ServicePostRequest: !include ../types/Service/ServicePostRequest.raml
+  ServicePatchRequest: !include ../types/Service/ServicePatchRequest.raml
+  ServicePostPatchResponse: !include ../types/Service/ServicePostPatchResponse.raml
 
 # Session 
-  Session: !include ../types/Session/Session.raml
+  SessionResponse: !include ../types/Session/SessionResponse.raml
 
 # StateType
-  StateType: !include ../types/StateType/StateType.raml
-  StateTypeList: !include ../types/StateType/StateTypeList.raml
+  StateTypeResponse: !include ../types/StateType/StateTypeResponse.raml
+  StateTypeCollectionResponse: !include ../types/StateType/StateTypeCollectionResponse.raml
 
 # TicketState
-  TicketState: !include ../types/TicketState/TicketState.raml
-  TicketStateList: !include ../types/TicketState/TicketStateList.raml
+  TicketStateResponse: !include ../types/TicketState/TicketStateResponse.raml
+  TicketStateCollectionResponse: !include ../types/TicketState/TicketStateCollectionResponse.raml
   TicketStatePostRequest: !include ../types/TicketState/TicketStatePostRequest.raml
   TicketStatePatchRequest: !include ../types/TicketState/TicketStatePatchRequest.raml
   TicketStatePostPatchResponse: !include ../types/TicketState/TicketStatePostPatchResponse.raml
 
 # TicketType
-  TicketType: !include ../types/TicketType/TicketType.raml
-  TicketTypeList: !include ../types/TicketType/TicketTypeList.raml
+  TicketTypeResponse: !include ../types/TicketType/TicketTypeResponse.raml
+  TicketTypeCollectionResponse: !include ../types/TicketType/TicketTypeCollectionResponse.raml
   TicketTypePostRequest: !include ../types/TicketType/TicketTypePostRequest.raml
   TicketTypePatchRequest: !include ../types/TicketType/TicketTypePatchRequest.raml
   TicketTypePostPatchResponse: !include ../types/TicketType/TicketTypePostPatchResponse.raml
 
 # Translation
-  Translation: !include ../types/Translation/Translation.raml
-  TranslationList: !include ../types/Translation/TranslationList.raml
+  TranslationResponse: !include ../types/Translation/TranslationResponse.raml
+  TranslationCollectionResponse: !include ../types/Translation/TranslationCollectionResponse.raml
   TranslationPostRequest: !include ../types/Translation/TranslationPostRequest.raml
   TranslationPatchRequest: !include ../types/Translation/TranslationPatchRequest.raml
   TranslationPostPatchResponse: !include ../types/Translation/TranslationPostPatchResponse.raml
-  TranslationLanguage: !include ../types/Translation/TranslationLanguage.raml
-  TranslationLanguageList: !include ../types/Translation/TranslationLanguageList.raml
+  TranslationLanguageResponse: !include ../types/Translation/TranslationLanguageResponse.raml
+  TranslationLanguageCollectionResponse: !include ../types/Translation/TranslationLanguageCollectionResponse.raml
   TranslationLanguagePostRequest: !include ../types/Translation/TranslationLanguagePostRequest.raml
   TranslationLanguagePatchRequest: !include ../types/Translation/TranslationLanguagePatchRequest.raml
   TranslationLanguagePostPatchResponse: !include ../types/Translation/TranslationLanguagePostPatchResponse.raml
 
 # User
-  User: !include ../types/User/User.raml
-  UserList: !include ../types/User/UserList.raml
+  UserResponse: !include ../types/User/UserResponse.raml
+  UserCollectionResponse: !include ../types/User/UserCollectionResponse.raml
   UserPostRequest: !include ../types/User/UserPostRequest.raml
   UserPatchRequest: !include ../types/User/UserPatchRequest.raml
   UserPostPatchResponse: !include ../types/User/UserPostPatchResponse.raml
-  UserPreference: !include ../types/User/UserPreference.raml
-  UserPreferenceList: !include ../types/User/UserPreferenceList.raml
+  UserPreferenceResponse: !include ../types/User/UserPreferenceResponse.raml
+  UserPreferenceCollectionResponse: !include ../types/User/UserPreferenceCollectionResponse.raml
   UserPreferencePostRequest: !include ../types/User/UserPreferencePostRequest.raml
   UserPreferencePatchRequest: !include ../types/User/UserPreferencePatchRequest.raml
   UserPreferencePostPatchResponse: !include ../types/User/UserPreferencePostPatchResponse.raml
 
 # Valid
-  Valid: !include ../types/Valid/Valid.raml
-  ValidList: !include ../types/Valid/ValidList.raml
+  ValidResponse: !include ../types/Valid/ValidResponse.raml
+  ValidCollectionResponse: !include ../types/Valid/ValidCollectionResponse.raml

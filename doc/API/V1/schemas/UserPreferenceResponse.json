@@ -1,0 +1,36 @@
+{
+   "$id" : "#UserPreferenceResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for user preference GET request.",
+   "type" : "object",
+   "definitions" : {
+      "UserPreference" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      }
+   },
+   "properties" : {
+      "UserPreference" : {
+         "$ref" : "#/definitions/UserPreference"
+      }
+   },
+   "required" : [
+      "UserPreference"
+   ]
+}

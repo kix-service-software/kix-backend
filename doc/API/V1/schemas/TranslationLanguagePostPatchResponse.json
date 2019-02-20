@@ -1,14 +1,14 @@
 {
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#TranslationLanguagePostPatchResponse",
-    "type": "object",
-    "description": "The ID of the created or updated translation language.",
-    "properties": {
-        "Language": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "Language"
-    ]
+   "$id" : "#TranslationLanguagePostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated translation language.",
+   "type" : "object",
+   "properties" : {
+      "Language" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "Language"
+   ]
 }

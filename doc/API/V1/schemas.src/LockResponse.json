@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#LockResponse",
+  "type": "object",
+  "description": "A response for lock GET request.",
+  "properties": {
+    "Lock": {
+      "$ref": "Lock.json"
+    }
+  },
+  "required": [
+    "Lock"
+  ]
+}

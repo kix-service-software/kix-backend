@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemClassDefinitionResponse",
+  "type": "object",
+  "description": "A response for config item class definition GET request.",
+  "properties": {
+    "ConfigItemClassDefinition": {
+      "$ref": "ConfigItemClassDefinition.json"
+    }
+  },
+  "required": [
+    "ConfigItemClassDefinition"
+  ]  
+}

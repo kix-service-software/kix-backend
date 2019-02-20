@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TranslationCollectionResponse",
+  "type": "object",
+  "description": "A list of translations.",
+  "properties": {
+    "Translation": {
+      "type": "array",
+      "items": {
+        "$ref": "Translation.json"
+      }
+    }
+  },
+  "required": [
+    "Translation"
+  ]
+}

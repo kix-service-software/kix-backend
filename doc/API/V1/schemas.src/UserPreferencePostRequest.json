@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#UserPreferencePostRequest",
+  "type": "object",
+  "description": "The user preference request object for creation.",
+  "properties": {
+    "UserPreference": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ID",
+        "Value"
+      ]
+    }
+  },
+  "required": [
+    "UserPreference"
+  ]
+}

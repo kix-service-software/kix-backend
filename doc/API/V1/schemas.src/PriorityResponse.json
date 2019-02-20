@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PriorityResponse",
+  "type": "object",
+  "description": "A response for priority GET request.",
+  "properties": {
+    "Priority": {
+      "$ref": "Priority.json"
+    }
+  },
+  "required": [
+    "Priority"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemPostRequest",
+  "type": "object",
+  "description": "The config item object for creation.",
+  "properties": {
+    "ConfigItem": {
+      "type": "object",
+      "properties": {
+        "ClassID": {
+          "type": "integer"
+        },    
+        "Version": {
+          "type": "object",
+          "$ref": "ConfigItemVersionPostRequest.json"
+        },
+        "Images": {
+          "type": "array",
+          "item": {
+            "$ref": "ConfigItemImagePostRequest.json"
+          }
+        }
+      },
+      "required": [
+        "ClassID",
+        "Version"
+      ]
+    }
+  },
+  "required": [
+    "ConfigItem"
+  ]
+}

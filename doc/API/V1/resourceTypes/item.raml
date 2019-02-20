@@ -1,6 +1,6 @@
   usage: Use this resourceType to represent any single item
   get:
-    is: [ hasResponseItem: { typeName: <<typeName>> }, hasNotFound, supportingFieldSelection ]
+    is: [ hasResponseItem: { typeName: <<typeName>>Response }, hasNotFound, supportingFieldSelection ]
   patch:
     is: [ hasRequestItem: { typeName: <<typeName>>PatchRequest }, hasResponseItem: { typeName: <<typeName>>PostPatchResponse }, hasBadRequest, hasNotFound, hasConflict ]
   delete:

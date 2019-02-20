@@ -1,0 +1,69 @@
+{
+   "$id" : "#ConfigItemClassDefinitionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for config item class definition GET request.",
+   "type" : "object",
+   "definitions" : {
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      }
+   },
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "$ref" : "#/definitions/ConfigItemClassDefinition"
+      }
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ]
+}

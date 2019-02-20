@@ -1,14 +1,14 @@
 {
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#TicketTypePostPatchResponse",
-    "type": "object",
-    "description": "The ID of the created or updated ticket type.",
-    "properties": {
-        "TicketTypeID": {
-            "type": "number"
-        }
-    },
-    "required": [
-        "TicketTypeID"
-    ]
+   "$id" : "#TicketTypePostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated ticket type.",
+   "type" : "object",
+   "properties" : {
+      "TicketTypeID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "TicketTypeID"
+   ]
 }

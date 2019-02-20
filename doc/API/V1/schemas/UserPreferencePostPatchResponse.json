@@ -1,14 +1,14 @@
 {
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#UserPreferencePostPatchResponse",
-    "type": "object",
-    "description": "The ID of the created or updated user preference.",
-    "properties": {
-        "PreferenceID": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "PreferenceID"
-    ]
+   "$id" : "#UserPreferencePostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated user preference.",
+   "type" : "object",
+   "properties" : {
+      "UserPreferenceID" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "UserPreferenceID"
+   ]
 }

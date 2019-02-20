@@ -1,0 +1,31 @@
+{
+	"Queue": {
+        "Calendar": "",
+        "ChangeBy": 1,
+        "ChangeTime": "2018-11-08 10:35:37",
+        "Comment": "Postmaster queue.",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-08 10:35:37",
+        "DefaultSignKey": null,
+        "Email": "kix@localhost",
+        "FirstResponseNotify": null,
+        "FirstResponseTime": null,
+        "FollowUpID": 1,
+        "FollowUpLock": 0,
+        "Fullname": "Postmaster",
+        "GroupID": 1,
+        "Name": "Postmaster",
+        "ParentID": null,
+        "QueueID": 1,
+        "RealName": "KIX System",
+        "SalutationID": 1,
+        "SignatureID": 1,
+        "SolutionNotify": null,
+        "SolutionTime": null,
+        "SystemAddressID": 1,
+        "UnlockTimeout": 0,
+        "UpdateNotify": null,
+        "UpdateTime": null,
+        "ValidID": 1
+	}
+}

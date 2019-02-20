@@ -1,24 +1,24 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#ClientRegistration",
-  "type": "object",
-  "description": "The client registration object.",
-  "properties": {
-    "ClientID": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Authentication": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CallbackURL": {
-      "type": "string",
-      "readOnly": true
-    }
-  },
-  "required": [
-    "ClientID",
-    "CallbackURL"
-  ]
+   "$id" : "#ClientRegistration",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The client registration object.",
+   "type" : "object",
+   "properties" : {
+      "Authentication" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CallbackURL" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ClientID" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ClientID",
+      "CallbackURL"
+   ]
 }

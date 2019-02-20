@@ -1,0 +1,101 @@
+{
+   "$id" : "#UserResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for user GET request.",
+   "type" : "object",
+   "definitions" : {
+      "User" : {
+         "$id" : "#User",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Preferences" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/UserPreference"
+               }
+            },
+            "UserEmail" : {
+               "type" : "string"
+            },
+            "UserFirstname" : {
+               "type" : "string"
+            },
+            "UserFullname" : {
+               "type" : "string"
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserLastname" : {
+               "type" : "string"
+            },
+            "UserLogin" : {
+               "type" : "string"
+            },
+            "UserTitle" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "UserID",
+            "UserFirstname",
+            "UserLastname",
+            "UserLogin"
+         ]
+      },
+      "UserPreference" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      }
+   },
+   "properties" : {
+      "User" : {
+         "$ref" : "#/definitions/User"
+      }
+   },
+   "required" : [
+      "User"
+   ]
+}

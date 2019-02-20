@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#UserPreferenceCollectionResponse",
+  "type": "object",
+  "description": "A list of user preferences.",
+  "properties": {
+    "UserPreference": {
+      "type": "array",
+      "items": {
+        "$ref": "UserPreference.json"
+      }
+    }
+  },
+  "required": [
+    "UserPreference"
+  ]
+}

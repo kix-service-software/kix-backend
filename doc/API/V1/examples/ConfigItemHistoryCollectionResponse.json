@@ -1,0 +1,17 @@
+{
+    "ConfigItemHistory": [
+        {
+            "Comment": "61%%1022000001",
+            "ConfigItemID": 61,
+            "CreateBy": 1,
+            "CreateTime": "2018-07-31 16:07:38",
+            "HistoryEntryID": 1900,
+            "HistoryType": "ConfigItemCreate",
+            "HistoryTypeID": 1,
+            "UserFirstname": "Admin",
+            "UserID": 1,
+            "UserLastname": "KIX",
+            "UserLogin": "root@localhost"
+        }
+    ]
+}

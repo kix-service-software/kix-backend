@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#ConfigItemClassPostPatchResponse",
+    "type": "object",
+    "description": "The ID of the created or updated config item class.",
+    "properties": {
+        "ConfigItemClassID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "ConfigItemClassID"
+    ]
+}

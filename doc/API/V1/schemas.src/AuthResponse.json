@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#AuthResponse",
+    "type": "object",
+    "description": "The auth response.",
+    "properties": {
+        "Token": {
+            "type": "string",
+            "readOnly": true
+        }
+    },
+    "required": [
+        "Token"
+    ]
+}

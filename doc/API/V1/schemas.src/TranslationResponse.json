@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TranslationResponse",
+  "type": "object",
+  "description": "A response for translation GET request.",
+  "properties": {
+    "Translation": {
+      "$ref": "Translation.json"
+    }
+  },
+  "required": [
+    "Translation"
+  ]
+}

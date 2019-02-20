@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#UserCollectionResponse",
+  "type": "object",
+  "description": "A list of users.",
+  "properties": {
+    "User": {
+      "type": "array",
+      "items": {
+        "$ref": "User.json"
+      }
+    }
+  },
+  "required": [
+    "User"
+  ]
+}

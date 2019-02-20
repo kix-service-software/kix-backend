@@ -1,65 +1,87 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#User",
-  "type": "object",
-  "description": "The user object.",
-  "properties": {
-    "ChangeBy": {
-      "type": "number",
-      "readOnly": true
-    },
-    "ChangeTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CreateBy": {
-      "type": "number",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "UserEmail": {
-      "type": "string"
-    },
-    "UserFirstname": {
-      "type": "string"
-    },
-    "UserFullname": {
-      "type": "string"
-    },
-    "UserID": {
-      "type": "number",
-      "readOnly": true
-    },
-    "UserLastname": {
-      "type": "string"
-    },
-    "UserLogin": {
-      "type": "string"
-    },
-    "UserTitle": {
-      "type": "string"
-    },
-    "ValidID": {
-      "type": "number"
-    },
-    "Preferences": {
-      "type": "array",
-      "item": {
-        "$ref": "#UserPreference"
+   "$id" : "#User",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The user object.",
+   "type" : "object",
+   "definitions" : {
+      "UserPreference" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
       }
-    }
-  },
-  "required": [
-    "ChangeBy",
-    "ChangeTime",
-    "CreateBy",
-    "CreateTime",
-    "UserID",
-    "UserFirstname",
-    "UserLastname",
-    "UserLogin"
-  ]
+   },
+   "properties" : {
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Preferences" : {
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/UserPreference"
+         }
+      },
+      "UserEmail" : {
+         "type" : "string"
+      },
+      "UserFirstname" : {
+         "type" : "string"
+      },
+      "UserFullname" : {
+         "type" : "string"
+      },
+      "UserID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "UserLastname" : {
+         "type" : "string"
+      },
+      "UserLogin" : {
+         "type" : "string"
+      },
+      "UserTitle" : {
+         "type" : "string"
+      },
+      "ValidID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "UserID",
+      "UserFirstname",
+      "UserLastname",
+      "UserLogin"
+   ]
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ObjectIconResponse",
+  "type": "object",
+  "description": "A response for object icon GET request.",
+  "properties": {
+    "ObjectIcon": {
+      "$ref": "ObjectIcon.json"
+    }
+  },
+  "required": [
+    "ObjectIcon"
+  ]
+}

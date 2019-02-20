@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemAttachmentResponse",
+  "type": "object",
+  "description": "A response for config item attachment GET request.",
+  "properties": {
+    "Attachment": {
+      "$ref": "ConfigItemAttachment.json"
+    }
+  },
+  "required": [
+    "Attachment"
+  ]
+}

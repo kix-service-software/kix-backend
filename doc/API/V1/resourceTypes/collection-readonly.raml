@@ -1,4 +1,4 @@
   usage: Use this resourceType to represent a readonly collection of items
   get:
     description: Get all <<typeName>> items.
-    is: [ hasResponseCollection: { typeName: <<typeName>> }, hasBadRequest, filterable, pageable, sortable ]
+    is: [ hasResponseCollection: { typeName: <<typeName>>CollectionResponse }, hasBadRequest, filterable, pageable, sortable ]

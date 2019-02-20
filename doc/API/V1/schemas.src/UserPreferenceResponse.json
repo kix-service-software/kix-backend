@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#UserPreferenceResponse",
+  "type": "object",
+  "description": "A response for user preference GET request.",
+  "properties": {
+    "UserPreference": {
+      "$ref": "UserPreference.json"
+    }
+  },
+  "required": [
+    "UserPreference"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ValidCollectionResponse",
+  "type": "object",
+  "description": "A list of valid items.",
+  "properties": {
+    "Valid": {
+      "type": "array",
+      "items": {
+        "$ref": "Valid.json"
+      }
+    }
+  },
+  "required": [
+    "Valid"
+  ]
+}

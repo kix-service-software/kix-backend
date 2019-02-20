@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#RoleResponse",
+  "type": "object",
+  "description": "A response for role GET request.",
+  "properties": {
+    "Role": {
+      "$ref": "Role.json"
+    }
+  },
+  "required": [
+    "Role"
+  ]  
+}

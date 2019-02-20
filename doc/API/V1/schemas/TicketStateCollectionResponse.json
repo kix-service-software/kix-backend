@@ -1,0 +1,70 @@
+{
+   "$id" : "#TicketStateCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of ticket states.",
+   "type" : "object",
+   "definitions" : {
+      "TicketState" : {
+         "$id" : "#TicketState",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The ticket state object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "TypeID",
+            "ValidID"
+         ]
+      }
+   },
+   "properties" : {
+      "TicketState" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TicketState"
+         }
+      }
+   },
+   "required" : [
+      "TicketState"
+   ]
+}

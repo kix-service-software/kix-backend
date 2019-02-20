@@ -1,0 +1,259 @@
+{
+   "$id" : "#QueueCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of queues.",
+   "type" : "object",
+   "definitions" : {
+      "Queue" : {
+         "$id" : "#Priority",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The priority object.",
+         "type" : "object",
+         "properties" : {
+            "Calendar" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DefaultSignKey" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "FirstResponseNotify" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "FirstResponseTime" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "FollowUpID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "FollowUpLock" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Fullname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "GroupID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ParentID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "QueueID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "RealName" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SalutationID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "SignatureID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "SolutionNotify" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "SolutionTime" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "SubQueues" : {
+               "type" : "object",
+               "readOnly" : true
+            },
+            "SystemAddressID" : {
+               "type" : "integer"
+            },
+            "TicketStats" : {
+               "type" : "object",
+               "properties" : {
+                  "EscalatedCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "LockCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "OpenCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
+               "readOnly" : true
+            },
+            "Tickets" : {
+               "type" : "array",
+               "readOnly" : true
+            },
+            "UnlockTimeout" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "UpdateNotify" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "UpdateTime" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "Fullname",
+            "GroupID",
+            "QueueID",
+            "Name",
+            "RealName",
+            "ValidID"
+         ]
+      }
+   },
+   "properties" : {
+      "Queue" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Queue"
+         }
+      }
+   },
+   "required" : [
+      "Queue"
+   ]
+}

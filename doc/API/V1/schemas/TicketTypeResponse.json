@@ -1,0 +1,63 @@
+{
+   "$id" : "#TicketTypeResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for client registration GET request.",
+   "type" : "object",
+   "definitions" : {
+      "TicketType" : {
+         "$id" : "#TicketType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The ticket type object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "properties" : {
+      "TicketType" : {
+         "$ref" : "#/definitions/TicketType"
+      }
+   },
+   "required" : [
+      "TicketType"
+   ]
+}

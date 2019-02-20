@@ -6,6 +6,16 @@ h5 {
   margin-top: 30px;
   margin-bottom: 10px;
 }
+code {
+  color: #000;
+  background-color: #f0f0f0;
+}
+pre {
+  margin-left: 8px;
+}
+pre.base-uri {
+  margin-left: 0px;
+}
 .param-table {
   border-collapse: collapse;  
   border-color: #ddd;
@@ -136,7 +146,6 @@ h5 {
 }
 .top-resource-description {
   border-bottom: 1px solid #ddd;
-  padding: 10px 15px;
 }
 .resource-description {
   border: 1px solid #ddd;
@@ -146,6 +155,10 @@ h5 {
 }
 .resource-description p:last-child {
   margin: 0;
+}
+.top-resource-description > h5:first-child,
+.resource-description > h5:first-child {
+  margin-top: 5px;
 }
 .list-group .badge {
   float: left;

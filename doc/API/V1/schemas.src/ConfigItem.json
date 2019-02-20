@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItem",
+  "type": "object",
+  "description": "The config item object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Class": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "ClassID": {
+      "type": "integer",
+      "readOnly": true
+    },    
+    "ConfigItemID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CurDeplStateID": {
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },    
+    "CurInciStateID": {
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },    
+    "CurrentVersion": {
+      "type": "object",
+      "$ref": "ConfigItemVersion.json",
+      "readOnly": true
+    },    
+    "LastVersionID": {
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "History": {
+      "type": "array",
+      "item": {
+        "$ref": "ConfigItemHistory.json"
+      }
+    },
+    "Images": {
+      "type": "array",
+      "item": {
+        "$ref": "ConfigItemImage.json"
+      }
+    },
+    "Versions": {
+      "type": "array",
+      "item": {
+        "$ref": "ConfigItemVersion.json"
+      }
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "Class",
+    "ClassID",
+    "CreateBy",
+    "CreateTime",
+    "ConfigItemID"
+  ]
+}

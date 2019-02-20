@@ -1,14 +1,14 @@
 {
-    "$schema": "http://json-schema.org/schema",
-    "$id": "#ConfigItemImagePostResponse",
-    "type": "object",
-    "description": "The ID of the created config item image.",
-    "properties": {
-        "ImageID": {
-            "type": "string"
-        }
-    },
-    "required": [
-        "ImageID"
-    ]
+   "$id" : "#ConfigItemImagePostResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created config item image.",
+   "type" : "object",
+   "properties" : {
+      "ImageID" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "ImageID"
+   ]
 }

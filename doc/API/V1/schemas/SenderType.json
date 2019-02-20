@@ -1,20 +1,20 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#SenderType",
-  "type": "object",
-  "description": "The sender type object.",
-  "properties": {
-    "ID": {
-      "type": "number",
-      "readOnly": true
-    },
-    "Name": {
-      "type": "string",
-      "readOnly": true
-    }
-  },
-  "required": [
-    "ID",
-    "Name"
-  ]
+   "$id" : "#SenderType",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The sender type object.",
+   "type" : "object",
+   "properties" : {
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ID",
+      "Name"
+   ]
 }

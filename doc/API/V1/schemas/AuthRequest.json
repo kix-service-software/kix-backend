@@ -1,26 +1,26 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#AuthRequest",
-  "type": "object",
-  "description": "An authorization object.",
-  "properties": {
-    "UserLogin": {
-      "type": "string"
-    },
-    "UserType": {
-      "type": "string",
-      "enum": [
-        "Agent",
-        "Customer"
-      ]
-    },
-    "Password": {
-      "type": "string"
-    }
-  },
-  "required": [
-    "UserLogin",
-    "UserType",
-    "Password"
-  ]
+   "$id" : "#AuthRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An authorization object.",
+   "type" : "object",
+   "properties" : {
+      "Password" : {
+         "type" : "string"
+      },
+      "UserLogin" : {
+         "type" : "string"
+      },
+      "UserType" : {
+         "type" : "string",
+         "enum" : [
+            "Agent",
+            "Customer"
+         ]
+      }
+   },
+   "required" : [
+      "UserLogin",
+      "UserType",
+      "Password"
+   ]
 }

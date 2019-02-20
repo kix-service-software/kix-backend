@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemPatchRequest",
+  "type": "object",
+  "description": "The config item object for update.",
+  "properties": {
+    "ConfigItem": {
+      "type": "object",
+      "properties": {
+        "DeplStateID": {
+          "type": "integer"
+        },    
+        "InciStateID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "ConfigItem"
+  ]
+}

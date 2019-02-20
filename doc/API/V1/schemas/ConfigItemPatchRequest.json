@@ -1,22 +1,22 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "$id": "#ConfigItemPatchRequest",
-  "type": "object",
-  "description": "The config item object for update.",
-  "properties": {
-    "ConfigItem": {
-      "type": "object",
-      "properties": {
-        "DeplStateID": {
-          "type": "number"
-        },    
-        "InciStateID": {
-          "type": "number"
-        }
+   "$id" : "#ConfigItemPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item object for update.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "object",
+         "properties" : {
+            "DeplStateID" : {
+               "type" : "integer"
+            },
+            "InciStateID" : {
+               "type" : "integer"
+            }
+         }
       }
-    }
-  },
-  "required": [
-    "ConfigItem"
-  ]
+   },
+   "required" : [
+      "ConfigItem"
+   ]
 }
