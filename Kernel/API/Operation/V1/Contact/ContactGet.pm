@@ -189,28 +189,6 @@ sub Run {
             }
         }
 
-        # include Tickets if requested
-        if ( $Param{Data}->{include}->{Tickets} ) {
-            # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'CustomerUserID',
-                            Operator => 'EQ',
-                            Value    => $ContactID,
-                        }
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'ARRAY',
-            );
-            $ContactData{Tickets} = \@TicketIDs;
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
-        }
-
         # include TicketStats if requested
         if ( $Param{Data}->{include}->{TicketStats} ) {
             # execute ticket searches

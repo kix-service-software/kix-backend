@@ -959,6 +959,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Contact::ContactUpdate
+    V1::Contact::ContactTicketSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Contact::ContactTicketSearch
     V1::Customer::CustomerSourceSearch:
         Description: ''
         MappingInbound:
@@ -994,6 +1001,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Customer::CustomerUpdate
+    V1::Customer::CustomerContactSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerContactSearch
+    V1::Customer::CustomerTicketSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Customer::CustomerTicketSearch
     V1::Salutation::SalutationSearch:
         Description: ''
         MappingInbound:
@@ -2314,6 +2335,10 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /contacts/:ContactID
+        V1::Contact::ContactTicketSearch:
+          RequestMethod:
+          - GET
+          Route: /contacts/:ContactID/tickets
         V1::Customer::CustomerSourceSearch:
           RequestMethod:
           - GET
@@ -2334,6 +2359,14 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /customers/:CustomerID
+        V1::Customer::CustomerContactSearch:
+          RequestMethod:
+          - GET
+          Route: /customers/:CustomerID/contacts
+        V1::Customer::CustomerTicketSearch:
+          RequestMethod:
+          - GET
+          Route: /customers/:CustomerID/tickets
         V1::Salutation::SalutationSearch:
           RequestMethod:
           - GET

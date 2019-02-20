@@ -65,6 +65,34 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerContactSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerContactSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">API_customers</Item>                
+                <Item Key="CacheTypeDependency">CustomerUser</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Customer::CustomerTicketSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">CustomerTicketSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="Controller">Customer</Item>
+                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="CacheType">API_customers</Item>                
+                <Item Key="CacheTypeDependency">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem Name="API::Operation::V1::Customer::CustomerGet###AttributeWhitelist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the customer data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
@@ -79,21 +107,4 @@
             </Hash>
         </Setting>
     </ConfigItem>  
-
-    <ConfigItem Name="API::Operation::GenericExpand###Customer.Tickets" Required="0" Valid="1">
-        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Operation">V1::Ticket::TicketGet</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::GenericExpand###Customer.Contacts" Required="0" Valid="1">
-        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Operation">V1::Contact::ContactGet</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
 </kix_config>
