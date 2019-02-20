@@ -14,9 +14,11 @@
 
     <script type="text/javascript">
       {% include "./scripts.js" %}
+      {% include "./plugins/json-browse.js" %}
     </script>
     <style>
       {% include "./styles.css" %}
+      {% include "./plugins/json-browse.css" %}
     </style>
   </head>
 

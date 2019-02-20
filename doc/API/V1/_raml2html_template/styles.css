@@ -16,6 +16,9 @@ pre {
 pre.base-uri {
   margin-left: 0px;
 }
+pre > code ul.json-dict {
+  margin-bottom: 0px;
+}
 .param-table {
   border-collapse: collapse;  
   border-color: #ddd;
