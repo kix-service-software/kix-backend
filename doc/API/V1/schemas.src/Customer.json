@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "#TicketType",
+  "$id": "#Customer",
   "type": "object",
-  "description": "The ticket type object.",
+  "description": "The customer object.",
   "properties": {
     "ChangeBy": {
       "type": "integer",
@@ -12,7 +12,22 @@
       "type": "string",
       "readOnly": true
     },
+    "City": {
+      "type": "string",
+      "readOnly": true
+    },
     "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Contacts": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+        "$ref": "Contact.json"
+      }
+    },
+    "Country": {
       "type": "string",
       "readOnly": true
     },
@@ -32,6 +47,25 @@
       "type": "string",
       "readOnly": true
     },
+    "Street": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Tickets": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+        "$ref": "Ticket.json"
+      }
+    },
+    "URL": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ZipCode": {
+      "type": "string",
+      "readOnly": true
+    },
     "ValidID": {
       "type": "integer",
       "readOnly": true
@@ -40,6 +74,8 @@
   "required": [
     "ChangeBy",
     "ChangeTime",
+    "CustomerID",
+    "CustomerIDs",
     "CreateBy",
     "CreateTime",
     "ID",

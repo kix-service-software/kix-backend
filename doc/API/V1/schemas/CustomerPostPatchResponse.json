@@ -1,0 +1,14 @@
+{
+   "$id" : "#CustomerPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated customer.",
+   "type" : "object",
+   "properties" : {
+      "CustomerID" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "CustomerID"
+   ]
+}

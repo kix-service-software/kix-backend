@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#CustomerResponse",
+  "type": "object",
+  "description": "A response for customer GET request.",
+  "properties": {
+    "Customer": {
+      "$ref": "Customer.json"
+    }
+  },
+  "required": [
+    "Customer"
+  ]
+}

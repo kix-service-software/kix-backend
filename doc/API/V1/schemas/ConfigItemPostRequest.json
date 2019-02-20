@@ -4,70 +4,54 @@
    "description" : "The config item object for creation.",
    "type" : "object",
    "definitions" : {
-      "ConfigItemVersionPostRequest" : {
-         "$id" : "#ConfigItemVersionPostRequest",
+      "ConfigItemVersionPostItem" : {
+         "$id" : "#ConfigItemVersionPostItem",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item version request object for creation.",
          "type" : "object",
          "properties" : {
-            "ConfigItemVersion" : {
-               "type" : "object",
-               "properties" : {
-                  "Data" : {
-                     "type" : "object"
-                  },
-                  "DeplStateID" : {
-                     "type" : "integer"
-                  },
-                  "InciStateID" : {
-                     "type" : "integer"
-                  },
-                  "Name" : {
-                     "type" : "string"
-                  }
-               },
-               "required" : [
-                  "Name",
-                  "DeplStateID",
-                  "InciStateID"
-               ]
+            "Data" : {
+               "type" : "object"
+            },
+            "DeplStateID" : {
+               "type" : "integer"
+            },
+            "InciStateID" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
             }
          },
          "required" : [
-            "ConfigItemVersion"
+            "Name",
+            "DeplStateID",
+            "InciStateID"
          ]
       },
-      "ConfigItemImagePostRequest" : {
-         "$id" : "#ConfigItemImagePostRequest",
+      "ConfigItemImagePostItem" : {
+         "$id" : "#ConfigItemImagePostItem",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item image request object for creation.",
          "type" : "object",
          "properties" : {
-            "Image" : {
-               "type" : "object",
-               "properties" : {
-                  "Comment" : {
-                     "type" : "string"
-                  },
-                  "Content" : {
-                     "type" : "string"
-                  },
-                  "ContentType" : {
-                     "type" : "string"
-                  },
-                  "Filename" : {
-                     "type" : "string"
-                  }
-               },
-               "required" : [
-                  "Content",
-                  "ContentType",
-                  "Filename"
-               ]
+            "Comment" : {
+               "type" : "string"
+            },
+            "Content" : {
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Filename" : {
+               "type" : "string"
             }
          },
          "required" : [
-            "Image"
+            "Content",
+            "ContentType",
+            "Filename"
          ]
       }
    },
@@ -81,11 +65,11 @@
             "Images" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemImagePostRequest"
+                  "$ref" : "#/definitions/ConfigItemImagePostItem"
                }
             },
             "Version" : {
-               "$ref" : "#/definitions/ConfigItemVersionPostRequest"
+               "$ref" : "#/definitions/ConfigItemVersionPostItem"
             }
          },
          "required" : [

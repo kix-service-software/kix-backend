@@ -3,8 +3,11 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item version request object for creation.",
    "type" : "object",
-   "properties" : {
-      "ConfigItemVersion" : {
+   "definitions" : {
+      "ConfigItemVersionPostItem" : {
+         "$id" : "#ConfigItemVersionPostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item version request object for creation.",
          "type" : "object",
          "properties" : {
             "Data" : {
@@ -25,6 +28,11 @@
             "DeplStateID",
             "InciStateID"
          ]
+      }
+   },
+   "properties" : {
+      "ConfigItemVersion" : {
+         "$ref" : "#/definitions/ConfigItemVersionPostItem"
       }
    },
    "required" : [

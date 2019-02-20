@@ -5,26 +5,7 @@
   "description": "The config item image request object for creation.",
   "properties": {
     "Image": {
-      "type": "object",
-      "properties": {
-        "Comment": {
-          "type": "string"
-        },
-        "Content": {
-          "type": "string"
-        },
-        "ContentType": {
-          "type": "string"
-        },
-        "Filename": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Content",
-        "ContentType",
-        "Filename"
-      ]
+      "$ref": "ConfigItemImagePostItem.json"
     }
   },
   "required": [

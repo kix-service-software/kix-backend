@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ContactCollectionResponse",
+  "type": "object",
+  "description": "A list of contacts.",
+  "properties": {
+    "Contact": {
+      "type": "array",
+      "items": {
+        "$ref": "Contact.json"
+      }
+    }
+  },
+  "required": [
+    "Contact"
+  ]
+}

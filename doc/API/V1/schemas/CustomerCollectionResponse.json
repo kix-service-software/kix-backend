@@ -1,13 +1,13 @@
 {
-   "$id" : "#TicketTypeCollectionResponse",
+   "$id" : "#CustomerCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
-   "description" : "A list of ticket types.",
+   "description" : "A list of customers.",
    "type" : "object",
    "definitions" : {
-      "TicketType" : {
-         "$id" : "#TicketType",
+      "Customer" : {
+         "$id" : "#Customer",
          "$schema" : "http://json-schema.org/schema",
-         "description" : "The ticket type object.",
+         "description" : "The customer object.",
          "type" : "object",
          "properties" : {
             "ChangeBy" : {
@@ -18,7 +18,15 @@
                "type" : "string",
                "readOnly" : true
             },
+            "City" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Country" : {
                "type" : "string",
                "readOnly" : true
             },
@@ -38,14 +46,28 @@
                "type" : "string",
                "readOnly" : true
             },
+            "Street" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URL" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "ValidID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "ZipCode" : {
+               "type" : "string",
                "readOnly" : true
             }
          },
          "required" : [
             "ChangeBy",
             "ChangeTime",
+            "CustomerID",
+            "CustomerIDs",
             "CreateBy",
             "CreateTime",
             "ID",
@@ -55,14 +77,14 @@
       }
    },
    "properties" : {
-      "TicketType" : {
+      "Customer" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/TicketType"
+            "$ref" : "#/definitions/Customer"
          }
       }
    },
    "required" : [
-      "TicketType"
+      "Customer"
    ]
 }

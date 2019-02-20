@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemVersionPostItem",
+  "type": "object",
+  "description": "The config item version request object for creation.",
+  "properties": {
+    "Name": {
+      "type": "string"
+    },
+    "DeplStateID": {
+      "type": "integer"
+    },
+    "InciStateID": {
+      "type": "integer"
+    },
+    "Data": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "Name",
+    "DeplStateID",
+    "InciStateID"
+  ]
+}

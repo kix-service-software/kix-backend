@@ -1,0 +1,129 @@
+{
+   "$id" : "#ContactCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of contacts.",
+   "type" : "object",
+   "definitions" : {
+      "Contact" : {
+         "$id" : "#Contact",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The contact object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "City" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Country" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CustomerID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CustomerIDs" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "Email" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fax" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Firstname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Lastname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Login" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Mobile" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Password" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Phone" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Street" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ZipCode" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CustomerID",
+            "CustomerIDs",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Login",
+            "ValidID"
+         ]
+      }
+   },
+   "properties" : {
+      "Contact" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Contact"
+         }
+      }
+   },
+   "required" : [
+      "Contact"
+   ]
+}

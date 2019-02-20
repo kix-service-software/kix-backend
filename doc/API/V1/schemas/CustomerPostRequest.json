@@ -1,0 +1,28 @@
+{
+   "$id" : "#CustomerPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The customer request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Customer" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name"
+         ]
+      }
+   },
+   "required" : [
+      "Customer"
+   ]
+}
