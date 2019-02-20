@@ -178,40 +178,6 @@ sub Run {
             }
         }
 
-        # include Contacts if requested
-        if ( $Param{Data}->{include}->{Contacts} ) {
-            # execute customer user search
-            my %CustomerUserList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-                CustomerID => $CustomerID,
-            );
-            $CustomerData{Contacts} = [ sort keys %CustomerUserList ];
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'CustomerUser');
-        }
-
-        # include Tickets if requested
-        if ( $Param{Data}->{include}->{Tickets} ) {
-            # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'CustomerID',
-                            Operator => 'EQ',
-                            Value    => $CustomerID,
-                        }
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'ARRAY',
-            );
-            $CustomerData{Tickets} = \@TicketIDs;
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
-        }
-
         # include TicketStats if requested
         if ( $Param{Data}->{include}->{TicketStats} ) {
             # execute ticket searches

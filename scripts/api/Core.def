@@ -135,11 +135,14 @@
 /contacts                                                               |   POST            | V1::Contact::ContactCreate
 /contacts/:ContactID                                                    |   GET             | V1::Contact::ContactGet
 /contacts/:ContactID                                                    |   PATCH           | V1::Contact::ContactUpdate
+/contacts/:ContactID/tickets                                            |   GET             | V1::Contact::ContactTicketSearch
 /customers/sources                                                      |   GET             | V1::Customer::CustomerSourceSearch
 /customers                                                              |   GET             | V1::Customer::CustomerSearch
 /customers                                                              |   POST            | V1::Customer::CustomerCreate
 /customers/:CustomerID                                                  |   GET             | V1::Customer::CustomerGet
 /customers/:CustomerID                                                  |   PATCH           | V1::Customer::CustomerUpdate
+/customers/:CustomerID/contacts                                         |   GET             | V1::Customer::CustomerContactSearch
+/customers/:CustomerID/tickets                                          |   GET             | V1::Customer::CustomerTicketSearch
 /salutations                                                            |   GET             | V1::Salutation::SalutationSearch
 /salutations                                                            |   POST            | V1::Salutation::SalutationCreate
 /salutations/:SalutationID                                              |   GET             | V1::Salutation::SalutationGet
