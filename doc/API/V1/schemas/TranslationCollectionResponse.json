@@ -1,0 +1,88 @@
+{
+   "$id" : "#TranslationCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of translations.",
+   "type" : "object",
+   "definitions" : {
+      "Translation" : {
+         "$id" : "#Translation",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer"
+            },
+            "Languages" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/TranslationLanguage"
+               }
+            },
+            "Pattern" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Pattern"
+         ]
+      },
+      "TranslationLanguage" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TranslationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "TranslationID",
+            "Language",
+            "Value"
+         ]
+      }
+   },
+   "properties" : {
+      "Translation" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Translation"
+         }
+      }
+   },
+   "required" : [
+      "Translation"
+   ]
+}

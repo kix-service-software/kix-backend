@@ -4,7 +4,7 @@
   "type": "object",
   "description": "The config item image request object for creation.",
   "properties": {
-    "ConfigItemImage": {
+    "Image": {
       "type": "object",
       "properties": {
         "Comment": {
@@ -28,6 +28,6 @@
     }
   },
   "required": [
-    "ConfigItemImage"
+    "Image"
   ]
 }

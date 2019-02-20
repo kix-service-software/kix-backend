@@ -1,0 +1,31 @@
+{
+   "$id" : "#ConfigItemClassPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item class object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItemClass" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "DefinitionString" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItemClass"
+   ]
+}

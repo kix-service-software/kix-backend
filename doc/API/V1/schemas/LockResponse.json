@@ -1,0 +1,59 @@
+{
+   "$id" : "#LockResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for lock GET request.",
+   "type" : "object",
+   "definitions" : {
+      "Lock" : {
+         "$id" : "#Lock",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The ticket lock object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "properties" : {
+      "Lock" : {
+         "$ref" : "#/definitions/Lock"
+      }
+   },
+   "required" : [
+      "Lock"
+   ]
+}

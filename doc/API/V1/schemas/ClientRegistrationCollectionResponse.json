@@ -1,0 +1,43 @@
+{
+   "$id" : "#ClientRegistrationCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of client registrations.",
+   "type" : "object",
+   "definitions" : {
+      "ClientRegistration" : {
+         "$id" : "#ClientRegistration",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The client registration object.",
+         "type" : "object",
+         "properties" : {
+            "Authentication" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CallbackURL" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClientID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ClientID",
+            "CallbackURL"
+         ]
+      }
+   },
+   "properties" : {
+      "ClientRegistration" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ClientRegistration"
+         }
+      }
+   },
+   "required" : [
+      "ClientRegistration"
+   ]
+}

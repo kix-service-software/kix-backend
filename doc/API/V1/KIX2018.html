@@ -578,7 +578,8 @@ pre code {
                "readOnly" : true
             },
             "Comment" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ConfigItemStats" : {
                "type" : "object",
@@ -615,14 +616,16 @@ pre code {
                }
             },
             "ID" : {
-               "type" : "string",
+               "type" : "integer",
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -770,8 +773,7 @@ pre code {
             }
          },
          "required" : [
-            "Name",
-            "ValidID"
+            "Name"
          ]
       }
    },
@@ -851,7 +853,8 @@ pre code {
                "readOnly" : true
             },
             "Comment" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ConfigItemStats" : {
                "type" : "object",
@@ -888,14 +891,16 @@ pre code {
                }
             },
             "ID" : {
-               "type" : "string",
+               "type" : "integer",
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -1240,268 +1245,268 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemClassDefinition": [
         {
-            "ClassID": "22",
-            "Version": 1,
+            "Class": "Computer",
+            "ClassID": 22,
             "CreateBy": 1,
             "CreateTime": "2017-08-18 22:47:00",
-            "DefinitionString": "[ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Vendor&#39;, &#39;Name&#39; =&gt; &#39;Vendor&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Model&#39;, &#39;Name&#39; =&gt; &#39;Model&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Description&#39;, &#39;Name&#39; =&gt; &#39;Description&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::Computer::Type&#39;, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;Type&#39;, &#39;Name&#39; =&gt; &#39;Type&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Customer&#39; }, &#39;Key&#39; =&gt; &#39;Owner&#39;, &#39;Name&#39; =&gt; &#39;Assigned owner&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;SerialNumber&#39;, &#39;Name&#39; =&gt; &#39;Serial Number&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;OperatingSystem&#39;, &#39;Name&#39; =&gt; &#39;Operating System&#39; }, { &#39;CountMax&#39; =&gt; 16, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;CPU&#39;, &#39;Name&#39; =&gt; &#39;CPU&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Ram&#39;, &#39;Name&#39; =&gt; &#39;Ram&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;HardDisk&#39;, &#39;Name&#39; =&gt; &#39;Hard Disk&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 10, &#39;Size&#39; =&gt; 20, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Capacity&#39;, &#39;Name&#39; =&gt; &#39;Capacity&#39; } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;FQDN&#39;, &#39;Name&#39; =&gt; &#39;FQDN&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 1, &#39;CountMax&#39; =&gt; 10, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;NIC&#39;, &#39;Name&#39; =&gt; &#39;Network Adapter&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::YesNo&#39;, &#39;Required&#39; =&gt; 1, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;IPoverDHCP&#39;, &#39;Name&#39; =&gt; &#39;IP over DHCP&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMax&#39; =&gt; 20, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 40, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 40, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;IPAddress&#39;, &#39;Name&#39; =&gt; &#39;IP Address&#39;, &#39;Searchable&#39; =&gt; 1 } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;GraphicAdapter&#39;, &#39;Name&#39; =&gt; &#39;Graphic Adapter&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;OtherEquipment&#39;, &#39;Name&#39; =&gt; &#39;Other Equipment&#39; }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;WarrantyExpirationDate&#39;, &#39;Name&#39; =&gt; &#39;Warranty Expiration Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;InstallDate&#39;, &#39;Name&#39; =&gt; &#39;Install Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Note&#39;, &#39;Name&#39; =&gt; &#39;Note&#39;, &#39;Searchable&#39; =&gt; 1}  ];",
             "Definition": [
                 {
-                    "Input": {
-                        "Size": 50,
-                        "MaxLength": 50,
-                        "Type": "Text"
-                    },
+                    "CountDefault": 0,
                     "CountMax": 1,
-                    "CountMin": 1,
-                    "Name": "Vendor",
-                    "Key": "Vendor",
-                    "Searchable": 1,
-                    "CountDefault": 1
+                    "CountMin": 0,
+                    "Input": {
+                        "Required": 1,
+                        "Type": "Date",
+                        "YearPeriodFuture": 10,
+                        "YearPeriodPast": 20
+                    },
+                    "Key": "InstallDate",
+                    "Name": "Install Date",
+                    "Searchable": 1
                 },
                 {
-                    "Name": "Model",
-                    "CountMin": 1,
+                    "CountDefault": 0,
                     "CountMax": 1,
+                    "CountMin": 0,
                     "Input": {
-                        "Size": 50,
-                        "MaxLength": 50,
-                        "Type": "Text"
-                    },
-                    "CountDefault": 1,
-                    "Searchable": 1,
-                    "Key": "Model"
-                },
-                {
-                    "Key": "Description",
-                    "Searchable": 1,
-                    "CountDefault": 1,
-                    "Input": {
+                        "Required": 1,
                         "Type": "TextArea"
                     },
-                    "CountMax": 1,
-                    "CountMin": 1,
-                    "Name": "Description"
+                    "Key": "Note",
+                    "Name": "Note",
+                    "Searchable": 1
                 },
                 {
-                    "Name": "Type",
-                    "CountMin": 1,
+                    "CountDefault": 0,
                     "CountMax": 1,
+                    "CountMin": 0,
                     "Input": {
-                        "Type": "GeneralCatalog",
-                        "Class": "ITSM::ConfigItem::Computer::Type",
-                        "Translation": 1
+                        "Required": 1,
+                        "Type": "TextArea"
                     },
-                    "Searchable": 1,
-                    "CountDefault": 1,
-                    "Key": "Type"
+                    "Key": "OtherEquipment",
+                    "Name": "Other Equipment"
                 },
                 {
-                    "Key": "Owner",
-                    "Searchable": 1,
                     "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "Class": "ITSM::ConfigItem::Computer::Type",
+                        "Translation": 1,
+                        "Type": "GeneralCatalog"
+                    },
+                    "Key": "Type",
+                    "Name": "Type",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "FQDN",
+                    "Name": "FQDN",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "GraphicAdapter",
+                    "Name": "Graphic Adapter"
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "OperatingSystem",
+                    "Name": "Operating System"
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "SerialNumber",
+                    "Name": "Serial Number",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 50,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "Model",
+                    "Name": "Model",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 50,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "Vendor",
+                    "Name": "Vendor",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 1,
+                    "CountMin": 1,
                     "Input": {
                         "Type": "Customer"
                     },
+                    "Key": "Owner",
+                    "Name": "Assigned owner",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
                     "CountMax": 1,
                     "CountMin": 1,
-                    "Name": "Assigned owner"
-                },
-                {
-                    "CountDefault": 1,
-                    "Searchable": 1,
-                    "Key": "SerialNumber",
-                    "Name": "Serial Number",
-                    "CountMin": 1,
-                    "CountMax": 1,
-                    "Input": {
-                        "MaxLength": 100,
-                        "Size": 50,
-                        "Type": "Text"
-                    }
-                },
-                {
-                    "CountDefault": 1,
-                    "Key": "OperatingSystem",
-                    "Name": "Operating System",
-                    "CountMin": 1,
-                    "CountMax": 1,
-                    "Input": {
-                        "Type": "Text",
-                        "Size": 50,
-                        "MaxLength": 100
-                    }
-                },
-                {
-                    "CountMax": 16,
-                    "Input": {
-                        "MaxLength": 100,
-                        "Size": 50,
-                        "Type": "Text"
-                    },
-                    "CountMin": 1,
-                    "Name": "CPU",
-                    "Key": "CPU",
-                    "CountDefault": 1
-                },
-                {
-                    "CountDefault": 1,
-                    "Key": "Ram",
-                    "Name": "Ram",
-                    "CountMin": 1,
-                    "Input": {
-                        "Size": 50,
-                        "MaxLength": 100,
-                        "Type": "Text"
-                    },
-                    "CountMax": 10
-                },
-                {
-                    "Key": "HardDisk",
-                    "CountDefault": 1,
-                    "CountMin": 1,
-                    "Input": {
-                        "MaxLength": 100,
-                        "Size": 50,
-                        "Type": "Text"
-                    },
-                    "Sub": [
-                        {
-                            "CountMin": 1,
-                            "Input": {
-                                "Type": "Text",
-                                "Size": 20,
-                                "MaxLength": 10
-                            },
-                            "CountMax": 1,
-                            "Name": "Capacity",
-                            "Key": "Capacity",
-                            "CountDefault": 1
-                        }
-                    ],
-                    "CountMax": 10,
-                    "Name": "Hard Disk"
-                },
-                {
-                    "CountDefault": 1,
-                    "Searchable": 1,
-                    "Key": "FQDN",
-                    "Name": "FQDN",
-                    "CountMin": 1,
-                    "CountMax": 1,
-                    "Input": {
-                        "Type": "Text",
-                        "MaxLength": 100,
-                        "Size": 50
-                    }
-                },
-                {
-                    "CountDefault": 1,
-                    "Key": "NIC",
-                    "Name": "Network Adapter",
-                    "CountMin": 0,
-                    "Sub": [
-                        {
-                            "Key": "IPoverDHCP",
-                            "CountDefault": 1,
-                            "Input": {
-                                "Class": "ITSM::ConfigItem::YesNo",
-                                "Translation": 1,
-                                "Required": 1,
-                                "Type": "GeneralCatalog"
-                            },
-                            "CountMax": 1,
-                            "CountMin": 1,
-                            "Name": "IP over DHCP"
-                        },
-                        {
-                            "Key": "IPAddress",
-                            "CountDefault": 0,
-                            "Searchable": 1,
-                            "CountMax": 20,
-                            "Input": {
-                                "Required": 1,
-                                "Type": "Text",
-                                "Size": 40,
-                                "MaxLength": 40
-                            },
-                            "CountMin": 0,
-                            "Name": "IP Address"
-                        }
-                    ],
-                    "CountMax": 10,
-                    "Input": {
-                        "Size": 50,
-                        "MaxLength": 100,
-                        "Required": 1,
-                        "Type": "Text"
-                    }
-                },
-                {
-                    "Name": "Graphic Adapter",
-                    "CountMax": 1,
-                    "Input": {
-                        "Type": "Text",
-                        "MaxLength": 100,
-                        "Size": 50
-                    },
-                    "CountMin": 1,
-                    "CountDefault": 1,
-                    "Key": "GraphicAdapter"
-                },
-                {
-                    "CountMin": 0,
-                    "Input": {
-                        "Required": 1,
-                        "Type": "TextArea"
-                    },
-                    "CountMax": 1,
-                    "Name": "Other Equipment",
-                    "Key": "OtherEquipment",
-                    "CountDefault": 0
-                },
-                {
-                    "Searchable": 1,
-                    "CountDefault": 1,
-                    "Key": "WarrantyExpirationDate",
-                    "Name": "Warranty Expiration Date",
-                    "CountMin": 1,
-                    "CountMax": 1,
                     "Input": {
                         "Type": "Date",
                         "YearPeriodFuture": 10,
                         "YearPeriodPast": 20
-                    }
+                    },
+                    "Key": "WarrantyExpirationDate",
+                    "Name": "Warranty Expiration Date",
+                    "Searchable": 1
                 },
                 {
-                    "Name": "Install Date",
-                    "CountMin": 0,
+                    "CountDefault": 1,
                     "CountMax": 1,
+                    "CountMin": 1,
                     "Input": {
-                        "YearPeriodPast": 20,
-                        "YearPeriodFuture": 10,
+                        "Type": "TextArea"
+                    },
+                    "Key": "Description",
+                    "Name": "Description",
+                    "Searchable": 1
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 10,
+                    "CountMin": 0,
+                    "Input": {
+                        "MaxLength": 100,
                         "Required": 1,
-                        "Type": "Date"
+                        "Size": 50,
+                        "Type": "Text"
                     },
-                    "CountDefault": 0,
-                    "Searchable": 1,
-                    "Key": "InstallDate"
+                    "Key": "NIC",
+                    "Name": "Network Adapter",
+                    "Sub": [
+                        {
+                            "CountDefault": 0,
+                            "CountMax": 20,
+                            "CountMin": 0,
+                            "Input": {
+                                "MaxLength": 40,
+                                "Required": 1,
+                                "Size": 40,
+                                "Type": "Text"
+                            },
+                            "Key": "IPAddress",
+                            "Name": "IP Address",
+                            "Searchable": 1
+                        },
+                        {
+                            "CountDefault": 1,
+                            "CountMax": 1,
+                            "CountMin": 1,
+                            "Input": {
+                                "Class": "ITSM::ConfigItem::YesNo",
+                                "Required": 1,
+                                "Translation": 1,
+                                "Type": "GeneralCatalog"
+                            },
+                            "Key": "IPoverDHCP",
+                            "Name": "IP over DHCP"
+                        }
+                    ]
                 },
                 {
-                    "CountMax": 1,
+                    "CountDefault": 1,
+                    "CountMax": 10,
+                    "CountMin": 1,
                     "Input": {
-                        "Type": "TextArea",
-                        "Required": 1
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
                     },
-                    "CountMin": 0,
-                    "Name": "Note",
-                    "Key": "Note",
-                    "Searchable": 1,
-                    "CountDefault": 0
+                    "Key": "HardDisk",
+                    "Name": "Hard Disk",
+                    "Sub": [
+                        {
+                            "CountDefault": 1,
+                            "CountMax": 1,
+                            "CountMin": 1,
+                            "Input": {
+                                "MaxLength": 10,
+                                "Size": 20,
+                                "Type": "Text"
+                            },
+                            "Key": "Capacity",
+                            "Name": "Capacity"
+                        }
+                    ]
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 10,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "Ram",
+                    "Name": "Ram"
+                },
+                {
+                    "CountDefault": 1,
+                    "CountMax": 16,
+                    "CountMin": 1,
+                    "Input": {
+                        "MaxLength": 100,
+                        "Size": 50,
+                        "Type": "Text"
+                    },
+                    "Key": "CPU",
+                    "Name": "CPU"
                 }
             ],
-            "DefinitionID": "1",
-            "Class": "Computer"
+            "DefinitionID": 1,
+            "DefinitionString": "[ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Vendor&#39;, &#39;Name&#39; =&gt; &#39;Vendor&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Model&#39;, &#39;Name&#39; =&gt; &#39;Model&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Description&#39;, &#39;Name&#39; =&gt; &#39;Description&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::Computer::Type&#39;, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;Type&#39;, &#39;Name&#39; =&gt; &#39;Type&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Customer&#39; }, &#39;Key&#39; =&gt; &#39;Owner&#39;, &#39;Name&#39; =&gt; &#39;Assigned owner&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;SerialNumber&#39;, &#39;Name&#39; =&gt; &#39;Serial Number&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;OperatingSystem&#39;, &#39;Name&#39; =&gt; &#39;Operating System&#39; }, { &#39;CountMax&#39; =&gt; 16, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;CPU&#39;, &#39;Name&#39; =&gt; &#39;CPU&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Ram&#39;, &#39;Name&#39; =&gt; &#39;Ram&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;HardDisk&#39;, &#39;Name&#39; =&gt; &#39;Hard Disk&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 10, &#39;Size&#39; =&gt; 20, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Capacity&#39;, &#39;Name&#39; =&gt; &#39;Capacity&#39; } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;FQDN&#39;, &#39;Name&#39; =&gt; &#39;FQDN&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 1, &#39;CountMax&#39; =&gt; 10, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;NIC&#39;, &#39;Name&#39; =&gt; &#39;Network Adapter&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::YesNo&#39;, &#39;Required&#39; =&gt; 1, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;IPoverDHCP&#39;, &#39;Name&#39; =&gt; &#39;IP over DHCP&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMax&#39; =&gt; 20, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 40, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 40, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;IPAddress&#39;, &#39;Name&#39; =&gt; &#39;IP Address&#39;, &#39;Searchable&#39; =&gt; 1 } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;GraphicAdapter&#39;, &#39;Name&#39; =&gt; &#39;Graphic Adapter&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;OtherEquipment&#39;, &#39;Name&#39; =&gt; &#39;Other Equipment&#39; }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;WarrantyExpirationDate&#39;, &#39;Name&#39; =&gt; &#39;Warranty Expiration Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;InstallDate&#39;, &#39;Name&#39; =&gt; &#39;Install Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Note&#39;, &#39;Name&#39; =&gt; &#39;Note&#39;, &#39;Searchable&#39; =&gt; 1}  ];",
+            "Version": 1
         }
     ]
 }</code></pre></div></div><h2 class="response-title" id="cmdb_classes__classid__definitions_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -1670,268 +1675,268 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemClassDefinition": {
-        "ClassID": "22",
-        "Version": 1,
+        "Class": "Computer",
+        "ClassID": 22,
         "CreateBy": 1,
         "CreateTime": "2017-08-18 22:47:00",
-        "DefinitionString": "[ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Vendor&#39;, &#39;Name&#39; =&gt; &#39;Vendor&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Model&#39;, &#39;Name&#39; =&gt; &#39;Model&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Description&#39;, &#39;Name&#39; =&gt; &#39;Description&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::Computer::Type&#39;, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;Type&#39;, &#39;Name&#39; =&gt; &#39;Type&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Customer&#39; }, &#39;Key&#39; =&gt; &#39;Owner&#39;, &#39;Name&#39; =&gt; &#39;Assigned owner&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;SerialNumber&#39;, &#39;Name&#39; =&gt; &#39;Serial Number&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;OperatingSystem&#39;, &#39;Name&#39; =&gt; &#39;Operating System&#39; }, { &#39;CountMax&#39; =&gt; 16, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;CPU&#39;, &#39;Name&#39; =&gt; &#39;CPU&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Ram&#39;, &#39;Name&#39; =&gt; &#39;Ram&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;HardDisk&#39;, &#39;Name&#39; =&gt; &#39;Hard Disk&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 10, &#39;Size&#39; =&gt; 20, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Capacity&#39;, &#39;Name&#39; =&gt; &#39;Capacity&#39; } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;FQDN&#39;, &#39;Name&#39; =&gt; &#39;FQDN&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 1, &#39;CountMax&#39; =&gt; 10, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;NIC&#39;, &#39;Name&#39; =&gt; &#39;Network Adapter&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::YesNo&#39;, &#39;Required&#39; =&gt; 1, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;IPoverDHCP&#39;, &#39;Name&#39; =&gt; &#39;IP over DHCP&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMax&#39; =&gt; 20, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 40, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 40, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;IPAddress&#39;, &#39;Name&#39; =&gt; &#39;IP Address&#39;, &#39;Searchable&#39; =&gt; 1 } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;GraphicAdapter&#39;, &#39;Name&#39; =&gt; &#39;Graphic Adapter&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;OtherEquipment&#39;, &#39;Name&#39; =&gt; &#39;Other Equipment&#39; }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;WarrantyExpirationDate&#39;, &#39;Name&#39; =&gt; &#39;Warranty Expiration Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;InstallDate&#39;, &#39;Name&#39; =&gt; &#39;Install Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Note&#39;, &#39;Name&#39; =&gt; &#39;Note&#39;, &#39;Searchable&#39; =&gt; 1}  ];",
         "Definition": [
             {
+                "CountDefault": 0,
+                "CountMax": 1,
+                "CountMin": 0,
                 "Input": {
-                    "Type": "Text",
-                    "MaxLength": 50,
-                    "Size": 50
+                    "Required": 1,
+                    "Type": "Date",
+                    "YearPeriodFuture": 10,
+                    "YearPeriodPast": 20
                 },
+                "Key": "InstallDate",
+                "Name": "Install Date",
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 0,
+                "CountMax": 1,
+                "CountMin": 0,
+                "Input": {
+                    "Required": 1,
+                    "Type": "TextArea"
+                },
+                "Key": "Note",
+                "Name": "Note",
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 0,
+                "CountMax": 1,
+                "CountMin": 0,
+                "Input": {
+                    "Required": 1,
+                    "Type": "TextArea"
+                },
+                "Key": "OtherEquipment",
+                "Name": "Other Equipment"
+            },
+            {
+                "CountDefault": 1,
                 "CountMax": 1,
                 "CountMin": 1,
-                "Name": "Vendor",
-                "Key": "Vendor",
-                "CountDefault": 1,
+                "Input": {
+                    "Class": "ITSM::ConfigItem::Computer::Type",
+                    "Translation": 1,
+                    "Type": "GeneralCatalog"
+                },
+                "Key": "Type",
+                "Name": "Type",
                 "Searchable": 1
             },
             {
                 "CountDefault": 1,
-                "Searchable": 1,
+                "CountMax": 1,
+                "CountMin": 1,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                },
+                "Key": "FQDN",
+                "Name": "FQDN",
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 1,
+                "CountMax": 1,
+                "CountMin": 1,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                },
+                "Key": "GraphicAdapter",
+                "Name": "Graphic Adapter"
+            },
+            {
+                "CountDefault": 1,
+                "CountMax": 1,
+                "CountMin": 1,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                },
+                "Key": "OperatingSystem",
+                "Name": "Operating System"
+            },
+            {
+                "CountDefault": 1,
+                "CountMax": 1,
+                "CountMin": 1,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                },
+                "Key": "SerialNumber",
+                "Name": "Serial Number",
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 1,
+                "CountMax": 1,
+                "CountMin": 1,
+                "Input": {
+                    "MaxLength": 50,
+                    "Size": 50,
+                    "Type": "Text"
+                },
                 "Key": "Model",
                 "Name": "Model",
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 1,
+                "CountMax": 1,
+                "CountMin": 1,
                 "Input": {
-                    "Type": "Text",
+                    "MaxLength": 50,
                     "Size": 50,
-                    "MaxLength": 50
+                    "Type": "Text"
                 },
-                "CountMax": 1,
-                "CountMin": 1
+                "Key": "Vendor",
+                "Name": "Vendor",
+                "Searchable": 1
             },
             {
                 "CountDefault": 1,
-                "Searchable": 1,
-                "Key": "Description",
-                "Name": "Description",
-                "Input": {
-                    "Type": "TextArea"
-                },
                 "CountMax": 1,
-                "CountMin": 1
-            },
-            {
-                "Searchable": 1,
-                "CountDefault": 1,
-                "Key": "Type",
-                "Name": "Type",
-                "Input": {
-                    "Type": "GeneralCatalog",
-                    "Translation": 1,
-                    "Class": "ITSM::ConfigItem::Computer::Type"
-                },
-                "CountMax": 1,
-                "CountMin": 1
-            },
-            {
-                "Searchable": 1,
-                "CountDefault": 1,
-                "Key": "Owner",
-                "Name": "Assigned owner",
-                "CountMax": 1,
+                "CountMin": 1,
                 "Input": {
                     "Type": "Customer"
                 },
-                "CountMin": 1
+                "Key": "Owner",
+                "Name": "Assigned owner",
+                "Searchable": 1
             },
             {
-                "Key": "SerialNumber",
                 "CountDefault": 1,
-                "Searchable": 1,
-                "CountMin": 1,
-                "CountMax": 1,
-                "Input": {
-                    "Type": "Text",
-                    "MaxLength": 100,
-                    "Size": 50
-                },
-                "Name": "Serial Number"
-            },
-            {
-                "Input": {
-                    "MaxLength": 100,
-                    "Size": 50,
-                    "Type": "Text"
-                },
                 "CountMax": 1,
                 "CountMin": 1,
-                "Name": "Operating System",
-                "Key": "OperatingSystem",
-                "CountDefault": 1
-            },
-            {
-                "Name": "CPU",
                 "Input": {
-                    "Type": "Text",
-                    "Size": 50,
-                    "MaxLength": 100
+                    "Type": "Date",
+                    "YearPeriodFuture": 10,
+                    "YearPeriodPast": 20
                 },
-                "CountMax": 16,
-                "CountMin": 1,
-                "CountDefault": 1,
-                "Key": "CPU"
+                "Key": "WarrantyExpirationDate",
+                "Name": "Warranty Expiration Date",
+                "Searchable": 1
             },
             {
-                "Key": "Ram",
                 "CountDefault": 1,
+                "CountMax": 1,
                 "CountMin": 1,
+                "Input": {
+                    "Type": "TextArea"
+                },
+                "Key": "Description",
+                "Name": "Description",
+                "Searchable": 1
+            },
+            {
+                "CountDefault": 1,
                 "CountMax": 10,
+                "CountMin": 0,
                 "Input": {
-                    "Size": 50,
                     "MaxLength": 100,
+                    "Required": 1,
+                    "Size": 50,
                     "Type": "Text"
                 },
-                "Name": "Ram"
+                "Key": "NIC",
+                "Name": "Network Adapter",
+                "Sub": [
+                    {
+                        "CountDefault": 0,
+                        "CountMax": 20,
+                        "CountMin": 0,
+                        "Input": {
+                            "MaxLength": 40,
+                            "Required": 1,
+                            "Size": 40,
+                            "Type": "Text"
+                        },
+                        "Key": "IPAddress",
+                        "Name": "IP Address",
+                        "Searchable": 1
+                    },
+                    {
+                        "CountDefault": 1,
+                        "CountMax": 1,
+                        "CountMin": 1,
+                        "Input": {
+                            "Class": "ITSM::ConfigItem::YesNo",
+                            "Required": 1,
+                            "Translation": 1,
+                            "Type": "GeneralCatalog"
+                        },
+                        "Key": "IPoverDHCP",
+                        "Name": "IP over DHCP"
+                    }
+                ]
             },
             {
+                "CountDefault": 1,
+                "CountMax": 10,
+                "CountMin": 1,
+                "Input": {
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
+                },
+                "Key": "HardDisk",
                 "Name": "Hard Disk",
                 "Sub": [
                     {
-                        "Name": "Capacity",
+                        "CountDefault": 1,
                         "CountMax": 1,
+                        "CountMin": 1,
                         "Input": {
                             "MaxLength": 10,
                             "Size": 20,
                             "Type": "Text"
                         },
-                        "CountMin": 1,
-                        "CountDefault": 1,
-                        "Key": "Capacity"
+                        "Key": "Capacity",
+                        "Name": "Capacity"
                     }
-                ],
-                "Input": {
-                    "Size": 50,
-                    "MaxLength": 100,
-                    "Type": "Text"
-                },
+                ]
+            },
+            {
+                "CountDefault": 1,
                 "CountMax": 10,
                 "CountMin": 1,
-                "CountDefault": 1,
-                "Key": "HardDisk"
-            },
-            {
-                "Name": "FQDN",
-                "CountMin": 1,
-                "CountMax": 1,
-                "Input": {
-                    "Type": "Text",
-                    "MaxLength": 100,
-                    "Size": 50
-                },
-                "CountDefault": 1,
-                "Searchable": 1,
-                "Key": "FQDN"
-            },
-            {
-                "CountDefault": 1,
-                "Key": "NIC",
-                "Name": "Network Adapter",
-                "CountMin": 0,
-                "Sub": [
-                    {
-                        "Key": "IPoverDHCP",
-                        "CountDefault": 1,
-                        "CountMax": 1,
-                        "Input": {
-                            "Type": "GeneralCatalog",
-                            "Required": 1,
-                            "Translation": 1,
-                            "Class": "ITSM::ConfigItem::YesNo"
-                        },
-                        "CountMin": 1,
-                        "Name": "IP over DHCP"
-                    },
-                    {
-                        "Name": "IP Address",
-                        "CountMin": 0,
-                        "CountMax": 20,
-                        "Input": {
-                            "Required": 1,
-                            "Type": "Text",
-                            "MaxLength": 40,
-                            "Size": 40
-                        },
-                        "Searchable": 1,
-                        "CountDefault": 0,
-                        "Key": "IPAddress"
-                    }
-                ],
-                "CountMax": 10,
-                "Input": {
-                    "MaxLength": 100,
-                    "Size": 50,
-                    "Type": "Text",
-                    "Required": 1
-                }
-            },
-            {
-                "CountDefault": 1,
-                "Key": "GraphicAdapter",
-                "Name": "Graphic Adapter",
-                "CountMin": 1,
-                "CountMax": 1,
                 "Input": {
                     "MaxLength": 100,
                     "Size": 50,
                     "Type": "Text"
-                }
-            },
-            {
-                "CountDefault": 0,
-                "Key": "OtherEquipment",
-                "Name": "Other Equipment",
-                "CountMax": 1,
-                "Input": {
-                    "Type": "TextArea",
-                    "Required": 1
                 },
-                "CountMin": 0
+                "Key": "Ram",
+                "Name": "Ram"
             },
             {
-                "Searchable": 1,
                 "CountDefault": 1,
-                "Key": "WarrantyExpirationDate",
-                "Name": "Warranty Expiration Date",
+                "CountMax": 16,
+                "CountMin": 1,
                 "Input": {
-                    "YearPeriodFuture": 10,
-                    "YearPeriodPast": 20,
-                    "Type": "Date"
+                    "MaxLength": 100,
+                    "Size": 50,
+                    "Type": "Text"
                 },
-                "CountMax": 1,
-                "CountMin": 1
-            },
-            {
-                "Input": {
-                    "YearPeriodFuture": 10,
-                    "YearPeriodPast": 20,
-                    "Type": "Date",
-                    "Required": 1
-                },
-                "CountMax": 1,
-                "CountMin": 0,
-                "Name": "Install Date",
-                "Key": "InstallDate",
-                "Searchable": 1,
-                "CountDefault": 0
-            },
-            {
-                "Name": "Note",
-                "CountMin": 0,
-                "CountMax": 1,
-                "Input": {
-                    "Required": 1,
-                    "Type": "TextArea"
-                },
-                "CountDefault": 0,
-                "Searchable": 1,
-                "Key": "Note"
+                "Key": "CPU",
+                "Name": "CPU"
             }
         ],
-        "Class": "Computer",
-        "DefinitionID": "1"
+        "DefinitionID": 1,
+        "DefinitionString": "[ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Vendor&#39;, &#39;Name&#39; =&gt; &#39;Vendor&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 50, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Model&#39;, &#39;Name&#39; =&gt; &#39;Model&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Description&#39;, &#39;Name&#39; =&gt; &#39;Description&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::Computer::Type&#39;, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;Type&#39;, &#39;Name&#39; =&gt; &#39;Type&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Customer&#39; }, &#39;Key&#39; =&gt; &#39;Owner&#39;, &#39;Name&#39; =&gt; &#39;Assigned owner&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;SerialNumber&#39;, &#39;Name&#39; =&gt; &#39;Serial Number&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;OperatingSystem&#39;, &#39;Name&#39; =&gt; &#39;Operating System&#39; }, { &#39;CountMax&#39; =&gt; 16, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;CPU&#39;, &#39;Name&#39; =&gt; &#39;CPU&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Ram&#39;, &#39;Name&#39; =&gt; &#39;Ram&#39; }, { &#39;CountMax&#39; =&gt; 10, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;HardDisk&#39;, &#39;Name&#39; =&gt; &#39;Hard Disk&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 10, &#39;Size&#39; =&gt; 20, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;Capacity&#39;, &#39;Name&#39; =&gt; &#39;Capacity&#39; } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;FQDN&#39;, &#39;Name&#39; =&gt; &#39;FQDN&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 1, &#39;CountMax&#39; =&gt; 10, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;NIC&#39;, &#39;Name&#39; =&gt; &#39;Network Adapter&#39;, &#39;Sub&#39; =&gt; [ { &#39;Input&#39; =&gt; { &#39;Class&#39; =&gt; &#39;ITSM::ConfigItem::YesNo&#39;, &#39;Required&#39; =&gt; 1, &#39;Translation&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;GeneralCatalog&#39; }, &#39;Key&#39; =&gt; &#39;IPoverDHCP&#39;, &#39;Name&#39; =&gt; &#39;IP over DHCP&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMax&#39; =&gt; 20, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 40, &#39;Required&#39; =&gt; 1, &#39;Size&#39; =&gt; 40, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;IPAddress&#39;, &#39;Name&#39; =&gt; &#39;IP Address&#39;, &#39;Searchable&#39; =&gt; 1 } ] }, { &#39;Input&#39; =&gt; { &#39;MaxLength&#39; =&gt; 100, &#39;Size&#39; =&gt; 50, &#39;Type&#39; =&gt; &#39;Text&#39; }, &#39;Key&#39; =&gt; &#39;GraphicAdapter&#39;, &#39;Name&#39; =&gt; &#39;Graphic Adapter&#39; }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;OtherEquipment&#39;, &#39;Name&#39; =&gt; &#39;Other Equipment&#39; }, { &#39;Input&#39; =&gt; { &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;WarrantyExpirationDate&#39;, &#39;Name&#39; =&gt; &#39;Warranty Expiration Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;Date&#39;, &#39;YearPeriodFuture&#39; =&gt; 10, &#39;YearPeriodPast&#39; =&gt; 20 }, &#39;Key&#39; =&gt; &#39;InstallDate&#39;, &#39;Name&#39; =&gt; &#39;Install Date&#39;, &#39;Searchable&#39; =&gt; 1 }, { &#39;CountDefault&#39; =&gt; 0, &#39;CountMin&#39; =&gt; 0, &#39;Input&#39; =&gt; { &#39;Required&#39; =&gt; 1, &#39;Type&#39; =&gt; &#39;TextArea&#39; }, &#39;Key&#39; =&gt; &#39;Note&#39;, &#39;Name&#39; =&gt; &#39;Note&#39;, &#39;Searchable&#39; =&gt; 1}  ];",
+        "Version": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="cmdb_classes__classid__definitions__definitionid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
@@ -2027,7 +2032,7 @@ pre code {
                "readOnly" : true
             },
             "ContentType" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Filename" : {
@@ -2145,13 +2150,29 @@ pre code {
                "readOnly" : true
             },
             "CurDeplStateID" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "CurInciStateID" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "CurrentVersion" : {
-               "type" : "object"
+               "$ref" : "#/definitions/ConfigItemVersion"
             },
             "History" : {
                "type" : "array",
@@ -2166,7 +2187,14 @@ pre code {
                }
             },
             "LastVersionID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Versions" : {
@@ -2174,9 +2202,6 @@ pre code {
                "item" : {
                   "$ref" : "#/definitions/ConfigItemVersion"
                }
-            },
-            "integer" : {
-               "type" : "string"
             }
          },
          "required" : [
@@ -2186,10 +2211,7 @@ pre code {
             "ClassID",
             "CreateBy",
             "CreateTime",
-            "ConfigItemID",
-            "CurInciStateID",
-            "CurDeplStateID",
-            "integer"
+            "ConfigItemID"
          ]
       },
       "ConfigItemVersion" : {
@@ -2273,10 +2295,6 @@ pre code {
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
-            },
-            "integer" : {
-               "type" : "string",
-               "readOnly" : true
             }
          },
          "required" : [
@@ -2298,7 +2316,6 @@ pre code {
             "InciStateID",
             "InciStateType",
             "Name",
-            "integer",
             "VersionID"
          ]
       }
@@ -2321,27 +2338,21 @@ pre code {
             "ChangeBy": 1,
             "ChangeTime": "2018-07-31 16:07:38",
             "Class": "Computer",
-            "CurInciStateID": null,
-            "ClassID": "22",
-            "CurDeplStateID": null,
+            "ClassID": 22,
             "ConfigItemID": 61,
-            "Number": "1022000001",
             "CreateBy": 1,
-            "LastVersionID": null,
-            "CreateTime": "2018-07-31 16:07:38"
+            "CreateTime": "2018-07-31 16:07:38",
+            "Number": "1022000001"
         },
         {
-            "CurDeplStateID": null,
-            "Number": "1022000002",
-            "ConfigItemID": 62,
-            "CreateBy": 1,
-            "CreateTime": "2018-07-31 16:47:48",
-            "LastVersionID": null,
             "ChangeBy": 1,
             "ChangeTime": "2018-07-31 16:47:48",
             "Class": "Computer",
-            "CurInciStateID": null,
-            "ClassID": "22"
+            "ClassID": 22,
+            "ConfigItemID": 62,
+            "CreateBy": 1,
+            "CreateTime": "2018-07-31 16:47:48",
+            "Number": "1022000002"
         }
     ]
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -2412,7 +2423,7 @@ pre code {
          "description" : "The config item image request object for creation.",
          "type" : "object",
          "properties" : {
-            "ConfigItemImage" : {
+            "Image" : {
                "type" : "object",
                "properties" : {
                   "Comment" : {
@@ -2436,7 +2447,7 @@ pre code {
             }
          },
          "required" : [
-            "ConfigItemImage"
+            "Image"
          ]
       }
    },
@@ -2586,7 +2597,7 @@ pre code {
                "readOnly" : true
             },
             "ContentType" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Filename" : {
@@ -2704,13 +2715,29 @@ pre code {
                "readOnly" : true
             },
             "CurDeplStateID" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "CurInciStateID" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "CurrentVersion" : {
-               "type" : "object"
+               "$ref" : "#/definitions/ConfigItemVersion"
             },
             "History" : {
                "type" : "array",
@@ -2725,7 +2752,14 @@ pre code {
                }
             },
             "LastVersionID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Versions" : {
@@ -2733,9 +2767,6 @@ pre code {
                "item" : {
                   "$ref" : "#/definitions/ConfigItemVersion"
                }
-            },
-            "integer" : {
-               "type" : "string"
             }
          },
          "required" : [
@@ -2745,10 +2776,7 @@ pre code {
             "ClassID",
             "CreateBy",
             "CreateTime",
-            "ConfigItemID",
-            "CurInciStateID",
-            "CurDeplStateID",
-            "integer"
+            "ConfigItemID"
          ]
       },
       "ConfigItemVersion" : {
@@ -2832,10 +2860,6 @@ pre code {
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
-            },
-            "integer" : {
-               "type" : "string",
-               "readOnly" : true
             }
          },
          "required" : [
@@ -2857,7 +2881,6 @@ pre code {
             "InciStateID",
             "InciStateType",
             "Name",
-            "integer",
             "VersionID"
          ]
       }
@@ -2877,7 +2900,7 @@ pre code {
         "ChangeTime": "2018-07-31 16:07:38",
         "Class": "Computer",
         "CurInciStateID": null,
-        "ClassID": "22",
+        "ClassID": 22,
         "CurDeplStateID": null,
         "ConfigItemID": 61,
         "Number": "1022000001",
@@ -3151,17 +3174,17 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemHistory": [
         {
-            "CreateBy": 1,
-            "UserLastname": "KIX",
-            "ConfigItemID": "61",
-            "HistoryEntryID": 1900,
-            "UserID": 1,
-            "HistoryTypeID": 1,
-            "CreateTime": "2018-07-31 16:07:38",
-            "HistoryType": "ConfigItemCreate",
-            "UserLogin": "root@localhost",
             "Comment": "61%%1022000001",
-            "UserFirstname": "Admin"
+            "ConfigItemID": 61,
+            "CreateBy": 1,
+            "CreateTime": "2018-07-31 16:07:38",
+            "HistoryEntryID": 1900,
+            "HistoryType": "ConfigItemCreate",
+            "HistoryTypeID": 1,
+            "UserFirstname": "Admin",
+            "UserID": 1,
+            "UserLastname": "KIX",
+            "UserLogin": "root@localhost"
         }
     ]
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems__configitemid__history_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -3269,16 +3292,16 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemHistory": {
         "Comment": "61%%1022000001",
-        "UserFirstname": "Admin",
-        "HistoryType": "ConfigItemCreate",
-        "UserLogin": "root@localhost",
+        "ConfigItemID": 61,
+        "CreateBy": 1,
         "CreateTime": "2018-07-31 16:07:38",
-        "HistoryTypeID": 1,
-        "UserID": 1,
         "HistoryEntryID": 1900,
+        "HistoryType": "ConfigItemCreate",
+        "HistoryTypeID": 1,
+        "UserFirstname": "Admin",
+        "UserID": 1,
         "UserLastname": "KIX",
-        "ConfigItemID": "61",
-        "CreateBy": 1
+        "UserLogin": "root@localhost"
     }
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems__configitemid__history__historyid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
@@ -3328,7 +3351,7 @@ pre code {
                "readOnly" : true
             },
             "ContentType" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Filename" : {
@@ -3350,7 +3373,7 @@ pre code {
       }
    },
    "properties" : {
-      "ConfigItemImage" : {
+      "Image" : {
          "type" : "array",
          "items" : {
             "$ref" : "#/definitions/ConfigItemImage"
@@ -3358,29 +3381,29 @@ pre code {
       }
    },
    "required" : [
-      "ConfigItemImage"
+      "Image"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Image": [
         {
-            "Filename": "20180817003018.90113.jpg",
-            "ID": "20180817003018.90113",
-            "ConfigItemID": "6",
             "Comment": "",
-            "ContentType": "image/jpeg"
+            "ConfigItemID": 6,
+            "ContentType": "image/jpeg",
+            "Filename": "20180817003018.90113.jpg",
+            "ID": "20180817003018.90113"
         },
         {
-            "ConfigItemID": "6",
             "Comment": "",
+            "ConfigItemID": 6,
             "ContentType": "image/jpeg",
             "Filename": "20180817003719.70337.jpg",
             "ID": "20180817003719.70337"
         },
         {
             "Comment": "this is a test",
+            "ConfigItemID": 6,
             "ContentType": "image/jpeg",
-            "ConfigItemID": "6",
             "Filename": "20180817004645.20986.jpg",
             "ID": "20180817004645.20986"
         }
@@ -3414,7 +3437,7 @@ pre code {
    "description" : "The config item image request object for creation.",
    "type" : "object",
    "properties" : {
-      "ConfigItemImage" : {
+      "Image" : {
          "type" : "object",
          "properties" : {
             "Comment" : {
@@ -3438,7 +3461,7 @@ pre code {
       }
    },
    "required" : [
-      "ConfigItemImage"
+      "Image"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
@@ -3535,7 +3558,7 @@ pre code {
                "readOnly" : true
             },
             "ContentType" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Filename" : {
@@ -3557,12 +3580,12 @@ pre code {
       }
    },
    "properties" : {
-      "ConfigItemImage" : {
+      "Image" : {
          "$ref" : "#/definitions/ConfigItemImage"
       }
    },
    "required" : [
-      "ConfigItemImage"
+      "Image"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
@@ -3759,10 +3782,6 @@ pre code {
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
-            },
-            "integer" : {
-               "type" : "string",
-               "readOnly" : true
             }
          },
          "required" : [
@@ -3784,7 +3803,6 @@ pre code {
             "InciStateID",
             "InciStateType",
             "Name",
-            "integer",
             "VersionID"
          ]
       }
@@ -3804,48 +3822,48 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemVersion": [
         {
-            "CurInciState": "Operational",
-            "CreateBy": 1,
             "Class": "Computer",
+            "ClassID": 22,
+            "ConfigItemID": 82,
+            "CreateBy": 1,
+            "CreateTime": "2018-08-01 12:42:18",
+            "CurDeplState": "Production",
+            "CurDeplStateID": 32,
+            "CurDeplStateType": "productive",
+            "CurInciState": "Operational",
+            "CurInciStateID": 1,
             "CurInciStateType": "operational",
+            "DeplState": "Production",
+            "DeplStateID": 32,
+            "DeplStateType": "productive",
+            "InciState": "Operational",
             "InciStateID": 1,
             "InciStateType": "operational",
-            "ConfigItemID": "82",
-            "CurDeplStateID": 32,
             "Name": "test ci",
-            "InciState": "Operational",
-            "CurDeplState": "Production",
-            "DeplState": "Production",
-            "ClassID": "22",
             "Number": "1022000022",
-            "DeplStateID": 32,
-            "VersionID": 561,
-            "CreateTime": "2018-08-01 12:42:18",
-            "CurDeplStateType": "productive",
-            "DeplStateType": "productive",
-            "CurInciStateID": 1
+            "VersionID": 561
         },
         {
-            "InciStateID": 1,
-            "CurInciState": "Operational",
-            "CreateBy": 1,
-            "CurInciStateType": "operational",
             "Class": "Computer",
-            "ConfigItemID": "82",
-            "InciStateType": "operational",
-            "CurDeplStateID": 32,
-            "Name": "test ci 2",
-            "InciState": "Operational",
+            "ClassID": 22,
+            "ConfigItemID": 82,
+            "CreateBy": 1,
+            "CreateTime": "2018-08-01 15:57:55",
             "CurDeplState": "Production",
-            "ClassID": "22",
+            "CurDeplStateID": 32,
+            "CurDeplStateType": "productive",
+            "CurInciState": "Operational",
+            "CurInciStateID": 1,
+            "CurInciStateType": "operational",
             "DeplState": "Production",
             "DeplStateID": 32,
-            "VersionID": 562,
+            "DeplStateType": "productive",
+            "InciState": "Operational",
+            "InciStateID": 1,
+            "InciStateType": "operational",
+            "Name": "test ci 2",
             "Number": "1022000022",
-            "CreateTime": "2018-08-01 15:57:55",
-            "CurDeplStateType": "productive",
-            "CurInciStateID": 1,
-            "DeplStateType": "productive"
+            "VersionID": 562
         }
     ]
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -4076,10 +4094,6 @@ pre code {
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
-            },
-            "integer" : {
-               "type" : "string",
-               "readOnly" : true
             }
          },
          "required" : [
@@ -4101,7 +4115,6 @@ pre code {
             "InciStateID",
             "InciStateType",
             "Name",
-            "integer",
             "VersionID"
          ]
       }
@@ -4118,8 +4131,8 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemVersion": {
         "Class": "Computer",
-        "ClassID": "22",
-        "ConfigItemID": "82",
+        "ClassID": 22,
+        "ConfigItemID": 82,
         "CreateBy": 1,
         "CreateTime": "2018-08-01 15:57:55",
         "CurDeplState": "Production",
@@ -4161,16 +4174,71 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems__configitemid__versions__versionid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions__versionid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_cmdb_configitems_attachments__attachmentid_" class="panel"><div class="resource-description"><h4 id="downloading-attachments">Downloading Attachments</h4><p><strong>Please note</strong></p><p>The content is base64 encoded.</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/cmdb/configitems</span><span class="uri">/attachments/{attachmentId}</span> <span class="methods"><a href="#cmdb_configitems_attachments__attachmentid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="cmdb_configitems_attachments__attachmentid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/cmdb/configitems</span><span class="uri">/attachments/{attachmentId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#cmdb_configitems_attachments__attachmentid__get_request" data-toggle="tab">Request</a></li><li><a href="#cmdb_configitems_attachments__attachmentid__get_response" data-toggle="tab">Response</a></li><li><a href="#cmdb_configitems_attachments__attachmentid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="cmdb_configitems_attachments__attachmentid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">attachmentId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ConfigItemAttachmentResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/ConfigItemAttachmentResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
-    "Attachment":{ 
-       "AttachmentID":"14",
-       "Content":"...",
-       "ContentType":"image/png",
-       "Filesize":"219.6 KBytes",
-       "FilesizeRaw":224831,
-       "Filename":"01_Ticketinfo-breit (3).png"
-    }
- }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems__configitemid__versions__versionid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions__versionid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_cmdb_configitems_attachments__attachmentid_" class="panel"><div class="resource-description"><h4 id="downloading-attachments">Downloading Attachments</h4><p><strong>Please note</strong></p><p>The content is base64 encoded.</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/cmdb/configitems</span><span class="uri">/attachments/{attachmentId}</span> <span class="methods"><a href="#cmdb_configitems_attachments__attachmentid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="cmdb_configitems_attachments__attachmentid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/cmdb/configitems</span><span class="uri">/attachments/{attachmentId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#cmdb_configitems_attachments__attachmentid__get_request" data-toggle="tab">Request</a></li><li><a href="#cmdb_configitems_attachments__attachmentid__get_response" data-toggle="tab">Response</a></li><li><a href="#cmdb_configitems_attachments__attachmentid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="cmdb_configitems_attachments__attachmentid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">attachmentId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ConfigItemAttachmentResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ConfigItemAttachmentResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for config item attachment GET request.",
+   "type" : "object",
+   "definitions" : {
+      "ConfigItemAttachment" : {
+         "$id" : "#ConfigItemAttachment",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item attachment object.",
+         "type" : "object",
+         "properties" : {
+            "AttachmentID" : {
+               "type" : "integer"
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "AttachmentID",
+            "ContentType",
+            "Content",
+            "Filesize",
+            "FilesizeRaw",
+            "Filename"
+         ]
+      }
+   },
+   "properties" : {
+      "Attachment" : {
+         "$ref" : "#/definitions/ConfigItemAttachment"
+      }
+   },
+   "required" : [
+      "Attachment"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+   "Attachment": {
+       "AttachmentID": 14,
+       "Content": "...",
+       "ContentType": "image/png",
+       "Filename": "01_Ticketinfo-breit (3).png",
+       "Filesize": "219.6 KBytes",
+       "FilesizeRaw": 224831
+   }
+}</code></pre></div></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -4193,7 +4261,50 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="clientregistrations" class="panel-title">Client Registrations</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/clientregistrations.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_clientregistrations" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/clientregistrations</span> <span class="methods"><a href="#clientregistrations_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#clientregistrations_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="clientregistrations_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/clientregistrations</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#clientregistrations_get_request" data-toggle="tab">Request</a></li><li><a href="#clientregistrations_get_response" data-toggle="tab">Response</a></li><li><a href="#clientregistrations_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="clientregistrations_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="clientregistrations_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="clientregistrations_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ClientRegistrationCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/ClientRegistrationCollectionResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="clientregistrations" class="panel-title">Client Registrations</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/clientregistrations.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_clientregistrations" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/clientregistrations</span> <span class="methods"><a href="#clientregistrations_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#clientregistrations_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="clientregistrations_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/clientregistrations</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#clientregistrations_get_request" data-toggle="tab">Request</a></li><li><a href="#clientregistrations_get_response" data-toggle="tab">Response</a></li><li><a href="#clientregistrations_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="clientregistrations_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="clientregistrations_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="clientregistrations_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ClientRegistrationCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ClientRegistrationCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of client registrations.",
+   "type" : "object",
+   "definitions" : {
+      "ClientRegistration" : {
+         "$id" : "#ClientRegistration",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The client registration object.",
+         "type" : "object",
+         "properties" : {
+            "Authentication" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CallbackURL" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClientID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ClientID",
+            "CallbackURL"
+         ]
+      }
+   },
+   "properties" : {
+      "ClientRegistration" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ClientRegistration"
+         }
+      }
+   },
+   "required" : [
+      "ClientRegistration"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ClientRegistration": [
         { 
             "ClientID": "KIX-Frontend",
@@ -4762,6 +4873,7 @@ pre code {
         "ChangeTime": "2018-09-28 09:17:03",
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
+        "ID": 1,
         "Pattern": "Incident"
     }
 }</code></pre></div></div><h2 class="response-title" id="i18n_translations__translationid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -4799,11 +4911,14 @@ pre code {
             "Pattern" : {
                "type" : "string"
             }
-         }
+         },
+         "required" : [
+            "Pattern"
+         ]
       }
    },
    "required" : [
-      "Pattern"
+      "Translation"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
@@ -5067,7 +5182,7 @@ pre code {
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
-    "TranslationLanguageID": "de"
+    "Language": "de"
 }</code></pre></div></div><h2 class="response-title" id="i18n_translations__translationid__languages_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -5203,7 +5318,11 @@ pre code {
       "TranslationLanguage"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/TranslationLanguagePatchRequest.json</code></pre></div></div><div class="tab-pane" id="i18n_translations__translationid__languages__language__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="i18n_translations__translationid__languages__language__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TranslationLanguagePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+    "TranslationLanguage": {
+        "Value": "Das ist ein Test"
+    }
+}</code></pre></div></div><div class="tab-pane" id="i18n_translations__translationid__languages__language__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="i18n_translations__translationid__languages__language__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TranslationLanguagePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#TranslationLanguagePostPatchResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "The ID of the created or updated translation language.",
@@ -5218,7 +5337,7 @@ pre code {
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
-    "TranslationLanguageID": "de"
+    "Language": "de"
 }</code></pre></div></div><h2 class="response-title" id="i18n_translations__translationid__languages__language__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -5371,23 +5490,58 @@ pre code {
                "readOnly" : true
             },
             "DefaultSignKey" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FirstResponseNotify" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FirstResponseTime" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FollowUpID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FollowUpLock" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Fullname" : {
@@ -5398,15 +5552,22 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
             },
             "ParentID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "QueueID" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -5415,19 +5576,47 @@ pre code {
                "readOnly" : true
             },
             "SalutationID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SignatureID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SolutionNotify" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SolutionTime" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SubQueues" : {
@@ -5460,13 +5649,37 @@ pre code {
                "readOnly" : true
             },
             "UnlockTimeout" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "UpdateNotify" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "UpdateTime" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "ValidID" : {
                "type" : "integer",
@@ -5480,7 +5693,7 @@ pre code {
             "CreateTime",
             "Fullname",
             "GroupID",
-            "ID",
+            "QueueID",
             "Name",
             "RealName",
             "ValidID"
@@ -5508,7 +5721,7 @@ pre code {
 			"Comment": "",
 			"CreateBy": 1,
 			"CreateTime": "2018-11-08 09:37:53",
-			"DefaultSignKey": "0",
+			"DefaultSignKey": 1,
 			"Email": "kix@localhost",
 			"FirstResponseNotify": 0,
 			"FirstResponseTime": 0,
@@ -5537,7 +5750,7 @@ pre code {
 			"Comment": "",
 			"CreateBy": 1,
 			"CreateTime": "2018-11-08 09:37:53",
-			"DefaultSignKey": "0",
+			"DefaultSignKey": 1,
 			"Email": "kix@localhost",
 			"FirstResponseNotify": 0,
 			"FirstResponseTime": 0,
@@ -5665,9 +5878,6 @@ pre code {
     "Queue": {
         "Calendar": "",
         "Comment": "Postmaster queue.",
-        "DefaultSignKey": null,
-        "FirstResponseNotify": null,
-        "FirstResponseTime": null,
         "FollowUpID": 1,
         "FollowUpLock": 0,
         "GroupID": 1,
@@ -5676,12 +5886,8 @@ pre code {
         "RealName": "KIX System",
         "SalutationID": 1,
         "SignatureID": 1,
-        "SolutionNotify": null,
-        "SolutionTime": null,
         "SystemAddressID": 1,
         "UnlockTimeout": 0,
-        "UpdateNotify": null,
-        "UpdateTime": null,
         "ValidID": 1
     }
 }</code></pre></div></div><div class="tab-pane" id="queues_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Queue has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueuePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -5783,23 +5989,58 @@ pre code {
                "readOnly" : true
             },
             "DefaultSignKey" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FirstResponseNotify" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FirstResponseTime" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FollowUpID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "FollowUpLock" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Fullname" : {
@@ -5810,15 +6051,22 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
             },
             "ParentID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "QueueID" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -5827,19 +6075,47 @@ pre code {
                "readOnly" : true
             },
             "SalutationID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SignatureID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SolutionNotify" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SolutionTime" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SubQueues" : {
@@ -5872,13 +6148,37 @@ pre code {
                "readOnly" : true
             },
             "UnlockTimeout" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "UpdateNotify" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "UpdateTime" : {
-               "type" : "integer"
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             },
             "ValidID" : {
                "type" : "integer",
@@ -5892,7 +6192,7 @@ pre code {
             "CreateTime",
             "Fullname",
             "GroupID",
-            "ID",
+            "QueueID",
             "Name",
             "RealName",
             "ValidID"
@@ -6170,7 +6470,499 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="queues__queueid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="priorities" class="panel-title">Priorities</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/priorities.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_priorities" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/priorities</span> <span class="methods"><a href="#priorities_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#priorities_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="priorities_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/priorities</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#priorities_get_request" data-toggle="tab">Request</a></li><li><a href="#priorities_get_response" data-toggle="tab">Response</a></li><li><a href="#priorities_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="priorities_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="priorities_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="priorities_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PriorityCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="queues__queueid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="objecticons" class="panel-title">Object Icons</h3></div><div class="panel-body"><div class="top-resource-description"><p><strong>Please note</strong></p><p>The content is base64 encoded.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_objecticons" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/objecticons</span> <span class="methods"><a href="#objecticons_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#objecticons_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objecticons_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/objecticons</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objecticons_get_request" data-toggle="tab">Request</a></li><li><a href="#objecticons_get_response" data-toggle="tab">Response</a></li><li><a href="#objecticons_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objecticons_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objecticons_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ObjectIconCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of object icons.",
+   "type" : "object",
+   "definitions" : {
+      "ObjectIcon" : {
+         "$id" : "#ObjectIcon",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The object icon object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID"
+         ]
+      }
+   },
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ObjectIcon"
+         }
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ObjectIcon": [
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "Content": "...",
+            "ContentType": "image/png", 
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "ID": 1,
+            "Object": "TicketType", 
+            "ObjectID": "1"
+        },
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 08:12:17",
+            "Content": "...",
+            "ContentType": "image/png", 
+            "CreateBy": 1,
+            "CreateTime": "2018-10-28 08:10:01",
+            "ID": 2,
+            "Object": "TicketType", 
+            "ObjectID": "2"
+        }        
+    ]
+}</code></pre></div></div><h2 class="response-title" id="objecticons_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="objecticons_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="objecticons_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/objecticons</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objecticons_post_request" data-toggle="tab">Request</a></li><li><a href="#objecticons_post_response" data-toggle="tab">Response</a></li><li><a href="#objecticons_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objecticons_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ObjectIconPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The object icon request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Object" : {
+               "type" : "string"
+            },
+            "ObjectID" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Object",
+            "ObjectID"
+         ]
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ObjectIcon": {
+        "Content": "...",
+        "ContentType": "image/png",
+        "Object": "TicketType",
+        "ObjectID": "1"
+    }
+}</code></pre></div></div><div class="tab-pane" id="objecticons_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The ObjectIcon has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ObjectIconPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated object icon.",
+   "type" : "object",
+   "properties" : {
+      "ObjectIconID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ObjectIconID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+    "ObjectIconID": 3
+}
+</code></pre></div></div><h2 class="response-title" id="objecticons_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="objecticons_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="objecticons_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_objecticons__objecticonid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/objecticons</span><span class="uri">/{objectIconId}</span> <span class="methods"><a href="#objecticons__objecticonid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#objecticons__objecticonid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#objecticons__objecticonid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objecticons__objecticonid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objecticons</span><span class="uri">/{objectIconId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objecticons__objecticonid__get_request" data-toggle="tab">Request</a></li><li><a href="#objecticons__objecticonid__get_response" data-toggle="tab">Response</a></li><li><a href="#objecticons__objecticonid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objecticons__objecticonid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objectIconId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objecticons__objecticonid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ObjectIconResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for object icon GET request.",
+   "type" : "object",
+   "definitions" : {
+      "ObjectIcon" : {
+         "$id" : "#ObjectIcon",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The object icon object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID"
+         ]
+      }
+   },
+   "properties" : {
+      "ObjectIcon" : {
+         "$ref" : "#/definitions/ObjectIcon"
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ObjectIcon": { 
+        "ChangeBy": 1,
+        "ChangeTime": "2018-10-28 08:12:17",
+        "Content": "...",
+        "ContentType": "image/png", 
+        "CreateBy": 1,
+        "CreateTime": "2018-10-28 08:10:01",
+        "ID": 2,
+        "Object": "TicketType", 
+        "ObjectID": "2"
+    }
+}</code></pre></div></div><h2 class="response-title" id="objecticons__objecticonid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="objecticons__objecticonid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="objecticons__objecticonid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objecticons</span><span class="uri">/{objectIconId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objecticons__objecticonid__patch_request" data-toggle="tab">Request</a></li><li><a href="#objecticons__objecticonid__patch_response" data-toggle="tab">Response</a></li><li><a href="#objecticons__objecticonid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objecticons__objecticonid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objectIconId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ObjectIconPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The object icon request object for update.",
+   "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Object" : {
+               "type" : "string"
+            },
+            "ObjectID" : {
+               "type" : "string"
+            }
+         }
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ObjectIcon": {
+        "Content": "...."
+    }
+}</code></pre></div></div><div class="tab-pane" id="objecticons__objecticonid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ObjectIconPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated object icon.",
+   "type" : "object",
+   "properties" : {
+      "ObjectIconID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ObjectIconID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+    "ObjectIconID": 3
+}
+</code></pre></div></div><h2 class="response-title" id="objecticons__objecticonid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="objecticons__objecticonid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="objecticons__objecticonid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="objecticons__objecticonid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="objecticons__objecticonid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objecticons</span><span class="uri">/{objectIconId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objecticons__objecticonid__delete_request" data-toggle="tab">Request</a></li><li><a href="#objecticons__objecticonid__delete_response" data-toggle="tab">Response</a></li><li><a href="#objecticons__objecticonid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objecticons__objecticonid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objectIconId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="objecticons__objecticonid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="objecticons__objecticonid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="objecticons__objecticonid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="objecticons__objecticonid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="priorities" class="panel-title">Priorities</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/priorities.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_priorities" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/priorities</span> <span class="methods"><a href="#priorities_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#priorities_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="priorities_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/priorities</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#priorities_get_request" data-toggle="tab">Request</a></li><li><a href="#priorities_get_response" data-toggle="tab">Response</a></li><li><a href="#priorities_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="priorities_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="priorities_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="priorities_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PriorityCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#PriorityCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of priorities.",
@@ -7094,7 +7886,7 @@ pre code {
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "UserID": [
+    "UserIDs": [
         1,
         2,
         3
@@ -7937,21 +8729,124 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="services__serviceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="session" class="panel-title">Current Session</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/session.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_session" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/session</span> <span class="methods"><a href="#session_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/session</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_get_request" data-toggle="tab">Request</a></li><li><a href="#session_get_response" data-toggle="tab">Response</a></li><li><a href="#session_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: SessionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/SessionResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{  
-    "AllowedOperations": [],
-    "CreateTime": "2018-08-28 11:34:55",
-    "CreateTimeUnix": 1535456095,
-    "DeniedOperations": [],
-    "Description": "",
-    "IgnoreMaxIdleTime": 0,
-    "LastRequestTime": "2018-08-28 13:10:31",
-    "LastRequestTimeUnix": 1535461831,
-    "RemoteIP": "::ffff:172.17.0.1",
-    "TokenType": "Normal",
-    "UserID": 1,
-    "UserType": "Agent",
-    "ValidUntilTime": "2018-08-29 03:34:55",
-    "ValidUntilTimeUnix": 1535513695
+}</code></pre></div></div></div><div class="tab-pane" id="services__serviceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="services__serviceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="session" class="panel-title">Current Session</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/session.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_session" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/session</span> <span class="methods"><a href="#session_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/session</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_get_request" data-toggle="tab">Request</a></li><li><a href="#session_get_response" data-toggle="tab">Response</a></li><li><a href="#session_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: SessionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#SessionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for session GET request.",
+   "type" : "object",
+   "definitions" : {
+      "Session" : {
+         "$id" : "#Session",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The extracted web token data.",
+         "type" : "object",
+         "properties" : {
+            "AllowedOperations" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DeniedOperations" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "IgnoreMaxIdleTime" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "LastRequestTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "LastRequestTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "RemoteIP" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TokenType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserType" : {
+               "type" : "string",
+               "enum" : [
+                  "Agent",
+                  "Customer"
+               ],
+               "readOnly" : true
+            },
+            "ValidUntilTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidUntilTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "AllowedOperations",
+            "CreateTime",
+            "CreateTimeUnix",
+            "DeniedOperations",
+            "TokenType",
+            "UserID",
+            "UserType",
+            "ValidUntilTime",
+            "ValidUntilTimeUnix"
+         ]
+      }
+   },
+   "properties" : {
+      "Session" : {
+         "$ref" : "#/definitions/Session"
+      }
+   },
+   "required" : [
+      "Session"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{  
+    "Session": {
+        "AllowedOperations": [],
+        "CreateTime": "2018-08-28 11:34:55",
+        "CreateTimeUnix": 1535456095,
+        "DeniedOperations": [],
+        "Description": "",
+        "IgnoreMaxIdleTime": 0,
+        "LastRequestTime": "2018-08-28 13:10:31",
+        "LastRequestTimeUnix": 1535461831,
+        "RemoteIP": "::ffff:172.17.0.1",
+        "TokenType": "Normal",
+        "UserID": 1,
+        "UserType": "Agent",
+        "ValidUntilTime": "2018-08-29 03:34:55",
+        "ValidUntilTimeUnix": 1535513695
+    }
 }</code></pre></div></div><h2 class="response-title" id="session_get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -8407,7 +9302,7 @@ pre code {
       }
    },
    "required" : [
-      "TicketStateID"
+      "TicketState"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
@@ -8623,7 +9518,7 @@ pre code {
       }
    },
    "required" : [
-      "TicketStateID"
+      "TicketState"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
@@ -8891,7 +9786,30 @@ pre code {
       "TicketType"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/TicketTypeCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="tickettypes_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "TicketType": [
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "Comment": "...", 
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "ID": 1,
+            "Name": "Incident", 
+            "ValidID": 1
+        },
+        { 
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 08:12:17",
+            "Comment": "...", 
+            "CreateBy": 1,
+            "CreateTime": "2018-10-28 08:10:01",
+            "ID": 2,
+            "Name": "Problem", 
+            "ValidID": 1
+        }        
+    ]
+}</code></pre></div></div><h2 class="response-title" id="tickettypes_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -10152,12 +11070,12 @@ pre code {
    "description" : "The ID of the created or updated user preference.",
    "type" : "object",
    "properties" : {
-      "PreferenceID" : {
+      "UserPreferenceID" : {
          "type" : "string"
       }
    },
    "required" : [
-      "PreferenceID"
+      "UserPreferenceID"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
@@ -10302,12 +11220,12 @@ pre code {
    "description" : "The ID of the created or updated user preference.",
    "type" : "object",
    "properties" : {
-      "PreferenceID" : {
+      "UserPreferenceID" : {
          "type" : "string"
       }
    },
    "required" : [
-      "PreferenceID"
+      "UserPreferenceID"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
@@ -10556,4 +11474,4 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#channels">Communication Channels</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#queues">Queues</a></li><li><a class="nav-resource" href="#priorities">Priorities</a></li><li><a class="nav-resource" href="#roles">Roles</a></li><li><a class="nav-resource" href="#sendertypes">Sender Types</a></li><li><a class="nav-resource" href="#services">Services</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#sessions">Sessions</a></li><li><a class="nav-resource" href="#statetypes">State Types</a></li><li><a class="nav-resource" href="#ticketlocks">Ticket Locks</a></li><li><a class="nav-resource" href="#ticketstates">Ticket States</a></li><li><a class="nav-resource" href="#tickettypes">Ticket Types</a></li><li><a class="nav-resource" href="#user">Current User</a></li><li><a class="nav-resource" href="#users">Users</a></li><li><a class="nav-resource" href="#valid">Valid</a></li></ul></div></div></div></div></body></html>
+}</code></pre></div></div></div><div class="tab-pane" id="valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#channels">Communication Channels</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#queues">Queues</a></li><li><a class="nav-resource" href="#objecticons">Object Icons</a></li><li><a class="nav-resource" href="#priorities">Priorities</a></li><li><a class="nav-resource" href="#roles">Roles</a></li><li><a class="nav-resource" href="#sendertypes">Sender Types</a></li><li><a class="nav-resource" href="#services">Services</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#sessions">Sessions</a></li><li><a class="nav-resource" href="#statetypes">State Types</a></li><li><a class="nav-resource" href="#ticketlocks">Ticket Locks</a></li><li><a class="nav-resource" href="#ticketstates">Ticket States</a></li><li><a class="nav-resource" href="#tickettypes">Ticket Types</a></li><li><a class="nav-resource" href="#user">Current User</a></li><li><a class="nav-resource" href="#users">Users</a></li><li><a class="nav-resource" href="#valid">Valid</a></li></ul></div></div></div></div></body></html>

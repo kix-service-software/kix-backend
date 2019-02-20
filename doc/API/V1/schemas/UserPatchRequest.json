@@ -1,0 +1,37 @@
+{
+   "$id" : "#UserPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The user request object for update.",
+   "type" : "object",
+   "properties" : {
+      "User" : {
+         "type" : "object",
+         "properties" : {
+            "UserEmail" : {
+               "type" : "string"
+            },
+            "UserFirstname" : {
+               "type" : "string"
+            },
+            "UserLastname" : {
+               "type" : "string"
+            },
+            "UserLogin" : {
+               "type" : "string"
+            },
+            "UserPw" : {
+               "type" : "string"
+            },
+            "UserTitle" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "User"
+   ]
+}

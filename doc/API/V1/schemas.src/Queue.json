@@ -29,30 +29,45 @@
       "readOnly": true
     },
     "DefaultSignKey": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "FirstResponseNotify": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "FirstResponseTime": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "FollowUpID": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "FollowUpLock": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "GroupID": {
       "type": "integer",
       "readOnly": true
     },
-    "ID": {
+    "QueueID": {
       "type": "integer",
       "readOnly": true
     },
@@ -65,7 +80,10 @@
       "readOnly": true
     },
     "ParentID": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "RealName": {
@@ -73,19 +91,31 @@
       "readOnly": true
     },
     "SalutationID": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "SignatureID": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "SolutionNotify": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "SolutionTime": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
     "SubQueues": {
@@ -118,13 +148,25 @@
       "readOnly": true
     },
     "UnlockTimeout": {
-      "type": "integer"
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
     },
     "UpdateNotify": {
-      "type": "integer"
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
     },
     "UpdateTime": {
-      "type": "integer"
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
     },
     "ValidID": {
       "type": "integer",
@@ -138,7 +180,7 @@
     "CreateTime",
     "Fullname",
     "GroupID",
-    "ID",
+    "QueueID",
     "Name",
     "RealName",
     "ValidID"

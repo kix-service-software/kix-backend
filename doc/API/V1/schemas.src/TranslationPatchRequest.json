@@ -10,10 +10,13 @@
         "Pattern": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "Pattern"
+      ]
     }
   },
   "required": [
-    "Pattern"
+    "Translation"
   ]
 }

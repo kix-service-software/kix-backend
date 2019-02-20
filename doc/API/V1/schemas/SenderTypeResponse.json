@@ -1,0 +1,36 @@
+{
+   "$id" : "#SenderTypeResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for sender type GET request.",
+   "type" : "object",
+   "definitions" : {
+      "SenderType" : {
+         "$id" : "#SenderType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The sender type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   },
+   "properties" : {
+      "SenderType" : {
+         "$ref" : "#/definitions/SenderType"
+      }
+   },
+   "required" : [
+      "SenderType"
+   ]
+}

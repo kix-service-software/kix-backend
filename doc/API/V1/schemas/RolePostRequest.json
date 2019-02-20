@@ -1,0 +1,29 @@
+{
+   "$id" : "#RolePostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The role request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Role" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "required" : [
+      "Role"
+   ]
+}

@@ -1,0 +1,40 @@
+{
+   "$id" : "#ServicePostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The service request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Service" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Criticality" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ParentID" : {
+               "type" : "integer"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Criticality",
+            "Name",
+            "TypeID",
+            "ValidID"
+         ]
+      }
+   },
+   "required" : [
+      "Service"
+   ]
+}

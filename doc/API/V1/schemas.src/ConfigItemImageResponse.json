@@ -4,11 +4,11 @@
   "type": "object",
   "description": "A response for config item image GET request.",
   "properties": {
-    "ConfigItemImage": {
+    "Image": {
       "$ref": "ConfigItemImage.json"
     }
   },
   "required": [
-    "ConfigItemImage"
+    "Image"
   ]
 }

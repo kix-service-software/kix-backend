@@ -1,0 +1,34 @@
+{
+   "$id" : "#ObjectIconPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The object icon request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Object" : {
+               "type" : "string"
+            },
+            "ObjectID" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Object",
+            "ObjectID"
+         ]
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ]
+}

@@ -1,0 +1,29 @@
+{
+   "$id" : "#ClientRegistrationPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The client registration request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ClientRegistration" : {
+         "type" : "object",
+         "properties" : {
+            "Authentication" : {
+               "type" : "string"
+            },
+            "CallbackURL" : {
+               "type" : "string"
+            },
+            "ClientID" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "ClientID",
+            "CallbackURL"
+         ]
+      }
+   },
+   "required" : [
+      "ClientRegistration"
+   ]
+}

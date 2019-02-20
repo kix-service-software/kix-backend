@@ -1,10 +1,10 @@
-{ 
-    "Attachment":{ 
-       "AttachmentID":"14",
-       "Content":"...",
-       "ContentType":"image/png",
-       "Filesize":"219.6 KBytes",
-       "FilesizeRaw":224831,
-       "Filename":"01_Ticketinfo-breit (3).png"
-    }
- }
+{
+   "Attachment": {
+       "AttachmentID": 14,
+       "Content": "...",
+       "ContentType": "image/png",
+       "Filename": "01_Ticketinfo-breit (3).png",
+       "Filesize": "219.6 KBytes",
+       "FilesizeRaw": 224831
+   }
+}

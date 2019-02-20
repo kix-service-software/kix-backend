@@ -1,0 +1,26 @@
+{
+   "$id" : "#AuthRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An authorization object.",
+   "type" : "object",
+   "properties" : {
+      "Password" : {
+         "type" : "string"
+      },
+      "UserLogin" : {
+         "type" : "string"
+      },
+      "UserType" : {
+         "type" : "string",
+         "enum" : [
+            "Agent",
+            "Customer"
+         ]
+      }
+   },
+   "required" : [
+      "UserLogin",
+      "UserType",
+      "Password"
+   ]
+}

@@ -1,0 +1,78 @@
+{
+   "$id" : "#QueuePostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The queue request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Queue" : {
+         "type" : "object",
+         "properties" : {
+            "Calendar" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "DefaultSignKey" : {
+               "type" : "integer"
+            },
+            "FirstResponseNotify" : {
+               "type" : "integer"
+            },
+            "FirstResponseTime" : {
+               "type" : "integer"
+            },
+            "FollowUpID" : {
+               "type" : "integer"
+            },
+            "FollowUpLock" : {
+               "type" : "integer"
+            },
+            "GroupID" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ParentID" : {
+               "type" : "integer"
+            },
+            "SalutationID" : {
+               "type" : "integer"
+            },
+            "SignatureID" : {
+               "type" : "integer"
+            },
+            "SolutionNotify" : {
+               "type" : "integer"
+            },
+            "SolutionTime" : {
+               "type" : "integer"
+            },
+            "SystemAddressID" : {
+               "type" : "integer"
+            },
+            "UnlockTimeout" : {
+               "type" : "integer"
+            },
+            "UpdateNotify" : {
+               "type" : "integer"
+            },
+            "UpdateTime" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "GroupID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "required" : [
+      "Queue"
+   ]
+}

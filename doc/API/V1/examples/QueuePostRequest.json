@@ -2,9 +2,6 @@
     "Queue": {
         "Calendar": "",
         "Comment": "Postmaster queue.",
-        "DefaultSignKey": null,
-        "FirstResponseNotify": null,
-        "FirstResponseTime": null,
         "FollowUpID": 1,
         "FollowUpLock": 0,
         "GroupID": 1,
@@ -13,12 +10,8 @@
         "RealName": "KIX System",
         "SalutationID": 1,
         "SignatureID": 1,
-        "SolutionNotify": null,
-        "SolutionTime": null,
         "SystemAddressID": 1,
         "UnlockTimeout": 0,
-        "UpdateNotify": null,
-        "UpdateTime": null,
         "ValidID": 1
     }
 }

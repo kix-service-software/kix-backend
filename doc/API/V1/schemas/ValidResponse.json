@@ -1,0 +1,32 @@
+{
+   "$id" : "#ValidResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for valid GET request.",
+   "type" : "object",
+   "definitions" : {
+      "Valid" : {
+         "$id" : "#Valid",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The valid object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         }
+      }
+   },
+   "properties" : {
+      "Valid" : {
+         "$ref" : "#/definitions/Valid"
+      }
+   },
+   "required" : [
+      "Valid"
+   ]
+}

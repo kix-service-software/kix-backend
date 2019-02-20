@@ -1,0 +1,105 @@
+{
+   "$id" : "#ConfigItemVersion",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item version object.",
+   "type" : "object",
+   "properties" : {
+      "Class" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ClassID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ConfigItemID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurDeplState" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurDeplStateID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CurDeplStateType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurInciState" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurInciStateID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CurInciStateType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "DeplState" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "DeplStateID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "DeplStateType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "InciState" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "InciStateID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "InciStateType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "VersionID" : {
+         "type" : "integer",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Class",
+      "ClassID",
+      "ConfigItemID",
+      "CreateBy",
+      "CreateTime",
+      "CurDeplState",
+      "CurDeplStateID",
+      "CurDeplStateType",
+      "CurInciState",
+      "CurInciStateID",
+      "CurInciStateType",
+      "DeplState",
+      "DeplStateID",
+      "DeplStateType",
+      "InciState",
+      "InciStateID",
+      "InciStateType",
+      "Name",
+      "VersionID"
+   ]
+}

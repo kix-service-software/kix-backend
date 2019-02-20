@@ -1,0 +1,100 @@
+{
+   "$id" : "#ConfigItemPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item object for creation.",
+   "type" : "object",
+   "definitions" : {
+      "ConfigItemVersionPostRequest" : {
+         "$id" : "#ConfigItemVersionPostRequest",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item version request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "ConfigItemVersion" : {
+               "type" : "object",
+               "properties" : {
+                  "Data" : {
+                     "type" : "object"
+                  },
+                  "DeplStateID" : {
+                     "type" : "integer"
+                  },
+                  "InciStateID" : {
+                     "type" : "integer"
+                  },
+                  "Name" : {
+                     "type" : "string"
+                  }
+               },
+               "required" : [
+                  "Name",
+                  "DeplStateID",
+                  "InciStateID"
+               ]
+            }
+         },
+         "required" : [
+            "ConfigItemVersion"
+         ]
+      },
+      "ConfigItemImagePostRequest" : {
+         "$id" : "#ConfigItemImagePostRequest",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item image request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Image" : {
+               "type" : "object",
+               "properties" : {
+                  "Comment" : {
+                     "type" : "string"
+                  },
+                  "Content" : {
+                     "type" : "string"
+                  },
+                  "ContentType" : {
+                     "type" : "string"
+                  },
+                  "Filename" : {
+                     "type" : "string"
+                  }
+               },
+               "required" : [
+                  "Content",
+                  "ContentType",
+                  "Filename"
+               ]
+            }
+         },
+         "required" : [
+            "Image"
+         ]
+      }
+   },
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "object",
+         "properties" : {
+            "ClassID" : {
+               "type" : "integer"
+            },
+            "Images" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemImagePostRequest"
+               }
+            },
+            "Version" : {
+               "$ref" : "#/definitions/ConfigItemVersionPostRequest"
+            }
+         },
+         "required" : [
+            "ClassID",
+            "Version"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ]
+}

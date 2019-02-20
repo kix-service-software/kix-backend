@@ -4,11 +4,11 @@
     "type": "object",
     "description": "The ID of the created or updated user preference.",
     "properties": {
-        "PreferenceID": {
+        "UserPreferenceID": {
             "type": "string"
         }
     },
     "required": [
-        "PreferenceID"
+        "UserPreferenceID"
     ]
 }

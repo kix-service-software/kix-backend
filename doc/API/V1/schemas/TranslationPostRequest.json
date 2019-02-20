@@ -1,0 +1,55 @@
+{
+   "$id" : "#TranslationPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The translation request object for creation.",
+   "type" : "object",
+   "definitions" : {
+      "TranslationLanguage" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TranslationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "TranslationID",
+            "Language",
+            "Value"
+         ]
+      }
+   },
+   "properties" : {
+      "Translation" : {
+         "type" : "object",
+         "properties" : {
+            "Languages" : {
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TranslationLanguage"
+               }
+            },
+            "Pattern" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Pattern"
+         ]
+      }
+   },
+   "required" : [
+      "Translation"
+   ]
+}

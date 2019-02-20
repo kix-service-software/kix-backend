@@ -61,7 +61,14 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'schema-directory',
-        Description => "Specify the directory where the source schema files are located (needed for transformation of the schema refs).",
+        Description => "Specify the directory where the source schema files are located (needed for transformation of the schema refs and validation).",
+        Required    => 1,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'example-directory',
+        Description => "Specify the directory where the example files are located (needed for validation of the examples against the schema).",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -74,6 +81,7 @@ sub Run {
 
     my $SourceDirectory = $Self->GetOption('source-directory');
     my $SchemaDirectory = $Self->GetOption('schema-directory');
+    my $ExampleDirectory = $Self->GetOption('example-directory');
     my $RamlFile = $Self->GetOption('raml-file');
     my $OutputFile = $Self->GetOption('output-file');
     my $Template = $Self->GetOption('template');
@@ -110,8 +118,7 @@ sub Run {
                 Location => $File
             );
             if ( !$Content ) {
-                $Self->_CleanUp(SourceDirectory => $SourceDirectory);
-                $Self->PrintError("Unable to read schema file $File.");
+                $Self->Print("<red>Unable to read schema file $File.</red>\n");
                 return $Self->ExitCodeError();
             }
 
@@ -154,15 +161,14 @@ sub Run {
             # validator resulting schema against the OpenAPI spec
             my $ValidationResult = $ValidatorObject->load_and_validate_schema($BundledSchema, {schema => $DraftURI});
             if ( !$ValidationResult ) {
-                $Self->_CleanUp(SourceDirectory => $SourceDirectory);
-                $Self->PrintError("Unable to validate bundled schema $File against OpenAPI specification ($DraftURI).");
+                $Self->Print("<red>Unable to validate bundled schema $File against OpenAPI specification ($DraftURI).</red>\n");
                 return $Self->ExitCodeError();
             }
 
-            $Self->Print("<green>validated</green>\n");
+            $Self->Print("<green>valid</green>\n");
 
             my $Result = $MainObject->FileWrite(
-                Directory => "$Cwd/$TargetDirectory/schemas",
+                Directory => "$TargetDirectory/schemas",
                 Filename  => $File,
                 Content   => \$BundledSchema
             );
@@ -171,24 +177,70 @@ sub Run {
         chdir $Cwd;
     }
 
+    # validating example files against schema
+    if ( -d "$ExampleDirectory" && -d "$TargetDirectory/schemas") {
+        $Self->Print("validating examples\n");
+
+        my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+            Directory => "$ExampleDirectory",
+            Filter    => '*.json'
+        );
+
+        my $JSONObject =$Kernel::OM->Get('Kernel::System::JSON');
+        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $ValidatorObject = JSON::Validator->new();
+
+        foreach my $File ( @Files ) {
+            $File = basename($File);
+
+            $Self->Print("    $File...");
+
+            # read example file
+            my $ExampleContent = $MainObject->FileRead(
+                Directory => "$ExampleDirectory",
+                Filename  => $File
+            );
+            if ( !$ExampleContent ) {
+                $Self->PrintError("<red>Unable to read example file $File.</red>\n");
+                return $Self->ExitCodeError();
+            }
+
+            # read schema file
+            my $SchemaContent = $MainObject->FileRead(
+                Directory => "$TargetDirectory/schemas",
+                Filename  => $File
+            );
+            if ( !$SchemaContent ) {
+                $Self->PrintError("<red>Unable to read schema file $File.</red>\n");
+                return $Self->ExitCodeError();
+            }
+
+            $ValidatorObject->schema($$SchemaContent);
+            my @ValidationResult = $ValidatorObject->validate(
+                $JSONObject->Decode( Data => $$ExampleContent )
+            );
+
+            if ( @ValidationResult ) {
+                $Self->Print("<red>Unable to validate example $File against schema.</red>\n");
+                foreach my $Line (@ValidationResult) {
+                    $Self->Print("        <red>$Line</red>\n");
+                }
+            }
+            else {
+                $Self->Print("<green>valid</green>\n");
+            }
+        }
+    }
+
     # execute raml2html 
     $Self->Print("executing raml2html -i $SourceDirectory/$RamlFile -o $OutputFile -t $Template\n");
     my $ExecResult = `raml2html -i $SourceDirectory/$RamlFile -o $OutputFile --template $Template`;
     if ( $? ) {
-        $Self->_CleanUp(SourceDirectory => $SourceDirectory);
         $Self->PrintError("raml2html failed (Code: $?, Message: $ExecResult).");
         return $Self->ExitCodeError();
     }
-    $Self->_CleanUp(SourceDirectory => $SourceDirectory);
 
     return $Self->ExitCodeOk();
-}
-
-sub _CleanUp {
-    my ($Self, %Param) = @_;
-
-    #rmdir("$Param{SourceDirectory}/schemas");
-    #move("$Param{SourceDirectory}/schemas.org", "$Param{SourceDirectory}/schemas");
 }
 
 1;

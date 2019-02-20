@@ -1,8 +1,8 @@
 {
     "ConfigItemVersion": {
         "Class": "Computer",
-        "ClassID": "22",
-        "ConfigItemID": "82",
+        "ClassID": 22,
+        "ConfigItemID": 82,
         "CreateBy": 1,
         "CreateTime": "2018-08-01 15:57:55",
         "CurDeplState": "Production",

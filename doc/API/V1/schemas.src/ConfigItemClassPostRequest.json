@@ -21,8 +21,7 @@
         }
       },
       "required": [
-        "Name",
-        "ValidID"
+        "Name"
       ]
     }
   },

@@ -1,0 +1,39 @@
+{
+   "$id" : "#StateTypeCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of state types.",
+   "type" : "object",
+   "definitions" : {
+      "StateType" : {
+         "$id" : "#StateType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The state type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   },
+   "properties" : {
+      "StateType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/StateType"
+         }
+      }
+   },
+   "required" : [
+      "StateType"
+   ]
+}

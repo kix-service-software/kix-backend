@@ -13,7 +13,8 @@
       "readOnly": true
     },
     "Comment": {
-      "type": "string"
+      "type": "string",
+      "readOnly": true
     },    
     "ConfigItemStats": {
       "type": "object",
@@ -45,14 +46,16 @@
       "$ref": "ConfigItemClassDefinition.json"
     },
     "ID": {
-      "type": "string",
+      "type": "integer",
       "readOnly": true
     },
     "Name": {
-      "type": "string"
+      "type": "string",
+      "readOnly": true
     },    
     "ValidID": {
-      "type": "integer"
+      "type": "integer",
+      "readOnly": true
     },
     "Definitions": {
       "type": "array",

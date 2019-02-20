@@ -34,7 +34,6 @@
     "Content",
     "Filesize",
     "FilesizeRaw",
-    "UserID",
     "Filename"
   ]
 }

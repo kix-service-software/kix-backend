@@ -33,21 +33,31 @@
       "readOnly": true
     },
     "CurDeplStateID": {
-      "type": "integer"
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
     },    
     "CurInciStateID": {
-      "type": "integer"
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
     },    
     "CurrentVersion": {
-      "type": "object"
+      "type": "object",
+      "$ref": "ConfigItemVersion.json",
+      "readOnly": true
     },    
     "LastVersionID": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
-    "integer": {
-      "type": "string"
-    },    
     "History": {
       "type": "array",
       "item": {
@@ -74,9 +84,6 @@
     "ClassID",
     "CreateBy",
     "CreateTime",
-    "ConfigItemID",
-    "CurInciStateID",
-    "CurDeplStateID",
-    "integer"
+    "ConfigItemID"
   ]
 }
