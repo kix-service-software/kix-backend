@@ -40,7 +40,7 @@
 
   $('.schemas code').each(function() {
     if ($(this).html().startsWith('{')) {
-      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true});
+      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true });
     }
   });
 
@@ -1110,6 +1110,7 @@ pre code {
                "readOnly" : true
             },
             "ConfigItemStats" : {
+               "description" : "result of include \"ConfigItemStats\"",
                "type" : "object",
                "properties" : {
                   "PostProductiveCount" : {
@@ -1138,6 +1139,7 @@ pre code {
                "$ref" : "#/definitions/ConfigItemClassDefinition"
             },
             "Definitions" : {
+               "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemClassDefinition"
@@ -1382,6 +1384,7 @@ pre code {
                "readOnly" : true
             },
             "ConfigItemStats" : {
+               "description" : "result of include \"ConfigItemStats\"",
                "type" : "object",
                "properties" : {
                   "PostProductiveCount" : {
@@ -1410,6 +1413,7 @@ pre code {
                "$ref" : "#/definitions/ConfigItemClassDefinition"
             },
             "Definitions" : {
+               "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemClassDefinition"
@@ -2703,12 +2707,14 @@ pre code {
                "$ref" : "#/definitions/ConfigItemVersion"
             },
             "History" : {
+               "description" : "added via include \"History\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemHistory"
                }
             },
             "Images" : {
+               "description" : "added via include \"Images\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemImage"
@@ -2726,6 +2732,7 @@ pre code {
                "readOnly" : true
             },
             "Versions" : {
+               "description" : "added via include \"Versions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemVersion"
@@ -2792,6 +2799,13 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
+            },
             "DeplState" : {
                "type" : "string",
                "readOnly" : true
@@ -2820,6 +2834,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
@@ -2845,6 +2863,59 @@ pre code {
             "InciStateType",
             "Name",
             "VersionID"
+         ]
+      },
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       }
    }
@@ -3249,12 +3320,14 @@ pre code {
                "$ref" : "#/definitions/ConfigItemVersion"
             },
             "History" : {
+               "description" : "added via include \"History\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemHistory"
                }
             },
             "Images" : {
+               "description" : "added via include \"Images\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemImage"
@@ -3272,6 +3345,7 @@ pre code {
                "readOnly" : true
             },
             "Versions" : {
+               "description" : "added via include \"Versions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemVersion"
@@ -3338,6 +3412,13 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
+            },
             "DeplState" : {
                "type" : "string",
                "readOnly" : true
@@ -3366,6 +3447,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
@@ -3391,6 +3476,59 @@ pre code {
             "InciStateType",
             "Name",
             "VersionID"
+         ]
+      },
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       }
    }
@@ -4271,6 +4409,13 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
+            },
             "DeplState" : {
                "type" : "string",
                "readOnly" : true
@@ -4299,6 +4444,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
@@ -4324,6 +4473,59 @@ pre code {
             "InciStateType",
             "Name",
             "VersionID"
+         ]
+      },
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       }
    }
@@ -4588,6 +4790,13 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
+            },
             "DeplState" : {
                "type" : "string",
                "readOnly" : true
@@ -4616,6 +4825,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
@@ -4641,6 +4854,59 @@ pre code {
             "InciStateType",
             "Name",
             "VersionID"
+         ]
+      },
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       }
    }
@@ -5468,16 +5734,20 @@ pre code {
                "readOnly" : true
             },
             "ID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             },
             "Languages" : {
+               "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/TranslationLanguage"
-               }
+               },
+               "readOnly" : true
             },
             "Pattern" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -5716,16 +5986,20 @@ pre code {
                "readOnly" : true
             },
             "ID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             },
             "Languages" : {
+               "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/TranslationLanguage"
-               }
+               },
+               "readOnly" : true
             },
             "Pattern" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -6535,6 +6809,7 @@ pre code {
                "type" : "integer"
             },
             "TicketStats" : {
+               "description" : "added via include \"TicketStats\"",
                "type" : "object",
                "properties" : {
                   "EscalatedCount" : {
@@ -6553,6 +6828,7 @@ pre code {
                "readOnly" : true
             },
             "Tickets" : {
+               "description" : "added via include \"Tickets\"",
                "type" : "array",
                "readOnly" : true
             },
@@ -7031,6 +7307,7 @@ pre code {
                "type" : "integer"
             },
             "TicketStats" : {
+               "description" : "added via include \"TicketStats\"",
                "type" : "object",
                "properties" : {
                   "EscalatedCount" : {
@@ -7049,6 +7326,7 @@ pre code {
                "readOnly" : true
             },
             "Tickets" : {
+               "description" : "added via include \"Tickets\"",
                "type" : "array",
                "readOnly" : true
             },
@@ -8375,10 +8653,20 @@ pre code {
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -8580,10 +8868,20 @@ pre code {
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -11154,6 +11452,7 @@ pre code {
                "readOnly" : true
             },
             "Preferences" : {
+               "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/UserPreference"
@@ -11163,26 +11462,32 @@ pre code {
                "type" : "string"
             },
             "UserFirstname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFullname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserID" : {
                "type" : "integer",
                "readOnly" : true
             },
             "UserLastname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserLogin" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserTitle" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -11371,6 +11676,7 @@ pre code {
                "readOnly" : true
             },
             "Preferences" : {
+               "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/UserPreference"
@@ -11380,26 +11686,32 @@ pre code {
                "type" : "string"
             },
             "UserFirstname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFullname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserID" : {
                "type" : "integer",
                "readOnly" : true
             },
             "UserLastname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserLogin" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserTitle" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -11626,6 +11938,7 @@ pre code {
                "readOnly" : true
             },
             "Preferences" : {
+               "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/UserPreference"
@@ -11635,26 +11948,32 @@ pre code {
                "type" : "string"
             },
             "UserFirstname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFullname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserID" : {
                "type" : "integer",
                "readOnly" : true
             },
             "UserLastname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserLogin" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserTitle" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [

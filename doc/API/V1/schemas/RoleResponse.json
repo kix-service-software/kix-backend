@@ -43,10 +43,20 @@
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [

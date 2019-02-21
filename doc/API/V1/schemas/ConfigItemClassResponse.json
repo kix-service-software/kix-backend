@@ -31,6 +31,7 @@
                "readOnly" : true
             },
             "ConfigItemStats" : {
+               "description" : "result of include \"ConfigItemStats\"",
                "type" : "object",
                "properties" : {
                   "PostProductiveCount" : {
@@ -59,6 +60,7 @@
                "$ref" : "#/definitions/ConfigItemClassDefinition"
             },
             "Definitions" : {
+               "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemClassDefinition"

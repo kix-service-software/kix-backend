@@ -55,7 +55,7 @@
     "Definition": {
       "type": "object",
       "description": "added via include \"Definition\"",
-      "$ref": "ConfigItemDefinition.json"
+      "$ref": "ConfigItemClassDefinition.json"
     },
     "DeplState": {
       "type": "string",

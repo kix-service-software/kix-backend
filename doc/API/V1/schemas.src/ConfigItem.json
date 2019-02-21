@@ -48,8 +48,9 @@
     },    
     "CurrentVersion": {
       "type": "object",
-      "$ref": "ConfigItemVersion.json",
-      "readOnly": true
+      "description": "added via include \"CurrentVersion\"",
+      "readOnly": true,
+      "$ref": "ConfigItemVersion.json"
     },    
     "LastVersionID": {
       "anyOf": [

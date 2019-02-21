@@ -180,6 +180,7 @@
                "type" : "integer"
             },
             "TicketStats" : {
+               "description" : "added via include \"TicketStats\"",
                "type" : "object",
                "properties" : {
                   "EscalatedCount" : {
@@ -198,6 +199,7 @@
                "readOnly" : true
             },
             "Tickets" : {
+               "description" : "added via include \"Tickets\"",
                "type" : "array",
                "readOnly" : true
             },

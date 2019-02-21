@@ -38,16 +38,20 @@
                "readOnly" : true
             },
             "ID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             },
             "Languages" : {
+               "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/TranslationLanguage"
-               }
+               },
+               "readOnly" : true
             },
             "Pattern" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             }
          },
          "required" : [
