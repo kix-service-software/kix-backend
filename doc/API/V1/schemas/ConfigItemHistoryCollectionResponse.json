@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item history objects.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemHistory" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemHistory"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemHistory"
+   ],
    "definitions" : {
       "ConfigItemHistory" : {
          "$id" : "#ConfigItemHistory",
@@ -67,16 +78,5 @@
             "UserLogin"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemHistory" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemHistory"
-   ]
+   }
 }

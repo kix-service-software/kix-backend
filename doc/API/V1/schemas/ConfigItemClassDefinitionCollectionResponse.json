@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item class definitions.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemClassDefinition"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ],
    "definitions" : {
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
@@ -57,16 +68,5 @@
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemClassDefinition" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemClassDefinition"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemClassDefinition"
-   ]
+   }
 }

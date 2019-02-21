@@ -39,7 +39,7 @@ $(document).ready(function() {
 
   $('.schemas code').each(function() {
     if ($(this).html().startsWith('{')) {
-      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true});
+      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true });
     }
   });
 

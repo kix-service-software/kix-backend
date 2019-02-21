@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of translation languages.",
    "type" : "object",
+   "properties" : {
+      "TranslationLanguage" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TranslationLanguage"
+         }
+      }
+   },
+   "required" : [
+      "TranslationLanguage"
+   ],
    "definitions" : {
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
@@ -29,16 +40,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "TranslationLanguage" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TranslationLanguage"
-         }
-      }
-   },
-   "required" : [
-      "TranslationLanguage"
-   ]
+   }
 }

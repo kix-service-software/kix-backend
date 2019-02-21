@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of object icons.",
    "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ObjectIcon"
+         }
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ],
    "definitions" : {
       "ObjectIcon" : {
          "$id" : "#ObjectIcon",
@@ -57,16 +68,5 @@
             "ObjectID"
          ]
       }
-   },
-   "properties" : {
-      "ObjectIcon" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ObjectIcon"
-         }
-      }
-   },
-   "required" : [
-      "ObjectIcon"
-   ]
+   }
 }

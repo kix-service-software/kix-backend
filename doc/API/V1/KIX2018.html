@@ -34,8 +34,20 @@
     $toggleElement.toggle();
   });
 
-  $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
-    hljs.highlightBlock(block);
+  //$('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
+  //  hljs.highlightBlock(block);
+  //});
+
+  $('.schemas code').each(function() {
+    if ($(this).html().startsWith('{')) {
+      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true});
+    }
+  });
+
+  $('.examples code').each(function() {
+    if ($(this).html().startsWith('{')) {
+      $(this).jsonHighlight(JSON.parse($(this).html()));
+    }
   });
 
   $('[data-toggle]').click(function() {
@@ -68,6 +80,168 @@
     } catch(e) {}
   });
 });
+      /**
+ * jQuery json-viewer
+ * @author: Kevin Olson <acidjazz@gmail.com>
+ */
+(function($){
+
+    /**
+     * Check if arg is either an array with at least 1 element, or a dict with at least 1 key
+     * @return boolean
+     */
+    function isCollapsable(arg) {
+      return arg instanceof Object && Object.keys(arg).length > 0;
+    }
+  
+    /**
+     * Check if a string represents a valid url
+     * @return boolean
+     */
+    function isUrl(string) {
+       var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+       return regexp.test(string);
+    }
+  
+    /**
+     * Transform a json object into html representation
+     * @return string
+     */
+    function json2html(json, options) {
+      html = '';
+      if (typeof json === 'string') {
+        // Escape tags
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        if (isUrl(json))
+          html += '<a href="' + json + '" class="json-string">' + json + '</a>';
+        else
+          html += '<span class="json-string">"' + json + '"</span>';
+      }
+      else if (typeof json === 'number') {
+        html += '<span class="json-number">' + json + '</span>';
+      }
+      else if (typeof json === 'boolean') {
+        html += '<span class="json-boolean">' + json + '</span>';
+      }
+      else if (json === null) {
+        html += '<span class="json-null">null</span>';
+      }
+      else if (json instanceof Array) {
+        if (json.length > 0) {
+          html += '[<ol class="json-array">';
+          for (var i = 0; i < json.length; ++i) {
+            html += '<li>'
+            // Add toggle button if item is collapsable
+            if (!options.noToggle && isCollapsable(json[i])) {
+                html += '<a href class="json-toggle"></a>';
+            }
+            html += json2html(json[i], options);
+            // Add comma if item is not last
+            if (i < json.length - 1) {
+              html += ',';
+            }
+            html += '</li>';
+          }
+          html += '</ol>]';
+        }
+        else {
+          html += '[]';
+        }
+      }
+      else if (typeof json === 'object') {
+        var key_count = Object.keys(json).length;
+        if (key_count > 0) {
+          html += '{<ul class="json-dict">';
+          for (var key in json) {
+            if (json.hasOwnProperty(key)) {
+              html += '<li>';
+              var keyRepr = options.withQuotes ?
+                '<span class="json-attribute">"' + key + '"</span>' : key;
+              // Add toggle button if item is collapsable
+              if (!options.noToggle && isCollapsable(json[key])) {
+                html += '<a href class="json-toggle">' + keyRepr + '</a>';
+              }
+              else {
+                html += keyRepr;
+              }
+              html += ': ' + json2html(json[key], options);
+              // Add comma if item is not last
+              if (--key_count > 0)
+                html += ',';
+              html += '</li>';
+            }
+          }
+          html += '</ul>}';
+        }
+        else {
+          html += '{}';
+        }
+      }
+      return html;
+    }
+  
+    $.fn.jsonHighlight = function(json) {
+
+        // jQuery chaining
+        return this.each(function() {
+
+            // Transform to HTML
+            var html = json2html(json, { withQuotes: true, noToggle: true })
+
+            // Insert HTML in target DOM element
+            $(this).html(html);    
+        });
+    }
+
+    /**
+     * jQuery plugin method
+     * @param json: a javascript object
+     * @param options: an optional options hash
+     */
+    $.fn.jsonBrowse = function(json, options) {
+      options = options || {};
+  
+      // jQuery chaining
+      return this.each(function() {
+  
+        // Transform to HTML
+        var html = json2html(json, options)
+        if (isCollapsable(json))
+          html = '<a href></a>' + html;
+  
+        // Insert HTML in target DOM element
+        $(this).html(html);
+  
+        // Bind click on toggle buttons
+        $(this).off('click');
+        $(this).on('click', 'a.json-toggle', function() {
+          var target = $(this).toggleClass('collapsed').siblings('ul.json-dict, ol.json-array');
+          target.toggle();
+          if (target.is(':visible')) {
+            target.siblings('.json-placeholder').remove();
+          }
+          else {
+            var count = target.children('li').length;
+            var placeholder = count + (count > 1 ? ' items' : ' item');
+            target.after('<a href class="json-placeholder">' + placeholder + '</a>');
+          }
+          return false;
+        });
+  
+        // Simulate click on toggle button when placeholder is clicked
+        $(this).on('click', 'a.json-placeholder', function() {
+          $(this).siblings('a.json-toggle').click();
+          return false;
+        });
+  
+        if (options.collapsed == true) {
+          // Trigger click to collapse all nodes
+          $(this).find('a.json-toggle').click();
+        }
+      });
+    };
+  })(jQuery);
+  
     </script><style>
       h1 {
   font-weight: bold;
@@ -86,6 +260,9 @@ pre {
 }
 pre.base-uri {
   margin-left: 0px;
+}
+pre > code ul.json-dict {
+  margin-bottom: 0px;
 }
 .param-table {
   border-collapse: collapse;  
@@ -283,6 +460,76 @@ pre code {
   font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
   font-size: 95%;
 }
+      /* Syntax highlighting for JSON objects */
+.json-body {
+    margin: 10px 20px;
+  }
+  
+  ul.json-dict, ol.json-array {
+    list-style-type: none;
+    margin: 0 0 0 1px;
+    border-left: 1px dotted #ccc;
+    padding-left: 2em;
+    font: 13px/18px monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+  .json-string {
+    color: #811f3f;
+  }
+  .json-number {
+    color: #267f99;
+  }
+  .json-boolean {
+    color: #0000ff;
+  }
+  .json-literal {
+    color: #0000ff;
+  }
+  .json-null {
+    color: #000;
+  }
+  .json-attribute {
+    color: #0451a5;
+  }
+  /* Toggle button */
+  a.json-toggle {
+    position: relative;
+    color: inherit;
+    text-decoration: none;
+  }
+  a.json-toggle:focus {
+    outline: none;
+  }
+  a.json-toggle:before {
+    content: "\25B6"; /* left arrow */
+    transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    color: #d9d9d9;
+    position: absolute;
+    display: inline-block;
+    width: 1em;
+    font-size: 10px;
+    left: -1.5em;
+  }
+  a.json-toggle.collapsed:before {
+    content: "\25B6"; /* left arrow */
+    transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    font-size: 10px;
+  }
+  
+  /* Collapsable placeholder links */
+  a.json-placeholder {
+    color: #aaa;
+    padding: 0 1em;
+    text-decoration: none;
+  }
+  a.json-placeholder:hover {
+    text-decoration: underline;
+  }
+  
     </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX 2018 REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api.pl/webservice/core:v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#sessions"><code>/sessions</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In constract to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function is based on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?search={...}
 </code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be execute at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?filter={...}
 </code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="lang-bash">{
@@ -353,6 +600,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of channels.",
    "type" : "object",
+   "properties" : {
+      "Channel" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Channel"
+         }
+      }
+   },
+   "required" : [
+      "Channel"
+   ],
    "definitions" : {
       "Channel" : {
          "$id" : "#Channel",
@@ -401,18 +659,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Channel" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Channel"
-         }
-      }
-   },
-   "required" : [
-      "Channel"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Channel": [
@@ -465,6 +712,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for channel GET request.",
    "type" : "object",
+   "properties" : {
+      "Channel" : {
+         "$ref" : "#/definitions/Channel"
+      }
+   },
+   "required" : [
+      "Channel"
+   ],
    "definitions" : {
       "Channel" : {
          "$id" : "#Channel",
@@ -513,15 +768,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Channel" : {
-         "$ref" : "#/definitions/Channel"
-      }
-   },
-   "required" : [
-      "Channel"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Channel": {
@@ -562,6 +809,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of client registrations.",
    "type" : "object",
+   "properties" : {
+      "ClientRegistration" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ClientRegistration"
+         }
+      }
+   },
+   "required" : [
+      "ClientRegistration"
+   ],
    "definitions" : {
       "ClientRegistration" : {
          "$id" : "#ClientRegistration",
@@ -587,18 +845,7 @@ pre code {
             "CallbackURL"
          ]
       }
-   },
-   "properties" : {
-      "ClientRegistration" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ClientRegistration"
-         }
-      }
-   },
-   "required" : [
-      "ClientRegistration"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ClientRegistration": [
@@ -717,6 +964,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for client registration GET request.",
    "type" : "object",
+   "properties" : {
+      "ClientRegistration" : {
+         "$ref" : "#/definitions/ClientRegistration"
+      }
+   },
+   "required" : [
+      "ClientRegistration"
+   ],
    "definitions" : {
       "ClientRegistration" : {
          "$id" : "#ClientRegistration",
@@ -742,15 +997,7 @@ pre code {
             "CallbackURL"
          ]
       }
-   },
-   "properties" : {
-      "ClientRegistration" : {
-         "$ref" : "#/definitions/ClientRegistration"
-      }
-   },
-   "required" : [
-      "ClientRegistration"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ClientRegistration": { 
@@ -832,6 +1079,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item class objects.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemClass" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemClass"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemClass"
+   ],
    "definitions" : {
       "ConfigItemClass" : {
          "$id" : "#ConfigItemClass",
@@ -961,18 +1219,7 @@ pre code {
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemClass" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemClass"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemClass"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemClass": [
@@ -1107,6 +1354,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item class GET request.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemClass" : {
+         "$ref" : "#/definitions/ConfigItemClass"
+      }
+   },
+   "required" : [
+      "ConfigItemClass"
+   ],
    "definitions" : {
       "ConfigItemClass" : {
          "$id" : "#ConfigItemClass",
@@ -1236,15 +1491,7 @@ pre code {
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemClass" : {
-         "$ref" : "#/definitions/ConfigItemClass"
-      }
-   },
-   "required" : [
-      "ConfigItemClass"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemClass": {
@@ -1445,6 +1692,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item class definitions.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemClassDefinition"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ],
    "definitions" : {
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
@@ -1499,18 +1757,7 @@ pre code {
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemClassDefinition" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemClassDefinition"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemClassDefinition"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemClassDefinition": [
@@ -1879,6 +2126,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item class definition GET request.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "$ref" : "#/definitions/ConfigItemClassDefinition"
+      }
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ],
    "definitions" : {
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
@@ -1933,15 +2188,7 @@ pre code {
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemClassDefinition" : {
-         "$ref" : "#/definitions/ConfigItemClassDefinition"
-      }
-   },
-   "required" : [
-      "ConfigItemClassDefinition"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemClassDefinition": {
@@ -2282,6 +2529,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item objects.",
    "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItem"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -2589,18 +2847,7 @@ pre code {
             "VersionID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItem" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItem"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItem"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItem": [
@@ -2653,6 +2900,32 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item object for creation.",
    "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "object",
+         "properties" : {
+            "ClassID" : {
+               "type" : "integer"
+            },
+            "Images" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemImagePostItem"
+               }
+            },
+            "Version" : {
+               "$ref" : "#/definitions/ConfigItemVersionPostItem"
+            }
+         },
+         "required" : [
+            "ClassID",
+            "Version"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
    "definitions" : {
       "ConfigItemVersionPostItem" : {
          "$id" : "#ConfigItemVersionPostItem",
@@ -2704,33 +2977,7 @@ pre code {
             "Filename"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItem" : {
-         "type" : "object",
-         "properties" : {
-            "ClassID" : {
-               "type" : "integer"
-            },
-            "Images" : {
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/ConfigItemImagePostItem"
-               }
-            },
-            "Version" : {
-               "$ref" : "#/definitions/ConfigItemVersionPostItem"
-            }
-         },
-         "required" : [
-            "ClassID",
-            "Version"
-         ]
-      }
-   },
-   "required" : [
-      "ConfigItem"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItem": {
@@ -2831,6 +3078,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item GET request.",
    "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "$ref" : "#/definitions/ConfigItem"
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -3138,15 +3393,7 @@ pre code {
             "VersionID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItem" : {
-         "$ref" : "#/definitions/ConfigItem"
-      }
-   },
-   "required" : [
-      "ConfigItem"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItem": {
@@ -3348,6 +3595,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item history objects.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemHistory" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemHistory"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemHistory"
+   ],
    "definitions" : {
       "ConfigItemHistory" : {
          "$id" : "#ConfigItemHistory",
@@ -3412,18 +3670,7 @@ pre code {
             "UserLogin"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemHistory" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemHistory"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemHistory": [
@@ -3469,6 +3716,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item history GET request.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemHistory" : {
+         "$ref" : "#/definitions/ConfigItemHistory"
+      }
+   },
+   "required" : [
+      "ConfigItemHistory"
+   ],
    "definitions" : {
       "ConfigItemHistory" : {
          "$id" : "#ConfigItemHistory",
@@ -3533,15 +3788,7 @@ pre code {
             "UserLogin"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemHistory" : {
-         "$ref" : "#/definitions/ConfigItemHistory"
-      }
-   },
-   "required" : [
-      "ConfigItemHistory"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemHistory": {
@@ -3585,6 +3832,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item images.",
    "type" : "object",
+   "properties" : {
+      "Image" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemImage"
+         }
+      }
+   },
+   "required" : [
+      "Image"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -3625,18 +3883,7 @@ pre code {
             "ID"
          ]
       }
-   },
-   "properties" : {
-      "Image" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemImage"
-         }
-      }
-   },
-   "required" : [
-      "Image"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Image": [
@@ -3690,6 +3937,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item image request object for creation.",
    "type" : "object",
+   "properties" : {
+      "Image" : {
+         "$ref" : "#/definitions/ConfigItemImagePostItem"
+      }
+   },
+   "required" : [
+      "Image"
+   ],
    "definitions" : {
       "ConfigItemImagePostItem" : {
          "$id" : "#ConfigItemImagePostItem",
@@ -3716,15 +3971,7 @@ pre code {
             "Filename"
          ]
       }
-   },
-   "properties" : {
-      "Image" : {
-         "$ref" : "#/definitions/ConfigItemImagePostItem"
-      }
-   },
-   "required" : [
-      "Image"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Image": {
@@ -3800,6 +4047,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item image GET request.",
    "type" : "object",
+   "properties" : {
+      "Image" : {
+         "$ref" : "#/definitions/ConfigItemImage"
+      }
+   },
+   "required" : [
+      "Image"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -3840,15 +4095,7 @@ pre code {
             "ID"
          ]
       }
-   },
-   "properties" : {
-      "Image" : {
-         "$ref" : "#/definitions/ConfigItemImage"
-      }
-   },
-   "required" : [
-      "Image"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Image": {
@@ -3962,6 +4209,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item versions.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemVersion" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemVersion"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemVersion"
+   ],
    "definitions" : {
       "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
@@ -4068,18 +4326,7 @@ pre code {
             "VersionID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemVersion" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemVersion"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemVersion"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemVersion": [
@@ -4156,6 +4403,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item version request object for creation.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemVersion" : {
+         "$ref" : "#/definitions/ConfigItemVersionPostItem"
+      }
+   },
+   "required" : [
+      "ConfigItemVersion"
+   ],
    "definitions" : {
       "ConfigItemVersionPostItem" : {
          "$id" : "#ConfigItemVersionPostItem",
@@ -4182,15 +4437,7 @@ pre code {
             "InciStateID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemVersion" : {
-         "$ref" : "#/definitions/ConfigItemVersionPostItem"
-      }
-   },
-   "required" : [
-      "ConfigItemVersion"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemVersion": {
@@ -4282,6 +4529,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item version GET request.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemVersion" : {
+         "$ref" : "#/definitions/ConfigItemVersion"
+      }
+   },
+   "required" : [
+      "ConfigItemVersion"
+   ],
    "definitions" : {
       "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
@@ -4388,15 +4643,7 @@ pre code {
             "VersionID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemVersion" : {
-         "$ref" : "#/definitions/ConfigItemVersion"
-      }
-   },
-   "required" : [
-      "ConfigItemVersion"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ConfigItemVersion": {
@@ -4449,6 +4696,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item attachment GET request.",
    "type" : "object",
+   "properties" : {
+      "Attachment" : {
+         "$ref" : "#/definitions/ConfigItemAttachment"
+      }
+   },
+   "required" : [
+      "Attachment"
+   ],
    "definitions" : {
       "ConfigItemAttachment" : {
          "$id" : "#ConfigItemAttachment",
@@ -4489,15 +4744,7 @@ pre code {
             "Filename"
          ]
       }
-   },
-   "properties" : {
-      "Attachment" : {
-         "$ref" : "#/definitions/ConfigItemAttachment"
-      }
-   },
-   "required" : [
-      "Attachment"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
    "Attachment": {
@@ -4531,135 +4778,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#ContactCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "A list of contacts.",
-   "type" : "object",
-   "definitions" : {
-      "Contact" : {
-         "$id" : "#Contact",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The contact object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "City" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Country" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CustomerID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CustomerIDs" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "Email" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Fax" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Firstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Lastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Login" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Mobile" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Password" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Phone" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Street" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Title" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ZipCode" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CustomerID",
-            "CustomerIDs",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Login",
-            "ValidID"
-         ]
-      }
-   },
-   "properties" : {
-      "Contact" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Contact"
-         }
-      }
-   },
-   "required" : [
-      "Contact"
-   ]
-}
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="contacts_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -4771,132 +4890,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_contacts__contactid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/contacts</span><span class="uri">/{contactId}</span> <span class="methods"><a href="#contacts__contactid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts__contactid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__get_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__get_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#ContactResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "A response for contact GET request.",
-   "type" : "object",
-   "definitions" : {
-      "Contact" : {
-         "$id" : "#Contact",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The contact object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "City" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Country" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CustomerID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CustomerIDs" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "Email" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Fax" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Firstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Lastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Login" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Mobile" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Password" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Phone" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Street" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Title" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ZipCode" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CustomerID",
-            "CustomerIDs",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Login",
-            "ValidID"
-         ]
-      }
-   },
-   "properties" : {
-      "Contact" : {
-         "$ref" : "#/definitions/Contact"
-      }
-   },
-   "required" : [
-      "Contact"
-   ]
-}
+}</code></pre></div></div></div><div class="tab-pane" id="contacts_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_contacts__contactid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/contacts</span><span class="uri">/{contactId}</span> <span class="methods"><a href="#contacts__contactid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts__contactid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__get_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__get_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactResponse.json</code></pre></div></div><h2 class="response-title" id="contacts__contactid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -5097,96 +5091,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="customers" class="panel-title">Customers</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this customer. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_customers" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/customers</span> <span class="methods"><a href="#customers_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/customers</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers_get_request" data-toggle="tab">Request</a></li><li><a href="#customers_get_response" data-toggle="tab">Response</a></li><li><a href="#customers_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#CustomerCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "A list of customers.",
-   "type" : "object",
-   "definitions" : {
-      "Customer" : {
-         "$id" : "#Customer",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The customer object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "City" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Country" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Street" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "URL" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ZipCode" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CustomerID",
-            "CustomerIDs",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      }
-   },
-   "properties" : {
-      "Customer" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Customer"
-         }
-      }
-   },
-   "required" : [
-      "Customer"
-   ]
-}
+}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="customers" class="panel-title">Customers</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this customer. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_customers" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/customers</span> <span class="methods"><a href="#customers_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/customers</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers_get_request" data-toggle="tab">Request</a></li><li><a href="#customers_get_response" data-toggle="tab">Response</a></li><li><a href="#customers_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="customers_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -5298,132 +5203,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers</span><span class="uri">/{customerId}</span> <span class="methods"><a href="#customers__customerid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers__customerid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers__customerid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers</span><span class="uri">/{customerId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#ContactResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "A response for contact GET request.",
-   "type" : "object",
-   "definitions" : {
-      "Contact" : {
-         "$id" : "#Contact",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The contact object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "City" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Country" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CustomerID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CustomerIDs" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "Email" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Fax" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Firstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Lastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Login" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Mobile" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Password" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Phone" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Street" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Title" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ZipCode" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CustomerID",
-            "CustomerIDs",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Login",
-            "ValidID"
-         ]
-      }
-   },
-   "properties" : {
-      "Contact" : {
-         "$ref" : "#/definitions/Contact"
-      }
-   },
-   "required" : [
-      "Contact"
-   ]
-}
+}</code></pre></div></div></div><div class="tab-pane" id="customers_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers</span><span class="uri">/{customerId}</span> <span class="methods"><a href="#customers__customerid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers__customerid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers__customerid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers</span><span class="uri">/{customerId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerResponse.json</code></pre></div></div><h2 class="response-title" id="customers__customerid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -5601,135 +5381,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid__contacts" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/customers/contacts.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers/{customerId}</span><span class="uri">/contacts</span> <span class="methods"><a href="#customers__customerid__contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers/{customerId}</span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Contact items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__contacts_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#ContactCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "A list of contacts.",
-   "type" : "object",
-   "definitions" : {
-      "Contact" : {
-         "$id" : "#Contact",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The contact object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "City" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Country" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CustomerID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CustomerIDs" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "Email" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Fax" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Firstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Lastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Login" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Mobile" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Password" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Phone" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Street" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Title" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ZipCode" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CustomerID",
-            "CustomerIDs",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Login",
-            "ValidID"
-         ]
-      }
-   },
-   "properties" : {
-      "Contact" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Contact"
-         }
-      }
-   },
-   "required" : [
-      "Contact"
-   ]
-}
+}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid__contacts" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/customers/contacts.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers/{customerId}</span><span class="uri">/contacts</span> <span class="methods"><a href="#customers__customerid__contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers/{customerId}</span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Contact items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__contacts_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="customers__customerid__contacts_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
@@ -5781,6 +5433,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of translations.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Translation"
+         }
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "Translation" : {
          "$id" : "#Translation",
@@ -5851,18 +5514,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Translation"
-         }
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Translation": [
@@ -5911,6 +5563,28 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "The translation request object for creation.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "type" : "object",
+         "properties" : {
+            "Languages" : {
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TranslationLanguage"
+               }
+            },
+            "Pattern" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Pattern"
+         ]
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
@@ -5937,29 +5611,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "type" : "object",
-         "properties" : {
-            "Languages" : {
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/TranslationLanguage"
-               }
-            },
-            "Pattern" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "Pattern"
-         ]
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Translation": {
@@ -6032,6 +5684,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for translation GET request.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "$ref" : "#/definitions/Translation"
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "Translation" : {
          "$id" : "#Translation",
@@ -6102,15 +5762,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "$ref" : "#/definitions/Translation"
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Translation": { 
@@ -6306,6 +5958,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of translation languages.",
    "type" : "object",
+   "properties" : {
+      "TranslationLanguage" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TranslationLanguage"
+         }
+      }
+   },
+   "required" : [
+      "TranslationLanguage"
+   ],
    "definitions" : {
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
@@ -6332,18 +5995,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "TranslationLanguage" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TranslationLanguage"
-         }
-      }
-   },
-   "required" : [
-      "TranslationLanguage"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TranslationLanguage": [
@@ -6479,6 +6131,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for translation language GET request.",
    "type" : "object",
+   "properties" : {
+      "TranslationLanguage" : {
+         "$ref" : "#/definitions/TranslationLanguage"
+      }
+   },
+   "required" : [
+      "TranslationLanguage"
+   ],
    "definitions" : {
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
@@ -6505,15 +6165,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "TranslationLanguage" : {
-         "$ref" : "#/definitions/TranslationLanguage"
-      }
-   },
-   "required" : [
-      "TranslationLanguage"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TranslationLanguage": {
@@ -6703,6 +6355,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of queues.",
    "type" : "object",
+   "properties" : {
+      "Queue" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Queue"
+         }
+      }
+   },
+   "required" : [
+      "Queue"
+   ],
    "definitions" : {
       "Queue" : {
          "$id" : "#Priority",
@@ -6944,18 +6607,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Queue" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Queue"
-         }
-      }
-   },
-   "required" : [
-      "Queue"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
 	"Queue": [
@@ -7202,6 +6854,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for queue GET request.",
    "type" : "object",
+   "properties" : {
+      "Queue" : {
+         "$ref" : "#/definitions/Queue"
+      }
+   },
+   "required" : [
+      "Queue"
+   ],
    "definitions" : {
       "Queue" : {
          "$id" : "#Priority",
@@ -7443,15 +7103,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Queue" : {
-         "$ref" : "#/definitions/Queue"
-      }
-   },
-   "required" : [
-      "Queue"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
 	"Queue": {
@@ -7720,6 +7372,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of object icons.",
    "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ObjectIcon"
+         }
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ],
    "definitions" : {
       "ObjectIcon" : {
          "$id" : "#ObjectIcon",
@@ -7774,18 +7437,7 @@ pre code {
             "ObjectID"
          ]
       }
-   },
-   "properties" : {
-      "ObjectIcon" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ObjectIcon"
-         }
-      }
-   },
-   "required" : [
-      "ObjectIcon"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ObjectIcon": [
@@ -7944,6 +7596,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for object icon GET request.",
    "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "$ref" : "#/definitions/ObjectIcon"
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ],
    "definitions" : {
       "ObjectIcon" : {
          "$id" : "#ObjectIcon",
@@ -7998,15 +7658,7 @@ pre code {
             "ObjectID"
          ]
       }
-   },
-   "properties" : {
-      "ObjectIcon" : {
-         "$ref" : "#/definitions/ObjectIcon"
-      }
-   },
-   "required" : [
-      "ObjectIcon"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ObjectIcon": { 
@@ -8212,6 +7864,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of priorities.",
    "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Priority"
+         }
+      }
+   },
+   "required" : [
+      "Priority"
+   ],
    "definitions" : {
       "Priority" : {
          "$id" : "#Priority",
@@ -8260,18 +7923,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Priority" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Priority"
-         }
-      }
-   },
-   "required" : [
-      "Priority"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Priority": [
@@ -8421,6 +8073,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for priority GET request.",
    "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "$ref" : "#/definitions/Priority"
+      }
+   },
+   "required" : [
+      "Priority"
+   ],
    "definitions" : {
       "Priority" : {
          "$id" : "#Priority",
@@ -8469,15 +8129,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Priority" : {
-         "$ref" : "#/definitions/Priority"
-      }
-   },
-   "required" : [
-      "Priority"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Priority": { 
@@ -8680,6 +8332,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of roles.",
    "type" : "object",
+   "properties" : {
+      "Role" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Role"
+         }
+      }
+   },
+   "required" : [
+      "Role"
+   ],
    "definitions" : {
       "Role" : {
          "$id" : "#Role",
@@ -8728,18 +8391,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Role" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Role"
-         }
-      }
-   },
-   "required" : [
-      "Role"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Role": [
@@ -8821,7 +8473,21 @@ pre code {
         "Name": "the new stats role",
         "ValidID": 1
     }
-}</code></pre></div></div><div class="tab-pane" id="roles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Role has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/RolePatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+}</code></pre></div></div><div class="tab-pane" id="roles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Role has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#RolePatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated role.",
+   "type" : "object",
+   "properties" : {
+      "RoleID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "RoleID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "RoleID": 3
 }</code></pre></div></div><h2 class="response-title" id="roles_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
@@ -8874,6 +8540,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for role GET request.",
    "type" : "object",
+   "properties" : {
+      "Role" : {
+         "$ref" : "#/definitions/Role"
+      }
+   },
+   "required" : [
+      "Role"
+   ],
    "definitions" : {
       "Role" : {
          "$id" : "#Role",
@@ -8922,15 +8596,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Role" : {
-         "$ref" : "#/definitions/Role"
-      }
-   },
-   "required" : [
-      "Role"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Role": {
@@ -8996,7 +8662,21 @@ pre code {
         "Name": "my special user role",
         "ValidID": 2
     }
-}</code></pre></div></div><div class="tab-pane" id="roles__roleid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/RolePatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
+}</code></pre></div></div><div class="tab-pane" id="roles__roleid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: RolePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#RolePatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated role.",
+   "type" : "object",
+   "properties" : {
+      "RoleID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "RoleID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "RoleID": 3
 }</code></pre></div></div><h2 class="response-title" id="roles__roleid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
@@ -9288,6 +8968,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of sender types.",
    "type" : "object",
+   "properties" : {
+      "SenderType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/SenderType"
+         }
+      }
+   },
+   "required" : [
+      "SenderType"
+   ],
    "definitions" : {
       "SenderType" : {
          "$id" : "#SenderType",
@@ -9309,18 +9000,7 @@ pre code {
             "Name"
          ]
       }
-   },
-   "properties" : {
-      "SenderType" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/SenderType"
-         }
-      }
-   },
-   "required" : [
-      "SenderType"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "SenderType": [
@@ -9361,6 +9041,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for sender type GET request.",
    "type" : "object",
+   "properties" : {
+      "SenderType" : {
+         "$ref" : "#/definitions/SenderType"
+      }
+   },
+   "required" : [
+      "SenderType"
+   ],
    "definitions" : {
       "SenderType" : {
          "$id" : "#SenderType",
@@ -9382,15 +9070,7 @@ pre code {
             "Name"
          ]
       }
-   },
-   "properties" : {
-      "SenderType" : {
-         "$ref" : "#/definitions/SenderType"
-      }
-   },
-   "required" : [
-      "SenderType"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "SenderType": {
@@ -9425,6 +9105,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of service.",
    "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Service"
+         }
+      }
+   },
+   "required" : [
+      "Service"
+   ],
    "definitions" : {
       "Service" : {
          "$id" : "#Service",
@@ -9498,18 +9189,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Priority" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Service"
-         }
-      }
-   },
-   "required" : [
-      "Service"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
 	"Service": [
@@ -9683,6 +9363,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for service GET request.",
    "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "$ref" : "#/definitions/Service"
+      }
+   },
+   "required" : [
+      "Service"
+   ],
    "definitions" : {
       "Service" : {
          "$id" : "#Service",
@@ -9756,15 +9444,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Priority" : {
-         "$ref" : "#/definitions/Service"
-      }
-   },
-   "required" : [
-      "Service"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Service": {
@@ -9979,6 +9659,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for session GET request.",
    "type" : "object",
+   "properties" : {
+      "Session" : {
+         "$ref" : "#/definitions/Session"
+      }
+   },
+   "required" : [
+      "Session"
+   ],
    "definitions" : {
       "Session" : {
          "$id" : "#Session",
@@ -10065,15 +9753,7 @@ pre code {
             "ValidUntilTimeUnix"
          ]
       }
-   },
-   "properties" : {
-      "Session" : {
-         "$ref" : "#/definitions/Session"
-      }
-   },
-   "required" : [
-      "Session"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{  
     "Session": {
@@ -10150,6 +9830,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of state types.",
    "type" : "object",
+   "properties" : {
+      "StateType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/StateType"
+         }
+      }
+   },
+   "required" : [
+      "StateType"
+   ],
    "definitions" : {
       "StateType" : {
          "$id" : "#StateType",
@@ -10171,18 +9862,7 @@ pre code {
             "Name"
          ]
       }
-   },
-   "properties" : {
-      "StateType" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/StateType"
-         }
-      }
-   },
-   "required" : [
-      "StateType"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "StateType": [
@@ -10223,6 +9903,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for state type GET request.",
    "type" : "object",
+   "properties" : {
+      "StateType" : {
+         "$ref" : "#/definitions/StateType"
+      }
+   },
+   "required" : [
+      "StateType"
+   ],
    "definitions" : {
       "StateType" : {
          "$id" : "#StateType",
@@ -10244,15 +9932,7 @@ pre code {
             "Name"
          ]
       }
-   },
-   "properties" : {
-      "StateType" : {
-         "$ref" : "#/definitions/StateType"
-      }
-   },
-   "required" : [
-      "StateType"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "StateType": {
@@ -10287,6 +9967,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of ticket locks.",
    "type" : "object",
+   "properties" : {
+      "Lock" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Lock"
+         }
+      }
+   },
+   "required" : [
+      "Lock"
+   ],
    "definitions" : {
       "Lock" : {
          "$id" : "#Lock",
@@ -10331,18 +10022,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Lock" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Lock"
-         }
-      }
-   },
-   "required" : [
-      "Lock"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Lock": [
@@ -10393,6 +10073,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for lock GET request.",
    "type" : "object",
+   "properties" : {
+      "Lock" : {
+         "$ref" : "#/definitions/Lock"
+      }
+   },
+   "required" : [
+      "Lock"
+   ],
    "definitions" : {
       "Lock" : {
          "$id" : "#Lock",
@@ -10437,15 +10125,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Lock" : {
-         "$ref" : "#/definitions/Lock"
-      }
-   },
-   "required" : [
-      "Lock"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Lock": {
@@ -10485,6 +10165,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of ticket states.",
    "type" : "object",
+   "properties" : {
+      "TicketState" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TicketState"
+         }
+      }
+   },
+   "required" : [
+      "TicketState"
+   ],
    "definitions" : {
       "TicketState" : {
          "$id" : "#TicketState",
@@ -10537,18 +10228,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketState" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TicketState"
-         }
-      }
-   },
-   "required" : [
-      "TicketState"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TicketState": [
@@ -10704,6 +10384,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for ticket state GET request.",
    "type" : "object",
+   "properties" : {
+      "TicketState" : {
+         "$ref" : "#/definitions/TicketState"
+      }
+   },
+   "required" : [
+      "TicketState"
+   ],
    "definitions" : {
       "TicketState" : {
          "$id" : "#TicketState",
@@ -10756,15 +10444,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketState" : {
-         "$ref" : "#/definitions/TicketState"
-      }
-   },
-   "required" : [
-      "TicketState"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TicketState": { 
@@ -10970,6 +10650,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of ticket types.",
    "type" : "object",
+   "properties" : {
+      "TicketType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TicketType"
+         }
+      }
+   },
+   "required" : [
+      "TicketType"
+   ],
    "definitions" : {
       "TicketType" : {
          "$id" : "#TicketType",
@@ -11020,18 +10711,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketType" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TicketType"
-         }
-      }
-   },
-   "required" : [
-      "TicketType"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TicketType": [
@@ -11181,6 +10861,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for ticket type GET request.",
    "type" : "object",
+   "properties" : {
+      "TicketType" : {
+         "$ref" : "#/definitions/TicketType"
+      }
+   },
+   "required" : [
+      "TicketType"
+   ],
    "definitions" : {
       "TicketType" : {
          "$id" : "#TicketType",
@@ -11231,15 +10919,7 @@ pre code {
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketType" : {
-         "$ref" : "#/definitions/TicketType"
-      }
-   },
-   "required" : [
-      "TicketType"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TicketType": { 
@@ -11442,6 +11122,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for user GET request.",
    "type" : "object",
+   "properties" : {
+      "User" : {
+         "$ref" : "#/definitions/User"
+      }
+   },
+   "required" : [
+      "User"
+   ],
    "definitions" : {
       "User" : {
          "$id" : "#User",
@@ -11528,15 +11216,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "User" : {
-         "$ref" : "#/definitions/User"
-      }
-   },
-   "required" : [
-      "User"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "User": { 
@@ -11581,6 +11261,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of user preferences.",
    "type" : "object",
+   "properties" : {
+      "UserPreference" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/UserPreference"
+         }
+      }
+   },
+   "required" : [
+      "UserPreference"
+   ],
    "definitions" : {
       "UserPreference" : {
          "$id" : "#UserPreference",
@@ -11602,18 +11293,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "UserPreference" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/UserPreference"
-         }
-      }
-   },
-   "required" : [
-      "UserPreference"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "UserPreference": [
@@ -11656,6 +11336,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of users.",
    "type" : "object",
+   "properties" : {
+      "User" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/User"
+         }
+      }
+   },
+   "required" : [
+      "User"
+   ],
    "definitions" : {
       "User" : {
          "$id" : "#User",
@@ -11742,18 +11433,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "User" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/User"
-         }
-      }
-   },
-   "required" : [
-      "User"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "User": [
@@ -11914,6 +11594,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for user GET request.",
    "type" : "object",
+   "properties" : {
+      "User" : {
+         "$ref" : "#/definitions/User"
+      }
+   },
+   "required" : [
+      "User"
+   ],
    "definitions" : {
       "User" : {
          "$id" : "#User",
@@ -12000,15 +11688,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "User" : {
-         "$ref" : "#/definitions/User"
-      }
-   },
-   "required" : [
-      "User"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "User": { 
@@ -12212,6 +11892,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of user preferences.",
    "type" : "object",
+   "properties" : {
+      "UserPreference" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/UserPreference"
+         }
+      }
+   },
+   "required" : [
+      "UserPreference"
+   ],
    "definitions" : {
       "UserPreference" : {
          "$id" : "#UserPreference",
@@ -12233,18 +11924,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "UserPreference" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/UserPreference"
-         }
-      }
-   },
-   "required" : [
-      "UserPreference"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "UserPreference": [
@@ -12380,6 +12060,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for user preference GET request.",
    "type" : "object",
+   "properties" : {
+      "UserPreference" : {
+         "$ref" : "#/definitions/UserPreference"
+      }
+   },
+   "required" : [
+      "UserPreference"
+   ],
    "definitions" : {
       "UserPreference" : {
          "$id" : "#UserPreference",
@@ -12401,15 +12089,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "UserPreference" : {
-         "$ref" : "#/definitions/UserPreference"
-      }
-   },
-   "required" : [
-      "UserPreference"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "UserPreference": {
@@ -12599,6 +12279,17 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of valid items.",
    "type" : "object",
+   "properties" : {
+      "Valid" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Valid"
+         }
+      }
+   },
+   "required" : [
+      "Valid"
+   ],
    "definitions" : {
       "Valid" : {
          "$id" : "#Valid",
@@ -12616,18 +12307,7 @@ pre code {
             }
          }
       }
-   },
-   "properties" : {
-      "Valid" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Valid"
-         }
-      }
-   },
-   "required" : [
-      "Valid"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Valid": [
@@ -12668,6 +12348,14 @@ pre code {
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for valid GET request.",
    "type" : "object",
+   "properties" : {
+      "Valid" : {
+         "$ref" : "#/definitions/Valid"
+      }
+   },
+   "required" : [
+      "Valid"
+   ],
    "definitions" : {
       "Valid" : {
          "$id" : "#Valid",
@@ -12685,15 +12373,7 @@ pre code {
             }
          }
       }
-   },
-   "properties" : {
-      "Valid" : {
-         "$ref" : "#/definitions/Valid"
-      }
-   },
-   "required" : [
-      "Valid"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Valid": {

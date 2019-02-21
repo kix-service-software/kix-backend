@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for translation GET request.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "$ref" : "#/definitions/Translation"
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "Translation" : {
          "$id" : "#Translation",
@@ -73,13 +81,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "$ref" : "#/definitions/Translation"
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }

@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for object icon GET request.",
    "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "$ref" : "#/definitions/ObjectIcon"
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ],
    "definitions" : {
       "ObjectIcon" : {
          "$id" : "#ObjectIcon",
@@ -57,13 +65,5 @@
             "ObjectID"
          ]
       }
-   },
-   "properties" : {
-      "ObjectIcon" : {
-         "$ref" : "#/definitions/ObjectIcon"
-      }
-   },
-   "required" : [
-      "ObjectIcon"
-   ]
+   }
 }

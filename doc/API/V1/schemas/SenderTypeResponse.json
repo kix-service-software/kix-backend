@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for sender type GET request.",
    "type" : "object",
+   "properties" : {
+      "SenderType" : {
+         "$ref" : "#/definitions/SenderType"
+      }
+   },
+   "required" : [
+      "SenderType"
+   ],
    "definitions" : {
       "SenderType" : {
          "$id" : "#SenderType",
@@ -24,13 +32,5 @@
             "Name"
          ]
       }
-   },
-   "properties" : {
-      "SenderType" : {
-         "$ref" : "#/definitions/SenderType"
-      }
-   },
-   "required" : [
-      "SenderType"
-   ]
+   }
 }

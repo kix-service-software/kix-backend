@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for config item image GET request.",
    "type" : "object",
+   "properties" : {
+      "Image" : {
+         "$ref" : "#/definitions/ConfigItemImage"
+      }
+   },
+   "required" : [
+      "Image"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -43,13 +51,5 @@
             "ID"
          ]
       }
-   },
-   "properties" : {
-      "Image" : {
-         "$ref" : "#/definitions/ConfigItemImage"
-      }
-   },
-   "required" : [
-      "Image"
-   ]
+   }
 }

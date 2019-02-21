@@ -3,6 +3,99 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item object.",
    "type" : "object",
+   "properties" : {
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Class" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ClassID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ConfigItemID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurDeplStateID" : {
+         "anyOf" : [
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
+      "CurInciStateID" : {
+         "anyOf" : [
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
+      "CurrentVersion" : {
+         "$ref" : "#/definitions/ConfigItemVersion"
+      },
+      "History" : {
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/ConfigItemHistory"
+         }
+      },
+      "Images" : {
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/ConfigItemImage"
+         }
+      },
+      "LastVersionID" : {
+         "anyOf" : [
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
+      "Versions" : {
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/ConfigItemVersion"
+         }
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "Class",
+      "ClassID",
+      "CreateBy",
+      "CreateTime",
+      "ConfigItemID"
+   ],
    "definitions" : {
       "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
@@ -211,98 +304,5 @@
             "ID"
          ]
       }
-   },
-   "properties" : {
-      "ChangeBy" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "ChangeTime" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Class" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "ClassID" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "ConfigItemID" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "CreateBy" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "CreateTime" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "CurDeplStateID" : {
-         "anyOf" : [
-            {
-               "type" : "integer"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "CurInciStateID" : {
-         "anyOf" : [
-            {
-               "type" : "integer"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "CurrentVersion" : {
-         "$ref" : "#/definitions/ConfigItemVersion"
-      },
-      "History" : {
-         "type" : "array",
-         "item" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
-         }
-      },
-      "Images" : {
-         "type" : "array",
-         "item" : {
-            "$ref" : "#/definitions/ConfigItemImage"
-         }
-      },
-      "LastVersionID" : {
-         "anyOf" : [
-            {
-               "type" : "integer"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "Versions" : {
-         "type" : "array",
-         "item" : {
-            "$ref" : "#/definitions/ConfigItemVersion"
-         }
-      }
-   },
-   "required" : [
-      "ChangeBy",
-      "ChangeTime",
-      "Class",
-      "ClassID",
-      "CreateBy",
-      "CreateTime",
-      "ConfigItemID"
-   ]
+   }
 }

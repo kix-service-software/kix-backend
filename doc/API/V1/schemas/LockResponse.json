@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for lock GET request.",
    "type" : "object",
+   "properties" : {
+      "Lock" : {
+         "$ref" : "#/definitions/Lock"
+      }
+   },
+   "required" : [
+      "Lock"
+   ],
    "definitions" : {
       "Lock" : {
          "$id" : "#Lock",
@@ -47,13 +55,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Lock" : {
-         "$ref" : "#/definitions/Lock"
-      }
-   },
-   "required" : [
-      "Lock"
-   ]
+   }
 }

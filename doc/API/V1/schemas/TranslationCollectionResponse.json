@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of translations.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Translation"
+         }
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "Translation" : {
          "$id" : "#Translation",
@@ -73,16 +84,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Translation"
-         }
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }

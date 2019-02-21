@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of users.",
    "type" : "object",
+   "properties" : {
+      "User" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/User"
+         }
+      }
+   },
+   "required" : [
+      "User"
+   ],
    "definitions" : {
       "User" : {
          "$id" : "#User",
@@ -89,16 +100,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "User" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/User"
-         }
-      }
-   },
-   "required" : [
-      "User"
-   ]
+   }
 }

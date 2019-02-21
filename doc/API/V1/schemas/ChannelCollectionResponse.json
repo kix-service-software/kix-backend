@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of channels.",
    "type" : "object",
+   "properties" : {
+      "Channel" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Channel"
+         }
+      }
+   },
+   "required" : [
+      "Channel"
+   ],
    "definitions" : {
       "Channel" : {
          "$id" : "#Channel",
@@ -51,16 +62,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Channel" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Channel"
-         }
-      }
-   },
-   "required" : [
-      "Channel"
-   ]
+   }
 }

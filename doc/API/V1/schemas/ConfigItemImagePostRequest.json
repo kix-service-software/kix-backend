@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item image request object for creation.",
    "type" : "object",
+   "properties" : {
+      "Image" : {
+         "$ref" : "#/definitions/ConfigItemImagePostItem"
+      }
+   },
+   "required" : [
+      "Image"
+   ],
    "definitions" : {
       "ConfigItemImagePostItem" : {
          "$id" : "#ConfigItemImagePostItem",
@@ -29,13 +37,5 @@
             "Filename"
          ]
       }
-   },
-   "properties" : {
-      "Image" : {
-         "$ref" : "#/definitions/ConfigItemImagePostItem"
-      }
-   },
-   "required" : [
-      "Image"
-   ]
+   }
 }

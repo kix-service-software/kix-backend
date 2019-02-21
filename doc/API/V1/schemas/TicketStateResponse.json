@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for ticket state GET request.",
    "type" : "object",
+   "properties" : {
+      "TicketState" : {
+         "$ref" : "#/definitions/TicketState"
+      }
+   },
+   "required" : [
+      "TicketState"
+   ],
    "definitions" : {
       "TicketState" : {
          "$id" : "#TicketState",
@@ -55,13 +63,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketState" : {
-         "$ref" : "#/definitions/TicketState"
-      }
-   },
-   "required" : [
-      "TicketState"
-   ]
+   }
 }

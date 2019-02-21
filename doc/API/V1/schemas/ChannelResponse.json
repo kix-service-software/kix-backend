@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for channel GET request.",
    "type" : "object",
+   "properties" : {
+      "Channel" : {
+         "$ref" : "#/definitions/Channel"
+      }
+   },
+   "required" : [
+      "Channel"
+   ],
    "definitions" : {
       "Channel" : {
          "$id" : "#Channel",
@@ -51,13 +59,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Channel" : {
-         "$ref" : "#/definitions/Channel"
-      }
-   },
-   "required" : [
-      "Channel"
-   ]
+   }
 }

@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item version request object for creation.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemVersion" : {
+         "$ref" : "#/definitions/ConfigItemVersionPostItem"
+      }
+   },
+   "required" : [
+      "ConfigItemVersion"
+   ],
    "definitions" : {
       "ConfigItemVersionPostItem" : {
          "$id" : "#ConfigItemVersionPostItem",
@@ -29,13 +37,5 @@
             "InciStateID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemVersion" : {
-         "$ref" : "#/definitions/ConfigItemVersionPostItem"
-      }
-   },
-   "required" : [
-      "ConfigItemVersion"
-   ]
+   }
 }

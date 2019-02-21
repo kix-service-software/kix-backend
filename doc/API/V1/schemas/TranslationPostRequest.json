@@ -3,6 +3,28 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The translation request object for creation.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "type" : "object",
+         "properties" : {
+            "Languages" : {
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TranslationLanguage"
+               }
+            },
+            "Pattern" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Pattern"
+         ]
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
@@ -29,27 +51,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "type" : "object",
-         "properties" : {
-            "Languages" : {
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/TranslationLanguage"
-               }
-            },
-            "Pattern" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "Pattern"
-         ]
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }

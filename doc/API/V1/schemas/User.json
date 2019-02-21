@@ -3,28 +3,6 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The user object.",
    "type" : "object",
-   "definitions" : {
-      "UserPreference" : {
-         "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The user preference object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "Value"
-         ]
-      }
-   },
    "properties" : {
       "ChangeBy" : {
          "type" : "integer",
@@ -83,5 +61,27 @@
       "UserFirstname",
       "UserLastname",
       "UserLogin"
-   ]
+   ],
+   "definitions" : {
+      "UserPreference" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      }
+   }
 }

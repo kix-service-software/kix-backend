@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of queues.",
    "type" : "object",
+   "properties" : {
+      "Queue" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Queue"
+         }
+      }
+   },
+   "required" : [
+      "Queue"
+   ],
    "definitions" : {
       "Queue" : {
          "$id" : "#Priority",
@@ -244,16 +255,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Queue" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Queue"
-         }
-      }
-   },
-   "required" : [
-      "Queue"
-   ]
+   }
 }

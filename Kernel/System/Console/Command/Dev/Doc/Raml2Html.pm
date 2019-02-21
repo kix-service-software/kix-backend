@@ -122,8 +122,15 @@ sub Run {
                 return $Self->ExitCodeError();
             }
 
-            $ValidatorObject->schema($$Content);
-            my $BundledSchema = $ValidatorObject->bundle( {ref_key => 'definitions'} );
+            my $BundledSchema;
+            my $EvalResult = eval {
+                $ValidatorObject->schema($$Content);
+                $BundledSchema = $ValidatorObject->bundle( {ref_key => 'definitions'} );
+            };
+
+            if ( !$EvalResult ) {
+                $Self->Print("<red>$@</red>");
+            }
 
             # store schema URI for validation
             my $DraftURI = $BundledSchema->{'$schema'};
@@ -136,7 +143,7 @@ sub Run {
                 Data => $BundledSchema,
             );
             my $i = 0;
-            foreach my $Attr ( qw(description type) ) {
+            foreach my $Attr ( qw(description type properties required) ) {
                 $i++;
                 $BundledSchema =~ s/"$Attr"/"$i$Attr"/g;
             }

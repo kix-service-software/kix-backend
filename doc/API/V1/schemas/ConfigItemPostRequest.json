@@ -3,6 +3,32 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item object for creation.",
    "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "object",
+         "properties" : {
+            "ClassID" : {
+               "type" : "integer"
+            },
+            "Images" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemImagePostItem"
+               }
+            },
+            "Version" : {
+               "$ref" : "#/definitions/ConfigItemVersionPostItem"
+            }
+         },
+         "required" : [
+            "ClassID",
+            "Version"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
    "definitions" : {
       "ConfigItemVersionPostItem" : {
          "$id" : "#ConfigItemVersionPostItem",
@@ -54,31 +80,5 @@
             "Filename"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItem" : {
-         "type" : "object",
-         "properties" : {
-            "ClassID" : {
-               "type" : "integer"
-            },
-            "Images" : {
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/ConfigItemImagePostItem"
-               }
-            },
-            "Version" : {
-               "$ref" : "#/definitions/ConfigItemVersionPostItem"
-            }
-         },
-         "required" : [
-            "ClassID",
-            "Version"
-         ]
-      }
-   },
-   "required" : [
-      "ConfigItem"
-   ]
+   }
 }

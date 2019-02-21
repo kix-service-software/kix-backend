@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for user GET request.",
    "type" : "object",
+   "properties" : {
+      "User" : {
+         "$ref" : "#/definitions/User"
+      }
+   },
+   "required" : [
+      "User"
+   ],
    "definitions" : {
       "User" : {
          "$id" : "#User",
@@ -89,13 +97,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "User" : {
-         "$ref" : "#/definitions/User"
-      }
-   },
-   "required" : [
-      "User"
-   ]
+   }
 }

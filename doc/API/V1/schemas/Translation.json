@@ -3,33 +3,6 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The translation object.",
    "type" : "object",
-   "definitions" : {
-      "TranslationLanguage" : {
-         "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "TranslationID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "TranslationID",
-            "Language",
-            "Value"
-         ]
-      }
-   },
    "properties" : {
       "ChangeBy" : {
          "type" : "integer",
@@ -67,5 +40,32 @@
       "CreateTime",
       "ID",
       "Pattern"
-   ]
+   ],
+   "definitions" : {
+      "TranslationLanguage" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TranslationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "TranslationID",
+            "Language",
+            "Value"
+         ]
+      }
+   }
 }

@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item versions.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemVersion" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemVersion"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemVersion"
+   ],
    "definitions" : {
       "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
@@ -109,16 +120,5 @@
             "VersionID"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemVersion" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemVersion"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemVersion"
-   ]
+   }
 }
