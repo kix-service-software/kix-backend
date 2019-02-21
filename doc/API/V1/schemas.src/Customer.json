@@ -22,6 +22,7 @@
     },
     "Contacts": {
       "type": "array",
+      "description": "added via include \"Contacts\"",
       "readOnly": true,
       "items": {
         "$ref": "Contact.json"
@@ -53,6 +54,7 @@
     },
     "Tickets": {
       "type": "array",
+      "description": "added via include \"Tickets\"",
       "readOnly": true,
       "items": {
         "$ref": "Ticket.json"

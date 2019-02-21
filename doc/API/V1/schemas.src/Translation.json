@@ -21,13 +21,17 @@
       "readOnly": true
     },
     "ID": {
-      "type": "integer"
+      "type": "integer",
+      "readOnly": true
     },
     "Pattern": {
-      "type": "string"
+      "type": "string",
+      "readOnly": true
     },
     "Languages": {
       "type": "array",
+      "description": "added via include \"Languages\"",
+      "readOnly": true,
       "item": {
         "$ref": "TranslationLanguage.json"
       }

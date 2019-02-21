@@ -18,6 +18,7 @@
     },    
     "ConfigItemStats": {
       "type": "object",
+      "description": "result of include \"ConfigItemStats\"",
       "properties": {
         "PostProductiveCount": {
           "type": "integer",
@@ -43,6 +44,7 @@
     },
     "CurrentDefinition": {
       "type": "object",
+      "description": "added via include \"CurrentDefinition\"",
       "$ref": "ConfigItemClassDefinition.json"
     },
     "ID": {
@@ -59,6 +61,7 @@
     },
     "Definitions": {
       "type": "array",
+      "description": "added via include \"Definitions\"",
       "item": {
         "$ref": "ConfigItemClassDefinition.json"
       }

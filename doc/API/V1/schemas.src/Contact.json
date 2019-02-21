@@ -85,6 +85,7 @@
     },
     "Tickets": {
       "type": "array",
+      "description": "added via include \"Tickets\"",
       "readOnly": true,
       "items": {
         "$ref": "Ticket.json"
