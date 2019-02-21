@@ -1,8 +1,16 @@
 {
    "$id" : "#TicketTypeResponse",
    "$schema" : "http://json-schema.org/schema",
-   "description" : "A response for client registration GET request.",
+   "description" : "A response for ticket type GET request.",
    "type" : "object",
+   "properties" : {
+      "TicketType" : {
+         "$ref" : "#/definitions/TicketType"
+      }
+   },
+   "required" : [
+      "TicketType"
+   ],
    "definitions" : {
       "TicketType" : {
          "$id" : "#TicketType",
@@ -35,10 +43,12 @@
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -51,13 +61,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketType" : {
-         "$ref" : "#/definitions/TicketType"
-      }
-   },
-   "required" : [
-      "TicketType"
-   ]
+   }
 }

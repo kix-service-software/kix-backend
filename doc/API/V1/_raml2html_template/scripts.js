@@ -33,8 +33,20 @@ $(document).ready(function() {
     $toggleElement.toggle();
   });
 
-  $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
-    hljs.highlightBlock(block);
+  //$('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
+  //  hljs.highlightBlock(block);
+  //});
+
+  $('.schemas code').each(function() {
+    if ($(this).html().startsWith('{')) {
+      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true });
+    }
+  });
+
+  $('.examples code').each(function() {
+    if ($(this).html().startsWith('{')) {
+      $(this).jsonHighlight(JSON.parse($(this).html()));
+    }
   });
 
   $('[data-toggle]').click(function() {

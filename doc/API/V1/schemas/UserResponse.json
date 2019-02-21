@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for user GET request.",
    "type" : "object",
+   "properties" : {
+      "User" : {
+         "$ref" : "#/definitions/User"
+      }
+   },
+   "required" : [
+      "User"
+   ],
    "definitions" : {
       "User" : {
          "$id" : "#User",
@@ -27,6 +35,7 @@
                "readOnly" : true
             },
             "Preferences" : {
+               "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/UserPreference"
@@ -36,26 +45,32 @@
                "type" : "string"
             },
             "UserFirstname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFullname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserID" : {
                "type" : "integer",
                "readOnly" : true
             },
             "UserLastname" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserLogin" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserTitle" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -89,13 +104,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "User" : {
-         "$ref" : "#/definitions/User"
-      }
-   },
-   "required" : [
-      "User"
-   ]
+   }
 }

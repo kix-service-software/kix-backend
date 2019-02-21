@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of translations.",
    "type" : "object",
+   "properties" : {
+      "Translation" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Translation"
+         }
+      }
+   },
+   "required" : [
+      "Translation"
+   ],
    "definitions" : {
       "Translation" : {
          "$id" : "#Translation",
@@ -27,16 +38,20 @@
                "readOnly" : true
             },
             "ID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             },
             "Languages" : {
+               "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/TranslationLanguage"
-               }
+               },
+               "readOnly" : true
             },
             "Pattern" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -73,16 +88,5 @@
             "Value"
          ]
       }
-   },
-   "properties" : {
-      "Translation" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Translation"
-         }
-      }
-   },
-   "required" : [
-      "Translation"
-   ]
+   }
 }

@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of client registrations.",
    "type" : "object",
+   "properties" : {
+      "ClientRegistration" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ClientRegistration"
+         }
+      }
+   },
+   "required" : [
+      "ClientRegistration"
+   ],
    "definitions" : {
       "ClientRegistration" : {
          "$id" : "#ClientRegistration",
@@ -28,16 +39,5 @@
             "CallbackURL"
          ]
       }
-   },
-   "properties" : {
-      "ClientRegistration" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ClientRegistration"
-         }
-      }
-   },
-   "required" : [
-      "ClientRegistration"
-   ]
+   }
 }

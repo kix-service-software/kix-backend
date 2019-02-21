@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of service.",
    "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Service"
+         }
+      }
+   },
+   "required" : [
+      "Service"
+   ],
    "definitions" : {
       "Service" : {
          "$id" : "#Service",
@@ -76,16 +87,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Priority" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Service"
-         }
-      }
-   },
-   "required" : [
-      "Service"
-   ]
+   }
 }

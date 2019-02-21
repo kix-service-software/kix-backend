@@ -1,0 +1,15 @@
+  displayName: Customers
+  description: !include ../descriptions/resources/customers.md
+  type: { collection: { typeName: Customer } }
+  /{customerId}:
+    type: { item: { typeName: Customer } }
+    uriParameters:
+      customerId:
+        displayName: CustomerID
+        type: string
+    /contacts:
+      description: !include ../descriptions/resources/customers/contacts.md
+      type: { collection-readonly: { typeName: Contact } }
+    /tickets:
+      description: !include ../descriptions/resources/customers/tickets.md
+      type: { collection-readonly: { typeName: Ticket } }

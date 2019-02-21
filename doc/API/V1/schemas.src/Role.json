@@ -29,10 +29,20 @@
       "readOnly": true
     },
     "Name": {
-      "type": "string"
+      "type": "string",
+      "readOnly": true
+    },
+    "UserIDs": {
+      "type": "array",
+      "description": "added via include \"UserIDs\"",
+      "readOnly": true,
+      "items": {
+        "type": "integer"
+      }
     },
     "ValidID": {
-      "type": "integer"
+      "type": "integer",
+      "readOnly": true
     }
   },
   "required": [

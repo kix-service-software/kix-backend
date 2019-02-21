@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for role GET request.",
    "type" : "object",
+   "properties" : {
+      "Role" : {
+         "$ref" : "#/definitions/Role"
+      }
+   },
+   "required" : [
+      "Role"
+   ],
    "definitions" : {
       "Role" : {
          "$id" : "#Role",
@@ -35,10 +43,20 @@
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -51,13 +69,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Role" : {
-         "$ref" : "#/definitions/Role"
-      }
-   },
-   "required" : [
-      "Role"
-   ]
+   }
 }

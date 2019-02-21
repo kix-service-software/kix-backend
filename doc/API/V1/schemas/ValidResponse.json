@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for valid GET request.",
    "type" : "object",
+   "properties" : {
+      "Valid" : {
+         "$ref" : "#/definitions/Valid"
+      }
+   },
+   "required" : [
+      "Valid"
+   ],
    "definitions" : {
       "Valid" : {
          "$id" : "#Valid",
@@ -20,13 +28,5 @@
             }
          }
       }
-   },
-   "properties" : {
-      "Valid" : {
-         "$ref" : "#/definitions/Valid"
-      }
-   },
-   "required" : [
-      "Valid"
-   ]
+   }
 }

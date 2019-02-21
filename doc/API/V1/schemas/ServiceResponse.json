@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for service GET request.",
    "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "$ref" : "#/definitions/Service"
+      }
+   },
+   "required" : [
+      "Service"
+   ],
    "definitions" : {
       "Service" : {
          "$id" : "#Service",
@@ -76,13 +84,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Priority" : {
-         "$ref" : "#/definitions/Service"
-      }
-   },
-   "required" : [
-      "Service"
-   ]
+   }
 }

@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of sender types.",
    "type" : "object",
+   "properties" : {
+      "SenderType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/SenderType"
+         }
+      }
+   },
+   "required" : [
+      "SenderType"
+   ],
    "definitions" : {
       "SenderType" : {
          "$id" : "#SenderType",
@@ -24,16 +35,5 @@
             "Name"
          ]
       }
-   },
-   "properties" : {
-      "SenderType" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/SenderType"
-         }
-      }
-   },
-   "required" : [
-      "SenderType"
-   ]
+   }
 }

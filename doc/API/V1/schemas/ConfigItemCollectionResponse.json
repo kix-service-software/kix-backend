@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item objects.",
    "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItem"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -166,12 +177,14 @@
                "$ref" : "#/definitions/ConfigItemVersion"
             },
             "History" : {
+               "description" : "added via include \"History\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemHistory"
                }
             },
             "Images" : {
+               "description" : "added via include \"Images\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemImage"
@@ -189,6 +202,7 @@
                "readOnly" : true
             },
             "Versions" : {
+               "description" : "added via include \"Versions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemVersion"
@@ -255,6 +269,13 @@
                "type" : "string",
                "readOnly" : true
             },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
+            },
             "DeplState" : {
                "type" : "string",
                "readOnly" : true
@@ -283,6 +304,10 @@
                "type" : "string",
                "readOnly" : true
             },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
             "VersionID" : {
                "type" : "integer",
                "readOnly" : true
@@ -309,17 +334,59 @@
             "Name",
             "VersionID"
          ]
+      },
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
       }
-   },
-   "properties" : {
-      "ConfigItem" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItem"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItem"
-   ]
+   }
 }

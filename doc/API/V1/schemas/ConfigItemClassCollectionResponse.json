@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item class objects.",
    "type" : "object",
+   "properties" : {
+      "ConfigItemClass" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemClass"
+         }
+      }
+   },
+   "required" : [
+      "ConfigItemClass"
+   ],
    "definitions" : {
       "ConfigItemClass" : {
          "$id" : "#ConfigItemClass",
@@ -23,6 +34,7 @@
                "readOnly" : true
             },
             "ConfigItemStats" : {
+               "description" : "result of include \"ConfigItemStats\"",
                "type" : "object",
                "properties" : {
                   "PostProductiveCount" : {
@@ -51,6 +63,7 @@
                "$ref" : "#/definitions/ConfigItemClassDefinition"
             },
             "Definitions" : {
+               "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
                   "$ref" : "#/definitions/ConfigItemClassDefinition"
@@ -132,16 +145,5 @@
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ConfigItemClass" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemClass"
-         }
-      }
-   },
-   "required" : [
-      "ConfigItemClass"
-   ]
+   }
 }

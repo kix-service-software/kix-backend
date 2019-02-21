@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of valid items.",
    "type" : "object",
+   "properties" : {
+      "Valid" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Valid"
+         }
+      }
+   },
+   "required" : [
+      "Valid"
+   ],
    "definitions" : {
       "Valid" : {
          "$id" : "#Valid",
@@ -20,16 +31,5 @@
             }
          }
       }
-   },
-   "properties" : {
-      "Valid" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Valid"
-         }
-      }
-   },
-   "required" : [
-      "Valid"
-   ]
+   }
 }

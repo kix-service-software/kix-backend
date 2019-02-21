@@ -127,6 +127,7 @@
     },
     "TicketStats": {
       "type": "object",
+      "description": "added via include \"TicketStats\"",
       "readOnly": true,
       "properties": {
         "EscalatedCount": {
@@ -145,6 +146,7 @@
     },
     "Tickets": {
       "type": "array",
+      "description": "added via include \"Tickets\"",
       "readOnly": true
     },
     "UnlockTimeout": {

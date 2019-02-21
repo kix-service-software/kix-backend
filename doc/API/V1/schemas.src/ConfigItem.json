@@ -48,8 +48,9 @@
     },    
     "CurrentVersion": {
       "type": "object",
-      "$ref": "ConfigItemVersion.json",
-      "readOnly": true
+      "description": "added via include \"CurrentVersion\"",
+      "readOnly": true,
+      "$ref": "ConfigItemVersion.json"
     },    
     "LastVersionID": {
       "anyOf": [
@@ -60,18 +61,21 @@
     },
     "History": {
       "type": "array",
+      "description": "added via include \"History\"",
       "item": {
         "$ref": "ConfigItemHistory.json"
       }
     },
     "Images": {
       "type": "array",
+      "description": "added via include \"Images\"",
       "item": {
         "$ref": "ConfigItemImage.json"
       }
     },
     "Versions": {
       "type": "array",
+      "description": "added via include \"Versions\"",
       "item": {
         "$ref": "ConfigItemVersion.json"
       }

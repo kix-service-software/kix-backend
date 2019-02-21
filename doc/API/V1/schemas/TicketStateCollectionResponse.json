@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of ticket states.",
    "type" : "object",
+   "properties" : {
+      "TicketState" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TicketState"
+         }
+      }
+   },
+   "required" : [
+      "TicketState"
+   ],
    "definitions" : {
       "TicketState" : {
          "$id" : "#TicketState",
@@ -55,16 +66,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "TicketState" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TicketState"
-         }
-      }
-   },
-   "required" : [
-      "TicketState"
-   ]
+   }
 }

@@ -29,10 +29,12 @@
          "readOnly" : true
       },
       "Name" : {
-         "type" : "string"
+         "type" : "string",
+         "readOnly" : true
       },
       "ValidID" : {
-         "type" : "integer"
+         "type" : "integer",
+         "readOnly" : true
       }
    },
    "required" : [

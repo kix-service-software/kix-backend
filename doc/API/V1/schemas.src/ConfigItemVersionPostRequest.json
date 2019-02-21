@@ -5,26 +5,7 @@
   "description": "The config item version request object for creation.",
   "properties": {
     "ConfigItemVersion": {
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string"
-        },
-        "DeplStateID": {
-          "type": "integer"
-        },
-        "InciStateID": {
-          "type": "integer"
-        },
-        "Data": {
-          "type": "object"
-        }
-      },
-      "required": [
-        "Name",
-        "DeplStateID",
-        "InciStateID"
-      ]
+      "$ref": "ConfigItemVersionPostItem.json"
     }
   },
   "required": [

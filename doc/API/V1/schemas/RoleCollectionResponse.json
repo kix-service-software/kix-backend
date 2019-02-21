@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of roles.",
    "type" : "object",
+   "properties" : {
+      "Role" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Role"
+         }
+      }
+   },
+   "required" : [
+      "Role"
+   ],
    "definitions" : {
       "Role" : {
          "$id" : "#Role",
@@ -35,10 +46,20 @@
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
             },
             "ValidID" : {
-               "type" : "integer"
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -51,16 +72,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Role" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Role"
-         }
-      }
-   },
-   "required" : [
-      "Role"
-   ]
+   }
 }

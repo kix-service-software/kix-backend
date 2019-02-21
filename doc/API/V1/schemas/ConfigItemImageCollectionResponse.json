@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of config item images.",
    "type" : "object",
+   "properties" : {
+      "Image" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ConfigItemImage"
+         }
+      }
+   },
+   "required" : [
+      "Image"
+   ],
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
@@ -43,16 +54,5 @@
             "ID"
          ]
       }
-   },
-   "properties" : {
-      "Image" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemImage"
-         }
-      }
-   },
-   "required" : [
-      "Image"
-   ]
+   }
 }

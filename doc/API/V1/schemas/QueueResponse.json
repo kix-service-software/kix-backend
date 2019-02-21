@@ -3,6 +3,14 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for queue GET request.",
    "type" : "object",
+   "properties" : {
+      "Queue" : {
+         "$ref" : "#/definitions/Queue"
+      }
+   },
+   "required" : [
+      "Queue"
+   ],
    "definitions" : {
       "Queue" : {
          "$id" : "#Priority",
@@ -172,6 +180,7 @@
                "type" : "integer"
             },
             "TicketStats" : {
+               "description" : "added via include \"TicketStats\"",
                "type" : "object",
                "properties" : {
                   "EscalatedCount" : {
@@ -190,6 +199,7 @@
                "readOnly" : true
             },
             "Tickets" : {
+               "description" : "added via include \"Tickets\"",
                "type" : "array",
                "readOnly" : true
             },
@@ -244,13 +254,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Queue" : {
-         "$ref" : "#/definitions/Queue"
-      }
-   },
-   "required" : [
-      "Queue"
-   ]
+   }
 }

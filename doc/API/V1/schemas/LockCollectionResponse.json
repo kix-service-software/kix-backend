@@ -3,6 +3,17 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of ticket locks.",
    "type" : "object",
+   "properties" : {
+      "Lock" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Lock"
+         }
+      }
+   },
+   "required" : [
+      "Lock"
+   ],
    "definitions" : {
       "Lock" : {
          "$id" : "#Lock",
@@ -47,16 +58,5 @@
             "ValidID"
          ]
       }
-   },
-   "properties" : {
-      "Lock" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Lock"
-         }
-      }
-   },
-   "required" : [
-      "Lock"
-   ]
+   }
 }

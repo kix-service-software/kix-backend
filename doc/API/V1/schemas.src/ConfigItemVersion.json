@@ -48,6 +48,15 @@
       "type": "string",
       "readOnly": true
     },
+    "Data": {
+      "type": "object",
+      "description": "added via include \"Data\""
+    },
+    "Definition": {
+      "type": "object",
+      "description": "added via include \"Definition\"",
+      "$ref": "ConfigItemClassDefinition.json"
+    },
     "DeplState": {
       "type": "string",
       "readOnly": true
@@ -75,6 +84,10 @@
     "Name": {
       "type": "string",
       "readOnly": true
+    },
+    "PreparedData": {
+      "type": "object",
+      "description": "added via include \"PreparedData\""
     },
     "VersionID": {
       "type": "integer",

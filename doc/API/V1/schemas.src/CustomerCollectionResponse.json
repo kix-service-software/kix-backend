@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#CustomerCollectionResponse",
+  "type": "object",
+  "description": "A list of customers.",
+  "properties": {
+    "Customer": {
+      "type": "array",
+      "items": {
+        "$ref": "Customer.json"
+      }
+    }
+  },
+  "required": [
+    "Customer"
+  ]
+}

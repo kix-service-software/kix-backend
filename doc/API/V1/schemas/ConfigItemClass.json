@@ -3,6 +3,77 @@
    "$schema" : "http://json-schema.org/schema",
    "description" : "The config item class object.",
    "type" : "object",
+   "properties" : {
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Comment" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ConfigItemStats" : {
+         "description" : "result of include \"ConfigItemStats\"",
+         "type" : "object",
+         "properties" : {
+            "PostProductiveCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ProductiveCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "PostProductiveCount",
+            "ProductiveCount"
+         ]
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CurrentDefinition" : {
+         "$ref" : "#/definitions/ConfigItemClassDefinition"
+      },
+      "Definitions" : {
+         "description" : "added via include \"Definitions\"",
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/ConfigItemClassDefinition"
+         }
+      },
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ValidID" : {
+         "type" : "integer",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Name",
+      "ValidID"
+   ],
    "definitions" : {
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
@@ -57,74 +128,5 @@
             "Version"
          ]
       }
-   },
-   "properties" : {
-      "ChangeBy" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "ChangeTime" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Comment" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "ConfigItemStats" : {
-         "type" : "object",
-         "properties" : {
-            "PostProductiveCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ProductiveCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "PostProductiveCount",
-            "ProductiveCount"
-         ]
-      },
-      "CreateBy" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "CreateTime" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "CurrentDefinition" : {
-         "$ref" : "#/definitions/ConfigItemClassDefinition"
-      },
-      "Definitions" : {
-         "type" : "array",
-         "item" : {
-            "$ref" : "#/definitions/ConfigItemClassDefinition"
-         }
-      },
-      "ID" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "Name" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "ValidID" : {
-         "type" : "integer",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "ChangeBy",
-      "ChangeTime",
-      "CreateBy",
-      "CreateTime",
-      "ID",
-      "Name",
-      "ValidID"
-   ]
+   }
 }
