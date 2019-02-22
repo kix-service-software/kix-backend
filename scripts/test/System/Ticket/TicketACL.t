@@ -87,8 +87,6 @@ my $QueueID   = $QueueObject->QueueAdd(
     ValidID         => $ValidList{'valid'},
     GroupID         => 1,
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Some comment',
     UserID          => 1,
 );
@@ -105,8 +103,6 @@ my $NewQueueID   = $QueueObject->QueueAdd(
     ValidID         => $ValidList{'valid'},
     GroupID         => 1,
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Some comment',
     UserID          => 1,
 );

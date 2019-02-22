@@ -108,8 +108,7 @@ for my $Test (@Tests) {
         GroupID         => 1,
         SystemAddressID => 1,
         FollowUpID      => $Test->{FollowUpID},
-        SalutationID    => 1,
-        SignatureID     => 1,
+        Signature       => '',
         Comment         => 'UnitTest queue',
         UserID          => 1,
     );

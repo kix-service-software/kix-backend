@@ -120,8 +120,7 @@ perform QueueCreate Operation. This will return the created QueueID.
 		        FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
 		        DefaultSignKey      => '...',     # (optional)
 		        SystemAddressID     => '...',
-		        SalutationID        => '...',
-		        SignatureID         => '...', 		               	        	
+		        Signature           => '...', 		               	        	
 	    	},
 	    },
     );
@@ -188,8 +187,7 @@ sub Run {
         FollowUpLock        => $Queue->{FollowUpLock} || '',
         DefaultSignKey      => $Queue->{DefaultSignKey} || '',
         SystemAddressID     => $Queue->{SystemAddressID} || 1,
-        SalutationID        => $Queue->{SalutationID} || 1,
-        SignatureID         => $Queue->{SignatureID} || 1, 
+        Signature           => $Queue->{Signature} || '', 
         UserID              => $Self->{Authorization}->{UserID},
     );
 

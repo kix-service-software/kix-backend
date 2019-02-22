@@ -46,8 +46,6 @@ my %QueueData1 = (
     ValidID         => 1,
     GroupID         => 1,
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Some comment',
     UserID          => 1,
 );
@@ -57,8 +55,6 @@ my %QueueData2 = (
     ValidID         => 1,
     GroupID         => 1,
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Some comment',
     UserID          => 1,
 );
@@ -68,8 +64,6 @@ my %QueueData3 = (
     ValidID         => 1,
     GroupID         => 1,
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Some comment',
     UserID          => 1,
 );

@@ -78,8 +78,7 @@ my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
     ValidID         => 1,
     GroupID         => 1,
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
+    Signature       => '',
     Comment         => 'Some comment',
     UserID          => 1,
 );

@@ -124,7 +124,6 @@ one or more ticket entries in one call.
                     "ChangeTime": "...",
                     "Email": "...",
                     "Calendar": "",
-                    "SalutationID": ...,
                     "CreateTime": "...",
                     "ValidID": ...,
                     "QueueID": ...,
@@ -140,7 +139,7 @@ one or more ticket entries in one call.
                     "Name": "...",
                     "SolutionNotify": ...,
                     "RealName": "...",
-                    "SignatureID": ...,
+                    "Signature": "...",
                     "UpdateTime": ...,
                     "FirstResponseTime": ... 
                     # If Include=TicketStats was passed, you'll get an entry like this:

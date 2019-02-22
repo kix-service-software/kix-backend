@@ -406,8 +406,6 @@ sub QueueCreate {
             UpdateTime        => 0,
             SolutionTime      => 0,
             SystemAddressID   => 1,
-            SalutationID      => 1,
-            SignatureID       => 1,
             UserID            => 1,
             MoveNotify        => 0,
             StateNotify       => 0,

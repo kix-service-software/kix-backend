@@ -143,16 +143,6 @@
 /customers/:CustomerID                                                  |   PATCH           | V1::Customer::CustomerUpdate
 /customers/:CustomerID/contacts                                         |   GET             | V1::Customer::CustomerContactSearch
 /customers/:CustomerID/tickets                                          |   GET             | V1::Customer::CustomerTicketSearch
-/salutations                                                            |   GET             | V1::Salutation::SalutationSearch
-/salutations                                                            |   POST            | V1::Salutation::SalutationCreate
-/salutations/:SalutationID                                              |   GET             | V1::Salutation::SalutationGet
-/salutations/:SalutationID                                              |   PATCH           | V1::Salutation::SalutationUpdate
-/salutations/:SalutationID                                              |   DELETE          | V1::Salutation::SalutationDelete
-/signatures                                                             |   GET             | V1::Signature::SignatureSearch
-/signatures                                                             |   POST            | V1::Signature::SignatureCreate
-/signatures/:SignatureID                                                |   GET             | V1::Signature::SignatureGet
-/signatures/:SignatureID                                                |   PATCH           | V1::Signature::SignatureUpdate
-/signatures/:SignatureID                                                |   DELETE          | V1::Signature::SignatureDelete
 /links/types                                                            |   GET             | V1::Link::LinkTypeSearch
 /links                                                                  |   GET             | V1::Link::LinkSearch
 /links                                                                  |   POST            | V1::Link::LinkCreate

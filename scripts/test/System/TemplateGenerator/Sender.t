@@ -72,8 +72,6 @@ my $QueueID   = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
     SolutionTime        => 2440,
     SolutionNotify      => 90,
     SystemAddressID     => $SystemAddressID,
-    SalutationID        => 1,
-    SignatureID         => 1,
     UserID              => 1,
     Comment             => 'Some Comment',
 );

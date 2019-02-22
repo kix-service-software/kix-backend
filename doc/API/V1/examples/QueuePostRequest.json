@@ -8,8 +8,6 @@
         "Name": "Postmaster",
         "ParentID": 1,
         "RealName": "KIX System",
-        "SalutationID": 1,
-        "SignatureID": 1,
         "SystemAddressID": 1,
         "UnlockTimeout": 0,
         "ValidID": 1

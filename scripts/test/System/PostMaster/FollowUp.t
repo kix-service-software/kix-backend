@@ -45,8 +45,6 @@ my $QueueID = $QueueObject->QueueAdd(
     UnlockTimeout   => 480,
     FollowUpID      => 3,                # create new ticket
     SystemAddressID => 1,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Some comment',
     UserID          => 1,
 );
@@ -206,8 +204,6 @@ for my $Test (@Tests) {
         UnlockTimeout   => 480,
         FollowUpID      => $Test->{QueueFollowUpID},
         SystemAddressID => 1,
-        SalutationID    => 1,
-        SignatureID     => 1,
         Comment         => 'Some comment',
         UserID          => 1,
         CheckSysConfig  => 0,

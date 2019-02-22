@@ -121,8 +121,7 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
                 DefaultSignKey      => '...',     # (optional)
                 SystemAddressID     => '...',
-                SalutationID        => '...',
-                SignatureID         => '...',                                     
+                Signature           => '...',                                     
             },
 	    },
 	);
@@ -204,8 +203,7 @@ sub Run {
         FollowUpLock        => $Queue->{FollowUpLock} || $QueueData{FollowUpLock},
         DefaultSignKey      => $Queue->{DefaultSignKey} || $QueueData{DefaultSignKey},
         SystemAddressID     => $Queue->{SystemAddressID} || $QueueData{SystemAddressID},
-        SalutationID        => $Queue->{SalutationID} || $QueueData{SalutationID},
-        SignatureID         => $Queue->{SignatureID} || $QueueData{SignatureID},            
+        Signature           => $Queue->{Signature} || $QueueData{Signature},            
         Comment             => $Queue->{Comment} || $QueueData{Comment},
         ValidID             => $Queue->{ValidID}  || $QueueData{ValidID},
         UserID              => $Self->{Authorization}->{UserID},

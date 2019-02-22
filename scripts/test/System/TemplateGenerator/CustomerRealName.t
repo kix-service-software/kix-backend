@@ -61,8 +61,6 @@ my $QueueID       = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
     ValidID         => 1,
     GroupID         => 1,
     SystemAddressID => $SystemAddressID,
-    SalutationID    => 1,
-    SignatureID     => 1,
     Comment         => 'Unit test queue',
     UserID          => 1,
 );
