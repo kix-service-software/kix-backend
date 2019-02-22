@@ -286,55 +286,6 @@
     </ForeignKey>
 </Table>
 
-<!-- salutation - all salutations -->
-<Table Name="salutation">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="text" Required="true" Size="3000" Type="VARCHAR"/>
-    <Column Name="content_type" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="salutation_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- signature - all signatures -->
-<Table Name="signature">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="text" Required="true" Size="3000" Type="VARCHAR"/>
-    <Column Name="content_type" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="signature_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-
 <!-- system_address - all email addresses of the system -->
 <Table Name="system_address">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
@@ -417,8 +368,7 @@
     <Column Name="system_address_id" Required="true" Type="SMALLINT"/>
     <Column Name="calendar_name" Required="false" Size="100" Type="VARCHAR"/>
     <Column Name="default_sign_key" Required="false" Size="100" Type="VARCHAR"/>
-    <Column Name="salutation_id" Required="true" Type="SMALLINT"/>
-    <Column Name="signature_id" Required="true" Type="SMALLINT"/>
+    <Column Name="signature" Required="false"  Size="10000" Type="VARCHAR"/>
     <Column Name="follow_up_id" Required="true" Type="SMALLINT"/>
     <Column Name="follow_up_lock" Required="true" Type="SMALLINT"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
@@ -438,12 +388,6 @@
     </ForeignKey>
     <ForeignKey ForeignTable="system_address">
         <Reference Local="system_address_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="salutation">
-        <Reference Local="salutation_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="signature">
-        <Reference Local="signature_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="groups">
         <Reference Local="group_id" Foreign="id"/>

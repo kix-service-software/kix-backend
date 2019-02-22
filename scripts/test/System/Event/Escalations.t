@@ -146,8 +146,6 @@ for my $Hours ( sort keys %WorkingHours ) {
             SolutionTime        => -40,
             SolutionNotify      => 80,
             SystemAddressID     => 1,
-            SalutationID        => 1,
-            SignatureID         => 1,
             UserID              => 1,
             Comment             => "Queue for OTRSEscalationEvents.t for test run at $StartingTimeStamp",
         );

@@ -176,8 +176,6 @@ for my $QueueProperty (@QueueProperties) {
         %{$QueueProperty},
         ValidID         => 1,
         SystemAddressID => 1,
-        SalutationID    => 1,
-        SignatureID     => 1,
         Comment         => 'Some comment',
         UserID          => 1,
     );

@@ -128,26 +128,8 @@
                "type" : "string",
                "readOnly" : true
             },
-            "SalutationID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "SignatureID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+            "Signature" : {
+               "type" : "string",
                "readOnly" : true
             },
             "SolutionNotify" : {

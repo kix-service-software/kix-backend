@@ -85,8 +85,7 @@ sub new {
         SolutionTime        => 0,
         SolutionNotify      => 0,
         SystemAddressID     => 1,
-        SalutationID        => 1,
-        SignatureID         => 1,
+        Signature           => '',
         FollowUpID          => 1,
         FollowUpLock        => 0,
     };
@@ -812,8 +811,7 @@ add queue with attributes
         FollowUpLock        => 0,           # yes (1) or no (0) (optional, default 0)
         DefaultSignKey      => 'key name',  # (optional)
         SystemAddressID     => 1,
-        SalutationID        => 1,
-        SignatureID         => 1,
+        Signature           => '',
         Comment             => 'Some comment',
         UserID              => 123,
     );
@@ -827,8 +825,7 @@ sub QueueAdd {
     if ( !$Param{NoDefaultValues} ) {
         for (
             qw(UnlockTimeout FirstResponseTime FirstResponseNotify UpdateTime UpdateNotify SolutionTime SolutionNotify
-            FollowUpLock SystemAddressID SalutationID SignatureID
-            FollowUpID FollowUpLock DefaultSignKey Calendar)
+            FollowUpLock SystemAddressID Signature FollowUpID FollowUpLock DefaultSignKey Calendar)
             )
         {
 
@@ -839,7 +836,7 @@ sub QueueAdd {
         }
     }
 
-    for (qw(Name GroupID SystemAddressID SalutationID SignatureID ValidID UserID FollowUpID)) {
+    for (qw(Name GroupID SystemAddressID ValidID UserID FollowUpID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -877,16 +874,16 @@ sub QueueAdd {
 
     return if !$DBObject->Do(
         SQL => 'INSERT INTO queue (name, group_id, unlock_timeout, system_address_id, '
-            . ' calendar_name, default_sign_key, salutation_id, signature_id, '
+            . ' calendar_name, default_sign_key, signature, '
             . ' first_response_time, first_response_notify, update_time, '
             . ' update_notify, solution_time, solution_notify, follow_up_id, '
             . ' follow_up_lock, valid_id, comments, create_time, create_by, '
             . ' change_time, change_by) VALUES '
-            . ' (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
+            . ' (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
             . ' ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Name},     \$Param{GroupID},        \$Param{UnlockTimeout}, \$Param{SystemAddressID},
-            \$Param{Calendar}, \$Param{DefaultSignKey}, \$Param{SalutationID},  \$Param{SignatureID},
+            \$Param{Calendar}, \$Param{DefaultSignKey}, \$Param{Signature},
             \$Param{FirstResponseTime}, \$Param{FirstResponseNotify}, \$Param{UpdateTime},
             \$Param{UpdateNotify},      \$Param{SolutionTime},        \$Param{SolutionNotify},
             \$Param{FollowUpID},        \$Param{FollowUpLock},        \$Param{ValidID},
@@ -1027,7 +1024,7 @@ sub QueueGet {
     # sql
     my @Bind;
     my $SQL = 'SELECT q.name, q.group_id, q.unlock_timeout, '
-        . 'q.system_address_id, q.salutation_id, q.signature_id, q.comments, q.valid_id, '
+        . 'q.system_address_id, q.signature, q.comments, q.valid_id, '
         . 'q.first_response_time, q.first_response_notify, '
         . 'q.update_time, q.update_notify, q.solution_time, q.solution_notify, '
         . 'q.follow_up_id, q.follow_up_lock, sa.value0, sa.value1, q.id, '
@@ -1056,31 +1053,30 @@ sub QueueGet {
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
         %Data = (
-            QueueID             => $Data[18],
+            QueueID             => $Data[17],
             Name                => $Data[0],
             GroupID             => $Data[1],
             UnlockTimeout       => $Data[2],
-            FirstResponseTime   => $Data[8],
-            FirstResponseNotify => $Data[9],
-            UpdateTime          => $Data[10],
-            UpdateNotify        => $Data[11],
-            SolutionTime        => $Data[12],
-            SolutionNotify      => $Data[13],
-            FollowUpID          => $Data[14],
-            FollowUpLock        => $Data[15],
+            FirstResponseTime   => $Data[7],
+            FirstResponseNotify => $Data[8],
+            UpdateTime          => $Data[9],
+            UpdateNotify        => $Data[10],
+            SolutionTime        => $Data[11],
+            SolutionNotify      => $Data[12],
+            FollowUpID          => $Data[13],
+            FollowUpLock        => $Data[14],
             SystemAddressID     => $Data[3],
-            SalutationID        => $Data[4],
-            SignatureID         => $Data[5],
-            Comment             => $Data[6],
-            ValidID             => $Data[7],
-            Email               => $Data[16],
-            RealName            => $Data[17],
-            DefaultSignKey      => $Data[19],
-            Calendar            => $Data[20] || '',
-            CreateBy            => $Data[21],
-            CreateTime          => $Data[22],
-            ChangeBy            => $Data[23],
-            ChangeTime          => $Data[24],
+            Signature           => $Data[4],
+            Comment             => $Data[5],
+            ValidID             => $Data[6],
+            Email               => $Data[15],
+            RealName            => $Data[16],
+            DefaultSignKey      => $Data[18],
+            Calendar            => $Data[19] || '',
+            CreateBy            => $Data[20],
+            CreateTime          => $Data[21],
+            ChangeBy            => $Data[22],
+            ChangeTime          => $Data[23],
         );
     }
 
@@ -1129,8 +1125,7 @@ update queue attributes
         SolutionTime        => 580, # (optional)
         SolutionNotify      => 80,  # (optional, notify agent if solution escalation is 80% reached)
         SystemAddressID     => 1,
-        SalutationID        => 1,
-        SignatureID         => 1,
+        Signature           => '',
         UserID              => 123,
         FollowUpID          => 1,
         Comment             => 'Some Comment2',
@@ -1148,7 +1143,7 @@ sub QueueUpdate {
 
     # check needed stuff
     for (
-        qw(QueueID Name ValidID GroupID SystemAddressID SalutationID SignatureID UserID FollowUpID)
+        qw(QueueID Name ValidID GroupID SystemAddressID UserID FollowUpID)
         )
     {
         if ( !$Param{$_} ) {
@@ -1244,7 +1239,7 @@ sub QueueUpdate {
             SET name = ?, comments = ?, group_id = ?, unlock_timeout = ?, first_response_time = ?,
                 first_response_notify = ?, update_time = ?, update_notify = ?, solution_time = ?,
                 solution_notify = ?, follow_up_id = ?, follow_up_lock = ?, system_address_id = ?,
-                calendar_name = ?, default_sign_key = ?, salutation_id = ?, signature_id = ?,
+                calendar_name = ?, default_sign_key = ?, signature = ?,
                 valid_id = ?, change_time = current_timestamp, change_by = ?
             WHERE id = ?',
         Bind => [
@@ -1252,9 +1247,8 @@ sub QueueUpdate {
             \$Param{FirstResponseTime}, \$Param{FirstResponseNotify}, \$Param{UpdateTime},
             \$Param{UpdateNotify},      \$Param{SolutionTime},        \$Param{SolutionNotify},
             \$Param{FollowUpID},        \$Param{FollowUpLock},        \$Param{SystemAddressID},
-            \$Param{Calendar},          \$Param{DefaultSignKey},      \$Param{SalutationID},
-            \$Param{SignatureID},       \$Param{ValidID},             \$Param{UserID},
-            \$Param{QueueID},
+            \$Param{Calendar},          \$Param{DefaultSignKey},      \$Param{Signature},
+            \$Param{ValidID},           \$Param{UserID},              \$Param{QueueID},
         ],
     );
 

@@ -37,11 +37,8 @@
             "ParentID" : {
                "type" : "integer"
             },
-            "SalutationID" : {
-               "type" : "integer"
-            },
-            "SignatureID" : {
-               "type" : "integer"
+            "Signature" : {
+               "type" : "string"
             },
             "SolutionNotify" : {
                "type" : "integer"

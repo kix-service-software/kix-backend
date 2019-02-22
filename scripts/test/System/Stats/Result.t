@@ -62,8 +62,6 @@ for my $Count ( 1 .. 3 ) {
         ValidID         => 1,
         GroupID         => 1,
         SystemAddressID => 1,
-        SalutationID    => 1,
-        SignatureID     => 1,
         Comment         => 'Some comment',
         UserID          => 1,
     );
