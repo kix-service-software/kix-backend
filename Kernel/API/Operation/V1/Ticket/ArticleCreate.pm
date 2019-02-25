@@ -400,9 +400,14 @@ sub _ArticleCreate {
     );
 
     if ( !$ArticleID ) {
+        my $Error = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
+
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create article, please contact the system administrator',
+            Message => $Error,
         );
     }
 

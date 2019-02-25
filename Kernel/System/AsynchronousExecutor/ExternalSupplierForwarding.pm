@@ -350,7 +350,7 @@ sub Run {
         . "] from "
         . $Self->{ConfigObject}->{Organization};
 
-    my $SentArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSend(
+    my $SentArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
         TicketID       => $Ticket{TicketID},
         Channel        => $Self->{ConfigObject}->Get('ExternalSupplierForwarding::Channel') || 'email',
         CustomerVisible => $Self->{ConfigObject}->Get('ExternalSupplierForwarding::VisibleForCustomer') || 0,

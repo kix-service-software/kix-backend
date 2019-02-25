@@ -438,7 +438,7 @@ sub ProviderGenerateResponse {
             );            
         }
         else {
-            ($MappedCode, $MappedMessage) = split(/:/, $Result);
+            ($MappedCode, $MappedMessage) = split(/:/, $Result, 2);
             if ( !$MappedMessage ) {
                 $MappedMessage = $Param{Message};
             }

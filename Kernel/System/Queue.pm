@@ -178,45 +178,6 @@ sub GetSystemAddress {
     return %Address;
 }
 
-=item GetSignature()
-
-get a queue signature
-
-    my $Signature = $QueueObject->GetSignature(QueueID => 123);
-
-=cut
-
-sub GetSignature {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID!',
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT text FROM signature si, queue sq '
-            . ' WHERE sq.id = ? AND sq.signature_id = si.id',
-        Bind  => [ \$Param{QueueID} ],
-        Limit => 1,
-    );
-
-    # fetch the result
-    my $String = '';
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $String = $Row[0];
-    }
-
-    return $String;
-}
-
 =item QueueStandardTemplateMemberAdd()
 
 to add a template to a queue
