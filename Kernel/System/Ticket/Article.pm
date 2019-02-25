@@ -60,6 +60,7 @@ create an article
         HistoryComment   => 'Some free text!',
         TimeUnits        => 123,                                    # optional
         UserID           => 123,
+        Loop             => 0,                                      # 1|0 used for bulk emails
         Attachment => [
             {
                 Content     => $Content,
@@ -72,6 +73,20 @@ create an article
                 Filename    => 'lala1.txt',
             },
         ],
+        Sign => {
+            Type    => 'PGP',
+            SubType => 'Inline|Detached',
+            Key     => '81877F5E',
+            Type    => 'SMIME',
+            Key     => '3b630c80',
+        },
+        Crypt => {
+            Type    => 'PGP',
+            SubType => 'Inline|Detached',
+            Key     => '81877F5E',
+            Type    => 'SMIME',
+            Key     => '3b630c80',
+        },
         NoAgentNotify    => 0,                                      # if you don't want to send agent notifications
         AutoResponseType => 'auto reply'                            # auto reject|auto follow up|auto reply/new ticket|auto remove
 
@@ -133,6 +148,9 @@ sub ArticleCreate {
     # lookups if no ids are passed
     if ( $Param{Channel} && !$Param{ChannelID} ) {
         $Param{ChannelID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $Param{Channel} );
+    }
+    elsif ( !$Param{Channel} && $Param{ChannelID} ) {
+        $Param{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $Param{ChannelID} );
     }
     if ( $Param{SenderType} && !$Param{SenderTypeID} ) {
         $Param{SenderTypeID} = $Self->ArticleSenderTypeLookup( SenderType => $Param{SenderType} );
@@ -249,6 +267,66 @@ sub ArticleCreate {
     # fix some bad stuff from some browsers (Opera)!
     else {
         $Param{Body} =~ s/(\n\r|\r\r\n|\r\n)/\n/g;
+    }
+
+    # handle some special things for channel "email"
+    if ( $Param{Channel} eq 'email' ) {
+        # check needed stuff
+        for (qw(TicketID UserID From Body Charset MimeType)) {
+            if ( !$Param{$_} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+                return;
+            }
+        }
+
+        $Param{ToOrig}      = $Param{To}          || '';
+        $Param{Loop}        = $Param{Loop}        || 0;
+        $Param{HistoryType} = $Param{HistoryType} || 'SendAnswer';
+
+        if ( !$Param{Channel} && !$Param{ChannelID} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Channel or ChannelID!',
+            );
+            return;
+        }
+        if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => 'Need SenderType or SenderTypeID!',
+            );
+            return;
+        }
+
+        # map ReplyTo into Reply-To if present
+        if ( $Param{ReplyTo} ) {
+            $Param{'Reply-To'} = $Param{ReplyTo};
+        }
+
+        # clean up
+        $Param{Body} =~ s/(\r\n|\n\r)/\n/g;
+        $Param{Body} =~ s/\r/\n/g;
+
+        # initialize parameter for attachments, so that the content pushed into that ref from
+        # EmbeddedImagesExtract will stay available
+        if ( !$Param{Attachment} ) {
+            $Param{Attachment} = [];
+        }
+
+        # check for base64 images in body and process them
+        $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
+            DocumentRef    => \$Param{Body},
+            AttachmentsRef => $Param{Attachment},
+        );
+
+        # create MessageID
+        my $Time      = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+        my $Random    = rand 999999;
+        my $FQDN      = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+        $Param{MessageID} = "<$Time.$Random\@$FQDN>";
     }
 
     # strip not wanted stuff
@@ -392,7 +470,6 @@ sub ArticleCreate {
         );
     }
     
-
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # add history row
@@ -498,99 +575,153 @@ sub ArticleCreate {
         );
     }
 
-    # send no agent notification!?
-    return $ArticleID if $Param{NoAgentNotify};
+    if ( !$Param{NoAgentNotify} ) {
 
-    my %Ticket = $Self->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 0,
-    );
+        my %Ticket = $Self->TicketGet(
+            TicketID      => $Param{TicketID},
+            DynamicFields => 0,
+        );
 
-    # remember agent to exclude notifications
-    my @SkipRecipients;
-    if ( $Param{ExcludeNotificationToUserID} && ref $Param{ExcludeNotificationToUserID} eq 'ARRAY' )
-    {
-        for my $UserID ( @{ $Param{ExcludeNotificationToUserID} } ) {
-            push @SkipRecipients, $UserID;
+        # remember agent to exclude notifications
+        my @SkipRecipients;
+        if ( $Param{ExcludeNotificationToUserID} && ref $Param{ExcludeNotificationToUserID} eq 'ARRAY' )
+        {
+            for my $UserID ( @{ $Param{ExcludeNotificationToUserID} } ) {
+                push @SkipRecipients, $UserID;
+            }
+        }
+
+        # remember agent to exclude notifications / already sent
+        my %DoNotSendMute;
+        if (
+            $Param{ExcludeMuteNotificationToUserID}
+            && ref $Param{ExcludeMuteNotificationToUserID} eq 'ARRAY'
+            )
+        {
+            for my $UserID ( @{ $Param{ExcludeMuteNotificationToUserID} } ) {
+                push @SkipRecipients, $UserID;
+            }
+        }
+
+        my $ExtraRecipients;
+        if ( $Param{ForceNotificationToUserID} && ref $Param{ForceNotificationToUserID} eq 'ARRAY' ) {
+            $ExtraRecipients = $Param{ForceNotificationToUserID};
+        }
+
+        # send agent notification on ticket create
+        if (
+            $FirstArticle &&
+            $Param{HistoryType}
+            =~ /^(EmailAgent|EmailCustomer|PhoneCallCustomer|WebRequestCustomer|SystemRequest)$/i
+            )
+        {
+            # trigger notification event
+            $Self->EventHandler(
+                Event => 'NotificationNewTicket',
+                Data  => {
+                    TicketID              => $Param{TicketID},
+                    ArticleID             => $ArticleID,
+                    Channel               => $Param{Channel},
+                    CustomerVisible       => $Param{CustomerVisible},
+                    Queue                 => $Param{Queue},
+                    Recipients            => $ExtraRecipients,
+                    SkipRecipients        => \@SkipRecipients,
+                    CustomerMessageParams => {%Param},
+                },
+                UserID => $Param{UserID},
+            );
+        }
+
+        # send agent notification on adding a note
+        elsif ( $Param{HistoryType} =~ /^AddNote$/i ) {
+
+            # trigger notification event
+            $Self->EventHandler(
+                Event => 'NotificationAddNote',
+                Data  => {
+                    TicketID              => $Param{TicketID},
+                    ArticleID             => $ArticleID,
+                    Channel               => $Param{Channel},
+                    CustomerVisible       => $Param{CustomerVisible},
+                    Queue                 => $Param{Queue},
+                    Recipients            => $ExtraRecipients,
+                    SkipRecipients        => \@SkipRecipients,
+                    CustomerMessageParams => {},
+                },
+                UserID => $Param{UserID},
+            );
+        }
+
+        # send agent notification on follow up
+        elsif ( $Param{HistoryType} =~ /^FollowUp$/i ) {
+
+            # trigger notification event
+            $Self->EventHandler(
+                Event => 'NotificationFollowUp',
+                Data  => {
+                    TicketID              => $Param{TicketID},
+                    ArticleID             => $ArticleID,
+                    Channel               => $Param{Channel},
+                    CustomerVisible       => $Param{CustomerVisible},
+                    Queue                 => $Param{Queue},
+                    Recipients            => $ExtraRecipients,
+                    SkipRecipients        => \@SkipRecipients,
+                    CustomerMessageParams => {%Param},
+                },
+                UserID => $Param{UserID},
+            );
         }
     }
 
-    # remember agent to exclude notifications / already sent
-    my %DoNotSendMute;
-    if (
-        $Param{ExcludeMuteNotificationToUserID}
-        && ref $Param{ExcludeMuteNotificationToUserID} eq 'ARRAY'
-        )
-    {
-        for my $UserID ( @{ $Param{ExcludeMuteNotificationToUserID} } ) {
-            push @SkipRecipients, $UserID;
+    # send article through email channel
+    if ( $Param{Channel} eq 'email' ) {
+
+        # send mail
+        my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
+            'Message-ID' => $Param{MessageID},
+            %Param,
+        );
+
+        # return if no mail was able to send
+        if ( !$HeadRef || !$BodyRef ) {
+            my $Error = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Message  => "Impossible to send message to: $Param{'To'} (Error: $Error).",
+                Priority => 'error',
+            );
+            return;
         }
-    }
 
-    my $ExtraRecipients;
-    if ( $Param{ForceNotificationToUserID} && ref $Param{ForceNotificationToUserID} eq 'ARRAY' ) {
-        $ExtraRecipients = $Param{ForceNotificationToUserID};
-    }
-
-    # send agent notification on ticket create
-    if (
-        $FirstArticle &&
-        $Param{HistoryType}
-        =~ /^(EmailAgent|EmailCustomer|PhoneCallCustomer|WebRequestCustomer|SystemRequest)$/i
-        )
-    {
-        # trigger notification event
-        $Self->EventHandler(
-            Event => 'NotificationNewTicket',
-            Data  => {
-                TicketID              => $Param{TicketID},
-                ArticleID             => $ArticleID,
-                Channel               => $Param{Channel},
-                CustomerVisible       => $Param{CustomerVisible},
-                Queue                 => $Param{Queue},
-                Recipients            => $ExtraRecipients,
-                SkipRecipients        => \@SkipRecipients,
-                CustomerMessageParams => {%Param},
-            },
-            UserID => $Param{UserID},
+        # write article to fs
+        my $Plain = $Self->ArticleWritePlain(
+            ArticleID => $ArticleID,
+            Email     => ${$HeadRef} . "\n" . ${$BodyRef},
+            UserID    => $Param{UserID}
         );
-    }
+        if ( !$Plain ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to write plain article for ArticleID $ArticleID.",
+            );
+            return;
+        }
 
-    # send agent notification on adding a note
-    elsif ( $Param{HistoryType} =~ /^AddNote$/i ) {
-
-        # trigger notification event
-        $Self->EventHandler(
-            Event => 'NotificationAddNote',
-            Data  => {
-                TicketID              => $Param{TicketID},
-                ArticleID             => $ArticleID,
-                Channel               => $Param{Channel},
-                CustomerVisible       => $Param{CustomerVisible},
-                Queue                 => $Param{Queue},
-                Recipients            => $ExtraRecipients,
-                SkipRecipients        => \@SkipRecipients,
-                CustomerMessageParams => {},
-            },
-            UserID => $Param{UserID},
+        # log
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'info',
+            Message  => "Sent email to '$Param{ToOrig}' from '$Param{From}'. "
+                . "HistoryType => $Param{HistoryType}, Subject => $Param{Subject};",
         );
-    }
 
-    # send agent notification on follow up
-    elsif ( $Param{HistoryType} =~ /^FollowUp$/i ) {
-
-        # trigger notification event
+        # event
         $Self->EventHandler(
-            Event => 'NotificationFollowUp',
+            Event => 'ArticleSend',
             Data  => {
-                TicketID              => $Param{TicketID},
-                ArticleID             => $ArticleID,
-                Channel               => $Param{Channel},
-                CustomerVisible       => $Param{CustomerVisible},
-                Queue                 => $Param{Queue},
-                Recipients            => $ExtraRecipients,
-                SkipRecipients        => \@SkipRecipients,
-                CustomerMessageParams => {%Param},
+                TicketID  => $Param{TicketID},
+                ArticleID => $ArticleID,
             },
             UserID => $Param{UserID},
         );
@@ -1859,170 +1990,6 @@ sub ArticleUpdate {
     return 1;
 }
 
-=item ArticleSend()
-
-send article via email and create article with attachments
-
-    my $ArticleID = $TicketObject->ArticleSend(
-        TicketID    => 123,
-        Channel     => 'email',                                                # ...
-        SenderType  => 'agent',                                                # agent|system|customer
-        From        => 'Some Agent <email@example.com>',                       # not required but useful
-        To          => 'Some Customer A <customer-a@example.com>',             # not required but useful
-        Cc          => 'Some Customer B <customer-b@example.com>',             # not required but useful
-        ReplyTo     => 'Some Customer B <customer-b@example.com>',             # not required, is possible to use 'Reply-To' instead
-        Subject     => 'some short description',                               # required
-        Body        => 'the message text',                                     # required
-        InReplyTo   => '<asdasdasd.12@example.com>',                           # not required but useful
-        References  => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
-        Charset     => 'iso-8859-15'
-        MimeType    => 'text/plain',
-        Loop        => 0, # 1|0 used for bulk emails
-        Attachment => [
-            {
-                Content     => $Content,
-                ContentType => $ContentType,
-                Filename    => 'lala.txt',
-            },
-            {
-                Content     => $Content,
-                ContentType => $ContentType,
-                Filename    => 'lala1.txt',
-            },
-        ],
-        Sign => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-            Type    => 'SMIME',
-            Key     => '3b630c80',
-        },
-        Crypt => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-            Type    => 'SMIME',
-            Key     => '3b630c80',
-        },
-        HistoryType    => 'OwnerUpdate',  # Move|AddNote|PriorityUpdate|WebRequestCustomer|...
-        HistoryComment => 'Some free text!',
-        NoAgentNotify  => 0,            # if you don't want to send agent notifications
-        UserID         => 123,
-    );
-
-Events:
-    ArticleSend
-
-=cut
-
-sub ArticleSend {
-    my ( $Self, %Param ) = @_;
-
-    my $ToOrig      = $Param{To}          || '';
-    my $Loop        = $Param{Loop}        || 0;
-    my $HistoryType = $Param{HistoryType} || 'SendAnswer';
-
-    # check needed stuff
-    for (qw(TicketID UserID From Body Charset MimeType)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    if ( !$Param{Channel} && !$Param{ChannelID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Channel or ChannelID!',
-        );
-        return;
-    }
-    if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need SenderType or SenderTypeID!',
-        );
-        return;
-    }
-
-    # map ReplyTo into Reply-To if present
-    if ( $Param{ReplyTo} ) {
-        $Param{'Reply-To'} = $Param{ReplyTo};
-    }
-
-    # clean up
-    $Param{Body} =~ s/(\r\n|\n\r)/\n/g;
-    $Param{Body} =~ s/\r/\n/g;
-
-    # initialize parameter for attachments, so that the content pushed into that ref from
-    # EmbeddedImagesExtract will stay available
-    if ( !$Param{Attachment} ) {
-        $Param{Attachment} = [];
-    }
-
-    # check for base64 images in body and process them
-    $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
-        DocumentRef    => \$Param{Body},
-        AttachmentsRef => $Param{Attachment},
-    );
-
-    # create article
-    my $Time      = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
-    my $Random    = rand 999999;
-    my $FQDN      = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
-    my $MessageID = "<$Time.$Random\@$FQDN>";
-    my $ArticleID = $Self->ArticleCreate(
-        %Param,
-        MessageID => $MessageID,
-    );
-    return if !$ArticleID;
-
-    # send mail
-    my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
-        'Message-ID' => $MessageID,
-        %Param,
-    );
-
-    # return if no mail was able to send
-    if ( !$HeadRef || !$BodyRef ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Message  => "Impossible to send message to: $Param{'To'} .",
-            Priority => 'error',
-        );
-        return;
-    }
-
-    # write article to fs
-    my $Plain = $Self->ArticleWritePlain(
-        ArticleID => $ArticleID,
-        Email     => ${$HeadRef} . "\n" . ${$BodyRef},
-        UserID    => $Param{UserID}
-    );
-    return if !$Plain;
-
-    # log
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
-        Priority => 'info',
-        Message  => "Sent email to '$ToOrig' from '$Param{From}'. "
-            . "HistoryType => $HistoryType, Subject => $Param{Subject};",
-    );
-
-    # event
-    $Self->EventHandler(
-        Event => 'ArticleSend',
-        Data  => {
-            TicketID  => $Param{TicketID},
-            ArticleID => $ArticleID,
-        },
-        UserID => $Param{UserID},
-    );
-
-    return $ArticleID;
-}
-
 =item ArticleBounce()
 
 bounce an article
@@ -2335,7 +2302,7 @@ sub SendAutoResponse {
     }
 
     # send email
-    my $ArticleID = $Self->ArticleSend(
+    my $ArticleID = $Self->ArticleCreate(
         Channel        => 'email',
         SenderType     => 'system',
         TicketID       => $Param{TicketID},

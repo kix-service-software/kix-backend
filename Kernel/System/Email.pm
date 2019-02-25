@@ -873,8 +873,6 @@ sub Bounce {
         Body    => \$BodyAsString,
     );
 
-    return if !$Sent;
-
     return ( \$HeaderAsString, \$BodyAsString );
 }
 

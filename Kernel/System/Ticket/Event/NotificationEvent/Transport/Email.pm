@@ -427,7 +427,7 @@ sub SendNotification {
             );
         }
 
-        my $ArticleID = $TicketObject->ArticleSend(
+        my $ArticleID = $TicketObject->ArticleCreate(
             Channel        => $Channel,
             CustomerVisible => $Param{Notification}->{Data}->{NotificationVisibleForCustomer} || 0,
             SenderType     => 'system',

@@ -90,7 +90,7 @@ sub Check {
             return (
                 Successful => 0,
                 Message =>
-                    "SMTP authentication failed: $Error! Enable Net::SMTP debug for more info!"
+                    "SMTP authentication failed: $Error!"
             );
         }
     }
@@ -137,7 +137,7 @@ sub Send {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message =>
-                "Can't use from '$Param{From}': $Error! Enable Net::SMTP debug for more info!",
+                "Can't use from '$Param{From}': $Error!",
         );
         $SMTP->quit();
         return;
@@ -151,7 +151,7 @@ sub Send {
             my $Error = $SMTP->code() . $SMTP->message();
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Can't send to '$To': $Error! Enable Net::SMTP debug for more info!",
+                Message  => "Can't send to '$To': $Error!",
             );
             $SMTP->quit();
             return;
@@ -172,7 +172,7 @@ sub Send {
         my $Error = $SMTP->code() . $SMTP->message();
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Can't send message: $Error! Enable Net::SMTP debug for more info!"
+            Message  => "Can't send message: $Error!"
         );
         $SMTP->quit();
         return;

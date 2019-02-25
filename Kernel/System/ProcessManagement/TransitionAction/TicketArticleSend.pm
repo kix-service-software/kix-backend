@@ -188,11 +188,7 @@ sub Run {
         $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
     }
 
-    # BPMX-capeIT
-    #    my $ArticleID = $TicketObject->ArticleCreate(
-    my $ArticleID = $TicketObject->ArticleSend(
-
-        # EO BPMX-capeIT
+    my $ArticleID = $TicketObject->ArticleCreate(
         %{ $Param{Config} },
         TicketID => $Param{Ticket}->{TicketID},
         UserID   => $Param{UserID},
