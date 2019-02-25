@@ -1040,7 +1040,7 @@
     <Index Name="article_search_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
-    <Index Name="article_channel_id">
+    <Index Name="article_search_channel_id">
         <IndexColumn Name="channel_id"/>
     </Index>
     <Index Name="article_search_article_sender_type_id">
