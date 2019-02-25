@@ -692,7 +692,16 @@ sub ArticleCreate {
                 Message  => "Impossible to send message to: $Param{'To'} (Error: $Error).",
                 Priority => 'error',
             );
-            return;
+            # flag article
+            $Self->ArticleFlagSet(
+                ArticleID => $ArticleID,
+                Key       => 'NotSentError',
+                Value     => $Error,
+                UserID    => $Param{UserID},                
+            );
+
+            # return the ArticleID since we have created the article already but just not sent
+            return $ArticleID;
         }
 
         # write article to fs
@@ -712,8 +721,7 @@ sub ArticleCreate {
         # log
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'info',
-            Message  => "Sent email to '$Param{ToOrig}' from '$Param{From}'. "
-                . "HistoryType => $Param{HistoryType}, Subject => $Param{Subject};",
+            Message  => "Sent email to '$Param{ToOrig}' from '$Param{From}'. HistoryType => $Param{HistoryType}, Subject => $Param{Subject};",
         );
 
         # event

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="article_flag">
+        <ColumnChange NameOld="article_value" NameNew="article_value" Required="false"  Size="1000" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>
