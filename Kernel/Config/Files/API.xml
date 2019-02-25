@@ -196,7 +196,7 @@
                 <Item Key="Forbidden">403:No permission to execute this operation.</Item>
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
-                <Item Key="NotAllowed">405:The resource doen't support the requested method. Please have a look into the "Allow" header which methods are supported by this resource.</Item>
+                <Item Key="NotAllowed">405:The resource does not support the requested method. Please have a look into the "Allow" header which methods are supported by this resource.</Item>
                 <Item Key="Object.AlreadyExists">409:Cannot create or update item, because it already exists.</Item>
                 <Item Key="Object.Created">201</Item>
                 <Item Key="Object.DependingObjectExists">409:Depending objects prevent this operation.</Item>
