@@ -22,36 +22,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Package::ConfigureCallHomeVerificationPath" Required="0" Valid="0">
-        <Description Translatable="1">Enables the unrequested automatic communication of installed packages and other system details to the path.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <String Regex=""></String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0050-CIC-CustomerUserList" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Parameters for the dashboard backend of the contact list overview of the agent interface . "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Dashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::CustomerUserList</Item>
-                <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-                <Item Key="Title" Translatable="1">Contacts</Item>
-                <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-                <Item Key="Description" Translatable="1">All contacts of a CustomerID</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###AdminDynamicField" Required="0" Valid="1">
         <Description Translatable="1">Frontend module registration for the agent interface.</Description>
         <Group>Framework</Group>
@@ -322,36 +292,6 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="KIX4OTRSTicketOverviewSmallHighlightMapping" Required="1" Valid="1">
-        <Description Translatable="1">Configure an stylesheet dependent on ticket state.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="new">color: darkgreen;</Item>
-                <Item Key="closed successful">color: darkgrey;</Item>
-                <Item Key="closed unsuccessful">color: darkgrey;</Item>
-                <Item Key="pending auto close+">color: darkblue;</Item>
-                <Item Key="pending auto close-">color: darkblue;</Item>
-                <Item Key="pending reminder">color: darkblue;</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIX4OTRSTicketOverviewLargeHighlightMapping" Required="1" Valid="1">
-        <Description Translatable="1">Configure an stylesheet dependent on ticket state.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="new">background-color: lightgreen;</Item>
-                <Item Key="closed successful">background-color: darkgrey;</Item>
-                <Item Key="closed unsuccessful">background-color: lightgrey;</Item>
-                <Item Key="pending auto close+">background-color: lightblue;</Item>
-                <Item Key="pending auto close-">background-color: lightblue;</Item>
-                <Item Key="pending reminder">background-color: lightblue;</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ImportExport::ObjectBackendRegistration###Service2CustomerUser" Required="0" Valid="1">
         <Description Translatable="1">Object backend module registration for the import/export module.</Description>
         <Group>Framework</Group>
@@ -440,733 +380,6 @@
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0510-CIC-TicketStats" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the dashboard backend of the customer id ticket stats of the agent interface. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketStatsGeneric</Item>
-                <Item Key="Title" Translatable="1">7 Day Stats</Item>
-                <Item Key="Description" Translatable="1">7 Day Stats</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentSmall</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTLLocal">30</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0520-CIC-TicketStats2Weeks" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the dashboard backend of the customer id ticket two week stats of the agent interface. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketStatsGenericWeek</Item>
-                <Item Key="Title" Translatable="1">14 Day Stats</Item>
-                <Item Key="Description" Translatable="1">14 Day Stats</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentSmall</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTLLocal">30</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0530-CIC-TicketStats1Month" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the dashboard backend of the customer id ticket one month stats of the agent interface. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketStatsGenericMonth</Item>
-                <Item Key="Title" Translatable="1">1 Month Stats</Item>
-                <Item Key="Description" Translatable="1">1 Month Stats</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentSmall</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTLLocal">30</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0140-CIC-CustomerServices" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the dashboard backend of the customer assigned services widget of the agent interface . "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::CustomerServices</Item>
-                <Item Key="Title" Translatable="1">Assigned Services</Item>
-                <Item Key="Description" Translatable="1">Shows all assigned services for the selected customer.</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="TableHeight">75</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0901-CIC-SearchTemplate01" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 01</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0902-CIC-SearchTemplate02" Required="0" Valid="2">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 02</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0903-CIC-SearchTemplate03" Required="0" Valid="3">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 03</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0904-CIC-SearchTemplate04" Required="0" Valid="4">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 04</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0905-CIC-SearchTemplate05" Required="0" Valid="5">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 05</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0906-CIC-SearchTemplate06" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 06</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0907-CIC-SearchTemplate07" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 07</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0908-CIC-SearchTemplate08" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 08</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0909-CIC-SearchTemplate09" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 09</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0910-CIC-SearchTemplate10" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the dashboard backend of the search template tickets overview of the agent interface. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::TicketGeneric</Item>
-                <Item Key="Title">Search Template 10</Item>
-                <Item Key="Description">All search template tickets</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Filter">All</Item>
-                <Item Key="Time"></Item>
-                <Item Key="Limit">10</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">0</Item>
-                <Item Key="CacheTTLLocal">0.5</Item>
-                <Item Key="DefaultColumns">
-                    <Hash>
-                        <Item Key="Age">2</Item>
-                        <Item Key="Changed">1</Item>
-                        <Item Key="CustomerID">1</Item>
-                        <Item Key="CustomerName">1</Item>
-                        <Item Key="CustomerUserID">1</Item>
-                        <Item Key="EscalationResponseTime">1</Item>
-                        <Item Key="EscalationSolutionTime">1</Item>
-                        <Item Key="EscalationTime">1</Item>
-                        <Item Key="EscalationUpdateTime">1</Item>
-                        <Item Key="TicketNumber">2</Item>
-                        <Item Key="Lock">1</Item>
-                        <Item Key="Owner">1</Item>
-                        <Item Key="PendingTime">1</Item>
-                        <Item Key="Queue">1</Item>
-                        <Item Key="Responsible">1</Item>
-                        <Item Key="Priority">1</Item>
-                        <Item Key="Service">1</Item>
-                        <Item Key="State">1</Item>
-                        <Item Key="SLA">1</Item>
-                        <Item Key="Title">2</Item>
-                        <Item Key="Type">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0260-CIC-TicketCalendar" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the customer dashboard backend of the ticket calendar. "Limit" is the number of entries shown by default. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::Calendar</Item>
-                <Item Key="Title" Translatable="1">Upcoming Events</Item>
-                <Item Key="Permission">rw</Item>
-                <Item Key="OwnerOnly"></Item>
-                <Item Key="Block">ContentSmall</Item>
-                <Item Key="Limit">6</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTL">2</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0710-CIC-RemoteDBList001" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the customer dashboard backend remote DB dashlet.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::RemoteDB</Item>
-                <Item Key="Title">Customer Tickets</Item>
-                <Item Key="Description">Shows customer ticket.</Item>
-                <Item Key="Prio">0540</Item>
-                <Item Key="Identifier">RemoteDBList001</Item>
-                <Item Key="Group"></Item>
-                <Item Key="DatabaseCacheTTL"></Item>
-                <Item Key="DatabaseDSN">DBI:Pg:dbname=otrs;host=localhost</Item>
-                <Item Key="DatabasePw">otrs</Item>
-                <Item Key="DatabaseTable">ticket</Item>
-                <Item Key="DatabaseType"></Item>
-                <Item Key="DatabaseUser">otrs</Item>
-                <Item Key="DatabaseCaseSensitive"></Item>
-                <Item Key="MaxResultCount">30</Item>
-                <Item Key="MaxResultDisplay">10</Item>
-                <Item Key="MaxResultSize"></Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="RestrictedDBAttributeCustomerLogin">customer_user_id</Item>
-                <Item Key="RestrictedDBAttributeCustomerUserID">customer_id</Item>
-                <Item Key="RestrictedOTRSObjects">Configuration</Item>
-                <Item Key="RestrictedOTRSAttributes">1</Item>
-                <Item Key="RestrictedDBAttributes">responsible_user_id</Item>
-                <Item Key="RestrictedMandatory">0</Item>
-                <Item Key="IdentifierAttribute">id</Item>
-                <Item Key="ShowAttributes">tn,title</Item>
-                <Item Key="ShowAttributesHead">TN,Title</Item>
-                <Item Key="TicketLink">1</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Limit">6</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTL">2</Item>
-                <Item Key="SearchAttribute">tn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0720-CIC-RemoteDBList002" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the customer dashboard backend remote DB dashlet.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::RemoteDB</Item>
-                <Item Key="Title">Customer Tickets</Item>
-                <Item Key="Description">Shows customer ticket.</Item>
-                <Item Key="Prio">0540</Item>
-                <Item Key="Identifier">RemoteDBList002</Item>
-                <Item Key="Group"></Item>
-                <Item Key="DatabaseCacheTTL"></Item>
-                <Item Key="DatabaseDSN">DBI:Pg:dbname=otrs;host=localhost</Item>
-                <Item Key="DatabasePw">otrs</Item>
-                <Item Key="DatabaseTable">ticket</Item>
-                <Item Key="DatabaseType"></Item>
-                <Item Key="DatabaseUser">otrs</Item>
-                <Item Key="DatabaseCaseSensitive"></Item>
-                <Item Key="MaxResultCount">30</Item>
-                <Item Key="MaxResultDisplay">10</Item>
-                <Item Key="MaxResultSize"></Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="RestrictedDBAttributeCustomerLogin">customer_user_id</Item>
-                <Item Key="RestrictedDBAttributeCustomerUserID">customer_id</Item>
-                <Item Key="RestrictedOTRSObjects">Configuration</Item>
-                <Item Key="RestrictedOTRSAttributes">1</Item>
-                <Item Key="RestrictedDBAttributes">responsible_user_id</Item>
-                <Item Key="RestrictedMandatory">0</Item>
-                <Item Key="IdentifierAttribute">id</Item>
-                <Item Key="ShowAttributes">tn,title</Item>
-                <Item Key="ShowAttributesHead">TN,Title</Item>
-                <Item Key="TicketLink">1</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Limit">6</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTL">2</Item>
-                <Item Key="SearchAttribute">tn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0730-CIC-RemoteDBList003" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the customer dashboard backend remote DB dashlet.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::RemoteDB</Item>
-                <Item Key="Title">Customer Tickets</Item>
-                <Item Key="Description">Shows customer ticket.</Item>
-                <Item Key="Prio">0540</Item>
-                <Item Key="Identifier">RemoteDBList003</Item>
-                <Item Key="Group"></Item>
-                <Item Key="DatabaseCacheTTL"></Item>
-                <Item Key="DatabaseDSN">DBI:Pg:dbname=otrs;host=localhost</Item>
-                <Item Key="DatabasePw">otrs</Item>
-                <Item Key="DatabaseTable">ticket</Item>
-                <Item Key="DatabaseType"></Item>
-                <Item Key="DatabaseUser">otrs</Item>
-                <Item Key="DatabaseCaseSensitive"></Item>
-                <Item Key="MaxResultCount">30</Item>
-                <Item Key="MaxResultDisplay">10</Item>
-                <Item Key="MaxResultSize"></Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="RestrictedDBAttributeCustomerLogin">customer_user_id</Item>
-                <Item Key="RestrictedDBAttributeCustomerUserID">customer_id</Item>
-                <Item Key="RestrictedOTRSObjects">Configuration</Item>
-                <Item Key="RestrictedOTRSAttributes">1</Item>
-                <Item Key="RestrictedDBAttributes">responsible_user_id</Item>
-                <Item Key="RestrictedMandatory">0</Item>
-                <Item Key="IdentifierAttribute">id</Item>
-                <Item Key="ShowAttributes">tn,title</Item>
-                <Item Key="ShowAttributesHead">TN,Title</Item>
-                <Item Key="TicketLink">1</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Limit">6</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTL">2</Item>
-                <Item Key="SearchAttribute">tn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0740-CIC-RemoteDBList004" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the customer dashboard backend remote DB dashlet.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::RemoteDB</Item>
-                <Item Key="Title">Customer Tickets</Item>
-                <Item Key="Description">Shows customer ticket.</Item>
-                <Item Key="Prio">0540</Item>
-                <Item Key="Identifier">RemoteDBList004</Item>
-                <Item Key="Group"></Item>
-                <Item Key="DatabaseCacheTTL"></Item>
-                <Item Key="DatabaseDSN">DBI:Pg:dbname=otrs;host=localhost</Item>
-                <Item Key="DatabasePw">otrs</Item>
-                <Item Key="DatabaseTable">ticket</Item>
-                <Item Key="DatabaseType"></Item>
-                <Item Key="DatabaseUser">otrs</Item>
-                <Item Key="DatabaseCaseSensitive"></Item>
-                <Item Key="MaxResultCount">30</Item>
-                <Item Key="MaxResultDisplay">10</Item>
-                <Item Key="MaxResultSize"></Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="RestrictedDBAttributeCustomerLogin">customer_user_id</Item>
-                <Item Key="RestrictedDBAttributeCustomerUserID">customer_id</Item>
-                <Item Key="RestrictedOTRSObjects">Configuration</Item>
-                <Item Key="RestrictedOTRSAttributes">1</Item>
-                <Item Key="RestrictedDBAttributes">responsible_user_id</Item>
-                <Item Key="RestrictedMandatory">0</Item>
-                <Item Key="IdentifierAttribute">id</Item>
-                <Item Key="ShowAttributes">tn,title</Item>
-                <Item Key="ShowAttributesHead">TN,Title</Item>
-                <Item Key="TicketLink">1</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Block">ContentLarge</Item>
-                <Item Key="Limit">6</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTL">2</Item>
-                <Item Key="SearchAttribute">tn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###CustomerDashboardRemoteDBAJAXHandler" Required="0" Valid="1">
         <Description Translatable="1">Frontend module registration for the agent interface.</Description>
         <Group>Framework</Group>
@@ -1177,25 +390,6 @@
                 <Title>Customer Dashboard RemoteDB AJAX Handler</Title>
                 <NavBarName>Ticket</NavBarName>
             </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0270-CIC-FurtherInformation" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Parameters for the customer dashboard backend to provide and save further information for contact or customer company. "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;).  "RwGroup" is used to restrict the writing access to the plugin. "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::CustomerDashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::CustomerDashboard::FurtherInformation</Item>
-                <Item Key="Title" Translatable="1">Further Information</Item>
-                <Item Key="Permission">rw</Item>
-                <Item Key="OwnerOnly"></Item>
-                <Item Key="Block">ContentSmall</Item>
-                <Item Key="RwGroup">admin</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-                <Item Key="CacheTTL">2</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Frontend::Module###CustomerDashboardFurtherInformationAJAXHandler" Required="0" Valid="1">
@@ -1245,16 +439,6 @@
         <Setting>
             <Hash>
                 <Item Key=""></Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ExternalSupplierForwarding::PDFOutputTicketDynamicFields" Required="1" Valid="1">
-        <Description Translatable="1">Defines which ticket dynamic fields are forwarded.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="MyDynamicField">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1388,18 +572,6 @@
         <Setting>
             <Array>
                 <Item></Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::AgentTicketPrintForwardFax###ShownArticleAttributes" Required="1" Valid="1">
-        <Description Translatable="1">Defines which article data parameters are displayed.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::AgentTicketPrintForwardFax</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Subject</Item>
-                <Item>From</Item>
-                <Item>Created</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -1541,36 +713,6 @@
                 <Item Key="1">Yes</Item>
                 <Item Key="0">No</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkedPerson::ModeComplex###Columns" Required="1" Valid="1">
-        <Description Translatable="1">Defines which person attributes are displayed in complex link presentation.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="1000">UserFirstname</Item>
-                <Item Key="1100">UserLastname</Item>
-                <Item Key="1200">UserEmail</Item>
-                <Item Key="1300">UserPhone</Item>
-                <Item Key="1400">UserMobile</Item>
-                <Item Key="1500">Type</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkedPerson::ModeComplex###ColumnHeaders" Required="1" Valid="1">
-        <Description Translatable="1">Defines the column headers of the person attributes displayed in complex link presentation.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="1000">Firstname</Item>
-                <Item Key="1100">Lastname</Item>
-                <Item Key="1200">Email</Item>
-                <Item Key="1300">Phone</Item>
-                <Item Key="1400">Mobile</Item>
-                <Item Key="1500">Type</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LinkedPerson::DetailKeys" Required="1" Valid="1">
@@ -3463,18 +2605,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Document::DefaultColumns" Required="1" Valid="1">
-        <Description Translatable="1">Columns that can be filtered in the linked object view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">1</Item>
-                <Item Key="DisplayPath">1</Item>
-                <Item Key="Path">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Document::FS###SearchType" Required="1" Valid="1">
         <Description Translatable="1">Specify the search type in FS sources ("live" is slower but does a live search in the directory tree and updates the meta data of the resulting files in the DB, "meta" is fast but only uses the meta data stored in the DB).</Description>
         <Group>Framework</Group>
@@ -3544,17 +2674,6 @@
                 <Description>LinkObject Utils</Description>
                 <Title>LinkObject Utils</Title>
             </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="LinkObject::PerformEmptySearch" Required="1" Valid="1">
-        <Description Translatable="1">Allows a search with empty search parameters in link object mask.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Frontend::Module###QuickLinkAJAXHandler" Required="0" Valid="1">
@@ -4395,16 +3514,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Tool::Acknowledge::DynamicField::Alias" Required="1" Valid="1">
-        <Description Translatable="1">Name of Dynamic Field for Service.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">SysMonXAlias</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::Type" Required="0" Valid="1">
         <Description Translatable="1">Define Tool (Nagios) acknowledge type.</Description>
         <Group>Framework</Group>
@@ -4412,16 +3521,6 @@
         <Setting>
             <Hash>
                 <Item Key="Nagios1">pipe</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Tool::Acknowledge::NamedPipe::CMD" Required="0" Valid="1">
-        <Description Translatable="1">Named pipe acknowledge command.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">echo '&lt;OUTPUTSTRING&gt;' >  /var/lib/nagios3/rw/nagios.cmd</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4597,28 +3696,6 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::AjaxDebug" Required="1" Valid="1">
-        <Description Translatable="1">Delivers extended debugging information in the frontend in case any AJAX errors occur, if enabled.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::TemplateCache" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Enables or disables the caching for templates. WARNING: Do NOT disable template caching for production environments for it will cause a massive performance drop! This setting should only be disabled for debugging reasons!</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
@@ -4917,30 +3994,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::RichTextPath" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the URL rich text editor path.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <String Regex="">&lt;KIX_CONFIG_Frontend::WebPath&gt;js/thirdparty/ckeditor-4.5.6/</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::RichTextWidth" Required="1" Valid="1">
-        <Description Translatable="1">Defines the width for the rich text editor component. Enter number (pixels) or percent value (relative).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <String Regex="^\d+%?$">620</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::RichTextHeight" Required="1" Valid="1">
-        <Description Translatable="1">Defines the height for the rich text editor component. Enter number (pixels) or percent value (relative).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <String Regex="^\d+%?$">320</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::RichText::DefaultCSS" Required="1" Valid="1">
         <Description Translatable="1">Defines the default CSS used in rich text editors.</Description>
         <Group>Framework</Group>
@@ -5020,28 +4073,6 @@
             <String Regex="^[0-9]{1,5}$">6000</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::AnimationEnabled" Required="1" Valid="1">
-        <Description Translatable="1">Turns on the animations used in the GUI. If you have problems with these animations (e.g. performance issues), you can turn them off here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::MenuDragDropEnabled" Required="1" Valid="1">
-        <Description Translatable="1">Turns on drag and drop for the main navigation.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="TimeInputFormat" Required="1" Valid="1">
         <Description Translatable="1">Defines the date input format used in forms (option or input fields).</Description>
         <Group>Framework</Group>
@@ -5119,17 +4150,6 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <String Regex="">@(example)\.(..|...)$</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CheckEmailInternalAddress" Required="1" Valid="1">
-        <Description Translatable="1">Makes the application check if a recipient is an internal address.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LinkObject::ViewMode" Required="1" Valid="1">
@@ -10390,17 +9410,6 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PGP::StoreDecryptedData" Required="1" Valid="1">
-        <Description Translatable="1">If this option is enabled, then the decrypted data will be stored in the database if they are displayed in AgentTicketZoom.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="SMIME" Required="1" Valid="1">
         <Description Translatable="1">Enables S/MIME support.</Description>
         <Group>Framework</Group>
@@ -10901,16 +9910,6 @@ You can log in via the following URL:
             <Array>
                 <Item>users</Item>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::HeaderMetaModule###1-Refresh" Required="1" Valid="1">
-        <Description Translatable="1">Defines the module to generate code for periodic page reloads.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleMetaHead</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::HeaderMeta::Refresh</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="CustomerFrontend::NotifyModule###1-ShowAgentOnline" Required="0" Valid="0">
@@ -11468,17 +10467,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesView" Required="1" Valid="1">
-        <Description Translatable="1">Sets the order of the different items in the customer preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Array>
-                <Item Translatable="1">User Profile</Item>
-                <Item Translatable="1">Other Settings</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="CustomerPreferencesGroups###Password" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences. 'PasswordRegExp' allows to match passwords against a regular expression. Define the minimum number of characters using 'PasswordMinSize'. Define if at least 2 lowercase and 2 uppercase letter characters are needed by setting the appropriate option to '1'. 'PasswordMin2Characters' defines if the password needs to contain at least 2 letter characters (set to 0 or 1). 'PasswordNeedDigit' controls the need of at least 1 digit (set to 0 or 1 to control).</Description>
         <Group>Framework</Group>
@@ -11713,33 +10701,6 @@ via the Preferences button after logging in.
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::MainMenu###010-EditCustomerID" Required="0" Valid="0">
-        <Description Translatable="1">Main menu registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>CustomerInformationCenter</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name" Translatable="1">Edit customer company</Item>
-                <Item Key="Link">[% Env("Baselink") %]Action=AdminCustomerCompany;Subaction=Change;CustomerID=[% Data.CustomerID | uri %];Nav=0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AgentCustomerInformationCenter::Backend###0600-CIC-CustomerCompanyInformation" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the dashboard backend of the customer company information of the agent interface . "Group" is used to restrict the access to the plugin (e. g. Group: admin;group1;group2;). "Default" determines if the plugin is enabled by default or if the user needs to enable it manually. "CacheTTLLocal" is the cache time in minutes for the plugin.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Dashboard</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Dashboard::CustomerCompanyInformation</Item>
-                <Item Key="Title" Translatable="1">Customer Company Information</Item>
-                <Item Key="Description" Translatable="1">Customer Company Information</Item>
-                <Item Key="Attributes"></Item>
-                <Item Key="Block">ContentSmall</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Default">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###AgentPreferences" Required="0" Valid="1">
         <Description Translatable="1">Frontend module registration for the agent interface.</Description>
         <Group>Framework</Group>
@@ -11845,14 +10806,6 @@ via the Preferences button after logging in.
                 <Title Translatable="1">Search</Title>
                 <NavBarName></NavBarName>
             </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::SearchDefault" Required="0" Valid="1">
-        <Description Translatable="1">Search backend default router.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::SearchRouter</SubGroup>
-        <Setting>
-            <String>Action=AgentTicketSearch;Subaction=AJAX</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Frontend::Module###Admin" Required="0" Valid="1">
@@ -12543,17 +11496,6 @@ via the Preferences button after logging in.
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Themes" Required="0" Valid="1">
-        <Description Translatable="1">Activates the available themes on the system. Value 1 means active, 0 means inactive.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Standard">1</Item>
-                <Item Key="Lite">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="PublicFrontend::CommonParam###Action" Required="1" Valid="1">
         <Description Translatable="1">Defines the default value for the action parameter for the public frontend. The action parameter is used in the scripts of the system.</Description>
         <Group>Framework</Group>
@@ -13045,17 +11987,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::AgentLinkObject::WildcardSearch" Required="1" Valid="1">
-        <Description Translatable="1">Starts a wildcard search of the active object after the link object mask is started.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::LinkObject</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Output::FilterText###OutputFilterTextAutoLink" Required="0" Valid="0">
         <Description Translatable="1">Defines a filter to process the text in the articles, in order to highlight predefined keywords.</Description>
         <Group>Framework</Group>
@@ -13063,206 +11994,6 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::Output::HTML::FilterText::AutoLink</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketZoom">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::OutputFilterTextAutoLink###CVE" Required="0" Valid="0">
-        <Description Translatable="1">Defines a filter for html output to add links behind CVE numbers. The element Image allows two input kinds. At once the name of an image (e.g. faq.png). In this case the OTRS image path will be used. The second possiblity is to insert the link to the image.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="RegExp">
-                    <Array>
-                        <Item>(CVE|CAN)\-(\d{3,4})\-(\d{2,})</Item>
-                    </Array>
-                </Item>
-                <Item Key="URL1">
-                    <Hash>
-                        <Item Key="Description">Mitre</Item>
-                        <Item Key="URL">http://cve.mitre.org/cgi-bin/cvename.cgi?name=&lt;MATCH1&gt;-&lt;MATCH2&gt;-&lt;MATCH3&gt;</Item>
-                        <Item Key="Image">http://cve.mitre.org/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL2">
-                    <Hash>
-                        <Item Key="Description">Google</Item>
-                        <Item Key="URL">http://google.com/search?q=&lt;MATCH1&gt;-&lt;MATCH2&gt;-&lt;MATCH3&gt;</Item>
-                        <Item Key="Image">http://www.google.de/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL3">
-                    <Hash>
-                        <Item Key="Description">US-CERT NVD</Item>
-                        <Item Key="URL">http://nvd.nist.gov/nvd.cfm?cvename=&lt;MATCH1&gt;-&lt;MATCH2&gt;-&lt;MATCH3&gt;</Item>
-                        <Item Key="Image">http://nvd.nist.gov/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketZoom">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::OutputFilterTextAutoLink###Bugtraq" Required="0" Valid="0">
-        <Description Translatable="1">Defines a filter for html output to add links behind bugtraq numbers. The element Image allows two input kinds. At once the name of an image (e.g. faq.png). In this case the OTRS image path will be used. The second possiblity is to insert the link to the image.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <!-- Example strings: BugTraq ID: 23862 | BugTraq ID: 8945 | Bugtraq ID 140 | BUGTRAQ:20070425 | BID 20799 -->
-        <!-- Example URL: http://www.securityfocus.com/bid/23862/info  -->
-        <Setting>
-            <Hash>
-                <Item Key="RegExp">
-                    <Array>
-                        <Item>Bugtraq[\s\w\t]*?ID[\s\w\t]*?:[\s\w\t]*?(\d{2,8})</Item>
-                        <Item>Bugtraq[\s\w\t]*?ID[\s\w\t]*?(\d{2,8})</Item>
-                        <Item>Bugtraq[\s\w\t]*?:[\s\w\t]*?(\d{2,8})</Item>
-                        <Item>Bugtraq[\s\w\t]*?(\d{2,8})</Item>
-                        <Item>BID[\s\w\t]*?:[\s\w\t]*?(\d{2,8})</Item>
-                        <Item>BID[\s\w\t]*?(\d{2,8})</Item>
-                    </Array>
-                </Item>
-                <Item Key="URL1">
-                    <Hash>
-                        <Item Key="Description">Security Focus</Item>
-                        <Item Key="URL">http://www.securityfocus.com/bid/&lt;MATCH1&gt;/info</Item>
-                        <Item Key="Image">http://www.securityfocus.com/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL2">
-                    <Hash>
-                        <Item Key="Description">Google</Item>
-                        <Item Key="URL">http://google.com/search?q=&lt;MATCH&gt;</Item>
-                        <Item Key="Image">http://www.google.de/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketZoom">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::OutputFilterTextAutoLink###MSBulletins" Required="0" Valid="0">
-        <Description Translatable="1">Defines a filter for html output to add links behind MSBulletin numbers. The element Image allows two input kinds. At once the name of an image (e.g. faq.png). In this case the OTRS image path will be used. The second possiblity is to insert the link to the image.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <!-- Example strings: MS07-021 | MS04-028 | MS-07-002 -->
-        <!-- Example URL: http://www.microsoft.com/technet/security/bulletin/MS07-021.mspx  -->
-        <Setting>
-            <Hash>
-                <Item Key="RegExp">
-                    <Array>
-                        <Item>MS[^A-Za-z]{0,5}(\d\d).?(\d{2,4})</Item>
-                    </Array>
-                </Item>
-                <Item Key="URL1">
-                    <Hash>
-                        <Item Key="Description">Microsoft Technet</Item>
-                        <Item Key="URL">http://www.microsoft.com/technet/security/bulletin/MS&lt;MATCH1&gt;-&lt;MATCH2&gt;.mspx</Item>
-                        <Item Key="Image">http://www.microsoft.com/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL2">
-                    <Hash>
-                        <Item Key="Description">Google</Item>
-                        <Item Key="URL">http://google.com/search?q=MS&lt;MATCH1&gt;-&lt;MATCH2&gt;</Item>
-                        <Item Key="Image">http://www.google.de/favicon.ico</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketZoom">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::OutputFilterTextAutoLink###Setting1" Required="0" Valid="0">
-        <Description Translatable="1">Define a filter for html output to add links behind a defined string. The element Image allows two input kinds. At once the name of an image (e.g. faq.png). In this case the OTRS image path will be used. The second possiblity is to insert the link to the image.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="RegExp">
-                    <Array>
-                        <Item>RegExp</Item>
-                    </Array>
-                </Item>
-                <Item Key="URL1">
-                    <Hash>
-                        <Item Key="Description">Description</Item>
-                        <Item Key="URL">URL</Item>
-                        <Item Key="Image">right-small.png</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL2">
-                    <Hash>
-                        <Item Key="Description">Description</Item>
-                        <Item Key="URL">URL</Item>
-                        <Item Key="Image">Image</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketZoom">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::OutputFilterTextAutoLink###Setting2" Required="0" Valid="0">
-        <Description Translatable="1">Defines a filter for html output to add links behind a defined string. The element Image allows two input kinds. At once the name of an image (e.g. faq.png). In this case the OTRS image path will be used. The second possiblity is to insert the link to the image.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="RegExp">
-                    <Array>
-                        <Item>RegExp</Item>
-                    </Array>
-                </Item>
-                <Item Key="URL1">
-                    <Hash>
-                        <Item Key="Description">Description</Item>
-                        <Item Key="URL">URL</Item>
-                        <Item Key="Image">right-small.png</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL2">
-                    <Hash>
-                        <Item Key="Description">Description</Item>
-                        <Item Key="URL">URL</Item>
-                        <Item Key="Image">Image</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-                <Item Key="URL3">
-                    <Hash>
-                        <Item Key="Description">Description</Item>
-                        <Item Key="URL">URL</Item>
-                        <Item Key="Image">Image</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
                 <Item Key="Templates">
                     <Hash>
                         <Item Key="AgentTicketZoom">1</Item>
@@ -13329,16 +12060,6 @@ via the Preferences button after logging in.
                 <Item>Core.InputFields.css</Item>
                 <Item>Core.Print.css</Item>
                 <Item>thirdparty/fontawesome/font-awesome.css</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Agent::ResponsiveCSS###000-Framework" Required="1" Valid="1">
-        <Description Translatable="1">List of responsive CSS files to always be loaded for the agent interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Core.Responsive.css</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -13422,16 +12143,6 @@ via the Preferences button after logging in.
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Loader::Customer::ResponsiveCSS###000-Framework" Required="1" Valid="1">
-        <Description Translatable="1">List of responsive CSS files to always be loaded for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Core.Responsive.css</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Loader::Customer::CommonJS###000-Framework" Required="1" Valid="1">
         <Description Translatable="1">List of JS files to always be loaded for the customer interface.</Description>
         <Group>Framework</Group>
@@ -13481,17 +12192,6 @@ via the Preferences button after logging in.
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="OpenMainMenuOnHover" Required="1" Valid="1">
-        <Description Translatable="1">If enabled, the first level of the main menu opens on mouse hover (instead of click only).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="FirstnameLastnameOrder" Required="1" Valid="1">
         <Description Translatable="1">Specifies the order in which the firstname and the lastname of agents will be displayed.</Description>
         <Group>Framework</Group>
@@ -13512,58 +12212,6 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Loader::Agent::Skin###000-default" Required="0" Valid="1">
-        <Description Translatable="1">Default skin for the agent interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="InternalName">default</Item>
-                <Item Key="VisibleName" Translatable="1">Default</Item>
-                <Item Key="Description" Translatable="1">This is the default orange - black skin.</Item>
-                <Item Key="HomePage">www.otrs.org</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Agent::Skin###001-slim" Required="0" Valid="1">
-        <Description Translatable="1">Default skin for the agent interface (slim version).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="InternalName">slim</Item>
-                <Item Key="VisibleName" Translatable="1">Default (Slim)</Item>
-                <Item Key="Description" Translatable="1">"Slim" skin which tries to save screen space for power users.</Item>
-                <Item Key="HomePage">www.otrs.org</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Agent::Skin###001-ivory" Required="0" Valid="1">
-        <Description Translatable="1">Balanced white skin by Felix Niklas.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="InternalName">ivory</Item>
-                <Item Key="VisibleName" Translatable="1">Ivory</Item>
-                <Item Key="Description" Translatable="1">Balanced white skin by Felix Niklas.</Item>
-                <Item Key="HomePage">www.felixniklas.de</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Agent::Skin###001-ivory-slim" Required="0" Valid="1">
-        <Description Translatable="1">Balanced white skin by Felix Niklas (slim version).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="InternalName">ivory-slim</Item>
-                <Item Key="VisibleName" Translatable="1">Ivory (Slim)</Item>
-                <Item Key="Description" Translatable="1">Balanced white skin by Felix Niklas (slim version).</Item>
-                <Item Key="HomePage">www.felixniklas.de</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Loader::Agent::DefaultSelectedSkin" Required="1" Valid="1">
         <Description Translatable="1">The agent skin's InternalName which should be used in the agent interface. Please check the available skins in Frontend::Agent::Skins.</Description>
         <Group>Framework</Group>
@@ -13580,19 +12228,6 @@ via the Preferences button after logging in.
             <Hash>
                 <Item Key="host1\.example\.com">SomeSkin1</Item>
                 <Item Key="host2\.example\.com">SomeSkin2</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Customer::Skin###000-default" Required="0" Valid="1">
-        <Description Translatable="1">Default skin for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="InternalName">default</Item>
-                <Item Key="VisibleName" Translatable="1">Default</Item>
-                <Item Key="Description" Translatable="1">This is the default orange - black skin for the customer interface.</Item>
-                <Item Key="HomePage">www.otrs.org</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -13621,28 +12256,6 @@ via the Preferences button after logging in.
         <SubGroup>Core::Time</SubGroup>
         <Setting>
             <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="AdminCustomerUser::RunInitialWildcardSearch" Required="1" Valid="1">
-        <Description Translatable="1">Runs an initial wildcard search of the existing contacts when accessing the AdminCustomerUser module.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::AdminCustomerUser</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-     <ConfigItem Name="AdminCustomerCompany::RunInitialWildcardSearch" Required="1" Valid="1">
-        <Description Translatable="1">Runs an initial wildcard search of the existing customer company when accessing the AdminCustomerCompany module.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::CustomerCompany</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
@@ -13862,28 +12475,6 @@ via the Preferences button after logging in.
             <String Regex="" Translatable="1">We are performing scheduled maintenance. Login is temporarily not available.</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ModernizeFormFields" Required="1" Valid="1">
-        <Description Translatable="1">Use new type of select and autocomplete fields in agent interface, where applicable (InputFields).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ModernizeCustomerFormFields" Required="1" Valid="1">
-        <Description Translatable="1">Use new type of select and autocomplete fields in customer interface, where applicable (InputFields).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Fetchmail::Bin" Required="0" Valid="0">
         <Description Translatable="1">Defines the fall-back path to open fetchmail binary. Note: The name of the binary needs to be 'fetchmail', if it is different please use a symbolic link.</Description>
         <Group>Framework</Group>
@@ -13925,14 +12516,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="KIXHelpURL" Required="1" Valid="1">
-        <Description Translatable="1">The URL to the KIX online help.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <String Regex="">http://www.cape-it.de/kix-help</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Output::FilterElementPost###OnlineHelp" Required="1" Valid="1">
         <Description Translatable="1">Activates the Online help link. Link will be shown near to logout links.</Description>
         <Group>Framework</Group>
@@ -13954,24 +12537,6 @@ via the Preferences button after logging in.
         <SubGroup>Core::Web</SubGroup>
         <Setting>
             <String Regex="">icons/kix.ico</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Agent::Skin###100-KIX4OTRS" Required="0" Valid="0">
-        <Description Translatable="1">KIX4OTRS skin for the agents interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Customer::Skin###100-KIX4OTRS" Required="0" Valid="0">
-        <Description Translatable="1">KIX4OTRS skin for the agents interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Loader::Agent::CommonJS###000-KIX4OTRS" Required="1" Valid="1">
@@ -14027,52 +12592,6 @@ via the Preferences button after logging in.
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DateSelection::Layout::SmartDateInput" Required="1" Valid="1">
-        <Description Translatable="1">Enable a smart style for date inputs (SysConfig-option TimeInputFormat will be ignored)</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DateSelection::Layout::SmartTimeInput" Required="1" Valid="1">
-        <Description Translatable="1">Enable a smart style for time inputs (SysConfig-option TimeInputFormat will be ignored)</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DateSelection::Layout::TimeInputIntervall" Required="1" Valid="1">
-        <Description Translatable="1">Set interval for minute in time selections. Hash key is template file regex, value is time interval from 1 to 60.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="^(?:(?!(^(AgentArticleEdit))).)*$">30</Item>
-                <Item Key="AgentArticleEdit">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DefaultCustomerInfoString" Required="0" Valid="1">
-        <Description Translatable="1">Infostring that will be used to show customer data if no specific infostring is defined in customer data backends.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <TextArea>$CustomerData-&gt;{UserCustomerID}&lt;br/&gt;
-                $CustomerData-&gt;{UserFirstname} $CustomerData-&gt;{UserLastname}&lt;br/&gt;&lt;br/&gt;
-                &lt;b&gt;[% Translate("Phone")  | html %]:&lt;/b&gt; $CustomerData-&gt;{UserPhone}&lt;br/&gt;
-                &lt;b&gt;[%  Translate("Mail")  | html %]:&lt;/b&gt; $CustomerData-&gt;{UserEmail}&lt;br/&gt;
-                $CustomerData-&gt;{UserComment}
-            </TextArea>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Loader::Agent::CommonJS###110-KIX4OTRSCustomerDetails" Required="1" Valid="1">
         <Description Translatable="1">List of JS files to always be loaded for the agent interface.</Description>
         <Group>Framework</Group>
@@ -14100,40 +12619,6 @@ via the Preferences button after logging in.
                 <Item>KIX4OTRS.Table.css</Item>
                 <Item>KIX4OTRS.TextModules.css</Item>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Loader::Agent::CommonCSS::IE8###100-KIX4OTRS" Required="1" Valid="1">
-        <Description Translatable="1">List of CSS files to always be loaded for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Array>
-                <Item>KIX4OTRS.Header.IE8.css</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::FilterElementPre###OverrideQDataDisplayLimits" Required="0" Valid="1">
-        <Description Translatable="1">Replaces the default Data character limits.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::OutputFilter::OverrideQDataDisplayLimits</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key=".*">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::OverrideQDataDisplayLimits" Required="0" Valid="0">
-        <Description Translatable="1">Allows overriding of Data character limits, hard coded in TTs. The key has the following format: &lt;TemplateFilePattern&gt;::(&lt;VariableNamePattern&gt;), the value is the numeric character limit that should be used. You can use RegEx, but you MUST not use any additional grouping! PLEASE NOTE: you have to execute otrs.DeleteCache.pl after activating or changing this config option.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Frontend::Module###DynamicFieldAJAXHandler" Required="0" Valid="1">
@@ -14286,21 +12771,6 @@ via the Preferences button after logging in.
                 <Item Key="PrefKey">UserDefaultService</Item>
                 <Item Key="Prio">2602</Item>
                 <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::FilterElementPre###CustomerSearchResult" Required="0" Valid="1">
-        <Description Translatable="1">Defines Output filter to provide possibility to open customer ticket search result for result form "print" in new tab.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::OutputFilter::CustomerSearchResult</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="CustomerTicketSearch">1</Item>
-                    </Hash>
-                </Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -15128,32 +13598,6 @@ via the Preferences button after logging in.
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Output::FilterElementPre###ToolbarSearchProfile" Required="0" Valid="1">
-        <Description Translatable="1">Replaces the toolbar search profile selection.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::ToolBarModule</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::OutputFilter::ToolbarSearchProfile</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="^Header$">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ToolbarSearchProfile###Ticket" Required="0" Valid="1">
-        <Description Translatable="1"></Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::ToolBarModule</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Modules::AgentTicketSearch</Item>
-                <Item Key="Subaction">LoadProfile</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###TextModuleAJAXHandler" Required="0" Valid="1">
         <Description Translatable="1">Frontend module registration for the TextModuleAJAXHandler object.</Description>
         <Group>Framework</Group>
@@ -15242,14 +13686,6 @@ via the Preferences button after logging in.
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TextModuleCategory::LimitShownEntries" Required="0" Valid="1">
-        <Description Translatable="1">Default value for maximum number of entries shown in TextModuleCategory overview.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <String Regex="">100</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Loader::Agent::CommonJS###101-KIX4OTRSTextModules" Required="1" Valid="1">
         <Description Translatable="1">List of JS files to always be loaded for the agent interface.</Description>
         <Group>Framework</Group>
@@ -15272,42 +13708,12 @@ via the Preferences button after logging in.
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TextModule::LimitShownEntries" Required="0" Valid="1">
-        <Description Translatable="1">Default value for maximum number of entries shown in TextModule overview.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <String Regex="">100</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="TextModule::XMLUploadDoNotAdd" Required="0" Valid="1">
-        <Description Translatable="1">Default value for Do-Not-Add-Flag in XML-textmodule upload.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="TextModule::LanguageQueueMatching" Required="0" Valid="1">
         <Description Translatable="1">If activated queues offered for use in EditView are limited by the selected language (language short identifier must be contained as subqueuename in complete queue name).</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Admin::TextModule</SubGroup>
         <Setting>
             <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="TextModule::ShowCategories" Required="0" Valid="1">
-        <Description Translatable="1">Define to show text module categories or not (tree view in sidebar).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
@@ -15325,28 +13731,6 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TextModule::ImportExport###CSVSeparator" Required="0" Valid="1">
-        <Description Translatable="1">Defines the CSV separator.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <Option SelectedID=";">
-                <Item Key=";">;</Item>
-                <Item Key=",">,</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="TextModuleCategory::ImportExport###FileType" Required="0" Valid="1">
-        <Description Translatable="1">Defines the import / export file type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <Option SelectedID="CSV">
-                <Item Key="XML">XML</Item>
-                <Item Key="CSV">CSV</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="TextModuleCategory::ImportExport###CSVSeparator" Required="0" Valid="1">
         <Description Translatable="1">Defines the CSV separator.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Admin::TextModule</SubGroup>
@@ -15620,18 +14004,6 @@ via the Preferences button after logging in.
             <TextArea>Bounced Ticket &lt;KIX_TICKET&gt; to &lt;KIX_BOUNCE_TO&gt;.</TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::CustomerUser::CustomerInfoTicketCount" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Sets the search paramater for the ticket count in contact info block.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1">CustomerID</Item>
-                <Item Key="0">CustomerUserID</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::CustomerUser::Item###91-AllTickets" Required="0" Valid="1">
         <Description Translatable="1">Customer item (icon) which shows all tickets of this customer as info block.</Description>
         <Group>Framework</Group>
@@ -15756,36 +14128,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Output::FilterElementPre###AgentTicketPopupSize" Required="0" Valid="1">
-        <Description Translatable="1"></Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::OutputFilter::AgentTicketPopupSize</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketNote">1</Item>
-                        <Item Key="AgentTicketOwner">1</Item>
-                        <Item Key="AgentTicketCustomer">1</Item>
-                        <Item Key="AgentTicketHistory">1</Item>
-                        <Item Key="AgentTicketPrint">1</Item>
-                        <Item Key="AgentLinkObject">1</Item>
-                        <Item Key="AgentTicketMerge">1</Item>
-                        <Item Key="AgentTicketResponsible">1</Item>
-                        <Item Key="AgentTicketDecision">1</Item>
-                        <Item Key="AgentTicketPending">1</Item>
-                        <Item Key="AgentTicketCompose">1</Item>
-                        <Item Key="AgentTicketPhoneCommon">1</Item>
-                        <Item Key="AgentTicketAddtlITSMField">1</Item>
-                        <Item Key="AgentArticleEdit">1</Item>
-                        <Item Key="AgentTicketMergeToCustomer">1</Item>
-                        <Item Key="ProcessManagement/ActivityDialogHeader">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###PopupSize" Required="0" Valid="1">
         <Description Translatable="1">Module Registration for the PopupSize AJAXHandler.</Description>
         <Group>Framework</Group>
@@ -15836,29 +14178,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Output::FilterElementPre###OutputFilterAgentTicketServiceAssignedQueueID" Required="0" Valid="1">
-        <Description Translatable="1"></Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::OutputFilter::AgentTicketServiceAssignedQueueID</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AgentTicketPhone">1</Item>
-                        <Item Key="AgentTicketEmail">1</Item>
-                        <Item Key="AgentTicketNote">1</Item>
-                        <Item Key="AgentTicketClose">1</Item>
-                        <Item Key="AgentTicketOwner">1</Item>
-                        <Item Key="AgentTicketPriority">1</Item>
-                        <Item Key="AgentTicketResponsible">1</Item>
-                        <Item Key="AgentTicketZoomTabActionCommon">1</Item>
-                        <Item Key="AgentTicketZoomTabEditCoreData">1</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Frontend::Module###ServiceAssignedQueueAJAXHandler" Required="0" Valid="1">
         <Description Translatable="1">Module Registration for the ServiceAssignedQueue AJAXHandler.</Description>
         <Group>Framework</Group>
@@ -15881,23 +14200,6 @@ via the Preferences button after logging in.
                 <Title>Save As Draft handler</Title>
                 <NavBarName>Ticket</NavBarName>
             </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel3::Actions###100-KIX4OTRS" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available for 'Action' in third level of the ACL structure.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Array>
-                <Item>AgentTicketZoomTabArticle</Item>
-                <Item>AgentTicketZoomTabProcess</Item>
-                <Item>AgentTicketZoomTabLinkedObjects</Item>
-                <Item>AgentTicketZoomTabAttachments</Item>
-                <Item>AgentTicketZoomTabActionCommon</Item>
-                <Item>AgentArticleEdit</Item>
-                <Item>AgentTicketAttachmentDownload</Item>
-                <Item>AgentTicketMergeToCustomer</Item>
-            </Array>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Frontend::Module###LinkObjectTableOrderAJAXHandler" Required="0" Valid="1">
@@ -15995,28 +14297,6 @@ via the Preferences button after logging in.
                 <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
                 <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::User</Item>
                 <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Output::FilterElementPre###AdminDynamicFieldSysConfigSettings" Required="0" Valid="1">
-        <Description Translatable="1">Defines Output filter to provide multiselect fields to assign dynamic fields easily to frontend modules.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::OutputFilter::AdminDynamicFieldSysConfigSettings</Item>
-                <Item Key="Templates">
-                    <Hash>
-                        <Item Key="AdminDynamicFieldCheckbox">1</Item>
-                        <Item Key="AdminDynamicFieldDateTime">1</Item>
-                        <Item Key="AdminDynamicFieldDropdown">1</Item>
-                        <Item Key="AdminDynamicFieldMultiselect">1</Item>
-                        <Item Key="AdminDynamicFieldText">1</Item>
-                        <Item Key="AdminDynamicFieldObjectReference">1</Item>
-                        <Item Key="AdminDynamicFieldDropdownGeneralCatalog">1</Item>
-                        <Item Key="AdminDynamicFieldMultiselectGeneralCatalog">1</Item>
-                    </Hash>
-                </Item>
             </Hash>
         </Setting>
     </ConfigItem>

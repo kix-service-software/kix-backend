@@ -67,18 +67,6 @@
             <String Regex="">86400</String><!-- default 1 day -->
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Common::CachedAuth::AgentCacheTTL" Required="1" Valid="1">
-        <Description Translatable="1">Cache time in seconds for agent authentication in the API.</Description>
-        <Setting>
-            <String Regex="">300</String><!-- default 5 min -->
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Common::CachedAuth::CustomerCacheTTL" Required="1" Valid="1">
-        <Description Translatable="1">Cache time in seconds for customer authentication in the API.</Description>
-        <Setting>
-            <String Regex="">300</String><!-- default 5 min -->
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="API::Transport::Module###HTTP::SOAP" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the transport layer.</Description>
         <Setting>
