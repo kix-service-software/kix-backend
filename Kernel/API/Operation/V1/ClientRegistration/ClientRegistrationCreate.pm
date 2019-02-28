@@ -16,6 +16,8 @@ package Kernel::API::Operation::V1::ClientRegistration::ClientRegistrationCreate
 use strict;
 use warnings;
 
+use MIME::Base64;
+
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
@@ -106,7 +108,13 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
         	ClientRegistration => {
                 ClientID       => '...',
                 CallbackURL    => '...',
-                Authentication => '...'     # optional
+                Authentication => '...',        # optional
+                Translations   => [             # optional
+                    {
+                        Language => 'de',
+                        POFile   => '...'       # base64 encoded content of the PO file
+                    }
+                ]
             }
 	    },
     );
@@ -156,6 +164,19 @@ sub Run {
         );
     }
     
+    # import translations if given
+    if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
+        foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
+            my $Content = MIME::Base64::decode_base64($Item->{Content});
+            # fire & forget, not result handling at the moment
+            my $Result = $Kernel::OM->Get('Kernel::System::Translation')->ImportPO(
+                Language => $Item->{Language},
+                Content  => $Content,
+                UserID   => $Self->{Authorization}->{UserID},
+            );
+        }
+    }
+
     my %SystemInfo;
     foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
         $SystemInfo{$Key} = $Kernel::OM->Get('Kernel::Config')->Get($Key);

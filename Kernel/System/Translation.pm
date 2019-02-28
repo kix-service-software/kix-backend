@@ -11,6 +11,8 @@ package Kernel::System::Translation;
 use strict;
 use warnings;
 
+use Locale::PO;
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -18,6 +20,10 @@ our @ObjectDependencies = (
     'Kernel::System::DB',
     'Kernel::System::Log',
 );
+
+our $DisableWarnings = 0;
+
+BEGIN { $SIG{'__WARN__'} = sub { warn $_[0] if !$DisableWarnings } }  # suppress warnings if not activated
 
 =head1 NAME
 
@@ -188,13 +194,15 @@ sub PatternExistsCheck {
         $PatternID = $Row[0];
     }
 
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $PatternID,
-    );
+    if ( $PatternID ) {
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $PatternID,
+        );
+    }
 
     return $PatternID;
 }
@@ -374,6 +382,7 @@ Inserts a new translation language
         PatternID  => 123,          # required
         Language   => $language,    # required
         Value      => '...',        # required
+        IsDefault => 0|1,           # optional
         UserID     => '...',        # required
     );
 
@@ -392,6 +401,8 @@ sub TranslationLanguageAdd {
             return;
         }
     }
+
+    $Param{IsDefault} = $Param{IsDefault} || 0;
 
     # check if the PatternID exists
     my %Pattern = $Self->PatternGet(
@@ -420,10 +431,11 @@ sub TranslationLanguageAdd {
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'INSERT INTO kix_translation_language '
-            . '(value, language, pattern_id, create_time, create_by, change_time, change_by) '
-            . 'VALUES (?,?,?, current_timestamp, ?, current_timestamp, ?)',
+            . '(value, language, is_default, pattern_id, create_time, create_by, change_time, change_by) '
+            . 'VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Value}, \$Param{Language}, \$Param{PatternID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Value}, \$Param{Language}, \$Param{IsDefault},
+            \$Param{PatternID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -469,7 +481,7 @@ sub TranslationLanguageGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL  => 'SELECT pattern_id, language, value, create_time, create_by, change_time, change_by FROM kix_translation_language WHERE pattern_id = ? AND language = ?',
+        SQL  => 'SELECT pattern_id, language, value, is_default, create_time, create_by, change_time, change_by FROM kix_translation_language WHERE pattern_id = ? AND language = ?',
         Bind => [ \$Param{PatternID}, \$Param{Language} ] 
     );
 
@@ -479,10 +491,11 @@ sub TranslationLanguageGet {
         $TranslationLanguage{PatternID}  = $Row[0];
         $TranslationLanguage{Language}   = $Row[1];
         $TranslationLanguage{Value}      = $Row[2];
-        $TranslationLanguage{CreateTime} = $Row[3];
-        $TranslationLanguage{CreateBy}   = $Row[4];
-        $TranslationLanguage{ChangeTime} = $Row[5];
-        $TranslationLanguage{ChangeBy}   = $Row[6];
+        $TranslationLanguage{IsDefault}  = $Row[3];
+        $TranslationLanguage{CreateTime} = $Row[4];
+        $TranslationLanguage{CreateBy}   = $Row[5];
+        $TranslationLanguage{ChangeTime} = $Row[6];
+        $TranslationLanguage{ChangeBy}   = $Row[7];
     }
 
     # set cache
@@ -558,6 +571,7 @@ Update an existing translation language entry
         PatternID => 123           # required
         Language  => '...'         # required
         Value     => '...',        # optional
+        IsDefault => 0|1,          # optional
         UserID    => '...',        # required
     );
 
@@ -590,11 +604,14 @@ sub TranslationLanguageUpdate {
         return;
     }
 
+    $Param{IsDefault} = $Param{IsDefault} || 0;
+
     # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE kix_translation_language SET value = ?, change_time = current_timestamp, change_by = ? WHERE pattern_id = ? AND language = ?',
+        SQL => 'UPDATE kix_translation_language SET value = ?, is_default = ?, change_time = current_timestamp, change_by = ? WHERE pattern_id = ? AND language = ?',
         Bind => [
-            \$Param{Value}, \$Param{UserID}, \$Param{PatternID}, \$Param{Language}
+            \$Param{Value}, \$Param{IsDefault}, \$Param{UserID}, 
+            \$Param{PatternID}, \$Param{Language}
         ],
     );
 
@@ -643,6 +660,167 @@ sub TranslationLanguageDelete {
 
     return 1;
 }
+
+=item ImportPO()
+
+Import a PO content
+
+    my $Result = $TranslationObject->ImportPO(
+        Language => '...'         # required
+        File     => '...',        # required if Content is not given
+        Content  => '...',        # required if File is not given
+        UserID   => 123           # required
+    );
+
+=cut
+
+sub ImportPO {
+    my ( $Self, %Param ) = @_;
+    my $CountTotal = 0;
+    my $CountOK = 0;
+
+    # check needed stuff
+    for (qw(Language)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    if ( !$Param{File} && !$Param{Content} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need File or Content!"
+        );
+        return;
+    }
+
+    if ( $Param{File} && $Param{Content} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need File OR Content, not both!"
+        );
+        return;
+    }
+
+    if ( $Param{Content} ) {
+        # store content in temp file
+        my ($FH, $Filename) = $Kernel::OM->Get('Kernel::System::FileTemp')->TempFile(
+            Suffix => '.po'
+        );
+
+        if ( !$Filename ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create temporary file!"
+            );
+            return;
+        }
+
+        my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+            Location => $Filename,
+            Content  => \$Param{Content}
+        );
+
+        if ( !$Result ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to write content to temporary file!"
+            );
+            return;
+        }
+
+        $Param{File} = $Filename;
+    }
+
+    my $Items;
+    {
+        $DisableWarnings = 1;
+        $Items = Locale::PO->load_file_ashash($Param{File});
+        $DisableWarnings = 0;
+    }
+
+    if ( IsHashRefWithData($Items) ) {        
+        foreach my $MsgId ( sort keys %{$Items} ) {
+            $CountTotal++;
+
+            my $Item = $Items->{$MsgId};
+
+            my $PatternID = $Self->PatternExistsCheck(
+                Value => $MsgId,
+            );
+
+            if ( !$PatternID ) {
+                # create new pattern entry
+                $PatternID = $Self->PatternAdd(
+                    Value  => $MsgId,
+                    UserID => $Param{UserID},
+                );
+                if ( !$PatternID ) {
+                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to add translation pattern !"
+                    );
+                    next;
+                }
+            }
+
+            # create or update language translation
+            my %Translation = $Self->TranslationLanguageGet(
+                PatternID => $PatternID,
+                Language  => $Param{Language},
+            );
+
+            if ( %Translation ) {
+                # update existing translation but only if it is still the default
+                if ( $Translation{IsDefault} ) {
+                    my $Result = $Self->TranslationLanguageUpdate(
+                        PatternID => $PatternID,
+                        Language  => $Param{Language},
+                        Value     => $Item->msgstr,
+                        IsDefault => 1,
+                        UserID    => $Param{UserID},
+                    );
+                    if ( !$Result ) {
+                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                            Priority => 'error',
+                            Message  => "Unable to update translation language '$Param{Language}' for PatternID $PatternID!"
+                        );
+                    }
+                }
+            }
+            else {
+                # create a new one
+                my $Result = $Self->TranslationLanguageAdd(
+                    PatternID => $PatternID,
+                    Language  => $Param{Language},
+                    Value     => $Item->msgstr,
+                    IsDefault => 1,
+                    UserID    => $Param{UserID},
+                );
+                if ( !$Result ) {
+                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to create translation language '$Param{Language}' for PatternID $PatternID!"
+                    );
+                }
+            }
+
+            $CountOK++;
+        }
+    }
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return ( $CountTotal, $CountOK );
+}
+
 
 1;
 

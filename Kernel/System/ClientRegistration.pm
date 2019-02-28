@@ -141,6 +141,7 @@ Adds a new client registration
         ClientID       => 'CLIENT1',
         CallbackURL    => '...',
         Authentication => '...',            # optional
+        Translations   => '...',            # optional
     );
 
 =cut
@@ -166,24 +167,22 @@ sub ClientRegistrationAdd {
         ],
     );
 
-    #handle the insert result...
-    if ($DBInsert) {
-
-        # delete cache
-        $Self->{CacheObject}->CleanUp(
-            Type => $Self->{CacheType}
-        );
-
-        return $Param{ClientID};
-    }
-    else {
+    # handle the insert result...
+    if ( !$DBInsert ) {
         $Self->{LogObject}->Log(
             Priority => 'error',
             Message  => "DB insert failed!",
         );
+
+        return;
     }
 
-    return;
+    # delete cache
+    $Self->{CacheObject}->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    return $Param{ClientID};
 }
 
 =item ClientRegistrationList()
