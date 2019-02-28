@@ -1,0 +1,44 @@
+# api
+msgid "No \"Authorization\" header found."
+msgid "No token in \"Authorization\" header found."
+msgid "No permission to execute this operation."
+msgid "The resource doen't support the requested method. Please have a look into the \"Allow\" header which methods are supported by this resource."
+msgid "Cannot create or update item, because it already exists."
+msgid "Depending objects prevent this operation."
+msgid "No permission to execute this operation."
+msgid "The requested item cannot be found."
+msgid "The requested item cannot be found or is invalid."
+msgid "Could not create item, please contact the system administrator."
+msgid "Could not update item, please contact the system administrator."
+msgid "Could not delete item, please contact the system administrator."
+msgid "The parent item(s) cannot be found."
+msgid "Authorization not possible, please contact the system administrator."
+msgid "User is not authorized. The requested operation cannot be executed."
+
+# ticket types
+msgid "Unclassified"
+msgid "Incident"
+msgid "Incident::Major"
+msgid "ServiceRequest"
+msgid "Problem"
+
+# ticket priority
+msgid "1 very low"
+msgid "2 low"
+msgid "3 normal"
+msgid "4 high"
+msgid "5 very high"
+
+# ticket states
+msgid "new"
+msgid "open"
+msgid "merged"
+msgid "closed successful"
+msgid "closed unsuccessful"
+msgid "pending auto"
+msgid "removed"
+
+# valid
+msgid "valid"
+msgid "invalid"
+msgid "invalid-temporarily"
