@@ -25,7 +25,13 @@ use Plack::Builder;
 use File::Path qw();
 use Fcntl qw(:flock);
 
-use Kernel::Config;
+use Kernel::System::ObjectManager;
+
+$Kernel::OM = Kernel::System::ObjectManager->new(
+    'Kernel::System::Log' => {
+        LogPrefix => 'API',
+    },
+);
 
 # Workaround: some parts of KIX use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
@@ -34,6 +40,7 @@ BEGIN {
 }
 
 _LockPID();
+_Autostart();
 
 my $App = CGI::Emulate::PSGI->handler(
     sub {
@@ -78,7 +85,7 @@ my $App = CGI::Emulate::PSGI->handler(
 
 sub _LockPID {
 	# create ConfigObject
-	my $ConfigObject = Kernel::Config->new();
+	my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
 	my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
 	my $PIDFile = $PIDDir . "service.pid";
@@ -103,6 +110,14 @@ sub _LockPID {
 	return if !flock( $FH, LOCK_EX | LOCK_NB );
 	print $FH $$;
 	close $FH;
+}
+
+sub _Autostart {
+    my $Result = $Kernel::OM->Get('Kernel::System::Autostart')->Run();
+ 	if ( $Result ) {
+		print STDERR "At least one autostart module failed. Please see the KIX log for details.\n";
+		exit $Result;
+	}
 }
 
 # add middlewares

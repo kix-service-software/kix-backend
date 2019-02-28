@@ -7,14 +7,33 @@
     "ClientRegistration": {
       "type": "object",
       "properties": {
-        "ClientID": {
-          "type": "string"
-        },
         "Authentication": {
           "type": "string"
         },
         "CallbackURL": {
           "type": "string"
+        },
+        "ClientID": {
+          "type": "string"
+        },
+        "Tanslations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Language": {
+                "type": "string"
+              },
+              "Content": {
+                "type": "string",
+                "description": "base64 encoded content of the PO file"
+              }
+            },
+            "required": [
+              "Language",
+              "Content"
+            ]
+          }
         }
       },
       "required": [

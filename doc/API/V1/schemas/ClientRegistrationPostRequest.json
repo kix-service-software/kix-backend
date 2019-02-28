@@ -15,6 +15,25 @@
             },
             "ClientID" : {
                "type" : "string"
+            },
+            "Tanslations" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Content" : {
+                        "description" : "base64 encoded content of the PO file",
+                        "type" : "string"
+                     },
+                     "Language" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Language",
+                     "Content"
+                  ]
+               }
             }
          },
          "required" : [
