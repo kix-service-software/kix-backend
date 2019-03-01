@@ -123,6 +123,93 @@ sub RunOperation {
     );
 }
 
+=item Options()
+
+initialize and gather information about the operation
+
+    my $Return = $CommonObject->Options();
+
+    $Return = {
+        Success => 1,                       # or 0 in case of failure,
+        Code    => 123
+        Message => 'Error Message',
+        Data => {
+            ...
+        }
+    }
+
+=cut
+
+sub Options {
+    my ( $Self, %Param ) = @_;
+    my %Data;
+
+    # init webservice
+    my $Result = $Self->Init(
+        WebserviceID => $Self->{WebserviceID},
+    );
+
+    if ( !$Result->{Success} ) {
+        $Self->_Error(
+            Code    => 'Webservice.InvalidConfiguration',
+            Message => $Result->{Message},
+        );
+    }
+
+    # get parameter definitions (if available)
+    my $Parameters;
+    if ( $Self->can('ParameterDefinition') ) {
+        $Parameters = $Self->ParameterDefinition(
+            %Param,
+        );
+
+        if ( IsHashRefWithData($Parameters) ) {
+            # add parameter information to result
+            $Data{Parameters} = $Parameters;
+        }
+    }
+
+    # add the schema if available
+    my $SchemaLocation = $Kernel::OM->Get('Kernel::Config')->Get('API::JSONSchema::Location');
+    if ( $SchemaLocation && -d $SchemaLocation ) {
+        foreach my $Type ( qw(Request Response) ) {
+            my $Object = $Self->{OperationConfig}->{$Type.'Object'};
+            if ( $Object ) {
+                my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                    Location => "$SchemaLocation/$Object.json",
+                );
+                if ( $Content ) {
+                    $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                        Data => $$Content
+                    );
+                }
+            }
+        }
+    }
+
+    # add the example if available
+    my $ExampleLocation = $Kernel::OM->Get('Kernel::Config')->Get('API::Example::Location');
+    if ( $ExampleLocation && -d $ExampleLocation ) {
+        foreach my $Type ( qw(Request Response) ) {
+            my $Object = $Self->{OperationConfig}->{$Type.'Object'};
+            if ( $Object ) {
+                my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                    Location => "$ExampleLocation/$Object.json",
+                );
+                if ( $Content ) {
+                    $Data{$Type}->{Example} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                        Data => $$Content
+                    );
+                }
+            }
+        }
+    }
+
+    return $Self->_Success(
+        %Data
+    );
+}
+
 =item Init()
 
 initialize the operation by checking the webservice configuration

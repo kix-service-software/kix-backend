@@ -85,8 +85,8 @@ sub ParameterDefinition {
 
     return {
         'DynamicFieldID' => {
-            Type     => 'ARRAY',
             DataType => 'NUMERIC',
+            Type     => 'ARRAY',
             Required => 1
         },           
     }

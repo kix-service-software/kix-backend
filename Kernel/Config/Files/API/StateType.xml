@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">StateTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">StateType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">StateTypeID</Item>
+                <Item Key="ResponseObject">StateTypeResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,8 +18,7 @@
             <Hash>
                 <Item Key="Name">StateTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">StateType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">StateTypeCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -7,10 +7,8 @@
             <Hash>
                 <Item Key="Name">TranslationGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
                 <Item Key="ObjectID">PatternID</Item>
+                <Item Key="ResponseObject">TranslationResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
             </Hash>
@@ -22,9 +20,7 @@
             <Hash>
                 <Item Key="Name">TranslationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ResponseObject">TranslationCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
             </Hash>
@@ -36,9 +32,8 @@
             <Hash>
                 <Item Key="Name">TranslationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">TranslationPostRequest</Item>
+                <Item Key="ResponseObject">TranslationPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -48,9 +43,8 @@
             <Hash>
                 <Item Key="Name">TranslationUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">TranslationPatchRequest</Item>
+                <Item Key="ResponseObject">TranslationPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -60,9 +54,6 @@
             <Hash>
                 <Item Key="Name">TranslationDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -73,10 +64,8 @@
             <Hash>
                 <Item Key="Name">TranslationLanguageGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
                 <Item Key="ObjectID">TranslationID</Item>
+                <Item Key="ResponseObject">TranslationLanguageResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
             </Hash>
@@ -88,9 +77,7 @@
             <Hash>
                 <Item Key="Name">TranslationLanguageSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ResponseObject">TranslationLanguageCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
             </Hash>
@@ -102,9 +89,8 @@
             <Hash>
                 <Item Key="Name">TranslationLanguageCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">TranslationLanguagePostRequest</Item>
+                <Item Key="ResponseObject">TranslationLanguagePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -114,9 +100,8 @@
             <Hash>
                 <Item Key="Name">TranslationLanguageUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">TranslationLanguagePatchRequest</Item>
+                <Item Key="ResponseObject">TranslationLanguagePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -126,9 +111,6 @@
             <Hash>
                 <Item Key="Name">TranslationLanguageDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">I18n</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

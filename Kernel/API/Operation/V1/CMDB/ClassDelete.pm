@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'ClassID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

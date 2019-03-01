@@ -85,11 +85,12 @@ sub ParameterDefinition {
 
     return {
         'FAQArticleID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
         'FAQVoteID' => {
-            Type     => 'ARRAY',
             DataType => 'NUMERIC',
+            Type     => 'ARRAY',
             Required => 1
         },
     }

@@ -85,8 +85,8 @@ sub ParameterDefinition {
 
     return {
         'StandardTemplateID' => {
-            Type     => 'ARRAY',
             DataType => 'NUMERIC',
+            Type     => 'ARRAY',
             Required => 1
         },
     }

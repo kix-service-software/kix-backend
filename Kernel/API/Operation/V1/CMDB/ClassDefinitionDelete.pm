@@ -92,10 +92,12 @@ sub ParameterDefinition {
 
     return {
         'ClassID' => {
+            DataType => 'NUMERIC',
             Required => 1,
             OneOf    => \@ClassIDs,            
         },       
         'DefinitionID' => {
+            DataType => 'NUMERIC',
             Required => 1,
             Type     => 'ARRAY',            
         },

@@ -84,8 +84,8 @@ sub ParameterDefinition {
 
     return {
         'ConfigItemID' => {
-            Type     => 'ARRAY',
             DataType => 'NUMERIC',
+            Type     => 'ARRAY',
             Required => 1
         },
     }

@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">TicketGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">TicketID</Item>
+                <Item Key="ResponseObject">TicketResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
                 <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; CustomerUserID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy; Unseen]</Item>
@@ -23,8 +22,7 @@
             <Hash>
                 <Item Key="Name">TicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -36,8 +34,8 @@
             <Hash>
                 <Item Key="Name">TicketCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketPostRequest</Item>
+                <Item Key="ResponseObject">TicketPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -47,8 +45,8 @@
             <Hash>
                 <Item Key="Name">TicketUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketPatchRequest</Item>
+                <Item Key="ResponseObject">TicketPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -58,8 +56,6 @@
             <Hash>
                 <Item Key="Name">TicketDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -98,9 +94,8 @@
             <Hash>
                 <Item Key="Name">ArticleGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ArticleID</Item>
+                <Item Key="ResponseObject">TicketArticleResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -112,8 +107,7 @@
             <Hash>
                 <Item Key="Name">ArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketArticleCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -125,8 +119,8 @@
             <Hash>
                 <Item Key="Name">ArticleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketArticlePostRequest</Item>
+                <Item Key="ResponseObject">TicketArticlePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -136,8 +130,8 @@
             <Hash>
                 <Item Key="Name">ArticleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketArticlePatchRequest</Item>
+                <Item Key="ResponseObject">TicketArticlePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -147,8 +141,6 @@
             <Hash>
                 <Item Key="Name">ArticleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -183,9 +175,8 @@
             <Hash>
                 <Item Key="Name">ArticleAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
+                <Item Key="ResponseObject">TicketArticleAttachmentResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -197,8 +188,7 @@
             <Hash>
                 <Item Key="Name">ArticleAttachmentSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketArticleAttachmentCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -210,8 +200,8 @@
             <Hash>
                 <Item Key="Name">ArticleAttachmentCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketArticleAttachmentPostRequest</Item>
+                <Item Key="ResponseObject">TicketArticleAttachmentPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -222,9 +212,8 @@
             <Hash>
                 <Item Key="Name">ArticleFlagGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FlagName</Item>
+                <Item Key="ResponseObject">TicketArticleFlagResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -236,8 +225,7 @@
             <Hash>
                 <Item Key="Name">ArticleFlagSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketArticleFlagCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -249,8 +237,8 @@
             <Hash>
                 <Item Key="Name">ArticleFlagCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketArticleFlagPostRequest</Item>
+                <Item Key="ResponseObject">TicketArticleFlagPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -260,8 +248,8 @@
             <Hash>
                 <Item Key="Name">ArticleFlagUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketArticleFlagPostRequest</Item>
+                <Item Key="ResponseObject">TicketArticleFlagPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -272,9 +260,8 @@
             <Hash>
                 <Item Key="Name">HistoryGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">HistoryID</Item>
+                <Item Key="ResponseObject">TicketHistoryResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -286,8 +273,7 @@
             <Hash>
                 <Item Key="Name">HistorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketHistoryCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -300,9 +286,8 @@
             <Hash>
                 <Item Key="Name">ChecklistGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">ArticleID</Item>
+                <Item Key="ObjectID">ChecklistID</Item>
+                <Item Key="ResponseObject">TicketChecklistResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -314,8 +299,7 @@
             <Hash>
                 <Item Key="Name">ChecklistSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketChecklistCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -327,8 +311,8 @@
             <Hash>
                 <Item Key="Name">ChecklistCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketChecklistPostRequest</Item>
+                <Item Key="ResponseObject">TicketChecklistPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -338,8 +322,8 @@
             <Hash>
                 <Item Key="Name">ChecklistUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketChecklistPatchRequest</Item>
+                <Item Key="ResponseObject">TicketChecklistPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -349,8 +333,6 @@
             <Hash>
                 <Item Key="Name">ChecklistDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -361,8 +343,7 @@
             <Hash>
                 <Item Key="Name">WatcherGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketWatcherResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -374,8 +355,7 @@
             <Hash>
                 <Item Key="Name">WatcherSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketWatcherCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
@@ -387,8 +367,8 @@
             <Hash>
                 <Item Key="Name">WatcherCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketWatcherPostRequest</Item>
+                <Item Key="ResponseObject">TicketWatcherPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -398,8 +378,6 @@
             <Hash>
                 <Item Key="Name">WatcherDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -410,8 +388,7 @@
             <Hash>
                 <Item Key="Name">ArticleAttachmentZipGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Ticket</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketArticleAttachmentZipResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>

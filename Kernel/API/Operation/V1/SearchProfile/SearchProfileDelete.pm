@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'SearchProfileID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

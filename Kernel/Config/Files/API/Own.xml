@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">UserGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Own</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">UserID</Item>
+                <Item Key="ResponseObject">UserResponse</Item>
                 <Item Key="CacheType">API_user</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
@@ -22,8 +21,7 @@
             <Hash>
                 <Item Key="Name">SessionGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Own</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SessionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>    
@@ -50,8 +48,7 @@
             <Hash>
                 <Item Key="Name">UserPreferenceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Own</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">UserPreferenceCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -62,8 +59,7 @@
             <Hash>
                 <Item Key="Name">UserRoleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Own</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">UserRoleCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

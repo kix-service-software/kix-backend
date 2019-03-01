@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">SenderTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SenderType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SenderTypeID</Item>
+                <Item Key="ResponseObject">SenderTypeResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,8 +18,7 @@
             <Hash>
                 <Item Key="Name">SenderTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SenderType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SenderTypeCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

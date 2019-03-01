@@ -171,7 +171,7 @@ sub ProviderProcessRequest {
 
     my %PossibleOperations;
 
-    my $RequestMethod = $ENV{'REQUEST_METHOD'} || 'GET';
+    my $RequestMethod = $ENV{'REQUEST_METHOD'} || 'OPTIONS';
     ROUTE:
     for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
 
@@ -179,7 +179,7 @@ sub ProviderProcessRequest {
 
         my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
 
-        if ( IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
+        if ( $RequestMethod ne 'OPTIONS' && IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
             next ROUTE if !grep { $RequestMethod eq $_ } @{ $RouteMapping{RequestMethod} };
         }
 
@@ -223,9 +223,10 @@ sub ProviderProcessRequest {
         }
     }
 
-    if ( !%PossibleOperations ) {
-        # we didn't find any possible operation, respond with 405 - find all allowed methods for this resource
-        my @AllowedMethods;
+    my %AllowedMethods;
+    if ( !%PossibleOperations || $RequestMethod eq 'OPTIONS' ) {
+        # if we didn't find any possible operation, respond with 405 - find all allowed methods for this resource
+        # if we have a OPTIONS request, just determine the allowed methods
         for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
 
             next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
@@ -236,23 +237,28 @@ sub ProviderProcessRequest {
 
             next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
 
-            push(@AllowedMethods, @{$RouteMapping{RequestMethod}});
-        }        
+            $AllowedMethods{$RouteMapping{RequestMethod}->[0]} = {
+                Operation => $CurrentOperation,
+                Route     => $RouteMapping{Route}
+            };
+        }
 
-        return $Self->_Error(
-            Code       => 'NotAllowed',
-            Additional => {
-                AddHeader => {
-                    Allow => join(', ', @AllowedMethods),
+        if ( !%PossibleOperations && $RequestMethod ne 'OPTIONS' ) {
+            return $Self->_Error(
+                Code       => 'NotAllowed',
+                Additional => {
+                    AddHeader => {
+                        Allow => join(', ', sort keys %AllowedMethods),
+                    }
                 }
-            }
-        );
+            );
+        }
     }
 
     # use the most recent operation (prefer "hard" routes above parameterized routes)
-    my $CurrentRoute = (reverse sort keys %PossibleOperations)[0];
-    $Operation = $PossibleOperations{$CurrentRoute}->{Operation};
-    %URIData   = %{$PossibleOperations{$CurrentRoute}->{URIParams}};
+    my $CurrentRoute = %PossibleOperations ? (reverse sort keys %PossibleOperations)[0] : $RequestURI;
+    $Operation = $PossibleOperations{$CurrentRoute} ? $PossibleOperations{$CurrentRoute}->{Operation} : '';
+    %URIData   = %PossibleOperations ? %{$PossibleOperations{$CurrentRoute}->{URIParams}} : ();
 
     # get direct sub-resource for generic including
     my %ResourceOperationRouteMapping = (
@@ -264,7 +270,12 @@ sub ProviderProcessRequest {
         # ignore non-search or -get operations
         next if $Op !~ /(Search|Get)$/;
         # ignore anything that has nothing to do with the current Ops route
-        next if "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\//;
+        if ( $CurrentRoute ne '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
+            next;
+        }
+        elsif ( $CurrentRoute eq '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
+            next;
+        }
 
         $ResourceOperationRouteMapping{$Op} = $Config->{RouteOperationMapping}->{$Op}->{Route};
     }
@@ -274,7 +285,7 @@ sub ProviderProcessRequest {
         %URIData = ( %QueryParams, %URIData, );
     }
 
-    if ( !$Operation ) {
+    if ( !$Operation && $RequestMethod ne 'OPTIONS' ) {
         return $Self->_Error(
             Code    => 'Transport.REST.OperationNotFound',
             Message => "HTTP::REST Error while determine Operation for request URI '$RequestURI'.",
@@ -284,9 +295,11 @@ sub ProviderProcessRequest {
     my $Length = $ENV{'CONTENT_LENGTH'};
 
     # no length provided, return the information we have
-    if ( !$Length ) {
+    if ( !$Length || $RequestMethod eq 'OPTIONS' ) {
         return $Self->_Success(
-            Operation => $Operation,
+            Route          => $CurrentRoute,
+            Operation      => $Operation,
+            AllowedMethods => \%AllowedMethods,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             Data      => {
                 %URIData,
@@ -535,13 +548,13 @@ sub RequesterPerformRequest {
 
     # check transport config
     if ( !IsHashRefWithData( $Self->{TransportConfig} ) ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoTransportConfig',
             Message => 'REST Transport: Have no TransportConfig',
         );
     }
     if ( !IsHashRefWithData( $Self->{TransportConfig}->{Config} ) ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoTransportConfig',
             Message => 'REST Transport: Have no Config',
         );
@@ -552,7 +565,7 @@ sub RequesterPerformRequest {
     for my $Needed (qw(Host DefaultCommand)) {
         next NEEDED if IsStringWithData( $Config->{$Needed} );
 
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.TransportConfigInvalid',
             Message => "REST Transport: Have no $Needed in config",
         );
@@ -560,7 +573,7 @@ sub RequesterPerformRequest {
 
     # check data param
     if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.DataMissing',
             Message => 'REST Transport: Invalid Data',
         );
@@ -568,7 +581,7 @@ sub RequesterPerformRequest {
 
     # check operation param
     if ( !IsStringWithData( $Param{Operation} ) ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.DataMissing',
             Message => 'REST Transport: Need Operation',
         );
@@ -611,7 +624,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $Message,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.InternalError',
             Message => $Message,
         );
@@ -653,7 +666,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $Message,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.InvalidMethod',
             Message => $Message,
         );
@@ -673,7 +686,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $Message,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoInvokerControllerMapping',
             Message => $Message,
         );
@@ -827,7 +840,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => $ResponseCode,
             Message => $ResponseError,
         );
@@ -842,7 +855,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoContent',
             Message => $ResponseError,
         );
@@ -896,7 +909,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.InvalidJSON',
             Message => $ResponseError,
         );

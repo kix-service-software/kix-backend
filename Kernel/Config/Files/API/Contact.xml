@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ContactGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ContactID</Item>
+                <Item Key="ResponseObject">ContactResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>
                 <Item Key="CacheTypeDependency">CustomerUser</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">ContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                
                 <Item Key="CacheTypeDependency">CustomerUser</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">ContactCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ContactPostRequest</Item>
+                <Item Key="ResponseObject">ContactPostPatchResponse</Item>
                 <Item Key="DefaultSource">Contact</Item>
             </Hash>
         </Setting>
@@ -48,8 +46,8 @@
             <Hash>
                 <Item Key="Name">ContactUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ContactPatchRequest</Item>
+                <Item Key="ResponseObject">ContactPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -72,8 +70,7 @@
             <Hash>
                 <Item Key="Name">ContactTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>

@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'SystemAddressID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

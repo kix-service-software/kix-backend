@@ -85,9 +85,11 @@ sub ParameterDefinition {
 
     return {
         'UserID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
         'RoleID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
     }
