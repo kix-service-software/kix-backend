@@ -214,7 +214,7 @@ sub Run {
             $Class{ConfigItemStats} = \%ConfigItemStats;
 
             # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'ITSMConfigItem');
+            $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
         }
 
         push(@ClassList, \%Class);

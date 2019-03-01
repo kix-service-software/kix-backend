@@ -140,6 +140,7 @@ sub Run {
                     VersionID     => $ConfigItem->{LastVersionID},
                 }
             );
+            
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
                 $ConfigItem->{CurrentVersion} = $Result->{Data}->{ConfigItemVersion};
             }

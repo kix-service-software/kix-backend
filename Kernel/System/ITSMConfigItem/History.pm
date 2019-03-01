@@ -69,9 +69,12 @@ sub HistoryGet {
         }
     }
 
-    # if cached result exists, return that result
-    return $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} }
-        if $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} };
+    my $CacheKey = 'HistoryGet::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # fetch some data from history for given config item
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -105,8 +108,13 @@ sub HistoryGet {
         Entries      => \@Entries,
     );
 
-    # save result in cache
-    $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} } = $Result;
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result,
+    );
 
     return $Result;
 }
@@ -148,11 +156,12 @@ sub HistoryEntryGet {
         }
     }
 
-    # if cached result exists, return that result
-    if ( $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} } ) {
-        my ($ConfigItemID) = keys %{ $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} } };
-        return $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} }->{$ConfigItemID};
-    }
+    my $CacheKey = 'HistoryEntryGet::'.$Param{HistoryEntryID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # fetch a single entry from history
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -184,7 +193,13 @@ sub HistoryEntryGet {
         Entries      => [ \%Entry ],
     );
 
-    $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} }->{ $Entry{ConfigItemID} } = $Result->[0];
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result->[0],
+    );
 
     return $Result->[0];
 }
@@ -269,9 +284,6 @@ sub HistoryAdd {
         }
     }
 
-    # delete cached results
-    delete $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} };
-
     # shorten the comment if it is bigger than max length
     if ( length( $Param{Comment} ) > 255 ) {
 
@@ -291,6 +303,11 @@ sub HistoryAdd {
 
         $Param{Comment} = $NewComment;
     }
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # insert history entry
     return $Kernel::OM->Get('Kernel::System::DB')->Do(
@@ -336,6 +353,11 @@ sub HistoryDelete {
         delete $Self->{Cache}->{Versions}->{$VersionNr} if $CacheConfigItem eq $Param{ConfigItemID};
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # delete history for given config item
     return $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE configitem_id = ?',
@@ -366,6 +388,11 @@ sub HistoryEntryDelete {
             return;
         }
     }
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # delete single entry
     return $Kernel::OM->Get('Kernel::System::DB')->Do(
@@ -404,9 +431,12 @@ sub HistoryTypeLookup {
         return;
     }
 
-    # if result is cached return that result
-    return $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} }
-        if $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} };
+    my $CacheKey = 'HistoryTypeLookup::'.($Param{HistoryTypeID}||'').'::'.($Param{HistoryType}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # set the appropriate SQL statement
     my $SQL = 'SELECT name FROM configitem_history_type WHERE id = ?';
@@ -427,8 +457,13 @@ sub HistoryTypeLookup {
         $Value = $Row[0];
     }
 
-    # save value in cache
-    $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} } = $Value;
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Value,
+    );
 
     return $Value;
 }

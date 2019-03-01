@@ -9,6 +9,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ClassID</Item>
                 <Item Key="ResponseObject">ConfigItemClassResponse</Item>
+                <Item Key="CacheType">API_cmdb_classes</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,6 +21,8 @@
                 <Item Key="Name">ClassSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseObject">ConfigItemClassCollectionResponse</Item>
+                <Item Key="CacheType">API_cmdb_classes</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -62,6 +66,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
                 <Item Key="ResponseObject">ConfigItemClassDefinitionResponse</Item>
+                <Item Key="CacheType">API_cmdb_classes</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -73,6 +79,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
                 <Item Key="ResponseObject">ConfigItemClassDefinitionCollectionResponse</Item>
+                <Item Key="CacheType">API_cmdb_classes</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -105,6 +113,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ConfigItemID</Item>
                 <Item Key="ResponseObject">ConfigItemResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -115,6 +125,8 @@
                 <Item Key="Name">ConfigItemSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseObject">ConfigItemCollectionResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -158,6 +170,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">VersionID</Item>
                 <Item Key="ResponseObject">ConfigItemVersionResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -168,6 +182,8 @@
                 <Item Key="Name">ConfigItemVersionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseObject">ConfigItemVersionCollectionResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -191,6 +207,8 @@
                 <Item Key="APIImage">V1</Item>
                 <Item Key="ObjectID">ImageID</Item>
                 <Item Key="ResponseObject">ConfigItemImageResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -201,6 +219,8 @@
                 <Item Key="Name">ConfigItemImageSearch</Item>
                 <Item Key="APIImage">V1</Item>
                 <Item Key="ResponseObject">ConfigItemImageCollectionResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -235,6 +255,8 @@
                 <Item Key="APIHistory">V1</Item>
                 <Item Key="ObjectID">HistoryID</Item>
                 <Item Key="ResponseObject">ConfigItemHistoryResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -245,6 +267,8 @@
                 <Item Key="Name">ConfigItemHistorySearch</Item>
                 <Item Key="APIHistory">V1</Item>
                 <Item Key="ResponseObject">ConfigItemHistoryCollectionResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -257,6 +281,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
                 <Item Key="ResponseObject">ConfigItemAttachmentResponse</Item>
+                <Item Key="CacheType">API_cmdb_configitems</Item>
+                <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>    
