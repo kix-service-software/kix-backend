@@ -88,6 +88,7 @@ sub ParameterDefinition {
             Required => 1
         },        
         'ImageID' => {
+            DataType => 'STRING',
             Type     => 'ARRAY',
             Required => 1
         },

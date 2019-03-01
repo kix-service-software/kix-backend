@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'RoleID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ServiceGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Service</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ServiceID</Item>
+                <Item Key="ResponseObject">ServiceResponse</Item>
                 <Item Key="CacheType">API_services</Item>
                 <Item Key="CacheTypeDependency">Service</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">ServiceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Service</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ServiceCollectionResponse</Item>
                 <Item Key="CacheType">API_services</Item>                
                 <Item Key="CacheTypeDependency">Service</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">ServiceCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Service</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ServicePostRequest</Item>
+                <Item Key="ResponseObject">ServicePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">ServiceUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Service</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ServicePatchRequest</Item>
+                <Item Key="ResponseObject">ServicePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +54,6 @@
             <Hash>
                 <Item Key="Name">ServiceDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Service</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

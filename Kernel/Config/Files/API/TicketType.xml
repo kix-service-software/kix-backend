@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">TicketTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TicketType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">TypeID</Item>
+                <Item Key="ResponseObject">TicketTypeResponse</Item>
                 <Item Key="CacheType">API_tickettypes</Item>
                 <Item Key="CacheTypeDependency">Type</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">TickeTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TicketType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_tickettypes</Item>                
                 <Item Key="CacheTypeDependency">Type</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">TicketTypeCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TicketType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketTypePostRequest</Item>
+                <Item Key="ResponseObject">TicketTypePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">TicketTypeUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TicketType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TicketTypePatchRequest</Item>
+                <Item Key="ResponseObject">TicketTypePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,8 +54,6 @@
             <Hash>
                 <Item Key="Name">TicketTypeDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TicketType</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

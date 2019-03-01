@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'SLAID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

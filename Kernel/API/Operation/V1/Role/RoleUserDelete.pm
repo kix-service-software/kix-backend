@@ -84,10 +84,12 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'UserID' => {
+        'RoleID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
-        'RoleID' => {
+        'UserID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
     }

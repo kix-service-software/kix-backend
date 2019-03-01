@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'TypeID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

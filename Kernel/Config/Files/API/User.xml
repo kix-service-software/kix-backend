@@ -7,10 +7,8 @@
             <Hash>
                 <Item Key="Name">UserGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
                 <Item Key="ObjectID">UserID</Item>
+                <Item Key="ResponseObject">UserResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
@@ -22,9 +20,7 @@
             <Hash>
                 <Item Key="Name">UserSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ResponseObject">UserCollectionResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
@@ -36,9 +32,8 @@
             <Hash>
                 <Item Key="Name">UserCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">UserPostRequest</Item>
+                <Item Key="ResponseObject">UserPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -48,9 +43,8 @@
             <Hash>
                 <Item Key="Name">UserUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">UserPatchRequest</Item>
+                <Item Key="ResponseObject">UserPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -77,10 +71,8 @@
             <Hash>
                 <Item Key="Name">UserPreferenceGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
-                <Item Key="ObjectID">UserID</Item>
+                <Item Key="ObjectID">UserPreferenceID</Item>
+                <Item Key="ResponseObject">UserPreferenceResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
@@ -92,9 +84,7 @@
             <Hash>
                 <Item Key="Name">UserPreferenceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ResponseObject">UserPreferenceCollectionResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
@@ -106,9 +96,8 @@
             <Hash>
                 <Item Key="Name">UserPreferenceCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">UserPreferencePostRequest</Item>
+                <Item Key="ResponseObject">UserPreferencePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -118,9 +107,8 @@
             <Hash>
                 <Item Key="Name">UserPreferenceUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">UserPreferencePatchRequest</Item>
+                <Item Key="ResponseObject">UserPreferencePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -130,9 +118,6 @@
             <Hash>
                 <Item Key="Name">UserPreferenceDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -143,9 +128,7 @@
             <Hash>
                 <Item Key="Name">UserRoleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ResponseObject">UserRoleIDCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -155,9 +138,8 @@
             <Hash>
                 <Item Key="Name">UserRoleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">UserRoleIDPostRequest</Item>
+                <Item Key="ResponseObject">UserRoleIDPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -167,9 +149,6 @@
             <Hash>
                 <Item Key="Name">UserRoleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">User</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

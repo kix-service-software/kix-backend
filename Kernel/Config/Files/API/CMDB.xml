@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ClassGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ClassID</Item>
+                <Item Key="ResponseObject">ConfigItemClassResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,8 +18,7 @@
             <Hash>
                 <Item Key="Name">ClassSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ConfigItemClassCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -30,8 +28,8 @@
             <Hash>
                 <Item Key="Name">ClassCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemClassPostRequest</Item>
+                <Item Key="ResponseObject">ConfigItemClassPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -41,8 +39,8 @@
             <Hash>
                 <Item Key="Name">ClassUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemClassPatchRequest</Item>
+                <Item Key="ResponseObject">ConfigItemClassPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -52,9 +50,6 @@
             <Hash>
                 <Item Key="Name">ClassDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -65,9 +60,8 @@
             <Hash>
                 <Item Key="Name">ClassDefinitionGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
+                <Item Key="ResponseObject">ConfigItemClassDefinitionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -77,9 +71,8 @@
             <Hash>
                 <Item Key="Name">ClassDefinitionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
+                <Item Key="ResponseObject">ConfigItemClassDefinitionCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -89,8 +82,6 @@
             <Hash>
                 <Item Key="Name">ClassDefinitionDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -100,8 +91,8 @@
             <Hash>
                 <Item Key="Name">ClassDefinitionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemClassDefinitionPostRequest</Item>
+                <Item Key="ResponseObject">ConfigItemClassDefinitionPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -112,9 +103,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ConfigItemID</Item>
+                <Item Key="ResponseObject">ConfigItemResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -124,8 +114,7 @@
             <Hash>
                 <Item Key="Name">ConfigItemSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ConfigItemCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -135,8 +124,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemPostRequest</Item>
+                <Item Key="ResponseObject">ConfigItemPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -146,8 +135,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemPatchRequest</Item>
+                <Item Key="ResponseObject">ConfigItemPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -157,8 +146,6 @@
             <Hash>
                 <Item Key="Name">ConfigItemDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -169,9 +156,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemVersionGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">VersionID</Item>
+                <Item Key="ResponseObject">ConfigItemVersionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -181,8 +167,7 @@
             <Hash>
                 <Item Key="Name">ConfigItemVersionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ConfigItemVersionCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -192,8 +177,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemVersionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemVersionPostRequest</Item>
+                <Item Key="ResponseObject">ConfigItemVersionPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -204,9 +189,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemImageGet</Item>
                 <Item Key="APIImage">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ImageID</Item>
+                <Item Key="ResponseObject">ConfigItemImageResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -216,8 +200,7 @@
             <Hash>
                 <Item Key="Name">ConfigItemImageSearch</Item>
                 <Item Key="APIImage">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ConfigItemImageCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -227,8 +210,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemImageCreate</Item>
                 <Item Key="APIImage">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ConfigItemImagePostRequest</Item>
+                <Item Key="ResponseObject">ConfigItemImagePostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -250,9 +233,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemHistoryGet</Item>
                 <Item Key="APIHistory">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">HistoryID</Item>
+                <Item Key="ResponseObject">ConfigItemHistoryResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -262,8 +244,7 @@
             <Hash>
                 <Item Key="Name">ConfigItemHistorySearch</Item>
                 <Item Key="APIHistory">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ConfigItemHistoryCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -274,9 +255,8 @@
             <Hash>
                 <Item Key="Name">ConfigItemAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">CMDB</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
+                <Item Key="ResponseObject">ConfigItemAttachmentResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>    

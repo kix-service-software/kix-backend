@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">SystemAddressGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SystemAddress</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">SystemAddressID</Item>
+                <Item Key="ResponseObject">SystemAddressResponse</Item>
                 <Item Key="CacheType">API_systemaddresses</Item>
                 <Item Key="CacheTypeDependency">SystemAddress</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">SystemAddressSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SystemAddress</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SystemAddressCollectionResponse</Item>
                 <Item Key="CacheType">API_systemaddresses</Item>                
                 <Item Key="CacheTypeDependency">SystemAddress</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">SystemAddressCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SystemAddress</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">SystemAddressPostRequest</Item>
+                <Item Key="ResponseObject">SystemAddressPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">SystemAddressUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SystemAddress</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">SystemAddressPatchRequest</Item>
+                <Item Key="ResponseObject">SystemAddressPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +54,6 @@
             <Hash>
                 <Item Key="Name">SystemAddressDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SystemAddress</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

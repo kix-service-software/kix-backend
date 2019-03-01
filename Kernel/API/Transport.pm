@@ -117,7 +117,7 @@ sub ProviderProcessRequest {
     my $Result = $Self->{BackendObject}->ProviderProcessRequest(%Param);
 
     # make sure an operation is provided in success case
-    if ( $Result->{Success} && !$Result->{Operation} ) {
+    if ( $Result->{Success} && !$Result->{Operation} && $Result->{Data}->{RequestMethod} ne 'OPTIONS' ) {
 
         return $Self->_Error(
             Code    => 'Transport.OperationNotFound',

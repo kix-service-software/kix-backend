@@ -85,9 +85,11 @@ sub ParameterDefinition {
 
     return {
         'TranslationID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
         'Language' => {
+            DataType => 'STRING',
             Required => 1
         },
     }

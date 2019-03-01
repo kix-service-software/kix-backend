@@ -226,4 +226,18 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::JSONSchema::Location" Required="1" Valid="1">
+        <Description Translatable="1">Defines the location where the JSON schema files are located.</Description>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/doc/API/V1/schemas</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Example::Location" Required="1" Valid="1">
+        <Description Translatable="1">Defines the location where the example files are located.</Description>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/doc/API/V1/examples</String>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>

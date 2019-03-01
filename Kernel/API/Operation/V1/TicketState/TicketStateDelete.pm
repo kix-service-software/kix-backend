@@ -87,6 +87,7 @@ sub ParameterDefinition {
 
     return {
         'StateID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

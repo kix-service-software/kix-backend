@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'GeneralCatalogItemID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'ObjectIconID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         }                

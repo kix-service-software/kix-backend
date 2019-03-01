@@ -84,6 +84,7 @@ sub ParameterDefinition {
 
     return {
         'TicketID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
     }

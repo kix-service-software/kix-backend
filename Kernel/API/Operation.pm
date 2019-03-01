@@ -198,8 +198,31 @@ sub Run {
         );
     }
 
-    # start map on backend
+    # start the backend
     return $Self->{BackendObject}->RunOperation(%Param);
+}
+
+=item Options()
+
+gather information about the Operation.
+
+    my $Result = $OperationObject->Options();
+
+    $Result = {
+        Success         => 1,                   # 0 or 1
+        ErrorMessage    => '',                  # in case of error
+        Data            => {                    # result data payload after Operation
+            ...
+        },
+    };
+
+=cut
+
+sub Options {
+    my ( $Self, %Param ) = @_;    
+
+    # start the backend
+    return $Self->{BackendObject}->Options(%Param);
 }
 
 =item GetCacheDependencies()

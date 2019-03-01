@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'MailAccountID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

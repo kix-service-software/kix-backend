@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'AttachmentID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

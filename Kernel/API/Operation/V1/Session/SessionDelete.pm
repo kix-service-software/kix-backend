@@ -81,6 +81,7 @@ sub ParameterDefinition {
 
     return {
         'Token' => {
+            DataType => 'STRING',
             Required => 1
         }                
     }

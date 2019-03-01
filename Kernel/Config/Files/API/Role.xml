@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">RoleGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">RoleID</Item>
+                <Item Key="ResponseObject">RoleResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Group</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">RoleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">RoleCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Group</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">RoleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">RolePostRequest</Item>
+                <Item Key="ResponseObject">RolePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">RoleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">RolePatchRequest</Item>
+                <Item Key="ResponseObject">RolePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +54,6 @@
             <Hash>
                 <Item Key="Name">RoleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -69,9 +64,7 @@
             <Hash>
                 <Item Key="Name">RoleUserSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:ro</Item>
+                <Item Key="ResponseObject">RoleUserIDCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -81,9 +74,8 @@
             <Hash>
                 <Item Key="Name">RoleUserCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="RequestObject">RoleUserIDPostRequest</Item>
+                <Item Key="ResponseObject">RoleUserIDPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -93,9 +85,6 @@
             <Hash>
                 <Item Key="Name">RoleUserDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Role</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

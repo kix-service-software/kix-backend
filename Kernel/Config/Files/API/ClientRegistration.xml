@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ClientRegistrationGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ClientRegistration</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ClientID</Item>
+                <Item Key="ResponseObject">ClientRegistrationResponse</Item>
                 <Item Key="CacheType">API_clientregistration</Item>
                 <Item Key="CacheTypeDependency">ClientRegistration</Item>
             </Hash>
@@ -21,9 +20,7 @@
             <Hash>
                 <Item Key="Name">ClientRegistrationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ClientRegistration</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+                <Item Key="ResponseObject">ClientRegistrationCollectionResponse</Item>
                 <Item Key="CacheType">API_clientregistration</Item>                
                 <Item Key="CacheTypeDependency">ClientRegistration</Item>
             </Hash>
@@ -35,8 +32,8 @@
             <Hash>
                 <Item Key="Name">ClientRegistrationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ClientRegistration</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ClientRegistrationPostRequest</Item>
+                <Item Key="ResponseObject">ClientRegistrationPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -46,8 +43,6 @@
             <Hash>
                 <Item Key="Name">ClientRegistrationDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ClientRegistration</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

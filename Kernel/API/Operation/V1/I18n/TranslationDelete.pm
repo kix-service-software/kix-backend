@@ -92,8 +92,8 @@ sub ParameterDefinition {
 
     return {
         'TranslationID' => {
-            Type     => 'ARRAY',
             DataType => 'NUMERIC',
+            Type     => 'ARRAY',
             Required => 1
         }                
     }

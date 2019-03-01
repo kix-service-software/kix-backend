@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'TextModuleID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ChannelGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Channel</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ChannelID</Item>
+                <Item Key="ResponseObject">ChannelResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,8 +18,7 @@
             <Hash>
                 <Item Key="Name">TickeTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Channel</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ChannelCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

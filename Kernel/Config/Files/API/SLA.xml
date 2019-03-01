@@ -7,8 +7,7 @@
             <Hash>
                 <Item Key="Name">SLAGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SLA</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SLAResponse</Item>
                 <Item Key="ObjectID">SLAID</Item>
                 <Item Key="CacheType">API_slas</Item>
                 <Item Key="CacheTypeDependency">SLA</Item>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">SLASearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SLA</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SLACollectionResponse</Item>
                 <Item Key="CacheType">API_slas</Item>                
                 <Item Key="CacheTypeDependency">SLA</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">SLACreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SLA</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">SLAPostRequest</Item>
+                <Item Key="ResponseObject">SLAPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">SLAUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SLA</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">SLAPatchRequest</Item>
+                <Item Key="ResponseObject">SLAPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +54,6 @@
             <Hash>
                 <Item Key="Name">SLADelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SLA</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

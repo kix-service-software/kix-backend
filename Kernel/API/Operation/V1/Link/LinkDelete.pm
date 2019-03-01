@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'LinkID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

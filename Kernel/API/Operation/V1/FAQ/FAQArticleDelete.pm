@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'FAQArticleID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },

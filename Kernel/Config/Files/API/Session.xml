@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">SessionGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Session</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">Token</Item>
+                <Item Key="ResponseObject">SessionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -20,8 +19,7 @@
             <Hash>
                 <Item Key="Name">SessionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Session</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SessionCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -32,8 +30,6 @@
             <Hash>
                 <Item Key="Name">SessionDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Session</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

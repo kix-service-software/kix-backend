@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">QueueGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">QueueID</Item>
+                <Item Key="ResponseObject">QueueResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">QueueSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">QueueCollectionResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">QueueCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">QueuePostRequest</Item>
+                <Item Key="ResponseObject">QueuePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">QueueUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">QueuePatchRequest</Item>
+                <Item Key="ResponseObject">QueuePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +54,6 @@
             <Hash>
                 <Item Key="Name">QueueDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

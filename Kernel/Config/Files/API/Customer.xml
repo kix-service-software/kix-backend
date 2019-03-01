@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">CustomerGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">CustomerID</Item>
+                <Item Key="ResponseObject">CustomerResponse</Item>
                 <Item Key="CacheType">API_customers</Item>
                 <Item Key="CacheTypeDependency">CustomerCompany</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">CustomerSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">CustomerCollectionResponse</Item>
                 <Item Key="CacheType">API_customers</Item>                
                 <Item Key="CacheTypeDependency">CustomerCompany</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">CustomerCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">CustomerPostRequest</Item>
+                <Item Key="ResponseObject">CustomerPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -47,8 +45,8 @@
             <Hash>
                 <Item Key="Name">CustomerUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">CustomerPatchRequest</Item>
+                <Item Key="ResponseObject">CustomerPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -59,8 +57,6 @@
             <Hash>
                 <Item Key="Name">CustomerSourceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -71,8 +67,7 @@
             <Hash>
                 <Item Key="Name">CustomerContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_customers</Item>                
                 <Item Key="CacheTypeDependency">CustomerUser</Item>
             </Hash>
@@ -85,8 +80,7 @@
             <Hash>
                 <Item Key="Name">CustomerTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Customer</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_customers</Item>                
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>

@@ -182,14 +182,81 @@ sub Run {
         );
     }
 
-    my $Operation = $FunctionResult->{Operation};
-
-    $Self->{DebuggerObject}->Debug(
-        Summary => "Detected operation '$Operation'",
-    );
-
-    # store route mapping for later use
+    my $Operation      = $FunctionResult->{Operation};
+    my $CurrentRoute   = $FunctionResult->{Route};
+    my $AllowedMethods = $FunctionResult->{AllowedMethods};
+    my $RequestMethod  = $FunctionResult->{Data}->{RequestMethod};
     my $ResourceOperationRouteMapping = $FunctionResult->{ResourceOperationRouteMapping};
+
+    if ( $Operation ) {
+        $Self->{DebuggerObject}->Debug(
+            Summary => "Detected operation '$Operation'",
+        );
+    }
+
+    # check if we have to respond to an OPTIONS request instead of executing the operation
+    if ( $RequestMethod eq 'OPTIONS' ) {
+        my $Data;
+
+        # add information about each allowed method
+        foreach my $AllowedMethod ( sort keys %{$AllowedMethods} ) {
+
+            # create an operation object for each allowed method and ask it for options
+            my $Operation = $AllowedMethods->{$AllowedMethod}->{Operation}; 
+
+            my $OperationObject = Kernel::API::Operation->new(
+                DebuggerObject          => $Self->{DebuggerObject},
+                APIVersion              => $Webservice->{Config}->{APIVersion},
+                Operation               => $Operation,
+                OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
+                WebserviceID            => $WebserviceID,
+                OperationRouteMapping   => $ResourceOperationRouteMapping,
+            );
+
+            # if operation init failed, bail out
+            if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
+                return $Self->_GenerateErrorResponse(
+                    %{$OperationObject},
+                );
+            }
+
+            # get options from operation
+            my $OptionsResult = $OperationObject->Options();
+
+            $Data->{Methods}->{$AllowedMethod} = {
+                %{$OptionsResult->{Data}},
+                Route  => $AllowedMethods->{$AllowedMethod}->{Route},
+                AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
+            }
+        }
+
+        # add information about sub-resources
+        $CurrentRoute = '' if $CurrentRoute eq '/';
+        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ResourceOperationRouteMapping});
+        if ( @ChildResources ) {
+            $Data->{Resources} = \@ChildResources;
+        }
+
+        my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
+            Success => 1,
+            Data    => $Data,
+            Additional => {
+                AddHeader => {
+                    Allow => join(', ', sort keys %{$AllowedMethods}),
+                }
+            }
+        );
+
+        if ( !$FunctionResult->{Success} ) {
+            $Self->_Error(
+                Code    => 'Provider.InternalError',
+                Message => 'Response could not be sent',
+                Data    => $FunctionResult->{ErrorMessage},
+            );
+        }
+
+        return;
+    }
 
     #
     # Map the incoming data based on the configured mapping
@@ -204,7 +271,7 @@ sub Run {
 
     # decide if mapping needs to be used or not
     if (
-        IsHashRefWithData( $ProviderConfig->{Operation}->{$Operation}->{MappingInbound} )
+        $Operation && IsHashRefWithData( $ProviderConfig->{Operation}->{$Operation}->{MappingInbound} )
         )
     {
         my $MappingInObject = Kernel::API::Mapping->new(
@@ -284,6 +351,7 @@ sub Run {
         );
     }
 
+    # execute the actual operation
     my $FunctionResultOperation = $OperationObject->Run(
         Data => $DataIn,
     );

@@ -85,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'QueueID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },
