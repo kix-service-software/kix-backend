@@ -173,7 +173,7 @@ sub DefinitionGet {
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return @{$Cache} if $Cache;
+    return $Cache if $Cache;
 
     if ( $Param{DefinitionID} ) {
 
