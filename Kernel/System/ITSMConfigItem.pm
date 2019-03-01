@@ -157,6 +157,13 @@ sub ConfigItemCount {
         return;
     }
 
+    my $CacheKey = 'ConfigItemCount::'.$Param{ClassID}.'::'.$Param{IncludePostproductive};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # get state list
     my @Functionality = ( 'preproductive', 'productive' );
     push( @Functionality, 'postproductive' ) if ( $Param{IncludePostproductive} );
@@ -186,6 +193,14 @@ sub ConfigItemCount {
         $Count = $Row[0];
     }
 
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Count,
+    );
+
     return $Count;
 }
 
@@ -212,6 +227,13 @@ sub ConfigItemResultList {
         );
         return;
     }
+
+    my $CacheKey = 'ConfigItemResultList::'.$Param{ClassID}.'::'.$Param{Start}.'::'.$Param{Limit};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # get state list
     my $StateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
@@ -252,6 +274,14 @@ sub ConfigItemResultList {
 
         push @ConfigItemList, $LastVersion;
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@ConfigItemList,
+    );
 
     return \@ConfigItemList;
 }
@@ -499,6 +529,11 @@ sub ConfigItemAdd {
         $ConfigItemID = $Row[0];
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # trigger ConfigItemCreate
     $Self->EventHandler(
         Event => 'ConfigItemCreate',
@@ -691,11 +726,9 @@ sub ConfigItemDelete {
         Bind => [ \$Param{ConfigItemID} ],
     );
 
-    # delete the cache
-    my $CacheKey = 'ConfigItemGet::ConfigItemID::' . $Param{ConfigItemID};
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $CacheKey,
     );
 
     return $Success;
@@ -745,6 +778,11 @@ sub ConfigItemAttachmentAdd {
 
     # check for error
     if ($Success) {
+
+        # clear cache
+        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+            Type => $Self->{CacheType},
+        );
 
         # trigger AttachmentAdd-Event
         $Self->EventHandler(
@@ -807,6 +845,11 @@ sub ConfigItemAttachmentDelete {
 
     # check for error
     if ($Success) {
+
+        # clear cache
+        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+            Type => $Self->{CacheType},
+        );
 
         # trigger AttachmentDeletePost-Event
         $Self->EventHandler(
@@ -938,6 +981,13 @@ sub ConfigItemAttachmentList {
         return;
     }
 
+    my $CacheKey = 'ConfigItemAttachmentList::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
     # find all attachments of this config item
     my @Attachments = $Kernel::OM->Get('Kernel::System::VirtualFS')->Find(
         Preferences => {
@@ -950,6 +1000,14 @@ sub ConfigItemAttachmentList {
         # remove extra information from filename
         $Filename =~ s{ \A ConfigItem / \d+ / }{}xms;
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Attachments,
+    );
 
     return @Attachments;
 }
@@ -1516,9 +1574,12 @@ sub ConfigItemLookup {
         return;
     }
 
-    # if result is cached return that result
-    return $Self->{Cache}->{ConfigItemLookup}->{$Key}->{ $Param{$Key} }
-        if $Self->{Cache}->{ConfigItemLookup}->{$Key}->{ $Param{$Key} };
+    my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # set the appropriate SQL statement
     my $SQL = 'SELECT configitem_number FROM configitem WHERE id = ?';
@@ -1539,7 +1600,13 @@ sub ConfigItemLookup {
         $Value = $Row[0];
     }
 
-    $Self->{Cache}->{ConfigItemLookup}->{$Key}->{ $Param{$Key} } = $Value;
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Value,
+    );
 
     return $Value;
 }
@@ -1928,6 +1995,11 @@ sub CurInciStateRecalc {
             UserID    => 1,
         );
     }
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     return 1;
 }
