@@ -97,6 +97,9 @@ msgstr ""
 msgid "pending auto"
 msgstr ""
 
+msgid "pending reminder"
+msgstr ""
+
 msgid "removed"
 msgstr ""
 
