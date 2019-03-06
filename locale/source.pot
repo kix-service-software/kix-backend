@@ -17,9 +17,6 @@ msgstr ""
 msgid "Depending objects prevent this operation."
 msgstr ""
 
-msgid "No permission to execute this operation."
-msgstr ""
-
 msgid "The requested item cannot be found."
 msgstr ""
 
