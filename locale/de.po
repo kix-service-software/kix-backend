@@ -150,3 +150,13 @@ msgstr ""
 
 msgid "new ticket"
 msgstr ""
+
+# auto response type
+msgid "auto reply"
+msgstr ""
+
+msgid "auto reject"
+msgstr ""
+
+msgid "auto follow up"
+msgstr ""
