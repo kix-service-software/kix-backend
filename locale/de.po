@@ -24,8 +24,12 @@ msgstr "Kein Token im \"Authorization\"-Header gefunden."
 msgid "No permission to execute this operation."
 msgstr "Keine Berechtigung, um die Operation auszuführen."
 
+#, fuzzy
+#| msgid ""
+#| "The resource doen't support the requested method. Please have a look into "
+#| "the \"Allow\" header which methods are supported by this resource."
 msgid ""
-"The resource doen't support the requested method. Please have a look into "
+"The resource doesn't support the requested method. Please have a look into "
 "the \"Allow\" header which methods are supported by this resource."
 msgstr ""
 "Die Ressource unterstützt die anfragte Methode nicht. Der \"Allow\"-Header "
