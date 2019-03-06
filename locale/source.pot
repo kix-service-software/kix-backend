@@ -138,3 +138,6 @@ msgstr ""
 
 msgid "auto reject"
 msgstr ""
+
+msgid "auto follow up"
+msgstr ""
