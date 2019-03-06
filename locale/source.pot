@@ -94,7 +94,10 @@ msgstr ""
 msgid "closed unsuccessful"
 msgstr ""
 
-msgid "pending auto"
+msgid "pending auto close+"
+msgstr ""
+
+msgid "pending auto close-"
 msgstr ""
 
 msgid "pending reminder"
