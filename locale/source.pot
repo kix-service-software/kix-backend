@@ -130,3 +130,8 @@ msgstr ""
 
 msgid "new ticket"
 msgstr ""
+
+
+# auto response type
+msgid "auto reply"
+msgstr ""
