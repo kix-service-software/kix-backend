@@ -195,7 +195,7 @@ sub Run {
     }
 
 	# get already prepared CI data from ConfigItemGet operation
-    if ( IsArrayRefWithData(\@ConfigItemList) ) {  	
+    if ( IsArrayRefWithData(\@ConfigItemList) ) {  	  
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data      => {

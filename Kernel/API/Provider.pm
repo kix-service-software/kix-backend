@@ -195,7 +195,7 @@ sub Run {
     }
 
     # check if we have to respond to an OPTIONS request instead of executing the operation
-    if ( $RequestMethod eq 'OPTIONS' ) {
+    if ( $RequestMethod && $RequestMethod eq 'OPTIONS' ) {
         my $Data;
 
         # add information about each allowed method

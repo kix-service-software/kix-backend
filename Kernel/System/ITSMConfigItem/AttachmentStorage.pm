@@ -232,8 +232,6 @@ sub AttachmentStorageAdd {
     my $ID     = 0;
     my $MD5sum = '';
 
-use Data::Dumper;
-print STDERR "AttachmentStorageAdd: ".Dumper(\%Param);
     #check required stuff...
     foreach (qw(DataRef Filename UserID)) {
         if ( !$Param{$_} ) {

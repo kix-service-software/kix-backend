@@ -441,6 +441,11 @@ sub _XMLVersionAdd {
         $MoveVersion = $OldVersionID;
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     return $XMLID if !$MoveVersion;
 
     # move old version in archiv
@@ -496,6 +501,11 @@ sub _XMLVersionDelete {
     $Kernel::OM->Get('Kernel::System::XML')->XMLHashDelete(
         Type => "ITSM::ConfigItem::Archiv::$Version->{ClassID}",
         Key  => $Param{VersionID},
+    );
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
     );
 
     return 1;

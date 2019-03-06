@@ -70,6 +70,13 @@ sub ImageGet {
         }
     }
 
+    my $CacheKey = 'ImageGet::'.$Param{ConfigItemID}.'::'.$Param{ImageID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
     my $ImageFiles = $Self->_GetImageFileList(
         ConfigItemID => $Param{ConfigItemID},
         ImageID      => $Param{ImageID},
@@ -129,6 +136,14 @@ sub ImageGet {
             last;
         }
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Image,
+    );
 
     return %Image;
 }
@@ -229,6 +244,11 @@ sub ImageAdd {
         }   
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     return $Filename;
 }
 
@@ -278,6 +298,11 @@ sub ImageDelete {
         }
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     return 1;
 }
 
@@ -306,6 +331,13 @@ sub ImageList {
         }
     }
 
+    my $CacheKey = 'ImageList::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     my $ImageFiles = $Self->_GetImageFileList(
         ConfigItemID => $Param{ConfigItemID},
     );
@@ -321,6 +353,14 @@ sub ImageList {
     
         @Result = (sort keys %ImageIDs);
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
 
     return \@Result;
 }

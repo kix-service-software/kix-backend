@@ -93,6 +93,13 @@ sub DefinitionList {
         return;
     }
 
+    my $CacheKey = 'DefinitionList::'.$Param{ClassID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # ask database
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'SELECT id, configitem_definition, version, create_time, create_by '
@@ -111,6 +118,14 @@ sub DefinitionList {
 
         push @DefinitionList, \%Definition;
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@DefinitionList,
+    );
 
     return \@DefinitionList;
 }
@@ -153,11 +168,14 @@ sub DefinitionGet {
         return;
     }
 
-    if ( $Param{DefinitionID} ) {
+    my $CacheKey = 'DefinitionGet::'.($Param{DefinitionID}||'').'::'.($Param{ClassID}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
-        # check if result is already cached
-        return $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} }
-            if $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} };
+    if ( $Param{DefinitionID} ) {
 
         # ask database
         $Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -213,7 +231,12 @@ sub DefinitionGet {
     $Definition{Class} = $ClassList->{ $Definition{ClassID} };
 
     # cache the result
-    $Self->{Cache}->{DefinitionGet}->{ $Definition{DefinitionID} } = \%Definition;
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Definition,
+    );
 
     return \%Definition;
 }
@@ -325,6 +348,11 @@ sub DefinitionAdd {
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
         $DefinitionID = $Row[0];
     }
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # trigger DefinitionCreate event
     $Self->EventHandler(
@@ -547,7 +575,10 @@ sub DefinitionDelete {
     );
     return if !$Success;
 
-    delete $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} };
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     return $Param{DefinitionID};
 }
