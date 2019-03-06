@@ -747,7 +747,12 @@ sub ImportPO {
         foreach my $MsgId ( sort keys %{$Items} ) {
             $CountTotal++;
 
-            my $Item = $Items->{$MsgId};
+            my $MsgStr = $Items->{$MsgId}->msgstr;
+            $MsgId =~ s/"//g;
+            $MsgStr =~ s/"//g;
+
+            # the pattern is empty, go to the next one
+            next if !$MsgId;
 
             my $PatternID = $Self->PatternExistsCheck(
                 Value => $MsgId,
@@ -768,6 +773,9 @@ sub ImportPO {
                 }
             }
 
+            # we don't have a translation for this language so go to the next pattern
+            next if !$MsgStr;
+
             # create or update language translation
             my %Translation = $Self->TranslationLanguageGet(
                 PatternID => $PatternID,
@@ -780,7 +788,7 @@ sub ImportPO {
                     my $Result = $Self->TranslationLanguageUpdate(
                         PatternID => $PatternID,
                         Language  => $Param{Language},
-                        Value     => $Item->msgstr,
+                        Value     => $MsgStr,
                         IsDefault => 1,
                         UserID    => $Param{UserID},
                     );
@@ -797,7 +805,7 @@ sub ImportPO {
                 my $Result = $Self->TranslationLanguageAdd(
                     PatternID => $PatternID,
                     Language  => $Param{Language},
-                    Value     => $Item->msgstr,
+                    Value     => $MsgStr,
                     IsDefault => 1,
                     UserID    => $Param{UserID},
                 );
