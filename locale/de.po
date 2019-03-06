@@ -1,0 +1,129 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-06 08:19+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.3.1\n"
+
+# api
+msgid "No \"Authorization\" header found."
+msgstr ""
+
+msgid "No token in \"Authorization\" header found."
+msgstr ""
+
+msgid "No permission to execute this operation."
+msgstr ""
+
+msgid "The resource doen't support the requested method. Please have a look into the \"Allow\" header which methods are supported by this resource."
+msgstr ""
+
+msgid "Cannot create or update item, because it already exists."
+msgstr ""
+
+msgid "Depending objects prevent this operation."
+msgstr ""
+
+msgid "No permission to execute this operation."
+msgstr ""
+
+msgid "The requested item cannot be found."
+msgstr ""
+
+msgid "The requested item cannot be found or is invalid."
+msgstr ""
+
+msgid "Could not create item, please contact the system administrator."
+msgstr ""
+
+msgid "Could not update item, please contact the system administrator."
+msgstr ""
+
+msgid "Could not delete item, please contact the system administrator."
+msgstr ""
+
+msgid "The parent item(s) cannot be found."
+msgstr ""
+
+msgid "Authorization not possible, please contact the system administrator."
+msgstr ""
+
+msgid "User is not authorized. The requested operation cannot be executed."
+msgstr ""
+
+# ticket types
+msgid "Unclassified"
+msgstr ""
+
+msgid "Incident"
+msgstr ""
+
+msgid "Incident::Major"
+msgstr ""
+
+msgid "ServiceRequest"
+msgstr ""
+
+msgid "Problem"
+msgstr ""
+
+# ticket priority
+msgid "1 very low"
+msgstr ""
+
+msgid "2 low"
+msgstr ""
+
+msgid "3 normal"
+msgstr ""
+
+msgid "4 high"
+msgstr ""
+
+msgid "5 very high"
+msgstr ""
+
+# ticket states
+msgid "new"
+msgstr ""
+
+msgid "open"
+msgstr ""
+
+msgid "merged"
+msgstr ""
+
+msgid "closed successful"
+msgstr ""
+
+msgid "closed unsuccessful"
+msgstr ""
+
+msgid "pending auto close+"
+msgstr ""
+
+msgid "pending auto close-"
+msgstr ""
+
+msgid "pending reminder"
+msgstr ""
+
+msgid "removed"
+msgstr ""
+
+# valid
+msgid "valid"
+msgstr ""
+
+msgid "invalid"
+msgstr ""
+
+msgid "invalid-temporarily"
+msgstr ""
