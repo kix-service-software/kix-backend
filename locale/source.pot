@@ -141,3 +141,24 @@ msgstr ""
 
 msgid "auto follow up"
 msgstr ""
+
+msgid "auto reply/new ticket"
+msgstr ""
+
+msgid "auto remove"
+msgstr ""
+
+
+# auto response
+msgid "default reply (after new ticket has been created)"
+msgstr ""
+
+msgid "default reject (after follow-up and rejected of a closed ticket)"
+msgstr ""
+
+msgid "default follow-up (after a ticket follow-up has been added)"
+msgstr ""
+
+msgid "default reject/new ticket created (after closed follow-up with new ticket creation)"
+msgstr ""
+
