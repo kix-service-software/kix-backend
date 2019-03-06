@@ -135,3 +135,6 @@ msgstr ""
 # auto response type
 msgid "auto reply"
 msgstr ""
+
+msgid "auto reject"
+msgstr ""
