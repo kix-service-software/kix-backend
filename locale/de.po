@@ -144,3 +144,9 @@ msgstr ""
 # follow up possible
 msgid "possible"
 msgstr ""
+
+msgid "reject"
+msgstr ""
+
+msgid "new ticket"
+msgstr ""
