@@ -94,10 +94,16 @@ msgstr ""
 msgid "closed unsuccessful"
 msgstr ""
 
+msgid "closed with workaround"
+msgstr ""
+
 msgid "pending auto close+"
 msgstr ""
 
 msgid "pending auto close-"
+msgstr ""
+
+msgid "pending auto reopen"
 msgstr ""
 
 msgid "pending reminder"
