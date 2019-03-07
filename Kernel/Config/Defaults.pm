@@ -26,6 +26,7 @@ use lib dirname($Bin) . '/Custom';
 
 use File::stat;
 use Digest::MD5;
+use Module::Refresh;
 
 use Exporter qw(import);
 our @EXPORT = qw(Translatable);
@@ -1702,6 +1703,15 @@ sub new {
     # 0=off; 1=log if there exists no entry; 2=log all;
     $Self->{Debug} = 0;
 
+    # load the config
+    $Self->LoadConfig(%Param);
+
+    return $Self;
+}
+
+sub LoadConfig {
+    my ( $Self, %Param ) = @_;
+
     # return on clear level
     if ( $Param{Level} && $Param{Level} eq 'Clear' ) {
 
@@ -1740,115 +1750,30 @@ sub new {
                 next FILE;
             }
 
-            # check config file format - use 1.0 as eval string, 1.1 as require or do
-            my $FileFormat = 1;
-            my $ConfigFile = '';
-            ## no critic
-            if ( open( my $In, '<', $File ) ) {
-            ## use critic
-
-                # only try to find # VERSION:1.1 in the first 8 lines
-                my $TryCount = 0;
-                LINE:
-                while ( my $Line = <$In> ) {
-                    if ($Line =~ /^\Q# VERSION:1.1\E/) {
-                        $FileFormat = 1.1;
-                        last LINE;
-                    }
-
-                    $TryCount++;
-                    if ( $TryCount >= 8 ) {
-                        last LINE;
-                    }
-                }
-                close($In);
-
-                # read file format 1.0 - file as string
-                if ( $FileFormat == 1 ) {
-                    open( my $In, '<', $File );
-                    $ConfigFile = do {local $/; <$In>};
-                    close $In;
-                }
-            }
-            else {
-                print STDERR "ERROR: $!: $File\n";
+            if (! require $File ) {
+                die "ERROR: $!\n";
             }
 
-            # use file format of config file
-            if ( $FileFormat == 1.1 ) {
+            # refresh module to make sure the current settings are loaded
+            Module::Refresh->refresh_module($File);
 
-                # check if mod_perl is used
-                my $Require = 1;
-                if ( exists $ENV{MOD_PERL} ) {
+            # prepare module name
+            my $Module = $File;
+            $Module =~ s/\Q$Self->{Home}\E//g;
+            $Module =~ s/^\///g;
+            $Module =~ s/\/\//\//g;
+            $Module =~ s/\//::/g;
+            $Module =~ s/\.pm$//g;
 
-                    # if mod_perl 2.x is used, check if Apache::Reload is use
-                    # on win32 Apache::Reload is not working correctly, so do also use "do"
-                    my $OS = $^O;
-                    ## no critic
-                    if ( $mod_perl::VERSION >= 1.99 && $OS ne 'MSWin32') {
-                    ## use critic
-                        my $ApacheReload = 0;
-                        MODULE:
-                        for my $Module ( sort keys %INC ) {
-                            $Module =~ s/\//::/g;
-                            $Module =~ s/\.pm$//g;
-                            if ( $Module eq 'Apache::Reload' || $Module eq 'Apache2::Reload' ) {
-                                $ApacheReload = 1;
-                                last MODULE;
-                            }
-                        }
-                        if ( !$ApacheReload ) {
-                            $Require = 0;
-                        }
-                    }
-
-                    # if mod_perl 1.x is used, do not use require
-                    else {
-                        $Require = 0;
-                    }
-                }
-
-                # if require is usable, use it (because of better performance,
-                # if not, use do to do it on runtime)
-                ## no critic
-                if ( $Require ) {
-                    if (! require $File ) {
-                        die "ERROR: $!\n";
-                    }
-                }
-                else {
-                    if (! do $File ) {
-                        die "ERROR: $!\n";
-                    }
-                }
-                ## use critic
-
-                # prepare file
-                $File =~ s/\Q$Self->{Home}\E//g;
-                $File =~ s/^\///g;
-                $File =~ s/\/\//\//g;
-                $File =~ s/\//::/g;
-                $File =~ s/\.pm$//g;
-                $File->Load($Self);
-            }
-            else {
-
-                # use eval for old file format
-                if ($ConfigFile) {
-                    if ( !eval $ConfigFile ) { ## no critic
-                        print STDERR "ERROR: Syntax error in $File: $@\n";
-                    }
-
-                    # print STDERR "Notice: Loaded: $File\n";
-                }
-            }
+            # load file
+            $Module->Load($Self);
         }
     }
 
     #rbo - T2016121190001552 - extended handling of RELEASE file 
     # load basic RELEASE file to check integrity of installation
     if ( -e ! "$Self->{Home}/RELEASE" ) {
-        print STDERR "ERROR: $Self->{Home}/RELEASE does not exist! This file is needed by central system parts of KIX, the system will not work without this file.\n";
+        print STDERR "($$) ERROR: $Self->{Home}/RELEASE does not exist! This file is needed by central system parts of KIX, the system will not work without this file.\n";
         die;
     }
     # load most recent RELEASE file
@@ -1883,12 +1808,12 @@ sub new {
             close($Product);
         }
         else {
-            print STDERR "ERROR: Can't read $Self->{Home}/$MostRecentReleaseFile: $! This file is needed by central system parts of KIX, the system will not work without this file.\n";
+            print STDERR "($$) ERROR: Can't read $Self->{Home}/$MostRecentReleaseFile: $! This file is needed by central system parts of KIX, the system will not work without this file.\n";
             die;
         }
     }
     else {
-        print STDERR "ERROR: Can't read $Self->{Home}: $!\n";
+        print STDERR "($$) ERROR: Can't read $Self->{Home}: $!\n";
         die;
     }
 
@@ -1907,12 +1832,27 @@ sub new {
                 $Self->{$Key} =~ s/\<(KIX|OTRS)_CONFIG_(.+?)\>/$Self->{$2}/g;
             }
             else {
-                print STDERR "ERROR: $Key not defined!\n";
+                print STDERR "($$) ERROR: $Key not defined!\n";
             }
         }
     }
 
-    return $Self;
+    my $File = $Self->{Home} . "/Kernel/Config/Files/ZZZAuto.pm";
+
+    if ( -f $File ) {
+
+        # get file metadata
+        my $Stat = stat( $File );
+
+        if ( !$Stat ) {
+            print STDERR "Error: cannot stat file '$File': $!";
+            return;
+        }
+
+        $Self->{ZZZAutoChecksum} = Digest::MD5::md5_hex( $Stat->mtime() );
+    }
+
+    return 1;
 }
 
 # Please see the documentation in Kernel/Config.pod.dist.
@@ -1922,7 +1862,14 @@ sub Get {
     # debug
     if ( $Self->{Debug} > 1 ) {
         my $Value = defined $Self->{$What} ? $Self->{$What} : '<undef>';
-        print STDERR "Debug: Config.pm ->Get('$What') --> $Value\n";
+        print STDERR "($$) Debug: Config.pm ->Get('$What') --> $Value\n";
+    }
+
+    if ( $Self->_CheckZZZAutoChanged() ) {
+        if ( $Self->{Debug} > 1 ) {
+            print STDERR "($$) Debug: ZZZAuto has changed on disk, reloading...\n";
+        }
+        $Self->LoadConfig();
     }
 
     return $Self->{$What};
@@ -1941,7 +1888,7 @@ sub Set {
     # debug
     if ( $Self->{Debug} > 1 ) {
         my $Value = defined $Param{Value} ? $Param{Value} : '<undef>';
-        print STDERR "Debug: Config.pm ->Set(Key => $Param{Key}, Value => $Value)\n";
+        print STDERR "($$) Debug: Config.pm ->Set(Key => $Param{Key}, Value => $Value)\n";
     }
 
     # set runtime config option
@@ -2003,6 +1950,27 @@ sub ConfigChecksum {
     }
 
     return Digest::MD5::md5_hex( $ConfigString );
+}
+
+# check if the ZZZAuto file has changed on disk
+sub _CheckZZZAutoChanged {
+    my $Self = shift;
+
+    my $File = $Self->{Home} . "/Kernel/Config/Files/ZZZAuto.pm";
+
+    return if ! -f $File;
+
+    # get file metadata
+    my $Stat = stat( $File );
+
+    if ( !$Stat ) {
+        print STDERR "($$) Error: cannot stat file '$File': $!";
+        return;
+    }
+
+    my $Checksum = Digest::MD5::md5_hex( $Stat->mtime() ); 
+
+    return $Self->{ZZZAutoChecksum} ne $Checksum;
 }
 
 1;
