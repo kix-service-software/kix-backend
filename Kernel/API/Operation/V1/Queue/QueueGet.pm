@@ -300,6 +300,11 @@ sub Run {
                     Operator => 'EQ',
                     Value    => $QueueID,
                 },
+                {
+                    Field    => 'StateType',
+                    Operator => 'EQ',
+                    Value    => 'open',
+                },
             );
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
