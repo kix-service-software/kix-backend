@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-06 08:19+0000\n"
-"PO-Revision-Date: 2019-03-06 14:48+0000\n"
+"PO-Revision-Date: 2019-03-11 12:30+0000\n"
 "Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
@@ -32,151 +32,165 @@ msgstr ""
 "enthält Informationen welche Methoden diese Ressource unterstützt."
 
 msgid "Cannot create or update item, because it already exists."
-msgstr ""
+msgstr "Das Item kann nicht angelegt werden, da es bereits existiert."
 
 msgid "Depending objects prevent this operation."
-msgstr ""
+msgstr "Abhängige Objekte verhindern die Ausführung dieser Operation."
 
 msgid "The requested item cannot be found."
-msgstr ""
+msgstr "Das angefragte Objekt kann nicht gefunden werden."
 
 msgid "The requested item cannot be found or is invalid."
-msgstr ""
+msgstr "Das angefragte Objekt kann nicht gefunden werden oder ist ungültig."
 
 msgid "Could not create item, please contact the system administrator."
 msgstr ""
+"Das Item konnte nicht erstellt werden, bitte kontaktieren Sie Ihren "
+"Administrator."
 
 msgid "Could not update item, please contact the system administrator."
 msgstr ""
+"Das Item konnte nicht geändert werden, bitte kontaktieren Sie Ihren "
+"Administrator."
 
 msgid "Could not delete item, please contact the system administrator."
 msgstr ""
+"Das Item konnte nicht gelöscht werden, bitte kontaktieren Sie Ihren "
+"Administrator."
 
 msgid "The parent item(s) cannot be found."
-msgstr ""
+msgstr "Das Elternobjekt / die Elternobjekte konnten nicht gefunden werden."
 
 msgid "Authorization not possible, please contact the system administrator."
 msgstr ""
+"Authorisierung nicht möglich, bitte kontaktieren Sie Ihren Administrator."
 
 msgid "User is not authorized. The requested operation cannot be executed."
 msgstr ""
+"Nutzer ist nicht authorisiert. Die angeforderte Operation kann nicht "
+"ausgeführt werden."
 
 # ticket types
 msgid "Unclassified"
-msgstr ""
+msgstr "Unklassifiziert"
 
 msgid "Incident"
-msgstr ""
+msgstr "Störung"
 
 msgid "Incident::Major"
 msgstr ""
 
+#, fuzzy
 msgid "ServiceRequest"
-msgstr ""
+msgstr "Serviceanfrage"
 
 msgid "Problem"
 msgstr ""
 
 # ticket priority
 msgid "1 very low"
-msgstr ""
+msgstr "1 sehr niedrig"
 
 msgid "2 low"
-msgstr ""
+msgstr "2 niedrig"
 
 msgid "3 normal"
 msgstr ""
 
 msgid "4 high"
-msgstr ""
+msgstr "4 hoch"
 
 msgid "5 very high"
-msgstr ""
+msgstr "5 sehr hoch"
 
 # ticket states
 msgid "new"
-msgstr ""
+msgstr "neu"
 
 msgid "open"
-msgstr ""
+msgstr "offen"
 
 msgid "merged"
-msgstr ""
+msgstr "zusammengefasst"
 
 msgid "closed successful"
-msgstr ""
+msgstr "erfolgreich geschlossen"
 
 msgid "closed unsuccessful"
-msgstr ""
+msgstr "erfolglos geschlossen"
 
 msgid "closed with workaround"
-msgstr ""
+msgstr "mit Workaround geschlossen"
 
 msgid "pending auto close+"
-msgstr ""
+msgstr "warten auf erfolgreich schließen"
 
 msgid "pending auto close-"
-msgstr ""
+msgstr "warten auf erfolglos schließen"
 
 msgid "pending auto reopen"
-msgstr ""
+msgstr "warten zur Wiedervorlage"
 
 msgid "pending reminder"
-msgstr ""
+msgstr "warten zur Erinnerung"
 
 msgid "removed"
-msgstr ""
+msgstr "entfernt"
 
 # valid
 msgid "valid"
-msgstr ""
+msgstr "gültig"
 
 msgid "invalid"
-msgstr ""
+msgstr "ungültig"
 
 msgid "invalid-temporarily"
-msgstr ""
+msgstr "temporär ungültig"
 
 # follow up possible
 msgid "possible"
-msgstr ""
+msgstr "möglich"
 
 msgid "reject"
-msgstr ""
+msgstr "ablehnen"
 
 msgid "new ticket"
-msgstr ""
+msgstr "neues Ticket"
 
 # auto response type
 msgid "auto reply"
-msgstr ""
+msgstr "automatische Antwort"
 
 msgid "auto reject"
-msgstr ""
+msgstr "automatische Ablehnung"
 
 msgid "auto follow up"
-msgstr ""
+msgstr "automatische Rückfrage"
 
 msgid "auto reply/new ticket"
-msgstr ""
+msgstr "automatische Antwort / neues Ticket"
 
 msgid "auto remove"
-msgstr ""
+msgstr "automatisches Entfernen"
 
 # auto response
 msgid "default reply (after new ticket has been created)"
-msgstr ""
+msgstr "Standardantwort (nachdem ein neues Ticket erstellt wurde)"
 
 msgid "default reject (after follow-up and rejected of a closed ticket)"
 msgstr ""
+"Standardablehnung (nachdem eine Antwort auf ein geschlossenes Ticket "
+"eingegangen und diese abgelehnt wurde)"
 
 msgid "default follow-up (after a ticket follow-up has been added)"
-msgstr ""
+msgstr "Standardantwort (nachdem eine Antwort auf ein Ticket eingegangen ist)"
 
 msgid ""
 "default reject/new ticket created (after closed follow-up with new ticket "
 "creation)"
 msgstr ""
+"Standardablehnung/Neues Ticket erstellt (nachdem eine Antwort auf ein "
+"geschlossenes Ticket eingegangen ist und ein neues Ticket erstellt wurde)"
 
 # CI classes
 msgid "General Information"
