@@ -143,19 +143,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AdminAPIMappingXSLT" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>admin</Group>
-                <Description>Admin</Description>
-                <Title Translatable="1">API Webservice Mapping GUI</Title>
-                <Loader>
-                    <CSS>Core.Agent.Admin.API.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="API::Mapping::Module###XSLT" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the mapping layer.</Description>
         <Setting>

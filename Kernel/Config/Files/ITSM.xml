@@ -1,86 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemZoomTabConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Shows all attribute and version data of this config item</Description>
-                <Title>Zoom</Title>
-                <NavBarName>Config Item</NavBarName>
-                <Loader>
-                    <CSS>ITSM.Agent.Detail.css</CSS>
-                    <CSS>ITSM.Agent.Default.css</CSS>
-                    <CSS>ITSM.Print.css</CSS>
-                    <CSS>KIX4OTRS.ITSM.Agent.Detail.css</CSS>
-                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
-                    <JavaScript>thirdparty/jquery-ui-tabs-1.10.3/jquery.ui.tabs.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemZoomTabLinkedObjects" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Shows objects linked with this config item</Description>
-                <Title>Zoom</Title>
-                <NavBarName>Config Item</NavBarName>
-                <Loader>
-                    <CSS>ITSM.Agent.Detail.css</CSS>
-                    <CSS>ITSM.Agent.Default.css</CSS>
-                    <CSS>ITSM.Print.css</CSS>
-                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
-                    <JavaScript>thirdparty/jquery-ui-tabs-1.10.3/jquery.ui.tabs.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemZoomTabLinkGraph" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Shows objects linked with this config item</Description>
-                <Title>Zoom</Title>
-                <NavBarName>Config Item</NavBarName>
-                <Loader>
-                    <CSS>ITSM.Agent.Detail.css</CSS>
-                    <CSS>ITSM.Agent.Default.css</CSS>
-                    <CSS>KIX4OTRS.AgentITSMConfigItemZoomTab.css</CSS>
-                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
-                    <JavaScript>thirdparty/jquery-ui-tabs-1.10.3/jquery.ui.tabs.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemZoomTabImages" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Shows images for this config item</Description>
-                <Title>Zoom</Title>
-                <NavBarName>Config Item</NavBarName>
-                <Loader>
-                    <CSS>ITSM.Agent.Detail.css</CSS>
-                    <CSS>ITSM.Agent.Default.css</CSS>
-                    <JavaScript>Core.KIX4OTRS.ConfigItemZoomTabs.js</JavaScript>
-                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
-                    <JavaScript>thirdparty/jquery-ui-tabs-1.10.3/jquery.ui.tabs.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ITSMConfigItem::SetIncidentStateOnLink" Required="1" Valid="1">
         <Description Translatable="1">Set the incident state of a CI automatically when a Ticket is Linked to a CI.</Description>
         <Group>ITSM</Group>
@@ -165,18 +84,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentAttachmentStorage" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the CI-AgentAttachmentStorage object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Core::AttachmentStorage</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Title></Title>
-                <NavBarName>Ticket</NavBarName>
-                <Description>To download attachments</Description>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="AttachmentStorageFS::StorageDirectory" Required="1" Valid="1">
         <Description Translatable="1">The path to the directory where the file system backend stores new attachments. The path needs to be specified relative to the OTRS-Home.</Description>
         <Group>ITSM</Group>
@@ -185,28 +92,6 @@
             <String Regex="">/var/attachments</String>
         </Setting>
      </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AdminITSMCIPAllocate" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AdminITSMCIPAllocate configuration in the admin area.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Admin::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>admin</Group>
-                <Description Translatable="1">Manage priority matrix.</Description>
-                <Title Translatable="1">Criticality &lt;-&gt; Impact &lt;-&gt; Priority</Title>
-                <NavBarName>Admin</NavBarName>
-                <NavBarModule>
-                    <Module>Kernel::Output::HTML::NavBar::ModuleAdmin</Module>
-                    <Name Translatable="1">Criticality &lt;-&gt; Impact &lt;-&gt; Priority</Name>
-                    <Block>System</Block>
-                    <Prio>430</Prio>
-                </NavBarModule>
-                <Loader>
-                    <CSS>ITSM.Table.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ITSM::Core::IncidentLinkTypeDirection" Required="1" Valid="1">
         <Description Translatable="1">Set the type and direction of links to be used to calculate the incident state. The key is the name of the link type (as defined in LinkObject::Type), and the value is the direction of the IncidentLinkType that should be followed to calculate the incident state. For example if the IncidentLinkType is set to 'DependsOn', and the Direction is 'Source', only 'Depends on' links will be followed (and not the opposite link 'Required for') to calculate the incident state. You can add more link types ad directions as you like, e.g. 'Includes' with the direction 'Target'. All link types defined in the sysconfig options LinkObject::Type are possible and the direction can be 'Source', 'Target', or 'Both'. IMPORTANT: AFTER YOU MAKE CHANGES TO THIS SYSCONFIG OPTION YOU NEED TO RUN THE SCRIPT bin/otrs.ITSMConfigItemIncidentStateRecalculate.pl SO THAT ALL INCIDENT STATES WILL BE RECALCULATED BASED ON THE NEW SETTINGS!</Description>
         <Group>ITSM</Group>
@@ -260,120 +145,6 @@
                 <Item Key="Event">(ConfigItemCreate|VersionCreate|DeploymentStateUpdate|IncidentStateUpdate|ConfigItemDelete|LinkAdd|LinkDelete|DefinitionUpdate|NameUpdate|ValueUpdate|DefinitionCreate|VersionDelete)</Item>
                 <Item Key="Transaction">0</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMService" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AgentITSMService object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>itsm-service</Group>
-                <GroupRo>itsm-service</GroupRo>
-                <Description Translatable="1">ITSM Service Overview.</Description>
-                <NavBarName>Service</NavBarName>
-                <Title Translatable="1">Service</Title>
-                <NavBar>
-                    <Description Translatable="1">Service-Area</Description>
-                    <Name>Services</Name>
-                    <Type>Menu</Type>
-                    <Block>ItemArea</Block>
-                    <Link>Action=AgentITSMService</Link>
-                    <NavBar>Service</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>3100</Prio>
-                </NavBar>
-                <NavBar>
-                    <Description Translatable="1">Service Overview</Description>
-                    <Name>Service</Name>
-                    <Link>Action=AgentITSMService</Link>
-                    <Type></Type>
-                    <Block></Block>
-                    <NavBar>Service</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>100</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMSLA" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AgentITSMSLA object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-service</GroupRo>
-                <Description Translatable="1">ITSM SLA Overview.</Description>
-                <NavBarName>Service</NavBarName>
-                <Title Translatable="1">SLA</Title>
-                <NavBar>
-                    <Description Translatable="1">SLA Overview</Description>
-                    <Name>SLA</Name>
-                    <Link>Action=AgentITSMSLA</Link>
-                    <Type></Type>
-                    <Block></Block>
-                    <NavBar>Service</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>200</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMServiceZoom" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AgentITSMServiceZoom object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-service</GroupRo>
-                <Description Translatable="1">Service Zoom.</Description>
-                <Title Translatable="1">Zoom</Title>
-                <NavBarName>Service</NavBarName>
-                <Loader>
-                    <CSS>Core.AllocationList.css</CSS>
-                    <JavaScript>Core.UI.Table.Sort.js</JavaScript>
-                    <JavaScript>Core.Agent.LinkObject.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMServicePrint" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AgentITSMServicePrint object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-service</GroupRo>
-                <Description Translatable="1">Service Print.</Description>
-                <Title Translatable="1">Print</Title>
-                <NavBarName>Service</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMSLAZoom" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AgentITSMSLAZoom object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-service</GroupRo>
-                <Description Translatable="1">SLA Zoom.</Description>
-                <Title Translatable="1">Zoom</Title>
-                <NavBarName>Service</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMSLAPrint" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the AgentITSMSLAPrint object in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-service</GroupRo>
-                <Description Translatable="1">SLA Print.</Description>
-                <Title Translatable="1">Print</Title>
-                <NavBarName>Service</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ITSMCIAttributeCollection::CompanyBackendMapping" Required="1" Valid="1">
@@ -433,282 +204,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMCITicketSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of tickets, used for autocompletion</Description>
-                <Title>ITSMCITicketSearch</Title>
-<!--
-                <NavBarName>Config Item</NavBarName>
--->
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentQueueSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of queues, used for autocompletion</Description>
-                <Title>QueueSearch</Title>
-<!--
-                <NavBarName>Config Item</NavBarName>
--->
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentServiceSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of services, used for autocompletion</Description>
-                <Title>ServiceSearch</Title>
-<!--
-                <NavBarName>Config Item</NavBarName>
--->
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentSLASearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of SLAs, used for autocompletion</Description>
-                <Title>SLA</Title>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentCustomerCompanySearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of customer companies, used for autocompletion</Description>
-                <Title>CIACCustomerCompanySearch</Title>
-<!--
-                <NavBarName>Config Item</NavBarName>
--->
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentCustomerUserCompanySearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of customer companies, used for autocompletion</Description>
-                <Title>CustomerUserCompanySearch</Title>
-<!--
-                <NavBarName>Config Item</NavBarName>
--->
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentCIClassSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup of CI classes, used for autocompletion</Description>
-                <Title>CIClassSearch</Title>
-<!--
-                <NavBarName>Config Item</NavBarName>
--->
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AdminITSMConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Admin::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>admin</Group>
-                <Description>Admin</Description>
-                <Title>Config Item</Title>
-                <NavBarName>Admin</NavBarName>
-                <NavBarModule>
-                    <Module>Kernel::Output::HTML::NavBar::ModuleAdmin</Module>
-                    <Name Translatable="1">Config Items</Name>
-                    <Description Translatable="1">Create and manage the definitions for Configuration Items.</Description>
-                    <Block>Ticket</Block>
-                    <Prio>495</Prio>
-                </NavBarModule>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>ITSM Config Item Overview</Description>
-                <NavBarName>Config Item</NavBarName>
-                <Title>Config Item</Title>
-                <NavBar>
-                    <Description>Configuration Management Database</Description>
-                    <Name>CMDB</Name>
-                    <Type>Menu</Type>
-                    <Block>ItemArea</Block>
-                    <Link>Action=AgentITSMConfigItem</Link>
-                    <NavBar>Config Item</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>3200</Prio>
-                </NavBar>
-                <NavBar>
-                    <Description>Overview</Description>
-                    <Name>Overview</Name>
-                    <Link>Action=AgentITSMConfigItem</Link>
-                    <Type></Type>
-                    <Block></Block>
-                    <NavBar>Config Item</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>100</Prio>
-                </NavBar>
-                <Loader>
-                    <CSS>ITSM.Agent.Default.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemZoom" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Config Item Zoom</Description>
-                <Title>Zoom</Title>
-                <NavBarName>Config Item</NavBarName>
-                <Loader>
-                    <CSS>ITSM.Agent.Default.css</CSS>
-                    <CSS>ITSM.Agent.Detail.css</CSS>
-                    <CSS>Core.AllocationList.css</CSS>
-                    <CSS>ITSM.Print.css</CSS>
-                    <CSS>KIX4OTRS.AgentITSMConfigItemZoomTab.css</CSS>
-                    <JavaScript>thirdparty/jquery-tablesorter-2.0.5/jquery.tablesorter.js</JavaScript>
-                    <JavaScript>thirdparty/jquery-ui-tabs-1.10.3/jquery.ui.tabs.js</JavaScript>
-                    <JavaScript>Core.KIX4OTRS.AgentZoomTabLinkGraph.js</JavaScript>
-                    <JavaScript>Core.KIX4OTRS.TicketZoomTabs.js</JavaScript>
-                    <JavaScript>Core.KIX4OTRS.ConfigItemZoomTabs.js</JavaScript>
-                    <JavaScript>Core.UI.AllocationList.js</JavaScript>
-                    <JavaScript>Core.UI.Table.Sort.js</JavaScript>
-                    <JavaScript>Core.Agent.TableFilters.js</JavaScript>
-                    <JavaScript>Core.Agent.LinkObject.js</JavaScript>
-                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
-                    <JavaScript>ITSM.Agent.ConfirmDialog.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemEdit" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>itsm-configitem</Group>
-                <Description>Config Item Edit</Description>
-                <Title>Edit</Title>
-                <NavBarName>Config Item</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemPrint" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Config Item Print</Description>
-                <Title>Print</Title>
-                <NavBarName>Config Item</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemDelete" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Delete a configuration item</Description>
-                <Title>Delete</Title>
-                <NavBarName>ITSM ConfigItem</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemAdd" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>itsm-configitem</Group>
-                <Description>Config Item Add</Description>
-                <Title>Add</Title>
-                <NavBarName>Config Item</NavBarName>
-                <NavBar>
-                    <Description>New</Description>
-                    <Name>New</Name>
-                    <Link>Action=AgentITSMConfigItemAdd</Link>
-                    <Type></Type>
-                    <Block></Block>
-                    <NavBar>Config Item</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>200</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Search Config Items</Description>
-                <Title>Search</Title>
-                <NavBarName>Config Item</NavBarName>
-                <NavBar>
-                    <Description>Search Config Items</Description>
-                    <Name>Search</Name>
-                    <Link>Action=AgentITSMConfigItemSearch</Link>
-                    <LinkOption>onclick="ITSM.Agent.ConfigItem.Search.OpenSearchDialog('AgentITSMConfigItemSearch'); if (event.stopPropagation) { event.stopPropagation(); } else { window.event.cancelBubble = true; } return false;"</LinkOption>
-                    <NavBar>Config Item</NavBar>
-                    <Type></Type>
-                    <Block></Block>
-                    <AccessKey></AccessKey>
-                    <Prio>300</Prio>
-                </NavBar>
-                <Loader>
-                    <CSS>ITSM.Agent.Detail.css</CSS>
-                    <CSS>ITSM.Table.css</CSS>
-                    <CSS>ITSM.Print.css</CSS>
-                    <JavaScript>thirdparty/jquery-tablesorter-2.0.5/jquery.tablesorter.js</JavaScript>
-                    <JavaScript>Core.UI.Table.Sort.js</JavaScript>
-                    <JavaScript>ITSM.Agent.Zoom.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ITSMConfigItem::NumberGenerator" Required="1" Valid="1">
         <Description Translatable="1">Selects the configuration item number generator module. "AutoIncrement" increments the configuration item number, the SystemID, the ConfigItemClassID and the counter are used. The format is "SystemID.ConfigItemClassID.Counter", e.g. 1205000004, 1205000005.</Description>
         <Group>ITSM</Group>
@@ -748,19 +243,6 @@
                 <Item Key="Event">(ConfigItemCreate|VersionCreate|DeploymentStateUpdate|IncidentStateUpdate|ConfigItemDelete|LinkAdd|LinkDelete|DefinitionUpdate|NameUpdate|ValueUpdate|DefinitionCreate|VersionDelete|AttachmentAddPost|AttachmentDeletePost)</Item>
                 <Item Key="Transaction">0</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemHistory" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>Config Item History</Description>
-                <Title>History</Title>
-                <NavBarName>Config Item</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="GeneralCatalogPreferences###DeploymentStates" Required="0" Valid="1">
@@ -825,22 +307,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::Frontend::AgentITSMConfigItem###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Required permissions to use the ITSM configuration item screen in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::Permission</SubGroup>
-        <Setting>
-            <String Regex="">ro</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::Frontend::AgentITSMConfigItemZoom###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Required permissions to use the ITSM configuration item zoom screen in the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::Permission</SubGroup>
-        <Setting>
-            <String Regex="">ro</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="GeneralCatalogPreferences###Permissions" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the example permission groups of the general catalog attributes.</Description>
         <Group>ITSM</Group>
@@ -856,87 +322,12 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Search###ConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Configuration item search backend router of the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::SearchRouter</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="^(?:Agent|Admin)ITSMConfigItem">Action=AgentITSMConfigItemSearch;Subaction=AJAX</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Search::JavaScript###ConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">JavaScript function for the search frontend.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::SearchRouter</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="^(?:Agent|Admin)ITSMConfigItem">ITSM.Agent.ConfigItem.Search.OpenSearchDialog('AgentITSMConfigItemSearch')</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ITSMConfigItem::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a configuration item, e.g. ConfigItem#, MyConfigItem#. The default is ConfigItem#.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
             <String Regex="">CI#</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::Frontend::AgentITSMConfigItem###SearchLimit" Required="1" Valid="1">
-        <Description Translatable="1">Defines the search limit for the AgentITSMConfigItem screen.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ViewConfigItem</SubGroup>
-        <Setting>
-            <String Regex="">10000</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::Frontend::AgentITSMConfigItem###ShowColumns" Required="1" Valid="1">
-        <Description Translatable="1">Defines the shown columns in the config item overview. This option has no effect on the position of the column. Note: Class column is always available if filter 'All' is selected.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ViewConfigItem</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="CurInciSignal">1</Item>
-                <Item Key="CurDeplSignal">1</Item>
-                <Item Key="Number">1</Item>
-                <Item Key="Name">1</Item>
-                <Item Key="Class">0</Item>
-                <Item Key="CurDeplState">1</Item>
-                <Item Key="CurDeplStateType">0</Item>
-                <Item Key="CurInciState">1</Item>
-                <Item Key="CurInciStateType">0</Item>
-                <Item Key="LastChanged">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::Frontend::AgentITSMConfigItem###ShowColumnsByClass" Required="0" Valid="0">
-        <Description Translatable="1">Defines the shown columns of CIs in the config item overview depending on the CI class. Each entry must be prefixed with the class name and double colons (i.e. Computer::). There are a few CI-Attributes that are common to all CIs (example for the class Computer: Computer::Name, Computer::CurDeplState, Computer::CreateTime). To show individual CI-Attributes as defined in the CI-Definition, the following scheme must be used (example for the class Computer): Computer::HardDisk::1, Computer::HardDisk::1::Capacity::1, Computer::HardDisk::2, Computer::HardDisk::2::Capacity::1. If there is no entry for a CI class, then the default columns are shown as defined in the setting ITSMConfigItem::Frontend::AgentITSMConfigItem###ShowColumns.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ViewConfigItem</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Computer::Name</Item>
-                <Item>Computer::Number</Item>
-                <Item>Computer::CurInciSignal</Item>
-                <Item>Computer::CurDeplSignal</Item>
-                <Item>Computer::CurDeplState</Item>
-                <Item>Computer::HardDisk::1</Item>
-                <Item>Computer::HardDisk::1::Capacity::1</Item>
-                <Item>Computer::HardDisk::2</Item>
-                <Item>Computer::HardDisk::2::Capacity::1</Item>
-                <Item>Computer::HardDisk::3</Item>
-                <Item>Computer::HardDisk::3::Capacity::1</Item>
-                <Item>Computer::WarrantyExpirationDate::1</Item>
-                <Item>Computer::CreateTime</Item>
-                <Item>Location::CurInciSignal</Item>
-                <Item>Location::Number</Item>
-                <Item>Location::Type::1</Item>
-                <Item>Location::Name</Item>
-                <Item>Location::Address::1</Item>
-                <Item>Location::LastChanged</Item>
-            </Array>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="UniqueCIName::EnableUniquenessCheck" Required="0" Valid="1">
@@ -959,18 +350,6 @@
                 <Item Key="global">global</Item>
                 <Item Key="class">class</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemBulk" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Configuration Item bulk module</Description>
-                <Title>Bulk-Action</Title>
-                <NavBarName>CMDB</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="GeneralCatalogPreferences###Comment2" Required="0" Valid="0">
@@ -1007,41 +386,6 @@
                 <Item Key="Target">Target</Item>
                 <Item Key="Both">Both</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentITSMConfigItemCompare" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ViewConfigItem</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>itsm-configitem</Group>
-                <Description>Config Item Compare</Description>
-                <Title>Compare</Title>
-                <NavBarName>Config Item</NavBarName>
-                <Loader>
-                    <CSS>KIX4OTRS.ITSM.Agent.Detail.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AgentLinkGraphITSMConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <GroupRo>itsm-configitem</GroupRo>
-                <Description>No Description</Description>
-                <Title>LinkGraph</Title>
-                <NavBarName></NavBarName>
-                <Loader>
-                    <JavaScript>thirdparty/jsplumb-1.6.4/jsplumb.js</JavaScript>
-                    <JavaScript>Core.KIX4OTRS.AgentLinkGraphITSMConfigItem.js</JavaScript>
-                    <JavaScript>Core.KIX4OTRS.AgentLinkGraph.js</JavaScript>
-                    <CSS>KIX4OTRS.AgentLinkGraph.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Frontend::Agent::AgentLinkGraphITSMConfigItem###LinkColors" Required="1" Valid="1">
@@ -1170,32 +514,6 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::KIXSidebarBackend###LinkedCIs" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the KIXSidebar backend linked config items.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::LinkedCIs</Item>
-                <Item Key="Title">Assigned CIs</Item>
-                <Item Key="Description">Shows all config items assigned to selected customers.</Item>
-                <Item Key="Prio">0400</Item>
-                <Item Key="Actions">AgentTicket(Email|Phone|Zoom)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Module###KIXSidebarLinkedCIsAJAXHandler" Required="1" Valid="1">
-        <Description Translatable="1">Frontend module registration for the KIXSidebarLinkedCIsAJAXHandler object.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarLinkedCIs AJAX handle</Description>
-                <Title>KIXSidebarLinkedCIs AJAX handler</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="CustomerFrontend::Module###KIXSidebarLinkedCIsAJAXHandler" Required="1" Valid="1">
         <Description Translatable="1">Frontend module registration for the KIXSidebarLinkedCIsAJAXHandler object.</Description>
         <Group>ITSM</Group>
@@ -1258,19 +576,6 @@
         <SubGroup>Frontend::Customer</SubGroup>
         <Setting>
             <String Regex="">RelevantTo</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="QuickLink::Backend###ITSMConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">QuickLink backend registration.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>QuickLink::Backend::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::QuickLink::ITSMConfigItem</Item>
-                <Item Key="SearchAttribute::Computer">Name,Number</Item>
-                <Item Key="SearchAttribute">Number,Name</Item>
-                <Item Key="SearchClass">Computer,Hardware,All</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="GenericInterface::Operation::Module###ConfigItem::ConfigItemCreate" Required="0" Valid="1">
