@@ -167,10 +167,44 @@ sub Run {
     if ( %ContactList ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Can not create Contact. Another Contact with same email address already exists.',
+            Message => 'Cannot create contact. Another contact with same email address already exists.',
+        );
+    }
+
+    # check if primary CustomerID exists
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
+        CustomerID => $Contact->{UserCustomerID},
+    );
+
+    if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => 'Validation failed. No valid customer found for primary customer ID "'.$Contact->{UserCustomerID}.'".',
         );
     }
     
+    if ( IsArrayRefWithData($Contact->{UserCustomerIDs}) ) {
+        # check if primary CustomerID is contained in assigned CustomerIDs
+        if ( !grep /$Contact->{UserCustomerID}/, @{$Contact->{UserCustomerIDs}} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. Primary customer ID "'.$Contact->{UserCustomerID}.'" is not available in assigned customer IDs "'.(join(", ", @{$Contact->{UserCustomerIDs}})).'".',
+            );
+        }
+        # check each assigned customer 
+        foreach my $CustomerID ( @{$Contact->{UserCustomerIDs}} ) {
+            my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
+                CustomerID => $CustomerID,
+            );
+            if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => 'Validation failed. No valid customer found for assigned customer ID "'.$CustomerID.'".',
+                );
+            }
+        }
+    }
+
     # create Contact
     my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
         %{$Contact},
