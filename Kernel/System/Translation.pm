@@ -744,10 +744,12 @@ sub ImportPO {
     }
 
     if ( IsHashRefWithData($Items) ) {        
+        my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+
         foreach my $MsgId ( sort keys %{$Items} ) {
             $CountTotal++;
 
-            my $MsgStr = $Items->{$MsgId}->msgstr;
+            my $MsgStr = $EncodeObject->EncodeInput($Items->{$MsgId}->msgstr);
             $MsgId =~ s/"//g;
             $MsgStr =~ s/"//g;
 
