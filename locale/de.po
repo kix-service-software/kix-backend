@@ -177,3 +177,188 @@ msgid ""
 "default reject/new ticket created (after closed follow-up with new ticket "
 "creation)"
 msgstr ""
+
+# CI classes
+msgid "General Information"
+msgstr "Allgemeine Informationen"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Vendor"
+msgstr "Hersteller"
+
+msgid "Model"
+msgstr "Modell"
+
+msgid "Location"
+msgstr "Standort"
+
+msgid "Building"
+msgstr "Gebäude"
+
+msgid "Room"
+msgstr "Raum"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Note"
+msgstr "Notiz"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Attachment"
+msgstr "Anhang"
+
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "Owner Information"
+msgstr "Besitzer Informationen"
+
+msgid "Assigned Customer"
+msgstr "Zugeordneter Kunde"
+
+msgid "Assigned Owner"
+msgstr "Zugeordneter Besitzer"
+
+msgid "Network Information"
+msgstr "Netzwerk Informationen"
+
+msgid "Network Interface"
+msgstr "Netzwerkschnittstelle"
+
+msgid "IP over DHCP"
+msgstr "IP via DHCP"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "yes"
+msgstr "ja"
+
+msgid "no"
+msgstr "nein"
+
+msgid "IP Address"
+msgstr "IP Adresse"
+
+msgid "Please enter a valid IPv4 address in form 123.123.123.123."
+msgstr ""
+"Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein."
+
+msgid "Network"
+msgstr "Netzwerk"
+
+msgid "Hardware Information"
+msgstr "Hardware Informationen"
+
+msgid "Serial Number"
+msgstr "Seriennummer"
+
+msgid "Hard Disk"
+msgstr "Festplatte"
+
+msgid "Capacity"
+msgstr "Kapazität"
+
+msgid "Graphic Adapter"
+msgstr "Grafikkarte"
+
+msgid "Other Equipment"
+msgstr "Sonstige Ausstattung"
+
+msgid "Software Information"
+msgstr "Software Informationen"
+
+msgid "Operating System"
+msgstr "Betriebssystem"
+
+msgid "Installed Software"
+msgstr "Installierte Software"
+
+msgid "Warranty Information"
+msgstr "Garantie Informationen"
+
+msgid "Warranty Expiration Date"
+msgstr "Garantieende"
+
+msgid "First Usage Date"
+msgstr "Inbetriebnahme"
+
+msgid "Global Location Number"
+msgstr "Globale Lokationsnummer"
+
+msgid "Address Information"
+msgstr "Adressinformationen"
+
+msgid "Street"
+msgstr "Straße"
+
+msgid "Street 2"
+msgstr "Straße 2"
+
+msgid "City"
+msgstr "Stadt"
+
+msgid "ZIP"
+msgstr "PLZ"
+
+msgid "Region"
+msgstr "Region"
+
+msgid "Country"
+msgstr "Land"
+
+msgid "Contact Information"
+msgstr "Kontaktinformationen"
+
+msgid "Contact Role"
+msgstr "Kontaktrolle"
+
+msgid "Contact"
+msgstr "Ansprechpartner"
+
+msgid "Parent Location"
+msgstr "Übergeordneter Standort"
+
+msgid "Room Type"
+msgstr "Raumtyp"
+
+msgid "Floor"
+msgstr "Geschoss"
+
+msgid "Please enter decimal numbers only."
+msgstr "Bitte geben Sie nur Dezimalzahlen ein."
+
+msgid "Room Label"
+msgstr "Raumbeschriftung"
+
+msgid "Network Address"
+msgstr "Netzwerkadresse"
+
+msgid "Subnet Mask"
+msgstr "Subnetzmaske"
+
+msgid "Product"
+msgstr "Produkt"
+
+msgid "License Information"
+msgstr "Lizenz Informationen"
+
+msgid "Licence Type"
+msgstr "Lizenztyp"
+
+msgid "License Key"
+msgstr "Lizenzschlüssel"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "Expiration Date"
+msgstr "Ablaufdatum"

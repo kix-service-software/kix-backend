@@ -4157,7 +4157,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">24</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Standort</Data>
+        <Data Key="name" Type="Quote">Location</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4167,7 +4167,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">25</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Haus</Data>
+        <Data Key="name" Type="Quote">Building</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -4177,7 +4177,7 @@ DefaultValue: ''
     <Insert Table="general_catalog">
         <Data Key="id" Type="AutoIncrement">26</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
-        <Data Key="name" Type="Quote">Raum</Data>
+        <Data Key="name" Type="Quote">Room</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
@@ -5117,19 +5117,17 @@ DefaultValue: ''
     <Insert Table="configitem_definition">
         <Data Key="class_id">22</Data>
         <Data Key="configitem_definition" Type="Quote">
- [
+[
     {
         Key   => 'SectionGeneral',
-        #Name  => 'General Information',
-        Name  => 'Allgemeine Informationen',
+        Name  => 'General Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'Type',
-                #Name       => 'Type',
-                Name       => 'Typ',
+                Name       => 'Type',
                 Searchable => 1,
                 Input      => {
                     Type        => 'GeneralCatalog',
@@ -5139,8 +5137,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Vendor',
-                #Name       => 'Vendor',
-                Name       => 'Hersteller',
+                Name       => 'Vendor',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5152,8 +5149,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Model',
-                #Name       => 'Model',
-                Name       => 'Modell',
+                Name       => 'Model',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5162,13 +5158,11 @@ DefaultValue: ''
             },
             {
                 Key        => 'Location',
-                #Name       => 'Asset Location',
-                Name       => 'Lokation',
+                Name       => 'Location',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
-                    #ReferencedCIClassName          =>  ['Location','Building','Room'],
-                    ReferencedCIClassName          =>  ['Standort','Haus','Raum'],
+                    ReferencedCIClassName          =>  ['Location','Building','Room'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5177,8 +5171,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Description',
-                #Name       => 'Description',
-                Name       => 'Beschreibung',
+                Name       => 'Description',
                 Searchable => 1,
                 Input      => {
                     Type => 'TextArea',
@@ -5189,8 +5182,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Note',
-                #Name       => 'Note',
-                Name       => 'Notizen',
+                Name       => 'Note',
                 Searchable => 1,
                 Input      => {
                     Type     => 'TextArea',
@@ -5201,8 +5193,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Attachment',
-                #Name       => 'Attachment',
-                Name       => 'Anhang',
+                Name       => 'Attachment',
                 Searchable => 1,
                 Input => {
                     Type      => 'Attachment',
@@ -5216,16 +5207,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionOwner',
-        #Name  => 'Owner Information',
-        Name  => 'Besitzer Informationen',
+        Name  => 'Owner Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'OwnerCustomer',
-                #Name       => 'Assigned Customer',
-                Name       => 'Zugeordneter Kunde',
+                Name       => 'Assigned Customer',
                 Searchable => 1,
                 Input      => {
                     Type => 'Customer',
@@ -5233,8 +5222,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'OwnerUser',
-                #Name       => 'Assigned Owner',
-                Name       => 'Zugeordneter Besitzer',
+                Name       => 'Assigned Owner',
                 Searchable => 1,
                 Input      => {
                     Type => 'Contact',
@@ -5249,8 +5237,7 @@ DefaultValue: ''
 
     {
         Key   => 'SectionNetwork',
-        #Name  => 'Network Information',
-        Name  => 'Netzwerk Informationen',
+        Name  => 'Network Information',
         Input => {
             Type => 'Dummy',
         },
@@ -5270,8 +5257,7 @@ DefaultValue: ''
 
           {
               Key   => 'NIC',
-              #Name  => 'Network Adapter',
-              Name  => 'Netzwerkschnittstelle',
+              Name  => 'Network Interface',
               Input => {
                   Type      => 'Text',
                   MaxLength => 100,
@@ -5283,8 +5269,7 @@ DefaultValue: ''
               Sub          => [
                   {
                       Key   => 'IPoverDHCP',
-                      #Name  => 'IP over DHCP',
-                      Name  => 'IP via DHCP',
+                      Name  => 'IP over DHCP',
                       Input => {
                           Type        => 'GeneralCatalog',
                           Class       => 'ITSM::ConfigItem::YesNo',
@@ -5294,14 +5279,12 @@ DefaultValue: ''
                   },
                   {
                       Key        => 'IPAddress',
-                      #Name       => 'IP Address',
-                      Name       => 'IP Adresse',
+                      Name       => 'IP Address',
                       Searchable => 1,
                       Input      => {
                           Type      => 'Text',
                           RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                          #RegExErrorMessage => 'Please enter a valid IPv4 address.',
-                          RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
+                          RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
                           MaxLength => 40,
                           Required  => 1,
                       },
@@ -5311,13 +5294,11 @@ DefaultValue: ''
                   },
                   {
                       Key        => 'Network',
-                      #Name       => 'Network',
-                      Name       => 'Netzwerk',
+                      Name       => 'Network',
                       Searchable => 1,
                       Input      => {
                           Type                           => 'CIClassReference',
-                          #ReferencedCIClassName          => 'Network',
-                          ReferencedCIClassName          => 'Netzwerk',
+                          ReferencedCIClassName          => 'Network',
                           ReferencedCIClassLinkType      => 'ConnectedTo',
                           ReferencedCIClassLinkDirection => 'Normal',
                           # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5335,14 +5316,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionHardware',
-        Name  => 'Hardware Informationen',
+        Name  => 'Hardware Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'SerialNumber',
-                #Name       => 'Serial Number',
+                Name       => 'Serial Number',
                 Name       => 'Seriennummer',
                 Searchable => 1,
                 Input      => {
@@ -5373,8 +5354,7 @@ DefaultValue: ''
             },
             {
                 Key   => 'HardDisk',
-                #Name  => 'Hard Disk',
-                Name  => 'Festplattenspeicher',
+                Name  => 'Hard Disk',
                 Input => {
                     Type      => 'Text',
                     MaxLength => 100,
@@ -5384,8 +5364,7 @@ DefaultValue: ''
                 Sub          => [
                     {
                         Key   => 'Capacity',
-                        #Name  => 'Capacity',
-                        Name  => 'Kapazität',
+                        Name  => 'Capacity',
                         Input => {
                             Type      => 'Text',
                             MaxLength => 10,
@@ -5395,8 +5374,7 @@ DefaultValue: ''
             },
             {
                 Key   => 'GraphicAdapter',
-                #Name  => 'Graphic Adapter',
-                Name  => 'Grafikkarte',
+                Name  => 'Graphic Adapter',
                 Input => {
                     Type      => 'Text',
                     MaxLength => 100,
@@ -5407,8 +5385,7 @@ DefaultValue: ''
             },
             {
                 Key   => 'OtherEquipment',
-                #Name  => 'Other Equipment',
-                Name  => 'Sonstige Ausstattung',
+                Name  => 'Other Equipment',
                 Input => {
                     Type     => 'TextArea',
                     Required => 1,
@@ -5422,16 +5399,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionSoftware',
-        #Name  => 'Software Information',
-        Name  => 'Software Informationen',
+        Name  => 'Software Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key   => 'OperatingSystem',
-                #Name  => 'Operating System',
-                Name  => 'Betriebssystem',
+                Name  => 'Operating System',
                 Input => {
                     Type      => 'Text',
                     MaxLength => 100,
@@ -5439,8 +5414,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'InstalledSoftware',
-                #Name       => 'Installed Software',
-                Name       => 'Installierte Software',
+                Name       => 'Installed Software',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
@@ -5463,7 +5437,6 @@ DefaultValue: ''
 
     {
         Key   => 'SectionWarranty',
-        #Name  => 'Warranty Information',
         Name  => 'Garantie Informationen',
         Input => {
             Type => 'Dummy',
@@ -5471,8 +5444,7 @@ DefaultValue: ''
         Sub => [
             {
                 Key        => 'WarrantyExpirationDate',
-                #Name       => 'Warranty Expiration Date',
-                Name       => 'Garantieende',
+                Name       => 'Warranty Expiration Date',
                 Searchable => 1,
                 Input      => {
                     Type             => 'Date',
@@ -5482,8 +5454,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'FirstUsageDate',
-                #Name       => 'First Usage Date',
-                Name       => 'Inbetriebnahme',
+                Name       => 'First Usage Date',
                 Searchable => 1,
                 Input      => {
                     Type             => 'Date',
@@ -5503,19 +5474,18 @@ DefaultValue: ''
 <!-- CI class Hardware -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">23</Data>
-        <Data Key="configitem_definition" Type="Quote">[
+        <Data Key="configitem_definition" Type="Quote">
+[
     {
         Key   => 'SectionGeneral',
-        #Name  => 'General Information',
-        Name  => 'Allgemeine Informationen',
+        Name  => 'General Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'Type',
-                #Name       => 'Type',
-                Name       => 'Typ',
+                Name       => 'Type',
                 Searchable => 1,
                 Input      => {
                     Type        => 'GeneralCatalog',
@@ -5525,8 +5495,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Vendor',
-                #Name       => 'Vendor',
-                Name       => 'Hersteller',
+                Name       => 'Vendor',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5538,8 +5507,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Model',
-                #Name       => 'Model',
-                Name       => 'Modell',
+                Name       => 'Model',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5548,13 +5516,11 @@ DefaultValue: ''
             },
             {
                 Key        => 'Location',
-                #Name       => 'Asset Location',
-                Name       => 'Lokation',
+                Name       => 'Location',
                 Searchable => 1,
                 Input      => {
                     Type                           => 'CIClassReference',
-                    #ReferencedCIClassName          =>  ['Location','Building','Room'],
-                    ReferencedCIClassName          =>  ['Standort','Haus','Raum'],
+                    ReferencedCIClassName          =>  ['Location','Building','Room'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5562,8 +5528,7 @@ DefaultValue: ''
                 },            },
             {
                 Key        => 'Description',
-                #Name       => 'Description',
-                Name       => 'Beschreibung',
+                Name       => 'Description',
                 Searchable => 1,
                 Input      => {
                     Type => 'TextArea',
@@ -5574,8 +5539,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Note',
-                #Name       => 'Note',
-                Name       => 'Notizen',
+                Name       => 'Note',
                 Searchable => 1,
                 Input      => {
                     Type     => 'TextArea',
@@ -5586,8 +5550,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Attachment',
-                #Name       => 'Attachment',
-                Name       => 'Anhang',
+                Name       => 'Attachment',
                 Searchable => 1,
                 Input => {
                     Type      => 'Attachment',
@@ -5601,16 +5564,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionOwner',
-        #Name  => 'Owner Information',
-        Name  => 'Besitzer Informationen',
+        Name  => 'Owner Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'OwnerCustomer',
-                #Name       => 'Assigned Customer',
-                Name       => 'Zugeordneter Kunde',
+                Name       => 'Assigned Customer',
                 Searchable => 1,
                 Input      => {
                     Type => 'Customer',
@@ -5618,8 +5579,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'OwnerUser',
-                #Name       => 'Assigned Owner',
-                Name       => 'Zugeordneter Besitzer',
+                Name       => 'Assigned Owner',
                 Searchable => 1,
                 Input      => {
                     Type => 'Contact',
@@ -5634,8 +5594,7 @@ DefaultValue: ''
 
     {
         Key   => 'SectionNetwork',
-        #Name  => 'Network Information',
-        Name  => 'Netzwerk Informationen',
+        Name  => 'Network Information',
         Input => {
             Type => 'Dummy',
         },
@@ -5655,8 +5614,7 @@ DefaultValue: ''
 
           {
               Key   => 'NIC',
-              #Name  => 'Network Adapter',
-              Name  => 'Netzwerkschnittstelle',
+              Name  => 'Network Adapter',
               Input => {
                   Type      => 'Text',
                   MaxLength => 100,
@@ -5668,8 +5626,7 @@ DefaultValue: ''
               Sub          => [
                   {
                       Key   => 'IPoverDHCP',
-                      #Name  => 'IP over DHCP',
-                      Name  => 'IP via DHCP',
+                      Name  => 'IP over DHCP',
                       Input => {
                           Type        => 'GeneralCatalog',
                           Class       => 'ITSM::ConfigItem::YesNo',
@@ -5679,14 +5636,12 @@ DefaultValue: ''
                   },
                   {
                       Key        => 'IPAddress',
-                      #Name       => 'IP Address',
-                      Name       => 'IP Adresse',
+                      Name       => 'IP Address',
                       Searchable => 1,
                       Input      => {
                           Type      => 'Text',
                           RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                          #RegExErrorMessage => 'Please enter a valid IPv4 address.',
-                          RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
+                          RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
                           MaxLength => 40,
                           Required  => 1,
                       },
@@ -5696,13 +5651,11 @@ DefaultValue: ''
                   },
                   {
                       Key        => 'Network',
-                      #Name       => 'Network',
-                      Name       => 'Netzwerk',
+                      Name       => 'Network',
                       Searchable => 1,
                       Input      => {
                           Type                           => 'CIClassReference',
-                          #ReferencedCIClassName          => 'Network',
-                          ReferencedCIClassName          => 'Netzwerk',
+                          ReferencedCIClassName          => 'Network',
                           ReferencedCIClassLinkType      => 'ConnectedTo',
                           ReferencedCIClassLinkDirection => 'Normal',
                           # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5720,15 +5673,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionHardware',
-        Name  => 'Hardware Informationen',
+        Name  => 'Hardware Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'SerialNumber',
-                #Name       => 'Serial Number',
-                Name       => 'Seriennummer',
+                Name       => 'Serial Number',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5753,16 +5705,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionWarranty',
-        #Name  => 'Warranty Information',
-        Name  => 'Garantie Informationen',
+        Name  => 'Warranty Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'WarrantyExpirationDate',
-                #Name       => 'Warranty Expiration Date',
-                Name       => 'Garantieende',
+                Name       => 'Warranty Expiration Date',
                 Searchable => 1,
                 Input      => {
                     Type             => 'Date',
@@ -5772,8 +5722,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'FirstUsageDate',
-                #Name       => 'First Usage Date',
-                Name       => 'Inbetriebnahme',
+                Name       => 'First Usage Date',
                 Searchable => 1,
                 Input      => {
                     Type             => 'Date',
@@ -5805,8 +5754,7 @@ DefaultValue: ''
         Sub => [
             {
                 Key        => 'GLN',
-                #Name       => 'Global Location Number',
-                Name       => 'Globale Lokationsnummer',
+                Name       => 'Global Location Number',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -5815,8 +5763,7 @@ DefaultValue: ''
             },
             {
                 Key => 'Note',
-                #Name       => 'Note',
-                Name       => 'Notizen',
+                Name       => 'Note',
                 Searchable => 1,
                 Input      => {
                     Type     => 'TextArea',
@@ -5828,8 +5775,7 @@ DefaultValue: ''
             },
             {
                 Key => 'Attachment',
-                #Name       => 'Attachment',
-                Name       => 'Anhang',
+                Name       => 'Attachment',
                 Searchable => 1,
                 Input      => {
                     Type => 'Attachment',
@@ -5841,16 +5787,14 @@ DefaultValue: ''
     },
     {
         Key   => 'SectionAddress',
-        #Name  => 'Address Information',
-        Name  => 'Adressinformationen',
+        Name  => 'Address Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'Street',
-                #Name       => 'Street',
-                Name       => 'Straße',
+                Name       => 'Street',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -5858,8 +5802,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Street2',
-                #Name       => 'Street 2',
-                Name       => 'Straße 2',
+                Name       => 'Street 2',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -5871,8 +5814,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'City',
-                #Name       => 'City',
-                Name       => 'Stadt',
+                Name       => 'City',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -5880,8 +5822,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'ZIP',
-                #Name       => 'ZIP',
-                Name       => 'PLZ',
+                Name       => 'ZIP',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -5901,8 +5842,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Country',
-                #Name       => 'Country',
-                Name       => 'Land',
+                Name       => 'Country',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -5917,16 +5857,14 @@ DefaultValue: ''
 
     {
         Key => 'SectionContacts',
-        #Name  => 'Contact Information',
-        Name  => 'Kontaktinformationen',
+        Name  => 'Contact Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key => 'ContactRole',
-                #Name       => 'Contact Role',
-                Name       => 'Kontaktrolle',
+                Name       => 'Contact Role',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -5935,8 +5873,7 @@ DefaultValue: ''
                 Sub => [
                     {
                         Key => 'Contact',
-                        #Name       => 'Contact',
-                        Name       => 'Ansprechpartner',
+                        Name       => 'Contact',
                         Searchable => 1,
                         Input      => {
                             Type     => 'Contact',
@@ -5969,15 +5906,12 @@ DefaultValue: ''
         Sub => [
             {
                 Key => 'ParentLocation',
-
-                #Name       => 'Parent Location',
-                Name       => 'Standort',
+                Name       => 'Parent Location',
                 Searchable => 1,
                 Input      => {
                     Required                       => 1,
                     Type                           => 'CIClassReference',
-                    #ReferencedCIClassName          => 'Location',
-                    ReferencedCIClassName          => 'Standort',
+                    ReferencedCIClassName          => 'Location',
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -5989,8 +5923,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'GLN',
-                #Name       => 'Global Location Number',
-                Name       => 'Globale Lokationsnummer',
+                Name       => 'Global Location Number',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -5999,8 +5932,7 @@ DefaultValue: ''
             },
             {
                 Key => 'Note',
-                #Name       => 'Note',
-                Name       => 'Notizen',
+                Name       => 'Note',
                 Searchable => 1,
                 Input      => {
                     Type     => 'TextArea',
@@ -6012,8 +5944,7 @@ DefaultValue: ''
             },
             {
                 Key => 'Attachment',
-                #Name       => 'Attachment',
-                Name       => 'Anhang',
+                Name       => 'Attachment',
                 Searchable => 1,
                 Input      => {
                     Type => 'Attachment',
@@ -6025,8 +5956,7 @@ DefaultValue: ''
     },
     {
         Key   => 'SectionAddress',
-        #Name  => 'Address Information',
-        Name  => 'Adressinformationen',
+        Name  => 'Address Information',
         Input => {
             Type => 'Dummy',
         },
@@ -6036,8 +5966,7 @@ DefaultValue: ''
         Sub => [
             {
                 Key        => 'Street',
-                #Name       => 'Street',
-                Name       => 'Straße',
+                Name       => 'Street',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -6045,8 +5974,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Street2',
-                #Name       => 'Street 2',
-                Name       => 'Straße 2',
+                Name       => 'Street 2',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -6058,8 +5986,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'City',
-                #Name       => 'City',
-                Name       => 'Stadt',
+                Name       => 'City',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -6067,8 +5994,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'ZIP',
-                #Name       => 'ZIP',
-                Name       => 'PLZ',
+                Name       => 'ZIP',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -6088,8 +6014,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Country',
-                #Name       => 'Country',
-                Name       => 'Land',
+                Name       => 'Country',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -6104,16 +6029,14 @@ DefaultValue: ''
 
     {
         Key => 'SectionContacts',
-        #Name  => 'Contact Information',
-        Name  => 'Kontaktinformationen',
+        Name  => 'Contact Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key => 'ContactRole',
-                #Name       => 'Contact Role',
-                Name       => 'Kontaktrolle',
+                Name       => 'Contact Role',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -6122,8 +6045,7 @@ DefaultValue: ''
                 Sub => [
                     {
                         Key => 'Contact',
-                        #Name       => 'Contact',
-                        Name       => 'Ansprechpartner',
+                        Name       => 'Contact',
                         Searchable => 1,
                         Input      => {
                             Type     => 'Contact',
@@ -6156,15 +6078,12 @@ DefaultValue: ''
         Sub => [
             {
                 Key => 'ParentLocation',
-
-                #Name       => 'Parent Location',
-                Name       => 'Haus',
+                Name       => 'Building',
                 Searchable => 1,
                 Input      => {
                     Required                       => 1,
                     Type                           => 'CIClassReference',
-                    #ReferencedCIClassName          => 'Building',
-                    ReferencedCIClassName          => 'Haus',
+                    ReferencedCIClassName          => 'Building',
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
@@ -6176,8 +6095,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'RoomType',
-                #Name       => 'Room Type',
-                Name       => 'Raumtyp',
+                Name       => 'Room Type',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -6186,21 +6104,18 @@ DefaultValue: ''
             },
             {
                 Key        => 'Floor',
-                #Name       => 'Floor',
-                Name       => 'Geschoss',
+                Name       => 'Floor',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
                     MaxLength => 50,
                     RegEx             => '\D',
-                    #RegExErrorMessage => 'Please enter decimal numbers only.',
-                    RegExErrorMessage => 'Bitte geben Sie nur Dezimalzahlen ein.',
+                    RegExErrorMessage => 'Please enter decimal numbers only.',
                 },
             },
             {
                 Key        => 'RoomLabel',
-                #Name       => 'Room Label',
-                Name       => 'Raumbeschriftung',
+                Name       => 'Room Label',
                 Searchable => 1,
                 Input      => {
                     Type => 'Text',
@@ -6209,8 +6124,7 @@ DefaultValue: ''
             },
             {
                 Key => 'Note',
-                #Name       => 'Note',
-                Name       => 'Notizen',
+                Name       => 'Note',
                 Searchable => 1,
                 Input      => {
                     Type     => 'TextArea',
@@ -6222,8 +6136,7 @@ DefaultValue: ''
             },
             {
                 Key => 'Attachment',
-                #Name       => 'Attachment',
-                Name       => 'Anhang',
+                Name       => 'Attachment',
                 Searchable => 1,
                 Input      => {
                     Type => 'Attachment',
@@ -6236,8 +6149,7 @@ DefaultValue: ''
 
     {
         Key => 'SectionContacts',
-        #Name  => 'Contact Information',
-        Name  => 'Kontaktinformationen',
+        Name  => 'Contact Information',
         Input => {
             Type => 'Dummy',
         },
@@ -6247,8 +6159,7 @@ DefaultValue: ''
         Sub => [
             {
                 Key => 'ContactRole',
-                #Name       => 'Contact Role',
-                Name       => 'Kontaktrolle',
+                Name       => 'Contact Role',
                 Searchable => 1,
                 Input      => {
                     Type     => 'Text',
@@ -6257,8 +6168,7 @@ DefaultValue: ''
                 Sub => [
                     {
                         Key => 'Contact',
-                        #Name       => 'Contact',
-                        Name       => 'Ansprechpartner',
+                        Name       => 'Contact',
                         Searchable => 1,
                         Input      => {
                             Type     => 'Contact',
@@ -6282,8 +6192,7 @@ DefaultValue: ''
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key        => 'Type',
-        #Name       => 'Type',
-        Name       => 'Typ',
+        Name       => 'Type',
         Searchable => 1,
         Input      => {
             Type        => 'GeneralCatalog',
@@ -6293,7 +6202,7 @@ DefaultValue: ''
     },
     {
         Key        => 'Description',
-        #Name       => 'Description',
+        Name       => 'Description',
         Name       => 'Beschreibung',
         Searchable => 1,
         Input      => {
@@ -6302,14 +6211,12 @@ DefaultValue: ''
     },
     {
         Key        => 'NetworkAddress',
-        #Name       => 'Network Address',
-        Name       => 'Netzwerk Adresse',
+        Name       => 'Network Address',
         Searchable => 1,
         Input      => {
             Type      => 'Text',
             RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-            #RegExErrorMessage => 'Please enter a valid IPv4 address.',
-            RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
+            RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
             MaxLength => 20,
             Required  => 1,
         },
@@ -6319,13 +6226,11 @@ DefaultValue: ''
         Sub          => [
             {
                 Key   => 'SubnetMask',
-                #Name  => 'Subnet Mask',
-                Name  => 'Subnetzmaske',
+                Name  => 'Subnet Mask',
                 Input => {
                     Type         => 'Text',
                     RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                    #RegExErrorMessage => 'Please enter a valid IPv4 address.',
-                    RegExErrorMessage => 'Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein.',
+                    RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
                     MaxLength    => 20,
                     ValueDefault => '255.255.255.0',
                     Required     => 1,
@@ -6350,8 +6255,7 @@ DefaultValue: ''
     },
     {
         Key        => 'Note',
-        #Name       => 'Note',
-        Name       => 'Notizen',
+        Name       => 'Note',
         Searchable => 1,
         Input      => {
             Type     => 'TextArea',
@@ -6372,16 +6276,14 @@ DefaultValue: ''
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
-        #Name  => 'General Information',
-        Name  => 'Allgemeine Informationen',
+        Name  => 'General Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'Type',
-                #Name       => 'Type',
-                Name       => 'Typ',
+                Name       => 'Type',
                 Searchable => 1,
                 Input      => {
                     Type        => 'GeneralCatalog',
@@ -6391,8 +6293,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Vendor',
-                #Name       => 'Vendor',
-                Name       => 'Hersteller',
+                Name       => 'Vendor',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -6401,8 +6302,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Product',
-                #Name       => 'Product',
-                Name       => 'Produkt',
+                Name       => 'Product',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -6425,8 +6325,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'Description',
-                #Name       => 'Description',
-                Name       => 'Beschreibung',
+                Name       => 'Description',
                 Searchable => 1,
                 Input      => {
                     Type => 'TextArea',
@@ -6440,16 +6339,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionOwner',
-        #Name  => 'Owner Information',
-        Name  => 'Besitzer Informationen',
+        Name  => 'Owner Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'OwnerCustomer',
-                #Name       => 'Assigned Customer',
-                Name       => 'Zugeordneter Kunde',
+                Name       => 'Assigned Customer',
                 Searchable => 1,
                 Input      => {
                     Type => 'Customer',
@@ -6457,8 +6354,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'OwnerUser',
-                #Name       => 'Assigned Owner',
-                Name       => 'Zugeordneter Besitzer',
+                Name       => 'Assigned Owner',
                 Searchable => 1,
                 Input      => {
                     Type => 'Contact',
@@ -6472,16 +6368,14 @@ DefaultValue: ''
 
     {
         Key   => 'SectionLicense',
-        #Name  => 'License Information',
-        Name  => 'Lizenzangaben',
+        Name  => 'License Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
                 Key        => 'LicenceType',
-                #Name       => 'Licence Type',
-                Name       => 'Lizenztyp',
+                Name       => 'Licence Type',
                 Searchable => 1,
                 Input      => {
                     Type        => 'GeneralCatalog',
@@ -6491,8 +6385,7 @@ DefaultValue: ''
             },
             {
                 Key        => 'LicenceKey',
-                #Name       => 'License Key',
-                Name       => 'Lizenzschlüssel',
+                Name       => 'License Key',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -6505,14 +6398,12 @@ DefaultValue: ''
                 Sub          => [
                     {
                         Key   => 'Quantity',
-                        #Name  => 'Quantity',
-                        Name  => 'Anzahl',
+                        Name  => 'Quantity',
                         Input => {
                             Type => 'Text',
                             # enforce integer input by using regex...
                             RegEx             => '^(?:(?:\d*))$',
-                            #RegExErrorMessage => 'Please enter decimal numbers only.',
-                            RegExErrorMessage => 'Bitte geben Sie nur Dezimalzahlen an.',
+                            RegExErrorMessage => 'Please enter decimal numbers only.',
                             MaxLength         => 20,
                             Required          => 1,
                         },
@@ -6522,8 +6413,7 @@ DefaultValue: ''
                     },
                     {
                         Key   => 'ExpirationDate',
-                        #Name  => 'Expiration Date',
-                        Name  => 'Ablaufdatum',
+                        Name  => 'Expiration Date',
                         Input => {
                             Type             => 'Date',
                             Required         => 1,
@@ -6541,8 +6431,7 @@ DefaultValue: ''
 
     {
         Key        => 'Note',
-        #Name       => 'Note',
-        Name       => 'Notizen',
+        Name       => 'Note',
         Searchable => 1,
         Input      => {
             Type     => 'TextArea',
@@ -6554,8 +6443,7 @@ DefaultValue: ''
     },
     {
         Key        => 'Attachment',
-        #Name       => 'Attachment',
-        Name       => 'Anhang',
+        Name       => 'Attachment',
         Searchable => 1,
         Input => {
             Type      => 'Attachment',

@@ -162,3 +162,186 @@ msgstr ""
 msgid "default reject/new ticket created (after closed follow-up with new ticket creation)"
 msgstr ""
 
+# CI classes
+msgid "General Information"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Vendor"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Location"
+msgstr ""
+
+msgid "Building"
+msgstr ""
+
+msgid "Room"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Note"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+msgid "Attachment"
+msgstr ""
+
+msgid "Attachments"
+msgstr ""
+
+msgid "Owner Information"
+msgstr ""
+
+msgid "Assigned Customer"
+msgstr ""
+
+msgid "Assigned Owner"
+msgstr ""
+
+msgid "Network Information"
+msgstr ""
+
+msgid "Network Interface"
+msgstr ""
+
+msgid "IP over DHCP"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "yes"
+msgstr ""
+
+msgid "no"
+msgstr ""
+
+msgid "IP Address"
+msgstr ""
+
+msgid "Please enter a valid IPv4 address in form 123.123.123.123."
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "Hardware Information"
+msgstr ""
+
+msgid "Serial Number"
+msgstr ""
+
+msgid "Hard Disk"
+msgstr ""
+
+msgid "Capacity"
+msgstr ""
+
+msgid "Graphic Adapter"
+msgstr ""
+
+msgid "Other Equipment"
+msgstr ""
+
+msgid "Software Information"
+msgstr ""
+
+msgid "Operating System"
+msgstr ""
+
+msgid "Installed Software"
+msgstr ""
+
+msgid "Warranty Information"
+msgstr ""
+
+msgid "Warranty Expiration Date"
+msgstr ""
+
+msgid "First Usage Date"
+msgstr ""
+
+msgid "Global Location Number"
+msgstr ""
+
+msgid "Address Information"
+msgstr ""
+
+msgid "Street"
+msgstr ""
+
+msgid "Street 2"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "ZIP"
+msgstr ""
+
+msgid "Region"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Contact Information"
+msgstr ""
+
+msgid "Contact Role"
+msgstr ""
+
+msgid "Contact"
+msgstr ""
+
+msgid "Parent Location"
+msgstr ""
+
+msgid "Room Type"
+msgstr ""
+
+msgid "Floor"
+msgstr ""
+
+msgid "Please enter decimal numbers only."
+msgstr ""
+
+msgid "Room Label"
+msgstr ""
+
+msgid "Network Address"
+msgstr ""
+
+msgid "Subnet Mask"
+msgstr ""
+
+msgid "Product"
+msgstr ""
+
+msgid "License Information"
+msgstr ""
+
+msgid "Licence Type"
+msgstr ""
+
+msgid "License Key"
+msgstr ""
+
+msgid "Quantity"
+msgstr ""
+
+msgid "Expiration Date"
+msgstr ""
