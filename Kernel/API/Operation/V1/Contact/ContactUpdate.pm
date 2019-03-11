@@ -188,6 +188,43 @@ sub Run {
         }
     }
     
+    # check if primary CustomerID exists
+    if ( $Contact->{UserCustomerID} ) {
+        my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
+            CustomerID => $Contact->{UserCustomerID},
+        );
+
+        if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. No valid customer found for primary customer ID "'.$Contact->{UserCustomerID}.'".',
+            );
+        }
+    }
+    
+    if ( IsArrayRefWithData($Contact->{UserCustomerIDs}) || IsArrayRefWithData($ContactData{UserCustomerIDs}) ) {
+        # check if primary CustomerID is contained in assigned CustomerIDs
+        my @CustomerIDs = @{IsArrayRefWithData($Contact->{UserCustomerIDs}) ? $Contact->{UserCustomerIDs} : $ContactData{UserCustomerIDs}};
+        if ( !grep /$Contact->{UserCustomerID}/, @CustomerIDs ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. Primary customer ID "'.$Contact->{UserCustomerID}.'" is not available in assigned customer IDs "'.(join(", ", @CustomerIDs)).'".',
+            );
+        }
+        # check each assigned customer 
+        foreach my $CustomerID ( @CustomerIDs ) {
+            my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
+                CustomerID => $CustomerID,
+            );
+            if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => 'Validation failed. No valid customer found for assigned customer ID "'.$CustomerID.'".',
+                );
+            }
+        }
+    }
+
     # update Contact
     my $Success = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
         %ContactData,
