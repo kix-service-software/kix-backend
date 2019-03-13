@@ -7,7 +7,7 @@
     "ClientRegistration": {
       "type": "object",
       "properties": {
-        "Authentication": {
+        "Authorization": {
           "type": "string"
         },
         "NotificationURL": {

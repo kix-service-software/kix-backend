@@ -110,7 +110,7 @@ sub ClientRegistrationGet {
             ClientID             => $Row[0],
             NotificationURL      => $Row[1],
             NotificationInterval => $Row[2],
-            Authentication       => $Row[3],
+            Authorization       => $Row[3],
             LastNotificationTimestamp => $Row[4],
         );
     }
@@ -144,7 +144,7 @@ Adds a new client registration
         ClientID             => 'CLIENT1',
         NotificationURL      => '...',            # optional
         NotificationInterval => 123,              # optional, in seconds
-        Authentication       => '...',            # optional
+        Authorization       => '...',             # optional
         Translations         => '...',            # optional
     );
 
@@ -166,12 +166,12 @@ sub ClientRegistrationAdd {
 
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, authentication, last_notification_timestamp) VALUES (?, ?, ?, ?, ?)",
+        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, authorization, last_notification_timestamp) VALUES (?, ?, ?, ?, ?)",
         Bind => [
             \$Param{ClientID},
             \$Param{NotificationURL},
             \$Param{NotificationInterval},
-            \$Param{Authentication},
+            \$Param{Authorization},
             \$Now,
         ],
     );

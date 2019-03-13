@@ -2802,7 +2802,7 @@
     <Column Name="client_id" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true"/>
     <Column Name="notification_url" Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="notification_interval" Required="false" Type="SMALLINT"/>
-    <Column Name="authentication" Type="VARCHAR" Size="10000"/>
+    <Column Name="authorization" Type="VARCHAR" Size="10000"/>
     <Column Name="last_notification_timestamp" Type="DECIMAL" Size="20,6"/>
 </Table>
 

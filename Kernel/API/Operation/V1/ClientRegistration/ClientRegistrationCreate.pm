@@ -106,7 +106,7 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
                 ClientID         => '...',
                 CallbackURL      => '...',        # optional
                 CallbackInterval => '...',        # optional
-                Authentication   => '...',        # optional
+                Authorization   => '...',         # optional
                 Translations     => [             # optional
                     {
                         Language => 'de',
@@ -153,7 +153,7 @@ sub Run {
         ClientID             => $ClientRegistration->{ClientID},
         NotificationURL      => $ClientRegistration->{NotificationURL},
         NotificationInterval => $ClientRegistration->{NotificationInterval},
-        Authentication       => $ClientRegistration->{Authentication},
+        Authorization        => $ClientRegistration->{Authorization},
     );
 
     if ( !$ClientID ) {

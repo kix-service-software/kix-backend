@@ -7,13 +7,16 @@
       "ClientRegistration" : {
          "type" : "object",
          "properties" : {
-            "Authentication" : {
-               "type" : "string"
-            },
-            "CallbackURL" : {
+            "Authorization" : {
                "type" : "string"
             },
             "ClientID" : {
+               "type" : "string"
+            },
+            "NotificationInterval" : {
+               "type" : "integer"
+            },
+            "NotificationURL" : {
                "type" : "string"
             },
             "Tanslations" : {
@@ -37,8 +40,7 @@
             }
          },
          "required" : [
-            "ClientID",
-            "CallbackURL"
+            "ClientID"
          ]
       }
    },

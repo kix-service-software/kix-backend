@@ -827,22 +827,57 @@ pre code {
          "description" : "The client registration object.",
          "type" : "object",
          "properties" : {
-            "Authentication" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CallbackURL" : {
-               "type" : "string",
+            "Authorization" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "ClientID" : {
                "type" : "string",
                "readOnly" : true
+            },
+            "LastNotificationTimestamp" : {
+               "anyOf" : [
+                  {
+                     "type" : "number"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "NotificationInterval" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "NotificationURL" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             }
          },
          "required" : [
-            "ClientID",
-            "CallbackURL"
+            "ClientID"
          ]
       }
    }
@@ -887,13 +922,16 @@ pre code {
       "ClientRegistration" : {
          "type" : "object",
          "properties" : {
-            "Authentication" : {
-               "type" : "string"
-            },
-            "CallbackURL" : {
+            "Authorization" : {
                "type" : "string"
             },
             "ClientID" : {
+               "type" : "string"
+            },
+            "NotificationInterval" : {
+               "type" : "integer"
+            },
+            "NotificationURL" : {
                "type" : "string"
             },
             "Tanslations" : {
@@ -917,8 +955,7 @@ pre code {
             }
          },
          "required" : [
-            "ClientID",
-            "CallbackURL"
+            "ClientID"
          ]
       }
    },
@@ -929,8 +966,9 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ClientRegistration": { 
         "ClientID": "KIX-Frontend",
-        "Authentication": "test123", 
-        "CallbackURL": "https://kix.example.org/backendfeedback"
+        "Authorization": "test123",
+        "NotificationURL": "http://kix-frontend.example.org/notifications",
+        "NotificationInterval": 30
     }
 }</code></pre></div></div><div class="tab-pane" id="clientregistrations_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="clientregistrations_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The ClientRegistration has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="clientregistrations_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
@@ -998,22 +1036,57 @@ pre code {
          "description" : "The client registration object.",
          "type" : "object",
          "properties" : {
-            "Authentication" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CallbackURL" : {
-               "type" : "string",
+            "Authorization" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "ClientID" : {
                "type" : "string",
                "readOnly" : true
+            },
+            "LastNotificationTimestamp" : {
+               "anyOf" : [
+                  {
+                     "type" : "number"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "NotificationInterval" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "NotificationURL" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             }
          },
          "required" : [
-            "ClientID",
-            "CallbackURL"
+            "ClientID"
          ]
       }
    }
@@ -1021,8 +1094,9 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ClientRegistration": { 
         "ClientID": "KIX-Frontend",
-        "Authentication": "test123", 
-        "CallbackURL": "https://kix.example.org/backendfeedback"
+        "Authorization": "test123", 
+        "NotificationURL": "https://kix.example.org/backendfeedback",
+        "NotificationInterval": 10
     }
 }</code></pre></div></div><h2 class="response-title" id="clientregistrations__clientid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",

@@ -4,7 +4,8 @@
     <TableAlter Name="client_registration">
         <ColumnAdd Name="notification_interval" Required="false" Type="SMALLINT" />
         <ColumnAdd Name="last_notification_timestamp" Type="DECIMAL" Size="20,6"/>
-        <ColumnRename NameOld="callback_url" NameNew="notification_url" />
+        <ColumnChange NameOld="callback_url" NameNew="notification_url" Required="false" Type="VARCHAR" Size="255"/>
+        <ColumnChange NameOld="authentication" NameNew="authorization" Type="VARCHAR" Size="10000"/>
     </TableAlter>
 
     <TableCreate Name="client_notification">

@@ -21,22 +21,57 @@
          "description" : "The client registration object.",
          "type" : "object",
          "properties" : {
-            "Authentication" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CallbackURL" : {
-               "type" : "string",
+            "Authorization" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "ClientID" : {
                "type" : "string",
                "readOnly" : true
+            },
+            "LastNotificationTimestamp" : {
+               "anyOf" : [
+                  {
+                     "type" : "number"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "NotificationInterval" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "NotificationURL" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
             }
          },
          "required" : [
-            "ClientID",
-            "CallbackURL"
+            "ClientID"
          ]
       }
    }
