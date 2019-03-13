@@ -14,6 +14,7 @@ use strict;
 use warnings;
 
 use Storable qw();
+use Time::HiRes qw(time);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -402,6 +403,8 @@ sub CleanUp {
     # cleanup in-memory cache
     # We don't have TTL/expiry information here, so just always delete to be sure.
     if ( $Param{Type} ) {
+        my $Start = time();
+
         delete $Self->{Cache}->{ $Param{Type} };
 
         # check and delete depending caches
@@ -414,6 +417,8 @@ sub CleanUp {
             Operation => 'CleanUp',
             %Param,
         );
+        my $Time = (time() - $Start) * 1000;
+        $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Param{Type}, $Time));
     }
     elsif ( $Param{KeepTypes} ) {
         my %KeepTypeLookup;
@@ -421,6 +426,8 @@ sub CleanUp {
         TYPE:
         for my $Type ( sort keys %{ $Self->{Cache} || {} } ) {
             next TYPE if exists $KeepTypeLookup{$Type};
+
+            my $Start = time();
             delete $Self->{Cache}->{$Type};
 
             # check and delete depending caches
@@ -433,9 +440,12 @@ sub CleanUp {
                 Operation => 'CleanUp',
                 Type      => $Type
             );
+            my $Time = (time() - $Start) * 1000;
+            $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Type, $Time));
         }
     }
     else {
+        my $Start = time();
         delete $Self->{Cache};
         delete $Self->{TypeDependencies};
 
@@ -450,7 +460,9 @@ sub CleanUp {
         $Self->_UpdateCacheStats(
             Operation => 'CleanUp',
             %Param,
-        );        
+        );
+        my $Time = (time() - $Start) * 1000;
+        $Self->_Debug('', sprintf("cleaned up everything in %.2f ms", $Time));          
     }
 
     # cleanup persistent cache
@@ -481,12 +493,16 @@ sub GetCacheStats {
             my $CacheStats = eval { Storable::thaw( ${$Content} ) };
             foreach my $Type (keys %{$CacheStats}) {
                 if (!exists $Result->{$Type}) {
-                    $Result->{$Type}->{AccessCount} = 0;
-                    $Result->{$Type}->{HitCount}    = 0;
+                    $Result->{$Type}->{AccessCount}  = 0;
+                    $Result->{$Type}->{HitCount}     = 0;
+                    $Result->{$Type}->{CleanupCount} = 0;
+                    $Result->{$Type}->{DeleteCount}  = 0;
                 }
-                $Result->{$Type}->{AccessCount} += $CacheStats->{$Type}->{AccessCount} || 0;
-                $Result->{$Type}->{HitCount}    += $CacheStats->{$Type}->{HitCount} || 0;
-                $Result->{$Type}->{KeyCount}    += $CacheStats->{$Type}->{KeyCount} || 0;
+                $Result->{$Type}->{AccessCount}  += $CacheStats->{$Type}->{AccessCount} || 0;
+                $Result->{$Type}->{HitCount}     += $CacheStats->{$Type}->{HitCount} || 0;
+                $Result->{$Type}->{KeyCount}     += $CacheStats->{$Type}->{KeyCount} || 0;
+                $Result->{$Type}->{CleanupCount} += $CacheStats->{$Type}->{CleanupCount} || 0;
+                $Result->{$Type}->{DeleteCount}  += $CacheStats->{$Type}->{DeleteCount} || 0;
             }
         }
     }
@@ -631,13 +647,22 @@ sub _UpdateCacheStats {
         if ($Self->{CacheStats}->{$Param{Type}}->{KeyCount}) {
             $Self->{CacheStats}->{$Param{Type}}->{KeyCount}--;
         }
+        $Self->{CacheStats}->{$Param{Type}}->{DeleteCount}++;
     }
     elsif ( $Param{Operation} eq 'CleanUp' ) {
         if ( $Param{Type} ) {
             $Self->{CacheStats}->{$Param{Type}}->{KeyCount} = 0;
+            $Self->{CacheStats}->{$Param{Type}}->{CleanupCount}++;
         }
         else {
-            delete $Self->{CacheStats};
+            # clear stats of each type and incease cleanup counter
+            foreach my $Type ( keys %{$Self->{CacheStats}} ) {
+                foreach my $Key ( keys %{$Self->{CacheStats}->{$Type}} ) {
+                    next if $Key eq 'CleanupCount';
+                    $Self->{CacheStats}->{$Type}->{$Key} = 0;
+                }
+                $Self->{CacheStats}->{$Type}->{CleanupCount}++;
+            }
         }
     }
 
