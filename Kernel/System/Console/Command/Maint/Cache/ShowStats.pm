@@ -41,10 +41,12 @@ sub Run {
     }
 
     my $Line = '-------------------------------------------------------------------------------------------';
-    printf("%-50s %10s %10s %10s %10s\n", 'Cache Type', '#Items', '#Access', '#Hits', 'Hitrate');
-    printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );
+    printf("%-50s %10s %10s %10s %10s %10s %10s\n", 'Cache Type', '#Cleanups', '#Deletes', '#Items', '#Access', '#Hits', 'Hitrate');
+    printf("%.50s %.10s %.10s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line, $Line, $Line );
 
     my %Totals = (
+        Cleanups => 0,
+        Deletes => 0,
         Items => 0,
         Access => 0,
         Hits => 0,
@@ -53,14 +55,16 @@ sub Run {
         my $StatsItem = $CacheStats->{$Type};
 
         my $Hitrate = ($StatsItem->{AccessCount} && $StatsItem->{HitCount}) ? $StatsItem->{HitCount} / $StatsItem->{AccessCount} * 100 : 0;
-        $Totals{Items}  += $StatsItem->{KeyCount};
-        $Totals{Access} += $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0;
-        $Totals{Hits}   += $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0;
+        $Totals{Items}    += $StatsItem->{KeyCount};
+        $Totals{Access}   += $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0;
+        $Totals{Hits}     += $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0;
+        $Totals{Cleanups} += $StatsItem->{CleanupCount} ? $StatsItem->{CleanupCount} : 0;
+        $Totals{Deletes}  += $StatsItem->{DeleteCount} ? $StatsItem->{DeleteCount} : 0;
 
-        printf("%-50s %10i %10i %10i %10i\n", $Type, $StatsItem->{KeyCount}, $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0, $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0, $Hitrate );
+        printf("%-50s %10i %10i %10i %10i %10i %10i\n", $Type, $StatsItem->{CleanupCount}, $StatsItem->{DeleteCount}, $StatsItem->{KeyCount}, $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0, $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0, $Hitrate );
     }
-    printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );
-    printf("%-50s %10i %10i %10i %10i\n\n", 'TOTAL', $Totals{Items}, $Totals{Access}, $Totals{Hits}, $Totals{Access} ? $Totals{Hits} / $Totals{Access} * 100 : 0 );
+    printf("%.50s %.10s %.10s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line, $Line, $Line );
+    printf("%-50s %10i %10i %10i %10i %10i %10i\n\n", 'TOTAL', $Totals{Cleanups}, $Totals{Deletes}, $Totals{Items}, $Totals{Access}, $Totals{Hits}, $Totals{Access} ? $Totals{Hits} / $Totals{Access} * 100 : 0 );
 
     $Self->Print("<green>Done.</green>\n");
 
