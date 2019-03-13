@@ -3,12 +3,12 @@
     
     <TableAlter Name="client_registration">
         <ColumnAdd Name="notification_interval" Required="false" Type="SMALLINT" />
-        <ColumnAdd Name="last_notification_timestamp" Type="DECIMAL" Size="10,6"/>
+        <ColumnAdd Name="last_notification_timestamp" Type="DECIMAL" Size="20,6"/>
         <ColumnRename NameOld="callback_url" NameNew="notification_url" />
     </TableAlter>
 
     <TableCreate Name="client_notification">
-        <Column Name="timestamp" Required="true" Type="DECIMAL" Size="10,6"/>
+        <Column Name="timestamp" Required="true" Type="DECIMAL" Size="20,6"/>
         <Column Name="event" Required="true" Type="VARCHAR" Size="10"/>
         <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
         <Column Name="object_id" Required="false" Type="VARCHAR" Size="10000"/>
