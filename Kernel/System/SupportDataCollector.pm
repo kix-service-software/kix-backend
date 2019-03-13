@@ -209,6 +209,12 @@ sub Collect {
         );
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'SupportData',
+    );
+
     return %ReturnData;
 }
 
@@ -452,6 +458,12 @@ sub CleanupAsynchronous {
 
         $PluginObject->CleanupAsynchronous();
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'SupportData',
+    );
 
     return 1;
 }

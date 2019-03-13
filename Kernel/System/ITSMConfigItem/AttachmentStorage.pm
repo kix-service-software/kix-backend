@@ -321,13 +321,11 @@ sub AttachmentStorageAdd {
 
     # insert preferences
     for my $Key ( sort keys %{ $Param{Preferences} } ) {
-        print STDERR "Prefs: $Key = $Param{Preferences}->{$Key}\n";
         return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
             SQL => 'INSERT INTO attachment_dir_preferences '
                 . '(attachment_directory_id, preferences_key, preferences_value) VALUES ( ?, ?, ?)',
             Bind => [ \$ID, \$Key, \$Param{Preferences}->{$Key} ],
         );
-
     }
 
     #-----------------------------------------------------------------
@@ -361,6 +359,14 @@ sub AttachmentStorageAdd {
             SQL  => $SQL,
             Bind => [ \$AttID, \$ID ]
         ) ) {
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'CREATE',
+            Object   => 'CMDB.ConfigItem.Attachment',
+            ObjectID => $ID,
+        );
+      
         return $ID;
     }
     else {

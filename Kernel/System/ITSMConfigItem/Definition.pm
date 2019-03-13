@@ -363,6 +363,13 @@ sub DefinitionAdd {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'CMDB.Class.Definition',
+        ObjectID => $Param{ClassID}.'::'.$DefinitionID,
+    );
+
     return $DefinitionID;
 }
 
@@ -550,7 +557,7 @@ sub _DefinitionPrepare {
 
 return a $DefinitionID are be deleted
 
-    my $DefinitionID = $ConfigItemObject->DefinitionGet(
+    my $DefinitionID = $ConfigItemObject->DefinitionDelete(
         DefinitionID => 123,
     );
 
@@ -568,6 +575,10 @@ sub DefinitionDelete {
         return;
     }
 
+    my $Definition = $Self->DefinitionGet(
+        DefinitionID => $Param{DefinitionID}
+    );
+
     # delete in database
     my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'DELETE FROM configitem_definition WHERE id = ?',
@@ -578,6 +589,13 @@ sub DefinitionDelete {
     # clear cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'CMDB.Class.Definition',
+        ObjectID => $Definition->{ClassID}.'::'.$Param{DefinitionID},
     );
 
     return $Param{DefinitionID};

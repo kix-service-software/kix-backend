@@ -203,8 +203,14 @@ sub Run {
         UserID       => $Self->{Authorization}->{UserID},
     );
 
+    if ( !$VersionID ) {
+        return $Self->_Error(
+            Code => 'Object.UnableToCreate',
+        );
+    }
+
     # check if new VersionID has been created, if not, return 200
-    if ( $VersionID > $ConfigItem->{LastVersionID} ) {
+    if ( $ConfigItem->{LastVersionID} && $VersionID > $ConfigItem->{LastVersionID} ) {
         return $Self->_Success(
             Code      => 'Object.Created',
             VersionID => $VersionID,

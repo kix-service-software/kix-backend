@@ -285,6 +285,14 @@ sub CustomerCompanyUpdate {
         },
         UserID => $Param{UserID},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Customer',
+        ObjectID => $Param{CustomerCompanyID},
+    );
+
     return $Result;
 }
 
@@ -476,6 +484,14 @@ sub SetPreferences {
             UserID => 1,
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Customer.Preference',
+        ObjectID => $Param{UserID}.'::'.$Param{Key},
+    );
+
     return $Result;
 
     # EO KIX4OTRS-capeIT

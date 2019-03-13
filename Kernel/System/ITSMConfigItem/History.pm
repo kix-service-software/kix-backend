@@ -310,7 +310,7 @@ sub HistoryAdd {
     );
 
     # insert history entry
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'INSERT INTO configitem_history ( configitem_id, content, create_by, '
             . 'create_time, type_id ) VALUES ( ?, ?, ?, current_timestamp, ? )',
         Bind => [
@@ -320,6 +320,15 @@ sub HistoryAdd {
             \$Param{HistoryTypeID},
         ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'CMDB.ConfigItem.History',
+        ObjectID => $Param{ConfigItemID}.'::'.$Param{HistoryTypeID},
+    );
+
+    return 1;
 }
 
 =item HistoryDelete()
@@ -359,10 +368,19 @@ sub HistoryDelete {
     );
 
     # delete history for given config item
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE configitem_id = ?',
         Bind => [ \$Param{ConfigItemID} ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'CMDB.ConfigItem.History',
+        ObjectID => $Param{ConfigItemID},
+    );
+
+    return 1;
 }
 
 =item HistoryEntryDelete()
@@ -389,16 +407,29 @@ sub HistoryEntryDelete {
         }
     }
 
+    my $HistoryEntry = $Self->HistoryEntryGet(
+        HistoryEntryID => $Param{HistoryEntryID}
+    );
+
     # clear cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # delete single entry
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE id = ?',
         Bind => [ \$Param{HistoryEntryID} ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'CMDB.ConfigItem.History',
+        ObjectID => $HistoryEntry->{ConfigItemID}.'::'.$Param{HistoryEntryID},
+    );
+
+    return 1;
 }
 
 =item HistoryTypeLookup()

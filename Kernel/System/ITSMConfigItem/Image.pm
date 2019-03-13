@@ -249,6 +249,13 @@ sub ImageAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'CMDB.ConfigItem.Image',
+        ObjectID => $Param{ConfigItemID}.'::'.$Filename,
+    );
+
     return $Filename;
 }
 
@@ -301,6 +308,13 @@ sub ImageDelete {
     # clear cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'CMDB.ConfigItem.Image',
+        ObjectID => $Param{ConfigItemID}.'::'.$Param{ImageID},
     );
 
     return 1;

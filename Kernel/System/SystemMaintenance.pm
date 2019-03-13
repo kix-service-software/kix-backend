@@ -133,6 +133,13 @@ sub SystemMaintenanceAdd {
     # return undef if not correct result
     return if !$ID;
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'SystemMaintenance',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -178,6 +185,13 @@ sub SystemMaintenanceDelete {
     return if !$DBObject->Do(
         SQL  => 'DELETE FROM system_maintenance WHERE id = ?',
         Bind => [ \$Param{ID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'SystemMaintenance',
+        ObjectID => $Param{ID},
     );
 
     return 1;
@@ -319,6 +333,13 @@ sub SystemMaintenanceUpdate {
             \$Param{ShowLoginMessage}, \$Param{NotifyMessage},
             \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'SystemMaintenance',
+        ObjectID => $Param{ID},
     );
 
     return 1;

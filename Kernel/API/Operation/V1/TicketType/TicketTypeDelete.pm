@@ -139,7 +139,7 @@ sub Run {
         }
 
         # delete tickettype	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Type')->TicketTypeDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeDelete(
             TypeID  => $TypeID,
             UserID  => $Self->{Authorization}->{UserID},
         );

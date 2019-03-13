@@ -124,6 +124,13 @@ sub TypeAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Type',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -331,6 +338,13 @@ sub TypeUpdate {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Type',
+        ObjectID => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -489,7 +503,7 @@ sub NameExistsCheck {
     return 0;
 }
 
-sub TicketTypeDelete {
+sub TypeDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -513,6 +527,13 @@ sub TicketTypeDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Type',
+        ObjectID => $Param{ID},
     );
 
     return 1;

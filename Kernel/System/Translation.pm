@@ -272,6 +272,13 @@ sub PatternAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Translation.Pattern',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -326,6 +333,13 @@ sub PatternUpdate {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Translation.Pattern',
+        ObjectID => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -369,6 +383,13 @@ sub PatternDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Translation.Pattern',
+        ObjectID => $Param{ID},
     );
 
     return 1;
@@ -442,6 +463,13 @@ sub TranslationLanguageAdd {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Translation.Language',
+        ObjectID => $Param{PatternID}.'::'.$Param{Language},
     );
 
     return 1;
@@ -620,6 +648,13 @@ sub TranslationLanguageUpdate {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Translation.Language',
+        ObjectID => $Param{PatternID}.'::'.$Param{Language},
+    );
+
     return 1;
 }
 
@@ -656,6 +691,13 @@ sub TranslationLanguageDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Translation.Language',
+        ObjectID => $Param{PatternID}.'::'.$Param{Language},
     );
 
     return 1;

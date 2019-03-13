@@ -126,6 +126,13 @@ sub StateAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'State',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -301,6 +308,13 @@ sub StateUpdate {
 
     # check all sysconfig options and correct them automatically if neccessary
     $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'State',
+        ObjectID => $Param{ID},
+    );
 
     return 1;
 }
@@ -729,7 +743,7 @@ sub StateTypeLookup {
     return $ReturnData;
 }
 
-sub TicketStateDelete {
+sub StateDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -753,6 +767,13 @@ sub TicketStateDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'State',
+        ObjectID => $Param{ID},
     );
 
     return 1;

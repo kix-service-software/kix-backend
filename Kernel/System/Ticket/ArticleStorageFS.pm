@@ -86,6 +86,11 @@ sub ArticleDelete {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     my $DynamicFieldListArticle = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
         ObjectType => 'Article',
         Valid      => 0,
@@ -169,6 +174,13 @@ sub ArticleDelete {
         );
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
     return 1;
 }
 
@@ -185,6 +197,11 @@ sub ArticleDeletePlain {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # delete from fs
     my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
@@ -207,6 +224,13 @@ sub ArticleDeletePlain {
             Key  => 'ArticlePlain',
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.Plain',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
 
     # return if only delete in my backend
     return 1 if $Param{OnlyMyBackend};
@@ -233,6 +257,11 @@ sub ArticleDeleteAttachment {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # delete from fs
     my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
@@ -267,6 +296,13 @@ sub ArticleDeleteAttachment {
             Type => 'ArticleStorageFS_' . $Param{ArticleID},
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.Attachment',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
 
     # return if only delete in my backend
     return 1 if $Param{OnlyMyBackend};
@@ -348,6 +384,11 @@ sub ArticleWriteAttachment {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # prepare/filter ArticleID
     $Param{ArticleID} = quotemeta( $Param{ArticleID} );
@@ -480,6 +521,13 @@ sub ArticleWriteAttachment {
         );
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Ticket.Article.Attachment',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
+    );
+    
     return 1;
 }
 

@@ -521,6 +521,13 @@ sub ArticleCreate {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Param{TicketID}.'::'.$ArticleID,
+    );
+
     # reset unlock if needed
     if ( !$Param{SenderType} ) {
         $Param{SenderType} = $Self->ArticleSenderTypeLookup( SenderTypeID => $Param{SenderTypeID} );
@@ -1995,6 +2002,13 @@ sub ArticleUpdate {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
+    );
+
     return 1;
 }
 
@@ -2071,6 +2085,13 @@ sub ArticleBounce {
             ArticleID => $Param{ArticleID},
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -2419,6 +2440,13 @@ sub ArticleFlagSet {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Ticket.Article.Flag',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+    );
+
     return 1;
 }
 
@@ -2467,6 +2495,11 @@ sub ArticleFlagDelete {
         }
     }
 
+    # event
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -2507,6 +2540,13 @@ sub ArticleFlagDelete {
             UserID => $Param{UserID},
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.Flag',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+    );
 
     return 1;
 }
@@ -2679,6 +2719,13 @@ sub ArticleAccountedTimeDelete {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM time_accounting WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.AccountedTime',
+        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;

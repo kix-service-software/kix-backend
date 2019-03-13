@@ -155,8 +155,7 @@ sub Run {
 
     if ( !$ConfigItemClassDefinitionID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => "Definition could not be created, please contact the system administrator.",
+            Code => 'Object.UnableToCreate',
         );
     }
 

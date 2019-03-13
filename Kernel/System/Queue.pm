@@ -236,6 +236,14 @@ sub QueueStandardTemplateMemberAdd {
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Queue.StandardTemplate',
+        ObjectID => $Param{QueueID}.'::'.$Param{StandardTemplateID},
+    );
+
     return $Success;
 }
 
@@ -931,6 +939,13 @@ sub QueueAdd {
         );
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Queue',
+        ObjectID => $QueueID,
+    );
+
     return $QueueID;
 }
 
@@ -1261,6 +1276,13 @@ sub QueueUpdate {
         }
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Queue',
+        ObjectID => $Param{QueueID},
+    );
+    
     # check all SysConfig options
     return 1 if !$Param{CheckSysConfig};
 
@@ -1362,7 +1384,16 @@ sub QueuePreferencesSet {
         );
     }
 
-    return $Self->{PreferencesObject}->QueuePreferencesSet(%Param);
+    my $Result = $Self->{PreferencesObject}->QueuePreferencesSet(%Param);
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Queue.Preference',
+        ObjectID => $Param{QueueID}.'::'.$Param{Key},
+    );    
+
+    return $Result;
 }
 
 =item QueuePreferencesGet()
@@ -1451,6 +1482,13 @@ sub QueueDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Queue',
+        ObjectID => $Param{QueueID},
     );
 
     return 1;

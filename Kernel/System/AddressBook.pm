@@ -178,9 +178,19 @@ sub AddressAdd {
             ],
         );
 
+        my $ID;
         while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-            return $Row[0];
+            $ID = $Row[0];
         }
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'CREATE',
+            Object   => 'AddressBook',
+            ObjectID => $ID,
+        );
+
+        return $ID;
     }
     else {
         $Self->{LogObject}->Log(
@@ -224,6 +234,13 @@ sub AddressUpdate {
         Type => $Self->{CacheType}
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'AddressBook',
+        ObjectID => $Param{AddressID},
+    );
+
     return 1;
 }
 
@@ -243,9 +260,17 @@ sub Empty {
         Type => $Self->{CacheType}
     );
 
-    return $Self->{DBObject}->Do(
+    return if !$Self->{DBObject}->Do(
         SQL  => 'DELETE FROM addressbook',
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'AddressBook',
+    );
+
+    return 1
 }
 
 =item AddressList()
@@ -342,6 +367,13 @@ sub AddressDelete {
     # delete cache
     $Self->{CacheObject}->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'AddressBook',
+        ObjectID => $Param{AddressID},
     );
 
     return 1;

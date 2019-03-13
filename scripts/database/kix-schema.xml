@@ -2800,8 +2800,21 @@
 <!-- client_registration - api client registration information -->
 <Table Name="client_registration">
     <Column Name="client_id" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true"/>
-    <Column Name="callback_url" Required="true" Type="VARCHAR" Size="255"/>
+    <Column Name="notification_url" Required="false" Type="VARCHAR" Size="255"/>
+    <Column Name="notification_interval" Required="false" Type="SMALLINT"/>
     <Column Name="authentication" Type="VARCHAR" Size="10000"/>
+    <Column Name="last_notification_timestamp" Type="DECIMAL" Size="10,6"/>
+</Table>
+
+<!-- client_notification - core events to notify the registered clients about -->
+<Table Name="client_notification">
+    <Column Name="timestamp" Required="true" Type="DECIMAL" Size="10,6"/>
+    <Column Name="event" Required="true" Type="VARCHAR" Size="10"/>
+    <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
+    <Column Name="object_id" Required="false" Type="VARCHAR" Size="10000"/>
+    <Index Name="client_notification_timestamp">
+        <IndexColumn Name="timestamp"/>
+    </Index>
 </Table>
 
 <!-- object_icon - icons for objects -->

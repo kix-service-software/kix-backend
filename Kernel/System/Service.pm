@@ -825,6 +825,13 @@ sub ServiceAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Service',
+        ObjectID => $ServiceID,
+    );
+
     return $ServiceID;
 }
 
@@ -999,6 +1006,13 @@ sub ServiceUpdate {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Service',
+        ObjectID => $Param{ServiceID},
     );
 
     return 1;
@@ -1359,13 +1373,21 @@ set service preferences
 =cut
 
 sub ServicePreferencesSet {
-    my $Self = shift;
+    my ($Self, %Param) = @_;
 
-    $Self->{PreferencesObject}->ServicePreferencesSet(@_);
+    $Self->{PreferencesObject}->ServicePreferencesSet(%Param);
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Service.Preference',
+        ObjectID => $Param{ServiceID}.'::'.$Param{Key},
+    );
+
     return 1;
 }
 
@@ -1842,6 +1864,13 @@ sub ServiceDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Service',
+        ObjectID => $Param{ServiceID},
     );
 
     return 1;

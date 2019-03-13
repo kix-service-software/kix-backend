@@ -163,6 +163,8 @@ sub new {
 
     $Self->{Map} = \%Map;
 
+    $Self->{CacheType} = 'GenericAgent';
+    
     return $Self;
 }
 
@@ -814,7 +816,14 @@ sub JobAdd {
     );
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'GenericAgent',
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'GenericAgent',
+        ObjectID => $Param{Name},
     );
 
     return 1;
@@ -861,7 +870,14 @@ sub JobDelete {
     );
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'GenericAgent',
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'GenericAgent',
+        ObjectID => $Param{Name},
     );
 
     return 1;

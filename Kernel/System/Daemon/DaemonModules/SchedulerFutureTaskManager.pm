@@ -92,8 +92,8 @@ sub new {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    # Check the database connection each 10 seconds.
-    return 1 if $Self->{DiscardCount} % ( 10 / $Self->{SleepPost} );
+    # Check the database connection each 5 seconds.
+    return 1 if $Self->{DiscardCount} % ( 5 / $Self->{SleepPost} );
 
     # Check if database is on-line.
     return 1 if $Self->{DBObject}->Ping();

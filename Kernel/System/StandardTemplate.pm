@@ -122,6 +122,13 @@ sub StandardTemplateAdd {
         Type => 'Queue',
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'StandardTemplate',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -244,6 +251,13 @@ sub StandardTemplateDelete {
         Type => 'Queue',
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'StandardTemplate',
+        ObjectID => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -308,6 +322,13 @@ sub StandardTemplateUpdate {
     # clear queue cache, due to Queue <-> Template relations
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => 'Queue',
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'StandardTemplate',
+        ObjectID => $Param{ID},
     );
 
     return 1;
