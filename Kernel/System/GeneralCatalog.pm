@@ -166,11 +166,22 @@ sub ClassRename {
     );
 
     # rename general catalog class
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE general_catalog SET general_catalog_class = ? '
             . 'WHERE general_catalog_class = ?',
         Bind => [ \$Param{ClassNew}, \$Param{ClassOld} ],
     );
+
+    return if !$Result;
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'GeneralCatalog.Class',
+        ObjectID => $Param{ClassOld}.'::'.$Param{ClassNew},
+    );
+
+    return 1;
 }
 
 =item ItemList()
@@ -532,6 +543,13 @@ sub ItemAdd {
         $ItemID = $Row[0];
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'GeneralCatalog',
+        ObjectID => $ItemID,
+    );
+
     return $ItemID;
 }
 
@@ -644,7 +662,7 @@ sub ItemUpdate {
         Type => $Self->{CacheType},
     );
 
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE general_catalog SET '
             . 'name = ?, valid_id = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? '
@@ -655,6 +673,17 @@ sub ItemUpdate {
             \$Param{UserID},  \$Param{ItemID},
         ],
     );
+
+    return if !$Result;
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'GeneralCatalog',
+        ObjectID => $Param{ItemID},
+    );
+
+    return 1;
 }
 
 =item GeneralCatalogPreferencesSet()
@@ -721,6 +750,13 @@ sub GeneralCatalogItemDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'GeneralCatalog',
+        ObjectID => $Param{ItemID},
     );
 
     return 1;

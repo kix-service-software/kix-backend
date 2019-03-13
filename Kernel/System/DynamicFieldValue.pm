@@ -179,6 +179,13 @@ sub ValueSet {
     # delete cache
     $Self->_DeleteFromCache(%Param);
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'DynamicField.Value',
+        ObjectID => $Param{FieldID}.'::'.$Param{ObjectID},
+    );
+
     return 1;
 }
 
@@ -334,6 +341,13 @@ sub ValueDelete {
     # delete cache
     $Self->_DeleteFromCache(%Param);
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'DynamicField.Value',
+        ObjectID => $Param{FieldID}.'::'.$Param{ObjectID},
+    );
+
     return 1;
 }
 
@@ -373,6 +387,13 @@ sub AllValuesDelete {
     # Cleanup entire cache!
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => 'DynamicFieldValue',
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'DynamicField.Value',
+        ObjectID => $Param{FieldID},
     );
 
     return 1;

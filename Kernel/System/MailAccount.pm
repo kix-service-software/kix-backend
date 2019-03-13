@@ -146,6 +146,13 @@ sub MailAccountAdd {
         $ID = $Row[0];
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'MailAccount',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -295,6 +302,13 @@ sub MailAccountUpdate {
         ],
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'MailAccount',
+        ObjectID => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -324,6 +338,13 @@ sub MailAccountDelete {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM mail_account WHERE id = ?',
         Bind => [ \$Param{ID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'MailAccount',
+        ObjectID => $Param{ID},
     );
 
     return 1;

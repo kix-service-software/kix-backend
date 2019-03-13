@@ -93,9 +93,6 @@ sub ParameterDefinition {
         'ClientRegistration::ClientID' => {
             Required => 1
         },
-        'ClientRegistration::CallbackURL' => {
-            Required => 1
-        },
     }
 }
 
@@ -106,10 +103,11 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
     my $Result = $OperationObject->Run(
         Data => {
         	ClientRegistration => {
-                ClientID       => '...',
-                CallbackURL    => '...',
-                Authentication => '...',        # optional
-                Translations   => [             # optional
+                ClientID         => '...',
+                CallbackURL      => '...',        # optional
+                CallbackInterval => '...',        # optional
+                Authentication   => '...',        # optional
+                Translations     => [             # optional
                     {
                         Language => 'de',
                         POFile   => '...'       # base64 encoded content of the PO file
@@ -152,9 +150,10 @@ sub Run {
 
     # create ClientRegistration
     my $ClientID = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationAdd(
-        ClientID       => $ClientRegistration->{ClientID},
-        CallbackURL    => $ClientRegistration->{CallbackURL},
-        Authentication => $ClientRegistration->{Authentication},
+        ClientID             => $ClientRegistration->{ClientID},
+        NotificationURL      => $ClientRegistration->{NotificationURL},
+        NotificationInterval => $ClientRegistration->{NotificationInterval},
+        Authentication       => $ClientRegistration->{Authentication},
     );
 
     if ( !$ClientID ) {

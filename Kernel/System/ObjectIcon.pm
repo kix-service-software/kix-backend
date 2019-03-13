@@ -200,6 +200,13 @@ sub ObjectIconAdd {
             $ID = $Row[0];
         }
 
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'CREATE',
+            Object   => 'ObjectIcon',
+            ObjectID => $ID,
+        );
+
         return $ID;
     }
     else {
@@ -257,6 +264,13 @@ sub ObjectIconUpdate {
         # delete cache
         $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
             Type => $Self->{CacheType}
+        );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'UPDATE',
+            Object   => 'ObjectIcon',
+            ObjectID => $Param{ID},
         );
 
         return $Param{ID};
@@ -371,6 +385,13 @@ sub ObjectIconDelete {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'ObjectIcon',
+        ObjectID => $Param{ID},
     );
 
     return 1;

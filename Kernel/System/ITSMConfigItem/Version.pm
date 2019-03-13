@@ -1164,6 +1164,13 @@ sub VersionAdd {
         ConfigItemID => $Param{ConfigItemID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'CMDB.ConfigItem.Version',
+        ObjectID => $Param{ConfigItemID}.'::'.$VersionID,
+    );
+
     return $VersionID;
 }
 
@@ -1291,6 +1298,13 @@ sub VersionDelete {
                     Comment      => $VersionID,
                 },
                 UserID => $Param{UserID},
+            );
+
+            # push client callback event
+            $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+                Event    => 'DELETE',
+                Object   => 'CMDB.ConfigItem.Version',
+                ObjectID => $Param{ConfigItemID}.'::'.$VersionID,
             );
         }
     }

@@ -612,6 +612,14 @@ sub ConfigItemUpdate {
             UserID => $Self->{UserID} || 1,
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'SysConfig',
+        ObjectID => $Param{OrgKey},
+    );
+
     return $Result;
 
     # EO KIXCore-capeIT
@@ -1180,7 +1188,7 @@ sub ConfigItemReset {
         Key   => $Param{Name},
         Value => $B,
         Valid => $ConfigItemDefault{Valid}
-    );
+    );    
     return 1;
 }
 

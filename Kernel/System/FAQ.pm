@@ -621,6 +621,13 @@ sub FAQAdd {
         }
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'FAQ.Article',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -771,6 +778,13 @@ sub FAQUpdate {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'FAQ.Article',
+        ObjectID => $Param{ItemID},
+    );
+
     return 1;
 }
 
@@ -910,7 +924,13 @@ sub AttachmentAdd {
         $AttachmentID = $Row[0];
     }
 
-print STDERR "AttachmentID: $AttachmentID\n";
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'FAQ.Article.Attachment',
+        ObjectID => $Param{ItemID}.'::'.$AttachmentID,
+    );
+    
     return $AttachmentID;
 }
 
@@ -1026,6 +1046,13 @@ sub AttachmentDelete {
         Bind => [ \$Param{FileID}, \$Param{ItemID} ],
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'FAQ.Article.Attachment',
+        ObjectID => $Param{ItemID}.'::'.$Param{FileID},
+    );
+
     return 1;
 }
 
@@ -1062,6 +1089,13 @@ sub AttachmentInlineDelete {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM faq_attachment WHERE disposition = \'inline\' AND faq_id = ? ',
         Bind => [ \$Param{ItemID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'FAQ.Article.InlineAttachment',
+        ObjectID => $Param{ItemID},
     );
 
     return 1;
@@ -1369,6 +1403,13 @@ sub FAQDelete {
     # delete cache
     $Self->_DeleteFromFAQCache(%Param);
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'FAQ.Article',
+        ObjectID => $Param{ItemID},
+    );
+
     return 1;
 }
 
@@ -1410,6 +1451,13 @@ sub FAQHistoryAdd {
         Bind => [
             \$Param{Name}, \$Param{ItemID}, \$Param{UserID}, \$Param{UserID},
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'FAQ.Article.History',
+        ObjectID => $Param{ItemID},
     );
 
     return 1;
@@ -1567,6 +1615,13 @@ sub FAQHistoryDelete {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM faq_history WHERE item_id = ?',
         Bind => [ \$Param{ItemID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'FAQ.Article.History',
+        ObjectID => $Param{ItemID},
     );
 
     return 1;
@@ -1868,6 +1923,13 @@ sub FAQLogAdd {
         Bind => [
             \$Param{ItemID}, \$Param{Interface}, \$IP, \$UserAgent,
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'FAQ.Article.Log',
+        ObjectID => $Param{ItemID},
     );
 
     return 1;
@@ -2212,6 +2274,13 @@ sub FAQContentTypeSet {
                 \$ItemID,
             ],
         );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'UPDATE',
+            Object   => 'FAQ.Article',
+            ObjectID => $ItemID,
+        );
     }
 
     # Delete cache
@@ -2306,6 +2375,13 @@ sub _FAQApprovalUpdate {
             );
         }
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'FAQ.Article',
+        ObjectID => $Param{ItemID},
+    );
 
     return 1;
 }

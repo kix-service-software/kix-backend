@@ -103,6 +103,13 @@ sub VoteAdd {
         Key  => $CacheKey,
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'FAQ.Article.Vote',
+        ObjectID => $Param{ItemID},
+    );
+
     return $VoteID;
 }
 
@@ -136,11 +143,23 @@ sub VoteDelete {
         }
     }
 
+    my %Vote = $Self->VoteGet(
+        VoteID => $Param{VoteID},
+        UserID => 1,
+    );
+
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             DELETE FROM faq_voting
             WHERE id = ?',
         Bind => [ \$Param{VoteID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'FAQ.Article.Vote',
+        ObjectID => $Vote{ItemID}.'::'.$Param{VoteID},
     );
 
     return 1;

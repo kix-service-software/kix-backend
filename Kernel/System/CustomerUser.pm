@@ -534,6 +534,13 @@ sub CustomerUserAdd {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Contact',
+        ObjectID => $Param{UserLogin},
+    );
+
     return $Result;
 
 }
@@ -603,6 +610,13 @@ sub CustomerUserUpdate {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Contact',
+        ObjectID => $Param{ID} || $Param{UserLogin},
+    );
+
     return $Result;
 
 }
@@ -656,6 +670,14 @@ sub SetPassword {
             UserID => $Param{UserID},
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Contact',
+        ObjectID => $Param{UserLogin},
+    );
+
     return $Result;
 
     # EO KIX4OTRS-capeIT
@@ -748,6 +770,14 @@ sub SetPreferences {
             UserID => 1,
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Contact.Preference',
+        ObjectID => $Param{UserID}.'::'.$Param{Key},
+    );
+
     return $Result;
 
     # EO KIX4OTRS-capeIT

@@ -110,8 +110,8 @@ sub new {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    # Check each 10 seconds.
-    return 1 if $Self->{DiscardCount} % ( 10 / $Self->{SleepPost} );
+    # Check each 5 seconds.
+    return 1 if $Self->{DiscardCount} % ( 5 / $Self->{SleepPost} );
 
     # Set running daemon cache.
     $Self->{CacheObject}->Set(

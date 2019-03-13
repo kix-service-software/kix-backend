@@ -130,6 +130,13 @@ sub SystemDataAdd {
         Key => $Param{Key},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'SystemData',
+        ObjectID => $Param{Key},
+    );    
+
     return 1;
 }
 
@@ -331,6 +338,13 @@ sub SystemDataUpdate {
         Key  => $Param{Key},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'SystemData',
+        ObjectID => $Param{Key},
+    );    
+
     return 1;
 }
 
@@ -385,6 +399,13 @@ sub SystemDataDelete {
     $Self->_SystemDataCacheKeyDelete(
         Key => $Param{Key},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'SystemData',
+        ObjectID => $Param{Key},
+    );    
 
     return 1;
 }

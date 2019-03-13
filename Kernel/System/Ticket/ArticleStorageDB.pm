@@ -53,6 +53,11 @@ sub ArticleDelete {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     my $DynamicFieldListArticle = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
         ObjectType => 'Article',
         Valid      => 0,
@@ -128,6 +133,13 @@ sub ArticleDelete {
         Bind => [ \$Param{ArticleID} ],
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
     return 1;
 }
 
@@ -145,10 +157,22 @@ sub ArticleDeletePlain {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # delete attachments
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM article_plain WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.Plain',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     # return if we only need to check one backend
@@ -169,6 +193,7 @@ sub ArticleDeletePlain {
             return;
         }
     }
+
     return 1;
 }
 
@@ -186,10 +211,22 @@ sub ArticleDeleteAttachment {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # delete attachments
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM article_attachment WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.Attachment',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     # return if we only need to check one backend
@@ -277,6 +314,11 @@ sub ArticleWriteAttachment {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     my $NewFileName = $Param{Filename};
     my %UsedFile;
     my %Index = $Self->ArticleAttachmentIndex(
@@ -340,6 +382,14 @@ sub ArticleWriteAttachment {
             \$Disposition, \$Param{UserID}, \$Param{UserID},
         ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Ticket.Article.Attachment',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
+    );
+
     return 1;
 }
 

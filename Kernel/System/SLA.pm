@@ -570,6 +570,13 @@ sub SLAAdd {
         return;
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'SLA',
+        ObjectID => $SLAID,
+    );
+
     return $SLAID;
 }
 
@@ -717,6 +724,13 @@ sub SLAUpdate {
 # ---
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'SLA',
+        ObjectID => $Param{SLAID},
+    );
+
     return 1;
 }
 
@@ -780,6 +794,13 @@ sub SLADelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'SLA',
+        ObjectID => $Param{SLAID},
     );
 
     return 1;

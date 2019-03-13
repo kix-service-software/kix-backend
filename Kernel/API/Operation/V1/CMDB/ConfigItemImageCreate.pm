@@ -157,6 +157,12 @@ sub Run {
         UserID       => $Self->{Authorization}->{UserID},
     );
 
+    if ( !$ImageID ) {
+        return $Self->_Error(
+            Code => 'Object.UnableToCreate',
+        );
+    }
+
     return $Self->_Success(
         Code      => 'Object.Created',
         ImageID => $ImageID,

@@ -140,7 +140,7 @@ sub Run {
         }
 	    
         # delete ticketstate	    
-        my $Success = $Kernel::OM->Get('Kernel::System::State')->TicketStateDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::State')->StateDelete(
             StateID  => $TicketStateID,
             UserID  => $Self->{Authorization}->{UserID},
         );

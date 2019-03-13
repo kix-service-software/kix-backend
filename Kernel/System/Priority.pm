@@ -245,6 +245,13 @@ sub PriorityAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Priority',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -294,6 +301,13 @@ sub PriorityUpdate {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Priority',
+        ObjectID => $Param{PriorityID},
     );
 
     # check all sysconfig options
@@ -387,6 +401,12 @@ sub PriorityDelete {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Priority',
+        ObjectID => $Param{PriorityID},
+    );
 
     return 1;
 }

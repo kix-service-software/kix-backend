@@ -126,6 +126,13 @@ sub CategoryAdd {
             . "created successfully ($Param{UserID})!",
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'FAQ.Category',
+        ObjectID => $CategoryID,
+    );
+
     return $CategoryID;
 }
 
@@ -255,6 +262,13 @@ sub CategoryDelete {
             DELETE FROM faq_category_group
             WHERE category_id = ?',
         Bind => [ \$Param{CategoryID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'FAQ.Category',
+        ObjectID => $Param{CategoryID},
     );
 
     return 1;
@@ -1059,7 +1073,14 @@ sub CategoryUpdate {
 
     # delete all cache, as FAQGet() will be also affected.
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'FAQ.Category',
+        ObjectID => $Param{CategoryID},
     );
 
     return 1;

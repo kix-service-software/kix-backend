@@ -115,6 +115,13 @@ sub SystemAddressAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'SystemAddress',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -238,6 +245,13 @@ sub SystemAddressUpdate {
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'SystemAddress',
+        ObjectID => $Param{ID},
     );
 
     return 1;
@@ -449,6 +463,13 @@ sub SystemAddressDelete {
     # reset cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'SystemAddress',
+        ObjectID => $Param{ID},
     );
 
     return 1;

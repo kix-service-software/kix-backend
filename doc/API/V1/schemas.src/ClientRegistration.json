@@ -9,16 +9,35 @@
       "readOnly": true
     },
     "Authentication": {
-      "type": "string",
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ],
       "readOnly": true
     },
-    "CallbackURL": {
-      "type": "string",
+    "NotificationURL": {
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "NotificationInterval": {
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "LastNotificationTimestamp": {
+      "anyOf": [
+        {"type": "number"},
+        {"type": "null"}
+      ],
       "readOnly": true
     }
   },
   "required": [
-    "ClientID",
-    "CallbackURL"
+    "ClientID"
   ]
 }

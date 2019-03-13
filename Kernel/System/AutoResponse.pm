@@ -129,6 +129,13 @@ sub AutoResponseAdd {
         $ID = $Row[0];
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'AutoResponse',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -244,6 +251,13 @@ sub AutoResponseUpdate {
             \$Param{AddressID}, \$Param{ContentType}, \$Param{ValidID},
             \$Param{UserID}, \$Param{ID},
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'AutoResponse',
+        ObjectID => $Param{ID},
     );
 
     return 1;

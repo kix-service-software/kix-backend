@@ -392,6 +392,13 @@ sub RepositoryAdd {
         Type => 'RepositoryList',
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'PackageManagement.Repository',
+        ObjectID => $Structure{Name}->{Content},
+    );
+
     return 1;
 }
 
@@ -440,6 +447,13 @@ sub RepositoryRemove {
     );
     $CacheObject->CleanUp(
         Type => 'RepositoryGet',
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'PackageManagement.Repository',
+        ObjectID => $Param{Name},
     );
 
     return 1;
@@ -629,6 +643,13 @@ sub PackageInstall {
         UserID => 1,
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'PackageManagement.Package',
+        ObjectID => $Structure{Name}->{Content},
+    );
+
     return 1;
 }
 
@@ -716,6 +737,13 @@ sub PackageReinstall {
             Version => $Structure{Version}->{Content},
         },
         UserID => 1,
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'PackageManagement.Package',
+        ObjectID => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -1126,6 +1154,13 @@ sub PackageUpgrade {
         UserID => 1,
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'PackageManagement.Package',
+        ObjectID => $Structure{Name}->{Content},
+    );
+
     return 1;
 }
 
@@ -1222,6 +1257,13 @@ sub PackageUninstall {
             Version => $Structure{Version}->{Content},
         },
         UserID => 1,
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'PackageManagement.Package',
+        ObjectID => $Structure{Name}->{Content},
     );
 
     return 1;

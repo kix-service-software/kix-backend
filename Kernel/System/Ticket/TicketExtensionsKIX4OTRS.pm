@@ -490,6 +490,11 @@ sub ArticleMove {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # update article data
     return 'MoveFailed' if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => "UPDATE article SET ticket_id = ?, "
@@ -515,6 +520,20 @@ sub ArticleMove {
             ArticleID => $Param{ArticleID},
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -735,6 +754,14 @@ sub ArticleCreateDateUpdate {
         },
         UserID => $Param{UserID},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'Ticket.Article',
+        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
+    );
+
     return 1;
 }
 
@@ -762,6 +789,11 @@ sub ArticleFlagDataSet {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # db quote
     for my $Quote (qw(Notes Subject Keywords Key)) {
@@ -795,6 +827,13 @@ sub ArticleFlagDataSet {
                 \$Param{ArticleID}, \$Param{Key},     \$Param{UserID}
             ],
         );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'UPDATE',
+            Object   => 'Ticket.Article.Flag',
+            ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        );
     }
 
     # insert action
@@ -807,6 +846,13 @@ sub ArticleFlagDataSet {
                 \$Param{ArticleID}, \$Param{Key},  \$Param{Keywords},
                 \$Param{Subject},   \$Param{Note}, \$Param{UserID}
             ],
+        );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'CREATE',
+            Object   => 'Ticket.Article.Flag',
+            ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -850,6 +896,11 @@ sub ArticleFlagDataDelete {
         return;
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # check if UserID or AllUsers set
     if ( $Param{UserID} ) {
 
@@ -871,6 +922,13 @@ sub ArticleFlagDataDelete {
             Bind => [ \$Param{ArticleID}, \$Param{Key} ],
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'Ticket.Article.Flag',
+        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
 
     return 1;
 }

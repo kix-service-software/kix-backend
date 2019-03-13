@@ -118,6 +118,14 @@ sub StdAttachmentAdd {
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         $ID = $Row[0];
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'StandardAttachment',
+        ObjectID => $ID,
+    );
+
     return $ID;
 }
 
@@ -253,6 +261,14 @@ sub StdAttachmentUpdate {
             ],
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'UPDATE',
+        Object   => 'StandardAttachment',
+        ObjectID => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -305,6 +321,14 @@ sub StdAttachmentDelete {
         SQL  => 'DELETE FROM standard_attachment WHERE ID = ?',
         Bind => [ \$Param{ID} ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'DELETE',
+        Object   => 'StandardAttachment',
+        ObjectID => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -522,11 +546,19 @@ sub StdAttachmentSetResponses {
                 \$ID, \$Param{ID}, \$Param{UserID}, \$Param{UserID},
             ],
         );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event    => 'CREATE',
+            Object   => 'StandardAttachment.Response',
+            ObjectID => $ID.'::'.$Param{ID},
+        );
     }
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
     return 1;
 }
 
@@ -588,6 +620,14 @@ sub StdAttachmentStandardTemplateMemberAdd {
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event    => 'CREATE',
+        Object   => 'StandardAttachment.TemplateMember',
+        ObjectID => $Param{AttachmentID}.'::'.$Param{StandardTemplateID},
+    );
+
     return $Success;
 }
 
