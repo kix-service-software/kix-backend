@@ -1368,7 +1368,7 @@ Your KIX Team
     <Insert Table="channel">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote" Translatable="1">phone-inbound</Data>
-        <Data Key="valid_id">1</Data>
+        <Data Key="valid_id">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -1377,7 +1377,7 @@ Your KIX Team
     <Insert Table="channel">
         <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="name" Type="Quote" Translatable="1">phone-outbound</Data>
-        <Data Key="valid_id">1</Data>
+        <Data Key="valid_id">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
