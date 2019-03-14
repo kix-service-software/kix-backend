@@ -98,7 +98,7 @@ sub ClientRegistrationGet {
     return %{$Cache} if $Cache;
     
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT client_id, notification_url, notification_interval, authentication, last_notification_timestamp FROM client_registration WHERE client_id = ?",
+        SQL   => "SELECT client_id, notification_url, notification_interval, authorization, last_notification_timestamp FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
 
