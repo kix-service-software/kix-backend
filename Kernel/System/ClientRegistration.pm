@@ -436,7 +436,7 @@ sub NotificationSend {
 
         $Self->{LogObject}->Log( 
             Priority => 'info', 
-            Message  => "Sending ". @EventList . " notifications to client $Param{ClientID} (" . (join(', ', @StatsParts)) . ').' 
+            Message  => "Sending ". @EventList . " notifications to client \"$Param{ClientID}\" (" . (join(', ', @StatsParts)) . ').' 
         );
 
         my $UserAgent = LWP::UserAgent->new();
@@ -476,6 +476,11 @@ sub NotificationSend {
             # something went wrong
             return;
         }
+
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'info',
+            Message  => "Client \"$Param{ClientID}\" responded ".$Response->status_line.".",
+        );
     }
 
     # update client registration
@@ -489,6 +494,10 @@ sub NotificationSend {
 
     # schedule new task if the scheduler executed this method
     if ( $Param{IsScheduler} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'info',
+            Message  => "Rescheduling notification task for client \"$Param{ClientID}\".",
+        );
         my $Result = $Self->ScheduleNotificationTask(
             ClientID => $Param{ClientID},
         );
