@@ -473,13 +473,16 @@ sub NotificationSend {
         my $Response = $UserAgent->request($Request);
 
         if ( !$Response->is_success ) {
-            # something went wrong
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
+            );
             return;
         }
 
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'info',
-            Message  => "Client \"$Param{ClientID}\" responded ".$Response->status_line.".",
+            Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
         );
     }
 
