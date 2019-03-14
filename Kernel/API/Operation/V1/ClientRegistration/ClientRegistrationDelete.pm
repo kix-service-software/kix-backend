@@ -85,7 +85,6 @@ sub ParameterDefinition {
 
     return {
         'ClientID' => {
-            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },
