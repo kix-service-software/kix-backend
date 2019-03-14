@@ -192,6 +192,11 @@ sub ClientRegistrationAdd {
 
     # schedule notification task if requested by client
     if ( $Param{NotificationURL} && $Param{NotificationInterval} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'info',
+            Message  => "Scheduling periodic notification task for client \"$Param{ClientID}\" with an interval of $Param{NotificationInterval} seconds.",
+        );
+
         my $Result = $Self->ScheduleNotificationTask(
             ClientID => $Param{ClientID},
         );
@@ -547,11 +552,6 @@ sub ScheduleNotificationTask {
         SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime() + $ClientRegistration{NotificationInterval},
     );
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
-        Priority => 'info',
-        Message  => "Scheduling periodic notification task for client \"$Param{ClientID}\" with an interval of $ClientRegistration{NotificationInterval} seconds.",
-    );
-
     # Create a new future task.
     my $TaskID = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskAdd(
         ExecutionTime => $ExecutionTime,
@@ -575,11 +575,6 @@ sub ScheduleNotificationTask {
         );
         return;
     }
-
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
-        Priority => 'info',
-        Message  => "Notification task for client \"$Param{ClientID}\" scheduled.",
-    );
 
     return 1;
 }
