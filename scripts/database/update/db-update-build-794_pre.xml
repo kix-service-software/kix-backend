@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="client_registration">
+        <ColumnChange NameOld="authorization" NameNew="notification_authorization" Type="VARCHAR" Size="10000"/>
+    </TableAlter>
+
+</database>

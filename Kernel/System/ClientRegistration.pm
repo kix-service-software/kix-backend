@@ -98,7 +98,7 @@ sub ClientRegistrationGet {
     return %{$Cache} if $Cache;
     
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT client_id, notification_url, notification_interval, authorization, last_notification_timestamp FROM client_registration WHERE client_id = ?",
+        SQL   => "SELECT client_id, notification_url, notification_interval, notification_authorization, last_notification_timestamp FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
 
@@ -166,7 +166,7 @@ sub ClientRegistrationAdd {
 
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, authorization, last_notification_timestamp) VALUES (?, ?, ?, ?, ?)",
+        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, notification_authorization, last_notification_timestamp) VALUES (?, ?, ?, ?, ?)",
         Bind => [
             \$Param{ClientID},
             \$Param{NotificationURL},
