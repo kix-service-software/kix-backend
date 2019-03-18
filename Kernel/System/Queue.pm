@@ -239,9 +239,9 @@ sub QueueStandardTemplateMemberAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Queue.StandardTemplate',
-        ObjectID => $Param{QueueID}.'::'.$Param{StandardTemplateID},
+        Event     => 'CREATE',
+        Namespace => 'Queue.StandardTemplate',
+        ObjectID  => $Param{QueueID}.'::'.$Param{StandardTemplateID},
     );
 
     return $Success;
@@ -941,9 +941,9 @@ sub QueueAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Queue',
-        ObjectID => $QueueID,
+        Event     => 'CREATE',
+        Namespace => 'Queue',
+        ObjectID  => $QueueID,
     );
 
     return $QueueID;
@@ -1278,9 +1278,9 @@ sub QueueUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Queue',
-        ObjectID => $Param{QueueID},
+        Event     => 'UPDATE',
+        Namespace => 'Queue',
+        ObjectID  => $Param{QueueID},
     );
     
     # check all SysConfig options
@@ -1388,9 +1388,9 @@ sub QueuePreferencesSet {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Queue.Preference',
-        ObjectID => $Param{QueueID}.'::'.$Param{Key},
+        Event     => 'CREATE',
+        Namespace => 'Queue.Preference',
+        ObjectID  => $Param{QueueID}.'::'.$Param{Key},
     );    
 
     return $Result;
@@ -1486,9 +1486,9 @@ sub QueueDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Queue',
-        ObjectID => $Param{QueueID},
+        Event     => 'DELETE',
+        Namespace => 'Queue',
+        ObjectID  => $Param{QueueID},
     );
 
     return 1;

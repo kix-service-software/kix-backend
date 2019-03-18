@@ -211,8 +211,8 @@ sub Collect {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'SupportData',
+        Event     => 'UPDATE',
+        Namespace => 'SupportData',
     );
 
     return %ReturnData;
@@ -461,8 +461,8 @@ sub CleanupAsynchronous {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'SupportData',
+        Event     => 'DELETE',
+        Namespace => 'SupportData',
     );
 
     return 1;

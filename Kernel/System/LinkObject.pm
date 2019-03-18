@@ -599,9 +599,9 @@ sub LinkAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Link',
-        ObjectID => $LinkID,
+        Event     => 'CREATE',
+        Namespace => 'Link',
+        ObjectID  => $LinkID,
     );
 
     return $LinkID;
@@ -656,8 +656,8 @@ sub LinkCleanup {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Link',
+        Event     => 'DELETE',
+        Namespace => 'Link',
     );
 
     return 1;
@@ -880,9 +880,9 @@ sub LinkDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Link',
-        ObjectID => $Param{LinkID} || $Existing{ID},
+        Event     => 'DELETE',
+        Namespace => 'Link',
+        ObjectID  => $Param{LinkID} || $Existing{ID},
     );
 
     return 1;

@@ -185,9 +185,9 @@ sub AddressAdd {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'CREATE',
-            Object   => 'AddressBook',
-            ObjectID => $ID,
+            Event      => 'CREATE',
+            Namespace  => 'AddressBook',
+            ObjectID   => $ID,
         );
 
         return $ID;
@@ -236,9 +236,9 @@ sub AddressUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'AddressBook',
-        ObjectID => $Param{AddressID},
+        Event     => 'UPDATE',
+        Namespace => 'AddressBook',
+        ObjectID  => $Param{AddressID},
     );
 
     return 1;
@@ -266,8 +266,8 @@ sub Empty {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'AddressBook',
+        Event     => 'DELETE',
+        Namespace => 'AddressBook',
     );
 
     return 1
@@ -371,9 +371,9 @@ sub AddressDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'AddressBook',
-        ObjectID => $Param{AddressID},
+        Event     => 'UPDATE',
+        Namespace => 'AddressBook',
+        ObjectID  => $Param{AddressID},
     );
 
     return 1;

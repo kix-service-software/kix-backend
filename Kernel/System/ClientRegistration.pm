@@ -11,6 +11,7 @@ package Kernel::System::ClientRegistration;
 use strict;
 use warnings;
 
+use CGI;
 use LWP::UserAgent;
 use Time::HiRes qw(gettimeofday);
 
@@ -297,7 +298,11 @@ sub ClientRegistrationDelete {
 
 Pushes a notification event to inform the clients
 
-    my $Result = $ClientRegistrationObject->NotifyClients();
+    my $Result = $ClientRegistrationObject->NotifyClients(
+        Event     => 'CREATE|UPDATE|DELETE',             # required
+        Namespace => 'Ticket.Article',                   # required
+        ObjectID  => '...'                               # optional
+    );
 
 =cut
 
@@ -305,7 +310,7 @@ sub NotifyClients {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Event Object ObjectID)) {
+    for (qw(Event Namespace)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -317,13 +322,19 @@ sub NotifyClients {
 
     my $Timestamp = gettimeofday();
 
+    # get RequestID
+    my $cgi = CGI->new;
+    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
+    my $RequestID = $Headers{'KIX-Request-ID'} || '';
+
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_notification (timestamp, event, object, object_id) VALUES (?, ?, ?, ?)",
+        SQL  => "INSERT INTO client_notification (timestamp, event, request_id, namespace, object_id) VALUES (?, ?, ?, ?)",
         Bind => [
             \$Timestamp,
             \$Param{Event},
-            \$Param{Object},
+            \$RequestID,
+            \$Param{Namespace},
             \$Param{ObjectID},
         ],
     );
@@ -410,7 +421,7 @@ sub NotificationSend {
     my $Timestamp = gettimeofday();
 
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT timestamp, event, object, object_id FROM client_notification WHERE timestamp > ?",
+        SQL   => "SELECT timestamp, event, request_id, namespace, object_type, object_id FROM client_notification WHERE timestamp > ?",
         Bind  => [
             \$ClientRegistration{LastNotificationTimestamp}
         ]
@@ -420,10 +431,12 @@ sub NotificationSend {
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         my %Event;
 
-        $Event{Timestamp} = $Row[0];
-        $Event{Event}     = $Row[1];
-        $Event{Object}    = $Row[2];
-        $Event{ObjectID}  = $Row[3];
+        $Event{Timestamp}  = $Row[0];
+        $Event{Event}      = $Row[1];
+        $Event{RequestID}  = $Row[2];
+        $Event{Namespace}  = $Row[3];
+        $Event{ObjectType} = $Row[4];
+        $Event{ObjectID}   = $Row[5];
 
         push(@EventList, \%Event);
     }

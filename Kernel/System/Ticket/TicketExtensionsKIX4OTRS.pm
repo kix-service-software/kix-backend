@@ -524,16 +524,16 @@ sub ArticleMove {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Ticket.Article',
-        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Ticket.Article',
-        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -757,9 +757,9 @@ sub ArticleCreateDateUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Ticket.Article',
-        ObjectID => $Param{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -830,9 +830,9 @@ sub ArticleFlagDataSet {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'UPDATE',
-            Object   => 'Ticket.Article.Flag',
-            ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -850,9 +850,9 @@ sub ArticleFlagDataSet {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'CREATE',
-            Object   => 'Ticket.Article.Flag',
-            ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+            Event     => 'CREATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -925,9 +925,9 @@ sub ArticleFlagDataDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Ticket.Article.Flag',
-        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Flag',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;

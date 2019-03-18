@@ -176,9 +176,9 @@ sub ClassRename {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'GeneralCatalog.Class',
-        ObjectID => $Param{ClassOld}.'::'.$Param{ClassNew},
+        Event     => 'UPDATE',
+        Namespace => 'GeneralCatalog.Class',
+        ObjectID  => $Param{ClassOld}.'::'.$Param{ClassNew},
     );
 
     return 1;
@@ -545,9 +545,9 @@ sub ItemAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'GeneralCatalog',
-        ObjectID => $ItemID,
+        Event     => 'CREATE',
+        Namespace => 'GeneralCatalog',
+        ObjectID  => $ItemID,
     );
 
     return $ItemID;
@@ -678,9 +678,9 @@ sub ItemUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'GeneralCatalog',
-        ObjectID => $Param{ItemID},
+        Event     => 'UPDATE',
+        Namespace => 'GeneralCatalog',
+        ObjectID  => $Param{ItemID},
     );
 
     return 1;
@@ -754,9 +754,9 @@ sub GeneralCatalogItemDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'GeneralCatalog',
-        ObjectID => $Param{ItemID},
+        Event     => 'DELETE',
+        Namespace => 'GeneralCatalog',
+        ObjectID  => $Param{ItemID},
     );
 
     return 1;

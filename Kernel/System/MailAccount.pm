@@ -148,9 +148,9 @@ sub MailAccountAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'MailAccount',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'MailAccount',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -304,9 +304,9 @@ sub MailAccountUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'MailAccount',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'MailAccount',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -342,9 +342,9 @@ sub MailAccountDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'MailAccount',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'MailAccount',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

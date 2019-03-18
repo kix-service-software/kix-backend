@@ -196,9 +196,9 @@ sub DynamicFieldAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'DynamicField',
-        ObjectID => $DynamicField->{ID},
+        Event     => 'CREATE',
+        Namespace => 'DynamicField',
+        ObjectID  => $DynamicField->{ID},
     );
 
     return $DynamicField->{ID};
@@ -461,9 +461,9 @@ sub DynamicFieldUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'DynamicField',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'DynamicField',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -533,9 +533,9 @@ sub DynamicFieldDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'DynamicField',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'DynamicField',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

@@ -394,9 +394,9 @@ sub RepositoryAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'PackageManagement.Repository',
-        ObjectID => $Structure{Name}->{Content},
+        Event     => 'CREATE',
+        Namespace => 'PackageManagement.Repository',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -451,9 +451,9 @@ sub RepositoryRemove {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'PackageManagement.Repository',
-        ObjectID => $Param{Name},
+        Event     => 'DELETE',
+        Namespace => 'PackageManagement.Repository',
+        ObjectID  => $Param{Name},
     );
 
     return 1;
@@ -645,9 +645,9 @@ sub PackageInstall {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'PackageManagement.Package',
-        ObjectID => $Structure{Name}->{Content},
+        Event     => 'CREATE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -741,9 +741,9 @@ sub PackageReinstall {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'PackageManagement.Package',
-        ObjectID => $Structure{Name}->{Content},
+        Event     => 'CREATE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -1156,9 +1156,9 @@ sub PackageUpgrade {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'PackageManagement.Package',
-        ObjectID => $Structure{Name}->{Content},
+        Event     => 'UPDATE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -1261,9 +1261,9 @@ sub PackageUninstall {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'PackageManagement.Package',
-        ObjectID => $Structure{Name}->{Content},
+        Event     => 'DELETE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;

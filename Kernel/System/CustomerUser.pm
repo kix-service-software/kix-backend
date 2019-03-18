@@ -536,9 +536,9 @@ sub CustomerUserAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Contact',
-        ObjectID => $Param{UserLogin},
+        Event     => 'CREATE',
+        Namespace => 'Contact',
+        ObjectID  => $Param{UserLogin},
     );
 
     return $Result;
@@ -612,9 +612,9 @@ sub CustomerUserUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Contact',
-        ObjectID => $Param{ID} || $Param{UserLogin},
+        Event     => 'UPDATE',
+        Namespace => 'Contact',
+        ObjectID  => $Param{ID} || $Param{UserLogin},
     );
 
     return $Result;
@@ -673,9 +673,9 @@ sub SetPassword {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Contact',
-        ObjectID => $Param{UserLogin},
+        Event     => 'UPDATE',
+        Namespace => 'Contact',
+        ObjectID  => $Param{UserLogin},
     );
 
     return $Result;
@@ -773,9 +773,9 @@ sub SetPreferences {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Contact.Preference',
-        ObjectID => $Param{UserID}.'::'.$Param{Key},
+        Event     => 'UPDATE',
+        Namespace => 'Contact.Preference',
+        ObjectID  => $Param{UserID}.'::'.$Param{Key},
     );
 
     return $Result;

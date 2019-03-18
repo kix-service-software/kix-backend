@@ -126,9 +126,9 @@ sub TypeAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Type',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'Type',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -340,9 +340,9 @@ sub TypeUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Type',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'Type',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -531,9 +531,9 @@ sub TypeDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Type',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'Type',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

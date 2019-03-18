@@ -2810,7 +2810,9 @@
 <Table Name="client_notification">
     <Column Name="timestamp" Required="true" Type="DECIMAL" Size="20,6"/>
     <Column Name="event" Required="true" Type="VARCHAR" Size="10"/>
-    <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
+    <Column Name="request_id" Required="true" Type="VARCHAR" Size="40"/>
+    <Column Name="namespace" Required="true" Type="VARCHAR" Size="255"/>
+    <Column Name="object_type" Required="false" Type="VARCHAR" Size="50"/>
     <Column Name="object_id" Required="false" Type="VARCHAR" Size="10000"/>
     <Index Name="client_notification_timestamp">
         <IndexColumn Name="timestamp"/>

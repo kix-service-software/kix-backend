@@ -117,9 +117,9 @@ sub SystemAddressAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'SystemAddress',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'SystemAddress',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -249,9 +249,9 @@ sub SystemAddressUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'SystemAddress',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'SystemAddress',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -467,9 +467,9 @@ sub SystemAddressDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'SystemAddress',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'SystemAddress',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

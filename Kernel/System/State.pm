@@ -128,9 +128,9 @@ sub StateAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'State',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'State',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -311,9 +311,9 @@ sub StateUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'State',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'State',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -771,9 +771,9 @@ sub StateDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'State',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'State',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

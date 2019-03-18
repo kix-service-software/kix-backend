@@ -362,9 +362,9 @@ sub AttachmentStorageAdd {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'CREATE',
-            Object   => 'CMDB.ConfigItem.Attachment',
-            ObjectID => $ID,
+            Event     => 'CREATE',
+            Namespace => 'CMDB.ConfigItem.Attachment',
+            ObjectID  => $ID,
         );
       
         return $ID;

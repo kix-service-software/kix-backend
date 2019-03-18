@@ -274,9 +274,9 @@ sub PatternAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Translation.Pattern',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'Translation.Pattern',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -335,9 +335,9 @@ sub PatternUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Translation.Pattern',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'Translation.Pattern',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -387,9 +387,9 @@ sub PatternDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Translation.Pattern',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'Translation.Pattern',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -467,9 +467,9 @@ sub TranslationLanguageAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Translation.Language',
-        ObjectID => $Param{PatternID}.'::'.$Param{Language},
+        Event     => 'CREATE',
+        Namespace => 'Translation.Language',
+        ObjectID  => $Param{PatternID}.'::'.$Param{Language},
     );
 
     return 1;
@@ -650,9 +650,9 @@ sub TranslationLanguageUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Translation.Language',
-        ObjectID => $Param{PatternID}.'::'.$Param{Language},
+        Event     => 'UPDATE',
+        Namespace => 'Translation.Language',
+        ObjectID  => $Param{PatternID}.'::'.$Param{Language},
     );
 
     return 1;
@@ -695,9 +695,9 @@ sub TranslationLanguageDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Translation.Language',
-        ObjectID => $Param{PatternID}.'::'.$Param{Language},
+        Event     => 'DELETE',
+        Namespace => 'Translation.Language',
+        ObjectID  => $Param{PatternID}.'::'.$Param{Language},
     );
 
     return 1;

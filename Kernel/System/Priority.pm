@@ -247,9 +247,9 @@ sub PriorityAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Priority',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'Priority',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -305,9 +305,9 @@ sub PriorityUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Priority',
-        ObjectID => $Param{PriorityID},
+        Event     => 'CREATE',
+        Namespace => 'Priority',
+        ObjectID  => $Param{PriorityID},
     );
 
     # check all sysconfig options
@@ -403,9 +403,9 @@ sub PriorityDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Priority',
-        ObjectID => $Param{PriorityID},
+        Event     => 'DELETE',
+        Namespace => 'Priority',
+        ObjectID  => $Param{PriorityID},
     );
 
     return 1;

@@ -124,9 +124,9 @@ sub StandardTemplateAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'StandardTemplate',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'StandardTemplate',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -253,9 +253,9 @@ sub StandardTemplateDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'StandardTemplate',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'StandardTemplate',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -326,9 +326,9 @@ sub StandardTemplateUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'StandardTemplate',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'StandardTemplate',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

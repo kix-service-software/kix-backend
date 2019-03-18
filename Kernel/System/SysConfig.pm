@@ -615,9 +615,9 @@ sub ConfigItemUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'SysConfig',
-        ObjectID => $Param{OrgKey},
+        Event     => 'UPDATE',
+        Namespace => 'SysConfig',
+        ObjectID  => $Param{OrgKey},
     );
 
     return $Result;
