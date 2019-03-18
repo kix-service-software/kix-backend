@@ -325,7 +325,7 @@ sub NotifyClients {
     # get RequestID
     my $cgi = CGI->new;
     my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-    my $RequestID = $Headers{'KIX-Request-ID'} || '';
+    my $RequestID = $Headers{HTTP_KIX_REQUEST_ID} || '';
 
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
