@@ -181,9 +181,9 @@ sub ValueSet {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'DynamicField.Value',
-        ObjectID => $Param{FieldID}.'::'.$Param{ObjectID},
+        Event     => 'UPDATE',
+        Namespace => 'DynamicField.Value',
+        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
     );
 
     return 1;
@@ -343,9 +343,9 @@ sub ValueDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'DynamicField.Value',
-        ObjectID => $Param{FieldID}.'::'.$Param{ObjectID},
+        Event     => 'DELETE',
+        Namespace => 'DynamicField.Value',
+        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
     );
 
     return 1;
@@ -391,9 +391,9 @@ sub AllValuesDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'DynamicField.Value',
-        ObjectID => $Param{FieldID},
+        Event     => 'DELETE',
+        Namespace => 'DynamicField.Value',
+        ObjectID  => $Param{FieldID},
     );
 
     return 1;

@@ -179,9 +179,9 @@ sub TextModuleAdd {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'CREATE',
-            Object   => 'TextModule',
-            ObjectID => $ID,
+            Event     => 'CREATE',
+            Namespace => 'TextModule',
+            ObjectID  => $ID,
         );
 
         return $ID;
@@ -346,9 +346,9 @@ sub TextModuleUpdate {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'UPDATE',
-            Object   => 'TextModule',
-            ObjectID => $Param{ID},
+            Event     => 'UPDATE',
+            Namespace => 'TextModule',
+            ObjectID  => $Param{ID},
         );
 
         return $Param{ID};
@@ -394,9 +394,9 @@ sub TextModuleDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'TextModule',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'TextModule',
+        ObjectID  => $Param{ID},
     );
 
     return $Result;

@@ -323,9 +323,9 @@ sub HistoryAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'CMDB.ConfigItem.History',
-        ObjectID => $Param{ConfigItemID}.'::'.$Param{HistoryTypeID},
+        Event     => 'CREATE',
+        Namespace => 'CMDB.ConfigItem.History',
+        ObjectID  => $Param{ConfigItemID}.'::'.$Param{HistoryTypeID},
     );
 
     return 1;
@@ -375,9 +375,9 @@ sub HistoryDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'CMDB.ConfigItem.History',
-        ObjectID => $Param{ConfigItemID},
+        Event     => 'DELETE',
+        Namespace => 'CMDB.ConfigItem.History',
+        ObjectID  => $Param{ConfigItemID},
     );
 
     return 1;
@@ -424,9 +424,9 @@ sub HistoryEntryDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'CMDB.ConfigItem.History',
-        ObjectID => $HistoryEntry->{ConfigItemID}.'::'.$Param{HistoryEntryID},
+        Event     => 'DELETE',
+        Namespace => 'CMDB.ConfigItem.History',
+        ObjectID  => $HistoryEntry->{ConfigItemID}.'::'.$Param{HistoryEntryID},
     );
 
     return 1;

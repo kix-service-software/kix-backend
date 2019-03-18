@@ -105,9 +105,9 @@ sub VoteAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'FAQ.Article.Vote',
-        ObjectID => $Param{ItemID},
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Article.Vote',
+        ObjectID  => $Param{ItemID},
     );
 
     return $VoteID;
@@ -157,9 +157,9 @@ sub VoteDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'FAQ.Article.Vote',
-        ObjectID => $Vote{ItemID}.'::'.$Param{VoteID},
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article.Vote',
+        ObjectID  => $Vote{ItemID}.'::'.$Param{VoteID},
     );
 
     return 1;

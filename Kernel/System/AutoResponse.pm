@@ -131,9 +131,9 @@ sub AutoResponseAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'AutoResponse',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'AutoResponse',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -255,9 +255,9 @@ sub AutoResponseUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'AutoResponse',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'AutoResponse',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

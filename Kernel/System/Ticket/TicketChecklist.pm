@@ -203,9 +203,9 @@ sub TicketChecklistItemStateUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Ticket.Checklist',
-        ObjectID => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
     );
 
     return 1;
@@ -253,9 +253,9 @@ sub TicketChecklistItemUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Ticket.Checklist',
-        ObjectID => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
     );
 
     return 1;
@@ -310,9 +310,9 @@ sub TicketChecklistItemCreate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Ticket.Checklist',
-        ObjectID => $Param{TicketID}.'::'.$ID,
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $Param{TicketID}.'::'.$ID,
     );
 
     return $ID;
@@ -354,9 +354,9 @@ sub TicketChecklistItemDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Ticket.Checklist',
-        ObjectID => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
     );
 
     return 1;

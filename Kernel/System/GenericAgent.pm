@@ -821,9 +821,9 @@ sub JobAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'GenericAgent',
-        ObjectID => $Param{Name},
+        Event     => 'CREATE',
+        Namespace => 'GenericAgent',
+        ObjectID  => $Param{Name},
     );
 
     return 1;
@@ -875,9 +875,9 @@ sub JobDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'GenericAgent',
-        ObjectID => $Param{Name},
+        Event     => 'DELETE',
+        Namespace => 'GenericAgent',
+        ObjectID  => $Param{Name},
     );
 
     return 1;

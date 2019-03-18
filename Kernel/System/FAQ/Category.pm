@@ -128,9 +128,9 @@ sub CategoryAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'FAQ.Category',
-        ObjectID => $CategoryID,
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Category',
+        ObjectID  => $CategoryID,
     );
 
     return $CategoryID;
@@ -266,9 +266,9 @@ sub CategoryDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'FAQ.Category',
-        ObjectID => $Param{CategoryID},
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Category',
+        ObjectID  => $Param{CategoryID},
     );
 
     return 1;
@@ -1078,9 +1078,9 @@ sub CategoryUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'FAQ.Category',
-        ObjectID => $Param{CategoryID},
+        Event     => 'UPDATE',
+        Namespace => 'FAQ.Category',
+        ObjectID  => $Param{CategoryID},
     );
 
     return 1;

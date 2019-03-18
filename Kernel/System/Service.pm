@@ -827,9 +827,9 @@ sub ServiceAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Service',
-        ObjectID => $ServiceID,
+        Event     => 'CREATE',
+        Namespace => 'Service',
+        ObjectID  => $ServiceID,
     );
 
     return $ServiceID;
@@ -1010,9 +1010,9 @@ sub ServiceUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Service',
-        ObjectID => $Param{ServiceID},
+        Event     => 'UPDATE',
+        Namespace => 'Service',
+        ObjectID  => $Param{ServiceID},
     );
 
     return 1;
@@ -1383,9 +1383,9 @@ sub ServicePreferencesSet {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Service.Preference',
-        ObjectID => $Param{ServiceID}.'::'.$Param{Key},
+        Event     => 'UPDATE',
+        Namespace => 'Service.Preference',
+        ObjectID  => $Param{ServiceID}.'::'.$Param{Key},
     );
 
     return 1;
@@ -1868,9 +1868,9 @@ sub ServiceDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Service',
-        ObjectID => $Param{ServiceID},
+        Event     => 'DELETE',
+        Namespace => 'Service',
+        ObjectID  => $Param{ServiceID},
     );
 
     return 1;

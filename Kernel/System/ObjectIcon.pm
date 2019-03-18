@@ -202,9 +202,9 @@ sub ObjectIconAdd {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'CREATE',
-            Object   => 'ObjectIcon',
-            ObjectID => $ID,
+            Event     => 'CREATE',
+            Namespace => 'ObjectIcon',
+            ObjectID  => $ID,
         );
 
         return $ID;
@@ -268,9 +268,9 @@ sub ObjectIconUpdate {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'UPDATE',
-            Object   => 'ObjectIcon',
-            ObjectID => $Param{ID},
+            Event     => 'UPDATE',
+            Namespace => 'ObjectIcon',
+            ObjectID  => $Param{ID},
         );
 
         return $Param{ID};
@@ -389,9 +389,9 @@ sub ObjectIconDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'ObjectIcon',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'ObjectIcon',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

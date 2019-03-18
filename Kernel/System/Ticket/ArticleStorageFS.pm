@@ -176,9 +176,9 @@ sub ArticleDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Ticket.Article',
-        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -227,9 +227,9 @@ sub ArticleDeletePlain {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Ticket.Article.Plain',
-        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Plain',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     # return if only delete in my backend
@@ -299,9 +299,9 @@ sub ArticleDeleteAttachment {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'Ticket.Article.Attachment',
-        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID},
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Attachment',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     # return if only delete in my backend
@@ -523,9 +523,9 @@ sub ArticleWriteAttachment {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'Ticket.Article.Attachment',
-        ObjectID => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Article.Attachment',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
     );
     
     return 1;

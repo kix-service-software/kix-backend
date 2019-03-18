@@ -288,9 +288,9 @@ sub CustomerCompanyUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Customer',
-        ObjectID => $Param{CustomerCompanyID},
+        Event     => 'UPDATE',
+        Namespace => 'Customer',
+        ObjectID  => $Param{CustomerCompanyID},
     );
 
     return $Result;
@@ -487,9 +487,9 @@ sub SetPreferences {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'Customer.Preference',
-        ObjectID => $Param{UserID}.'::'.$Param{Key},
+        Event     => 'UPDATE',
+        Namespace => 'Customer.Preference',
+        ObjectID  => $Param{UserID}.'::'.$Param{Key},
     );
 
     return $Result;

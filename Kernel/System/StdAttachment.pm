@@ -121,9 +121,9 @@ sub StdAttachmentAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'StandardAttachment',
-        ObjectID => $ID,
+        Event     => 'CREATE',
+        Namespace => 'StandardAttachment',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -264,9 +264,9 @@ sub StdAttachmentUpdate {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'UPDATE',
-        Object   => 'StandardAttachment',
-        ObjectID => $Param{ID},
+        Event     => 'UPDATE',
+        Namespace => 'StandardAttachment',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -324,9 +324,9 @@ sub StdAttachmentDelete {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'DELETE',
-        Object   => 'StandardAttachment',
-        ObjectID => $Param{ID},
+        Event     => 'DELETE',
+        Namespace => 'StandardAttachment',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -549,9 +549,9 @@ sub StdAttachmentSetResponses {
 
         # push client callback event
         $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event    => 'CREATE',
-            Object   => 'StandardAttachment.Response',
-            ObjectID => $ID.'::'.$Param{ID},
+            Event     => 'CREATE',
+            Namespace => 'StandardAttachment.Response',
+            ObjectID  => $ID.'::'.$Param{ID},
         );
     }
 
@@ -623,9 +623,9 @@ sub StdAttachmentStandardTemplateMemberAdd {
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event    => 'CREATE',
-        Object   => 'StandardAttachment.TemplateMember',
-        ObjectID => $Param{AttachmentID}.'::'.$Param{StandardTemplateID},
+        Event     => 'CREATE',
+        Namespace => 'StandardAttachment.TemplateMember',
+        ObjectID  => $Param{AttachmentID}.'::'.$Param{StandardTemplateID},
     );
 
     return $Success;
