@@ -329,7 +329,7 @@ sub NotifyClients {
 
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_notification (timestamp, event, request_id, namespace, object_id) VALUES (?, ?, ?, ?)",
+        SQL  => "INSERT INTO client_notification (timestamp, event, request_id, namespace, object_id) VALUES (?, ?, ?, ?, ?)",
         Bind => [
             \$Timestamp,
             \$Param{Event},
