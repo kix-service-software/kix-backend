@@ -107,7 +107,6 @@ one or more ticket entries in one call.
                                                                                    # (supported: DynamicFields, Attachments)
             expand               => 0,                                             # Optional, 0 as default. Expand referenced objects
                                                                                    # (supported: Attachments) 
-            HTMLBodyAsAttachment => 1                                              # Optional, If enabled the HTML body version of each article is added to the attachments list
         },
     );
 
@@ -191,9 +190,6 @@ sub Run {
         );
     }
 
-    # By default does not include HTML body as attachment (3) unless is explicitly requested (2).
-    my $StripPlainBodyAsAttachment = $Param{Data}->{HTMLBodyAsAttachment} ? 2 : 3;
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -228,21 +224,6 @@ sub Run {
                 Code => 'Object.NoPermission',
             );
         }
-
-        # if ( $Param{Data}->{include}->{Attachments} ) {
-        #     # get attachment index (without attachments)
-        #     my %AtmIndex = $TicketObject->ArticleAttachmentIndex(
-        #         ContentPath                => $ArticleRaw{ContentPath},
-        #         ArticleID                  => $ArticleID,
-        #         StripPlainBodyAsAttachment => $StripPlainBodyAsAttachment,
-        #         UserID                     => $Self->{Authorization}->{UserID},
-        #     );
-
-        #     my @Attachments = sort keys %AtmIndex;
-
-        #     # set Attachments data
-        #     $ArticleRaw{Attachments} = \@Attachments;
-        # }
 
         my %ArticleData;
         my @DynamicFields;

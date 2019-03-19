@@ -178,7 +178,7 @@ sub Run {
             Data          => {
                 TicketID     => $Param{Data}->{TicketID},
                 ArticleID    => $Param{Data}->{ArticleID},
-                AttachmentID => join(',', keys %AttachmentIndex),
+                AttachmentID => join(',', sort keys %AttachmentIndex),
                 include      => $Param{Data}->{include},
                 expand       => $Param{Data}->{expand},
             }
