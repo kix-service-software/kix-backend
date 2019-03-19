@@ -206,6 +206,7 @@ sub Options {
     }
 
     return $Self->_Success(
+        IsOptionsResponse => 1,
         %Data
     );
 }
@@ -685,67 +686,69 @@ sub _Success {
     # ignore cached calues if we have a cached response (see end of Init method)
 
     # handle Search parameter if we have to
-    if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData($Self->{Search}) ) {
-        $Self->_ApplyFilter(
-            Data   => \%Param,
-            Filter => $Self->{Search}
-        );
-    }
+    if ( !$Param{IsOptionsResponse} ) {
+        if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData($Self->{Search}) ) {
+            $Self->_ApplyFilter(
+                Data   => \%Param,
+                Filter => $Self->{Search}
+            );
+        }
 
-    # honor a filter, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Filter}) ) {
-        $Self->_ApplyFilter(
-            Data => \%Param,
-        );
-    }
+        # honor a filter, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Filter}) ) {
+            $Self->_ApplyFilter(
+                Data => \%Param,
+            );
+        }
 
-    # honor a sorter, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Sort}) ) {
-        $Self->_ApplySort(
-            Data => \%Param,
-        );
-    }
+        # honor a sorter, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Sort}) ) {
+            $Self->_ApplySort(
+                Data => \%Param,
+            );
+        }
 
-    # honor an offset, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Offset}) ) {
-        $Self->_ApplyOffset(
-            Data => \%Param,
-        );
-    }
+        # honor an offset, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Offset}) ) {
+            $Self->_ApplyOffset(
+                Data => \%Param,
+            );
+        }
 
-    # honor a limiter, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Limit}) ) {
-        $Self->_ApplyLimit(
-            Data => \%Param,
-        );
-    }
+        # honor a limiter, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Limit}) ) {
+            $Self->_ApplyLimit(
+                Data => \%Param,
+            );
+        }
 
-    # honor a field selector, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Fields}) ) {
-        $Self->_ApplyFieldSelector(
-            Data => \%Param,
-        );
-    }
+        # honor a field selector, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Fields}) ) {
+            $Self->_ApplyFieldSelector(
+                Data => \%Param,
+            );
+        }
 
-    # honor a generic include, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Include}) ) {
-        $Self->_ApplyInclude(
-            Data => \%Param,
-        );
-    }
+        # honor a generic include, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Include}) ) {
+            $Self->_ApplyInclude(
+                Data => \%Param,
+            );
+        }
 
-    # honor an expander, if we have one
-    if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Expand}) ) {
-        $Self->_ApplyExpand(
-            Data => \%Param,
-        );
-    }
+        # honor an expander, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{Expand}) ) {
+            $Self->_ApplyExpand(
+                Data => \%Param,
+            );
+        }
 
-    # cache request without offset and limit if CacheType is set for this operation
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::DisableCaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
-        $Self->_CacheRequest(
-            Data => \%Param,
-        );
+        # cache request without offset and limit if CacheType is set for this operation
+        if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::DisableCaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
+            $Self->_CacheRequest(
+                Data => \%Param,
+            );
+        }
     }
 
     # prepare result
@@ -753,6 +756,7 @@ sub _Success {
     my $Message = $Param{Message};
     delete $Param{Code};
     delete $Param{Message};
+    delete $Param{IsOptionsResponse};
 
     # return structure
     my $Result = {

@@ -81,8 +81,9 @@ sub new {
     # get default options
     $Self->{Voting} = $ConfigObject->Get('FAQ::Voting');
 
-    # get the cache TTL (in seconds)
-    $Self->{CacheTTL} = int( $ConfigObject->Get('FAQ::CacheTTL') || 60 * 60 * 24 * 2 );
+    # init cache settings
+    $Self->{CacheType} = 'FAQ';
+    $Self->{CacheTTL}  = int( $ConfigObject->Get('FAQ::CacheTTL') || 60 * 60 * 24 * 2 );
 
     # init of event handler
     # currently there are no FAQ event modules but is needed to initialize otherwise errors are
@@ -156,7 +157,7 @@ sub FAQGet {
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
     my $Cache = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -250,7 +251,7 @@ sub FAQGet {
 
         # cache result
         $CacheObject->Set(
-            Type  => 'FAQ',
+            Type  => $Self->{CacheType},
             Key   => $CacheKey,
             Value => \%Data,
             TTL   => $Self->{CacheTTL},
@@ -320,7 +321,7 @@ sub ItemFieldGet {
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
     my $Cache = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -371,7 +372,7 @@ sub ItemFieldGet {
 
     # set cache
     $CacheObject->Set(
-        Type  => 'FAQ',
+        Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => $Cache,
         TTL   => $Self->{CacheTTL},
@@ -596,7 +597,9 @@ sub FAQAdd {
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(Type => 'FAQ');
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # check if approval feature is enabled
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
@@ -723,8 +726,10 @@ sub FAQUpdate {
         );
     }
 
-    # delete cache
-    $Self->_DeleteFromFAQCache(%Param);
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -764,8 +769,10 @@ sub FAQUpdate {
             return;
         }
 
-        # delete cache
-        $Self->_DeleteFromFAQCache(%Param);
+        # clear cache
+        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+            Type => $Self->{CacheType}
+        );
     }
 
     # check if history entry should be added
@@ -1400,8 +1407,10 @@ sub FAQDelete {
         Bind => [ \$Param{ItemID} ],
     );
 
-    # delete cache
-    $Self->_DeleteFromFAQCache(%Param);
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
@@ -2534,45 +2543,6 @@ sub _FAQApprovalTicketCreate {
     }
 
     return;
-}
-
-#
-# Deletes all needed FAQ item cache entries for a given FAQ ItemID.
-#
-sub _DeleteFromFAQCache {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(ItemID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-
-            return;
-        }
-    }
-
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
-    # Clear FAQGet cache
-    $CacheObject->Delete(
-        Type => 'FAQ',
-        Key  => 'FAQGet::ItemID::' . $Param{ItemID} . '::ItemFields::1',
-    );
-    $CacheObject->Delete(
-        Type => 'FAQ',
-        Key  => 'FAQGet::ItemID::' . $Param{ItemID} . '::ItemFields::0',
-    );
-
-    # Clear ItemFeldGet cache
-    $CacheObject->Delete(
-        Type => 'FAQ',
-        Key  => 'ItemFieldGet::ItemID::' . $Param{ItemID},
-    );
-    return 1;
 }
 
 1;

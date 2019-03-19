@@ -398,7 +398,7 @@ sub CategoryGet {
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
     my $Cache = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -430,10 +430,10 @@ sub CategoryGet {
 
     # cache result
     $CacheObject->Set(
-        Type  => 'FAQ',
+        Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Data,
-        TTL   => 60 * 60 * 24 * 2,
+        TTL   => $Self->{CacheTTL}
     );
 
     return %Data;
@@ -543,12 +543,6 @@ sub CategoryGroupGetAll {
         return;
     }
 
-    # check cache
-    if ( $Self->{Cache}->{CategoryGroupGetAll} ) {
-
-        return $Self->{Cache}->{CategoryGroupGetAll};
-    }
-
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -563,9 +557,6 @@ sub CategoryGroupGetAll {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Groups{ $Row[1] }->{ $Row[0] } = 1;
     }
-
-    # cache
-    $Self->{Cache}->{CategoryGroupGetAll} = \%Groups;
 
     return \%Groups;
 }
@@ -613,12 +604,6 @@ sub CategoryList {
         $Valid = $Param{Valid};
     }
 
-    # check cache
-    if ( $Self->{Cache}->{CategoryList}->{$Valid} ) {
-
-        return $Self->{Cache}->{CategoryList}->{$Valid};
-    }
-
     # build SQL
     my $SQL = '
         SELECT id, parent_id, name
@@ -642,9 +627,6 @@ sub CategoryList {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Data{ $Row[1] }->{ $Row[0] } = $Row[2];
     }
-
-    # cache
-    $Self->{Cache}->{CategoryList}->{$Valid} = \%Data;
 
     return \%Data;
 }
@@ -923,12 +905,6 @@ sub CategoryTreeList {
         $Valid = $Param{Valid};
     }
 
-    # check cache
-    if ( $Self->{Cache}->{GetCategoryTree}->{$Valid} ) {
-
-        return $Self->{Cache}->{GetCategoryTree}->{$Valid};
-    }
-
     # build SQL
     my $SQL = '
         SELECT id, parent_id, name
@@ -985,9 +961,6 @@ sub CategoryTreeList {
             $CategoryTree{$CategoryID} = $CategoryName;
         }
     }
-
-    # cache
-    $Self->{Cache}->{GetCategoryTree}->{$Valid} = \%CategoryTree;
 
     return \%CategoryTree;
 }
@@ -1212,9 +1185,6 @@ sub CustomerCategorySearch {
         while ( my @Row = $DBObject->FetchrowArray() ) {
             $Articles{ $Row[1] }++;
         }
-
-        # cache
-        $Self->{Cache}->{$CacheKey} = \%Articles;
     }
 
     for my $CategoryID (@CategoryIDs) {
@@ -1398,13 +1368,11 @@ sub GetUserCategories {
         UserID => $Param{UserID},
     );
     my %UserGroups;
-    if ( !$Self->{Cache}->{GetUserCategories}->{GroupMemberList} ) {
         %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
             UserID => $Param{UserID},
             Type   => $Param{Type},
             Result => 'HASH',
         );
-        $Self->{Cache}->{GetUserCategories}->{GroupMemberList} = \%UserGroups;
     }
     else {
         %UserGroups = %{ $Self->{Cache}->{GetUserCategories}->{GroupMemberList} };
@@ -1531,10 +1499,6 @@ sub GetCustomerCategories {
 
     # check cache
     my $CacheKey = 'GetCustomerCategories::CustomerUser::' . $Param{CustomerUser};
-    if ( defined $Self->{Cache}->{$CacheKey} ) {
-
-        return $Self->{Cache}->{$CacheKey};
-    }
 
     # get all valid categories
     my $Categories = $Self->CategoryList(
@@ -1558,9 +1522,6 @@ sub GetCustomerCategories {
         UserGroups     => \%UserGroups,
         UserID         => $Param{UserID},
     );
-
-    # cache
-    $Self->{Cache}->{$CacheKey} = $CustomerCategories;
 
     return $CustomerCategories;
 }

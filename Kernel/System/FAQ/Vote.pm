@@ -323,7 +323,7 @@ sub ItemVoteDataGet {
     # check cache
     my $CacheKey = 'ItemVoteDataGet::' . $Param{ItemID};
     my $Cache    = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -351,10 +351,10 @@ sub ItemVoteDataGet {
 
     # cache result
     $CacheObject->Set(
-        Type  => 'FAQ',
+        Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Data,
-        TTL   => 60 * 60 * 24 * 2,
+        TTL   => $Self->{CacheTTL},
     );
 
     return \%Data;
