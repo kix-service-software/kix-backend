@@ -179,7 +179,7 @@ sub Run {
     my @AttachmentList;
 
     # start loop
-    foreach my $AttachmentID ( sort @{$Param{Data}->{AttachmentID}} ) {
+    foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
         
         my %Attachment = $TicketObject->ArticleAttachment(
             ArticleID          => $Param{Data}->{ArticleID},
