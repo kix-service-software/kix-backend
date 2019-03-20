@@ -189,7 +189,8 @@ sub ClientRegistrationAdd {
 
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType});
+        Type => $Self->{CacheType}
+    );
 
     # schedule notification task if requested by client
     if ( $Param{NotificationURL} && $Param{NotificationInterval} ) {
@@ -246,10 +247,10 @@ sub ClientRegistrationList {
 
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type           => $Self->{CacheType},
-        Key            => $CacheKey,
-        Value          => \@Result,
-        TTL            => $CacheTTL,
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@Result,
+        TTL   => $CacheTTL,
     );
 
     return \@Result;
@@ -280,8 +281,7 @@ sub ClientRegistrationDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'DELETE FROM client_registration WHERE client_id = ?',
         Bind => [ \$Param{ClientID} ],
     );

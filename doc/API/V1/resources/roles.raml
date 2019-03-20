@@ -1,6 +1,9 @@
   displayName: Roles
   description: !include ../descriptions/resources/roles.md
   type: { collection: { typeName: Role } }
+  /permissiontypes:
+    description: !include ../descriptions/resources/roles/permissiontypes.md
+    type: { collection-readonly: { typeName: PermissionType } }
   /{roleId}:
     type: { item: { typeName: Role } }
     uriParameters:
@@ -15,4 +18,13 @@
         uriParameters:
           userId:
             displayName: UserID
+            type: number
+    /permissions:
+      description: !include ../descriptions/resources/roles/permissions.md
+      type: { collection: { typeName: Permission } }
+      /{permissionId}:
+        type: { item: { typeName: Permission } }
+        uriParameters:
+          permissionId:
+            displayName: PermissionID
             type: number

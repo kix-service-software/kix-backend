@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PermissionPostRequest",
+  "type": "object",
+  "description": "The permission request object for creation.",
+  "properties": {
+    "Comment": {
+      "type": "string"
+    },
+    "IsRequired": {
+      "type": "integer"
+    },
+    "TypeID": {
+      "type": "integer" 
+    },
+    "Target": {
+      "type": "string"
+    },
+    "Value": {
+      "type": "integer",
+      "description": "bitmask, please see documentation for bit descriptions"
+    }
+  },
+  "required": [
+    "Target",
+    "TypeID",
+    "Value"
+  ]
+}

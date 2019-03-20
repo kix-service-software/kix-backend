@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'RoleID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+        $Found = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
             RoleID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Role' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+        $Found = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
             Role => $Param{Data}->{$Param{Attribute}},
         );        
     }

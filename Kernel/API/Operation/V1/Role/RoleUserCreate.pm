@@ -118,11 +118,10 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-        UID    => $Param{Data}->{UserID},
-        RID    => $Param{Data}->{RoleID},
-        Active => 1,
-        UserID => $Self->{Authorization}->{UserID},
+    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+        AssignUserID => $Param{Data}->{UserID},
+        RoleID       => $Param{Data}->{RoleID},
+        UserID       => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {

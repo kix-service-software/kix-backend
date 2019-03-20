@@ -32,6 +32,14 @@
       "type": "string",
       "readOnly": true
     },
+    "Permissions": {
+      "type": "array",
+      "description": "added via include \"Permissions\"",
+      "readOnly": true,
+      "items": {
+        "$ref": "Permission.json"
+      }
+    },
     "UserIDs": {
       "type": "array",
       "description": "added via include \"UserIDs\"",

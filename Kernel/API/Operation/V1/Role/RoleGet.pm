@@ -135,7 +135,7 @@ sub Run {
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
         # get the Role data
-        my %RoleData = $Kernel::OM->Get('Kernel::System::Group')->RoleGet(
+        my %RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
             ID => $RoleID,
         );
 

@@ -98,7 +98,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform RoleUpdate Operation. This will return the updated TypeID.
+perform RoleUpdate Operation. This will return the updated RoleID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -133,7 +133,7 @@ sub Run {
     );
 
     # check if Role exists 
-    my $RoleData = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+    my $RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
   
@@ -144,7 +144,7 @@ sub Run {
     }
 
     # update Role
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleUpdate(
+    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
         ID      => $Param{Data}->{RoleID},
         Name    => $Role->{Name} || $RoleData->{Name},
         Comment => $Role->{Comment} || $RoleData->{Comment},

@@ -12,7 +12,19 @@
         },
         "Name": {
           "type": "string"
-        },
+        },         
+        "Permissions": {
+          "type": "array",
+          "item": {
+            "$ref": "PermissionPostItem.json"
+          }
+        },    
+        "UserIDs": {
+          "type": "array",
+          "item": {
+            "type": "integer"
+          }
+        },    
         "ValidID": {
           "type": "integer"
         }

@@ -1,0 +1,14 @@
+{
+   "$id" : "#PermissionPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated permission.",
+   "type" : "object",
+   "properties" : {
+      "PermissionID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "PermissionID"
+   ]
+}

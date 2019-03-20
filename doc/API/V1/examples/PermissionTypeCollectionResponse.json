@@ -1,0 +1,24 @@
+{
+    "PermissionType": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "Comment": "Permission type that corresponds with a collection resource.",
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "ID": 1,
+            "Name": "Resource",
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 10:17:03",
+            "Comment": "Permission type that corresponds with a item resource.",
+            "CreateBy": 1,
+            "CreateTime": "2018-11-20 12:34:55",
+            "ID": 2,
+            "Name": "Object",
+            "ValidID": 1
+        }
+    ]
+}
