@@ -1367,16 +1367,11 @@ sub GetUserCategories {
     my $CategoryGroups = $Self->CategoryGroupGetAll(
         UserID => $Param{UserID},
     );
-    my %UserGroups;
-        %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => $Param{Type},
-            Result => 'HASH',
-        );
-    }
-    else {
-        %UserGroups = %{ $Self->{Cache}->{GetUserCategories}->{GroupMemberList} };
-    }
+    my %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        UserID => $Param{UserID},
+        Type   => $Param{Type},
+        Result => 'HASH',
+    );
 
     my $UserCategories = $Self->_UserCategories(
         Categories     => $Categories,
