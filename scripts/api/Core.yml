@@ -497,41 +497,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Channel::ChannelGet
-    V1::Group::GroupSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Group::GroupSearch
-    V1::Group::GroupCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Group::GroupCreate
-    V1::Group::GroupGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Group::GroupGet
-    V1::Group::GroupUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Group::GroupUpdate
-    V1::Group::GroupDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Group::GroupDelete
     V1::AddressBook::AddressSearch:
         Description: ''
         MappingInbound:
@@ -567,27 +532,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::AddressBook::AddressDelete
-    V1::Role::RoleUserSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUserSearch
-    V1::Role::RoleUserCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUserCreate
-    V1::Role::RoleUserDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUserDelete
     V1::Role::RoleSearch:
         Description: ''
         MappingInbound:
@@ -602,6 +546,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Role::RoleCreate
+    V1::Role::PermissionTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionTypeSearch
     V1::Role::RoleGet:
         Description: ''
         MappingInbound:
@@ -623,6 +574,62 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Role::RoleDelete
+    V1::Role::RoleUserSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserSearch
+    V1::Role::RoleUserCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserCreate
+    V1::Role::RoleUserDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserDelete
+    V1::Role::PermissionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionSearch
+    V1::Role::PermissionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionCreate
+    V1::Role::PermissionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionGet
+    V1::Role::PermissionUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionUpdate
+    V1::Role::PermissionDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionDelete
     V1::Lock::LockSearch:
         Description: ''
         MappingInbound:
@@ -2001,26 +2008,6 @@ Provider:
           RequestMethod:
           - GET
           Route: /channels/:ChannelID
-        V1::Group::GroupSearch:
-          RequestMethod:
-          - GET
-          Route: /groups
-        V1::Group::GroupCreate:
-          RequestMethod:
-          - POST
-          Route: /groups
-        V1::Group::GroupGet:
-          RequestMethod:
-          - GET
-          Route: /groups/:GroupID
-        V1::Group::GroupUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /groups/:GroupID
-        V1::Group::GroupDelete:
-          RequestMethod:
-          - DELETE
-          Route: /groups/:GroupID
         V1::AddressBook::AddressSearch:
           RequestMethod:
           - GET
@@ -2041,18 +2028,6 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /addressbook/:AddressID
-        V1::Role::RoleUserSearch:
-          RequestMethod:
-          - GET
-          Route: /roles/:RoleID/userids
-        V1::Role::RoleUserCreate:
-          RequestMethod:
-          - POST
-          Route: /roles/:RoleID/userids
-        V1::Role::RoleUserDelete:
-          RequestMethod:
-          - DELETE
-          Route: /roles/:RoleID/userids/:UserID
         V1::Role::RoleSearch:
           RequestMethod:
           - GET
@@ -2061,6 +2036,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /roles
+        V1::Role::PermissionTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /roles/permissiontypes
         V1::Role::RoleGet:
           RequestMethod:
           - GET
@@ -2073,6 +2052,38 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /roles/:RoleID
+        V1::Role::RoleUserSearch:
+          RequestMethod:
+          - GET
+          Route: /roles/:RoleID/userids
+        V1::Role::RoleUserCreate:
+          RequestMethod:
+          - POST
+          Route: /roles/:RoleID/userids
+        V1::Role::RoleUserDelete:
+          RequestMethod:
+          - DELETE
+          Route: /roles/:RoleID/userids/:UserID
+        V1::Role::PermissionSearch:
+          RequestMethod:
+          - GET
+          Route: /roles/:RoleID/permissions
+        V1::Role::PermissionCreate:
+          RequestMethod:
+          - POST
+          Route: /roles/:RoleID/permissions
+        V1::Role::PermissionGet:
+          RequestMethod:
+          - GET
+          Route: /roles/:RoleID/permissions/:PermissionID
+        V1::Role::PermissionUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /roles/:RoleID/permissions/:PermissionID
+        V1::Role::PermissionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /roles/:RoleID/permissions/:PermissionID
         V1::Lock::LockSearch:
           RequestMethod:
           - GET

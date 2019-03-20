@@ -128,19 +128,19 @@ sub Run {
     );
 
     # check if Role exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+    my $Exists = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
         Role => $Role->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Role. Role with same name '$Role->{Name}' already exists.",
+            Message => "Cannot create role. Role with same name '$Role->{Name}' already exists.",
         );
     }
 
     # create Role
-    my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleAdd(
+    my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
         Name    => $Role->{Name},
         Comment => $Role->{Comment} || '',
         ValidID => $Role->{ValidID} || 1,
@@ -150,10 +150,44 @@ sub Run {
     if ( !$RoleID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Role, please contact the system administrator',
+            Message => 'Could not create role, please contact the system administrator',
         );
     }
     
+    # assign users
+    if ( IsArrayRefWithData($Role->{UserIDs}) ) {
+        foreach my $UserID ( @{$Role->{UserIDs}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Role::RoleUserCreate',
+                Data          => {
+                    RoleID => $RoleID,
+                    UserID => $UserID,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+    }
+
+    # assign permissions
+    if ( IsArrayRefWithData($Role->{Permissions}) ) {
+        foreach my $Permission ( @{$Role->{Permissions}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Role::PermissionCreate',
+                Data          => {
+                    RoleID     => $RoleID,
+                    Permission => $Permission,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+    }
+
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',

@@ -14,8 +14,8 @@ use utf8;
 
 use vars (qw($Self));
 
-# get group object
-my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+# get role object
+my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
 
 #
 # Role tests
@@ -29,16 +29,16 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-my $GroupNameRandom  = $Helper->GetRandomID();
+my $NameRandom  = $Helper->GetRandomID();
 my %RoleIDByRoleName = (
-    'test-role-' . $GroupNameRandom . '-1' => undef,
-    'test-role-' . $GroupNameRandom . '-2' => undef,
-    'test-role-' . $GroupNameRandom . '-3' => undef,
+    'test-role-' . $NameRandom . '-1' => undef,
+    'test-role-' . $NameRandom . '-2' => undef,
+    'test-role-' . $NameRandom . '-3' => undef,
 );
 
 # try to add roles
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
-    my $RoleID = $GroupObject->RoleAdd(
+    my $RoleID = $RoleObject->RoleAdd(
         Name    => $RoleName,
         ValidID => 1,
         UserID  => 1,
@@ -56,7 +56,7 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 
 # try to add already added roles
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
-    my $RoleID = $GroupObject->RoleAdd(
+    my $RoleID = $RoleObject->RoleAdd(
         Name    => $RoleName,
         ValidID => 1,
         UserID  => 1,
@@ -71,7 +71,7 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 # try to fetch data of existing roles
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleIDByRoleName{$RoleName};
-    my %Role = $GroupObject->RoleGet( ID => $RoleID );
+    my %Role = $RoleObject->RoleGet( ID => $RoleID );
 
     $Self->Is(
         $Role{Name},
@@ -84,14 +84,14 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleIDByRoleName{$RoleName};
 
-    my $FetchedRoleID = $GroupObject->RoleLookup( Role => $RoleName );
+    my $FetchedRoleID = $RoleObject->RoleLookup( Role => $RoleName );
     $Self->Is(
         $FetchedRoleID,
         $RoleID,
         'RoleLookup() for role name ' . $RoleName,
     );
 
-    my $FetchedRoleName = $GroupObject->RoleLookup( RoleID => $RoleID );
+    my $FetchedRoleName = $RoleObject->RoleLookup( RoleID => $RoleID );
     $Self->Is(
         $FetchedRoleName,
         $RoleName,
@@ -100,7 +100,7 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 }
 
 # list roles
-my %Roles = $GroupObject->RoleList();
+my %Roles = $RoleObject->RoleList();
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleIDByRoleName{$RoleName};
 
@@ -111,22 +111,22 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 }
 
 # role data list
-my %RoleDataList = $GroupObject->RoleDataList();
+my %RoleDataList = $RoleObject->RoleList();
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleIDByRoleName{$RoleName};
 
     $Self->True(
-        exists $RoleDataList{$RoleID} && $RoleDataList{$RoleID}->{Name} eq $RoleName,
+        exists $RoleDataList{$RoleID} && $RoleDataList{$RoleID} eq $RoleName,
         'RoleDataList() contains role ' . $RoleName . ' with ID ' . $RoleID,
     );
 }
 
 # change name of a single role
-my $RoleNameToChange = 'test-role-' . $GroupNameRandom . '-1';
+my $RoleNameToChange = 'test-role-' . $NameRandom . '-1';
 my $ChangedRoleName  = $RoleNameToChange . '-changed';
 my $RoleIDToChange   = $RoleIDByRoleName{$RoleNameToChange};
 
-my $RoleUpdateResult = $GroupObject->RoleUpdate(
+my $RoleUpdateResult = $RoleObject->RoleUpdate(
     ID      => $RoleIDToChange,
     Name    => $ChangedRoleName,
     ValidID => 1,
@@ -142,7 +142,7 @@ $RoleIDByRoleName{$ChangedRoleName} = $RoleIDToChange;
 delete $RoleIDByRoleName{$RoleNameToChange};
 
 # try to add role with previous name
-my $RoleID1 = $GroupObject->RoleAdd(
+my $RoleID1 = $RoleObject->RoleAdd(
     Name    => $RoleNameToChange,
     ValidID => 1,
     UserID  => 1,
@@ -158,7 +158,7 @@ if ($RoleID1) {
 }
 
 # try to add role with changed name
-$RoleID1 = $GroupObject->RoleAdd(
+$RoleID1 = $RoleObject->RoleAdd(
     Name    => $ChangedRoleName,
     ValidID => 1,
     UserID  => 1,
@@ -170,7 +170,7 @@ $Self->False(
 );
 
 my $RoleName2 = $ChangedRoleName . 'update';
-my $RoleID2   = $GroupObject->RoleAdd(
+my $RoleID2   = $RoleObject->RoleAdd(
     Name    => $RoleName2,
     ValidID => 1,
     UserID  => 1,
@@ -182,7 +182,7 @@ $Self->True(
 );
 
 # try to update role with existing name
-my $RoleUpdateWrong = $GroupObject->RoleUpdate(
+my $RoleUpdateWrong = $RoleObject->RoleUpdate(
     ID      => $RoleID2,
     Name    => $ChangedRoleName,
     ValidID => 2,

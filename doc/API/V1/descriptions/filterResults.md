@@ -45,6 +45,8 @@ The filter definition is a JSON object in the following form:
 |```<Type>```||The type of data that should be used to compare the value. If not given, the value will be interpreted as a string.|
 |```<Not>```||To negate the comparison set this to ```true```.|
 
+If both lists are given (AND and OR) they will be combines using a logical AND operation.
+
 
 ** Supported types **
 

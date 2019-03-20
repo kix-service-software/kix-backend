@@ -116,9 +116,9 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # delete RoleUser	    
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserDelete(
-        RoleID  => $Param{Data}->{RoleID},
-        UserID  => $Param{Data}->{UserID},
+    my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleUserDelete(
+        RoleID => $Param{Data}->{RoleID},
+        UserID => $Param{Data}->{UserID},
     );
  
     if ( !$Success ) {

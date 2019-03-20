@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PermissionResponse",
+  "type": "object",
+  "description": "A response for permission GET request.",
+  "properties": {
+    "Permission": {
+      "$ref": "Permission.json"
+    }
+  },
+  "required": [
+    "Permission"
+  ]  
+}

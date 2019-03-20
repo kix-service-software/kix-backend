@@ -111,14 +111,11 @@ perform RoleDelete Operation. This will return the deleted RoleID.
 sub Run {
     my ( $Self, %Param ) = @_;
     
-    # get permission type list
-    my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Group')->_PermissionTypeList();
-
     # start loop
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
         # search Role user       
-        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserGet(
+        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserGet(
             RoleID => $RoleID,
         );
    
@@ -129,25 +126,9 @@ sub Run {
             );
         }
 
-        foreach my $Type ( keys %PermissionTypeList ) {
-	        # search Role role       
-	        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleGroupGet(
-	            Type    => $Type,
-	            RoleID => $RoleID,
-	        );
-	  
-	        if ( IsHashRefWithData(\%ResultRoleList) ) {
-	            return $Self->_Error(
-	                Code    => 'Object.DependingObjectExists',
-	                Message => 'Cannot delete Role. This Role is assgined to at least one group.',
-	            );
-	        }
-        }
-        
         # delete Role	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleDelete(
-            RoleID  => $RoleID,
-            UserID  => $Self->{Authorization}->{UserID},
+        my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleDelete(
+            ID  => $RoleID,
         );
 
         if ( !$Success ) {

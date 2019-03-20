@@ -13,6 +13,18 @@
             "Name" : {
                "type" : "string"
             },
+            "Permissions" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/PermissionPostItem"
+               }
+            },
+            "UserIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
             "ValidID" : {
                "type" : "integer"
             }
@@ -25,5 +37,36 @@
    },
    "required" : [
       "Role"
-   ]
+   ],
+   "definitions" : {
+      "PermissionPostItem" : {
+         "$id" : "#PermissionPostRequest",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The permission request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "IsRequired" : {
+               "type" : "integer"
+            },
+            "Target" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "Value" : {
+               "description" : "bitmask, please see documentation for bit descriptions",
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Target",
+            "TypeID",
+            "Value"
+         ]
+      }
+   }
 }

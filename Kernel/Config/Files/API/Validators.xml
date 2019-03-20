@@ -228,7 +228,7 @@
                 <Item Key="Module">StateTypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx">(TicketStateCreate|TicketStateUpdate)</Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(PermissionCreate|PermissionUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

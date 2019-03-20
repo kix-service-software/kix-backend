@@ -1,0 +1,7 @@
+{
+    "Permission": {
+        "Target": "/tickets",
+        "TypeID": 1,
+        "Value": 12
+    }
+}

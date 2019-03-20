@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/V1/Group/GroupGet.pm - API Group Get operation backend
+# Kernel/API/Operation/V1/Role/PermissionGet.pm - API Role Get operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Group::GroupGet;
+package Kernel::API::Operation::V1::Role::PermissionGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Group::GroupGet - API Group Get Operation backend
+Kernel::API::Operation::V1::Role::PermissionGet - API Permission Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Kernel::API::Operation::V1::Group::GroupGet - API Group Get Operation backend
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::Group::GroupGet->new();
+by using Kernel::API::Operation::V1::Role::PermissionGet->new();
 
 =cut
 
@@ -64,19 +64,52 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Group::GroupGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Role::PermissionGet');
 
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'RoleID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+        'PermissionID' => {
+            Type     => 'ARRAY',
+            DataType => 'NUMERIC',
+            Required => 1
+        }                
+    }
+}
+
 =item Run()
 
-perform GroupGet Operation. This function is able to return
+perform PermissionGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            GroupID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            RoleID       => 12
+            PermissionID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -85,7 +118,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            Group => [
+            Permission => [
                 {
                     ...
                 },
@@ -101,68 +134,35 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
+    my @PermissionList;
 
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
+    # start loop
+    foreach my $PermissionID ( @{$Param{Data}->{PermissionID}} ) {
 
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'GroupID' => {
-                Type     => 'ARRAY',
-                DataType => 'NUMERIC',
-                Required => 1
-            }                
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
-    my @GroupList;
-
-    # start state loop
-    State:    
-    foreach my $GroupID ( @{$Param{Data}->{GroupID}} ) {
-
-        # get the Group data
-        my %GroupData = $Kernel::OM->Get('Kernel::System::Group')->GroupGet(
-            ID => $GroupID,
+        # get the Permission data
+        my %PermissionData = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
+            ID => $PermissionID,
         );
 
-        if ( !IsHashRefWithData( \%GroupData ) ) {
+        if ( !IsHashRefWithData( \%PermissionData ) || $PermissionData{RoleID} != $Param{Data}->{RoleID} ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
-        
+
         # add
-        push(@GroupList, \%GroupData);
+        push(@PermissionList, \%PermissionData);
     }
 
-    if ( scalar(@GroupList) == 1 ) {
+    if ( scalar(@PermissionList) == 1 ) {
         return $Self->_Success(
-            Group => $GroupList[0],
+            Permission => $PermissionList[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        Group => \@GroupList,
+        Permission => \@PermissionList,
     );
 }
 

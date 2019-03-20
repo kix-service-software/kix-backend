@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableCreate Name="permission_type">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+        <Column Name="name" Required="true" Size="250" Type="VARCHAR"/>
+        <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+        <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Unique Name="permission_type_name">
+            <UniqueColumn Name="name"/>
+        </Unique>
+        <ForeignKey ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKey>    
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+    <TableCreate Name="role_permission">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+        <Column Name="role_id" Required="true" Type="INTEGER"/>
+        <Column Name="type_id" Required="true" Type="INTEGER"/>
+        <Column Name="target" Required="true" Size="1000" Type="VARCHAR"/>
+        <Column Name="value" Required="true" Type="SMALLINT"/>
+        <Column Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
+        <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Index Name="role_permission_role_id">
+            <IndexColumn Name="role_id"/>
+        </Index>
+        <ForeignKey ForeignTable="permission_type">
+            <Reference Local="type_id" Foreign="id"/>
+        </ForeignKey>    
+        <ForeignKey ForeignTable="roles">
+            <Reference Local="role_id" Foreign="id"/>
+        </ForeignKey>    
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>        
+    </TableCreate>
+
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Resource</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a collection resource.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Object</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a item resource.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Queue->Ticket</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type for the relationship of queues and tickets.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+</database>
