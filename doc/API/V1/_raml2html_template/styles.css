@@ -12,6 +12,13 @@ code {
 }
 pre {
   margin-left: 8px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(150,150,150,0.75);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(150,150,150,0.75);
+  box-shadow: 0px 0px 5px 0px rgba(150,150,150,0.75);
+  background-color: #fcfcfc;
+  border: 0px solid transparent;
+  border-radius: 4px;
+  padding: 15px;
 }
 pre.base-uri {
   margin-left: 0px;
@@ -19,19 +26,26 @@ pre.base-uri {
 pre > code ul.json-dict {
   margin-bottom: 0px;
 }
+table,
+.table
 .param-table {
   border-collapse: collapse;  
   border-color: #ddd;
   border: 0;
   width: 100%;
   margin-bottom: 20px;
+  border: 1px solid #ddd !important;
 }
+table thead th,
+.table thead th,
 .param-table thead th {
   background-color: #fafafa;
   padding: 8px;
   border: 1px solid #ddd;
   border-bottom: 2px solid #ddd;
 }
+table tbody td,
+.table tbody td,
 .param-table tbody td {
   vertical-align: top;
   padding: 8px;

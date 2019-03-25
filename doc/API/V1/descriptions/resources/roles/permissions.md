@@ -4,7 +4,7 @@ For each existing role permissions can be created. A permission item has a ```Ty
 |-|-|-|
 |Resource|collection resource URI|```/tickets```|
 |Object|item resource URI|```/tickets/123```|
-|Queue->Ticket|ID of the source object (the QueueID)|```123```|
+|Object Property Value|\<ObjectType\>.\<Property\>[.\<Property\>...]=\<Value\>|```Ticket.QueueID=123```|
 
 The permission value itself is a bitmask with the following values:
 

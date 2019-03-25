@@ -7,6 +7,18 @@
       "User" : {
          "type" : "object",
          "properties" : {
+            "Preferences" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/UserPreferencePostItem"
+               }
+            },
+            "RoleIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
             "UserEmail" : {
                "type" : "string"
             },
@@ -39,5 +51,25 @@
    },
    "required" : [
       "User"
-   ]
+   ],
+   "definitions" : {
+      "UserPreferencePostItem" : {
+         "$id" : "#UserPreferencePostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string"
+            },
+            "Value" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      }
+   }
 }

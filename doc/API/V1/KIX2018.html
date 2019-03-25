@@ -257,6 +257,13 @@ code {
 }
 pre {
   margin-left: 8px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(150,150,150,0.75);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(150,150,150,0.75);
+  box-shadow: 0px 0px 5px 0px rgba(150,150,150,0.75);
+  background-color: #fcfcfc;
+  border: 0px solid transparent;
+  border-radius: 4px;
+  padding: 15px;
 }
 pre.base-uri {
   margin-left: 0px;
@@ -264,19 +271,26 @@ pre.base-uri {
 pre > code ul.json-dict {
   margin-bottom: 0px;
 }
+table,
+.table
 .param-table {
   border-collapse: collapse;  
   border-color: #ddd;
   border: 0;
   width: 100%;
   margin-bottom: 20px;
+  border: 1px solid #ddd !important;
 }
+table thead th,
+.table thead th,
 .param-table thead th {
   background-color: #fafafa;
   padding: 8px;
   border: 1px solid #ddd;
   border-bottom: 2px solid #ddd;
 }
+table tbody td,
+.table tbody td,
 .param-table tbody td {
   vertical-align: top;
   padding: 8px;
@@ -530,7 +544,7 @@ pre code {
     text-decoration: underline;
   }
   
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX 2018 REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api.pl/webservice/core:v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#sessions"><code>/sessions</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In constract to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function is based on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?search={...}
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX 2018 REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api.pl/webservice/core:v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#sessions"><code>/sessions</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In constract to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function is based on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?search={...}
 </code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be execute at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?filter={...}
 </code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="lang-bash">{
 "&lt;Object&gt;": {
@@ -9596,7 +9610,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__userids__userid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids__userid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_roles__roleid__permissions" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span> <span class="methods"><a href="#roles__roleid__permissions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#roles__roleid__permissions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="roles__roleid__permissions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__permissions_get_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__permissions_get_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__permissions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__permissions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="roles__roleid__permissions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__permissions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PermissionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__userids__userid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids__userid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_roles__roleid__permissions" class="panel"><div class="resource-description"><p>For each existing role permissions can be created. A permission item has a <code>TypeID</code> which references a permission type defined in the resource <a href="#roles_permissiontypes_get"><code>/roles/permissiontypes</code></a>. Additionally the target for the permission has to be defined. Each permission type has its own target schema. The following table lists the possible targets for each default permission type.</p><table class="table"><thead><tr><th>Permission Type</th><th>Permission Target</th><th>Example</th></tr></thead><tbody><tr><td>Resource</td><td>collection resource URI</td><td><code>/tickets</code></td></tr><tr><td>Object</td><td>item resource URI</td><td><code>/tickets/123</code></td></tr><tr><td>Object Property Value</td><td>\<objecttype\>.\<property\>[.\<property\>...]=\<value\></value\></property\></property\></objecttype\></td><td><code>Ticket.QueueID=123</code></td></tr></tbody></table><p>The permission value itself is a bitmask with the following values:</p><table class="table"><thead><tr><th>Value</th><th>Permission</th></tr></thead><tbody><tr><td><code>0x0001</code></td><td>CREATE</td></tr><tr><td><code>0x0002</code></td><td>READ</td></tr><tr><td><code>0x0004</code></td><td>UPDATE</td></tr><tr><td><code>0x0008</code></td><td>DELETE</td></tr><tr><td><code>0xf000</code></td><td>DENY</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span> <span class="methods"><a href="#roles__roleid__permissions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#roles__roleid__permissions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="roles__roleid__permissions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__permissions_get_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__permissions_get_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__permissions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__permissions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="roles__roleid__permissions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__permissions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PermissionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#PermissionCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of permissions.",
@@ -12647,6 +12661,18 @@ pre code {
       "User" : {
          "type" : "object",
          "properties" : {
+            "Preferences" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/UserPreferencePostItem"
+               }
+            },
+            "RoleIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
             "UserEmail" : {
                "type" : "string"
             },
@@ -12679,7 +12705,27 @@ pre code {
    },
    "required" : [
       "User"
-   ]
+   ],
+   "definitions" : {
+      "UserPreferencePostItem" : {
+         "$id" : "#UserPreferencePostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string"
+            },
+            "Value" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "User": {
@@ -13126,6 +13172,17 @@ pre code {
    "type" : "object",
    "properties" : {
       "UserPreference" : {
+         "$ref" : "#/definitions/UserPreferencePostItem"
+      }
+   },
+   "required" : [
+      "UserPreference"
+   ],
+   "definitions" : {
+      "UserPreferencePostItem" : {
+         "$id" : "#UserPreferencePostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference request object for creation.",
          "type" : "object",
          "properties" : {
             "ID" : {
@@ -13140,10 +13197,7 @@ pre code {
             "Value"
          ]
       }
-   },
-   "required" : [
-      "UserPreference"
-   ]
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "UserPreference": {
@@ -13431,7 +13485,177 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="users__userid__preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="valid" class="panel-title">Valid</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/valid.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_valid" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/valid</span> <span class="methods"><a href="#valid_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="valid_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/valid</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Valid items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#valid_get_request" data-toggle="tab">Request</a></li><li><a href="#valid_get_response" data-toggle="tab">Response</a></li><li><a href="#valid_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="valid_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="valid_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ValidCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="users__userid__preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_users__userid__roleids" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/users/roleids.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/users/{userId}</span><span class="uri">/roleids</span> <span class="methods"><a href="#users__userid__roleids_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#users__userid__roleids_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="users__userid__roleids_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/users/{userId}</span><span class="uri">/roleids</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#users__userid__roleids_get_request" data-toggle="tab">Request</a></li><li><a href="#users__userid__roleids_get_response" data-toggle="tab">Response</a></li><li><a href="#users__userid__roleids_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users__userid__roleids_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">userId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="users__userid__roleids_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__roleids_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: UserRoleIDCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#UserRoleIDList",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of role IDs.",
+   "type" : "object",
+   "properties" : {
+      "RoleIDs" : {
+         "type" : "array",
+         "items" : {
+            "type" : "integer"
+         }
+      }
+   },
+   "required" : [
+      "RoleIDs"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "RoleIDs": [
+        1,
+        2,
+        3
+    ]
+}</code></pre></div></div><h2 class="response-title" id="users__userid__roleids_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="users__userid__roleids_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__roleids_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="users__userid__roleids_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/users/{userId}</span><span class="uri">/roleids</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#users__userid__roleids_post_request" data-toggle="tab">Request</a></li><li><a href="#users__userid__roleids_post_response" data-toggle="tab">Response</a></li><li><a href="#users__userid__roleids_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users__userid__roleids_post_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">userId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: UserRoleIDPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#UserRoleIDPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The user role request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "RoleID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "RoleID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "RoleID": 2
+}</code></pre></div></div><div class="tab-pane" id="users__userid__roleids_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__roleids_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The UserRoleID has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: UserRoleIDPostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#UserRoleIDPostResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The RoleID of the created user role.",
+   "type" : "object",
+   "properties" : {
+      "RoleID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "RoleID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "RoleID": 2
+}</code></pre></div></div><h2 class="response-title" id="users__userid__roleids_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="users__userid__roleids_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="users__userid__roleids_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__roleids_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_users__userid__roleids__roleid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/users/{userId}/roleids</span><span class="uri">/{roleId}</span> <span class="methods"><a href="#users__userid__roleids__roleid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="users__userid__roleids__roleid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/users/{userId}/roleids</span><span class="uri">/{roleId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#users__userid__roleids__roleid__delete_request" data-toggle="tab">Request</a></li><li><a href="#users__userid__roleids__roleid__delete_response" data-toggle="tab">Response</a></li><li><a href="#users__userid__roleids__roleid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users__userid__roleids__roleid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">userId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr><tr><td class="uri">roleId</td><td><center>yes</center></td><td>number</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="users__userid__roleids__roleid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__roleids__roleid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="users__userid__roleids__roleid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="users__userid__roleids__roleid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="users__userid__roleids__roleid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="users__userid__roleids__roleid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="valid" class="panel-title">Valid</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/valid.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_valid" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/valid</span> <span class="methods"><a href="#valid_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="valid_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/valid</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Valid items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#valid_get_request" data-toggle="tab">Request</a></li><li><a href="#valid_get_response" data-toggle="tab">Response</a></li><li><a href="#valid_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="valid_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="valid_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ValidCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ValidCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of valid items.",

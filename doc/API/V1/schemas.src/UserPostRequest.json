@@ -7,6 +7,12 @@
     "User": {
       "type": "object",
       "properties": {
+        "Preferences": {
+          "type": "array",
+          "item": {
+            "$ref": "UserPreferencePostItem.json"
+          }
+        },    
         "UserEmail": {
           "type": "string"
         },
@@ -24,6 +30,12 @@
         },
         "UserTitle": {
           "type": "string"
+        },
+        "RoleIDs": {
+          "type": "array",
+          "item": {
+            "type": "integer"
+          }
         },
         "ValidID": {
           "type": "integer"

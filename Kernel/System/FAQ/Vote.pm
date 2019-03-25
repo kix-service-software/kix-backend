@@ -96,11 +96,9 @@ sub VoteAdd {
         $VoteID = $Row[0];
     }
 
-    # delete cache
-    my $CacheKey = 'ItemVoteDataGet::' . $Param{ItemID};
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
-        Type => 'FAQ',
-        Key  => $CacheKey,
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
     );
 
     # push client callback event
@@ -153,6 +151,11 @@ sub VoteDelete {
             DELETE FROM faq_voting
             WHERE id = ?',
         Bind => [ \$Param{VoteID} ],
+    );
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
     );
 
     # push client callback event

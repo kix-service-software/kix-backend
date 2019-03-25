@@ -16,3 +16,12 @@
           preferenceId:
             displayName: PeferenceID
             type: string
+    /roleids:
+      description: !include ../descriptions/resources/users/roleids.md
+      type: { collection-nopatch: { typeName: UserRoleID } }
+      /{roleId}:
+        type: { item-deleteonly: { typeName: UserRoleID } }
+        uriParameters:
+          roleId:
+            displayName: RoleID
+            type: number

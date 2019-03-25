@@ -5,6 +5,17 @@
    "type" : "object",
    "properties" : {
       "UserPreference" : {
+         "$ref" : "#/definitions/UserPreferencePostItem"
+      }
+   },
+   "required" : [
+      "UserPreference"
+   ],
+   "definitions" : {
+      "UserPreferencePostItem" : {
+         "$id" : "#UserPreferencePostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference request object for creation.",
          "type" : "object",
          "properties" : {
             "ID" : {
@@ -19,8 +30,5 @@
             "Value"
          ]
       }
-   },
-   "required" : [
-      "UserPreference"
-   ]
+   }
 }
