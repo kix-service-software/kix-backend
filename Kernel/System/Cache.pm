@@ -1,7 +1,7 @@
 # --
 # Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 KIX AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -25,7 +25,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Cache - Key/value based data cache for OTRS
+Kernel::System::Cache - Key/value based data cache for KIX
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,7 @@ store a value in the cache.
     );
 
 The Type here refers to the group of entries that should be cached and cleaned up together,
-usually this will represent the OTRS object that is supposed to be cached, like 'Ticket'.
+usually this will represent the KIX object that is supposed to be cached, like 'Ticket'.
 
 The Key identifies the entry (together with the type) for retrieval and deletion of this value.
 
@@ -181,8 +181,10 @@ sub Set {
             );
         }
         foreach my $Type (@{$Param{Depends}}) {
-            $Self->_Debug('', "adding cache key to depending cache type \"$Type\": $Param{Key}");
-            $Self->{TypeDependencies}->{$Type}->{$Param{Type}}->{$Param{Key}} = 1;
+            if ( !exists $Self->{TypeDependencies}->{$Type} || !exists $Self->{TypeDependencies}->{$Type}->{$Param{Type}} ) {
+                $Self->_Debug('', "adding dependent cache type \"$Param{Type}\" to cache type \"$Type\".");
+                $Self->{TypeDependencies}->{$Type}->{$Param{Type}} = 1;
+            }
         }
     }
 
@@ -560,35 +562,22 @@ sub _HandleDependingCacheTypes {
         );
     }
 
-    if ( $Self->{TypeDependencies} && exists $Self->{TypeDependencies}->{$Param{Type}} ) {
+    if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
         $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
-        
-        foreach my $DependendType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
-            $Self->_Debug($Param{Indent}, "    deleting ".(scalar (keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}}))." key(s) in depending cache type \"$DependendType\"");
-            
-            foreach my $Key ( keys %{$Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}} ) {
-                $Self->_Debug($Param{Indent}, "        deleting key: $Key");
-                # remove key entry to make sure we don't end up in a recursive loop
-                delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}->{$Key};
-                $Self->Delete(
-                    Type => $DependendType,
-                    Key  => $Key,
-                    Indent => $Param{Indent}.'    ',
-                );
-            }
 
-            if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}->{$DependendType}) ) {
-                $Self->_Debug($Param{Indent}, "        no keys left in dependend type \"$DependendType\", deleting entry");
-                # delete whole dependend type if all keys are deleted
-                delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependendType};
-            }
+        foreach my $DependentType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
+            $Self->_Debug($Param{Indent}, "    cleaning up depending cache type \"$DependentType\"");
+            delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependentType};
 
-        }
-
-        if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
-            $Self->_Debug($Param{Indent}, "        no dependencies left for type $Param{Type}, deleting entry");
             # delete whole type if all keys are deleted
-            delete $Self->{TypeDependencies}->{$Param{Type}};
+            if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
+                $Self->_Debug($Param{Indent}, "        no dependencies left for type $Param{Type}, deleting entry");
+                delete $Self->{TypeDependencies}->{$Param{Type}};
+            }
+
+            $Self->CleanUp(
+                Type => $DependentType,
+            );
         }
 
         # Set persistent cache
