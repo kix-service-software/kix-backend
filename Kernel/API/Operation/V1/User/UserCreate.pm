@@ -191,8 +191,8 @@ sub Run {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserPreferenceCreate',
                 Data          => {
-                    UserID     => $UserID,
-                    Preference => $Pref
+                    UserID         => $UserID,
+                    UserPreference => $Pref
                 }
             );
             
