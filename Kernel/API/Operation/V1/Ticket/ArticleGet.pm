@@ -196,7 +196,7 @@ sub Run {
     my @ArticleList;
 
     # start loop
-    for my $ArticleID ( sort @{$Param{Data}->{ArticleID}} ) {
+    for my $ArticleID ( @{$Param{Data}->{ArticleID}} ) {
 
         my %ArticleRaw = $TicketObject->ArticleGet(
             ArticleID          => $ArticleID,
