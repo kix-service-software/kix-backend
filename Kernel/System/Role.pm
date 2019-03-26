@@ -156,7 +156,7 @@ sub RoleGet {
         %Role = (
             ID         => $Row[0],
             Name       => $Row[1],
-            Commment   => $Row[2],
+            Comment    => $Row[2],
             ValidID    => $Row[3],
             CreateTime => $Row[4],
             CreateBy   => $Row[5],
