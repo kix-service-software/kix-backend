@@ -282,7 +282,7 @@ my %UserSearch = $UserObject->UserSearch(
 $Self->Is(
     $UserSearch{$UserID},
     $UserRand . '房治郎',
-    "UserSearch after update",
+    "UserSearch(Search) after update",
 );
 
 %UserSearch = $UserObject->UserSearch(
@@ -293,7 +293,7 @@ $Self->Is(
 $Self->Is(
     $UserSearch{$UserID},
     $UserRand . '房治郎',
-    "UserSearch for login after update",
+    "UserSearch(Search) for login after update",
 );
 
 %UserSearch = $UserObject->UserSearch(
@@ -304,7 +304,7 @@ $Self->Is(
 $Self->Is(
     $UserSearch{$UserID},
     $UserRand . '@example2.com',
-    "UserSearch for login after update",
+    "UserSearch(PostMasterSearch) after update",
 );
 
 # check token support

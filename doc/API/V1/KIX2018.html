@@ -12310,8 +12310,27 @@ pre code {
                   "$ref" : "#/definitions/UserPreference"
                }
             },
+            "RoleIDs" : {
+               "description" : "added via include \"RoleIDs\"",
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "UserComment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
             "UserEmail" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFirstname" : {
                "type" : "string",
@@ -12331,6 +12350,28 @@ pre code {
             },
             "UserLogin" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "UserMobile" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "UserPhone" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "UserTitle" : {
@@ -12376,17 +12417,20 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "User": { 
+    "User": {
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
+        "UserComment": "",
         "UserEmail": "john.doe@example.com",
         "UserFirstname": "John",
         "UserFullname": "John Doe",
         "UserID": 3,
         "UserLastname": "Doe",
         "UserLogin": "jdoe",
+        "UserMobile": "1234567",
+        "UserPhone": "13568",
         "UserTitle": "Dr.",
         "ValidID": 1
     }
@@ -12534,8 +12578,27 @@ pre code {
                   "$ref" : "#/definitions/UserPreference"
                }
             },
+            "RoleIDs" : {
+               "description" : "added via include \"RoleIDs\"",
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "UserComment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
             "UserEmail" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFirstname" : {
                "type" : "string",
@@ -12555,6 +12618,28 @@ pre code {
             },
             "UserLogin" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "UserMobile" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "UserPhone" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "UserTitle" : {
@@ -12601,33 +12686,39 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "User": [
-        { 
+        {
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
             "CreateBy": 1,
             "CreateTime": "2018-08-28 11:34:55",
+            "UserComment": "some comment",
             "UserEmail": "john.doe@example.com",
             "UserFirstname": "John",
             "UserFullname": "John Doe",
             "UserID": 3,
             "UserLastname": "Doe",
             "UserLogin": "jdoe",
+            "UserMobile": "98765432",
+            "UserPhone": "1234567",
             "UserTitle": "Dr.",
             "ValidID": 1
         },
-        { 
+        {
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
             "CreateBy": 1,
             "CreateTime": "2018-10-28 08:10:01",
+            "UserComment": "",
             "UserEmail": "max.mustermann@example.com",
             "UserFirstname": "Max",
             "UserFullname": "Max Mustermann",
             "UserID": 4,
             "UserLastname": "Mustermann",
             "UserLogin": "mamu",
+            "UserMobile": "123456",
+            "UserPhone": "",
             "ValidID": 1
-        }        
+        }
     ]
 }</code></pre></div></div><h2 class="response-title" id="users_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
@@ -12673,6 +12764,9 @@ pre code {
                   "type" : "integer"
                }
             },
+            "UserComment" : {
+               "type" : "string"
+            },
             "UserEmail" : {
                "type" : "string"
             },
@@ -12683,6 +12777,12 @@ pre code {
                "type" : "string"
             },
             "UserLogin" : {
+               "type" : "string"
+            },
+            "UserMobile" : {
+               "type" : "string"
+            },
+            "UserPhone" : {
                "type" : "string"
             },
             "UserPw" : {
@@ -12828,8 +12928,27 @@ pre code {
                   "$ref" : "#/definitions/UserPreference"
                }
             },
+            "RoleIDs" : {
+               "description" : "added via include \"RoleIDs\"",
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "UserComment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
             "UserEmail" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true
             },
             "UserFirstname" : {
                "type" : "string",
@@ -12849,6 +12968,28 @@ pre code {
             },
             "UserLogin" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "UserMobile" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "UserPhone" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "UserTitle" : {
@@ -12894,17 +13035,20 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "User": { 
+    "User": {
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
+        "UserComment": "",
         "UserEmail": "john.doe@example.com",
         "UserFirstname": "John",
         "UserFullname": "John Doe",
         "UserID": 3,
         "UserLastname": "Doe",
         "UserLogin": "jdoe",
+        "UserMobile": "1234567",
+        "UserPhone": "13568",
         "UserTitle": "Dr.",
         "ValidID": 1
     }
@@ -12940,6 +13084,9 @@ pre code {
       "User" : {
          "type" : "object",
          "properties" : {
+            "UserComment" : {
+               "type" : "string"
+            },
             "UserEmail" : {
                "type" : "string"
             },
@@ -12950,6 +13097,12 @@ pre code {
                "type" : "string"
             },
             "UserLogin" : {
+               "type" : "string"
+            },
+            "UserMobile" : {
+               "type" : "string"
+            },
+            "UserPhone" : {
                "type" : "string"
             },
             "UserPw" : {

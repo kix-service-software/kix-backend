@@ -169,8 +169,8 @@ sub GetUserData {
     # get initial data
     my @Bind;
     my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, "
-        . " title, first_name, last_name, $Self->{UserTableUserPW}, valid_id, "
-        . " create_time, change_time FROM $Self->{UserTable} WHERE ";
+        . " title, first_name, last_name, $Self->{UserTableUserPW}, email, phone, mobile, "
+        . " comments, valid_id, create_time, change_time FROM $Self->{UserTable} WHERE ";
 
     if ( $Param{User} ) {
         my $User = lc $Param{User};
@@ -199,9 +199,13 @@ sub GetUserData {
         $Data{UserFirstname} = $Row[3];
         $Data{UserLastname}  = $Row[4];
         $Data{UserPw}        = $Row[5];
-        $Data{ValidID}       = $Row[6];
-        $Data{CreateTime}    = $Row[7];
-        $Data{ChangeTime}    = $Row[8];
+        $Data{UserEmail}     = $Row[6];
+        $Data{UserPhone}     = $Row[7];
+        $Data{UserMobile}    = $Row[8];
+        $Data{UserComment}   = $Row[9];
+        $Data{ValidID}       = $Row[10];
+        $Data{CreateTime}    = $Row[11];
+        $Data{ChangeTime}    = $Row[12];
     }
 
     # check data
@@ -305,11 +309,6 @@ sub GetUserData {
             );
         }
 
-        # check compat stuff
-        if ( !$Preferences{UserEmail} ) {
-            $Preferences{UserEmail} = $Data{UserLogin};
-        }
-
         # add preferences defaults
         my $Config = $ConfigObject->Get('PreferencesGroups');
         if ( $Config && ref $Config eq 'HASH' ) {
@@ -350,9 +349,11 @@ to add new users
         UserFirstname => 'Huber',
         UserLastname  => 'Manfred',
         UserLogin     => 'mhuber',
-        UserPw        => 'some-pass', # not required
+        UserPw        => 'some-pass',           # optional
         UserEmail     => 'email@example.com',
-        UserMobile    => '1234567890', # not required
+        UserPhone     => '1234567890',          # optional
+        UserMobile    => '1234567890',          # optional
+        UserComment   => 'some comment',        # optional
         ValidID       => 1,
         ChangeUserID  => 123,
     );
@@ -411,14 +412,15 @@ sub UserAdd {
     # sql
     return if !$DBObject->Do(
         SQL => "INSERT INTO $Self->{UserTable} "
-            . "(title, first_name, last_name, "
+            . "(title, first_name, last_name, email, phone, mobile, "
             . " $Self->{UserTableUser}, $Self->{UserTableUserPW}, "
-            . " valid_id, create_time, create_by, change_time, change_by)"
+            . " comments, valid_id, create_time, create_by, change_time, change_by)"
             . " VALUES "
-            . " (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
+            . " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
         Bind => [
             \$Param{UserTitle}, \$Param{UserFirstname}, \$Param{UserLastname},
-            \$Param{UserLogin}, \$RandomPassword, \$Param{ValidID},
+            \$Param{UserEmail}, \$Param{UserPhone}, \$Param{UserMobile}, 
+            \$Param{UserLogin}, \$RandomPassword, \$Param{UserComment}, \$Param{ValidID},
             \$Param{ChangeUserID}, \$Param{ChangeUserID},
         ],
     );
@@ -460,20 +462,6 @@ sub UserAdd {
         PW        => $Param{UserPw}
     );
 
-    # set email address
-    $Self->SetPreferences(
-        UserID => $UserID,
-        Key    => 'UserEmail',
-        Value  => $Param{UserEmail}
-    );
-
-    # set mobile phone
-    $Self->SetPreferences(
-        UserID => $UserID,
-        Key    => 'UserMobile',
-        Value  => $Param{UserMobile} || '',
-    );
-
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -491,9 +479,11 @@ to update users
         UserFirstname => 'Huber',
         UserLastname  => 'Manfred',
         UserLogin     => 'mhuber',
-        UserPw        => 'some-pass', # not required
+        UserPw        => 'some-pass',           # optional
         UserEmail     => 'email@example.com',
-        UserMobile    => '1234567890', # not required
+        UserPhone     => '1234567890',          # optional
+        UserMobile    => '1234567890',          # optional
+        UserComment   => 'some comment',        # optional
         ValidID       => 1,
         ChangeUserID  => 123,
     );
@@ -504,22 +494,10 @@ sub UserUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    # KIX4OTRS-capeIT
-    my @FixUserStuffArray =
-        qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID);
-    my %FixUserStuffHash = ();
+    for (qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID)) {
 
-    # for (qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID)) {
-    for my $FixUserStuff (@FixUserStuffArray) {
-        $FixUserStuffHash{$FixUserStuff} = 1;
-
-       # if ( !$Param{$_} ) {
-       # $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
-        if ( !$Param{$FixUserStuff} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
-                ->Log( Priority => 'error', Message => "Need $FixUserStuff!" );
-
-            # EO KIX4OTRS-capeIT
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -560,13 +538,15 @@ sub UserUpdate {
 
     # update db
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => "UPDATE $Self->{UserTable} SET title = ?, first_name = ?, last_name = ?, "
-            . " $Self->{UserTableUser} = ?, valid_id = ?, "
+        SQL => "UPDATE $Self->{UserTable} SET title = ?, first_name = ?, last_name = ?, email = ?, phone = ?, mobile = ?, "
+            . " $Self->{UserTableUser} = ?, comments = ?, valid_id = ?, "
             . " change_time = current_timestamp, change_by = ? "
             . " WHERE $Self->{UserTableUserID} = ?",
         Bind => [
             \$Param{UserTitle}, \$Param{UserFirstname}, \$Param{UserLastname},
-            \$Param{UserLogin}, \$Param{ValidID}, \$Param{ChangeUserID}, \$Param{UserID},
+            \$Param{UserEmail}, \$Param{UserPhone}, \$Param{UserMobile},
+            \$Param{UserLogin}, \$Param{UserComment}, \$Param{ValidID}, 
+            \$Param{ChangeUserID}, \$Param{UserID},
         ],
     );
 
@@ -576,43 +556,7 @@ sub UserUpdate {
             UserLogin => $Param{UserLogin},
             PW        => $Param{UserPw}
         );
-
-        # KIX4OTRS-capeIT
-        $FixUserStuffHash{UserPw} = 1;
-
-        # EO KIX4OTRS-capeIT
     }
-
-    # KIX4OTRS-capeIT
-    # set email address
-    # $Self->SetPreferences(
-    #     UserID => $Param{UserID},
-    #     Key    => 'UserEmail',
-    #     Value  => $Param{UserEmail}
-    # );
-    foreach my $ParamKey ( keys %Param ) {
-        if (
-            ( $ParamKey =~ /^User/ )
-            &&
-            ( !$FixUserStuffHash{$ParamKey} )
-            )
-        {
-            $Self->SetPreferences(
-                UserID => $Param{UserID},
-                Key    => $ParamKey,
-                Value  => $Param{$ParamKey}
-            );
-        }
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # set email address
-    $Self->SetPreferences(
-        UserID => $Param{UserID},
-        Key    => 'UserMobile',
-        Value  => $Param{UserMobile} || '',
-    );
 
     # update search profiles if the UserLogin changed
     if ( lc $OldUserLogin ne lc $Param{UserLogin} ) {
@@ -623,28 +567,9 @@ sub UserUpdate {
         );
     }
 
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
     # delete cache
-    $CacheObject->CleanUp(
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-    );
-
-    # TODO Not needed to delete the cache if ValidID or Name was not changed
-
-    my $SystemPermissionConfig = $Kernel::OM->Get('Kernel::Config')->Get('System::Permission') || [];
-
-    for my $Type ( @{$SystemPermissionConfig}, 'rw' ) {
-
-        $CacheObject->Delete(
-            Type => 'GroupPermissionUserGet',
-            Key  => 'PermissionUserGet::' . $Param{UserID} . '::' . $Type,
-        );
-    }
-
-    $CacheObject->CleanUp(
-        Type => 'GroupPermissionGroupGet',
     );
 
     return 1;
@@ -702,6 +627,15 @@ sub UserSearch {
         return;
     }
 
+    my $CacheKey = 'UserSearch::'.($Param{Search} || '').'::'.($Param{PostMasterSearch} || '').'::'.($Param{Userlogin} || '').'::'.($Param{Valid} || '').'::'.($Param{Limit} || '');
+
+    # check cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -709,14 +643,13 @@ sub UserSearch {
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string
-    my $SQL = "SELECT $Self->{UserTableUserID}, login
-                   FROM $Self->{UserTable} WHERE ";
+    my $SQL = "SELECT $Self->{UserTableUserID}, login FROM $Self->{UserTable} WHERE ";
     my @Bind;
 
     if ( $Param{Search} ) {
 
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(login first_name last_name)],
+            Key      => [qw(login first_name last_name email phone mobile)],
             Value    => $Param{Search},
             BindMode => 1,
         );
@@ -725,18 +658,25 @@ sub UserSearch {
     }
     elsif ( $Param{PostMasterSearch} ) {
 
-        my %UserID = $Self->SearchPreferences(
-            Key   => 'UserEmail',
-            Value => $Param{PostMasterSearch},
+        return if !$DBObject->Prepare(
+            SQL   => $SQL. ' email = ?',
+            Bind  => [ \$Param{PostMasterSearch} ],
         );
 
-        for ( sort keys %UserID ) {
+        # fetch the result
+        my %UserList;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $UserList{ $Row[0] } = $Row[1];
+        }
+
+        foreach my $UserID ( sort keys %UserList ) {
             my %User = $Self->GetUserData(
-                UserID => $_,
+                UserID => $UserID,
                 Valid  => $Param{Valid},
             );
             if (%User) {
-                return %UserID;
+                $UserList{$UserID} = $User{UserEmail};
+                return %UserList;
             }
         }
 
@@ -752,8 +692,7 @@ sub UserSearch {
 
     # add valid option
     if ($Valid) {
-        $SQL .= "AND valid_id IN ("
-            . join( ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet() ) . ")";
+        $SQL .= "AND valid_id IN (" . join( ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet() ) . ")";
     }
 
     # get data
@@ -767,6 +706,14 @@ sub UserSearch {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Users{ $Row[0] } = $Row[1];
     }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Users,
+    );
 
     return %Users;
 }
