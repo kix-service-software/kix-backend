@@ -32,6 +32,7 @@
         <Data Key="first_name" Type="Quote">Admin</Data>
         <Data Key="last_name" Type="Quote">KIX</Data>
         <Data Key="login" Type="Quote">root@localhost</Data>
+        <Data Key="email" Type="Quote">root@localhost</Data>
         <Data Key="pw" Type="Quote">roK20XGbWEsSM</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
