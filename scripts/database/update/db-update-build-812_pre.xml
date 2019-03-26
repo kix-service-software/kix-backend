@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="users">
+        <ColumnAdd Name="email" Required="true" Size="255" Type="VARCHAR"/>
+        <ColumnAdd Name="phone" Required="false" Size="150" Type="VARCHAR"/>
+        <ColumnAdd Name="mobile" Required="false" Size="150" Type="VARCHAR"/>
+        <ColumnAdd Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>

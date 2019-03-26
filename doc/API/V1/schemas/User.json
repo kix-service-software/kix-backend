@@ -27,8 +27,27 @@
             "$ref" : "#/definitions/UserPreference"
          }
       },
+      "RoleIDs" : {
+         "description" : "added via include \"RoleIDs\"",
+         "type" : "array",
+         "item" : {
+            "type" : "integer"
+         }
+      },
+      "UserComment" : {
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
       "UserEmail" : {
-         "type" : "string"
+         "type" : "string",
+         "readOnly" : true
       },
       "UserFirstname" : {
          "type" : "string",
@@ -48,6 +67,28 @@
       },
       "UserLogin" : {
          "type" : "string",
+         "readOnly" : true
+      },
+      "UserMobile" : {
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
+      "UserPhone" : {
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "null"
+            }
+         ],
          "readOnly" : true
       },
       "UserTitle" : {

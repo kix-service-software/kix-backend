@@ -7,6 +7,9 @@
       "User" : {
          "type" : "object",
          "properties" : {
+            "UserComment" : {
+               "type" : "string"
+            },
             "UserEmail" : {
                "type" : "string"
             },
@@ -17,6 +20,12 @@
                "type" : "string"
             },
             "UserLogin" : {
+               "type" : "string"
+            },
+            "UserMobile" : {
+               "type" : "string"
+            },
+            "UserPhone" : {
                "type" : "string"
             },
             "UserPw" : {

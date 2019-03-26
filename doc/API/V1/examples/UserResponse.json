@@ -1,15 +1,18 @@
 {
-    "User": { 
+    "User": {
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
+        "UserComment": "",
         "UserEmail": "john.doe@example.com",
         "UserFirstname": "John",
         "UserFullname": "John Doe",
         "UserID": 3,
         "UserLastname": "Doe",
         "UserLogin": "jdoe",
+        "UserMobile": "1234567",
+        "UserPhone": "13568",
         "UserTitle": "Dr.",
         "ValidID": 1
     }
