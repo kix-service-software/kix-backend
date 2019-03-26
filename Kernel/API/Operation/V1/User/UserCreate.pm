@@ -185,7 +185,7 @@ sub Run {
     }
 
     # add preferences
-    if ( IsHashRefWithData($User->{Preferences}) ) {
+    if ( IsArrayRefWithData($User->{Preferences}) ) {
 
         foreach my $Pref ( @{$User->{Preferences}} ) {
             my $Result = $Self->ExecOperation(
@@ -204,8 +204,8 @@ sub Run {
         }
     }
 
-    # create roles
-    if ( IsHashRefWithData($User->{RoleIDs}) ) {
+    # assign roles
+    if ( IsArrayRefWithData($User->{RoleIDs}) ) {
 
         foreach my $RoleID ( @{$User->{RoleIDs}} ) {
             my $Result = $Self->ExecOperation(
