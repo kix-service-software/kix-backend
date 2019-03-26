@@ -5265,7 +5265,7 @@ DefaultValue: ''
               },
               CountMin     => 0,
               CountMax     => 10,
-              CountDefault => 1,
+              CountDefault => 0,
               Sub          => [
                   {
                       Key   => 'IPoverDHCP',
@@ -5324,7 +5324,6 @@ DefaultValue: ''
             {
                 Key        => 'SerialNumber',
                 Name       => 'Serial Number',
-                Name       => 'Seriennummer',
                 Searchable => 1,
                 Input      => {
                     Type      => 'Text',
@@ -5437,7 +5436,7 @@ DefaultValue: ''
 
     {
         Key   => 'SectionWarranty',
-        Name  => 'Garantie Informationen',
+        Name  => 'Warranty Information',
         Input => {
             Type => 'Dummy',
         },
@@ -5474,8 +5473,7 @@ DefaultValue: ''
 <!-- CI class Hardware -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">23</Data>
-        <Data Key="configitem_definition" Type="Quote">
-[
+        <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
         Name  => 'General Information',
@@ -9264,6 +9262,3 @@ Zz4KPC9zdmc+
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 </database>
-
-
-
