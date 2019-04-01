@@ -89,7 +89,8 @@ sub Run {
 
     # perform user search
     my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
-        Type => 'Short',
+        Type  => 'Short',
+        Valid => 0,
     );
 
     if (IsHashRefWithData(\%UserList)) {

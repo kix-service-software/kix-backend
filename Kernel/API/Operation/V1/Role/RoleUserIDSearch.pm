@@ -115,12 +115,12 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform RoleUser search
-    my %UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+    my @UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
         RoleID => $Param{Data}->{RoleID},
     );
 
     my @ResultList;
-    foreach my $UserID ( sort keys %UserList ) {
+    foreach my $UserID ( sort @UserList ) {
         push(@ResultList, 0 + $UserID);     # enforce nummeric ID
     }
     if ( IsArrayRefWithData(\@ResultList) ) {
