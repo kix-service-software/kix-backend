@@ -1867,18 +1867,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission###3-GroupCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to check the group permissions for the access to tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Permission::GroupCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-                </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::Permission###4-WatcherCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to grant access to the watcher agents of a ticket.</Description>
         <Group>Ticket</Group>
@@ -1936,18 +1924,6 @@
                 <Item Key="Postmaster">ro, move, note</Item>
                 <Item Key="Raw">rw</Item>
                 <Item Key="Misc">note</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerTicket::Permission###1-GroupCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to check the group permissions for customer access to tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::CustomerPermission::GroupCheck</Item>
-                <Item Key="Required">1</Item>
-                <Item Key="Granted">0</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -108,7 +108,6 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 ParentID            => 123,
                 Comment             => '...',     # (optional)
                 ValidID             => '...',     # (optional)              
-                GroupID             => '...',
                 Calendar            => '...',     # (optional)
                 FirstResponseTime   => '...',     # (optional)
                 FirstResponseNotify => '...',     # (optional, notify agent if first response escalation is 60% reached)
@@ -190,7 +189,6 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueUpdate(    
         QueueID             => $Param{Data}->{QueueID},
         Name                => $Queue->{Name} || $QueueData{Name},
-        GroupID             => $Queue->{GroupID} || $QueueData{GroupID},
         Calendar            => $Queue->{Calendar} || $QueueData{Calendar},
         FirstResponseTime   => $Queue->{FirstResponseTime} || $QueueData{FirstResponseTime},
         FirstResponseNotify => $Queue->{FirstResponseNotify} || $QueueData{FirstResponseNotify},

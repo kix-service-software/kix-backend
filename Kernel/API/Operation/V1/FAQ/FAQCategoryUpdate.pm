@@ -104,9 +104,6 @@ perform FAQCategoryUpdate Operation. This will return the updated TypeID.
                 Comment  => 'Some comment', # optional
                 ParentID => 2,              # optional
                 ValidID  => 1,              # optional
-                GroupIDs => [               # optional
-                    1,2,3,...
-                ]
             },
         },
     );
@@ -171,22 +168,6 @@ sub Run {
         return $Self->_Error(
             Code => 'Object.UnableToUpdate',
         );
-    }
-
-    # set groups
-    if ( IsArrayRefWithData($FAQCategory->{GroupIDs}) ) {
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
-            CategoryID => $Param{Data}->{FAQCategoryID},
-            GroupIDs   => $FAQCategory->{GroupIDs},
-            UserID     => $Self->{Authorization}->{UserID},
-        );
-
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToCreate',
-                Message => 'Could not create group assignment, please contact the system administrator',
-            );
-        }
     }
 
     # return result    

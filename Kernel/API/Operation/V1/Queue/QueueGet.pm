@@ -133,7 +133,6 @@ one or more ticket entries in one call.
                     "Comment": "...",
                     "ParentID": ...,
                     "DefaultSignKey": ...,
-                    "GroupID": ...,
                     "SolutionTime": ...,
                     "FollowUpID": ...,
                     "Name": "...",
