@@ -4951,8 +4951,7 @@ DefaultValue: ''
 <!-- CI class Computer -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">22</Data>
-        <Data Key="configitem_definition" Type="Quote">
-[
+        <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
         Name  => 'General Information',
@@ -5572,7 +5571,7 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
-<!-- CI class Standort -->
+<!-- CI class Location -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">24</Data>
         <Data Key="configitem_definition" Type="Quote">[
@@ -5724,7 +5723,7 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
-<!-- CI class Haus -->
+<!-- CI class Building -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">25</Data>
         <Data Key="configitem_definition" Type="Quote">[
@@ -5896,7 +5895,7 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
-<!-- CI class Raum -->
+<!-- CI class Room -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">26</Data>
         <Data Key="configitem_definition" Type="Quote">[
@@ -6019,7 +6018,7 @@ DefaultValue: ''
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
     </Insert>
-<!-- CI class Netzwerk -->
+<!-- CI class Network -->
     <Insert Table="configitem_definition">
         <Data Key="class_id">27</Data>
         <Data Key="configitem_definition" Type="Quote">[
