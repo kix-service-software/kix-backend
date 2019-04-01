@@ -145,25 +145,10 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        # customers are not allowed to update articles
-        return $Self->_Error(
-            Code    => 'Forbidden'
-        );        
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
+    # isolate and trim Article parameter
+    my $Article = $Self->_Trim(
+        Data => $Param{Data}->{Article}
     );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Forbidden'
-        );
-    }
 
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
@@ -191,7 +176,7 @@ sub Run {
     return $Self->_ArticleUpdate(
         TicketID  => $Param{Data}->{TicketID},
         ArticleID => $Param{Data}->{ArticleID},
-        Article   => $Param{Data}->{Article},
+        Article   => $Article,
         UserID    => $Self->{Authorization}->{UserID},
     );
 }

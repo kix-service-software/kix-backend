@@ -132,20 +132,6 @@ sub Run {
         );
     }
 
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermission(
-        ConfigItem => $ConfigItem,
-        UserID     => $Self->{Authorization}->{UserID},
-        UserType   => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to update ConfigItems for this class!",
-        );
-    }
-
     # isolate and trim ConfigItem parameter
     my $ConfigItem = $Self->_Trim(
         Data => $Param{Data}->{ConfigItem}

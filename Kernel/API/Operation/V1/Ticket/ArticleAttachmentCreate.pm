@@ -135,24 +135,10 @@ perform ArticleAttachmentCreate Operation. This will return the created Attachme
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
+    # isolate and trim Attachment parameter
+    my $Attachment = $Self->_Trim(
+        Data => $Param{Data}->{Attachment}
     );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create attachment for ticket $Param{Data}->{TicketID}!",
-        );
-    }
 
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -190,7 +176,7 @@ sub Run {
     
     # check attachment values
     my $AttachmentCheck = $Self->_CheckAttachment( 
-        Attachment => $Param{Data}->{Attachment} 
+        Attachment => $Attachment 
     );
 
     if ( !$AttachmentCheck->{Success} ) {
@@ -201,10 +187,10 @@ sub Run {
 
     # create the new attachment
     my $AttachmentID = $TicketObject->ArticleWriteAttachment(
-        %{$Param{Data}->{Attachment}},
-        Content    => MIME::Base64::decode_base64( $Param{Data}->{Attachment}->{Content} ),
+        %{$Attachment},
+        Content    => MIME::Base64::decode_base64( $Attachment->{Content} ),
         ArticleID  => $Param{Data}->{ArticleID},
-        UserID     => $PermissionUserID,
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$AttachmentID ) {

@@ -176,7 +176,7 @@ sub Options {
             my $Object = $Self->{OperationConfig}->{$Type.'Object'};
             if ( $Object ) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                    Location => "$SchemaLocation/$Object.json",
+                    Location => "$SchemaLocation/$Object.json",                    
                 );
                 if ( $Content ) {
                     $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(

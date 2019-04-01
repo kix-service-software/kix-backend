@@ -1334,7 +1334,7 @@ sub CheckPermission {
     }
 
     # UserID 1 has God Mode ;)
-    return 1 if $Param{UserID} == 1;
+    return 1 if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
 
     my %PermissionList = $Self->PermissionList(
         UserID => $Param{UserID},
@@ -1343,7 +1343,7 @@ sub CheckPermission {
 
     my $Result = 0;
     my %RelevantPermissions;
-    my $SpecificPermission;
+    my %SpecificPermissions;
     foreach my $ID ( sort keys %PermissionList ) {
         my $Permission = $PermissionList{$ID};
 
@@ -1363,23 +1363,50 @@ sub CheckPermission {
         # check for a specific match
         next if $Param{Target} !~ /^$Target$/;
 
-        $SpecificPermission = $Permission;
+        # we found a specific permission for this request 
+        $SpecificPermissions{$PermissionType{Name}}->{$ID} = $Permission;
     }
 
     $Self->_PermissionDebug("relevant permissions: ".Dumper(\%RelevantPermissions));
 
     # sum up all the relevant permissions
     my $ResultingPermission = 0;
+    TYPE_RELEVANT:
     foreach my $Type ( qw(Resource Object) ) {
+        PERMISSION_RELEVANT:
         foreach my $ID ( sort { length($RelevantPermissions{$Type}->{$a}->{Target}) <=> length($RelevantPermissions{$Type}->{$b}->{Target}) } keys %{$RelevantPermissions{$Type}} ) {            
-            $ResultingPermission |= $RelevantPermissions{$Type}->{$ID}->{Value};
+            my $Permission = $RelevantPermissions{$Type}->{$ID};
+            $ResultingPermission |= $Permission->{Value};
+            if ( ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                last TYPE_RELEVANT;
+            }
         }
     }
 
-    # we have our sum of all relevant permissions, now look if we have a specific match
-    if ( IsHashRefWithData($SpecificPermission) ) {
-        $Self->_PermissionDebug("specific permission found: ".Dumper($SpecificPermission));
-        $ResultingPermission &= $SpecificPermission->{Value};
+    # check if we have a DENY already
+    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    # we have our sum of all relevant permissions, now look if we have specific permissions
+    if ( %SpecificPermissions ) {
+        $Self->_PermissionDebug("specific permissions found: ".Dumper(\%SpecificPermissions));
+        my $ResultingSpecificPermission = 0;
+        # sum up all the specific permissions
+        TYPE_SPECIFIC:
+        foreach my $Type ( qw(Resource Object) ) {
+            PERMISSION_SPECIFIC:
+            foreach my $ID ( sort { length($SpecificPermissions{$Type}->{$a}->{Target}) <=> length($SpecificPermissions{$Type}->{$b}->{Target}) } keys %{$SpecificPermissions{$Type}} ) {            
+                my $Permission = $RelevantPermissions{$Type}->{$ID};
+                $ResultingSpecificPermission |= $Permission->{Value};
+                if ( ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                    $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                    last TYPE_SPECIFIC;
+                }
+            }
+        }
+
+        # now calculate the result
+        $ResultingPermission &= $ResultingSpecificPermission;
     }
 
     my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(

@@ -304,23 +304,6 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check ticket permission
-    TICKET:
-    for my $TicketID ( @{$Param{Data}->{TicketID}} ) {
-
-        my $Permission = $Self->CheckAccessPermission(
-            TicketID => $TicketID,
-            UserID   => $Self->{Authorization}->{UserID},
-            UserType => $Self->{Authorization}->{UserType},
-        );
-
-        next TICKET if $Permission;
-
-        return $Self->_Error(
-            Code => 'Object.NoPermission',
-        );
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -388,31 +371,6 @@ sub Run {
         }
         else {
             $TicketData{DynamicFields} = [];
-        }
-
-        # include articles if requested
-        if ( $Param{Data}->{include}->{Articles} ) {
-            my @ArticleIndex = $TicketObject->ArticleIndex(
-                TicketID        => $TicketID,
-                CustomerVisible => $Self->{Authorization}->{UserType} eq 'Customer' ? 1 : 0,
-                UserID          => $Self->{Authorization}->{UserID},
-            );
-
-            $TicketData{Articles} = \@ArticleIndex;
-        }
-
-        # include history if requested
-        if ( $Param{Data}->{include}->{History} ) {
-            my @HistoryItems = $TicketObject->HistoryGet(
-                TicketID   => $TicketID,
-                UserID     => $Self->{Authorization}->{UserID},
-            );
-
-            my @HistoryIDs;
-            foreach my $HistoryItem ( @HistoryItems ) {
-                push(@HistoryIDs, $HistoryItem->{HistoryID});
-            }
-            $TicketData{History} = \@HistoryIDs;
         }
 
         # include TimeUnits if requested

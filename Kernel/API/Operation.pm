@@ -303,9 +303,6 @@ sub _CheckOperationPermission {
         return;
     }
 
-    # OPTIONS requests are always possible
-    return 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
-
     # check if user has permission for this request
     my ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
         UserID              => $Param{Authorization}->{UserID},
@@ -323,6 +320,9 @@ sub _CheckOperationPermission {
             push(@AllowedMethods, $ReversePermissionMapping{$Perm});
         }
     }
+
+    # OPTIONS requests are always possible
+    $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
     return ($Granted, @AllowedMethods);
 }

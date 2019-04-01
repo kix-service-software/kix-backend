@@ -114,25 +114,6 @@ perform TicketDelete Operation. This will return the deleted TicketID. The ticke
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check delete permission
-    my $Permission = $Self->CheckDeletePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $PermissionUserID,
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to delete ticket $Param{Data}->{TicketID}.",
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # unlock the ticket

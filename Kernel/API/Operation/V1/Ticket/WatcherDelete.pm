@@ -114,20 +114,6 @@ perform WatcherDelete Operation. This will return the deleted WatcherUserID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check delete permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to delete Watcher.",
-        );
-    }
-
     # check if Watcher exists
     my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
         TicketID => $Param{Data}->{TicketID},

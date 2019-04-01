@@ -176,25 +176,6 @@ perform ArticleCreate Operation. This will return the created ArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create article for ticket $Param{Data}->{TicketID}!",
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # get ticket data
@@ -208,8 +189,10 @@ sub Run {
         );
     }
 
-    # isolate Article parameter
-    my $Article = $Param{Data}->{Article};
+    # isolate and trim Article parameter
+    my $Article = $Self->_Trim(
+        Data => $Param{Data}->{Article}
+    );
 
     # add UserType
     $Article->{UserType} = $Self->{Authorization}->{UserType};
@@ -246,7 +229,7 @@ sub Run {
     return $Self->_ArticleCreate(
         Ticket   => \%Ticket,
         Article  => $Article,
-        UserID   => $PermissionUserID,
+        UserID   => $Self->{Authorization}->{UserID},
     );
 }
 

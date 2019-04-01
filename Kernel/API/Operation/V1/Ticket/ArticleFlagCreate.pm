@@ -131,26 +131,6 @@ perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        # customers are not allowed to update articles
-        return $Self->_Error(
-            Code => 'Forbidden'
-        );        
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code => 'Forbidden'
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Article = $TicketObject->ArticleGet(

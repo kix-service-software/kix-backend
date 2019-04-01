@@ -197,27 +197,10 @@ perform TicketCreate Operation. This will return the created TicketID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # isolate ticket hash
-    my $Ticket = $Param{Data}->{Ticket};
-
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermission(
-        Ticket   => $Ticket,
-        UserID   => $PermissionUserID,
-        UserType => $Self->{Authorization}->{UserType},
+    # isolate and trim Ticket parameter
+    my $Ticket = $Self->_Trim(
+        Data => $Param{Data}->{Ticket}
     );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create tickets in given queue!",
-        );
-    }
 
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket( 
@@ -233,7 +216,7 @@ sub Run {
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
         Ticket => $Ticket,
-        UserID => $PermissionUserID,
+        UserID => $Self->{Authorization}->{UserID},
     );
 }
 

@@ -119,23 +119,9 @@ perform WatcherCreate Operation. This will return the created WatcherItemID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to add Watchers!",
-        );
-    }
-
-    # isolate and trim WatcherItem parameter
+    # isolate and trim Watcher parameter
     my $Watcher = $Self->_Trim(
-        Data => $Param{Data}->{Watcher},
+        Data => $Param{Data}->{Watcher}
     );
 
     # check if Watcher exists
