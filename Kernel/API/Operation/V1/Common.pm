@@ -1812,7 +1812,7 @@ sub _GetCacheKey {
 
     # sort some things to make sure you always get the same cache key independent of the given order 
     foreach my $What (@CacheKeyParts) {
-        next if !$RequestData{$What};
+        next if !$What || !$RequestData{$What};
 
         my @Parts = split(/,/, $RequestData{$What});
         $RequestData{$What} = join(',', sort @Parts);
