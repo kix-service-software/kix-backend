@@ -272,6 +272,8 @@ checks whether the user is allowed to execute this operation
 sub _CheckOperationPermission {
     my ( $Self, %Param ) = @_;    
 
+    my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
+
     # check if token allows access, first check denials
     my $Access = 1;
     foreach my $DeniedOp ( @{$Param{Authorization}->{DeniedOperations}} ) {
@@ -296,20 +298,22 @@ sub _CheckOperationPermission {
     }
 
     # return false if access is explicitly denied by token
-    return if !$Access;
+    if ( !$Access ) {
+        $Self->_PermissionDebug("RequestURI = $Self->{RequestURI}, requested permission = $RequestedPermission --> permission denied by token");
+        return;
+    }
 
     # OPTIONS requests are always possible
     return 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
     # check if user has permission for this request
-    my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
     my ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
         UserID              => $Param{Authorization}->{UserID},
         Target              => $Self->{RequestURI},
         RequestedPermission => $RequestedPermission,
     );
 
-    $Self->_PermissionDebug(sprintf("RequestURI = $Self->{RequestURI}, RequestedPermission = $RequestedPermission --> Granted = $Granted, AllowedPermission = 0x%04x", ($AllowedPermission||0)));
+    $Self->_PermissionDebug(sprintf("RequestURI = $Self->{RequestURI}, requested permission = $RequestedPermission --> Granted = $Granted, allowed permission = 0x%04x", ($AllowedPermission||0)));
 
     my @AllowedMethods;
     if ( $AllowedPermission ) {
