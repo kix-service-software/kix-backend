@@ -1334,7 +1334,7 @@ sub CheckPermission {
     }
 
     # UserID 1 has God Mode ;)
-    #return 1 if $Param{UserID} == 1;
+    return 1 if $Param{UserID} == 1;
 
     my %PermissionList = $Self->PermissionList(
         UserID => $Param{UserID},
