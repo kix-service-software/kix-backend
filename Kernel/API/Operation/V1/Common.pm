@@ -481,9 +481,9 @@ sub PrepareData {
         foreach my $Parameter ( sort keys %Parameters ) {
 
             # check requirement
-            if ( $Parameters{$Parameter}->{Required} && !exists($Data{$Parameter}) ) {
+            if ( $Parameters{$Parameter}->{Required} && !defined($Data{$Parameter}) ) {
                 $Result->{Success} = 0;
-                $Result->{Message} = "Required parameter $Parameter is missing!",
+                $Result->{Message} = "Required parameter $Parameter is missing or undefined!",
                 last;
             }
             elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref($Parameters{$Parameter}->{RequiredIfNot}) eq 'ARRAY' ) {
@@ -496,7 +496,7 @@ sub PrepareData {
                 }
                 if ( !exists($Data{$Parameter}) && !$AltParameterHasValue ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter or ".( join(" or ", @{$Parameters{$Parameter}->{RequiredIfNot}}) )." is missing!",
+                    $Result->{Message} = "Required parameter $Parameter or ".( join(" or ", @{$Parameters{$Parameter}->{RequiredIfNot}}) )." is missing or undefined!",
                     last;
                 }
             }
@@ -744,7 +744,7 @@ sub _Success {
         }
 
         # cache request without offset and limit if CacheType is set for this operation
-        if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::DisableCaching') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
+        if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData(\%Param) && $Self->{OperationConfig}->{CacheType} ) {
             $Self->_CacheRequest(
                 Data => \%Param,
             );
@@ -826,12 +826,34 @@ sub ExecOperation {
         }
     }
 
+    # prepare RequestURI
+    my $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+        ID => $Self->{WebserviceID},
+    );
+    if ( !IsHashRefWithData($Webservice) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message =>
+                "Could not load web service configuration for web service with ID $Self->{WebserviceID}",
+        );
+
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "Could not load web service configuration for web service with ID $Self->{WebserviceID}!",
+        );
+    }
+    my $RequestURI = $Webservice->{Config}->{Provider}->{Transport}->{Config}->{RouteOperationMapping}->{$Param{OperationType}}->{Route};
+    $RequestURI =~ s/:(\w*)/$Param{Data}->{$1}/egx;
+
     # init new Operation object
     my $OperationObject = Kernel::API::Operation->new(
         DebuggerObject          => $Self->{DebuggerObject},
         Operation               => (split(/::/, $Param{OperationType}))[-1],
         OperationType           => $Param{OperationType},
         WebserviceID            => $Self->{WebserviceID},
+        RequestMethod           => $Self->{RequestMethod},
+        RequestURI              => $RequestURI,
+        CurrentRoute            => $Webservice->{Config}->{Provider}->{Transport}->{Config}->{RouteOperationMapping}->{$Param{OperationType}}->{Route},
         OperationRouteMapping   => $Self->{OperationRouteMapping},
         Authorization           => $Self->{Authorization},
         Level                   => $Self->{Level} + 1,
@@ -844,7 +866,7 @@ sub ExecOperation {
         );
     }
 
-    ($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
+    $Self->_Debug($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
 
     my $Result = $OperationObject->Run(
         Data    => {

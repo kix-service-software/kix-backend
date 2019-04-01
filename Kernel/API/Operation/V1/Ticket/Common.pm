@@ -537,33 +537,31 @@ sub CheckCreatePermission {
         }
     }
 
-    # get create permission groups
-    my %UserGroups;
+    # TODO!!! rbo-190327
+    # # get create permission groups
+    # my %UserGroups;
 
-    if ( $Param{UserType} ne 'Customer' ) {
-        %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $Param{UserID},
-            Type   => 'create',
-        );
-    }
-    else {
-        %UserGroups = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'create',
-            Result => 'HASH',
-        );
-    }
+    # if ( $Param{UserType} ne 'Customer' ) {
+    #     %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+    #         UserID => $Param{UserID},
+    #         Type   => 'create',
+    #     );
+    # }
+    # else {
+    #     %UserGroups = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
+    #         UserID => $Param{UserID},
+    #         Type   => 'create',
+    #         Result => 'HASH',
+    #     );
+    # }
 
-    my %QueueData;
-    if ( defined $Param{Ticket}->{Queue} && $Param{Ticket}->{Queue} ne '' ) {
-        %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( Name => $Param{Ticket}->{Queue} );
-    }
-    else {
-        %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{Ticket}->{QueueID} );
-    }
-
-    # permission check, can we create new tickets in queue
-    return if !$UserGroups{ $QueueData{GroupID} };
+    # my %QueueData;
+    # if ( defined $Param{Ticket}->{Queue} && $Param{Ticket}->{Queue} ne '' ) {
+    #     %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( Name => $Param{Ticket}->{Queue} );
+    # }
+    # else {
+    #     %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{Ticket}->{QueueID} );
+    # }
 
     return 1;
 }

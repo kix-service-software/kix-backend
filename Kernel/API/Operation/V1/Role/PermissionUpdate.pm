@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Permission::PermissionUpdate;
+package Kernel::API::Operation::V1::Role::PermissionUpdate;
 
 use strict;
 use warnings;

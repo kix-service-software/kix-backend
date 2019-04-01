@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserDelete.pm - API RoleUser Delete operation backend
+# Kernel/API/Operation/User/UserRoleSearch.pm - API UserRole Search operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserDelete;
+package Kernel::API::Operation::V1::User::UserRoleIDSearch;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -26,9 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleUserDelete - API Role RoleUserDelete Operation backend
-
-=head1 SYNOPSIS
+Kernel::API::Operation::User::UserRoleIDSearch - API User UserRole Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -50,7 +48,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw( DebuggerObject WebserviceID )) {
+    for my $Needed (qw(DebuggerObject WebserviceID)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'Operation.InternalError',
@@ -84,12 +82,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'RoleID' => {
-            DataType => 'NUMERIC',
-            Required => 1
-        },
         'UserID' => {
-            DataType => 'NUMERIC',
             Required => 1
         },
     }
@@ -97,17 +90,23 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform RoleUserDelete Operation. This will return the deleted RoleUserID.
+perform UserRoleSearch Operation. This will return a User ID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            RoleID  => 123,
-            UserID  => 123,
-        },		
+            UserID => 123
+        }
     );
 
     $Result = {
-        Message    => '',                      # in case of error
+        Success => 1,                                # 0 or 1
+        Code    => '',                          # In case of an error
+        Message => '',                          # In case of an error
+        Data    => {
+            RoleIDs => [
+                ...
+            ]
+        },
     };
 
 =cut
@@ -115,21 +114,25 @@ perform RoleUserDelete Operation. This will return the deleted RoleUserID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # delete RoleUser	    
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleUserDelete(
-        RoleID => $Param{Data}->{RoleID},
+    # get roles list
+    my %RoleList = $Kernel::OM->Get('Kernel::System::User')->RoleList(
         UserID => $Param{Data}->{UserID},
     );
- 
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToDelete',
-            Message => 'Could not delete role assignment, please contact the system administrator',
-        );
+
+    my @ResultList;
+    foreach my $RoleID ( sort keys %RoleList ) {
+        push(@ResultList, 0 + $RoleID);     # enforce nummeric ID
+    }
+    if ( IsArrayRefWithData(\@ResultList) ) {
+        return $Self->_Success(
+            RoleIDs => \@ResultList,
+        )
     }
 
     # return result
-    return $Self->_Success();
+    return $Self->_Success(
+        RoleIDs => [],
+    );
 }
 
 1;

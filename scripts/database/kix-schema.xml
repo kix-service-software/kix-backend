@@ -108,109 +108,6 @@
     </ForeignKey>
 </Table>
 
-<!-- group - all groups -->
-<Table Name="groups">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="groups_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- group_user - relation group<->user -->
-<Table Name="group_user">
-    <Column Name="user_id" Required="true" Type="INTEGER"/>
-    <Column Name="group_id" Required="true" Type="INTEGER"/>
-    <Column Name="permission_key" Required="true" Size="20" Type="VARCHAR"/>
-    <Column Name="permission_value" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Index Name="group_user_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <Index Name="group_user_group_id">
-        <IndexColumn Name="group_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-        <Reference Local="user_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="groups">
-        <Reference Local="group_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- group_role - relation group<->role -->
-<Table Name="group_role">
-    <Column Name="role_id" Required="true" Type="INTEGER"/>
-    <Column Name="group_id" Required="true" Type="INTEGER"/>
-    <Column Name="permission_key" Required="true" Size="20" Type="VARCHAR"/>
-    <Column Name="permission_value" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Index Name="group_role_role_id">
-        <IndexColumn Name="role_id"/>
-    </Index>
-    <Index Name="group_role_group_id">
-        <IndexColumn Name="group_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="groups">
-        <Reference Local="group_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="roles">
-        <Reference Local="role_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- group_customer_user - relation group<->customer user -->
-<Table Name="group_customer_user">
-    <Column Name="user_id" Required="true" Size="100" Type="VARCHAR"/>
-    <Column Name="group_id" Required="true" Type="INTEGER"/>
-    <Column Name="permission_key" Required="true" Size="20" Type="VARCHAR"/>
-    <!-- Here permission_value is still used (0/1) because CustomerGroup.pm
-        was not yet refactored like Group.pm. -->
-    <Column Name="permission_value" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Index Name="group_customer_user_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <Index Name="group_customer_user_group_id">
-        <IndexColumn Name="group_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="groups">
-        <Reference Local="group_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- role - all roles -->
 <Table Name="roles">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
@@ -283,7 +180,7 @@
     <Column Name="role_id" Required="true" Type="INTEGER"/>
     <Column Name="type_id" Required="true" Type="INTEGER"/>
     <Column Name="target" Required="true" Size="1000" Type="VARCHAR"/>
-    <Column Name="value" Required="true" Type="SMALLINT"/>
+    <Column Name="value" Required="true" Type="INTEGER"/>
     <Column Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
@@ -412,7 +309,6 @@
 <Table Name="queue">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="group_id" Required="true" Type="INTEGER"/>
     <Column Name="unlock_timeout" Required="false" Type="INTEGER"/>
     <Column Name="first_response_time" Required="false" Type="INTEGER"/>
     <Column Name="first_response_notify" Required="false" Type="SMALLINT"/>
@@ -435,17 +331,11 @@
     <Unique Name="queue_name">
         <UniqueColumn Name="name"/>
     </Unique>
-    <Index Name="queue_group_id">
-        <IndexColumn Name="group_id"/>
-    </Index>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="system_address">
         <Reference Local="system_address_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="groups">
-        <Reference Local="group_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="follow_up_possible">
         <Reference Local="follow_up_id" Foreign="id"/>
@@ -900,7 +790,6 @@
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
     <Column Name="queue_id" Required="true" Type="INTEGER"/>
     <Column Name="queue" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="group_id" Required="true" Type="INTEGER"/>
     <Column Name="s_lock" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="s_state" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
@@ -910,17 +799,11 @@
     <Index Name="ticket_index_queue_id">
         <IndexColumn Name="queue_id"/>
     </Index>
-    <Index Name="ticket_index_group_id">
-        <IndexColumn Name="group_id"/>
-    </Index>
     <ForeignKey ForeignTable="ticket">
         <Reference Local="ticket_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="queue">
         <Reference Local="queue_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="groups">
-        <Reference Local="group_id" Foreign="id"/>
     </ForeignKey>
 </Table>
 
@@ -2267,18 +2150,6 @@
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id" />
     </ForeignKey>
-</Table>
-<Table Name="faq_category_group">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
-    <Column Name="category_id" Required="true" Size="200" Type="INTEGER" />
-    <Column Name="group_id" Required="true" Type="INTEGER" />
-    <Column Name="created" Required="false" Type="DATE" />
-    <Column Name="created_by" Required="false" Type="INTEGER" />
-    <Column Name="changed" Required="false" Type="DATE" />
-    <Column Name="changed_by" Required="false" Type="INTEGER" />
-    <Index Name="faq_category_group_category_id">
-        <IndexColumn Name="category_id" />
-    </Index>
 </Table>
 <Table Name="faq_item">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />

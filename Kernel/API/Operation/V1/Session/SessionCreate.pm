@@ -137,6 +137,17 @@ sub Run {
             $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
                 UserLogin => $Param{Data}->{UserLogin},
             );
+            # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
+            my $HasPermission = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                UserID            => $UserID,
+                Target            => '/sessions',
+                RequestedPermission => 'CREATE'
+            );
+            if ( !$HasPermission ) {
+                return $Self->_Error(
+                    Code => 'Forbidden'
+                );
+            }
         }
     }
     elsif ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Customer' ) {
@@ -147,6 +158,17 @@ sub Run {
         );
         if ( $User ) {
             $UserID = $Param{Data}->{UserLogin};
+            # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
+            my $HasPermission = $Kernel::OM->Get('Kernel::System::CustomerUser')->CheckPermission(
+                UserID            => $UserID,
+                Target            => '/sessions',
+                RequestedPermission => 'CREATE'
+            );
+            if ( !$HasPermission ) {
+                return $Self->_Error(
+                    Code => 'Forbidden'
+                );
+            }
         }        
     }
 
@@ -156,7 +178,7 @@ sub Run {
         return $Self->_Error(
             Code => 'SessionCreate.AuthFail'
         );
-    }
+    }    
 
     # create new token
     my $Token = $Kernel::OM->Get('Kernel::System::Token')->CreateToken(

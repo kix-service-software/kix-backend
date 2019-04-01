@@ -158,7 +158,7 @@ sub Run {
     if ( IsArrayRefWithData($Role->{UserIDs}) ) {
         foreach my $UserID ( @{$Role->{UserIDs}} ) {
             my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Role::RoleUserCreate',
+                OperationType => 'V1::Role::RoleUserIDCreate',
                 Data          => {
                     RoleID => $RoleID,
                     UserID => $UserID,

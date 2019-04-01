@@ -15,6 +15,9 @@ use warnings;
 
 use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
+use Data::Dumper;
+
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -1127,6 +1130,273 @@ sub UserList {
     return %Users;
 }
 
+=item UserLoginExistsCheck()
+
+return 1 if another user with this login (username) already exists
+
+    $Exist = $UserObject->UserLoginExistsCheck(
+        UserLogin => 'Some::UserLogin',
+        UserID => 1, # optional
+    );
+
+=cut
+
+sub UserLoginExistsCheck {
+    my ( $Self, %Param ) = @_;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare(
+        SQL =>
+            "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
+        Bind => [ \$Param{UserLogin} ],
+    );
+
+    # fetch the result
+    my $Flag;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        if ( !$Param{UserID} || $Param{UserID} ne $Row[0] ) {
+            $Flag = 1;
+        }
+    }
+    if ($Flag) {
+        return 1;
+    }
+    return 0;
+}
+
+=item PermissionList()
+
+return a list of all permission of a given user
+
+    my %List = $UserObject->PermissionList(
+        UserID => 123
+        Types  => [ 'Resource', 'Object' ]       # optional
+    );
+
+=cut
+
+sub PermissionList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'PermissionList::'.$Param{UserID}.'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    my @Bind;
+    my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ?';
+    push(@Bind, \$Param{UserID});
+
+    # filter specific permission types
+    if ( IsArrayRefWithData($Param{Types}) ) {
+        my %TypesMap = map { $_ => 1 } @{$Param{Types}};
+        my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeList();
+        my @PermissionTypeIDs;
+        foreach my $ID ( sort keys %PermissionTypeList ) {
+            next if !$TypesMap{$PermissionTypeList{$ID}};
+            push(@PermissionTypeIDs, $ID);
+        }
+        $SQL .= ' AND type_id IN (' . join(',', sort @PermissionTypeIDs) . ')';
+    }
+
+    # close sub-query
+    $SQL .= ')';
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare( 
+        SQL  => $SQL,
+        Bind => \@Bind
+    );
+
+    # fetch the result
+    my %Result;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Result{ $Row[0] } = $Row[1];
+    }
+
+    # resolve permissions for IDs
+    foreach my $ID ( keys %Result ) {
+        my %Permission = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
+            ID => $ID
+        );
+        $Result{$ID} = \%Permission;
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Result,
+    );
+
+    return %Result;
+}
+
+=item RoleList()
+
+return a list of all roles of a given user
+
+    my @RoleIDs = $UserObject->RoleList(
+        UserID => 123
+    );
+
+=cut
+
+sub RoleList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'RoleList::'.$Param{UserID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare( 
+        SQL  => 'SELECT role_id FROM role_user WHERE user_id = ?',
+        Bind => [
+            \$Param{UserID}
+        ]
+    );
+
+    # fetch the result
+    my @Result;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push(@Result, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
+
+    return @Result;
+}
+
+=item CheckPermission()
+
+returns true if the requested permission is granted
+
+    my @List = $UserObject->CheckPermission(
+        UserID              => 123,
+        Types               => [ 'Resource', 'Object' ]
+        Target              => '/tickets',
+        RequestedPermission => 'READ'
+    );
+
+=cut
+
+sub CheckPermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(UserID Target RequestedPermission) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    # UserID 1 has God Mode ;)
+    #return 1 if $Param{UserID} == 1;
+
+    my %PermissionList = $Self->PermissionList(
+        UserID => $Param{UserID},
+        Types  => $Param{Types},
+    );
+
+    my $Result = 0;
+    my %RelevantPermissions;
+    my $SpecificPermission;
+    foreach my $ID ( sort keys %PermissionList ) {
+        my $Permission = $PermissionList{$ID};
+
+        # prepare target
+        my $Target = $Permission->{Target};
+        $Target =~ s/\*/.*?/g;
+        $Target =~ s/\//\\\//g;
+
+        next if $Param{Target} !~ /^$Target/;
+
+        my %PermissionType = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
+            ID => $Permission->{TypeID}
+        );
+
+        $RelevantPermissions{$PermissionType{Name}}->{$ID} = $Permission;
+
+        # check for a specific match
+        next if $Param{Target} !~ /^$Target$/;
+
+        $SpecificPermission = $Permission;
+    }
+
+    $Self->_PermissionDebug("relevant permissions: ".Dumper(\%RelevantPermissions));
+
+    # sum up all the relevant permissions
+    my $ResultingPermission = 0;
+    foreach my $Type ( qw(Resource Object) ) {
+        foreach my $ID ( sort { length($RelevantPermissions{$Type}->{$a}->{Target}) <=> length($RelevantPermissions{$Type}->{$b}->{Target}) } keys %{$RelevantPermissions{$Type}} ) {            
+            $ResultingPermission |= $RelevantPermissions{$Type}->{$ID}->{Value};
+        }
+    }
+
+    # we have our sum of all relevant permissions, now look if we have a specific match
+    if ( IsHashRefWithData($SpecificPermission) ) {
+        $Self->_PermissionDebug("specific permission found: ".Dumper($SpecificPermission));
+        $ResultingPermission &= $SpecificPermission->{Value};
+    }
+
+    my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+        Value  => $ResultingPermission,
+        Format => 'Short'
+    );
+
+    $Self->_PermissionDebug("resulting permission: $ResultingPermissionShort");
+    
+    # check if we have a DENY 
+    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    my $Granted = ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}}) == Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}};
+
+    return ( $Granted, $ResultingPermission);
+}
+
 =item GenerateRandomPassword()
 
 generate a random password
@@ -1439,45 +1709,17 @@ sub _UserFullname {
     return $UserFullname;
 }
 
+sub _PermissionDebug {
+    my ( $Self, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
+
+    printf STDERR "%10s %s\n", "[Permission]", $Message;
+}
+
 =end Internal:
 
 =cut
-
-=item UserLoginExistsCheck()
-
-return 1 if another user with this login (username) already exists
-
-    $Exist = $UserObject->UserLoginExistsCheck(
-        UserLogin => 'Some::UserLogin',
-        UserID => 1, # optional
-    );
-
-=cut
-
-sub UserLoginExistsCheck {
-    my ( $Self, %Param ) = @_;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    return if !$DBObject->Prepare(
-        SQL =>
-            "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
-        Bind => [ \$Param{UserLogin} ],
-    );
-
-    # fetch the result
-    my $Flag;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        if ( !$Param{UserID} || $Param{UserID} ne $Row[0] ) {
-            $Flag = 1;
-        }
-    }
-    if ($Flag) {
-        return 1;
-    }
-    return 0;
-}
 
 1;
 

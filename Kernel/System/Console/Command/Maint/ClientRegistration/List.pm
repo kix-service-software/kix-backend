@@ -40,12 +40,11 @@ sub Run {
         my %ClientRegistration = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationGet(
             ClientID => $ClientID
         );
-        $Self->Print("$ClientID\n");
         foreach my $Key ( sort keys %ClientRegistration ) {
-            next if $Key eq 'ClientID';
             my $Value = $ClientRegistration{$Key} || '-';
-            $Self->Print("    $Key: $Value\n");
+            $Self->Print(sprintf("    %25s: %s\n", $Key, $Value));
         }
+        $Self->Print("-------------------------------------------------------------------------\n");
     }
 
     $Self->Print("<green>Done.</green>\n");

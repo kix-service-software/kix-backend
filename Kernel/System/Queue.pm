@@ -18,9 +18,7 @@ use base qw(Kernel::System::EventHandler);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Cache',
-    'Kernel::System::CustomerGroup',
     'Kernel::System::DB',
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::Main',
     'Kernel::System::StandardTemplate',
@@ -412,17 +410,7 @@ sub GetAllQueues {
     # fetch all queues
     my $CacheKey;
     if ( $Param{UserID} ) {
-
-        # get group list
-        my %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $Param{UserID},
-            Type   => $Type,
-        );
-
-        return if !%GroupList;
-
-        my $GroupString = join ', ', sort keys %GroupList;
-        $CacheKey = "GetAllQueues::UserID::${Type}::${GroupString}::$Param{UserID}";
+        $CacheKey = "GetAllQueues::UserID::${Type}::$Param{UserID}";
 
         # check cache
         my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -433,23 +421,12 @@ sub GetAllQueues {
 
         return if !$DBObject->Prepare(
             SQL => "SELECT id, name FROM queue WHERE "
-                . " group_id IN ( $GroupString ) AND "
                 . " valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )",
         );
     }
     elsif ( $Param{CustomerUserID} ) {
 
-        # get group ids
-        my @GroupIDs = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
-            UserID => $Param{CustomerUserID},
-            Type   => $Type,
-            Result => 'ID',
-        );
-
-        return if !@GroupIDs;
-
-        my $GroupString = join ', ', sort @GroupIDs;
-        $CacheKey = "GetAllQueues::CustomerUserID::${Type}::${GroupString}::$Param{CustomerUserID}";
+        $CacheKey = "GetAllQueues::CustomerUserID::${Type}::$Param{CustomerUserID}";
 
         # check cache
         my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -460,7 +437,6 @@ sub GetAllQueues {
 
         return if !$DBObject->Prepare(
             SQL => "SELECT id, name FROM queue WHERE "
-                . " group_id IN ( $GroupString ) AND "
                 . " valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )",
         );
     }
@@ -731,35 +707,6 @@ sub GetFollowUpLockOption {
     return $Queue{FollowUpLock};
 }
 
-=item GetQueueGroupID()
-
-get GroupID defined for the given QueueID.
-
-    my $GroupID = $QueueObject->GetQueueGroupID( QueueID => $QueueID );
-
-=cut
-
-sub GetQueueGroupID {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID!'
-        );
-        return;
-    }
-
-    # get (already cached) queue data
-    my %Queue = $Self->QueueGet(
-        ID => $Param{QueueID},
-    );
-
-    return if !%Queue;
-    return $Queue{GroupID};
-}
-
 =item QueueAdd()
 
 add queue with attributes
@@ -767,7 +714,6 @@ add queue with attributes
     $QueueObject->QueueAdd(
         Name                => 'Some::Queue',
         ValidID             => 1,
-        GroupID             => 1,
         Calendar            => 'Calendar1', # (optional)
         FirstResponseTime   => 120,         # (optional)
         FirstResponseNotify => 60,          # (optional, notify agent if first response escalation is 60% reached)
@@ -805,7 +751,7 @@ sub QueueAdd {
         }
     }
 
-    for (qw(Name GroupID SystemAddressID ValidID UserID FollowUpID)) {
+    for (qw(Name SystemAddressID ValidID UserID FollowUpID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -842,16 +788,16 @@ sub QueueAdd {
     my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO queue (name, group_id, unlock_timeout, system_address_id, '
+        SQL => 'INSERT INTO queue (name, unlock_timeout, system_address_id, '
             . ' calendar_name, default_sign_key, signature, '
             . ' first_response_time, first_response_notify, update_time, '
             . ' update_notify, solution_time, solution_notify, follow_up_id, '
             . ' follow_up_lock, valid_id, comments, create_time, create_by, '
             . ' change_time, change_by) VALUES '
-            . ' (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
+            . ' (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
             . ' ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name},     \$Param{GroupID},        \$Param{UnlockTimeout}, \$Param{SystemAddressID},
+            \$Param{Name},     \$Param{UnlockTimeout}, \$Param{SystemAddressID},
             \$Param{Calendar}, \$Param{DefaultSignKey}, \$Param{Signature},
             \$Param{FirstResponseTime}, \$Param{FirstResponseNotify}, \$Param{UpdateTime},
             \$Param{UpdateNotify},      \$Param{SolutionTime},        \$Param{SolutionNotify},
@@ -999,7 +945,7 @@ sub QueueGet {
 
     # sql
     my @Bind;
-    my $SQL = 'SELECT q.name, q.group_id, q.unlock_timeout, '
+    my $SQL = 'SELECT q.name, q.unlock_timeout, '
         . 'q.system_address_id, q.signature, q.comments, q.valid_id, '
         . 'q.first_response_time, q.first_response_notify, '
         . 'q.update_time, q.update_notify, q.solution_time, q.solution_notify, '
@@ -1031,28 +977,27 @@ sub QueueGet {
         %Data = (
             QueueID             => $Data[17],
             Name                => $Data[0],
-            GroupID             => $Data[1],
-            UnlockTimeout       => $Data[2],
-            FirstResponseTime   => $Data[7],
-            FirstResponseNotify => $Data[8],
-            UpdateTime          => $Data[9],
-            UpdateNotify        => $Data[10],
-            SolutionTime        => $Data[11],
-            SolutionNotify      => $Data[12],
-            FollowUpID          => $Data[13],
-            FollowUpLock        => $Data[14],
-            SystemAddressID     => $Data[3],
-            Signature           => $Data[4],
-            Comment             => $Data[5],
-            ValidID             => $Data[6],
-            Email               => $Data[15],
-            RealName            => $Data[16],
-            DefaultSignKey      => $Data[18],
-            Calendar            => $Data[19] || '',
-            CreateBy            => $Data[20],
-            CreateTime          => $Data[21],
-            ChangeBy            => $Data[22],
-            ChangeTime          => $Data[23],
+            UnlockTimeout       => $Data[1],
+            FirstResponseTime   => $Data[6],
+            FirstResponseNotify => $Data[7],
+            UpdateTime          => $Data[8],
+            UpdateNotify        => $Data[9],
+            SolutionTime        => $Data[10],
+            SolutionNotify      => $Data[11],
+            FollowUpID          => $Data[12],
+            FollowUpLock        => $Data[13],
+            SystemAddressID     => $Data[2],
+            Signature           => $Data[3],
+            Comment             => $Data[4],
+            ValidID             => $Data[5],
+            Email               => $Data[14],
+            RealName            => $Data[15],
+            DefaultSignKey      => $Data[17],
+            Calendar            => $Data[18] || '',
+            CreateBy            => $Data[19],
+            CreateTime          => $Data[20],
+            ChangeBy            => $Data[21],
+            ChangeTime          => $Data[22],
         );
     }
 
@@ -1092,7 +1037,6 @@ update queue attributes
         QueueID             => 123,
         Name                => 'Some::Queue',
         ValidID             => 1,
-        GroupID             => 1,
         Calendar            => '1', # (optional) default ''
         FirstResponseTime   => 120, # (optional)
         FirstResponseNotify => 60,  # (optional, notify agent if first response escalation is 60% reached)
@@ -1119,7 +1063,7 @@ sub QueueUpdate {
 
     # check needed stuff
     for (
-        qw(QueueID Name ValidID GroupID SystemAddressID UserID FollowUpID)
+        qw(QueueID Name ValidID SystemAddressID UserID FollowUpID)
         )
     {
         if ( !$Param{$_} ) {
@@ -1212,14 +1156,14 @@ sub QueueUpdate {
     return if !$DBObject->Do(
         SQL => '
             UPDATE queue
-            SET name = ?, comments = ?, group_id = ?, unlock_timeout = ?, first_response_time = ?,
+            SET name = ?, comments = ?, unlock_timeout = ?, first_response_time = ?,
                 first_response_notify = ?, update_time = ?, update_notify = ?, solution_time = ?,
                 solution_notify = ?, follow_up_id = ?, follow_up_lock = ?, system_address_id = ?,
                 calendar_name = ?, default_sign_key = ?, signature = ?,
                 valid_id = ?, change_time = current_timestamp, change_by = ?
             WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{Comment}, \$Param{GroupID}, \$Param{UnlockTimeout},
+            \$Param{Name}, \$Param{Comment}, \$Param{UnlockTimeout},
             \$Param{FirstResponseTime}, \$Param{FirstResponseNotify}, \$Param{UpdateTime},
             \$Param{UpdateNotify},      \$Param{SolutionTime},        \$Param{SolutionNotify},
             \$Param{FollowUpID},        \$Param{FollowUpLock},        \$Param{SystemAddressID},

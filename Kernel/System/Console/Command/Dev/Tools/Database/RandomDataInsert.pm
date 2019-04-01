@@ -24,7 +24,7 @@ our @ObjectDependencies = (
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Group',
+    'Kernel::System::Role',
     'Kernel::System::Queue',
     'Kernel::System::Ticket',
     'Kernel::System::User',
@@ -71,8 +71,8 @@ sub Configure {
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-groups',
-        Description => "Specify how many groups should be generated.",
+        Name        => 'generate-roless',
+        Description => "Specify how many roles should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
@@ -123,13 +123,13 @@ sub Run {
         ObjectType => ['Article'],
     );
 
-    # groups
-    my @GroupIDs;
-    if ( !$Self->GetOption('generate-groups') ) {
-        @GroupIDs = GroupGet();
+    # roles
+    my @RoleIDs;
+    if ( !$Self->GetOption('generate-roles') ) {
+        @RoleIDs = RoleGet();
     }
     else {
-        @GroupIDs = GroupCreate( $Self->GetOption('generate-groups') );
+        @RoleIDs = RoleCreate( $Self->GetOption('generate-roles') );
     }
 
     # users
@@ -138,7 +138,7 @@ sub Run {
         @UserIDs = UserGet();
     }
     else {
-        @UserIDs = UserCreate( $Self->GetOption('generate-users'), \@GroupIDs );
+        @UserIDs = UserCreate( $Self->GetOption('generate-users'), \@RoleIDs );
     }
 
     # queues
@@ -147,7 +147,7 @@ sub Run {
         @QueueIDs = QueueGet();
     }
     else {
-        @QueueIDs = QueueCreate( $Self->GetOption('generate-queues'), \@GroupIDs );
+        @QueueIDs = QueueCreate( $Self->GetOption('generate-queues'));
     }
 
     # customer users
@@ -393,7 +393,6 @@ sub QueueGet {
 
 sub QueueCreate {
     my $Count = shift || return;
-    my @GroupIDs = @{ shift() };
 
     my @QueueIDs;
     for ( 1 .. $Count ) {
@@ -401,7 +400,6 @@ sub QueueCreate {
         my $ID   = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
             Name              => $Name,
             ValidID           => 1,
-            GroupID           => $GroupIDs[ int( rand( scalar @GroupIDs ) ) ],
             FirstResponseTime => 0,
             UpdateTime        => 0,
             SolutionTime      => 0,
@@ -421,47 +419,39 @@ sub QueueCreate {
     return @QueueIDs;
 }
 
-sub GroupGet {
-    my @GroupIDs;
-    my %Groups = $Kernel::OM->Get('Kernel::System::Group')->GroupList( Valid => 1 );
-    for ( sort keys %Groups ) {
-        push @GroupIDs, $_;
+sub RoleGet {
+    my @RoleIDs;
+    my %Roles = $Kernel::OM->Get('Kernel::System::Role')->RoleList( Valid => 1 );
+    for ( sort keys %Roles ) {
+        push @RoleIDs, $_;
     }
-    return @GroupIDs;
+    return @RoleIDs;
 }
 
-sub GroupCreate {
+sub RoleCreate {
     my $Count = shift || return;
 
-    my @GroupIDs;
+    my @RoleIDs;
     for ( 1 .. $Count ) {
-        my $Name = 'fill-up-group' . int( rand(100_000_000) );
-        my $ID   = $Kernel::OM->Get('Kernel::System::Group')->GroupAdd(
+        my $Name = 'fill-up-role' . int( rand(100_000_000) );
+        my $ID   = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
             Name    => $Name,
             ValidID => 1,
             UserID  => 1,
         );
         if ($ID) {
-            print "Group '$Name' with ID '$ID' created.\n";
-            push( @GroupIDs, $ID );
+            print "Role '$Name' with ID '$ID' created.\n";
+            push( @RoleIDs, $ID );
 
-            # add root to every group
-            $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-                GID        => $ID,
-                UID        => 1,
-                Permission => {
-                    ro        => 1,
-                    move_into => 1,
-                    create    => 1,
-                    owner     => 1,
-                    priority  => 0,
-                    rw        => 1,
-                },
-                UserID => 1,
+            # add root to every role
+            $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                AssignUserID => 1,
+                RoleID       => $ID,
+                UserID       => 1,
             );
         }
     }
-    return @GroupIDs;
+    return @RoleIDs;
 }
 
 sub UserGet {
@@ -478,7 +468,7 @@ sub UserGet {
 
 sub UserCreate {
     my $Count = shift || return;
-    my @GroupIDs = @{ shift() };
+    my @RoleIDs = @{ shift() };
 
     my @UserIDs;
     for ( 1 .. $Count ) {
@@ -494,38 +484,13 @@ sub UserCreate {
         if ($ID) {
             print "User '$Name' with ID '$ID' created.\n";
             push( @UserIDs, $ID );
-            for my $GroupID (@GroupIDs) {
-                my $GroupAdd = int( rand(3) );
-                if ( $GroupAdd == 2 ) {
-                    $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-                        GID        => $GroupID,
-                        UID        => $ID,
-                        Permission => {
-                            ro        => 1,
-                            move_into => 1,
-                            create    => 1,
-                            owner     => 1,
-                            priority  => 0,
-                            rw        => 1,
-                        },
-                        UserID => 1,
-                    );
-                }
-                elsif ( $GroupAdd == 1 ) {
-                    $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-                        GID        => $GroupID,
-                        UID        => $ID,
-                        Permission => {
-                            ro        => 1,
-                            move_into => 1,
-                            create    => 1,
-                            owner     => 0,
-                            priority  => 0,
-                            rw        => 0,
-                        },
-                        UserID => 1,
-                    );
-                }
+            for my $RoleID (@RoleIDs) {
+                my $RoleAdd = int( rand(3) );
+                $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                    AssignUserID => $ID,
+                    RoleID       => $RoleID,
+                    UserID       => 1,
+                );
             }
         }
     }

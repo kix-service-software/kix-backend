@@ -41,90 +41,20 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
-    <Insert Table="groups">
+    <Insert Table="role">
         <Data Key="id" Type="AutoIncrement">1</Data>
-        <Data Key="name" Type="Quote">users</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for default access.</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Admin User</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Allows administrative tasks.</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote">admin</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group of all administrators.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="name" Type="Quote">stats</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for statistics access.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">4</Data>
-        <Data Key="name" Type="Quote">faq</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for general FAQ access.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">5</Data>
-        <Data Key="name" Type="Quote">faq_admin</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for FAQ administrators.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">6</Data>
-        <Data Key="name" Type="Quote">faq_approval</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for FAQ approval users.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">7</Data>
-        <Data Key="name" Type="Quote">itsm-configitem</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for ITSM ConfigItem mask access.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">8</Data>
-        <Data Key="name" Type="Quote">itsm-service</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for ITSM Service mask access.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="groups">
-        <Data Key="id" Type="AutoIncrement">9</Data>
-        <Data Key="name" Type="Quote">SwitchButton</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Group for SwitchButton access.</Data>
+    <Insert Table="role">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Agent User</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Allows tasks for daily work.</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -132,91 +62,31 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">1</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Resource</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a collection resource.</Data>
+        <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">2</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Object</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a item resource.</Data>
+        <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">3</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">4</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">5</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">6</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">7</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">8</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="group_user">
-        <Data Key="user_id">1</Data>
-        <Data Key="group_id">9</Data>
-        <Data Key="permission_key" Type="Quote">rw</Data>
-        <Data Key="permission_value">1</Data>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">PropertyValue</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1).</Data>
+        <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -507,7 +377,6 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote">Postmaster</Data>
-        <Data Key="group_id">1</Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -522,7 +391,6 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote">Raw</Data>
-        <Data Key="group_id">1</Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -537,7 +405,6 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote">Junk</Data>
-        <Data Key="group_id">1</Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -552,7 +419,6 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="name" Type="Quote">Misc</Data>
-        <Data Key="group_id">1</Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -3886,38 +3752,6 @@ DefaultValue: ''
     <Insert Table="faq_history">
         <Data Key="name" Type="Quote">Created</Data>
         <Data Key="item_id">1</Data>
-        <Data Key="created">current_timestamp</Data>
-        <Data Key="created_by">1</Data>
-        <Data Key="changed">current_timestamp</Data>
-        <Data Key="changed_by">1</Data>
-    </Insert>
-    <Insert Table="faq_category_group">
-        <Data Key="category_id">1</Data>
-        <Data Key="group_id">4</Data>
-        <Data Key="created">current_timestamp</Data>
-        <Data Key="created_by">1</Data>
-        <Data Key="changed">current_timestamp</Data>
-        <Data Key="changed_by">1</Data>
-    </Insert>
-    <Insert Table="faq_category_group">
-        <Data Key="category_id">2</Data>
-        <Data Key="group_id">4</Data>
-        <Data Key="created">current_timestamp</Data>
-        <Data Key="created_by">1</Data>
-        <Data Key="changed">current_timestamp</Data>
-        <Data Key="changed_by">1</Data>
-    </Insert>
-    <Insert Table="faq_category_group">
-        <Data Key="category_id">3</Data>
-        <Data Key="group_id">4</Data>
-        <Data Key="created">current_timestamp</Data>
-        <Data Key="created_by">1</Data>
-        <Data Key="changed">current_timestamp</Data>
-        <Data Key="changed_by">1</Data>
-    </Insert>
-    <Insert Table="faq_category_group">
-        <Data Key="category_id">4</Data>
-        <Data Key="group_id">4</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -9228,38 +9062,5 @@ Zz4KPC9zdmc+
         <Data Key="create_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
-    </Insert>
-
-    <Insert Table="permission_type">
-        <Data Key="id" Type="AutoIncrement">1</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Resource</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a collection resource.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-
-    <Insert Table="permission_type">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Object</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a item resource.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-
-    <Insert Table="permission_type">
-        <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Object Property Value</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access of objects to specific property values (i.e. tickets with QueueID=1).</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
     </Insert>
 </database>

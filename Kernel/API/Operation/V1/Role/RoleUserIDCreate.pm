@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserRoleSearch.pm - API UserRole Search operation backend
+# Kernel/API/Operation/Role/RoleUserCreate.pm - API RoleUser Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserRoleSearch;
+package Kernel::API::Operation::V1::Role::RoleUserIDCreate;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -26,7 +26,9 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::User::UserRoleSearch - API User UserRole Search Operation backend
+Kernel::API::Operation::V1::Role::RoleUserIDCreate - API Role RoleUser Create Operation backend
+
+=head1 SYNOPSIS
 
 =head1 PUBLIC INTERFACE
 
@@ -48,7 +50,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
+    for my $Needed (qw( DebuggerObject WebserviceID )) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'Operation.InternalError',
@@ -85,27 +87,29 @@ sub ParameterDefinition {
         'UserID' => {
             Required => 1
         },
+        'RoleID' => {
+            Required => 1
+        },
     }
 }
 
 =item Run()
 
-perform UserRoleSearch Operation. This will return a User ID.
+perform RoleUserIDCreate Operation. This will return sucsess.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID => 123
-        }
+            UserID    => 12,
+            RoleID    => 6,
+        },
     );
 
     $Result = {
-        Success => 1,                                # 0 or 1
-        Code    => '',                          # In case of an error
-        Message => '',                          # In case of an error
-        Data    => {
-            RoleID => [
-                ...
-            ]
+        Success         => 1,                       # 0 or 1
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
+        Data            => {                        # result data payload after Operation
+            UserID => 12
         },
     };
 
@@ -114,25 +118,26 @@ perform UserRoleSearch Operation. This will return a User ID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform UserRole search
-    my %RoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserRoleGet(
-        UserID => $Param{Data}->{UserID},
+    # create RoleUser
+    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+        AssignUserID => $Param{Data}->{UserID},
+        RoleID       => $Param{Data}->{RoleID},
+        UserID       => $Self->{Authorization}->{UserID},
     );
 
-    my @ResultList;
-    foreach my $RoleID ( sort keys %RoleList ) {
-        push(@ResultList, 0 + $RoleID);     # enforce nummeric ID
+    if ( !$Success ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToCreate',
+            Message => 'Could not create role assignment, please contact the system administrator',
+        );
     }
-    if ( IsArrayRefWithData(\@ResultList) ) {
-        return $Self->_Success(
-            RoleID => \@ResultList,
-        )
-    }
-
-    # return result
+    
+    # return result    
     return $Self->_Success(
-        RoleID => [],
-    );
+        Code   => 'Object.Created',
+        UserID => $Param{Data}->{UserID},
+    );    
 }
+
 
 1;

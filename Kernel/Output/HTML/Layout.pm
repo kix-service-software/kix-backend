@@ -38,7 +38,6 @@ our @ObjectDependencies = (
     'Kernel::System::User',
     'Kernel::System::VideoChat',
     'Kernel::System::Web::Request',
-    'Kernel::System::Group',
 );
 
 =head1 NAME

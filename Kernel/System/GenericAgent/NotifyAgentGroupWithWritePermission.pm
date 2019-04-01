@@ -14,7 +14,6 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::Queue',
     'Kernel::System::SLA',

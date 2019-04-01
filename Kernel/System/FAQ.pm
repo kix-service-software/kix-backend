@@ -31,7 +31,6 @@ our @ObjectDependencies = (
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Encode',
-    'Kernel::System::Group',
     'Kernel::System::LinkObject',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
@@ -453,21 +452,22 @@ sub FAQAdd {
     # check if approval feature is used
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') ) {
 
-        # check permission
-        my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'ro',
-            Result => 'HASH',
-        );
+        # TODO!!! rbo-190327
+        # # check permission
+        # my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        #     UserID => $Param{UserID},
+        #     Type   => 'ro',
+        #     Result => 'HASH',
+        # );
 
-        # get the approval group
-        my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
+        # # get the approval group
+        # my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
 
-        # set default to 0 if approved param is not given
-        # or if user does not have the rights to approve
-        if ( !defined $Param{Approved} || !$Groups{$ApprovalGroup} ) {
-            $Param{Approved} = 0;
-        }
+        # # set default to 0 if approved param is not given
+        # # or if user does not have the rights to approve
+        # if ( !defined $Param{Approved} || !$Groups{$ApprovalGroup} ) {
+        #     $Param{Approved} = 0;
+        # }
     }
 
     # if approval feature is not activated, a new FAQ item is always approved
@@ -737,20 +737,21 @@ sub FAQUpdate {
     # update approval
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{ApprovalOff} ) {
 
-        # check permission
-        my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'ro',
-            Result => 'HASH',
-        );
+        # TODO!!! rbo-190327
+        # # check permission
+        # my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        #     UserID => $Param{UserID},
+        #     Type   => 'ro',
+        #     Result => 'HASH',
+        # );
 
-        # get the approval group
-        my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
+        # # get the approval group
+        # my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
 
-        # set approval to 0 if user does not have the rights to approve
-        if ( !$Groups{$ApprovalGroup} ) {
-            $Param{Approved} = 0;
-        }
+        # # set approval to 0 if user does not have the rights to approve
+        # if ( !$Groups{$ApprovalGroup} ) {
+        #     $Param{Approved} = 0;
+        # }
 
         # update the approval
         my $UpdateSuccess = $Self->_FAQApprovalUpdate(

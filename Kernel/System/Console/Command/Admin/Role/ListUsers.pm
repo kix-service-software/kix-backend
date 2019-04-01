@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Admin::Group::Add;
+package Kernel::System::Console::Command::Admin::Role::ListUsers;
 
 use strict;
 use warnings;
@@ -16,24 +16,17 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Group'
+    'Kernel::System::Role',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Create a new group.');
+    $Self->Description('List users assigned to a role.');
     $Self->AddOption(
-        Name        => 'name',
-        Description => "Name of the new group.",
+        Name        => 'role-name',
+        Description => 'Name of the role.',
         Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'comment',
-        Description => "Comment for the new group.",
-        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -41,26 +34,39 @@ sub Configure {
     return;
 }
 
+sub PreRun {
+
+    my ( $Self, %Param ) = @_;
+
+    $Self->{RoleName} = $Self->GetOption('role-name');
+
+    # check role
+    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+    if ( !$Self->{RoleID} ) {
+        die "Role $Self->{RoleName} does not exist.\n";
+    }
+
+    return;
+}
+
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Creating a new group...</yellow>\n");
+    $Self->Print("<yellow>Listing users assigned to role $Self->{RoleName}...</yellow>\n");
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->GroupAdd(
+    my @UserIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+        RoleID  => $Self->{RoleID},
         UserID  => 1,
-        ValidID => 1,
-        Comment => $Self->GetOption('comment'),
-        Name    => $Self->GetOption('name'),
     );
 
-    # error handling
-    if ( !$Success ) {
-        $Self->PrintError("Can't create group.\n");
-        return $Self->ExitCodeError();
+    foreach my $ID ( sort @UserIDs ) {
+        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            UserID => $ID
+        );
+        $Self->Print("$User{UserFullname} ($User{UserLogin})\n");
     }
 
-    $Self->Print("<green>Done.</green>\n");
-
+    $Self->Print("<green>Done</green>\n");
     return $Self->ExitCodeOk();
 }
 

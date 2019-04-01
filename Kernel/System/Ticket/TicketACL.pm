@@ -1287,22 +1287,7 @@ sub _GetChecks {
             UserID => $Param{UserID},
         );
 
-        # get group object
-        my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-        for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
-
-            my %Groups = $GroupObject->PermissionUserGet(
-                UserID => $Param{UserID},
-                Type   => $Type,
-            );
-
-            my @GroupNames = sort values %Groups;
-
-            $User{"Group_$Type"} = \@GroupNames;
-        }
-
-        my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+        my %RoleIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
             UserID => $Param{UserID},
         );
 

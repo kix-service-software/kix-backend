@@ -4,7 +4,6 @@
         "Comment": "Postmaster queue.",
         "FollowUpID": 1,
         "FollowUpLock": 0,
-        "GroupID": 1,
         "Name": "Postmaster",
         "ParentID": 1,
         "RealName": "KIX System",

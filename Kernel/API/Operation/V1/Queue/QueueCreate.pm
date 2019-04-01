@@ -90,10 +90,7 @@ sub ParameterDefinition {
         },
         'Queue::Name' => {
             Required => 1
-        },
-        'Queue::GroupID' => {
-            Required => 1
-        },            
+        }
     }
 }
 
@@ -107,7 +104,6 @@ perform QueueCreate Operation. This will return the created QueueID.
 	        	Name                => '...',
 	        	Comment             => '...',     # (optional)
 	        	ValidID             => '...',     # (optional)	        	
-		        GroupID             => '...',
 		        Calendar            => '...',     # (optional)
 		        FirstResponseTime   => '...',     # (optional)
 		        FirstResponseNotify => '...',     # (optional, notify agent if first response escalation is 60% reached)
@@ -174,7 +170,6 @@ sub Run {
         Name                => $Queue->{Name},
         Comment             => $Queue->{Comment} || '',
         ValidID             => $Queue->{ValidID} || 1,
-        GroupID             => $Queue->{GroupID},
         Calendar            => $Queue->{Calendar} || '',
         FirstResponseTime   => $Queue->{FirstResponseTime} || '',
         FirstResponseNotify => $Queue->{FirstResponseNotify} || '',

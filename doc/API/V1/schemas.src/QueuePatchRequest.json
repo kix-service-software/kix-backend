@@ -28,9 +28,6 @@
         "FollowUpLock": {
           "type": "integer"
         },
-        "GroupID": {
-          "type": "integer"
-        },
         "Name": {
           "type": "string"
         },

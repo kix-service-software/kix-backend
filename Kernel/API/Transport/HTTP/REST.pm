@@ -298,12 +298,13 @@ sub ProviderProcessRequest {
     if ( !$Length || $RequestMethod eq 'OPTIONS' ) {
         return $Self->_Success(
             Route          => $CurrentRoute,
+            RequestURI     => $RequestURI,
             Operation      => $Operation,
             AllowedMethods => \%AllowedMethods,
+            RequestMethod  => $RequestMethod,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             Data      => {
                 %URIData,
-                RequestMethod => $RequestMethod,
             },
         );
     }
@@ -387,9 +388,13 @@ sub ProviderProcessRequest {
 
     # all ok - return data
     return $Self->_Success(
-        Operation => $Operation,
-        Data      => $ReturnData,
+        Route          => $CurrentRoute,
+        RequestURI     => $RequestURI,
+        Operation      => $Operation,
+        AllowedMethods => \%AllowedMethods,
+        RequestMethod  => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
+        Data           => $ReturnData,
     );
 }
 

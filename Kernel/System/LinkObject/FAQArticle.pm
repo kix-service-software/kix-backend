@@ -16,7 +16,6 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::FAQ',
-    'Kernel::System::Group',
     'Kernel::System::Log',
 );
 
@@ -50,10 +49,6 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-
-    # create additional objects
-    # $GroupObject = Kernel::System::Group->new( %{$Self} );
-    # $FAQObject   = Kernel::System::FAQ->new( %{$Self} );
 
     return $Self;
 }
@@ -124,82 +119,6 @@ sub LinkListWithData {
     }
 
     return 1;
-}
-
-=item ObjectPermission()
-
-checks read permission for a given object and UserID.
-
-    $Permission = $FAQLinkObject->ObjectPermission(
-        Object  => 'FAQ',
-        Key     => 123,
-        UserID  => 1,
-    );
-
-=cut
-
-sub ObjectPermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Object Key UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # check module registry of AgentFAQZoom
-    my $ModuleReg = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::Module')->{AgentFAQZoom};
-
-    # do not grant access if frontend module is not registered
-    return if !$ModuleReg;
-
-    # grant access if module permission has no Group or GroupRo defined
-    if ( !$ModuleReg->{GroupRo} && !$ModuleReg->{Group} ) {
-
-        return 1;
-    }
-
-    # get database object
-    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-    PERMISSION:
-    for my $Permission (qw(GroupRo Group)) {
-
-        next PERMISSION if !$ModuleReg->{$Permission};
-        next PERMISSION if ref $ModuleReg->{$Permission} ne 'ARRAY';
-
-        for my $Group ( @{ $ModuleReg->{$Permission} } ) {
-
-            # get the group id
-            my $GroupID = $GroupObject->GroupLookup( Group => $Group );
-
-            my $Type;
-            if ( $Permission eq 'GroupRo' ) {
-                $Type = 'ro';
-            }
-            elsif ( $Permission eq 'Group' ) {
-                $Type = 'rw';
-            }
-
-            # get user groups, where the user has the appropriate privilege
-            my %Groups = $GroupObject->GroupMemberList(
-                UserID => $Param{UserID},
-                Type   => $Type,
-                Result => 'HASH',
-            );
-
-            # grant access if agent is a member in the group
-            return 1 if $Groups{$GroupID};
-        }
-    }
-
-    return;
 }
 
 =item ObjectDescriptionGet()

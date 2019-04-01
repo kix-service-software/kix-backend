@@ -25,6 +25,14 @@ use base qw(
 
 our $ObjectManagerDisabled = 1;
 
+# mapping for permissions
+use constant REQUEST_METHOD_PERMISSION_MAPPING => {
+    'GET'    => 'READ',
+    'POST'   => 'CREATE',
+    'PATCH'  => 'UPDATE',
+    'DELETE' => 'DELETE',
+};
+
 =head1 NAME
 
 Kernel::API::Operation - API Operation interface
@@ -63,7 +71,7 @@ create an object.
         Operation       => 'TicketCreate',                # the name of the operation in the web service
         OperationType   => 'V1::Ticket::TicketCreate',    # the local operation backend to use
         WebserviceID    => $WebserviceID,                 # ID of the currently used web service
-        OperationRouteMapping => {},                      # optional
+        OperationRouteMapping => {},                      # required
         NoAuthorizationNeeded => 1                        # optional
     );
 
@@ -76,7 +84,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject Operation OperationType WebserviceID)) {
+    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping RequestMethod RequestURI CurrentRoute WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
             return $Self->_Error(
@@ -107,14 +115,17 @@ sub new {
 
     # check permission
     if ( IsHashRefWithData($Param{Authorization}) ) {
-        my $Permission = $Self->_CheckOperationPermission(
-            OperationType   => $Param{OperationType},
-            OperationConfig => $Self->{OperationConfig},
-            Authorization   => $Param{Authorization},
+        my ($Granted, @AllowedMethods) = $Self->_CheckOperationPermission(
+            Authorization => $Param{Authorization},
         );
-        if ( !$Permission ) {
+        if ( !$Granted ) {
             return $Self->_Error(
-                Code => 'Forbidden'
+                Code => 'Forbidden',
+                Additional => {
+                    AddHeader => {
+                        Allow => join(', ', @AllowedMethods),
+                    }
+                }
             );
         }
     }
@@ -155,6 +166,7 @@ sub new {
     $Self->{BackendObject}->{OperationType}         = $Param{OperationType};
     $Self->{BackendObject}->{OperationConfig}       = $Self->{OperationConfig};
     $Self->{BackendObject}->{OperationRouteMapping} = $Param{OperationRouteMapping};
+    $Self->{BackendObject}->{RequestMethod}         = $Self->{RequestMethod};
 
     # add call level
     $Self->{Level} = $Param{Level};
@@ -252,8 +264,6 @@ sub GetCacheDependencies {
 checks whether the user is allowed to execute this operation
 
     my $Permission = $OperationObject->_CheckOperationPermission(
-        OperationType    => 'V1::Own::UserGet',
-        OperationConfig  => { },
         Authorization    => { },
     );
 
@@ -265,7 +275,7 @@ sub _CheckOperationPermission {
     # check if token allows access, first check denials
     my $Access = 1;
     foreach my $DeniedOp ( @{$Param{Authorization}->{DeniedOperations}} ) {
-        if ( $Param{OperationType} =~ /^$DeniedOp$/g ) {
+        if ( $Self->{OperationType} =~ /^$DeniedOp$/g ) {
             $Access = 0;
             last;
         }
@@ -278,71 +288,47 @@ sub _CheckOperationPermission {
         }
         # we don't have access, so check if the operation is explicitly allowed
         foreach my $AllowedOp ( @{$Param{Authorization}->{AllowedOperations}} ) {
-            if ( $Param{OperationType} =~ /^$AllowedOp$/g ) {
+            if ( $Self->{OperationType} =~ /^$AllowedOp$/g ) {
                 $Access = 1;
                 last;
             }
         }        
     }
 
-    return 0 if !$Access;
+    # return false if access is explicitly denied by token
+    return if !$Access;
 
-    return 1 if !$Param{OperationConfig}->{Permission};
+    # OPTIONS requests are always possible
+    return 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
-    # parse permissions
-    my $Result = 0;
-    PERMISSION:
-    foreach my $PermissionDef ( split(/\s*,\s*/, $Param{OperationConfig}->{Permission}) ) {
+    # check if user has permission for this request
+    my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
+    my ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+        UserID              => $Param{Authorization}->{UserID},
+        Target              => $Self->{RequestURI},
+        RequestedPermission => $RequestedPermission,
+    );
 
-        my ($ObjectType, $Rest)   = split(/=/, $PermissionDef);
-        my ($Object, $Permission) = split(/:/, $Rest);
-        my @UserIDs;
+    $Self->_PermissionDebug(sprintf("RequestURI = $Self->{RequestURI}, RequestedPermission = $RequestedPermission --> Granted = $Granted, AllowedPermission = 0x%04x", ($AllowedPermission||0)));
 
-        # check roles, groups and users
-        if ( uc($ObjectType) eq 'ROLE' ) {
-            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-            my $RoleID = $GroupObject->RoleLookup( 
-                Role => $Object
-            );
-            if ( $RoleID ) {
-                @UserIDs = $GroupObject->GroupUserRoleMemberList(
-                    RoleID => $RoleID,
-                    Result => 'ID',
-                );
-            }
-        }
-        elsif ( uc($ObjectType) eq 'GROUP' ) {
-            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-            my $GroupID = $GroupObject->GroupLookup( 
-                Group => $Object
-            );
-            if ( $GroupID ) {
-                @UserIDs = $GroupObject->GroupGroupMemberList(
-                    GroupID => $GroupID,
-                    Type    => $Permission,
-                    Result  => 'ID',
-                );
-            }
-        }
-        elsif ( uc($ObjectType) eq 'USER' ) {
-            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-            my $UserID = $UserObject->UserLookup( 
-                UserLogin => $Object 
-            );
-            if ( $UserID ) {
-                push(@UserIDs, $UserID);
-            }
-        }
-
-        my %UserHash = map { $_ => 1 } @UserIDs;
-        if ( $UserHash{$Param{Authorization}->{UserID}} ) {
-            # user has permission, abort loop
-            $Result = 1;
-            last PERMISSION;
+    my @AllowedMethods;
+    if ( $AllowedPermission ) {
+        my %ReversePermissionMapping = reverse %{Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING};
+        foreach my $Perm ( sort keys %{Kernel::System::Role::Permission->PERMISSION} ) {
+            next if (($AllowedPermission & Kernel::System::Role::Permission->PERMISSION->{$Perm}) != Kernel::System::Role::Permission->PERMISSION->{$Perm});
+            push(@AllowedMethods, $ReversePermissionMapping{$Perm});
         }
     }
 
-    return $Result;
+    return ($Granted, @AllowedMethods);
+}
+
+sub _PermissionDebug {
+    my ( $Self, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
+
+    printf STDERR "%10s %s\n", "[Permission]", $Message;
 }
 
 1;

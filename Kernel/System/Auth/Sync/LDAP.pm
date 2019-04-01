@@ -19,7 +19,6 @@ use Net::LDAP::Util qw(escape_filter_value);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Encode',
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::User',
 );
@@ -202,15 +201,11 @@ sub Sync {
     my %PermissionsEmpty =
         map { $_ => 0 } @{ $ConfigObject->Get('System::Permission') };
 
-    # get group object
-    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-    # get system groups and create lookup
-    my %SystemGroups = $GroupObject->GroupList( Valid => 1 );
-    my %SystemGroupsByName = reverse %SystemGroups;
+    # get RoleObject
+    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
 
     # get system roles and create lookup
-    my %SystemRoles = $GroupObject->RoleList( Valid => 1 );
+    my %SystemRoles = $RoleObject->RoleList( Valid => 1 );
     my %SystemRolesByName = reverse %SystemRoles;
 
     # sync user from ldap
@@ -290,37 +285,6 @@ sub Sync {
                     Priority => 'notice',
                     Message  => "Initial data for '$Param{User}' ($UserDN) created in RDBMS.",
                 );
-
-                # sync initial groups
-                my $UserSyncInitialGroups = $ConfigObject->Get(
-                    'AuthSyncModule::LDAP::UserSyncInitialGroups' . $Self->{Count}
-                );
-                if ($UserSyncInitialGroups) {
-                    GROUP:
-                    for my $Group ( @{$UserSyncInitialGroups} ) {
-
-                        # only for valid groups
-                        if ( !$SystemGroupsByName{$Group} ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                                Priority => 'notice',
-                                Message =>
-                                    "Invalid group '$Group' in "
-                                    . "'AuthSyncModule::LDAP::UserSyncInitialGroups"
-                                    . "$Self->{Count}'!",
-                            );
-                            next GROUP;
-                        }
-
-                        $GroupObject->PermissionGroupUserAdd(
-                            GID        => $SystemGroupsByName{$Group},
-                            UID        => $UserID,
-                            Permission => {
-                                rw => 1,
-                            },
-                            UserID => 1,
-                        );
-                    }
-                }
             }
         }
 
@@ -349,225 +313,6 @@ sub Sync {
                     ChangeUserID => 1,
                 );
             }
-        }
-    }
-
-    # variable to store group permissions from ldap
-    my %GroupPermissionsFromLDAP;
-
-    # sync ldap group 2 otrs group permissions
-    my $UserSyncGroupsDefinition = $ConfigObject->Get(
-        'AuthSyncModule::LDAP::UserSyncGroupsDefinition' . $Self->{Count}
-    );
-    if ($UserSyncGroupsDefinition) {
-
-        # read and remember groups from ldap
-        GROUPDN:
-        for my $GroupDN ( sort keys %{$UserSyncGroupsDefinition} ) {
-
-            # search if we are allowed to
-            my $Filter;
-            if ( $Self->{UserAttr} eq 'DN' ) {
-                $Filter = "($Self->{AccessAttr}=" . escape_filter_value($UserDN) . ')';
-            }
-            else {
-                $Filter = "($Self->{AccessAttr}=" . escape_filter_value( $Param{User} ) . ')';
-            }
-            my $Result = $LDAP->search(
-                base   => $GroupDN,
-                filter => $Filter,
-            );
-            if ( $Result->code() ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => "Search failed! ($GroupDN) filter='$Filter' " . $Result->error(),
-                );
-                next GROUPDN;
-            }
-
-            # extract it
-            my $Valid;
-            for my $Entry ( $Result->all_entries() ) {
-                $Valid = $Entry->dn();
-            }
-
-            # log if there is no LDAP entry
-            if ( !$Valid ) {
-
-                # failed login note
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'notice',
-                    Message  => "User: $Param{User} not in "
-                        . "GroupDN='$GroupDN', Filter='$Filter'! (REMOTE_ADDR: $RemoteAddr).",
-                );
-                next GROUPDN;
-            }
-
-            # remember group permissions
-            my %SyncGroups = %{ $UserSyncGroupsDefinition->{$GroupDN} };
-            SYNCGROUP:
-            for my $SyncGroup ( sort keys %SyncGroups ) {
-
-                # only for valid groups
-                if ( !$SystemGroupsByName{$SyncGroup} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
-                        Priority => 'notice',
-                        Message =>
-                            "Invalid group '$SyncGroup' in "
-                            . "'AuthSyncModule::LDAP::UserSyncGroupsDefinition"
-                            . "$Self->{Count}'!",
-                    );
-                    next SYNCGROUP;
-                }
-
-                # set/overwrite remembered permissions
-
-                # if rw permission exists, discard all other permissions
-                if ( $SyncGroups{$SyncGroup}->{rw} ) {
-                    $GroupPermissionsFromLDAP{ $SystemGroupsByName{$SyncGroup} } = {
-                        rw => 1,
-                    };
-                    next SYNCGROUP;
-                }
-
-                # remember permissions as provided
-                $GroupPermissionsFromLDAP{ $SystemGroupsByName{$SyncGroup} } = {
-                    %PermissionsEmpty,
-                    %{ $SyncGroups{$SyncGroup} },
-                };
-            }
-        }
-    }
-
-    # sync ldap attribute 2 otrs group permissions
-    my $UserSyncAttributeGroupsDefinition = $ConfigObject->Get(
-        'AuthSyncModule::LDAP::UserSyncAttributeGroupsDefinition' . $Self->{Count}
-    );
-    if ($UserSyncAttributeGroupsDefinition) {
-
-        # build filter
-        my $Filter = "($Self->{UID}=" . escape_filter_value( $Param{User} ) . ')';
-
-        # perform search
-        $Result = $LDAP->search(
-            base   => $Self->{BaseDN},
-            filter => $Filter,
-        );
-        if ( $Result->code() ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Search failed! ($Self->{BaseDN}) filter='$Filter' " . $Result->error(),
-            );
-        }
-        else {
-            my %SyncConfig = %{$UserSyncAttributeGroupsDefinition};
-            for my $Attribute ( sort keys %SyncConfig ) {
-
-                my %AttributeValues = %{ $SyncConfig{$Attribute} };
-                ATTRIBUTEVALUE:
-                for my $AttributeValue ( sort keys %AttributeValues ) {
-
-                    for my $Entry ( $Result->all_entries() ) {
-
-                        # Check if configured value exists in values of group attribute
-                        # If yes, add sync groups to the user
-                        my $GotValue;
-                        my @Values = $Entry->get_value($Attribute);
-                        VALUE:
-                        for my $Value (@Values) {
-                            next VALUE if $Value !~ m{ \A \Q$AttributeValue\E \z }xmsi;
-                            $GotValue = 1;
-                            last VALUE;
-                        }
-                        next ATTRIBUTEVALUE if !$GotValue;
-
-                        # remember group permissions
-                        my %SyncGroups = %{ $AttributeValues{$AttributeValue} };
-                        SYNCGROUP:
-                        for my $SyncGroup ( sort keys %SyncGroups ) {
-
-                            # only for valid groups
-                            if ( !$SystemGroupsByName{$SyncGroup} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                                    Priority => 'notice',
-                                    Message =>
-                                        "Invalid group '$SyncGroup' in "
-                                        . "'AuthSyncModule::LDAP::UserSyncAttributeGroupsDefinition"
-                                        . "$Self->{Count}'!",
-                                );
-                                next SYNCGROUP;
-                            }
-
-                            # set/overwrite remembered permissions
-
-                            # if rw permission exists, discard all other permissions
-                            if ( $SyncGroups{$SyncGroup}->{rw} ) {
-                                $GroupPermissionsFromLDAP{ $SystemGroupsByName{$SyncGroup} } = {
-                                    rw => 1,
-                                };
-                                next SYNCGROUP;
-                            }
-
-                            # remember permissions as provided
-                            $GroupPermissionsFromLDAP{ $SystemGroupsByName{$SyncGroup} } = {
-                                %PermissionsEmpty,
-                                %{ $SyncGroups{$SyncGroup} },
-                            };
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    # Compare group permissions from LDAP with current user group permissions.
-    my %GroupPermissionsChanged;
-
-    if (%GroupPermissionsFromLDAP) {
-
-        PERMISSIONTYPE:
-        for my $PermissionType ( @{ $ConfigObject->Get('System::Permission') } ) {
-
-            # get current permission for type
-            my %GroupPermissions = $GroupObject->PermissionUserGroupGet(
-                UserID => $UserID,
-                Type   => $PermissionType,
-            );
-
-            GROUPID:
-            for my $GroupID ( sort keys %SystemGroups ) {
-
-                my $OldPermission = $GroupPermissions{$GroupID} ? 1 : 0;
-
-                # Set the new permission (from LDAP) if exist, if not set it to a default value
-                #   regularly 0 but it LDAP has rw permission set it to 1 as PermissionUserGroupGet()
-                #   gets all system permissions to 1 if stored permission is rw.
-                my $NewPermission = $GroupPermissionsFromLDAP{$GroupID}->{$PermissionType}
-                    || $GroupPermissionsFromLDAP{$GroupID}->{rw} ? 1 : 0;
-
-                # Skip permission if is identical as in the DB
-                next GROUPID if $OldPermission == $NewPermission;
-
-                # Remember the LDAP permission if they are not identical as in the DB.
-                $GroupPermissionsChanged{$GroupID} = $GroupPermissionsFromLDAP{$GroupID};
-            }
-        }
-    }
-
-    # update changed group permissions
-    if (%GroupPermissionsChanged) {
-        for my $GroupID ( sort keys %GroupPermissionsChanged ) {
-
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'notice',
-                Message  => "User: '$Param{User}' sync ldap group $SystemGroups{$GroupID}!",
-            );
-            $GroupObject->PermissionGroupUserAdd(
-                GID        => $GroupID,
-                UID        => $UserID,
-                Permission => $GroupPermissionsChanged{$GroupID} || \%PermissionsEmpty,
-                UserID     => 1,
-            );
         }
     }
 
@@ -719,7 +464,7 @@ sub Sync {
     if (%RolePermissionsFromLDAP) {
 
         # get current user roles
-        my %UserRoles = $GroupObject->PermissionUserRoleGet(
+        my %UserRoles = $UserObject->RoleList(
             UserID => $UserID,
         );
 
@@ -740,11 +485,11 @@ sub Sync {
                 Priority => 'notice',
                 Message  => "User: '$Param{User}' sync ldap role $SystemRoles{$RoleID}!",
             );
-            $GroupObject->PermissionRoleUserAdd(
-                UID    => $UserID,
-                RID    => $RoleID,
-                Active => $RolePermissionsFromLDAP{$RoleID} || 0,
-                UserID => 1,
+            $RoleObject->RoleUserAdd(
+                AssignUserID  => $UserID,
+                RoleID        => $RoleID,
+                UserID        => 1,
+#                Active => $RolePermissionsFromLDAP{$RoleID} || 0,
             );
         }
     }

@@ -20,11 +20,17 @@ our @ObjectDependencies = (
     'Kernel::System::Valid',
 );
 
-use constant PERMISSION_CREATE => 0x0001;
-use constant PERMISSION_READ   => 0x0002;
-use constant PERMISSION_UPDATE => 0x0004;
-use constant PERMISSION_DELETE => 0x0008;
-use constant PERMISSION_DENY   => 0xF000;
+# define permission bit values
+use constant PERMISSION => {
+    CREATE => 0x0001,
+    READ   => 0x0002,
+    UPDATE => 0x0004,
+    DELETE => 0x0008,
+    DENY   => 0xF000,
+};
+
+# just for convenience
+use constant PERMISSION_CRUD => 0x000F;
 
 =head1 NAME
 
@@ -174,6 +180,65 @@ sub PermissionTypeGet {
     ); 
 
     return %Result;
+}
+
+=item PermissionTypeLookup()
+
+get id for permission type parameters
+
+    my $PermissionID = $RoleObject->PermissionTypeLookup(
+        Name => '...'
+    );
+
+=cut
+
+sub PermissionTypeLookup {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Name)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # create cache key
+    my $CacheKey = 'PermissionTypeLookup::' . $Param{Name};
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL  => 'SELECT id FROM permission_type WHERE name = ?',
+        Bind => [ 
+            \$Param{Name},
+        ]
+    );
+
+    my $Result;
+    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        $Result = $Row[0];
+    }
+
+    if ( $Result ) {
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            Key   => $CacheKey,
+            Value => $Result,
+            TTL   => $Self->{CacheTTL},
+        );
+    }
+
+    return $Result;
 }
 
 =item PermissionLookup()
@@ -413,6 +478,11 @@ sub PermissionAdd {
         Type => $Self->{CacheType}
     );
 
+    # delete user cache 
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => 'User'
+    );
+
     return $ID;
 }
 
@@ -422,6 +492,7 @@ updates a permission
 
     my $Success = $RoleObject->PermissionUpdate(
         ID         => 123,
+        TypeID     => 1,                                        # optional
         Target     => '/tickets',                               # optional
         Value      => 0x000F,                                   # optional
         IsRequired => 0,                                        # optional
@@ -453,8 +524,8 @@ sub PermissionUpdate {
     # check if this is a duplicate after the change
     my $ID = $Self->PermissionLookup( 
         RoleID => $Data{RoleID},
-        TypeID => $Data{TypeID},
-        Target => $Param{Target}
+        TypeID => $Param{TypeID} || $Data{TypeID},
+        Target => $Param{Target} || $Param{Target},
     );
     if ( $ID && $ID != $Param{ID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -470,7 +541,7 @@ sub PermissionUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key (qw(Target Value IsRequired Comment ValidID)) {
+    for my $Key ( qw(TypeID Target Value IsRequired Comment) ) {
 
         next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
 
@@ -481,18 +552,26 @@ sub PermissionUpdate {
 
     return 1 if !$ChangeRequired;
 
+    $Param{TypeID} ||= $Data{TypeID};
+
     # update role in database
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE role_permission SET target = ?, value = ?, is_required = ?, comments = ?, '
+        SQL => 'UPDATE role_permission SET type_id = ?, target = ?, value = ?, is_required = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Target}, \$Param{Value}, \$Param{IsRequired}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{TypeID}, \$Param{Target}, \$Param{Value}, \$Param{IsRequired}, 
+            \$Param{Comment}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
     # delete cache 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # delete user cache 
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => 'User'
     );
 
     return 1;
@@ -596,8 +675,67 @@ sub PermissionDelete {
         Type => $Self->{CacheType}
     );
 
+    # delete user cache 
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => 'User'
+    );
+
     return 1;
 
+}
+
+=item GetReadablePermissionValue()
+
+returns the permission value in a readable format
+
+    my $ValueStr = $RoleObject->GetReadablePermissionValue(
+        Value  => 123,
+        Format => 'Short|Long'          # default is Short
+    );
+
+=cut
+
+sub GetReadablePermissionValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Value)) {
+        if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Result;
+
+    if ( $Param{Format} && $Param{Format} eq 'Long' ) {
+        my @Permissions;              
+        foreach my $PermissionName ( sort keys %{$Self->PERMISSION} ) {
+            next if ($Param{Value} & $Self->{$PermissionName}) != $Self->{$PermissionName};
+            push(@Permissions, $PermissionName);
+        }
+        $Result = (join(' + ', @Permissions) || 'NONE') . ' (0x'. (sprintf('%04x', $Param{Value})).')';
+    }
+    else {
+        foreach my $PermissionName ( qw( CREATE READ UPDATE DELETE DENY ) ) {
+            my $Short = substr($PermissionName, 0, 1);
+            if ($PermissionName eq 'DENY') {
+                $Short = 'X'
+            }
+
+            if ( ($Param{Value} & $Self->PERMISSION->{$PermissionName}) == $Self->PERMISSION->{$PermissionName} ) {
+                $Result .= $Short;
+            }
+            else {
+                $Result .= '-';
+            }
+        }
+    }
+
+    return $Result;
 }
 
 1;

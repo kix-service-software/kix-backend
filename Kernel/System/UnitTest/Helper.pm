@@ -23,7 +23,7 @@ our @ObjectDependencies = (
     'Kernel::System::DB',
     'Kernel::System::Cache',
     'Kernel::System::CustomerUser',
-    'Kernel::System::Group',
+    'Kernel::System::Role',
     'Kernel::System::Main',
     'Kernel::System::UnitTest',
     'Kernel::System::User',
@@ -160,7 +160,7 @@ be set to invalid automatically during the destructor. Returns
 the login name of the new user, the password is the same.
 
     my $TestUserLogin = $Helper->TestUserCreate(
-        Groups => ['admin', 'users'],           # optional, list of groups to add this user to (rw rights)
+        Roles => ['admin', 'users'],            # optional, list of roles to add this user to
         Language => 'de'                        # optional, defaults to 'en' if not set
     );
 
@@ -204,31 +204,23 @@ sub TestUserCreate {
 
     $Self->{UnitTestObject}->True( 1, "Created test user $TestUserID" );
 
-    # Add user to groups
-    GROUP_NAME:
-    for my $GroupName ( @{ $Param{Groups} || [] } ) {
+    # Add user to roles
+    ROLE_NAME:
+    for my $RoleName ( @{ $Param{Roles} || [] } ) {
 
-        # get group object
-        my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+        # get role object
+        my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
 
-        my $GroupID = $GroupObject->GroupLookup( Group => $GroupName );
-        die "Cannot find group $GroupName" if ( !$GroupID );
+        my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
+        die "Cannot find role $RoleName" if ( !$RoleID );
 
-        $GroupObject->PermissionGroupUserAdd(
-            GID        => $GroupID,
-            UID        => $TestUserID,
-            Permission => {
-                ro        => 1,
-                move_into => 1,
-                create    => 1,
-                owner     => 1,
-                priority  => 1,
-                rw        => 1,
-            },
-            UserID => 1,
-        ) || die "Could not add test user $TestUserLogin to group $GroupName";
+        $RoleObject->RoleUserAdd(
+            AssignUserID => $TestUserID,
+            RoleID       => $RoleID,
+            UserID       => 1,
+        ) || die "Could not add test user $TestUserLogin to role $RoleName";
 
-        $Self->{UnitTestObject}->True( 1, "Added test user $TestUserLogin to group $GroupName" );
+        $Self->{UnitTestObject}->True( 1, "Added test user $TestUserLogin to role $RoleName" );
     }
 
     # set user language

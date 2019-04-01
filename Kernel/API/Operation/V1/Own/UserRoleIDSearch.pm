@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserSearch.pm - API UserRole Search operation backend
+# Kernel/API/Operation/Own/UserRoleSearch.pm - API UserRole Search operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserSearch;
+package Kernel::API::Operation::V1::Own::UserRoleIDSearch;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::Role::RoleUserSearch - API Role RoleUser Search Operation backend
+Kernel::API::Operation::Own::UserRoleIDSearch - API Own UserRole Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,39 +62,13 @@ sub new {
     return $Self;
 }
 
-=item ParameterDefinition()
-
-define parameter preparation and check for this operation
-
-    my $Result = $OperationObject->ParameterDefinition(
-        Data => {
-            ...
-        },
-    );
-
-    $Result = {
-        ...
-    };
-
-=cut
-
-sub ParameterDefinition {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        'RoleID' => {
-            Required => 1
-        },
-    }
-}
 
 =item Run()
 
-perform UserRoleSearch Operation. This will return a User ID.
+perform UserRoleSearch Operation. This will return a Role ID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            RoleID => 123
         }
     );
 
@@ -103,7 +77,7 @@ perform UserRoleSearch Operation. This will return a User ID.
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            UserID => [
+            RoleIDs => [
                 ...
             ]
         },
@@ -114,24 +88,21 @@ perform UserRoleSearch Operation. This will return a User ID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform RoleUser search
-    my %UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
-        RoleID => $Param{Data}->{RoleID},
+    # get roles list
+    my %RoleList = $Kernel::OM->Get('Kernel::System::User')->RoleList(
+        UserID => $Param{Data}->{UserID},
     );
 
-    my @ResultList;
-    foreach my $UserID ( sort keys %UserList ) {
-        push(@ResultList, 0 + $UserID);     # enforce nummeric ID
-    }
+    my @ResultList = sort keys %RoleList;
     if ( IsArrayRefWithData(\@ResultList) ) {
         return $Self->_Success(
-            UserIDs => \@ResultList,
+            RoleIDs => \@ResultList,
         )
     }
 
     # return result
     return $Self->_Success(
-        UserIDs => [],
+        RoleIDs => [],
     );
 }
 

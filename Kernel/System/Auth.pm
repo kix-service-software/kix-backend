@@ -17,7 +17,6 @@ use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::Main',
     'Kernel::System::SystemMaintenance',
@@ -324,26 +323,27 @@ sub Auth {
     # check if system maintenance is active
     if ($ActiveMaintenance) {
 
-        # check if user is allow to login
-        # get current user groups
-        my %Groups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $UserID,
-            Type   => 'move_into',
-        );
+        # TODO!!! rbo-190327
+        # # check if user is allow to login
+        # # get current user groups
+        # my %Groups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+        #     UserID => $UserID,
+        #     Type   => 'move_into',
+        # );
 
-        # reverse groups hash for easy look up
-        %Groups = reverse %Groups;
+        # # reverse groups hash for easy look up
+        # %Groups = reverse %Groups;
 
-        # check if the user is in the Admin group
-        # if that is not the case return
-        if ( !$Groups{admin} ) {
+        # # check if the user is in the Admin group
+        # # if that is not the case return
+        # if ( !$Groups{admin} ) {
 
-            $Self->{LastErrorMessage} =
-                $ConfigObject->Get('SystemMaintenance::IsActiveDefaultLoginErrorMessage')
-                || Translatable("It is currently not possible to login due to a scheduled system maintenance.");
+        #     $Self->{LastErrorMessage} =
+        #         $ConfigObject->Get('SystemMaintenance::IsActiveDefaultLoginErrorMessage')
+        #         || Translatable("It is currently not possible to login due to a scheduled system maintenance.");
 
-            return;
-        }
+        #     return;
+        # }
     }
 
     # last login preferences update

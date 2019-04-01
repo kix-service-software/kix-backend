@@ -73,6 +73,11 @@ sub RoleUserAdd {
         Type => $Self->{CacheType}
     );
 
+    # delete user cache 
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => 'User'
+    );
+
     return 1;
 }
 
@@ -171,6 +176,11 @@ sub RoleUserDelete {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # delete user cache 
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => 'User'
     );
 
     return 1;
