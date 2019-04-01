@@ -119,33 +119,6 @@ sub new {
 
         next SOURCE if !$ConfigObject->Get("CustomerUser$Count");
 
-        # KIX4OTRS-capeIT
-        my $BackendGroups = $ConfigObject->Get("CustomerUser$Count")->{AccessGroups} || "";
-
-        my $Access = 1;
-        if (
-            $Param{UserID}
-            && (
-                $Param{UserID} eq '1'
-                || $Param{UserID} eq $ConfigObject->Get("CustomerPanelUserID")
-            )
-            )
-        {
-            $Access = 1;
-        }
-        elsif ( $BackendGroups && ref $BackendGroups eq 'ARRAY' ) {
-            GROUP:
-            for my $Group ( @{$BackendGroups} ) {
-                $Access = 0;
-                next GROUP if ( ( grep { $_ eq $Group; } @UserGroups ) == 0 );
-                $Access = 1;
-                last;
-            }
-        }
-        next if !$Access;
-
-        # EO KIX4OTRS-capeIT
-
         # prepare SearchFields for backend
         my $CustomerUserMap = $ConfigObject->Get("CustomerUser$Count");
         my @SearchFields;
