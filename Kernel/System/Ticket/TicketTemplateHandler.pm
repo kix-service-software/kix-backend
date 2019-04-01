@@ -92,42 +92,6 @@ sub TicketTemplateList {
         $Templates{ $Row[0] } = $Row[1];
     }
 
-    my $Config = $Self->{ConfigObject}->Get('Ticket::QuickTicketByDefaultSet::UserGroups');
-    if ( $Param{UserID} ) {
-        my $Permission = $Config->{Permission};
-
-        if ( !$Param{Frontend} || $Param{Frontend} eq 'Agent' ) {
-            $Self->{GroupObject} = $Kernel::OM->Get('Kernel::System::Group');
-        }
-        elsif ( $Param{Frontend} eq 'Customer' ) {
-            $Self->{GroupObject} = $Kernel::OM->Get('Kernel::System::CustomerGroup');
-        }
-        my %UserGroups = $Self->{GroupObject}->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => $Permission,
-            Result => 'HASH',
-        );
-
-        for my $Template ( keys %Templates ) {
-            my $Found              = 0;
-            my %TicketTemplateHash = $Self->TicketTemplateGet(
-                ID => $Template
-            );
-
-            # no user groups defined for this ticket template
-            next if !defined $TicketTemplateHash{UserGroupIDs};
-
-            # get array of user groups with permission
-            my @Array = split( /,/, $TicketTemplateHash{UserGroupIDs} );
-
-            # check if user is part of one of these groups
-            next if grep { defined $UserGroups{$_} } @Array;
-
-            # delete if no permission
-            delete( $Templates{$Template} );
-        }
-    }
-
     # set ticket template cache
     $Self->{$CacheKey} = {
         %Templates,

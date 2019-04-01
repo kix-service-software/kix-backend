@@ -28,7 +28,6 @@ use Kernel::System::Auth;
 use Kernel::System::Cache;
 use Kernel::System::DB;
 use Kernel::System::Encode;
-use Kernel::System::Group;
 use Kernel::System::Log;
 use Kernel::System::Main;
 use Kernel::System::Time;

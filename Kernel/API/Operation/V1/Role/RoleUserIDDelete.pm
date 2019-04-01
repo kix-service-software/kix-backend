@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserRoleDelete.pm - API UserRole Delete operation backend
+# Kernel/API/Operation/Role/RoleUserDelete.pm - API RoleUser Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserRoleDelete;
+package Kernel::API::Operation::V1::Role::RoleUserIDDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::UserRoleDelete - API User UserRoleDelete Operation backend
+Kernel::API::Operation::V1::Role::RoleUserIDDelete - API Role RoleUserDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -84,11 +84,11 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'UserID' => {
+        'RoleID' => {
             DataType => 'NUMERIC',
             Required => 1
         },
-        'RoleID' => {
+        'UserID' => {
             DataType => 'NUMERIC',
             Required => 1
         },
@@ -97,7 +97,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform UserRoleDelete Operation. This will return {}.
+perform RoleUserIDDelete Operation. This will return the deleted RoleUserID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -115,10 +115,10 @@ perform UserRoleDelete Operation. This will return {}.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # delete UserRole	    
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserDelete(
-        RoleID  => $Param{Data}->{RoleID},
-        UserID  => $Param{Data}->{UserID},
+    # delete RoleUser	    
+    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserDelete(
+        RoleID => $Param{Data}->{RoleID},
+        UserID => $Param{Data}->{UserID},
     );
  
     if ( !$Success ) {

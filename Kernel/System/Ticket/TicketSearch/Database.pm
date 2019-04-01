@@ -432,71 +432,72 @@ sub _CreatePermissionSQL {
         return;
     }
 
-    # permission check and restrictions
-    my %GroupList;
-    if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
+    # TODO!!! rbo-190327
+    # # permission check and restrictions
+    # my %GroupList;
+    # if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
 
-        # get users groups
-        %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $Param{UserID},
-            Type   => $Param{Permission} || 'ro',
-        );
+    #     # get users groups
+    #     %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+    #         UserID => $Param{UserID},
+    #         Type   => $Param{Permission} || 'ro',
+    #     );
 
-        # return if we have no permissions
-        return if !%GroupList;
-    }
-    if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
+    #     # return if we have no permissions
+    #     return if !%GroupList;
+    # }
+    # if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
 
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    #     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-        # get customer groups
-        %GroupList = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => $Param{Permission} || 'ro',
-            Result => 'HASH',
-        );
+    #     # get customer groups
+    #     %GroupList = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
+    #         UserID => $Param{UserID},
+    #         Type   => $Param{Permission} || 'ro',
+    #         Result => 'HASH',
+    #     );
 
-        # return if we have no permissions
-        return if !%GroupList;
+    #     # return if we have no permissions
+    #     return if !%GroupList;
 
-        # get all customer ids
-        $SQLWhere = '(';
-        my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
-            User => $Param{UserID},
-        );
+    #     # get all customer ids
+    #     $SQLWhere = '(';
+    #     my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
+    #         User => $Param{UserID},
+    #     );
 
-        if (@CustomerIDs) {
+    #     if (@CustomerIDs) {
 
-            my $Lower = '';
-            if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
-                $Lower = 'LOWER';
-            }
+    #         my $Lower = '';
+    #         if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
+    #             $Lower = 'LOWER';
+    #         }
 
-            $SQLWhere .= "$Lower(st.customer_id) IN (";
-            my $Exists = 0;
+    #         $SQLWhere .= "$Lower(st.customer_id) IN (";
+    #         my $Exists = 0;
 
-            for (@CustomerIDs) {
+    #         for (@CustomerIDs) {
 
-                if ($Exists) {
-                    $SQLWhere  .= ', ';
-                }
-                else {
-                    $Exists = 1;
-                }
-                $SQLWhere  .= "$Lower('" . $DBObject->Quote($_) . "')";
-            }
-            $SQLWhere  .= ') OR ';
-        }
+    #             if ($Exists) {
+    #                 $SQLWhere  .= ', ';
+    #             }
+    #             else {
+    #                 $Exists = 1;
+    #             }
+    #             $SQLWhere  .= "$Lower('" . $DBObject->Quote($_) . "')";
+    #         }
+    #         $SQLWhere  .= ') OR ';
+    #     }
 
-        # get all own tickets
-        my $UserIDQuoted = $DBObject->Quote( $Param{UserID} );
-        $SQLWhere  .= "st.customer_user_id = '$UserIDQuoted') ";
-    }
+    #     # get all own tickets
+    #     my $UserIDQuoted = $DBObject->Quote( $Param{UserID} );
+    #     $SQLWhere  .= "st.customer_user_id = '$UserIDQuoted') ";
+    # }
 
-    # add group ids to sql string
-    if (%GroupList) {
-        $SQLWhere = 'sq.group_id IN ('.(join(',', sort keys %GroupList)).')';
-    }
+    # # add group ids to sql string
+    # if (%GroupList) {
+    #     $SQLWhere = 'sq.group_id IN ('.(join(',', sort keys %GroupList)).')';
+    # }
 
     return $SQLWhere;
 }

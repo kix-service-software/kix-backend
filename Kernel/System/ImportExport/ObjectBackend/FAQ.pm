@@ -16,7 +16,6 @@ our @ObjectDependencies = (
     'Kernel::System::Time',
     'Kernel::System::CSV',
     'Kernel::System::User',
-    'Kernel::System::Group',
     'Kernel::System::FAQ',
     'Kernel::Config'
 );
@@ -50,33 +49,9 @@ sub ObjectAttributesGet {
     my %CategoryList = %{$CategoryTreeListRef};
     my %StateList    = $Kernel::OM->Get('Kernel::System::FAQ')->StateList( UserID => 1, );
     my %LanguageList = $Kernel::OM->Get('Kernel::System::FAQ')->LanguageList( UserID => 1, );
-    my %GroupList    = $Kernel::OM->Get('Kernel::System::Group')->GroupList();
     my %FormatList   = ( "plain" => "PlainText", "html" => "HTML" );
 
     my $Attributes = [
-        {
-            Key   => 'DefaultGroupID',
-            Name  => 'Default group for new category',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%GroupList,
-                Required     => 1,
-                Translation  => 0,
-                PossibleNone => 0,
-            },
-        },
-
-        {
-            Key   => 'DefaultCategoryID',
-            Name  => 'Default Category (if empty/invalid)',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%CategoryList,
-                Required     => 0,
-                Translation  => 1,
-                PossibleNone => 1,
-            },
-        },
         {
             Key   => 'DefaultLanguageID',
             Name  => 'Default Language (if empty/invalid)',
@@ -644,9 +619,7 @@ sub ImportDataSave {
         Counter        => $Param{Counter}                  || '',
         CategoryID     => $NewFAQData{CategoryID}          || '',
         Category       => $NewFAQData{Category}            || '',
-        DefaultGroupID => $ObjectData->{DefaultCategoryID} || '',
     );
-
     if ( $NewFAQData{Category} && !$NewFAQData{CategoryID} ) {
         $NewFAQData{CategoryID} = $CategoryID || '';
     }
@@ -791,14 +764,6 @@ sub _CheckCategory {
     my %Result   = ();
     my $ParentID = '0';
 
-    # get group id for faq group
-    my $DefaultFAQGroupID = $Param{DefaultGroupID};
-    if ( !$DefaultFAQGroupID ) {
-        $DefaultFAQGroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
-            Group => 'faq',
-        );
-    }
-
     my @CategoryNamePartsArray = split( "::", $Param{Category} );
 
     my $CategoryHashRef = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryList(
@@ -831,11 +796,6 @@ sub _CheckCategory {
                     Comment  => 'automatically created by FAQ-Import',
                     ValidID  => 1,
                     UserID   => 1,
-                );
-                $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
-                    CategoryID => $NewCategoryID,
-                    GroupIDs   => [$DefaultFAQGroupID],
-                    UserID     => 1,
                 );
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'notice',

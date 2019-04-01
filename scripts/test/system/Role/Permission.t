@@ -52,7 +52,6 @@ for my $RoleCount ( 1 .. 3 ) {
     $RoleIDByRoleName{$RoleName} = $RoleID;
 }
 my @RoleIDs = values %RoleIDByRoleName;
-
 #
 # Permission tests (users and roles)
 #
@@ -68,7 +67,7 @@ my @PermissionTests = (
             {
                 TypeID => 1,
                 Target => '/users',
-                Value  => Kernel::System::Role::Permission::PERMISSION_CREATE + Kernel::System::Role::Permission::PERMISSION_READ,
+                Value  => Kernel::System::Role::Permission->PERMISSION->{CREATE} + Kernel::System::Role::Permission->PERMISSION->{READ},
             }
         ]
     },
@@ -83,7 +82,7 @@ my @PermissionTests = (
             {
                 TypeID => 1,
                 Target => '/tickets/1',
-                Value  => Kernel::System::Role::Permission::PERMISSION_READ,
+                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
             }
         ]
     },
@@ -99,13 +98,13 @@ my @PermissionTests = (
                 TypeID  => 1,
                 Target  => '/queues',
                 Comment => 'full permission on queues',
-                Value   => Kernel::System::Role::Permission::PERMISSION_CREATE + Kernel::System::Role::Permission::PERMISSION_READ + Kernel::System::Role::Permission::PERMISSION_UPDATE + Kernel::System::Role::Permission::PERMISSION_DELETE,
+                Value   => Kernel::System::Role::Permission->PERMISSION_CRUD,
             },
             {
                 TypeID  => 2,
                 Target  => '/queues/1',
                 Comment => 'read permission on queue 1',
-                Value   => Kernel::System::Role::Permission::PERMISSION_READ,
+                Value   => Kernel::System::Role::Permission->PERMISSION->{READ},
             }
         ]
     },
@@ -120,7 +119,7 @@ my @PermissionTests = (
             {
                 TypeID => 1,
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission::PERMISSION_READ + Kernel::System::Role::Permission::PERMISSION_UPDATE,
+                Value  => Kernel::System::Role::Permission->PERMISSION->{READ} + Kernel::System::Role::Permission->PERMISSION->{UPDATE},
             }
         ]
     },
@@ -155,7 +154,7 @@ for my $PermissionTest (@PermissionTests) {
 
             $Self->True(
                 $Success,
-                "PermissionAdd() - add permission 0x".sprintf('%04x', $Permission->{Permission})." on $Permission->{Target} for role ID $RoleID"
+                "PermissionAdd() - add permission 0x".sprintf('%04x', $Permission->{Value})." on $Permission->{Target} for role ID $RoleID"
             );
         }
     }
@@ -204,9 +203,9 @@ for my $PermissionTest (@PermissionTests) {
             );
 
             $Self->Is(
-                $PermissionData{TypeID}.'::'.sprintf('%04x', $PermissionData{Permission}).'::'.$PermissionData{TargetID},
-                $Permission->{TypeID}.'::'.sprintf('%04x', $Permission->{Permission}).'::'.$Permission->{TargetID},                    
-                "PermissionGet() - permission 0x".sprintf('%04x', $Permission->{Permission})." on $Permission->{Target} should be assigned to role ID $RoleID"
+                $PermissionData{TypeID}.'::'.sprintf('%04x', $PermissionData{Value}).'::'.$PermissionData{TargetID},
+                $Permission->{TypeID}.'::'.sprintf('%04x', $Permission->{Value}).'::'.$Permission->{TargetID},                    
+                "PermissionGet() - permission 0x".sprintf('%04x', $Permission->{Value})." on $Permission->{Target} should be assigned to role ID $RoleID"
             );
         }
     }
@@ -255,7 +254,7 @@ for my $PermissionTest (@PermissionTests) {
 
             $Self->True(
                 $Success,
-                "PermissionDelete() - remove permission 0x".sprintf('%04x', $Permission->{Permission})." on $Permission->{Target} from role ID $RoleID"
+                "PermissionDelete() - remove permission 0x".sprintf('%04x', $Permission->{Value})." on $Permission->{Target} from role ID $RoleID"
             );
         }
     }
@@ -271,7 +270,7 @@ for my $PermissionTest (@PermissionTests) {
 
             $Self->False(
                 $PermissionID,
-                "PermissionList() - permission 0x".sprintf('%04x', $Permission->{Permission})." on $Permission->{Target} should not be assigned to role ID $RoleID"
+                "PermissionList() - permission 0x".sprintf('%04x', $Permission->{Value})." on $Permission->{Target} should not be assigned to role ID $RoleID"
             );
         }
     }

@@ -20,7 +20,6 @@ our @ObjectDependencies = (
     'Kernel::System::CSV',
     'Kernel::System::DB',
     'Kernel::System::FAQ',
-    'Kernel::System::Group',
     'Kernel::System::Main',
 );
 
@@ -111,11 +110,6 @@ sub Run {
     # get all FAQ language ids
     my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
 
-    # get group id for FAQ group
-    my $FAQGroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
-        Group => 'faq',
-    );
-
     my $LineCounter;
     my $SuccessCount    = 0;
     my $UnScuccessCount = 0;
@@ -168,13 +162,6 @@ sub Run {
                     ParentID => $ParentID,
                     ValidID  => 1,
                     UserID   => 1,
-                );
-
-                # add new category to FAQ group
-                $FAQObject->SetCategoryGroup(
-                    CategoryID => $CategoryID,
-                    GroupIDs   => [$FAQGroupID],
-                    UserID     => 1,
                 );
             }
 

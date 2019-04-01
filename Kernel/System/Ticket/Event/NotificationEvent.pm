@@ -24,11 +24,11 @@ our @ObjectDependencies = (
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Email',
-    'Kernel::System::Group',
     'Kernel::System::HTMLUtils',
     'Kernel::System::JSON',
     'Kernel::System::Log',
     'Kernel::System::NotificationEvent',
+    'Kernel::System::Role',
     'Kernel::System::Queue',
     'Kernel::System::SystemAddress',
     'Kernel::System::TemplateGenerator',
@@ -69,7 +69,7 @@ sub Run {
         return;
     }
 
-    # get ticket object
+    # get objects
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # return if no notification is active
@@ -407,7 +407,6 @@ sub _NotificationFilter {
         next KEY if $Key eq 'Recipients';
         next KEY if $Key eq 'SkipRecipients';
         next KEY if $Key eq 'RecipientAgents';
-        next KEY if $Key eq 'RecipientGroups';
         next KEY if $Key eq 'RecipientRoles';
         next KEY if $Key eq 'TransportEmailTemplate';
         next KEY if $Key eq 'Events';
@@ -592,7 +591,6 @@ sub _RecipientsGet {
 
     # get needed objects
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $GroupObject  = $Kernel::OM->Get('Kernel::System::Group');
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     my @RecipientUserIDs;
@@ -680,30 +678,31 @@ sub _RecipientsGet {
                 }
                 elsif ( $Recipient eq 'AgentWritePermissions' ) {
 
-                    my $GroupID = $QueueObject->GetQueueGroupID(
-                        QueueID => $Ticket{QueueID},
-                    );
+                    #TODO!!! rbo-190327
+                    # my $GroupID = $QueueObject->GetQueueGroupID(
+                    #     QueueID => $Ticket{QueueID},
+                    # );
 
-                    my %UserList = $GroupObject->PermissionGroupUserGet(
-                        GroupID => $GroupID,
-                        Type    => 'rw',
-                        UserID  => $Param{UserID},
-                    );
+                    # my %UserList = $GroupObject->PermissionGroupUserGet(
+                    #     GroupID => $GroupID,
+                    #     Type    => 'rw',
+                    #     UserID  => $Param{UserID},
+                    # );
 
-                    my %RoleList = $GroupObject->PermissionGroupRoleGet(
-                        GroupID => $GroupID,
-                        Type    => 'rw',
-                    );
-                    for my $RoleID ( sort keys %RoleList ) {
-                        my %RoleUserList = $GroupObject->PermissionRoleUserGet(
-                            RoleID => $RoleID,
-                        );
-                        %UserList = ( %RoleUserList, %UserList );
-                    }
+                    # my %RoleList = $GroupObject->PermissionGroupRoleGet(
+                    #     GroupID => $GroupID,
+                    #     Type    => 'rw',
+                    # );
+                    # for my $RoleID ( sort keys %RoleList ) {
+                    #     my %RoleUserList = $GroupObject->PermissionRoleUserGet(
+                    #         RoleID => $RoleID,
+                    #     );
+                    #     %UserList = ( %RoleUserList, %UserList );
+                    # }
 
-                    my @UserIDs = sort keys %UserList;
+                    # my @UserIDs = sort keys %UserList;
 
-                    push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
+                    # push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyQueues' ) {
 
@@ -882,37 +881,13 @@ sub _RecipientsGet {
     # hash to keep track which agents are already receiving this notification
     my %AgentUsed = map { $_ => 1 } @RecipientUserIDs;
 
-    # get recipients by RecipientGroups
-    if ( $Notification{Data}->{RecipientGroups} ) {
-
-        RECIPIENT:
-        for my $GroupID ( @{ $Notification{Data}->{RecipientGroups} } ) {
-
-            my %GroupMemberList = $GroupObject->PermissionGroupUserGet(
-                GroupID => $GroupID,
-                Type    => 'ro',
-            );
-
-            GROUPMEMBER:
-            for my $UserID ( sort keys %GroupMemberList ) {
-
-                next GROUPMEMBER if $UserID == 1;
-                next GROUPMEMBER if $AgentUsed{$UserID};
-
-                $AgentUsed{$UserID} = 1;
-
-                push @RecipientUserIDs, $UserID;
-            }
-        }
-    }
-
     # get recipients by RecipientRoles
     if ( $Notification{Data}->{RecipientRoles} ) {
 
         RECIPIENT:
         for my $RoleID ( @{ $Notification{Data}->{RecipientRoles} } ) {
 
-            my %RoleMemberList = $GroupObject->PermissionRoleUserGet(
+            my %RoleMemberList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserGet(
                 RoleID => $RoleID,
             );
 

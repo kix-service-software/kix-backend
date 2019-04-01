@@ -28,9 +28,6 @@
             "FollowUpLock" : {
                "type" : "integer"
             },
-            "GroupID" : {
-               "type" : "integer"
-            },
             "Name" : {
                "type" : "string"
             },
@@ -63,7 +60,6 @@
             }
          },
          "required" : [
-            "GroupID",
             "Name",
             "ValidID"
          ]

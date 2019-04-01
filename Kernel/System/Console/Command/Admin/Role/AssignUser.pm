@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Admin::Role::UserLink;
+package Kernel::System::Console::Command::Admin::Role::AssignUser;
 
 use strict;
 use warnings;
@@ -17,23 +17,23 @@ use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Kernel::System::User',
-    'Kernel::System::Group',
+    'Kernel::System::Role',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Connect a user to a role.');
+    $Self->Description('Assign a user to a role.');
     $Self->AddOption(
-        Name        => 'user-name',
-        Description => 'Name of the user who should be linked to the given role.',
+        Name        => 'role-name',
+        Description => 'Name of the role the given user should be assigned to.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'role-name',
-        Description => 'Name of the role the given user should be linked to.',
+        Name        => 'user-name',
+        Description => 'Name of the user who should be assigned to the given role.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -56,7 +56,7 @@ sub PreRun {
     }
 
     # check role
-    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup( Role => $Self->{RoleName} );
+    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
     if ( !$Self->{RoleID} ) {
         die "Role $Self->{RoleName} does not exist.\n";
     }
@@ -67,19 +67,17 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Trying to link user $Self->{UserName} to role $Self->{RoleName}...</yellow>\n");
+    $Self->Print("<yellow>Assigning user $Self->{UserName} to role $Self->{RoleName}...</yellow>\n");
 
-    # add user 2 role
-    if (
-        !$Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-            UID    => $Self->{UserID},
-            RID    => $Self->{RoleID},
-            Active => 1,
-            UserID => 1,
-        )
-        )
-    {
-        $Self->PrintError("Can't add user to role.");
+    # add user to role
+    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+        AssignUserID => $Self->{UserID},
+        RoleID       => $Self->{RoleID},
+        UserID       => 1,
+    );
+
+    if ( $Success ) {
+        $Self->PrintError("Can't assign user to role.");
         return $Self->ExitCodeError();
     }
 

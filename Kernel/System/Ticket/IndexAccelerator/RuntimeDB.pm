@@ -16,7 +16,6 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::DB',
-    'Kernel::System::Group',
     'Kernel::System::Lock',
     'Kernel::System::Log',
     'Kernel::System::State',
@@ -62,25 +61,6 @@ sub TicketAcceleratorIndex {
     for (qw(UserID)) {
         $Param{$_} = $DBObject->Quote( $Param{$_}, 'Integer' );
     }
-
-    # get user groups
-    my $Type             = 'rw';
-    my $AgentTicketQueue = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::AgentTicketQueue');
-    if (
-        $AgentTicketQueue
-        && ref $AgentTicketQueue eq 'HASH'
-        && $AgentTicketQueue->{ViewAllPossibleTickets}
-        )
-    {
-        $Type = 'ro';
-    }
-
-    my %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-        UserID => $Param{UserID},
-        Type   => $Type,
-    );
-
-    my @GroupIDs = sort keys %GroupList;
 
     my @QueueIDs = @{ $Param{ShownQueueIDs} };
     my %Queues;
@@ -136,20 +116,6 @@ sub TicketAcceleratorIndex {
         }
     }
 
-    # check if user is in min. one group! if not, return here
-    if ( !@GroupIDs ) {
-
-        my %Hashes;
-        $Hashes{QueueID} = 0;
-        $Hashes{Queue}   = 'CustomQueue';
-        $Hashes{MaxAge}  = 0;
-        $Hashes{Count}   = 0;
-
-        push @{ $Queues{Queues} }, \%Hashes;
-
-        return %Queues;
-    }
-
     # CustomQueue add on
     return if !$DBObject->Prepare(
 
@@ -161,7 +127,6 @@ sub TicketAcceleratorIndex {
                 AND st.queue_id = sq.id
                 AND st.archive_flag = 0
                 AND suq.queue_id = st.queue_id
-                AND sq.group_id IN ( ${\(join ', ', @GroupIDs)} )
                 AND suq.user_id = $Param{UserID}
                 GROUP BY st.ticket_lock_id",
     );
@@ -204,7 +169,6 @@ sub TicketAcceleratorIndex {
             WHERE st.ticket_state_id IN ( ${\(join ', ', @ViewableStateIDs)} )
                 AND st.queue_id = sq.id
                 AND st.archive_flag = 0
-                AND sq.group_id IN ( ${\(join ', ', @GroupIDs)} )
             GROUP BY st.queue_id, sq.name, st.ticket_lock_id
             ORDER BY sq.name"
     );

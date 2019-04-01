@@ -35,7 +35,6 @@ our @ObjectDependencies = (
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Email',
-    'Kernel::System::Group',
     'Kernel::System::HTMLUtils',
     'Kernel::System::LinkObject',
     'Kernel::System::Lock',
@@ -1266,7 +1265,6 @@ sub TicketGet {
     );
 
     $Ticket{Queue}   = $Queue{Name};
-    $Ticket{GroupID} = $Queue{GroupID};
 
     # fillup runtime values
     $Ticket{Age} = $TimeObject->SystemTime() - $Ticket{CreateTimeUnix};
@@ -3816,7 +3814,7 @@ sub GetSubscribedUserIDsByQueueID {
         return;
     }
 
-    # get group of queue
+    # get queues
     my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{QueueID} );
 
     # get database object
@@ -3833,7 +3831,6 @@ sub GetSubscribedUserIDsByQueueID {
     }
 
     # get needed objects
-    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
     my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
 
     # check if user is valid and check permissions
@@ -3849,15 +3846,16 @@ sub GetSubscribedUserIDsByQueueID {
 
         next USER if !%User;
 
-        # just send emails to permitted agents
-        my %GroupMember = $GroupObject->PermissionUserGet(
-            UserID => $UserID,
-            Type   => 'ro',
-        );
+        # TODO!!! rbo-190327
+        # # just send emails to permitted agents
+        # my %GroupMember = $GroupObject->PermissionUserGet(
+        #     UserID => $UserID,
+        #     Type   => 'ro',
+        # );
 
-        if ( $GroupMember{ $Queue{GroupID} } ) {
-            push @CleanUserIDs, $UserID;
-        }
+        # if ( $GroupMember{ $Queue{GroupID} } ) {
+        #     push @CleanUserIDs, $UserID;
+        # }
     }
 
     return @CleanUserIDs;

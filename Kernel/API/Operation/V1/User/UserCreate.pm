@@ -209,7 +209,7 @@ sub Run {
 
         foreach my $RoleID ( @{$User->{RoleIDs}} ) {
             my $Result = $Self->ExecOperation(
-                OperationType => 'V1::User::UserRoleCreate',
+                OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {
                     UserID => $UserID,
                     RoleID => $RoleID,

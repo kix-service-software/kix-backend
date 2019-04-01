@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Admin::Role::Add;
+package Kernel::System::Console::Command::Admin::User::ListRoles;
 
 use strict;
 use warnings;
@@ -16,24 +16,18 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
+    'Kernel::System::User',
     'Kernel::System::Role',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Create a new role.');
+    $Self->Description('List the roles the user is assigned to.');
     $Self->AddOption(
-        Name        => 'name',
-        Description => 'Name of the new role.',
+        Name        => 'user',
+        Description => 'Specify the user login of the agent.',
         Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'comment',
-        Description => 'Comment for the new role.',
-        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -41,25 +35,41 @@ sub Configure {
     return;
 }
 
+sub PreRun {
+
+    my ( $Self, %Param ) = @_;
+
+    $Self->{UserLogin} = $Self->GetOption('user');
+
+    # check user
+    $Self->{UserID} = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $Self->{UserLogin} );
+    if ( !$Self->{UserID} ) {
+        die "User $Self->{Userlogin} does not exist.\n";
+    }
+
+    return;
+}
+
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Adding a new role...</yellow>\n");
+    $Self->Print("<yellow>Listing roles the user $Self->{UserLogin} is assigned to...</yellow>\n");
 
-    my $RID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
-        Name    => $Self->GetOption('name'),
-        Comment => $Self->GetOption('comment') || '',
-        ValidID => 1,
-        UserID  => 1,
+    my @RoleIDs = $Kernel::OM->Get('Kernel::System::User')->RoleList(
+        UserID  => $Self->{UserID},
     );
 
-    if ($RID) {
-        $Self->Print("<green>Done</green>\n");
-        return $Self->ExitCodeOk();
+    foreach my $ID ( sort @RoleIDs ) {
+        my $RoleName = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+            RoleID => $ID
+        );
+        next if !$RoleName;
+
+        $Self->Print("$RoleName\n");
     }
 
-    $Self->PrintError("Can't add role");
-    return $Self->ExitCodeError();
+    $Self->Print("<green>Done</green>\n");
+    return $Self->ExitCodeOk();
 }
 
 1;

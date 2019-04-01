@@ -19,7 +19,6 @@ use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
     'Kernel::System::Auth',
-    'Kernel::System::Group',
     'Kernel::System::User',
 );
 
@@ -32,7 +31,6 @@ sub Run {
 
     # get needed objects
     my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
-    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
 
     my %UserList = $UserObject->UserList(
         Type  => 'Short',

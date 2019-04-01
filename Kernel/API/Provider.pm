@@ -183,9 +183,10 @@ sub Run {
     }
 
     my $Operation      = $FunctionResult->{Operation};
+    my $RequestURI     = $FunctionResult->{RequestURI};
     my $CurrentRoute   = $FunctionResult->{Route};
     my $AllowedMethods = $FunctionResult->{AllowedMethods};
-    my $RequestMethod  = $FunctionResult->{Data}->{RequestMethod};
+    my $RequestMethod  = $FunctionResult->{RequestMethod};
     my $ResourceOperationRouteMapping = $FunctionResult->{ResourceOperationRouteMapping};
 
     if ( $Operation ) {
@@ -320,7 +321,6 @@ sub Run {
         $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
 
         if ( !$FunctionResult->{Success} ) {
-
             return $Self->_GenerateErrorResponse(
                 %{$FunctionResult},
             );
@@ -341,6 +341,9 @@ sub Run {
         OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
         WebserviceID            => $WebserviceID,
         OperationRouteMapping   => $ResourceOperationRouteMapping,
+        RequestMethod           => $RequestMethod,
+        CurrentRoute            => $CurrentRoute,
+        RequestURI              => $RequestURI,
         Authorization           => $Authorization,
     );
 

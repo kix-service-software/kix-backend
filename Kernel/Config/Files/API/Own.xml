@@ -53,13 +53,13 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Own::UserRoleSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Own::UserRoleIDSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">UserRoleSearch</Item>
+                <Item Key="Name">UserRoleIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">UserRoleCollectionResponse</Item>
+                <Item Key="ResponseObject">UserRoleIDCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

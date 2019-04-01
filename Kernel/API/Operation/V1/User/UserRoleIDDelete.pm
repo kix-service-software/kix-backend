@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/User/UserRoleCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/User/UserRoleDelete.pm - API UserRole Delete operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserRoleCreate;
+package Kernel::API::Operation::V1::User::UserRoleIDDelete;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::User::UserRoleCreate - API User UserRole Create Operation backend
+Kernel::API::Operation::V1::User::UserRoleDelete - API User UserRoleDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -85,9 +85,11 @@ sub ParameterDefinition {
 
     return {
         'UserID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
         'RoleID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
     }
@@ -95,21 +97,17 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform UserRoleCreate Operation. This will return sucsess.
+perform UserRoleDelete Operation. This will return {}.
 
     my $Result = $OperationObject->Run(
         Data => {
-            UserID    => 12,
-            RoleID    => 6,
-        },
+            RoleID  => 123,
+            UserID  => 123,
+        },		
     );
 
     $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-        },
+        Message    => '',                      # in case of error
     };
 
 =cut
@@ -117,26 +115,21 @@ perform UserRoleCreate Operation. This will return sucsess.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserAdd(
-        UID    => $Param{Data}->{UserID},
-        RID    => $Param{Data}->{RoleID},
-        Active => 1,
-        UserID => $Self->{Authorization}->{UserID},
+    # delete RoleUser	    
+    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserDelete(
+        RoleID => $Param{Data}->{RoleID},
+        UserID => $Param{Data}->{UserID},
     );
-
+ 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create role assignment, please contact the system administrator',
+            Code    => 'Object.UnableToDelete',
+            Message => 'Could not delete role assignment, please contact the system administrator',
         );
     }
-    
-    # return result    
-    return $Self->_Success(
-        Code   => 'Object.Created',
-    );    
-}
 
+    # return result
+    return $Self->_Success();
+}
 
 1;

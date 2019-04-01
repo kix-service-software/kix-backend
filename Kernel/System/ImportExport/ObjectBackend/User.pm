@@ -10,11 +10,7 @@ package Kernel::System::ImportExport::ObjectBackend::User;
 
 use strict;
 use warnings;
-use Kernel::System::User;
-use Kernel::System::Valid;
-use Kernel::System::Time;
-use Kernel::System::Queue;
-use Kernel::System::Group;
+
 use Time::Local;
 
 use vars qw($VERSION);
@@ -24,7 +20,7 @@ our @ObjectDependencies = (
     'Kernel::System::ImportExport',
     'Kernel::System::User',
     'Kernel::System::Queue',
-    'Kernel::System::Group',
+    'Kernel::System::Role',
     'Kernel::System::Log',
     'Kernel::Config'
 );
@@ -472,16 +468,15 @@ sub ExportDataGet {
         }
 
         # get roles
-        my @RoleIDs = $Kernel::OM->Get('Kernel::System::Group')->GroupUserRoleMemberList(
+        my %Roles = $Kernel::OM->Get('Kernel::System::User')->RolesList(
             UserID => $CurrUser,
-            Result => 'ID',
         );
-        if (@RoleIDs) {
+        if (%Roles) {
             my $CurrIndex = 0;
             my $NumberOfRoles = $ObjectData->{NumberOfRoles} || 10;
-            for my $RoleID (@RoleIDs) {
+            for my $RoleID (sort keys %{$Roles}) {
                 if ( $CurrIndex < $NumberOfRoles ) {
-                    my $Role = $Kernel::OM->Get('Kernel::System::Group')
+                    my $Role = $Kernel::OM->Get('Kernel::System::Role')
                         ->RoleLookup( RoleID => $RoleID );
                     $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) } = $Role;
                 }
@@ -869,17 +864,17 @@ UserConfigItemOverviewSmallPageShown UserChangeOverviewSmallPageShown UserRefres
             if ( $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) } ) {
 
                 # get RoleID
-                my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+                my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
                     Role => $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) },
                 );
 
                 #create new entry
                 if ($RoleID) {
-                    my $Success = $Kernel::OM->Get('Kernel::System::Group')->GroupUserRoleMemberAdd(
-                        UID    => $UserID,
-                        RID    => $RoleID,
-                        Active => 1,
-                        UserID => $Param{UserID},
+                    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                        AssignUserID => $UserID,
+                        RoleID       => $RoleID,
+                        Active       => 1,
+                        UserID       => $Param{UserID},
                     );
                     $ReturnCode = "Partially changed - see log for details" if ( !$Success );
 

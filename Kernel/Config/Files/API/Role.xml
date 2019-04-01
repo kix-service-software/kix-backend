@@ -58,32 +58,32 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserIDSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">RoleUserSearch</Item>
+                <Item Key="Name">RoleUserIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseObject">RoleUserIDCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserCreate" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserIDCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">RoleUserCreate</Item>
+                <Item Key="Name">RoleUserIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestObject">RoleUserIDPostRequest</Item>
                 <Item Key="ResponseObject">RoleUserIDPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserDelete" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserIDDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">RoleUserDelete</Item>
+                <Item Key="Name">RoleUserIDDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

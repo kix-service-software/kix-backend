@@ -16,7 +16,6 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Group',
     'Kernel::System::Queue',
     'Kernel::System::SystemAddress',
 );
@@ -28,13 +27,6 @@ sub Configure {
     $Self->AddOption(
         Name        => 'name',
         Description => 'Queue name for the new queue.',
-        Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'group',
-        Description => 'Group which should be assigned to the new queue.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -104,14 +96,6 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new queue...</yellow>\n");
 
-    # check group
-    my $Group = $Self->GetOption('group');
-    my $GroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup( Group => $Group );
-    if ( !$GroupID ) {
-        $Self->PrintError("Found no GroupID for $Group\n");
-        return $Self->ExitCodeError();
-    }
-
     my $SystemAddressID   = $Self->GetOption('system-address-id');
     my $SystemAddressName = $Self->GetOption('system-address-name');
 
@@ -139,7 +123,6 @@ sub Run {
     # add queue
     my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
         Name              => $Self->GetOption('name'),
-        GroupID           => $GroupID,
         SystemAddressID   => $SystemAddressID || $Self->GetOption('system-address-id') || undef,
         Comment           => $Self->GetOption('comment'),
         UnlockTimeout     => $Self->GetOption('unlock-timeout'),

@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Role/RoleUserCreate.pm - API RoleUser Create operation backend
+# Kernel/API/Operation/User/UserRoleCreate.pm - API RoleUser Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Role::RoleUserCreate;
+package Kernel::API::Operation::V1::User::UserRoleIDCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Role::RoleUserCreate - API Role RoleUser Create Operation backend
+Kernel::API::Operation::V1::User::UserRoleCreate - API User UserRole Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -64,27 +64,6 @@ sub new {
     return $Self;
 }
 
-=item Run()
-
-perform RoleUserCreate Operation. This will return sucsess.
-
-    my $Result = $OperationObject->Run(
-        Data => {
-            UserID    => 12,
-            RoleID    => 6,
-        },
-    );
-
-    $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-        },
-    };
-
-=cut
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -114,6 +93,28 @@ sub ParameterDefinition {
     }
 }
 
+=item Run()
+
+perform UserRoleCreate Operation. This will return sucsess.
+
+    my $Result = $OperationObject->Run(
+        Data => {
+            UserID    => 12,
+            RoleID    => 6,
+        },
+    );
+
+    $Result = {
+        Success         => 1,                       # 0 or 1
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
+        Data            => {                        # result data payload after Operation
+            RoleID => 123
+        },
+    };
+
+=cut
+
 sub Run {
     my ( $Self, %Param ) = @_;
 
@@ -130,10 +131,11 @@ sub Run {
             Message => 'Could not create role assignment, please contact the system administrator',
         );
     }
-    
+
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
+        RoleID => $Param{Data}->{RoleID},
     );    
 }
 

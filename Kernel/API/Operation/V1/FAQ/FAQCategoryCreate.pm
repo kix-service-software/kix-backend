@@ -90,11 +90,7 @@ sub ParameterDefinition {
         },
         'FAQCategory::Name' => {
             Required => 1
-        },            
-        'FAQCategory::GroupIDs' => {
-            Type     => 'ARRAY',
-            Required => 1
-        },            
+        }
     }
 }
 
@@ -109,9 +105,6 @@ perform FAQCategoryCreate Operation. This will return the created FAQCategoryID.
                 Comment  => 'Some comment', # optional
                 ParentID => 2,              # optional
                 ValidID  => 1,              # optional, default 1
-                GroupIDs => [
-                    1,2,3,...
-                ]
             },
         },
     );
@@ -164,20 +157,6 @@ sub Run {
         );
     }
 
-    # set groups    
-    my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
-        CategoryID => $FAQCategoryID,
-        GroupIDs   => $FAQCategory->{GroupIDs} || [],
-        UserID     => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create group assignment, please contact the system administrator',
-        );
-    }
-    
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',

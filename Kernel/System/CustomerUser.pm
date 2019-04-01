@@ -20,9 +20,6 @@ our @ObjectDependencies = (
     'Kernel::System::CustomerCompany',
     'Kernel::System::DB',
 
-    # KIX4OTRS-capeIT
-    'Kernel::System::Group',
-
     # EO KIX4OTRS-capeIT
     'Kernel::System::Log',
     'Kernel::System::Main',
@@ -81,7 +78,6 @@ sub new {
 
     # KIX4OTRS-capeIT
     my $TimeObject  = $Kernel::OM->Get('Kernel::System::Time');
-    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
     my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
 
     my $FrontendBaselink = '';
@@ -116,31 +112,7 @@ sub new {
             }
         }
     }
-
-    my @UserGroups;
-    $Param{UserID} = 1 if !$Param{UserID};
-    if ( $Param{UserID} && $FrontendBaselink eq 'index' ) {
-        if ( $Param{UserID} !~ /^\d+$/ ) {
-            $Param{UserID} = $UserObject->UserLookup(
-                UserLogin => $Param{UserID}
-            );
-        }
-        @UserGroups = $GroupObject->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'ro',
-            Result => 'Name',
-        );
-    }
-    elsif ( !$Param{UserID} && $FrontendBaselink eq 'customer' ) {
-        $Param{UserID} = $ConfigObject->Get("CustomerPanelUserID");
-    }
-    elsif ( !$ConfigObject->Get('CustomerGroupSupport') && $FrontendBaselink eq 'customer' ) {
-        # if no customer group support is activate and we are in the customer frontend, allow access
-        $Param{UserID} = $ConfigObject->Get("CustomerPanelUserID");
-    }
-
-    # EO KIX4OTRS-capeIT
-
+    
     # load customer user backend module
     SOURCE:
     for my $Count ( '', 1 .. 10 ) {

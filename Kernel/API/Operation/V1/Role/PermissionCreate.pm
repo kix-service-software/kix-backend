@@ -64,34 +64,6 @@ sub new {
     return $Self;
 }
 
-=item Run()
-
-perform PermissionCreate Operation. This will return sucsess.
-
-    my $Result = $OperationObject->Run(
-        Data => {
-            RoleID     => 6,
-            Permission => {
-                TypeID     => 1,
-                Target     => '/tickets',
-                Value      => 0x0003,
-                IsRequired => 0,
-                Comment    => 'just a comment'
-            }
-        },
-    );
-
-    $Result = {
-        Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
-        Message         => '',                      # in case of error
-        Data            => {                        # result data payload after Operation
-            PermissionID => 123
-        },
-    };
-
-=cut
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -135,6 +107,34 @@ sub ParameterDefinition {
         },
     }
 }
+
+=item Run()
+
+perform PermissionCreate Operation. This will return sucsess.
+
+    my $Result = $OperationObject->Run(
+        Data => {
+            RoleID     => 6,
+            Permission => {
+                TypeID     => 1,
+                Target     => '/tickets',
+                Value      => 0x0003,
+                IsRequired => 0,
+                Comment    => 'just a comment'
+            }
+        },
+    );
+
+    $Result = {
+        Success         => 1,                       # 0 or 1
+        Code            => '',                      # 
+        Message         => '',                      # in case of error
+        Data            => {                        # result data payload after Operation
+            PermissionID => 123
+        },
+    };
+
+=cut
 
 sub Run {
     my ( $Self, %Param ) = @_;

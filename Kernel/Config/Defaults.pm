@@ -208,36 +208,6 @@ sub LoadDefaults {
 #        'host1\.example\.com' => 'SomeTheme1',
 #        'host2\.example\.com' => 'SomeTheme1',
 #    };
-
-    # Frontend::WebPath
-    # (URL base path of icons, CSS and Java Script.)
-    $Self->{'Frontend::WebPath'} = '/kix-web/';
-
-    #rbo - T2016121190001552 - added KIX placeholders
-    # Frontend::JavaScriptPath
-    # (URL JavaScript path.)
-    $Self->{'Frontend::JavaScriptPath'} =  '<KIX_CONFIG_Frontend::WebPath>js/';
-
-    #rbo - T2016121190001552 - added KIX placeholders
-    # Frontend::CSSPath
-    # (URL CSS path.)
-    $Self->{'Frontend::CSSPath'} =  '<KIX_CONFIG_Frontend::WebPath>css/';
-
-    #rbo - T2016121190001552 - added KIX placeholders
-    # Frontend::ImagePath
-    # (URL image path of icons for navigation.)
-    $Self->{'Frontend::ImagePath'} = '<KIX_CONFIG_Frontend::WebPath>skins/Agent/default/img/';
-
-    # DefaultViewNewLine
-    # (insert new line in text messages after max x chars and
-    # the next word)
-    $Self->{DefaultViewNewLine} = 90;
-
-    # DefaultViewLines
-    # (Max viewable lines in text messages (like ticket lines
-    # in QueueZoom)
-    $Self->{DefaultViewLines} = 6000;
-
     # ShowAlwaysLongTime
     # (show always time in long /days hours minutes/ or short
     # /days hours/ format)
@@ -274,7 +244,31 @@ sub LoadDefaults {
     $Self->{CheckEmailInvalidAddress} = '@(example)\.(..|...)$';
 
     # --------------------------------------------------- #
-    # LogModule                                           #
+    # API                                                 #
+    # --------------------------------------------------- #
+    # cache is enabled
+    $Self->{'API::Cache'} = 1;
+
+    # debug API behaviour
+    $Self->{'API::Debug'} = 0;
+
+    # --------------------------------------------------- #
+    # Cache                                               #
+    # --------------------------------------------------- #
+    # stats are disabled
+    $Self->{'Cache::Stats'} = 0;
+
+    # debug cache behaviour
+    $Self->{'Cache::Debug'} = 0;
+
+    # --------------------------------------------------- #
+    # Permissions                                         #
+    # --------------------------------------------------- #
+    # debug permissions
+    $Self->{'Permission::Debug'} = 0;
+
+    # --------------------------------------------------- #
+    # Logging                                             #
     # --------------------------------------------------- #
     # (log backend module)
     $Self->{LogModule} = 'Kernel::System::Log::File';
@@ -499,38 +493,6 @@ sub LoadDefaults {
 #    $Self->{'AuthSyncModule::LDAP::UserAttr'} = 'UID';
 #    $Self->{'AuthSyncModule::LDAP::UserAttr'} = 'DN';
 
-    # AuthSyncModule::LDAP::UserSyncInitialGroups
-    # (sync following group with rw permission after initial create of first agent
-    # login)
-#    $Self->{'AuthSyncModule::LDAP::UserSyncInitialGroups'} = [
-#        'users',
-#    ];
-
-    # AuthSyncModule::LDAP::UserSyncGroupsDefinition
-    # (If "LDAP" was selected for AuthModule and you want to sync LDAP
-    # groups to otrs groups, define the following.)
-#    $Self->{'AuthSyncModule::LDAP::UserSyncGroupsDefinition'} = {
-#        # ldap group
-#        'cn=agent,o=otrs' => {
-#            # otrs group
-#            'admin' => {
-#                # permission
-#                rw => 1,
-#                ro => 1,
-#            },
-#            'faq' => {
-#                rw => 0,
-#                ro => 1,
-#            },
-#        },
-#        'cn=agent2,o=otrs' => {
-#            'users' => {
-#                rw => 1,
-#                ro => 1,
-#            },
-#        }
-#    };
-
     # AuthSyncModule::LDAP::UserSyncRolesDefinition
     # (If "LDAP" was selected for AuthModule and you want to sync LDAP
     # groups to otrs roles, define the following.)
@@ -544,36 +506,6 @@ sub LoadDefaults {
 #        'cn=agent2,o=otrs' => {
 #            'role3' => 1,
 #        }
-#    };
-
-    # AuthSyncModule::LDAP::UserSyncAttributeGroupsDefinition
-    # (If "LDAP" was selected for AuthModule and you want to sync LDAP
-    # attributes to otrs groups, define the following.)
-#    $Self->{'AuthSyncModule::LDAP::UserSyncAttributeGroupsDefinition'} = {
-#        # ldap attribute
-#        'LDAPAttribute' => {
-#            # ldap attribute value
-#            'LDAPAttributeValue1' => {
-#                # otrs group
-#                'admin' => {
-#                    # permission
-#                    rw => 1,
-#                    ro => 1,
-#                },
-#                'faq' => {
-#                    rw => 0,
-#                    ro => 1,
-#                },
-#            },
-#        },
-#        'LDAPAttribute2' => {
-#            'LDAPAttributeValue' => {
-#                'users' => {
-#                    rw => 1,
-#                    ro => 1,
-#                },
-#            },
-#         }
 #    };
 
     # AuthSyncModule::LDAP::UserSyncAttributeRolesDefinition
@@ -783,131 +715,6 @@ sub LoadDefaults {
     $Self->{SpellCheckerIgnore} = [ 'www', 'webmail', 'https', 'http', 'html', 'rfc' ];
 
     # --------------------------------------------------- #
-    # CommonCSS                                           #
-    # --------------------------------------------------- #
-
-    # Customer Common CSS
-    $Self->{'Loader::Customer::CommonCSS'}->{'000-Framework'} =  [
-        'Core.Reset.css',
-        'Core.Default.css',
-        'Core.Form.css',
-        'Core.Dialog.css',
-        'Core.Tooltip.css',
-        'Core.Login.css',
-        'Core.Control.css',
-        'Core.Table.css',
-        'Core.TicketZoom.css',
-        'Core.InputFields.css',
-        'Core.Print.css',
-        'thirdparty/fontawesome/font-awesome.css'
-    ];
-
-    # Agent Common CSS
-    $Self->{'Loader::Agent::CommonCSS'}->{'000-Framework'} =  [
-        'Core.Reset.css',
-        'Core.Default.css',
-        'Core.Header.css',
-        'Core.OverviewControl.css',
-        'Core.OverviewSmall.css',
-        'Core.OverviewMedium.css',
-        'Core.OverviewLarge.css',
-        'Core.Footer.css',
-        'Core.PageLayout.css',
-        'Core.Form.css',
-        'Core.Table.css',
-        'Core.Widget.css',
-        'Core.WidgetMenu.css',
-        'Core.TicketDetail.css',
-        'Core.Tooltip.css',
-        'Core.Dialog.css',
-        'Core.InputFields.css',
-        'Core.Print.css',
-        'thirdparty/fontawesome/font-awesome.css',
-    ];
-
-    # --------------------------------------------------- #
-    # CommonJS                                           #
-    # --------------------------------------------------- #
-
-    # Customer Common JS
-    $Self->{'Loader::Customer::CommonJS'}->{'000-Framework'} =  [
-        'thirdparty/jquery-2.1.4/jquery.js',
-        'thirdparty/jquery-browser-detection/jquery-browser-detection.js',
-        'thirdparty/jquery-validate-1.14.0/jquery.validate.js',
-        'thirdparty/jquery-ui-1.11.4/jquery-ui.js',
-        'thirdparty/stacktrace-0.6.4/stacktrace.js',
-        'thirdparty/jquery-pubsub/pubsub.js',
-        'thirdparty/jquery-jstree-3.1.1/jquery.jstree.js',
-        'Core.Debug.js',
-        'Core.Exception.js',
-        'Core.Data.js',
-        'Core.JSON.js',
-        'Core.JavaScriptEnhancements.js',
-        'Core.Config.js',
-        'Core.App.js',
-        'Core.App.Responsive.js',
-        'Core.AJAX.js',
-        'Core.UI.js',
-        'Core.UI.InputFields.js',
-        'Core.UI.Accessibility.js',
-        'Core.UI.Dialog.js',
-        'Core.UI.RichTextEditor.js',
-        'Core.UI.Datepicker.js',
-        'Core.UI.Popup.js',
-        'Core.UI.TreeSelection.js',
-        'Core.UI.Autocomplete.js',
-        'Core.Form.js',
-        'Core.Form.ErrorTooltips.js',
-        'Core.Form.Validate.js',
-        'Core.Customer.js',
-        'Core.Customer.Responsive.js'
-    ];
-
-    # Agent Common JS
-    $Self->{'Loader::Agent::CommonJS'}->{'000-Framework'} =  [
-        'thirdparty/jquery-2.1.4/jquery.js',
-        'thirdparty/jquery-browser-detection/jquery-browser-detection.js',
-        'thirdparty/jquery-ui-1.11.4/jquery-ui.js',
-        'thirdparty/jquery-ui-touch-punch-0.2.3/jquery.ui.touch-punch.js',
-        'thirdparty/jquery-validate-1.14.0/jquery.validate.js',
-        'thirdparty/stacktrace-0.6.4/stacktrace.js',
-        'thirdparty/jquery-pubsub/pubsub.js',
-        'thirdparty/jquery-jstree-3.1.1/jquery.jstree.js',
-        'Core.JavaScriptEnhancements.js',
-        'Core.Debug.js',
-        'Core.Exception.js',
-        'Core.Data.js',
-        'Core.Config.js',
-        'Core.JSON.js',
-        'Core.App.js',
-        'Core.App.Responsive.js',
-        'Core.AJAX.js',
-        'Core.UI.js',
-        'Core.UI.InputFields.js',
-        'Core.UI.Accordion.js',
-        'Core.UI.Datepicker.js',
-        'Core.UI.DnD.js',
-        'Core.UI.Floater.js',
-        'Core.UI.Resizable.js',
-        'Core.UI.Table.js',
-        'Core.UI.Accessibility.js',
-        'Core.UI.RichTextEditor.js',
-        'Core.UI.Dialog.js',
-        'Core.UI.ActionRow.js',
-        'Core.UI.Popup.js',
-        'Core.UI.TreeSelection.js',
-        'Core.UI.Autocomplete.js',
-        'Core.Form.js',
-        'Core.Form.ErrorTooltips.js',
-        'Core.Form.Validate.js',
-        'Core.Agent.js',
-        'Core.Agent.Search.js',
-        'Core.Agent.CustomerInformationCenterSearch.js',
-        'Core.UI.Notification.js',
-        'Core.Agent.Responsive.js',
-    ];
-
-    # --------------------------------------------------- #
     #                                                     #
     #            package management options               #
     #                                                     #
@@ -955,20 +762,6 @@ sub LoadDefaults {
 
 #    $Self->{'SMIME::CertPath'} = '/etc/ssl/certs';
 #    $Self->{'SMIME::PrivatePath'} = '/etc/ssl/private';
-
-    # --------------------------------------------------- #
-    # system permissions
-    # --------------------------------------------------- #
-    $Self->{'System::Permission'}           = [
-        'ro',
-        'move_into',
-        'create',
-        'note',
-        'owner',
-        'priority',
-        'rw',
-    ];
-    $Self->{'System::Customer::Permission'} = [ 'ro', 'rw' ];
 
     # --------------------------------------------------- #
     #                                                     #
@@ -1534,155 +1327,11 @@ via the Preferences button after logging in.
         0 => 'No',
     };
 
-    $Self->{'Frontend::CommonParam'} = {
-
-        # param => default value
-#        SomeParam => 'DefaultValue',
-        Action => 'AdminInit',
-    };
-
-    $Self->{'CustomerFrontend::CommonParam'} = {
-
-        # param => default value
-#        SomeParam => 'DefaultValue',
-    };
-
-    $Self->{'PublicFrontend::CommonParam'} = {
-
-        # param => default value
-#        SomeParam => 'DefaultValue',
-    };
-
     # If the public interface is protected with .htaccess
     # we can specify the htaccess login data here,
     # this is necessary for the support data collector
     # $Self->{'PublicFrontend::AuthUser'} = '';
     # $Self->{'PublicFrontend::AuthPassword'} = '';
-
-    # --------------------------------------------------- #
-    # Frontend Module Registry (Agent)
-    # --------------------------------------------------- #
-    # Module (from Kernel/Modules/*.pm) => Group
-
-    # admin interface
-    $Self->{'Frontend::Module'}->{Admin} = {
-        'Description' => 'Admin Area.',
-        'Group' => [
-            'admin'
-        ],
-        'Loader' => {
-            'CSS' => [
-                'Core.Agent.Admin.css'
-            ],
-                'JavaScript' => [
-                'Core.Agent.Admin.SysConfig.js'
-            ]
-        },
-        'NavBar' => [
-            {
-                'AccessKey' => 'a',
-                'Block' => 'ItemArea',
-                'Description' => '',
-                'Link' => 'Action=Admin',
-                'LinkOption' => '',
-                'Name' => 'Admin',
-                'NavBar' => 'Admin',
-                'Prio' => '10000',
-                'Type' => 'Menu'
-            }
-        ],
-        'NavBarModule' => {
-            'Module' => 'Kernel::Output::HTML::NavBar::ModuleAdmin'
-        },
-        'NavBarName' => 'Admin',
-        'Title' => ''
-    };
-    $Self->{'Frontend::Module'}->{AdminInit} = {
-        'Description' => 'Admin',
-        'Group' => [
-            'admin'
-        ],
-        'NavBarName' => '',
-        'Title' => 'Init'
-    };
-    $Self->{'Frontend::Module'}->{AdminLog} = {
-        'Description' => 'Admin',
-        'Group' => [
-            'admin'
-        ],
-        'NavBarModule' => {
-            'Block' => 'System',
-            'Description' => Translatable('View system log messages.'),
-            'Module' => 'Kernel::Output::HTML::NavBar::ModuleAdmin',
-            'Name' => Translatable('System Log'),
-            'Prio' => '600'
-        },
-        'NavBarName' => 'Admin',
-        'Title' => 'System Log'
-    };
-    $Self->{'Frontend::Module'}->{AdminSysConfig} = {
-        Group        => ['admin'],
-        Description  => 'Admin',
-        Title        => 'SysConfig',
-        NavBarName   => 'Admin',
-        NavBarModule => {
-            Module      => 'Kernel::Output::HTML::NavBar::ModuleAdmin',
-            Name        => Translatable('SysConfig'),
-            Description => Translatable('Edit the system configuration settings.'),
-            Block       => 'System',
-            Prio        => 800,
-        },
-        Loader       => {
-            CSS => [
-                'Core.Agent.Admin.SysConfig.css',
-            ],
-            JavaScript => [
-                'Core.Agent.Admin.SysConfig.js',
-            ],
-        },
-    };
-    $Self->{'Frontend::Module'}->{AdminPackageManager} = {
-        'Description' => 'Software Package Manager.',
-        'Group' => [
-            'admin'
-        ],
-        'NavBarModule' => {
-            'Block' => 'System',
-            'Description' => Translatable('Update and extend your system with software packages.'),
-            'Module' => 'Kernel::Output::HTML::NavBar::ModuleAdmin',
-            'Name' => Translatable('Package Manager'),
-            'Prio' => '1000'
-        },
-        'NavBarName' => 'Admin',
-        'Title' => 'Package Manager'
-    };
-    # specify Loader settings for Login screens
-    $Self->{'Frontend::Module'}->{Login} = {
-        Loader       => {
-            JavaScript => [
-                'Core.Agent.Login.js',
-            ],
-        },
-    };
-    $Self->{'CustomerFrontend::Module'}->{CustomerLogin} = {
-        Loader       => {
-            JavaScript => [
-                'Core.Customer.Login.js',
-            ],
-        },
-    };
-
-    # specify Loader settings for the installer
-    $Self->{'Frontend::Module'}->{Installer} = {
-        Loader       => {
-            JavaScript => [
-                'Core.Installer.js',
-            ],
-            CSS => [
-                'Core.Installer.css'
-            ],
-        },
-    };
 
     return;
 }

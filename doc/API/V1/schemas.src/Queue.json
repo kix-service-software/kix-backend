@@ -63,10 +63,6 @@
       ],
       "readOnly": true
     },
-    "GroupID": {
-      "type": "integer",
-      "readOnly": true
-    },
     "QueueID": {
       "type": "integer",
       "readOnly": true
@@ -171,7 +167,6 @@
     "CreateBy",
     "CreateTime",
     "Fullname",
-    "GroupID",
     "QueueID",
     "Name",
     "RealName",
