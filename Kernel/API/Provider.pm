@@ -182,8 +182,8 @@ sub Run {
         );
     }
 
+    $RequestURI        = $FunctionResult->{RequestURI};
     my $Operation      = $FunctionResult->{Operation};
-    my $RequestURI     = $FunctionResult->{RequestURI};
     my $CurrentRoute   = $FunctionResult->{Route};
     my $AllowedMethods = $FunctionResult->{AllowedMethods};
     my $RequestMethod  = $FunctionResult->{RequestMethod};

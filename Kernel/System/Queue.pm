@@ -975,9 +975,12 @@ sub QueueGet {
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
         %Data = (
-            QueueID             => $Data[17],
             Name                => $Data[0],
             UnlockTimeout       => $Data[1],
+            SystemAddressID     => $Data[2],
+            Signature           => $Data[3],
+            Comment             => $Data[4],
+            ValidID             => $Data[5],
             FirstResponseTime   => $Data[6],
             FirstResponseNotify => $Data[7],
             UpdateTime          => $Data[8],
@@ -986,12 +989,9 @@ sub QueueGet {
             SolutionNotify      => $Data[11],
             FollowUpID          => $Data[12],
             FollowUpLock        => $Data[13],
-            SystemAddressID     => $Data[2],
-            Signature           => $Data[3],
-            Comment             => $Data[4],
-            ValidID             => $Data[5],
             Email               => $Data[14],
             RealName            => $Data[15],
+            QueueID             => $Data[16],
             DefaultSignKey      => $Data[17],
             Calendar            => $Data[18] || '',
             CreateBy            => $Data[19],
