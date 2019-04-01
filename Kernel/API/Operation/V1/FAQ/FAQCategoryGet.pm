@@ -150,12 +150,6 @@ sub Run {
             $FAQCategory{ParentID} = undef;
         }
 
-        # include GroupIDs
-        $FAQCategory{GroupIDs} = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGroupGet(
-            CategoryID => $FAQCategoryID,
-            UserID     => $Self->{Authorization}->{UserID},
-        );
-
         # include SubCategories if requested
         if ( $Param{Data}->{include}->{SubCategories} ) {
             $FAQCategory{SubCategories} = $Kernel::OM->Get('Kernel::System::FAQ')->CategorySubCategoryIDList(

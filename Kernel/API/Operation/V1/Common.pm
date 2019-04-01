@@ -866,7 +866,7 @@ sub ExecOperation {
         );
     }
 
-    $Self->_Debug($Self->{LevelIndent}."ExecOperation: $Self->{OperationConfig}->{Name} --> $OperationObject->{OperationConfig}->{Name}");
+    $Self->_Debug($Self->{LevelIndent}, "executing operation $OperationObject->{OperationConfig}->{Name}");
 
     my $Result = $OperationObject->Run(
         Data    => {

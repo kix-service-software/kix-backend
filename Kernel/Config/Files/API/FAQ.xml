@@ -19,7 +19,7 @@
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">FAQCategoryGet</Item>
+                <Item Key="Name">FAQCategorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
