@@ -195,6 +195,21 @@ sub Run {
         );
     }
 
+    # check authorization if needed
+    my $Authorization;
+    if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
+        $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
+
+        if ( $RequestMethod ne 'OPTIONS' && !$FunctionResult->{Success} ) {
+            return $Self->_GenerateErrorResponse(
+                %{$FunctionResult},
+            );
+        }
+        else {
+            $Authorization = $FunctionResult->{Data}->{Authorization};
+        }
+    }
+
     # check if we have to respond to an OPTIONS request instead of executing the operation
     if ( $RequestMethod && $RequestMethod eq 'OPTIONS' ) {
         my $Data;
@@ -212,22 +227,33 @@ sub Run {
                 OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
                 WebserviceID            => $WebserviceID,
                 OperationRouteMapping   => $ResourceOperationRouteMapping,
+                RequestMethod           => $AllowedMethod,
+                CurrentRoute            => $CurrentRoute,
+                RequestURI              => $RequestURI,
+                Authorization           => $Authorization,
             );
 
             # if operation init failed, bail out
             if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
-                return $Self->_GenerateErrorResponse(
-                    %{$OperationObject},
-                );
+                # only bail out if it's not a 403
+                if ( $OperationObject->{Code} ne 'Forbidden' ) {
+                    return $Self->_GenerateErrorResponse(
+                        %{$OperationObject},
+                    );
+                }
+                # remove this method from the allowed methods
+                delete $AllowedMethods->{$AllowedMethod};
             }
+            else {
+                # get options from operation
+                my $OptionsResult = $OperationObject->Options();
+                my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
 
-            # get options from operation
-            my $OptionsResult = $OperationObject->Options();
-
-            $Data->{Methods}->{$AllowedMethod} = {
-                %{$OptionsResult->{Data}},
-                Route  => $AllowedMethods->{$AllowedMethod}->{Route},
-                AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
+                $Data->{Methods}->{$AllowedMethod} = {
+                    %OptionsData,
+                    Route               => $AllowedMethods->{$AllowedMethod}->{Route},
+                    AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
+                }
             }
         }
 
@@ -313,21 +339,6 @@ sub Run {
             Summary => "Incoming data after mapping",
             Data    => $DataIn,
         );
-    }
-
-    # check authorization if needed
-    my $Authorization;
-    if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
-        $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
-
-        if ( !$FunctionResult->{Success} ) {
-            return $Self->_GenerateErrorResponse(
-                %{$FunctionResult},
-            );
-        }
-        else {
-            $Authorization = $FunctionResult->{Data}->{Authorization};
-        }
     }
 
     #

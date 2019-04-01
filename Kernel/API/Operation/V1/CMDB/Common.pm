@@ -36,42 +36,6 @@ Kernel::API::Operation::V1::CMDB::Common - Base class for all CMDB operations
 
 =cut
 
-=item CheckCreatePermission ()
-
-Tests if the user has the permission to create a CI for a specific class
-
-    my $Result = $CommonObject->CheckCreatePermission(
-        ConfigItem => $ConfigItemHashReference,
-        UserID     => 123,
-        UserType   => 'Agent',
-    );
-
-returns:
-    $Result = 1                                 # if everything is OK
-
-=cut
-
-sub CheckCreatePermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(ConfigItem UserID UserType)) {
-        if ( !$Param{$Needed} ) {
-            return;
-        }
-    }
-
-    # check create permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->Permission(
-        Scope   => 'Class',
-        ClassID => $Param{ConfigItem}->{ClassID},
-        UserID  => $Param{UserID},
-        Type    => 'rw',
-    );
-
-    return 1;
-}
-
 =begin Internal:
 
 =item _CheckConfigItem()

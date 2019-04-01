@@ -137,69 +137,6 @@ perform ChecklistCreate Operation. This will return the created ChecklistItemID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # get possible item states
-    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
-    my @PossibleItemStates = sort keys %{$PossibleItemStates};
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'ChecklistItem' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'ChecklistItem::Text' => {
-                Required => 1
-            },
-            'ChecklistItem::State' => {
-                OneOf    => \@PossibleItemStates,
-                Required => 1
-            },
-            'ChecklistItem::Position' => {
-                Required => 1,
-                Format   => '^(\d+)$',
-            },            
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create checklist item!",
-        );
-    }
-
     # isolate and trim ChecklistItem parameter
     my $ChecklistItem = $Self->_Trim(
         Data => $Param{Data}->{ChecklistItem},

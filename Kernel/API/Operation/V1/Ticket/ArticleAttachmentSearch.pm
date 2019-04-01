@@ -116,20 +116,6 @@ perform ArticleAttachmentSearch Operation. This will return a article attachment
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check ticket permission
-    my $Permission = $Self->CheckAccessPermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Article = $TicketObject->ArticleGet(

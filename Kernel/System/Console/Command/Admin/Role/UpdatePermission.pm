@@ -53,7 +53,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'value',
-        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY). You can combine different values by using a + sign, i.e. READ+UPDATE.',
+        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY). You can combine different values by using a comma and plus or minus sign to add or remove the permission, i.e. +READ,-UPDATE.',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -107,9 +107,11 @@ sub PreRun {
     }
 
     # check permission type
-    $Self->{PermissionTypeID} = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
-    if ( !$Self->{PermissionTypeID} ) {
-        die "Permission type $Self->{PermissionType} does not exist.\n";
+    if ( $Self->{PermissionTypeID} ) {
+        $Self->{PermissionTypeID} = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
+        if ( !$Self->{PermissionTypeID} ) {
+            die "Permission type $Self->{PermissionType} does not exist.\n";
+        }
     }
 
     return;
@@ -122,12 +124,35 @@ sub Run {
 
     my $Value = 0;
     if ( $Self->GetOption('value') ) {
+        my $Mode = '';
+        if ( $Self->GetOption('value') =~ /^\+/g ) {
+            $Mode  = 'add';
+            $Value = $Self->{Permission}->{Value};
+        }
+        elsif ( $Self->GetOption('value') =~ /^\-/g ) {
+            $Mode = 'sub';
+            $Value = $Self->{Permission}->{Value};
+        }
+
         my %PossiblePermissions = %{Kernel::System::Role::Permission->PERMISSION};
         $PossiblePermissions{CRUD} = Kernel::System::Role::Permission->PERMISSION_CRUD;
 
-        foreach my $Permission ( split(/\s*\+\s*/, $Self->GetOption('value')) ) {
-            $Value += $PossiblePermissions{$Permission};
+        foreach my $Permission ( split(/\s*\,\s*/, $Self->GetOption('value') ) ) {            
+            my $Mode = 'add';
+            if ( $Permission =~ /^([+-])(.*?)$/g ) {
+                $Mode = $1;
+                $Permission = $2;
+            }
+
+            if ( $Mode eq '+' && ($Value & $PossiblePermissions{$Permission}) != $PossiblePermissions{$Permission} ) {
+                $Value += $PossiblePermissions{$Permission};
+            }
+            elsif ( $Mode eq '-' && ($Value & $PossiblePermissions{$Permission}) == $PossiblePermissions{$Permission} ) {
+                $Value -= $PossiblePermissions{$Permission};
+            }
         }
+
+        $Value = 0 if $Value < 0;
     }
 
     my $Result = $Kernel::OM->Get('Kernel::System::Role')->PermissionUpdate(
@@ -136,7 +161,7 @@ sub Run {
         Target     => $Self->GetOption('target') || $Self->{Permission}->{Target},
         Value      => defined $Self->GetOption('value') ? $Value : $Self->{Permission}->{Value},
         IsRequired => (defined $Self->GetOption('required') ? ($Self->GetOption('required') eq 'yes') : $Self->{Permission}->{IsRequired}) || 0,
-        Comment    => $Self->GetOption('comment') || $Self->{Permission}->{Comment},
+        Comment    => defined $Self->GetOption('comment') ? $Self->GetOption('comment') : $Self->{Permission}->{Comment},
         UserID     => 1,
     );
 

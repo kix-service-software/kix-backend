@@ -113,20 +113,6 @@ perform HistorySearch Operation. This will return a history list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check ticket permission
-    my $Permission = $Self->CheckAccessPermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
-        );
-    }
-
     # get history list
     my @HistoryList = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryGet(
         TicketID => $Param{Data}->{TicketID},

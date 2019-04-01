@@ -138,6 +138,9 @@ sub Run {
 
             $Self->Print(sprintf("%6i %-25s %-25s %8s %6s %-80s\n", $ID, $PermissionType{Name}, $Role, $IsRequired, $Value, $Permission->{Target}));
 
+            if ( $Permission->{Comment} ) {
+                $Self->Print(sprintf("%74s %s\n","", "(Comment: $Permission->{Comment})"));
+            }
         }
     }
 

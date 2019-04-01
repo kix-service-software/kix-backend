@@ -146,20 +146,6 @@ sub Run {
         Data => $Param{Data}->{ConfigItem}
     );
 
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermission(
-        ConfigItem => $ConfigItem,
-        UserID     => $Self->{Authorization}->{UserID},
-        UserType   => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create ConfigItems for this class!",
-        );
-    }
-
     # check ConfigItem attribute values
     my $ConfigItemCheck = $Self->_CheckConfigItem( 
         ConfigItem => $ConfigItem

@@ -119,19 +119,6 @@ perform ChecklistDelete Operation. This will return the deleted ChecklistItemID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check delete permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code => 'Object.NoPermission',
-        );
-    }
-
     # check if checklist item exists
     my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
         TicketID => $Param{Data}->{TicketID},

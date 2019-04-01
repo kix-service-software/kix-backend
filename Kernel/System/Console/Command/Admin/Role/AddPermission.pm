@@ -46,7 +46,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'value',
-        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY). You can combine different values by using a + sign, i.e. READ+UPDATE.',
+        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY). You can combine different values by using a comma, i.e. READ,UPDATE.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -100,16 +100,18 @@ sub Run {
     $PossiblePermissions{CRUD} = Kernel::System::Role::Permission->PERMISSION_CRUD;
 
     my $Value = 0;
-    foreach my $Permission ( split(/\s*\+\s*/, $Self->GetOption('value')) ) {
+    foreach my $Permission ( split(/\s*\,\s*/, $Self->GetOption('value')) ) {
         $Value += $PossiblePermissions{$Permission};
     }
+
+    my $IsRequired = $Self->GetOption('required') || 'no';
 
     my $PermissionID = $Kernel::OM->Get('Kernel::System::Role')->PermissionAdd(
         RoleID     => $Self->{RoleID},
         TypeID     => $Self->{PermissionTypeID},
         Target     => $Self->GetOption('target') || '',
         Value      => $Value,
-        IsRequired => ($Self->GetOption('required') eq 'yes'),
+        IsRequired => ($IsRequired eq 'yes'),
         Comment    => $Self->GetOption('comment') || '',
         UserID     => 1,
     );

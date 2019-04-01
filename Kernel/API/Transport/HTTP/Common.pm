@@ -56,8 +56,8 @@ sub ProviderCheckAuthorization {
     # check authentication header
     my $cgi = CGI->new;
     my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-    
-    if (!$Headers{HTTP_AUTHORIZATION}) {
+        
+    if ( !$Headers{HTTP_AUTHORIZATION} ) {
         return $Self->_Error(
             Code => 'Authorization.NoHeader'
         );
@@ -65,7 +65,7 @@ sub ProviderCheckAuthorization {
 
     my %Authorization = split(/\s+/, $Headers{HTTP_AUTHORIZATION});
 
-    if (!$Authorization{Token}) {
+    if ( !$Authorization{Token} ) {
         return $Self->_Error(
             Code => 'Authorization.NoToken'
         );

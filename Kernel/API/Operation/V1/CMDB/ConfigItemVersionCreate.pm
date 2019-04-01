@@ -147,19 +147,6 @@ sub Run {
         );
     }
 
-    # check create permissions
-    my $Permission = $Self->CheckCreatePermission(
-        ConfigItem => $ConfigItem,
-        UserID     => $Self->{Authorization}->{UserID},
-        UserType   => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code => 'Object.NoPermission',
-        );
-    }
-
     # check ConfigItem attribute values
     my $VersionCheck = $Self->_CheckConfigItemVersion( 
         ConfigItem => $ConfigItem,

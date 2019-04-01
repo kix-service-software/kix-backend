@@ -149,25 +149,10 @@ perform TicketUpdate Operation. This will return the updated TicketID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # isolate ticket hash
-    my $Ticket = $Param{Data}->{Ticket};
-
-    # check update permission
-    my $Permission = $Self->CheckUpdatePermission(
-        TicketID => $Param{Data}->{TicketID},
-        Ticket   => $Ticket,
-        UserID   => $PermissionUserID,
-        UserType => $Self->{Authorization}->{UserType},
+    # isolate and trim Ticket parameter
+    my $Ticket = $Self->_Trim(
+        Data => $Param{Data}->{Ticket}
     );
-
-    if ( !$Permission->{Success} ) {
-        return $Permission;
-    }
 
     # get ticket
     my %TicketData = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
@@ -192,7 +177,7 @@ sub Run {
     my $Result = $Self->_TicketUpdate(
         TicketID => $Param{Data}->{TicketID},
         Ticket   => $Ticket,
-        UserID   => $PermissionUserID,
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     return $Result;

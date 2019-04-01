@@ -473,15 +473,8 @@ sub PermissionAdd {
         $ID = $Row[0];
     }
 
-    # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
-
-    # delete user cache 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'User'
-    );
+    # delete whole cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
     return $ID;
 }
@@ -564,15 +557,8 @@ sub PermissionUpdate {
         ],
     );
 
-    # delete cache 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
-
-    # delete user cache 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'User'
-    );
+    # delete whole cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
     return 1;
 }
@@ -670,15 +656,8 @@ sub PermissionDelete {
         Bind => [ \$Param{ID} ],
     );
    
-    # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
-
-    # delete user cache 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'User'
-    );
+    # delete whole cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
     return 1;
 

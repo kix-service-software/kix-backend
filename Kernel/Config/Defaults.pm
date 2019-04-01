@@ -64,8 +64,8 @@ sub LoadDefaults {
     # system data                                         #
     # --------------------------------------------------- #
     # SecureMode
-    # Disables the use of web-installer (installer.pl).
     # GenericAgent, PackageManager and SQL Box can only be used if SecureMode is enabled.
+    # UserID 1 has no "God Mode" is SecureMode is enabled
     $Self->{SecureMode} = 0;
 
     # SystemID
