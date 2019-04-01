@@ -187,6 +187,7 @@ sub Run {
     my $CurrentRoute   = $FunctionResult->{Route};
     my $AllowedMethods = $FunctionResult->{AllowedMethods};
     my $RequestMethod  = $FunctionResult->{RequestMethod};
+    my $DataIn         = $FunctionResult->{Data};
     my $ResourceOperationRouteMapping = $FunctionResult->{ResourceOperationRouteMapping};
 
     if ( $Operation ) {
@@ -288,8 +289,6 @@ sub Run {
     #
     # Map the incoming data based on the configured mapping
     #
-
-    my $DataIn = $FunctionResult->{Data};
 
     $Self->{DebuggerObject}->Debug(
         Summary => "Incoming data before mapping",
