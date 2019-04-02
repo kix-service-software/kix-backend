@@ -156,19 +156,6 @@ sub Run {
         Data => $Param{Data}->{FAQArticle}
     );
 
-    # check rw permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $IncomingFAQArticle->{CategoryID} || $FAQArticleData{CategoryID},
-        UserID     => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to update FAQ article in given category!",
-        );
-    }
-
     # merge attributes
     my %FAQArticle;
     foreach my $Key ( qw(Name StateID CategoryID Language Approved Visibility ContentType Title Field1 Field2 Field3 Field4 Field5 Field6 ApprovalOff ValidID) ) {

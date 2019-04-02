@@ -116,26 +116,7 @@ sub Run {
 
     # start loop
     foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
-
-        # get the FAQArticle data
-        my %FAQArticle = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
-            ItemID     => $FAQArticleID,
-            UserID     => $Self->{Authorization}->{UserID},
-        );
    
-        # check rw permissions
-        my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-            CategoryID => $FAQArticle{CategoryID},
-            UserID   => $Self->{Authorization}->{UserID},
-        );
-    
-        if ( $Permission ne 'rw' ) {
-            return $Self->_Error(
-                Code    => 'Object.NoPermission',
-                Message => "No permission to delete FAQArticle!",
-            );
-        }
-
         # delete FAQArticle        
         my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQDelete(
             ItemID     => $FAQArticleID,

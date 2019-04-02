@@ -1210,7 +1210,9 @@ sub PermissionList {
             next if !$TypesMap{$PermissionTypeList{$ID}};
             push(@PermissionTypeIDs, $ID);
         }
-        $SQL .= ' AND type_id IN (' . join(',', sort @PermissionTypeIDs) . ')';
+        if ( @PermissionTypeIDs ) {
+            $SQL .= ' AND type_id IN (' . join(',', sort @PermissionTypeIDs) . ')';
+        }
     }
 
     # close sub-query

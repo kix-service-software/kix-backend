@@ -179,19 +179,6 @@ sub Run {
     my $FAQArticle = $Self->_Trim(
         Data => $Param{Data}->{FAQArticle}
     );
-
-    # check rw permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::FAQ')->CheckCategoryUserPermission(
-        CategoryID => $FAQArticle->{CategoryID},
-        UserID     => $Self->{Authorization}->{UserID},
-    );
-
-    if ( $Permission ne 'rw' ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create FAQ article in given category!",
-        );
-    }
     
     # everything is ok, let's create the FAQArticle
     my $FAQArticleID = $Kernel::OM->Get('Kernel::System::FAQ')->FAQAdd(
