@@ -159,7 +159,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericInclude###ObjectPermissions" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::GenericInclude###ConfiguredPermissions" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
