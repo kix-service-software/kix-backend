@@ -18,9 +18,11 @@ There are some generic includes that can be used in every query regardless of a 
 |-|-|
 |```Links```|Include all the the linked objects of this item.|
 |```ObjectIcon```|Include the icon for this item.|
+|```Permissions```|Include the permission for this item.|
 
 Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function [```expand```](#expand_objects) for information on how to tranform these IDs to actual objects.
 
+The ```Permissions``` include will include an object with two arrays thaat each contain the relevant permissions: ```Assigned``` and ```DependingObjects```. The ```Assigned``` list contains the permissions that are assigned exactly to the specific object. The second list ```DependingObjects``` contains the list of permissions for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz). 
 
 ** Example **
 
