@@ -663,6 +663,86 @@ sub PermissionDelete {
 
 }
 
+=item PermissionListForObject()
+
+returns a two lists of directly assigned permissions für the given object
+
+    my %Permissions = $UserObject->PermissionsListForObject(
+        Target       => '/queue/1',
+        ObjectIDAttr => 'QueueID', 
+    );
+
+returns
+    {
+        Assigned => [],
+        DependingObjects => [],
+    }
+
+=cut
+
+sub PermissionListForObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(Target ObjectIDAttr) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    my %PermissionTypeList = reverse $Self->PermissionTypeList();
+
+    # get all relevant permissions
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL  => "SELECT id FROM role_permission WHERE type_id IN (SELECT id FROM permission_type WHERE name IN ('Object', 'PropertyValue'))",
+    );
+
+    my @PermissionIDs;
+    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        push(@PermissionIDs, $Row[0]);
+    }
+
+    my @AssignedPermissions;
+    my @DependingObjectsPermissions;
+    foreach my $ID ( sort @PermissionIDs ) {
+        my %Permission = $Self->PermissionGet(
+            ID => $ID,
+        );
+
+        if ( !%Permission ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to get permission ID $ID!"
+            );
+            return;
+        }        
+
+        # ignore wildcard targets on type Object 
+        next if ( $Permission{Target} =~ /\*/ && $Permission{TypeID} == $PermissionTypeList{Object} );
+
+        # prepare target
+        my $Target = $Permission{Target};
+        $Target =~ s/\//\\\//g;
+
+        my @SplitParts = split(/\//, $Param{Target});
+        my $ObjectID = $SplitParts[-1];
+
+        # check for assigned permission
+        if ( $Param{Target} =~ /^$Target/ ) {
+            push(@AssignedPermissions, \%Permission);
+        }
+        elsif ( $Target =~ /\.$Param{ObjectIDAttr} EQ $ObjectID/ ) { 
+            push(@DependingObjectsPermissions, \%Permission);
+        }
+    }
+
+    return ( Assigned => \@AssignedPermissions, DependingObjects => \@DependingObjectsPermissions );
+}
+
 =item GetReadablePermissionValue()
 
 returns the permission value in a readable format

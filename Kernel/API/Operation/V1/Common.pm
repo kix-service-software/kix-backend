@@ -1551,9 +1551,11 @@ sub _ApplyInclude {
                     foreach my $ObjectID ( split(/\s*,\s*/, $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}}) ) {
                         
                         $Param{Data}->{$Object}->[$Index++]->{$Include} = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
-                            Object   => $Object,
-                            ObjectID => $ObjectID,
-                            UserID   => $Self->{Authorization}->{UserID},
+                            RequestURI => $Self->{RequestURI},
+                            Object       => $Object,
+                            ObjectID     => $ObjectID,
+                            ObjectIDAttr => $Self->{OperationConfig}->{ObjectID},
+                            UserID       => $Self->{Authorization}->{UserID},
                         );
 
                         # add specific cache dependencies after exec if available
@@ -1566,9 +1568,11 @@ sub _ApplyInclude {
                 }
                 else {
                     my $Result = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
-                        Object   => $Object,
-                        ObjectID => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
-                        UserID   => $Self->{Authorization}->{UserID},
+                        RequestURI   => $Self->{RequestURI},
+                        Object       => $Object,
+                        ObjectID     => $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}},
+                        ObjectIDAttr => $Self->{OperationConfig}->{ObjectID},
+                        UserID       => $Self->{Authorization}->{UserID},
                     );
 
                     if ( $Result ) {

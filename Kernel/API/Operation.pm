@@ -158,15 +158,10 @@ sub new {
     # pass back error message from backend if backend module could not be executed
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
-    # pass authorization information to backend
-    $Self->{BackendObject}->{Authorization}   = $Param{Authorization};
-
-    # pass operation information to backend
-    $Self->{BackendObject}->{Operation}             = $Param{Operation};
-    $Self->{BackendObject}->{OperationType}         = $Param{OperationType};
-    $Self->{BackendObject}->{OperationConfig}       = $Self->{OperationConfig};
-    $Self->{BackendObject}->{OperationRouteMapping} = $Param{OperationRouteMapping};
-    $Self->{BackendObject}->{RequestMethod}         = $Self->{RequestMethod};
+    # pass information to backend
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping) ) {
+        $Self->{BackendObject}->{$Key} = $Param{$Key} || $Self->{$Key};
+    }
 
     # add call level
     $Self->{Level} = $Param{Level};
