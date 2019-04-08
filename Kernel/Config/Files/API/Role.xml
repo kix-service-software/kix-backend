@@ -159,12 +159,12 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericInclude###Permissions" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::GenericInclude###ObjectPermissions" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
                 <Item Key="Module">V1::Role::GenericIncludeHandler</Item>
-                <Item Key="IgnoreOperationRegEx">V1::Role::RoleGet</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
                 <Item Key="CacheType">API_permission</Item>
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
