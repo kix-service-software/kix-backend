@@ -5577,9 +5577,7 @@ DefaultValue: ''
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key => 'SectionGeneral',
-
-        #Name  => 'General Information',
-        Name  => 'Allgemeine Informationen',
+        Name  => 'General Information',
         Input => {
             Type => 'Dummy',
         },
@@ -5729,15 +5727,13 @@ DefaultValue: ''
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key => 'SectionGeneral',
-
-        #Name  => 'General Information',
-        Name  => 'Allgemeine Informationen',
+        Name  => 'General Information',
         Input => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key => 'ParentLocation',
+                Key        => 'ParentLocation',
                 Name       => 'Parent Location',
                 Searchable => 1,
                 Input      => {
@@ -5900,10 +5896,8 @@ DefaultValue: ''
         <Data Key="class_id">26</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key => 'SectionGeneral',
-
-        #Name  => 'General Information',
-        Name  => 'Allgemeine Informationen',
+        Key   => 'SectionGeneral',
+        Name  => 'General Information',
         Input => {
             Type => 'Dummy',
         },
@@ -6035,7 +6029,6 @@ DefaultValue: ''
     {
         Key        => 'Description',
         Name       => 'Description',
-        Name       => 'Beschreibung',
         Searchable => 1,
         Input      => {
             Type => 'TextArea',
