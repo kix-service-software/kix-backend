@@ -164,7 +164,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">V1::Role::GenericIncludeHandler</Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">V1::Role::RoleGet</Item>
                 <Item Key="CacheType">API_permission</Item>
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
