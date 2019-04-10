@@ -104,8 +104,8 @@ sub Run {
         }
     }
     else {
-        $Self->Print("Type                      Required  Value Target\n");
-        $Self->Print("------------------------- -------- ------ --------------------------------------------------------------------------------\n");
+        $Self->Print("ID     Type                      Required  Value Target\n");
+        $Self->Print("------ ------------------------- -------- ------ --------------------------------------------------------------------------------\n");
 
         foreach my $ID ( sort @PermissionIDs ) {
             my %Permission = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
@@ -127,7 +127,7 @@ sub Run {
             # prepare required
             my $IsRequired = $Permission{IsRequired} ? 'yes' : '';
 
-            $Self->Print(sprintf("%-25s %8s %6s %-80s\n", $PermissionType{Name}, $IsRequired, $Value, $Permission{Target}));
+            $Self->Print(sprintf("%6i %-25s %8s %6s %-80s\n", $Permission{ID}, $PermissionType{Name}, $IsRequired, $Value, $Permission{Target}));
 
             if ( $Permission{Comment} ) {
                 $Self->Print(sprintf("%41s %s\n","", "(Comment: $Permission{Comment})"));

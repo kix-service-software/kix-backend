@@ -160,11 +160,25 @@ sub Run {
         );
     }
 
+    # validate permission
+    my $ValidationResult = $Kernel::OM->Get('Kernel::System::Role')->ValidatePermission(
+        TypeID => $Permission->{TypeID} || $PermissionData{TypeID},
+        Target => $Permission->{Target} || $PermissionData{Target},
+        Value  => defined $Permission->{Value} ? $Permission->{Value} : $PermissionData{Value},
+    );
+    if ( !$ValidationResult ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Cannot create permission. The permission target doesn't match the possible ones for type PropertyValue.",
+        );
+    }
+
     # update permission
     my $Success = $Kernel::OM->Get('Kernel::System::Role')->PermissionUpdate(
         ID         => $Param{Data}->{PermissionID},
+        TypeID     => $Permission->{TypeID} || $PermissionData{TypeID},
         Target     => $Permission->{Target} || $PermissionData{Target},
-        Value      => $Permission->{Value} || $PermissionData{Value},
+        Value      => defined $Permission->{Value} ? $Permission->{Value} : $PermissionData{Value},
         IsRequired => $Permission->{IsRequired} || $PermissionData{IsRequired},
         Comment    => $Permission->{Comment} || $PermissionData{Comment},
         UserID     => $Self->{Authorization}->{UserID},

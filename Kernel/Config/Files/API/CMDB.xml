@@ -11,6 +11,7 @@
                 <Item Key="ResponseObject">ConfigItemClassResponse</Item>
                 <Item Key="CacheType">API_cmdb_classes</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
+                <Item Key="RelevantPropertyValuePermissions">CIClass-to-ConfigItem</Item>
             </Hash>
         </Setting>
     </ConfigItem>

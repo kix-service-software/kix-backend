@@ -223,36 +223,34 @@ sub ProviderProcessRequest {
         }
     }
 
-    my %AllowedMethods;
-    if ( !%PossibleOperations || $RequestMethod eq 'OPTIONS' ) {
-        # if we didn't find any possible operation, respond with 405 - find all allowed methods for this resource
-        # if we have a OPTIONS request, just determine the allowed methods
-        for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+    # determine all the  allowed methods
+    my %AvailableMethods;
+    for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
 
-            next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
+        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
 
-            my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
-            my $RouteRegEx = $RouteMapping{Route};
-            $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
+        my $RouteRegEx = $RouteMapping{Route};
+        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
-            next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
 
-            $AllowedMethods{$RouteMapping{RequestMethod}->[0]} = {
-                Operation => $CurrentOperation,
-                Route     => $RouteMapping{Route}
-            };
-        }
+        $AvailableMethods{$RouteMapping{RequestMethod}->[0]} = {
+            Operation => $CurrentOperation,
+            Route     => $RouteMapping{Route}
+        };
+    }
 
-        if ( !%PossibleOperations && $RequestMethod ne 'OPTIONS' ) {
-            return $Self->_Error(
-                Code       => 'NotAllowed',
-                Additional => {
-                    AddHeader => {
-                        Allow => join(', ', sort keys %AllowedMethods),
-                    }
+    if ( !%PossibleOperations && $RequestMethod ne 'OPTIONS' ) {
+        # if we didn't find any possible operation, respond with 405
+        return $Self->_Error(
+            Code       => 'NotAllowed',
+            Additional => {
+                AddHeader => {
+                    Allow => join(', ', sort keys %AvailableMethods),
                 }
-            );
-        }
+            }
+        );
     }
 
     # use the most recent operation (prefer "hard" routes above parameterized routes)
@@ -300,7 +298,7 @@ sub ProviderProcessRequest {
             Route          => $CurrentRoute,
             RequestURI     => $RequestURI,
             Operation      => $Operation,
-            AllowedMethods => \%AllowedMethods,
+            AvailableMethods => \%AvailableMethods,
             RequestMethod  => $RequestMethod,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             Data      => {
@@ -391,7 +389,7 @@ sub ProviderProcessRequest {
         Route          => $CurrentRoute,
         RequestURI     => $RequestURI,
         Operation      => $Operation,
-        AllowedMethods => \%AllowedMethods,
+        AvailableMethods => \%AvailableMethods,
         RequestMethod  => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
         Data           => $ReturnData,

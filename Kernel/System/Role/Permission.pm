@@ -11,6 +11,8 @@ package Kernel::System::Role::Permission;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Cache',
@@ -446,6 +448,14 @@ sub PermissionAdd {
         return;
     }
 
+    if ( !$Self->ValidatePermission(%Param) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "The permission target doesn't match the possible ones for type PropertyValue.",
+        );
+        return;
+    }
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -518,12 +528,25 @@ sub PermissionUpdate {
     my $ID = $Self->PermissionLookup( 
         RoleID => $Data{RoleID},
         TypeID => $Param{TypeID} || $Data{TypeID},
-        Target => $Param{Target} || $Param{Target},
+        Target => $Param{Target} || $Data{Target},
     );
     if ( $ID && $ID != $Param{ID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "A permission with the same type and target already exists for this role.",
+        );
+        return;
+    }
+
+    my $ValidationResult = $Self->ValidatePermission(
+        TypeID => $Param{TypeID} || $Data{TypeID},
+        Target => $Param{Target} || $Data{Target},
+        Value  => defined $Param{Value} ? $Param{Value} : $Data{Value},
+    );
+    if ( !$ValidationResult ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "The permission target doesn't match the possible ones for type PropertyValue.",
         );
         return;
     }
@@ -668,7 +691,9 @@ sub PermissionDelete {
 returns a two lists of directly assigned permissions für the given object
 
     my %Permissions = $UserObject->PermissionsListForObject(
+        RelevantPropertyValuePermissions => [ 'Queue-to-Ticket' ]
         Target       => '/queue/1',
+        ObjectID     => 123
         ObjectIDAttr => 'QueueID', 
     );
 
@@ -684,7 +709,7 @@ sub PermissionListForObject {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    foreach my $Key ( qw(Target ObjectIDAttr) ) {
+    foreach my $Key ( qw(Target ObjectID ObjectIDAttr) ) {
         if ( !$Param{$Key} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -693,6 +718,24 @@ sub PermissionListForObject {
             return;
         }
     }
+
+    # prepare relevant PropertyValue patterns
+    my %RelevantPropertyValuePermissions;
+    if ( IsArrayRefWithData($Param{RelevantPropertyValuePermissions}) ) {
+        my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Permission::PropertyValue');
+        if ( IsHashRefWithData($Config) ) {
+            foreach my $Key ( @{$Param{RelevantPropertyValuePermissions}} ) {
+                foreach my $Pattern ( values %{$Config->{$Key}} ) {
+                    my $PreparedPattern = $Pattern;
+                    $PreparedPattern =~ s/<$Param{ObjectIDAttr}>/$Param{ObjectID}/g;
+                    $RelevantPropertyValuePermissions{$PreparedPattern} = 1;
+                }
+            }
+        }
+    }
+
+use Data::Dumper;
+print STDERR "RelevantPropertyValuePermissions: ".Dumper(\%RelevantPropertyValuePermissions);
 
     my %PermissionTypeList = reverse $Self->PermissionTypeList();
 
@@ -727,21 +770,75 @@ sub PermissionListForObject {
         # prepare target
         my $Target = $Permission{Target};
         $Target =~ s/\//\\\//g;
+        $Target =~ s/\{.+?\}//g;
 
         my @SplitParts = split(/\//, $Param{Target});
         my $ObjectID = $SplitParts[-1];
 
+print STDERR "$Param{Target} <=> $Target\n";
         # check for assigned permission
         if ( $Param{Target} =~ /^$Target/ ) {
             push(@AssignedPermissions, \%Permission);
         }
-        elsif ( $Target =~ /\.$Param{ObjectIDAttr} EQ $ObjectID/ ) { 
+
+print STDERR "$Permission{Target}\n";
+        # check for PropertyValue permission (depending objects)
+        if ( $RelevantPropertyValuePermissions{$Permission{Target}} ) {
             push(@DependingObjectsPermissions, \%Permission);
         }
     }
 
     return ( Assigned => \@AssignedPermissions, DependingObjects => \@DependingObjectsPermissions );
 }
+
+=item ValidatePermission()
+
+returns true if the permission is valid - at the moment only the target for type PropertyValue will be validated
+
+    my $Result = $RoleObject->ValidatePermission(
+        TypeID => 3,
+        Target => '...',
+        Value  => 10
+    );
+
+=cut
+
+sub ValidatePermission {
+    my ( $Self, %Param ) = @_;
+
+    # validate new PropertyValue permission
+    my %PermissionTypeList = $Self->PermissionTypeList( Valid => 1 );
+    
+    if ( $PermissionTypeList{$Param{TypeID}} && $PermissionTypeList{$Param{TypeID}} eq 'PropertyValue' ) {
+        # check if the target pattern matches the possible ones
+        my $PossibleList = $Kernel::OM->Get('Kernel::Config')->Get('Permission::PropertyValue');
+        my $Found = 0;
+        foreach my $Possible ( sort keys %{$PossibleList} ) {
+            my $Pattern = $PossibleList->{$Possible}->{'READ_UPDATE_DELETE'};
+            if ( ($Param{Value} & $Self->PERMISSION->{CREATE}) == $Self->PERMISSION->{CREATE} ) {
+                $Pattern = $PossibleList->{$Possible}->{CREATE};
+            }
+            my $Target = $Param{Target};
+
+            $Pattern =~ s/\*/.*?/g;
+            $Pattern =~ s/\//\\\//g;
+            $Pattern =~ s/\{(.+?)\}/\\{$1\\}/g;
+            $Pattern =~ s/<.+?>/\\d+?/g;
+
+            if ( $Target =~ /^$Pattern$/ ) {
+                $Found = 1;
+                last;
+            }
+        }
+
+        if ( !$Found ) {
+            return;
+        }
+    }
+
+    return 1;
+}
+
 
 =item GetReadablePermissionValue()
 
@@ -773,7 +870,7 @@ sub GetReadablePermissionValue {
     if ( $Param{Format} && $Param{Format} eq 'Long' ) {
         my @Permissions;              
         foreach my $PermissionName ( sort keys %{$Self->PERMISSION} ) {
-            next if ($Param{Value} & $Self->{$PermissionName}) != $Self->{$PermissionName};
+            next if ($Param{Value} & $Self->PERMISSION->{$PermissionName}) != $Self->PERMISSION->{$PermissionName};
             push(@Permissions, $PermissionName);
         }
         $Result = (join(' + ', @Permissions) || 'NONE') . ' (0x'. (sprintf('%04x', $Param{Value})).')';
