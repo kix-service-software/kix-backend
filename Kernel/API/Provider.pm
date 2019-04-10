@@ -182,13 +182,11 @@ sub Run {
         );
     }
 
-    $RequestURI        = $FunctionResult->{RequestURI};
-    my $Operation      = $FunctionResult->{Operation};
-    my $CurrentRoute   = $FunctionResult->{Route};
-    my $AllowedMethods = $FunctionResult->{AllowedMethods};
-    my $RequestMethod  = $FunctionResult->{RequestMethod};
-    my $DataIn         = $FunctionResult->{Data};
-    my $ResourceOperationRouteMapping = $FunctionResult->{ResourceOperationRouteMapping};
+    # save FunctionResult for later use
+    my %ProcessRequestResult = %{$FunctionResult};
+
+    my $Operation = $FunctionResult->{Operation};
+    my $DataIn    = $FunctionResult->{Data};
 
     if ( $Operation ) {
         $Self->{DebuggerObject}->Debug(
@@ -201,7 +199,7 @@ sub Run {
     if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
         $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
 
-        if ( $RequestMethod ne 'OPTIONS' && !$FunctionResult->{Success} ) {
+        if ( $ProcessRequestResult{RequestMethod} ne 'OPTIONS' && !$FunctionResult->{Success} ) {
             return $Self->_GenerateErrorResponse(
                 %{$FunctionResult},
             );
@@ -212,14 +210,14 @@ sub Run {
     }
 
     # check if we have to respond to an OPTIONS request instead of executing the operation
-    if ( $RequestMethod && $RequestMethod eq 'OPTIONS' ) {
+    if ( $ProcessRequestResult{RequestMethod} && $ProcessRequestResult{RequestMethod} eq 'OPTIONS' ) {
         my $Data;
 
-        # add information about each allowed method
-        foreach my $AllowedMethod ( sort keys %{$AllowedMethods} ) {
+        # add information about each available method
+        foreach my $Method ( sort keys %{$ProcessRequestResult{AvailableMethods}} ) {
 
             # create an operation object for each allowed method and ask it for options
-            my $Operation = $AllowedMethods->{$AllowedMethod}->{Operation}; 
+            my $Operation = $ProcessRequestResult{AvailableMethods}->{$Method}->{Operation}; 
 
             my $OperationObject = Kernel::API::Operation->new(
                 DebuggerObject          => $Self->{DebuggerObject},
@@ -227,10 +225,11 @@ sub Run {
                 Operation               => $Operation,
                 OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
                 WebserviceID            => $WebserviceID,
-                OperationRouteMapping   => $ResourceOperationRouteMapping,
-                RequestMethod           => $AllowedMethod,
-                CurrentRoute            => $CurrentRoute,
-                RequestURI              => $RequestURI,
+                AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+                OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+                RequestMethod           => $Method,
+                CurrentRoute            => $ProcessRequestResult{Route},
+                RequestURI              => $ProcessRequestResult{RequestURI},
                 Authorization           => $Authorization,
             );
 
@@ -242,25 +241,24 @@ sub Run {
                         %{$OperationObject},
                     );
                 }
-                # remove this method from the allowed methods
-                delete $AllowedMethods->{$AllowedMethod};
             }
             else {
                 # get options from operation
                 my $OptionsResult = $OperationObject->Options();
                 my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
 
-                $Data->{Methods}->{$AllowedMethod} = {
+                $Data->{Methods}->{$Method} = {
                     %OptionsData,
-                    Route               => $AllowedMethods->{$AllowedMethod}->{Route},
+                    Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
                     AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
                 }
             }
         }
 
         # add information about sub-resources
+        my $CurrentRoute = $ProcessRequestResult{Route};
         $CurrentRoute = '' if $CurrentRoute eq '/';
-        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ResourceOperationRouteMapping});
+        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessRequestResult{ResourceOperationRouteMapping}});
         if ( @ChildResources ) {
             $Data->{Resources} = \@ChildResources;
         }
@@ -270,7 +268,7 @@ sub Run {
             Data    => $Data,
             Additional => {
                 AddHeader => {
-                    Allow => join(', ', sort keys %{$AllowedMethods}),
+                    Allow => join(', ', sort keys %{$Data->{Methods}}),
                 }
             }
         );
@@ -350,10 +348,12 @@ sub Run {
         Operation               => $Operation,
         OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
         WebserviceID            => $WebserviceID,
-        OperationRouteMapping   => $ResourceOperationRouteMapping,
-        RequestMethod           => $RequestMethod,
-        CurrentRoute            => $CurrentRoute,
-        RequestURI              => $RequestURI,
+        AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+        OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+        AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+        RequestMethod           => $ProcessRequestResult{RequestMethod},
+        CurrentRoute            => $ProcessRequestResult{Route},
+        RequestURI              => $ProcessRequestResult{RequestURI},
         Authorization           => $Authorization,
     );
 

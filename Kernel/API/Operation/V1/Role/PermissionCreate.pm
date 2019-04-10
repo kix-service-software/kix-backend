@@ -169,6 +169,17 @@ sub Run {
         );
     }
 
+    # validate permission
+    my $ValidationResult = $Kernel::OM->Get('Kernel::System::Role')->ValidatePermission(
+        %{$Permission}
+    );
+    if ( !$ValidationResult ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Cannot create permission. The permission target doesn't match the possible ones for type PropertyValue.",
+        );
+    }
+
     # create Permission
     my $PermissionID = $Kernel::OM->Get('Kernel::System::Role')->PermissionAdd(
         RoleID     => $Param{Data}->{RoleID},

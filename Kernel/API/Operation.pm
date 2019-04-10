@@ -84,7 +84,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping RequestMethod RequestURI CurrentRoute WebserviceID)) {
+    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
             return $Self->_Error(
@@ -128,6 +128,8 @@ sub new {
                 }
             );
         }
+
+        $Self->{Authorization} = $Param{Authorization};        
     }
 
     # create validator
@@ -159,7 +161,7 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping) ) {
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods) ) {
         $Self->{BackendObject}->{$Key} = $Param{$Key} || $Self->{$Key};
     }
 
@@ -302,6 +304,7 @@ sub _CheckOperationPermission {
     my ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
         UserID              => $Param{Authorization}->{UserID},
         Target              => $Self->{RequestURI},
+        Types               => [ 'Resource', 'Object' ],
         RequestedPermission => $RequestedPermission,
     );
 

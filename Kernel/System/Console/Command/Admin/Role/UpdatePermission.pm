@@ -107,7 +107,7 @@ sub PreRun {
     }
 
     # check permission type
-    if ( $Self->{PermissionTypeID} ) {
+    if ( $Self->{PermissionType} ) {
         $Self->{PermissionTypeID} = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
         if ( !$Self->{PermissionTypeID} ) {
             die "Permission type $Self->{PermissionType} does not exist.\n";

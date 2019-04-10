@@ -10,6 +10,12 @@
         "Comment": {
           "type": "string"
         },
+        "IsRequired": {
+          "type": "integer"
+        },
+        "TypeID": {
+          "type": "integer" 
+        },
         "Target": {
           "type": "string"
         },

@@ -420,7 +420,7 @@ sub CleanUp {
             %Param,
         );
         my $Time = (time() - $Start) * 1000;
-        $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Param{Type}, $Time));
+#        $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Param{Type}, $Time));
     }
     elsif ( $Param{KeepTypes} ) {
         my %KeepTypeLookup;
@@ -443,7 +443,7 @@ sub CleanUp {
                 Type      => $Type
             );
             my $Time = (time() - $Start) * 1000;
-            $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Type, $Time));
+#            $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Type, $Time));
         }
     }
     else {
@@ -464,7 +464,7 @@ sub CleanUp {
             %Param,
         );
         my $Time = (time() - $Start) * 1000;
-        $Self->_Debug('', sprintf("cleaned up everything in %.2f ms", $Time));          
+#        $Self->_Debug('', sprintf("cleaned up everything in %.2f ms", $Time));          
     }
 
     # cleanup persistent cache
@@ -674,6 +674,9 @@ sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
     return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') );
+    return if !$Message;
+
+    $Indent ||= '';
 
     printf STDERR "%10s %s%s\n", "[Cache]", $Indent, $Message;
 }
