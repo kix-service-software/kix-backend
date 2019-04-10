@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
+    <ConfigItem Name="ImpressLink" Required="0" Valid="1">
+        <Description Translatable="1">Defines the language dependent link to an online impress.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="de">https://www.kixdesk.com/de/impressum-datenschutz.html</Item>
+                <Item Key="en">https://www.kixdesk.com/en/legal-notes.html</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="ImportExport::ObjectBackendRegistration###FAQ" Required="0" Valid="1">
         <Description Translatable="1">Object backend module registration for the import/export module.</Description>
         <Group>Framework</Group>
