@@ -1371,6 +1371,8 @@ sub CheckPermission {
 
     $Self->_PermissionDebug("relevant permissions: ".Dumper(\%RelevantPermissions));
 
+    return if !IsHashRefWithData(\%RelevantPermissions);
+    
     # sum up all the relevant permissions
     my $ResultingPermission = 0;
     TYPE_RELEVANT:
