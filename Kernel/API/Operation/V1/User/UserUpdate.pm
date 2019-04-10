@@ -191,6 +191,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
         %UserData,
         %{$User},
+        UserPw        => $User->{UserPw},
         ChangeUserID  => $Self->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
