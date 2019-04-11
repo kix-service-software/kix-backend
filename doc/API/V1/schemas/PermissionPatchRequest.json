@@ -10,8 +10,14 @@
             "Comment" : {
                "type" : "string"
             },
+            "IsRequired" : {
+               "type" : "integer"
+            },
             "Target" : {
                "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
             },
             "Value" : {
                "description" : "bitmask, please see documentation for bit descriptions",

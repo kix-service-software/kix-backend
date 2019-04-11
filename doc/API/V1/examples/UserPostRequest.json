@@ -4,7 +4,7 @@
         "UserFirstname": "John",
         "UserLastname": "Doe",
         "UserLogin": "jdoe",
-        "UserPassword": "secret",
+        "UserPw": "secret",
         "UserTitle": "Dr.",
         "ValidID": 1
     }
