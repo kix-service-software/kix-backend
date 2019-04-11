@@ -1354,7 +1354,12 @@ sub CheckPermission {
         $Target =~ s/\*/.*?/g;
         $Target =~ s/\//\\\//g;
 
-        next if $Param{Target} !~ /^$Target/;
+        # check if permission target matches the target to be checked (check whole resources)
+        if ( $Param{Target} !~ /^$Target$/ ) {
+            # the permission target doesn't match the target itself (i.e. permission target "/tickets" vs. target "/tickets/123/articles")
+            # check it with a / at the end but just the beginning part (needed for permission inheritance)
+            next if $Param{Target} !~ /^$Target\//;
+        }
 
         my %PermissionType = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
             ID => $Permission->{TypeID}

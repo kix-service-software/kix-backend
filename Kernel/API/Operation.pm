@@ -115,7 +115,7 @@ sub new {
 
     # check permission
     if ( IsHashRefWithData($Param{Authorization}) ) {
-        my ($Granted, @AllowedMethods) = $Self->_CheckOperationPermission(
+        my ($Granted, @AllowedMethods) = $Self->_CheckPermission(
             Authorization => $Param{Authorization},
         );
         if ( !$Granted ) {
@@ -256,17 +256,17 @@ sub GetCacheDependencies {
 
 =begin Internal:
 
-=item _CheckOperationPermission()
+=item _CheckPermission()
 
-checks whether the user is allowed to execute this operation
+checks whether the user is allowed to execute this operation (Resource and Object types)
 
-    my $Permission = $OperationObject->_CheckOperationPermission(
+    my $Permission = $OperationObject->_CheckPermission(
         Authorization    => { },
     );
 
 =cut
 
-sub _CheckOperationPermission {
+sub _CheckPermission {
     my ( $Self, %Param ) = @_;    
 
     my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
