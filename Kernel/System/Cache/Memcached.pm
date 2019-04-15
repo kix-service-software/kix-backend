@@ -196,7 +196,7 @@ sub CleanUp {
             my %KeepTypeLookup;
             @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
 
-            $CacheIndex = $Self->{MemcachedObject}->get(
+            my $CacheIndex = $Self->{MemcachedObject}->get(
                 "Memcached::CachedObjects",
             );
 
