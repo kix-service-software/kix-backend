@@ -255,7 +255,7 @@ sub CreateToken {
     $Payload{CreateTimeUnix}       = $TimeObject->SystemTime();
     $Payload{ValidUntilTimeUnix}   = $ValidUntilTimeUnix;
     $Payload{RemoteIP}             = $Param{Payload}->{RemoteIP} || $ENV{REMOTE_ADDR} || 'none';
-    $Payload{IgnoreMaxIdleTime}    = $Param{Payload}->{IgnoreMaxIdleTime} + 0 || 0;
+    $Payload{IgnoreMaxIdleTime}    = ($Param{Payload}->{IgnoreMaxIdleTime} || 0) + 0;
     $Payload{Description}          = $Param{Payload}->{Description} || '';
     $Payload{TokenType}            = $Param{Payload}->{TokenType} || 'Normal';
     $Payload{AllowedOperations}    = $Param{Payload}->{AllowedOperations} || [];
