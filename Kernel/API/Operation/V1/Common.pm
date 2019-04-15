@@ -245,6 +245,12 @@ sub RunOperation {
         }
     }
 
+    # log created ID of POST requests
+    if ( $Self->{RequestMethod} eq 'POST' && IsHashRefWithData($Result) && $Result->{Success} ) {
+        my @Data = %{$Result->{Data}};
+        $Self->_Debug($Self->{LevelIndent}, "created new item (".join('=', @Data).")");
+    }
+
     return $Result    
 }
 
