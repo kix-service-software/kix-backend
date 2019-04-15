@@ -216,9 +216,8 @@ sub RunOperation {
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
-                $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}, "return cached response");
-            }
+            print STDERR "CacheKey: $CacheKey\n";
+            $Self->_Debug($Self->{LevelIndent}, "return cached response");
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
                 %{$CacheResult}
