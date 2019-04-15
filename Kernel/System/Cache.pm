@@ -686,7 +686,7 @@ sub _Debug {
 
     $Indent ||= '';
 
-    printf STDERR "%10s %s%s\n", "[Cache]", $Indent, $Message;
+    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Cache]", $Indent, $Message;
 }
 
 =back

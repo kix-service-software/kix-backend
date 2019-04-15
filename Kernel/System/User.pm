@@ -1750,7 +1750,7 @@ sub _PermissionDebug {
 
     return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
 
-    printf STDERR "%10s %s\n", "[Permission]", $Message;
+    printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
 }
 
 =end Internal:
