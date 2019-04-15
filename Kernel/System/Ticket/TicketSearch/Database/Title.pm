@@ -86,36 +86,36 @@ sub Search {
     }
 
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, "st.title = '".$Param{Search}->{Value}."'" );
+        push( @SQLWhere, $Param{Search}->{Field}." = '".$Param{Search}->{Value}."'" );
     }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        push( @SQLWhere, "st.title LIKE '".$Param{Search}->{Value}."%'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => 'st.title',
+            Value => $Param{Search}->{Value}.'%'
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        push( @SQLWhere, "st.title LIKE '%".$Param{Search}->{Value}."'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => 'st.title',
+            Value => '%'.$Param{Search}->{Value}
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        push( @SQLWhere, "st.title LIKE '%".$Param{Search}->{Value}."%'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => 'st.title',
+            Value => '%'.$Param{Search}->{Value}.'%'
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-        my $Field = 'st.title';
         my $Value = $Param{Search}->{Value};
         $Value =~ s/\*/%/g;
-
-        # check if database supports LIKE in large text types
-        if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
-            if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
-                $Field = "LCASE(st.title)";
-                $Value = "LCASE('$Value')";
-            }
-            else {
-                $Field = "LOWER(st.title)";
-                $Value = "LOWER('$Value')";
-            }
-        }
-        else {
-            $Value = "'$Value'";
-        }
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => 'st.title',
+            Value => $Value
+        );        
         push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {

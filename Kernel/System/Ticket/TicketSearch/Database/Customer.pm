@@ -93,22 +93,38 @@ sub Search {
         'CustomerUserID' => 'st.customer_user_id',
     );
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {        
         push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}." = '".$Param{Search}->{Value}."'" );
     }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}." LIKE '".$Param{Search}->{Value}."%'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => $AttributeMapping{$Param{Search}->{Field}},
+            Value => $Param{Search}->{Value}.'%'
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}." LIKE '%".$Param{Search}->{Value}."'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => $AttributeMapping{$Param{Search}->{Field}},
+            Value => '%'.$Param{Search}->{Value}
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}." LIKE '%".$Param{Search}->{Value}."%'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => $AttributeMapping{$Param{Search}->{Field}},
+            Value => '%'.$Param{Search}->{Value}.'%'
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
         my $Value = $Param{Search}->{Value};
         $Value =~ s/\*/%/g;
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}." LIKE '".$Value."'" );
+        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+            Field => $AttributeMapping{$Param{Search}->{Field}},
+            Value => $Param{Search}->{Value}
+        );
+        push( @SQLWhere, $Field." LIKE ".$Value );
     }    
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}." IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );

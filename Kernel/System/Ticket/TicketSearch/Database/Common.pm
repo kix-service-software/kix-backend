@@ -128,6 +128,36 @@ sub Sort {
     return;        
 }
 
+=begin Internal:
+
+=cut
+
+sub _PrepareFieldAndValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Field = $Param{Field};
+    my $Value = $Param{Value};
+
+    # check if database supports LIKE in large text types
+    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+        if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+            $Field = "LCASE(st.title)";
+            $Value = "LCASE('$Value')";
+        }
+        else {
+            $Field = "LOWER(st.title)";
+            $Value = "LOWER('$Value')";
+        }
+    }
+    else {
+        $Value = "'$Value'";
+    }
+
+    return ($Field, $Value);
+}
+
+=end Internal:
+
 1;
 
 =back
