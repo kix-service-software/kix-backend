@@ -68,52 +68,33 @@ sub Set {
         }
     }
 
-    if ($Self->{Config}->{CacheMetaInfo}) {
-        # update indexes
-        my $Result = $Self->{MemcachedObject}->get_multi(
-            "Memcached::CachedObjects",
-            "Memcached::CacheIndex::$Param{Type}",
-        );
+    # update indexes
+    my $Result = $Self->{MemcachedObject}->get_multi(
+        "Memcached::CachedObjects",
+        "Memcached::CacheIndex::$Param{Type}",
+    );
 
-        # update global object index
-        if ( !$Result->{'Memcached::CachedObjects'} || ref( $Result->{'Memcached::CachedObjects'} ) ne 'HASH' ) {
-            $Result->{'Memcached::CachedObjects'} = {};
-        }
-        $Result->{'Memcached::CachedObjects'}->{ $Param{Type} } = 1;
-
-        # update cache index for Type
-        if (
-            !$Result->{"Memcached::CacheIndex::$Param{Type}"}
-            || ref( $Result->{"Memcached::CacheIndex::$Param{Type}"} ) ne 'HASH'
-            )
-        {
-            $Result->{"Memcached::CacheIndex::$Param{Type}"} = {};
-        }
-        $Result->{"Memcached::CacheIndex::$Param{Type}"}->{$PreparedKey} = 1;
-
-        return $Self->{MemcachedObject}->set_multi(
-            [ $PreparedKey, $Param{Value}, $TTL, ],
-            [ "Memcached::CacheIndex::$Param{Type}", $Result->{"Memcached::CacheIndex::$Param{Type}"} ],
-            [ "Memcached::CachedObjects",          $Result->{"Memcached::CachedObjects"} ],
-        );
+    # update global object index
+    if ( !$Result->{'Memcached::CachedObjects'} || ref( $Result->{'Memcached::CachedObjects'} ) ne 'HASH' ) {
+        $Result->{'Memcached::CachedObjects'} = {};
     }
-    else {
-        # update indexes
-        my $Result = $Self->{MemcachedObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
+    $Result->{'Memcached::CachedObjects'}->{ $Param{Type} } = 1;
 
-        # update cache index for Type
-        if (!$Result || ref( $Result ) ne 'HASH') {
-            $Result = {};
-        }
-        $Result->{$PreparedKey} = 1;
-
-        return $Self->{MemcachedObject}->set_multi(
-            [ $PreparedKey, $Param{Value}, $TTL, ],
-            [ "Memcached::CacheIndex::$Param{Type}", $Result ],
-        );
+    # update cache index for Type
+    if (
+        !$Result->{"Memcached::CacheIndex::$Param{Type}"}
+        || ref( $Result->{"Memcached::CacheIndex::$Param{Type}"} ) ne 'HASH'
+        )
+    {
+        $Result->{"Memcached::CacheIndex::$Param{Type}"} = {};
     }
+    $Result->{"Memcached::CacheIndex::$Param{Type}"}->{$PreparedKey} = 1;
+
+    return $Self->{MemcachedObject}->set_multi(
+        [ $PreparedKey, $Param{Value}, $TTL, ],
+        [ "Memcached::CacheIndex::$Param{Type}", $Result->{"Memcached::CacheIndex::$Param{Type}"} ],
+        [ "Memcached::CachedObjects",          $Result->{"Memcached::CachedObjects"} ],
+    );
 }
 
 sub Get {
@@ -173,17 +154,15 @@ sub CleanUp {
                 "Memcached::CacheIndex::$Param{Type}",
             );
 
-            if ($Self->{Config}->{CacheMetaInfo}) {
-                # delete from global object index
-                $CacheIndex = $Self->{MemcachedObject}->get(
-                    "Memcached::CachedObjects",
-                );
-                delete $CacheIndex->{ $Param{Type} };
-                $Self->{MemcachedObject}->set(
-                    "Memcached::CachedObjects",
-                    $CacheIndex,
-                );
-            }
+            # delete from global object index
+            $CacheIndex = $Self->{MemcachedObject}->get(
+                "Memcached::CachedObjects",
+            );
+            delete $CacheIndex->{ $Param{Type} };
+            $Self->{MemcachedObject}->set(
+                "Memcached::CachedObjects",
+                $CacheIndex,
+            );
         }
         return 1;
     }
