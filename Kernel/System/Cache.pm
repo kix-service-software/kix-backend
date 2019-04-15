@@ -461,10 +461,18 @@ sub CleanUp {
             );
         }
 
+        # some debug output
+        $Self->_Debug($Param{Indent}, "cleaning up everything");
+
         $Self->_UpdateCacheStats(
             Operation => 'CleanUp',
             %Param,
         );        
+    }
+
+    if ( $Param{KeepTypes} ) {
+        # some debug output
+        $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
     }
 
     # cleanup persistent cache
