@@ -192,7 +192,25 @@ sub CleanUp {
         return 1;
     }
     else {
-        return $Self->{MemcachedObject}->flush_all();
+        if ( $Param{KeepTypes} ) {
+            my %KeepTypeLookup;
+            @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
+
+            $CacheIndex = $Self->{MemcachedObject}->get(
+                "Memcached::CachedObjects",
+            );
+
+            TYPE:
+            for my $Type ( sort keys %{ $CacheIndex || {} } ) {
+                next TYPE if exists $KeepTypeLookup{$Type};
+                $Self->CleanUp(
+                    Type => $Type
+                );
+            }        
+        } 
+        else {
+            return $Self->{MemcachedObject}->flush_all();
+        }
     }
 }
 

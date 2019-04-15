@@ -486,6 +486,13 @@ sub PermissionAdd {
     # delete whole cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Role.Permission',
+        ObjectID  => $Param{RoleID}.'::'.$ID,
+    );
+
     return $ID;
 }
 
@@ -583,6 +590,13 @@ sub PermissionUpdate {
     # delete whole cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Role.Permission',
+        ObjectID  => $Data{RoleID}.'::'.$Param{ID},
+    );
+
     return 1;
 }
 
@@ -673,6 +687,11 @@ sub PermissionDelete {
         }
     }
 
+    # get current data
+    my %Data = $Self->PermissionGet(
+        ID => $Param{ID},
+    );
+
     # get database object
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'DELETE FROM role_permission WHERE id = ?',
@@ -681,6 +700,13 @@ sub PermissionDelete {
    
     # delete whole cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Role.Permission',
+        ObjectID  => $Data{RoleID}.'::'.$Param{ID},
+    );
 
     return 1;
 

@@ -59,7 +59,7 @@ sub RoleUserAdd {
             return;
         }
     }
-
+    
     # insert new relation
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'INSERT INTO role_user '
@@ -69,13 +69,13 @@ sub RoleUserAdd {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
-    # delete user cache 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'User'
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Role.User',
+        ObjectID  => $Param{RoleID}.'::'.$Param{AssignUserID},
     );
 
     return 1;
@@ -174,13 +174,13 @@ sub RoleUserDelete {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
 
-    # delete user cache 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'User'
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Role.User',
+        ObjectID  => $Param{RoleID}.'::'.$Param{UserID},
     );
 
     return 1;

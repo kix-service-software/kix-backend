@@ -251,6 +251,13 @@ sub RoleAdd {
         Type => $Self->{CacheType}
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Role',
+        ObjectID  => $RoleID,
+    );
+
     return $RoleID;
 }
 
@@ -325,6 +332,13 @@ sub RoleUpdate {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Role',
+        ObjectID  => $Param{ID},
     );
 
     return 1;
@@ -426,16 +440,17 @@ sub RoleDelete {
         Type => $Self->{CacheType}
     );
 
-    return 1;
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Role',
+        ObjectID  => $Param{ID},
+    );
 
+    return 1;
 }
 
 1;
-
-=end Internal:
-
-
-
 
 =back
 

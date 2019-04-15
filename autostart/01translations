@@ -1,1 +1,8 @@
-Dev::Tools::ImportTranslations --allow-root
+# flush the cache to make sure it's in a consistent state
+Maint::Cache::Delete --allow-root
+
+# refresh translations of PO file
+Admin::Translation::Import --allow-root
+
+# warmup core cache
+Admin::Translation::List --allow-root --quiet

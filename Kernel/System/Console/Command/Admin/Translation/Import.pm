@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Dev::Tools::ImportTranslations;
+package Kernel::System::Console::Command::Admin::Translation::Import;
 
 use strict;
 use warnings;
@@ -67,7 +67,7 @@ sub Run {
     my $Language  = $Self->GetOption('language') || '';
     my $LocaleDir = $Self->GetOption('locale-directory') || $Home.'/locale';
 
-    $Self->Print("<yellow>Starting import...</yellow>\n\n");
+    $Self->Print("<yellow>Updating translations...</yellow>\n\n");
 
     my @POFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
         Directory => $LocaleDir,

@@ -208,7 +208,25 @@ sub CleanUp {
         return 1;
     }
     else {
-        return $Self->{RedisObject}->flushall();
+        if ( $Param{KeepTypes} ) {
+            my %KeepTypeLookup;
+            @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
+
+            $CacheIndex = $Self->{RedisObject}->get(
+                "Memcached::CachedObjects",
+            );
+
+            TYPE:
+            for my $Type ( sort keys %{ $CacheIndex || {} } ) {
+                next TYPE if exists $KeepTypeLookup{$Type};
+                $Self->CleanUp(
+                    Type => $Type
+                );
+            }        
+        } 
+        else {
+            return $Self->{RedisObject}->flushall();
+        }        
     }
 }
 
