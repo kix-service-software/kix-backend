@@ -11,6 +11,7 @@
                 <Item Key="ResponseObject">TranslationResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
+                <Item Key="DisableUserBasedCaching">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -23,6 +24,7 @@
                 <Item Key="ResponseObject">TranslationCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
+                <Item Key="DisableUserBasedCaching">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -68,6 +70,7 @@
                 <Item Key="ResponseObject">TranslationLanguageResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
+                <Item Key="DisableUserBasedCaching">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -80,6 +83,7 @@
                 <Item Key="ResponseObject">TranslationLanguageCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
                 <Item Key="CacheTypeDependency">Translation</Item>
+                <Item Key="DisableUserBasedCaching">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
