@@ -9578,6 +9578,18 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="Cache::AlwaysKeepTypesOnCompleteCleanUp" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defined which cache types should be ignored when doing a complete cache cleanup, i.e. change of permissions. Key = Cache Type, Value = 1 to activate.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Cache</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Cache">1</Item>
+                <Item Key="Translation">1</Item>
+                <Item Key="API_i18n_translations">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="SystemMaintenance::TimeNotifyUpcomingMaintenance" Required="0" Valid="1">
         <Description Translatable="1">Sets the minutes a notification is shown for notice about upcoming system maintenance period.</Description>
         <Group>Framework</Group>

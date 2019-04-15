@@ -402,11 +402,19 @@ sub CleanUp {
 
     $Param{Indent} = $Param{Indent} || '';
 
+    my @AdditionalKeepTypes;
+    my $AlwaysKeepTypes = $Kernel::OM->Get('Kernel::Config')->Get('Cache::AlwaysKeepTypesOnCompleteCleanUp');
+    if ( IsHashRefWithData($AlwaysKeepTypes) ) {
+        # extend relevant param with the list of activated types
+        @AdditionalKeepTypes = grep { defined $_ } map { $AlwaysKeepTypes->{$_} ? $_ : undef } keys %{$AlwaysKeepTypes};
+        if ( @AdditionalKeepTypes ) {
+            $Param{KeepTypes} = \(@{$Param{KeepTypes} || []}, @AdditionalKeepTypes);
+        }
+    }
+
     # cleanup in-memory cache
     # We don't have TTL/expiry information here, so just always delete to be sure.
     if ( $Param{Type} ) {
-        my $Start = time();
-
         delete $Self->{Cache}->{ $Param{Type} };
 
         # check and delete depending caches
@@ -419,17 +427,14 @@ sub CleanUp {
             Operation => 'CleanUp',
             %Param,
         );
-        my $Time = (time() - $Start) * 1000;
-#        $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Param{Type}, $Time));
     }
     elsif ( $Param{KeepTypes} ) {
         my %KeepTypeLookup;
-        @KeepTypeLookup{ @{ $Param{KeepTypes} } } = undef;
+        @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
         TYPE:
         for my $Type ( sort keys %{ $Self->{Cache} || {} } ) {
             next TYPE if exists $KeepTypeLookup{$Type};
 
-            my $Start = time();
             delete $Self->{Cache}->{$Type};
 
             # check and delete depending caches
@@ -442,12 +447,9 @@ sub CleanUp {
                 Operation => 'CleanUp',
                 Type      => $Type
             );
-            my $Time = (time() - $Start) * 1000;
-#            $Self->_Debug('', sprintf("cleaned up type \"%s\" in %.2f ms", $Type, $Time));
         }
     }
     else {
-        my $Start = time();
         delete $Self->{Cache};
         delete $Self->{TypeDependencies};
 
@@ -462,9 +464,7 @@ sub CleanUp {
         $Self->_UpdateCacheStats(
             Operation => 'CleanUp',
             %Param,
-        );
-        my $Time = (time() - $Start) * 1000;
-#        $Self->_Debug('', sprintf("cleaned up everything in %.2f ms", $Time));          
+        );        
     }
 
     # cleanup persistent cache

@@ -88,6 +88,9 @@ sub Run {
         }
 
         foreach my $Line ( @{$Content} ) {
+            # ignore empty lines and comments
+            next if ( $Line =~ /^\s*$/ || $Line =~ /^\s*#/ );
+
             chomp($Line);
             my @Command = Text::ParseWords::quotewords('\s+', 0, $Line);
     

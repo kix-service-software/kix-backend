@@ -18,6 +18,7 @@ use Storable qw();
 use Digest::MD5 qw();
 use File::Path qw();
 use File::Find qw();
+use File::Basename;
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -181,9 +182,15 @@ sub CleanUp {
         Filter    => $Param{Type} || '*',
     );
 
-    if ( $Param{KeepTypes} ) {
-        my $KeepTypesRegex = join( '|', map {"\Q$_\E"} @{ $Param{KeepTypes} } );
-        @TypeList = grep { $_ !~ m{/$KeepTypesRegex/?$}smx } @TypeList;
+    if ( $Param{KeepTypes} ) {                
+        my %KeepTypes = map { $_ => 1 } @{$Param{KeepTypes}};
+        my @RealTypeList;        
+        foreach my $Directory (sort @TypeList) {
+            my $Type = basename($Directory);
+            next if $KeepTypes{$Type};
+            push(@RealTypeList, $Directory);
+        }
+        @TypeList = @RealTypeList;
     }
 
     return 1 if !@TypeList;
