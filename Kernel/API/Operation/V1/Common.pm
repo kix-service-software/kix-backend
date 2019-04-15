@@ -216,7 +216,6 @@ sub RunOperation {
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            print STDERR "CacheKey: $CacheKey\n";
             $Self->_Debug($Self->{LevelIndent}, "return cached response");
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
@@ -1424,27 +1423,27 @@ sub _ApplyFilter {
                                     # the string contains a part
                                     elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {               
                                         my $FilterValueQuoted = quotemeta $FilterValue;
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/ ) {
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/i ) {
                                             $FilterMatch = 0;
                                         }
                                     }
                                     # the string starts with the part
                                     elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {                        
                                         my $FilterValueQuoted = quotemeta $FilterValue;
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/ ) {
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/i ) {
                                             $FilterMatch = 0;
                                         }
                                     }
                                     # the string ends with the part
                                     elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {                        
                                         my $FilterValueQuoted = quotemeta $FilterValue;
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/ ) {
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/i ) {
                                             $FilterMatch = 0;
                                         }
                                     }
                                     # the string matches the pattern
                                     elsif ( $FilterItem->{Operator} eq 'LIKE' ) {  
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/ig ) {
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/i ) {
                                             $FilterMatch = 0;
                                         }
                                     }
