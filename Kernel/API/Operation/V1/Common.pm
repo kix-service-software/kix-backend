@@ -2081,11 +2081,12 @@ sub _GetCacheKey {
     }
 
     # add UserID to CacheKey if not explicitly disabled
+    my $UserID = '';
     if ( !$Self->{OperationConfig}->{DisableUserBasedCaching} ) {
-        $RequestData{UserID} = $Self->{Authorization}->{UserID};
+        $UserID= $Self->{Authorization}->{UserID};
     }
 
-    my $CacheKey = $Self->{WebserviceID}.'::'.$Self->{OperationType}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
+    my $CacheKey = $UserID.'::'.$Self->{WebserviceID}.'::'.$Self->{OperationType}.'::'.$Kernel::OM->Get('Kernel::System::Main')->Dump(
         \%RequestData,
         'ascii+noindent'
     );
