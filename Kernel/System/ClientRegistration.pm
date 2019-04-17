@@ -495,13 +495,14 @@ sub NotificationSend {
                 Priority => 'error',
                 Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
             );
-            return;
+            # don't return in case of an error, just re-schedule the job to try it again later
         }
-
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'info',
-            Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
-        );
+        else {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'info',
+                Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
+            );
+        }
     }
 
     # update client registration
