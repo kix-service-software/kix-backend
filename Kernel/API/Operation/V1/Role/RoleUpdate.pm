@@ -133,11 +133,11 @@ sub Run {
     );
 
     # check if Role exists 
-    my $RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
-        RoleID => $Param{Data}->{RoleID},
+    my %RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+        ID => $Param{Data}->{RoleID},
     );
   
-    if ( !$RoleData ) {
+    if ( !%RoleData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
@@ -146,9 +146,9 @@ sub Run {
     # update Role
     my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
         ID      => $Param{Data}->{RoleID},
-        Name    => $Role->{Name} || $RoleData->{Name},
-        Comment => $Role->{Comment} || $RoleData->{Comment},
-        ValidID => $Role->{ValidID}  || $RoleData->{ValidID},
+        Name    => $Role->{Name} || $RoleData{Name},
+        Comment => $Role->{Comment} || $RoleData{Comment},
+        ValidID => defined $Role->{ValidID} ? $Role->{ValidID} : $RoleData{ValidID},
         UserID  => $Self->{Authorization}->{UserID},
     );
 
