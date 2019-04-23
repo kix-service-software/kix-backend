@@ -13,6 +13,8 @@ package Kernel::API::Operation;
 use strict;
 use warnings;
 
+use File::Basename;
+
 use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
 
@@ -162,7 +164,7 @@ sub new {
 
     # pass information to backend
     foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods) ) {
-        $Self->{BackendObject}->{$Key} = $Param{$Key} || $Self->{$Key};
+        $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 
     # add call level
@@ -205,6 +207,12 @@ sub Run {
         return $Self->_Error(
             %{$ValidatorResult},
         );
+    }
+
+    if ( $Self->{AlteredRequestURI} && $Self->{CurrentRoute} =~ /:(.+?)$/ ) {
+        # the RequestURI has been altered by the permission check
+        # this can happen in case of multiple IDs with different permissions (the user has no permission to some of the items)
+        $Param{Data}->{$1} = (split(/\//, $Self->{AlteredRequestURI}))[-1];
     }
 
     # start the backend
@@ -300,15 +308,36 @@ sub _CheckPermission {
         return;
     }
 
-    # check if user has permission for this request
-    my ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
-        UserID              => $Param{Authorization}->{UserID},
-        Target              => $Self->{RequestURI},
-        Types               => [ 'Resource', 'Object' ],
-        RequestedPermission => $RequestedPermission,
-    );
+    # split multiple (item) resources in the URI
+    my ($Resource, $ResourceBase) = fileparse $Self->{RequestURI};
+    my @Resources = split(/,/, $Resource);
 
-    $Self->_PermissionDebug(sprintf("RequestURI = $Self->{RequestURI}, requested permission = $RequestedPermission --> Granted = $Granted, allowed permission = 0x%04x", ($AllowedPermission||0)));
+    # check if user has permission for this request
+    my $Granted = 0;
+    my $AllowedPermission;
+    my @GrantedResources;
+    foreach my $Resource ( @Resources ) {
+        ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+            UserID              => $Param{Authorization}->{UserID},
+            Target              => $ResourceBase.$Resource,
+            Types               => [ 'Resource', 'Object' ],
+            RequestedPermission => $RequestedPermission,
+        );
+
+        $Self->_PermissionDebug(sprintf("RequestURI = %s, requested permission = $RequestedPermission --> Granted = $Granted, allowed permission = 0x%04x", $ResourceBase.$Resource, ($AllowedPermission||0)));
+
+        if ( $Granted ) {
+            # build new list of allowed (item) resources
+            push(@GrantedResources, $Resource);
+        }
+    }
+
+    # create a new RequestURI with granted resources if some of the item resources are denied
+    if ( scalar(@Resources) > 1 && scalar(@GrantedResources) < scalar(@Resources) ) {
+        $Granted = 1;
+        $Self->{AlteredRequestURI} = $ResourceBase.join(',', @GrantedResources);
+        $Self->_PermissionDebug(sprintf("altered RequestURI = %s, requested permission = $RequestedPermission --> Granted = $Granted, allowed permission = 0x%04x", $Self->{AlteredRequestURI}, ($AllowedPermission||0)));
+    }
 
     my @AllowedMethods;
     if ( $AllowedPermission ) {

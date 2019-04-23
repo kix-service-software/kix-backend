@@ -76,7 +76,7 @@ sub Run {
         UserID       => 1,
     );
 
-    if ( $Success ) {
+    if ( !$Success ) {
         $Self->PrintError("Can't assign user to role.");
         return $Self->ExitCodeError();
     }
