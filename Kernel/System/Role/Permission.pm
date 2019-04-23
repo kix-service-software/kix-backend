@@ -24,6 +24,7 @@ our @ObjectDependencies = (
 
 # define permission bit values
 use constant PERMISSION => {
+    NONE   => 0x0000,
     CREATE => 0x0001,
     READ   => 0x0002,
     UPDATE => 0x0004,
@@ -720,7 +721,7 @@ returns a two lists of directly assigned permissions für the given object
         RelevantPropertyValuePermissions => [ 'Queue-to-Ticket' ]
         Target       => '/queue/1',
         ObjectID     => 123
-        ObjectIDAttr => 'QueueID', 
+        ObjectIDAttr => 'QueueID',
     );
 
 returns
