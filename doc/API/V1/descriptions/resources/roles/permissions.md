@@ -1,10 +1,10 @@
 For each existing role permissions can be created. A permission item has a ```TypeID``` which references a permission type defined in the resource [```/roles/permissiontypes```](#roles_permissiontypes_get). Additionally the target for the permission has to be defined. Each permission type has its own target schema. The following table lists the possible targets for each default permission type.
 
-|Permission Type|Permission Target|Example|
-|-|-|-|
-|Resource|collection resource URI|```/tickets```|
-|Object|item resource URI|```/tickets/123```|
-|Object Property Value|\<ObjectType\>.\<Property\>[.\<Property\>...]=\<Value\>|```Ticket.QueueID=123```|
+|ID|Permission Type|Permission Target|Example|
+|-|-|-|-|
+|1|Resource|collection resource URI|```/tickets```|
+|2|Object|item resource URI|```/tickets/123```|
+|3|PropertyValue|\<ObjectType\>.\<Property\> EQ \<Value\>|```Ticket.QueueID EQ 123```|
 
 The permission value itself is a bitmask with the following values:
 
