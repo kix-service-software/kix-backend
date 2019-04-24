@@ -124,6 +124,11 @@ sub CategoryAdd {
             . "created successfully ($Param{UserID})!",
     );
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
@@ -354,6 +359,10 @@ Returns:
         Name       => 'My Category',
         Comment    => 'This is my first category.',
         ValidID    => 1,
+        CreateTime => '2010-04-07 15:41:15',
+        CreateBy   => 1,
+        ChangeTime => '2010-04-07 15:41:15',
+        ChangeBy   => 1
     );
 
 =cut
@@ -400,7 +409,7 @@ sub CategoryGet {
     # SQL
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT id, parent_id, name, comments, valid_id
+            SELECT id, parent_id, name, comments, valid_id, created, created_by, changed, changed_by
             FROM faq_category
             WHERE id = ?',
         Bind  => [ \$Param{CategoryID} ],
@@ -415,6 +424,10 @@ sub CategoryGet {
             Name       => $Row[2],
             Comment    => $Row[3],
             ValidID    => $Row[4],
+            CreateTime => $Row[5],
+            CreateBy   => $Row[6],
+            ChangeTime => $Row[7],
+            ChangeBy   => $Row[8],
         );
     }
 
@@ -912,7 +925,7 @@ sub CategoryUpdate {
             . "ID: '$Param{CategoryID}' updated successfully ($Param{UserID})!",
     );
 
-    # delete all cache, as FAQGet() will be also affected.
+    # clear cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
