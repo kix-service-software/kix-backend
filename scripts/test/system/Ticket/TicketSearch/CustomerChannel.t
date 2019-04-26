@@ -72,7 +72,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
             Priority     => '3 normal',
             State        => 'new',
             CustomerID   => '123465' . $RandomID,
-            CustomerUser => 'customerOne@example.com',
+            Contact => 'customerOne@example.com',
             OwnerID      => 1,
             UserID       => 1,
         );
@@ -139,7 +139,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
             Name   => 'Customer Interface (Internal/External)',
             Config => {
                 Subject        => 'Kumbala' . $RandomID,
-                CustomerUserID => 'customerOne@example.com',
+                ContactID => 'customerOne@example.com',
             },
             ExpectedResults => [ $TicketIDs[1] ],
             ForBothStorages => 1,

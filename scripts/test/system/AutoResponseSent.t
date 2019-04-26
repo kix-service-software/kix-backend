@@ -155,7 +155,7 @@ for my $Test (@Tests) {
         Priority     => '3 normal',
         State        => 'open',
         CustomerID   => '12345',
-        CustomerUser => 'test@localunittest.com',
+        Contact => 'test@localunittest.com',
         OwnerID      => 1,
         UserID       => 1,
     );
@@ -243,7 +243,7 @@ for my $Test (@Tests) {
         Priority     => '3 normal',
         State        => 'open',
         CustomerID   => '12345',
-        CustomerUser => 'test@localunittest.com',
+        Contact => 'test@localunittest.com',
         OwnerID      => 1,
         UserID       => 1,
     );

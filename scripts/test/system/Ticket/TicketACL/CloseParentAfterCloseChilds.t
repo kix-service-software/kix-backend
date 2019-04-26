@@ -68,7 +68,7 @@ for my $TitleDataItem (@TitleData) {
         Priority     => '3 normal',
         State        => 'open',
         CustomerNo   => '123465',
-        CustomerUser => 'customer@example.com',
+        Contact => 'customer@example.com',
         OwnerID      => 1,
         UserID       => 1,
     );

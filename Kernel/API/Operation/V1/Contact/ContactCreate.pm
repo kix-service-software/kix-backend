@@ -83,26 +83,26 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    # determine required attributes from Map config
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
-    my %RequiredAttributes;
-    foreach my $MapItem ( @{$Config->{Map}} ) {
-        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
-
-        $RequiredAttributes{'Contact::'.$MapItem->{Attribute}} = {
-            Required => 1
-        };
-    }
-
     return {
-        'SourceID' => {
-            Required => 1
-        },
         'Contact' => {
             Type     => 'HASH',
             Required => 1
         },          
-        %RequiredAttributes,
+        'Contact::Firstname' => {
+            Required => 1
+        },            
+        'Contact::Lastname' => {
+            Required => 1
+        },
+        'Contact::Email' => {
+            Required => 1
+        },
+        'Contact::PrimaryOrganisationID' => {
+            Required => 1,
+        },
+        'Contact::OrganisationIDs' => {
+            Required => 1,
+        },
     }
 }
 
@@ -112,9 +112,8 @@ perform ContactCreate Operation. This will return the created ContactLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SourceID => '...'       # required (ID of backend to write to - backend must be writeable)
             Contact => {
-                ...                 # attributes (required and optional) depend on Map config 
+                ...                 # attributes
             },
         },
     );
@@ -133,25 +132,14 @@ perform ContactCreate Operation. This will return the created ContactLogin.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if backend (Source) is writeable
-    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
-        ReadOnly => 0
-    );    
-    if ( !$SourceList{$Param{Data}->{SourceID}} ) {
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'Cannot create contact. Backend with given SourceID is not writable or does not exist.',
-        );        
-    }
-
     # isolate and trim Contact parameter
     my $Contact = $Self->_Trim(
         Data => $Param{Data}->{Contact}
     );
 
-    # check Userlogin exists
-    my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        UserLogin => $Contact->{UserLogin},
+    # check Login exists
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+        Login => $Contact->{Login},
     );
     if ( %ContactData ) {
         return $Self->_Error(
@@ -160,9 +148,9 @@ sub Run {
         );
     }
 
-    # check UserEmail exists
-    my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-        PostMasterSearch => $Contact->{UserEmail},
+    # check Email exists
+    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+        PostMasterSearch => $Contact->{Email},
     );
     if ( %ContactList ) {
         return $Self->_Error(
@@ -171,46 +159,47 @@ sub Run {
         );
     }
 
-    # check if primary CustomerID exists
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
-        CustomerID => $Contact->{UserCustomerID},
-    );
-
-    if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
-        return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => 'Validation failed. No valid customer found for primary customer ID "'.$Contact->{UserCustomerID}.'".',
+    # check if primary OrganisationID exists
+    if ( $Contact->{PrimaryOrganisationID} ) {
+        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            ID => $Contact->{PrimaryOrganisationID},
         );
-    }
-    
-    if ( IsArrayRefWithData($Contact->{UserCustomerIDs}) ) {
-        # check if primary CustomerID is contained in assigned CustomerIDs
-        if ( !grep /$Contact->{UserCustomerID}/, @{$Contact->{UserCustomerIDs}} ) {
+
+        if ( !%OrgData || $OrgData{ValidID} != 1 ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => 'Validation failed. Primary customer ID "'.$Contact->{UserCustomerID}.'" is not available in assigned customer IDs "'.(join(", ", @{$Contact->{UserCustomerIDs}})).'".',
+                Message => 'Validation failed. No valid organisation found for primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'".',
+            );
+        }
+    }
+    
+    if ( IsArrayRefWithData($Contact->{OrganisationIDs}) || IsArrayRefWithData($ContactData{OrganisationIDs}) ) {
+        # check if primary CustomerID is contained in assigned CustomerIDs
+        my @OrgIDs = @{IsArrayRefWithData($Contact->{OrganisationIDs}) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs}};
+        if ( !grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. Primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'" is not available in assigned organisation IDs "'.(join(", ", @OrgIDs)).'".',
             );
         }
         # check each assigned customer 
-        foreach my $CustomerID ( @{$Contact->{UserCustomerIDs}} ) {
-            my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
-                CustomerID => $CustomerID,
+        foreach my $OrgID ( @OrgIDs ) {
+            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                ID => $OrgID,
             );
-            if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+            if ( !%OrgData || $OrgData{ValidID} != 1 ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => 'Validation failed. No valid customer found for assigned customer ID "'.$CustomerID.'".',
+                    Message => 'Validation failed. No valid organisation found for assigned organisation ID "'.$OrgID.'".',
                 );
             }
         }
     }
 
     # create Contact
-    my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
+    my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
         %{$Contact},
-        UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $Contact->{UserCustomerID},
         ValidID         => $Contact->{ValidID} || 1,
-        Source          => $Param{Data}->{SourceID},
         UserID          => $Self->{Authorization}->{UserID},
     );    
     if ( !$ContactID ) {

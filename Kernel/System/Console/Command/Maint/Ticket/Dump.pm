@@ -56,7 +56,7 @@ sub Run {
     $Self->Print( "<green>" . ( '=' x 69 ) . "</green>\n" );
 
     KEY:
-    for my $Key (qw(TicketNumber TicketID Title Created Queue State Priority Lock CustomerID CustomerUserID))
+    for my $Key (qw(TicketNumber TicketID Title Created Queue State Priority Lock CustomerID ContactID))
     {
 
         next KEY if !$Key;

@@ -12,7 +12,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     maxOccurs="1"
                     minOccurs="1">
                         <xsd:annotation>
-                            <xsd:documentation>UserLogin, CustomerUserLogin or SessionID is mandatory</xsd:documentation>
+                            <xsd:documentation>UserLogin, ContactLogin or SessionID is mandatory</xsd:documentation>
                         </xsd:annotation>
                     <xsd:element
                         name="UserLogin"
@@ -20,7 +20,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                         minOccurs="0">
                     </xsd:element>
                     <xsd:element
-                        name="CustomerUserLogin"
+                        name="ContactLogin"
                         type="xsd:string"
                         minOccurs="0">
                     </xsd:element>
@@ -239,7 +239,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 </xsd:element>
             </xsd:choice>
             <xsd:element
-                name="CustomerUser"
+                name="Contact"
                 type="xsd:string"
                 maxOccurs="1"
                 minOccurs="1">
@@ -467,7 +467,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     minOccurs="1"
                     maxOccurs="1">
                     <xsd:annotation>
-                        <xsd:documentation>UserLogin, CustomerUserLogin or SessionID is mandatory</xsd:documentation>
+                        <xsd:documentation>UserLogin, ContactLogin or SessionID is mandatory</xsd:documentation>
                     </xsd:annotation>
                     <xsd:element
                         name="UserLogin"
@@ -475,7 +475,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                         minOccurs="0">
                     </xsd:element>
                     <xsd:element
-                        name="CustomerUserLogin"
+                        name="ContactLogin"
                         type="xsd:string"
                         minOccurs="0">
                     </xsd:element>
@@ -695,7 +695,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 </xsd:element>
             </xsd:choice>
             <xsd:element
-                name="CustomerUser"
+                name="Contact"
                 type="xsd:string"
                 maxOccurs="1"
                 minOccurs="0">
@@ -718,7 +718,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     minOccurs="1"
                     maxOccurs="1">
                     <xsd:annotation>
-                        <xsd:documentation>UserLogin, CustomerUserLogin or SessionID is mandatory</xsd:documentation>
+                        <xsd:documentation>UserLogin, ContactLogin or SessionID is mandatory</xsd:documentation>
                     </xsd:annotation>
                     <xsd:element
                         name="UserLogin"
@@ -726,7 +726,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                         minOccurs="0">
                     </xsd:element>
                     <xsd:element
-                        name="CustomerUserLogin"
+                        name="ContactLogin"
                         type="xsd:string"
                         minOccurs="0">
                     </xsd:element>
@@ -849,7 +849,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 minOccurs="0">
             </xsd:element>
             <xsd:element
-                name="CustomerUserID"
+                name="ContactID"
                 type="xsd:string"
                 minOccurs="1">
             </xsd:element>
@@ -1281,7 +1281,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 minOccurs="0">
             </xsd:element>
             <xsd:element
-                name="CustomerUserID"
+                name="ContactID"
                 type="xsd:string"
                 minOccurs="1">
             </xsd:element>
@@ -1622,7 +1622,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     minOccurs="1"
                     maxOccurs="1">
                     <xsd:annotation>
-                        <xsd:documentation>UserLogin, CustomerUserLogin or SessionID is mandatory</xsd:documentation>
+                        <xsd:documentation>UserLogin, ContactLogin or SessionID is mandatory</xsd:documentation>
                     </xsd:annotation>
                     <xsd:element
                         name="UserLogin"
@@ -1630,7 +1630,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                         minOccurs="0">
                     </xsd:element>
                     <xsd:element
-                        name="CustomerUserLogin"
+                        name="ContactLogin"
                         type="xsd:string"
                         minOccurs="0">
                     </xsd:element>
@@ -1789,7 +1789,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     maxOccurs="unbounded">
                 </xsd:element>
                 <xsd:element
-                    name="CustomerUserLogin"
+                    name="ContactLogin"
                     type="xsd:string"
                     minOccurs="0"
                     maxOccurs="unbounded">
@@ -2093,7 +2093,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     maxOccurs="unbounded">
                 </xsd:element>
                 <xsd:element
-                    name="CustomerUserID"
+                    name="ContactID"
                     type="xsd:string"
                     minOccurs="0"
                     maxOccurs="unbounded">
@@ -2171,7 +2171,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                     maxOccurs="1">
                     <xsd:annotation>
                         <xsd:documentation>
-                            UserLogin or CustomerUserLogin is mandatory.
+                            UserLogin or ContactLogin is mandatory.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:element
@@ -2180,7 +2180,7 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                         minOccurs="0">
                     </xsd:element>
                     <xsd:element
-                        name="CustomerUserLogin"
+                        name="ContactLogin"
                         type="xsd:string"
                         minOccurs="0">
                     </xsd:element>

@@ -47,7 +47,7 @@ $Self->Is(
 # create ConfigItem object
 my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
 
-my $TestCustomerUserLogin = $HelperObject->TestCustomerUserCreate();
+my $TestContactLogin = $HelperObject->TestContactCreate();
 
 # create webservice object
 my $WebserviceObject = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice');
@@ -252,7 +252,7 @@ my @ConfigItems = (
             Model           => 'Thinkpad',
             Description     => 'Thinkpad X300',
             Type            => 'Desktop',
-            Owner           => $TestCustomerUserLogin,
+            Owner           => $TestContactLogin,
             SerialNumber    => 'abc12345abc',
             OperatingSystem => 'CentOS 6.0',
             CPU             => 'Intel Core i3',
@@ -304,7 +304,7 @@ my @ConfigItems = (
             Model        => 'Hardware Model',
             Description  => 'Tesitng Hanrdware',
             Type         => 'Camera',
-            Owner        => $TestCustomerUserLogin,
+            Owner        => $TestContactLogin,
             SerialNumber => '123amc456',
         },
     },
@@ -356,7 +356,7 @@ my @ConfigItems = (
             Version      => '1.1.1',
             Description  => 'Some software description',
             Type         => 'Admin Tool',
-            Owner        => $TestCustomerUserLogin,
+            Owner        => $TestContactLogin,
             SerialNumber => '123ABC456',
             LicenceType  => 'Open Source',
             LicenceKey   => [
@@ -385,7 +385,7 @@ my @ConfigItems = (
             Version      => '1.1.1',
             Description  => 'Some software description',
             Type         => 'Admin Tool',
-            Owner        => $TestCustomerUserLogin,
+            Owner        => $TestContactLogin,
             SerialNumber => '123ABC456',
             LicenceType  => 'Open Source',
             LicenceKey   => [
@@ -414,7 +414,7 @@ my @ConfigItems = (
             Version      => '1.1.1',
             Description  => 'Some software description',
             Type         => 'Admin Tool',
-            Owner        => $TestCustomerUserLogin,
+            Owner        => $TestContactLogin,
             SerialNumber => '123ABC456',
             LicenceType  => 'Open Source',
             LicenceKey   => [

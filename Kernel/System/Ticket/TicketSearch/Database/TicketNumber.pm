@@ -85,6 +85,7 @@ sub Search {
         return;
     }
 
+print STDERR "here!!!\n";
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, "st.tn = '$Param{Search}->{Value}'" );
     }

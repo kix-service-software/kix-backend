@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#OrganisationPatchRequest",
+  "type": "object",
+  "description": "The organisation request object for update.",
+  "properties": {
+    "Organisation": {
+      "type": "object",
+      "properties": {
+        "City": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Number": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Street": {
+          "type": "string"
+        },
+        "Url": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        },
+        "Zip": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "Organisation"
+  ]
+}

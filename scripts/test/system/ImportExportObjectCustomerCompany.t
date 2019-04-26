@@ -16,15 +16,15 @@ use Data::Dumper;
 use Kernel::System::Encode;
 use Kernel::System::GeneralCatalog;
 use Kernel::System::ImportExport;
-use Kernel::System::ImportExport::ObjectBackend::CustomerCompany;
-use Kernel::System::CustomerCompany;
+use Kernel::System::ImportExport::ObjectBackend::Organisation;
+use Kernel::System::Organisation;
 use Kernel::System::XML;
 
-$Self->{CustomerCompanyObject}   = Kernel::System::CustomerCompany->new( %{$Self} );
+$Self->{OrganisationObject}   = Kernel::System::Organisation->new( %{$Self} );
 $Self->{EncodeObject}            = Kernel::System::Encode->new( %{$Self} );
 $Self->{GeneralCatalogObject}    = Kernel::System::GeneralCatalog->new( %{$Self} );
 $Self->{ImportExportObject}      = Kernel::System::ImportExport->new( %{$Self} );
-$Self->{ObjectBackendObject}     = Kernel::System::ImportExport::ObjectBackend::CustomerCompany->new( %{$Self} );
+$Self->{ObjectBackendObject}     = Kernel::System::ImportExport::ObjectBackend::Organisation->new( %{$Self} );
     
 
 # ------------------------------------------------------------ #
@@ -37,7 +37,7 @@ for ( 1 .. 30 ) {
 
     # add a test template for later checks
     my $TemplateID = $Self->{ImportExportObject}->TemplateAdd(
-        Object  => 'CustomerCompany',
+        Object  => 'Organisation',
         Format  => 'UnitTest' . int rand 1_000_000,
         Name    => 'UnitTest' . int rand 1_000_000,
         ValidID => 1,
@@ -59,8 +59,8 @@ my $ObjectList1 = $Self->{ImportExportObject}->ObjectList();
 
 # check object list
 $Self->True(
-    $ObjectList1 && ref $ObjectList1 eq 'HASH' && $ObjectList1->{CustomerCompany},
-    "Test $TestCount: ObjectList() - CustomerCompany exists",
+    $ObjectList1 && ref $ObjectList1 eq 'HASH' && $ObjectList1->{Organisation},
+    "Test $TestCount: ObjectList() - Organisation exists",
 );
 
 $TestCount++;

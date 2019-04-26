@@ -36,7 +36,7 @@ my $ModuleName = 'TicketSLASet';
 my $RandomID   = $Helper->GetRandomID();
 
 # add a customer user
-my $TestCustomerUserLogin = $Helper->TestCustomerUserCreate();
+my $TestContactLogin = $Helper->TestContactCreate();
 
 # set user details
 my $TestUserLogin = $Helper->TestUserCreate();
@@ -131,8 +131,8 @@ for my $SLAData (@SLAs) {
 #
 # Assign services to customer (0 and 1)
 #
-my $Success = $ServiceObject->CustomerUserServiceMemberAdd(
-    CustomerUserLogin => $TestCustomerUserLogin,
+my $Success = $ServiceObject->ContactServiceMemberAdd(
+    ContactLogin => $TestContactLogin,
     ServiceID         => $Services[0]->{ServiceID},
     Active            => 1,
     UserID            => 1,
@@ -141,7 +141,7 @@ my $Success = $ServiceObject->CustomerUserServiceMemberAdd(
 # sanity test
 $Self->True(
     $Success,
-    "CustomerUserServiceMemberAdd() for user $TestCustomerUserLogin, and Service $Services[0]->{Name}"
+    "ContactServiceMemberAdd() for user $TestContactLogin, and Service $Services[0]->{Name}"
         . " with true",
 );
 
@@ -158,7 +158,7 @@ for my $Item ( 0 .. 1 ) {
         StateID       => 1,
         TypeID        => 1,
         Service       => ( $Item == 0 ) ? $Services[0]->{Name} : undef,
-        CustomerUser  => ( $Item == 0 ) ? $TestCustomerUserLogin : undef,
+        Contact  => ( $Item == 0 ) ? $TestContactLogin : undef,
         OwnerID       => 1,
         ResponsibleID => 1,
         UserID        => $UserID,

@@ -271,16 +271,9 @@ sub _ArticleCreate {
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
-    my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket->{CustomerUser},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        User => $Ticket->{ContactID},
     );
-
-    my $CustomerID = $CustomerUserData{UserCustomerID} || '';
-
-    # use user defined CustomerID if defined
-    if ( defined $Ticket->{CustomerID} && $Ticket->{CustomerID} ne '' ) {
-        $CustomerID = $Ticket->{CustomerID};
-    }
 
     # get user object
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
@@ -324,14 +317,14 @@ sub _ArticleCreate {
     if ( $Article->{From} ) {
         $From = $Article->{From};
     }
-    # use data from customer user (if customer user is in database)
-    elsif ( IsHashRefWithData( \%CustomerUserData ) ) {
-        $From = '"' . $CustomerUserData{UserFirstname} . ' ' . $CustomerUserData{UserLastname} . '"'
-            . ' <' . $CustomerUserData{UserEmail} . '>';
+    # use data from contact (if contact is in database)
+    elsif ( IsHashRefWithData( \%ContactData ) ) {
+        $From = '"' . $ContactData{Firstname} . ' ' . $ContactData{Lastname} . '"'
+            . ' <' . $ContactData{Email} . '>';
     }
     # otherwise use customer user as sent from the request (it should be an email)
     else {
-        $From = $Ticket->{CustomerUser};
+        $From = $Ticket->{ContactID};
     }
 
     # set Article To

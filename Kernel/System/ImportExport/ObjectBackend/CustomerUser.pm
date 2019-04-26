@@ -8,25 +8,25 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ImportExport::ObjectBackend::CustomerUser;
+package Kernel::System::ImportExport::ObjectBackend::Contact;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
     'Kernel::System::ImportExport',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::Config'
 );
 
 =head1 NAME
 
-Kernel::System::ImportExport::ObjectBackend::CustomerUser - import/export backend for CustomerUser
+Kernel::System::ImportExport::ObjectBackend::Contact - import/export backend for Contact
 
 =head1 SYNOPSIS
 
-All functions to import and export CustomerUser entries
+All functions to import and export Contact entries
 
 =over 4
 
@@ -40,7 +40,7 @@ create an object
     use Kernel::System::DB;
     use Kernel::System::Log;
     use Kernel::System::Main;
-    use Kernel::System::ImportExport::ObjectBackend::CustomerUser;
+    use Kernel::System::ImportExport::ObjectBackend::Contact;
 
     my $ConfigObject = Kernel::Config->new();
     my $LogObject = Kernel::System::Log->new(
@@ -55,7 +55,7 @@ create an object
         LogObject    => $LogObject,
         MainObject   => $MainObject,
     );
-    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::CustomerUser->new(
+    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::Contact->new(
         ConfigObject       => $ConfigObject,
         LogObject          => $LogObject,
         DBObject           => $DBObject,
@@ -95,7 +95,7 @@ sub ObjectAttributesGet {
         return;
     }
 
-    my %CSList    = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList();
+    my %CSList    = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSourceList();
     my %Validlist = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
 
     my $Attributes = [
@@ -411,34 +411,34 @@ sub ExportDataGet {
     }
 
     # search the customer users...
-    my %CustomerUserList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
         Search => '*',
         Valid  => 0,
     );
 
     my @ExportData;
 
-    for my $CurrUser (%CustomerUserList) {
+    for my $CurrUser (%ContactList) {
 
-        my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             User => $CurrUser,
         );
 
         # prepare validity...
-        if ( $CustomerUserData{ValidID} ) {
-            $CustomerUserData{Valid} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
-                ValidID => $CustomerUserData{ValidID},
+        if ( $ContactData{ValidID} ) {
+            $ContactData{Valid} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+                ValidID => $ContactData{ValidID},
             );
         }
 
         # prepare password...
-        if ( $CustomerUserData{UserPassword} ) {
-            $CustomerUserData{UserPassword} = '-';
+        if ( $ContactData{UserPassword} ) {
+            $ContactData{UserPassword} = '-';
         }
 
         if (
-            $CustomerUserData{Source}
-            && ( $CustomerUserData{Source} eq $ObjectData->{CustomerBackend} )
+            $ContactData{Source}
+            && ( $ContactData{Source} eq $ObjectData->{CustomerBackend} )
             )
         {
             my @CurrRow;
@@ -448,7 +448,7 @@ sub ExportDataGet {
                     push @CurrRow, '';
                 }
                 else {
-                    push( @CurrRow, $CustomerUserData{$Key} || '' );
+                    push( @CurrRow, $ContactData{$Key} || '' );
                 }
             }
             push @ExportData, \@CurrRow;
@@ -529,7 +529,7 @@ sub ImportDataSave {
     #    my @MappingObjectList;
     #    my %Identifier;
     my $Counter             = 0;
-    my %NewCustomerUserData = qw{};
+    my %NewContactData = qw{};
 
     #--------------------------------------------------------------------------
     #BUILD MAPPING TABLE...
@@ -559,8 +559,8 @@ sub ImportDataSave {
         # CustomerKey of Backend is used to search for existing enrties anyway!
         #
         #  See lines 638-639:
-        #       if ( !$CustomerUserKey || $CustomerUserKey ne 'UserLogin' ) {
-        #           $CustomerUserKey = "UserLogin";
+        #       if ( !$ContactKey || $ContactKey ne 'UserLogin' ) {
+        #           $ContactKey = "UserLogin";
         #       }
 
         #        if (
@@ -578,11 +578,11 @@ sub ImportDataSave {
         #        elsif ( $MappingObjectData->{Identifier} ) {
         #            $Identifier{ $MappingObjectData->{Key} } =
         #                $Param{ImportDataRow}->[$Counter];
-        #            $CustomerUserKey = $MappingObjectData->{Key};
+        #            $ContactKey = $MappingObjectData->{Key};
         #        }
 
         if ( $MappingObjectData->{Key} ne "UserCountry" ) {
-            $NewCustomerUserData{ $MappingObjectData->{Key} } = 
+            $NewContactData{ $MappingObjectData->{Key} } = 
             $Param{ImportDataRow}->[$Counter];
         } 
         else {
@@ -590,23 +590,23 @@ sub ImportDataSave {
             # Note that standardizing against the ISO 3166-1 list might be a better approach...
             my $CountryList = $Kernel::OM->Get('Kernel::System::ReferenceData')->CountryList();
             if ( exists $CountryList->{$Param{ImportDataRow}->[$Counter]} ) {
-                $NewCustomerUserData{ $MappingObjectData->{Key} } = $Param{ImportDataRow}->[$Counter];
+                $NewContactData{ $MappingObjectData->{Key} } = $Param{ImportDataRow}->[$Counter];
             } 
             else {
-                $NewCustomerUserData{ $MappingObjectData->{Key} } = 
+                $NewContactData{ $MappingObjectData->{Key} } = 
                     join ('', map { ucfirst lc } split /(\s+)/, $Param{ImportDataRow}->[$Counter]);
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'notice',
                     Message  => "Country '$Param{ImportDataRow}->[$Counter]' "
-                        . "not found - save as '$NewCustomerUserData{ $MappingObjectData->{Key} }'.",
+                        . "not found - save as '$NewContactData{ $MappingObjectData->{Key} }'.",
                 );
             }
         }
 
 
         # WORKAROUND - for FEFF-character in _some_ texts (remove it)...
-        if ( $NewCustomerUserData{ $MappingObjectData->{Key} } ) {
-            $NewCustomerUserData{ $MappingObjectData->{Key} } =~ s/(\x{feff})//g;
+        if ( $NewContactData{ $MappingObjectData->{Key} } ) {
+            $NewContactData{ $MappingObjectData->{Key} } =~ s/(\x{feff})//g;
         }
         #EO WORKAROUND
 
@@ -618,70 +618,70 @@ sub ImportDataSave {
     #DO THE IMPORT...
 
     # (0) search user
-    my %CustomerUserData = ();
+    my %ContactData = ();
 
-    my $CustomerUserKey;
-    my $CustomerBackend = $Kernel::OM->Get('Kernel::Config')->Get($ObjectData->{CustomerBackend} || $ObjectData->{CustomerUserBackend});
+    my $ContactKey;
+    my $CustomerBackend = $Kernel::OM->Get('Kernel::Config')->Get($ObjectData->{CustomerBackend} || $ObjectData->{ContactBackend});
     if ( $CustomerBackend && $CustomerBackend->{CustomerKey} && $CustomerBackend->{Map} ) {
         for my $Entry ( @{ $CustomerBackend->{Map} } ) {
             next if ( $Entry->{Label} ne $CustomerBackend->{CustomerKey} );
 
-            $CustomerUserKey = $Entry->{Attribute};
+            $ContactKey = $Entry->{Attribute};
             last;
         }
-        if ( !$CustomerUserKey ) {
-            $CustomerUserKey = "UserLogin";
+        if ( !$ContactKey ) {
+            $ContactKey = "UserLogin";
         }
     }
 
-    if ( $NewCustomerUserData{$CustomerUserKey} ) {
-        %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $NewCustomerUserData{$CustomerUserKey}
+    if ( $NewContactData{$ContactKey} ) {
+        %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            User => $NewContactData{$ContactKey}
         );
     }
 
     my $NewUser = 1;
-    if (%CustomerUserData) {
+    if (%ContactData) {
         $NewUser = 0;
     }
 
     #---------------------------------------------------------------------------
     # (1) Preprocess data...
     my $DefaultCustomerID = $Kernel::OM->Get('Kernel::Config')->Get(
-        'CustomerUserImport::DefaultCustomerID'
+        'ContactImport::DefaultCustomerID'
     ) || 'DefaultCustomerID';
     my $DefaultEmailAddress = $Kernel::OM->Get('Kernel::Config')->Get(
-        'CustomerUserImport::DefaultEmailAddress'
+        'ContactImport::DefaultEmailAddress'
     ) || 'dummy@localhost';
     my $EmailDomainCustomerIDMapping = $Kernel::OM->Get('Kernel::Config')->Get(
-        'CustomerUserImport::EMailDomainCustomerIDMapping'
+        'ContactImport::EMailDomainCustomerIDMapping'
     );
 
     # lookup Valid-ID...
-    if ( !$NewCustomerUserData{ValidID} && $NewCustomerUserData{Valid} ) {
-        $NewCustomerUserData{ValidID} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
-            Valid => $NewCustomerUserData{Valid}
+    if ( !$NewContactData{ValidID} && $NewContactData{Valid} ) {
+        $NewContactData{ValidID} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+            Valid => $NewContactData{Valid}
         );
     }
-    if ( !$NewCustomerUserData{ValidID} ) {
-        $NewCustomerUserData{ValidID} = $ObjectData->{DefaultValid} || 1;
+    if ( !$NewContactData{ValidID} ) {
+        $NewContactData{ValidID} = $ObjectData->{DefaultValid} || 1;
     }
 
     #UserEmail-Domain 2 CustomerID Mapping...
     if ( $ObjectData->{EnableMailDomainCustomerIDMapping} ) {
 
         # get company mapping from email address
-        if ( $NewCustomerUserData{UserEmail} ) {
+        if ( $NewContactData{UserEmail} ) {
 
             for my $Key ( keys( %{$EmailDomainCustomerIDMapping} ) ) {
                 $EmailDomainCustomerIDMapping->{ lc($Key) } = $EmailDomainCustomerIDMapping->{$Key};
             }
 
-            my ( $LocalPart, $DomainPart ) = split( '@', $NewCustomerUserData{UserEmail} );
+            my ( $LocalPart, $DomainPart ) = split( '@', $NewContactData{UserEmail} );
             $DomainPart = lc($DomainPart);
 
             if ( $EmailDomainCustomerIDMapping->{$DomainPart} ) {
-                $NewCustomerUserData{UserCustomerID} =
+                $NewContactData{UserCustomerID} =
                     $EmailDomainCustomerIDMapping->{$DomainPart};
             }
             elsif (
@@ -689,22 +689,22 @@ sub ImportDataSave {
                 && $EmailDomainCustomerIDMapping->{ANYTHINGELSE}
                 )
             {
-                $NewCustomerUserData{UserCustomerID} =
+                $NewContactData{UserCustomerID} =
                     $EmailDomainCustomerIDMapping->{ANYTHINGELSE};
             }
         }
     }
 
     # default UserCustomerID...
-    if ( !$NewCustomerUserData{UserCustomerID} ) {
-        $NewCustomerUserData{UserCustomerID} = $CustomerUserData{UserCustomerID}
+    if ( !$NewContactData{UserCustomerID} ) {
+        $NewContactData{UserCustomerID} = $ContactData{UserCustomerID}
             || $ObjectData->{DefaultUserCustomerID}
             || $DefaultCustomerID;
     }
 
     # default UserEmail...
-    if ( !$NewCustomerUserData{UserEmail} ) {
-        $NewCustomerUserData{UserEmail} = $CustomerUserData{UserEmail}
+    if ( !$NewContactData{UserEmail} ) {
+        $NewContactData{UserEmail} = $ContactData{UserEmail}
             || $ObjectData->{DefaultUserEmail}
             || $DefaultEmailAddress;
     }
@@ -713,23 +713,23 @@ sub ImportDataSave {
     if (
         ( $NewUser || $ObjectData->{ResetPassword} )
         && (
-            ( $NewCustomerUserData{UserPassword} && $NewCustomerUserData{UserPassword} eq '-' )
-            || ( !$NewCustomerUserData{UserPassword} )
+            ( $NewContactData{UserPassword} && $NewContactData{UserPassword} eq '-' )
+            || ( !$NewContactData{UserPassword} )
         )
         )
     {
-        $NewCustomerUserData{UserPassword} = $NewCustomerUserData{$CustomerUserKey}
+        $NewContactData{UserPassword} = $NewContactData{$ContactKey}
             . ( $ObjectData->{ResetPasswordSuffix} || '' );
     }
     elsif ( !$NewUser && !$ObjectData->{ResetPassword} ) {
-        delete $NewCustomerUserData{UserPassword};
-        delete $CustomerUserData{UserPassword};
+        delete $NewContactData{UserPassword};
+        delete $ContactData{UserPassword};
     }
 
     #---------------------------------------------------------------------------
     # (2) overwrite existing values with new values...
-    for my $Key ( keys(%NewCustomerUserData) ) {
-        $CustomerUserData{$Key} = $NewCustomerUserData{$Key};
+    for my $Key ( keys(%NewContactData) ) {
+        $ContactData{$Key} = $NewContactData{$Key};
     }
 
     #---------------------------------------------------------------------------
@@ -740,19 +740,19 @@ sub ImportDataSave {
     if ($NewUser) {
 
         # set defaults
-        delete $CustomerUserData{ID};
-        $Result = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-            %CustomerUserData,
-            Source => $ObjectData->{CustomerBackend} || $ObjectData->{CustomerUserBackend},
+        delete $ContactData{ID};
+        $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            %ContactData,
+            Source => $ObjectData->{CustomerBackend} || $ObjectData->{ContactBackend},
             UserID => $Param{UserID},
         );
 
         if ( !$Result ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "ImportDataSave: adding CustomerUser ("
+                Message  => "ImportDataSave: adding Contact ("
                     . "CustomerEmail "
-                    . $CustomerUserData{UserEmail}
+                    . $ContactData{UserEmail}
                     . ") failed (line $Param{Counter}).",
             );
         }
@@ -765,25 +765,25 @@ sub ImportDataSave {
     #---------------------------------------------------------------------------
     #(3) if user DOES exists => check backend and update...
     else {
-        $CustomerUserData{ID} = $NewCustomerUserData{$CustomerUserKey};
+        $ContactData{ID} = $NewContactData{$ContactKey};
 
         if (
-            $CustomerUserData{Source}
-            && $CustomerUserData{Source} eq $ObjectData->{CustomerBackend}
+            $ContactData{Source}
+            && $ContactData{Source} eq $ObjectData->{CustomerBackend}
             )
         {
-            $Result = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
+            $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
                 Source => $ObjectData->{CustomerBackend},
-                %CustomerUserData,
+                %ContactData,
                 UserID => $Param{UserID},
             );
 
             if ( !$Result ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => "ImportDataSave: updating CustomerUser ("
+                    Message  => "ImportDataSave: updating Contact ("
                         . "CustomerEmail "
-                        . $CustomerUserData{UserEmail}
+                        . $ContactData{UserEmail}
                         . ") failed (line $Param{Counter}).",
                 );
             }
@@ -803,33 +803,33 @@ sub ImportDataSave {
 
             # find backend and backup customer user data backend refs...
             while (
-                $CustomerUserData{Source}
-                && $CustomerUserData{Source} ne $ObjectData->{CustomerBackend}
+                $ContactData{Source}
+                && $ContactData{Source} ne $ObjectData->{CustomerBackend}
                 )
             {
-                $BackendRef{ $CustomerUserData{Source} } =
-                    $Kernel::OM->Get('Kernel::System::CustomerUser')->{ $CustomerUserData{Source} };
-                delete( $Kernel::OM->Get('Kernel::System::CustomerUser')->{ $CustomerUserData{Source} } );
+                $BackendRef{ $ContactData{Source} } =
+                    $Kernel::OM->Get('Kernel::System::Contact')->{ $ContactData{Source} };
+                delete( $Kernel::OM->Get('Kernel::System::Contact')->{ $ContactData{Source} } );
 
-                %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-                    User => $NewCustomerUserData{$CustomerUserKey}
+                %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                    User => $NewContactData{$ContactKey}
                 );
             }
 
             # overwrite existing values with new values...
-            for my $Key ( keys(%NewCustomerUserData) ) {
-                $CustomerUserData{$Key} = $NewCustomerUserData{$Key};
+            for my $Key ( keys(%NewContactData) ) {
+                $ContactData{$Key} = $NewContactData{$Key};
             }
 
             # update existing entry...
             if (
-                $CustomerUserData{Source}
-                && $CustomerUserData{Source} eq $ObjectData->{CustomerBackend}
+                $ContactData{Source}
+                && $ContactData{Source} eq $ObjectData->{CustomerBackend}
                 )
             {
-                $CustomerUserData{ID} = $NewCustomerUserData{$CustomerUserKey};
-                $Result = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
-                    %CustomerUserData,
+                $ContactData{ID} = $NewContactData{$ContactKey};
+                $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+                    %ContactData,
                     Source => $ObjectData->{CustomerBackend},
                     UserID => $Param{UserID},
                 );
@@ -839,8 +839,8 @@ sub ImportDataSave {
 
             # create new entry...
             else {
-                $Result = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-                    %CustomerUserData,
+                $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+                    %ContactData,
                     Source => $ObjectData->{CustomerBackend},
                     UserID => $Param{UserID},
                 );
@@ -852,9 +852,9 @@ sub ImportDataSave {
             if ( !$Result ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => "ImportDataSave: forcing CustomerUser ("
+                    Message  => "ImportDataSave: forcing Contact ("
                         . "CustomerEmail "
-                        . $CustomerUserData{UserEmail}
+                        . $ContactData{UserEmail}
                         . ") in "
                         . $ObjectData->{CustomerBackend}
                         . " ($ResultNote) "
@@ -865,17 +865,17 @@ sub ImportDataSave {
 
             # restore customer user data backend refs...
             for my $CurrKey ( keys(%BackendRef) ) {
-                $Kernel::OM->Get('Kernel::System::CustomerUser')->{$CurrKey} = $BackendRef{$CurrKey};
+                $Kernel::OM->Get('Kernel::System::Contact')->{$CurrKey} = $BackendRef{$CurrKey};
             }
 
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'notice',
-                Message  => "ImportDataSave: updating CustomerUser ("
+                Message  => "ImportDataSave: updating Contact ("
                     . "CustomerEmail "
-                    . $CustomerUserData{UserEmail}
-                    . ") failed - CustomerUser exists in other backend.",
+                    . $ContactData{UserEmail}
+                    . ") failed - Contact exists in other backend.",
 
             );
         }

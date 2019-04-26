@@ -217,7 +217,7 @@ my $TicketID1 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465' . $RandomID,
-    CustomerUser => 'customerOne@example.com',
+    Contact => 'customerOne@example.com',
     Service      => 'TestService' . $RandomID,
     OwnerID      => 1,
     UserID       => 1,
@@ -355,7 +355,7 @@ my $TicketID2 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465' . $RandomID,
-    CustomerUser => 'customerTwo' . $RandomID . '@example.com',
+    Contact => 'customerTwo' . $RandomID . '@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -471,7 +471,7 @@ my $TicketID3 = $TicketObject->TicketCreate(
     Priority     => '1 very low',
     State        => 'new',
     CustomerID   => '123465' . $RandomID,
-    CustomerUser => 'customerThree@example.com',
+    Contact => 'customerThree@example.com',
     Type         => 'TestType' . $RandomID,
     OwnerID      => 1,
     UserID       => 1,
@@ -515,7 +515,7 @@ my $TicketID4 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '654321' . $RandomID,
-    CustomerUser => 'customerFour@example.com',
+    Contact => 'customerFour@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1381,7 +1381,7 @@ my @Tests = (
 # Add a wrong value test for each possible parameter on direct search
 
 for my $Item (
-    qw(TicketNumber Title From To Cc Subject Body CustomerID CustomerUserLogin StateType
+    qw(TicketNumber Title From To Cc Subject Body CustomerID ContactLogin StateType
     Fulltext
     )
     )

@@ -347,7 +347,7 @@ sub GenerateCustomFilesArchive {
     $Config =~ s/(\$Self->\{'[^']+(?:Password|Pw)\d*'\}\s*=\s*)\'.*?\'/$1\'xxx\'/mg;
 
     # Complex settings like:
-    #     $Self->{CustomerUser1} = {
+    #     $Self->{Contact1} = {
     #         Params => {
     #             UserPw => 'xxx',
     $Config =~ s/((?:Password|Pw)\d*\s*=>\s*)\'.*?\'/$1\'xxx\'/mg;

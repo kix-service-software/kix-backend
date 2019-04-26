@@ -115,7 +115,7 @@ my $TicketID = $TicketObject->TicketCreate(
     PriorityID   => 1,
     StateID      => 1,
     CustomerNo   => '123465',
-    CustomerUser => 'customerUnitTest@example.com',
+    Contact => 'customerUnitTest@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -166,7 +166,7 @@ my %NewJob = (
         Cc                           => '',
         Subject                      => '',
         CustomerID                   => '',
-        CustomerUserLogin            => 'customerUnitTest@example.com',
+        ContactLogin            => 'customerUnitTest@example.com',
         TimeSearchType               => 'TimePoint',
         TicketCreateTimePoint        => 1,
         TicketCreateTimePointStart   => 'Last',
@@ -181,7 +181,7 @@ my %NewJob = (
         NewStateID                   => 2,
         NewPriorityID                => 3,
         NewNoteBody                  => '',
-        NewCustomerUserLogin         => '',
+        NewContactLogin         => '',
         NewOwnerID                   => 1,
         NewModule                    => '',
         DynamicField_TicketFreeKey1  => 'Phone',
@@ -240,9 +240,9 @@ $Self->Is(
 # check job attributes
 my %GetParam = $GenericAgentObject->JobGet( Name => $Name );
 $Self->Is(
-    $GetParam{CustomerUserLogin} || '',
+    $GetParam{ContactLogin} || '',
     'customerUnitTest@example.com',
-    "JobGet() - CustomerUserLogin",
+    "JobGet() - ContactLogin",
 );
 $Self->Is(
     $GetParam{Title} || '',
@@ -391,9 +391,9 @@ $Self->True(
 # check job attributes
 %GetParam = $GenericAgentObject->JobGet( Name => $Name );
 $Self->Is(
-    $GetParam{CustomerUserLogin} || '',
+    $GetParam{ContactLogin} || '',
     'customerUnitTest@example.com',
-    "JobGet() - CustomerUserLogin",
+    "JobGet() - ContactLogin",
 );
 $Self->Is(
     $GetParam{Title} || '',
@@ -469,9 +469,9 @@ $Self->True(
 # check job attributes
 %GetParam = $GenericAgentObject->JobGet( Name => $Name );
 $Self->Is(
-    $GetParam{CustomerUserLogin} || '',
+    $GetParam{ContactLogin} || '',
     'customerUnitTest@example.com',
-    "JobGet() - CustomerUserLogin",
+    "JobGet() - ContactLogin",
 );
 $Self->Is(
     $GetParam{Title} || '',

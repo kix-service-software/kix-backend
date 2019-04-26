@@ -389,7 +389,7 @@ sub Execute {
     my $ParsedGlobalOptions = $Self->_ParseGlobalOptions( \@CommandlineArguments );
 
     # Don't allow to run these scripts as root.
-    if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 ) {    # $EFFECTIVE_USER_ID
+    if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
         $Self->PrintError(
             "You cannot run kix.Console.pl as root. Please run it as the apache user or with the help of su:"
         );

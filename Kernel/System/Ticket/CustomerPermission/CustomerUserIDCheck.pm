@@ -8,13 +8,13 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::CustomerPermission::CustomerUserIDCheck;
+package Kernel::System::Ticket::CustomerPermission::ContactIDCheck;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
 );
@@ -50,10 +50,10 @@ sub Run {
     );
 
     return if !%Ticket;
-    return if !$Ticket{CustomerUserID};
+    return if !$Ticket{ContactID};
 
     # get user data
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         User => $Param{UserID},
     );
 
@@ -61,7 +61,7 @@ sub Run {
     return if !$CustomerData{UserLogin};
 
     # check user login, return access if customer user id is the same
-    return 1 if lc $Ticket{CustomerUserID} eq lc $CustomerData{UserLogin};
+    return 1 if lc $Ticket{ContactID} eq lc $CustomerData{UserLogin};
 
     # return no access
     return;

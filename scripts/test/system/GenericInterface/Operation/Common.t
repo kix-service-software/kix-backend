@@ -113,13 +113,13 @@ my $UserSessionID = $SessionOperationObject->CreateSessionID(
 );
 
 # set customer user details
-my $CustomerUserLogin     = $Helper->TestCustomerUserCreate();
-my $CustomerUserPassword  = $CustomerUserLogin;
-my $CustomerUserID        = $CustomerUserLogin;
-my $CustomerUserSessionID = $SessionOperationObject->CreateSessionID(
+my $ContactLogin     = $Helper->TestContactCreate();
+my $ContactPassword  = $ContactLogin;
+my $ContactID        = $ContactLogin;
+my $ContactSessionID = $SessionOperationObject->CreateSessionID(
     Data => {
-        CustomerUserLogin => $CustomerUserLogin,
-        Password          => $CustomerUserPassword,
+        ContactLogin => $ContactLogin,
+        Password          => $ContactPassword,
     },
 );
 
@@ -130,9 +130,9 @@ $Self->IsNot(
     "CreateSessionID() for User"
 );
 $Self->IsNot(
-    $CustomerUserSessionID,
+    $ContactSessionID,
     undef,
-    "CreateSessionID() for CustomerUser"
+    "CreateSessionID() for Contact"
 );
 
 # Tests for Auth()
@@ -162,9 +162,9 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name => 'CustomerUserLogin No Password',
+        Name => 'ContactLogin No Password',
         Data => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
         },
         Success => 0,
     },
@@ -184,9 +184,9 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name => 'CustomerUserLogin Invalid Password',
+        Name => 'ContactLogin Invalid Password',
         Data => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
             Password          => $RandomID,
         },
         Success => 0,
@@ -200,10 +200,10 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name => 'Invalid CustomerUserLogin Correct Password',
+        Name => 'Invalid ContactLogin Correct Password',
         Data => {
-            CustomerUserLogin => $RandomID,
-            Password          => $CustomerUserPassword,
+            ContactLogin => $RandomID,
+            Password          => $ContactPassword,
         },
         Success => 0,
     },
@@ -221,10 +221,10 @@ my @Tests = (
     {
         Name => 'Correct CustomerSessionID',
         Data => {
-            SessionID => $CustomerUserSessionID,
+            SessionID => $ContactSessionID,
         },
         ExpectedResult => {
-            User     => $CustomerUserID,
+            User     => $ContactID,
             UserType => 'Customer',
         },
         Success => 1,
@@ -242,13 +242,13 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name => 'Correct CustomerUserLogin and Password',
+        Name => 'Correct ContactLogin and Password',
         Data => {
-            CustomerUserLogin => $CustomerUserLogin,
-            Password          => $CustomerUserPassword,
+            ContactLogin => $ContactLogin,
+            Password          => $ContactPassword,
         },
         ExpectedResult => {
-            User     => $CustomerUserID,
+            User     => $ContactID,
             UserType => 'Customer',
         },
         Success => 1,

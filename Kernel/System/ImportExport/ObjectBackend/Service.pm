@@ -405,7 +405,7 @@ sub ExportDataGet {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message =>
-                "Service2CustomerUser: search data is not a hash ref - ignoring search limitation.",
+                "Service2Contact: search data is not a hash ref - ignoring search limitation.",
         );
     }
     my @ServiceList = $Kernel::OM->Get('Kernel::System::Service')->ServiceSearch(

@@ -14,7 +14,7 @@ use warnings;
 use utf8;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::LinkObject'
 );
 
@@ -25,7 +25,7 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    $Self->{CustomerUserObject} = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
 
     return $Self;
@@ -48,21 +48,21 @@ sub KIXSidebarCustomerSearch {
         );
 
         for my $ID ( keys %LinkKeyList ) {
-            my %CustomerUser = $Self->{CustomerUserObject}->CustomerUserDataGet(
+            my %Contact = $Self->{ContactObject}->ContactGet(
                 User => $ID,
             );
 
             if (
-                %CustomerUser
-                && defined $CustomerUser{Source}
-                && defined $CustomerUser{ValidID}
-                && "$CustomerUser{ValidID}" eq "1"
+                %Contact
+                && defined $Contact{Source}
+                && defined $Contact{ValidID}
+                && "$Contact{ValidID}" eq "1"
             ) {
 
                 SOURCE:
                 for my $Source ( @{ $Param{CustomerBackends} } ) {
-                    if ($CustomerUser{Source} eq $Source) {
-                        $Result{ $ID } = \%CustomerUser;
+                    if ($Contact{Source} eq $Source) {
+                        $Result{ $ID } = \%Contact;
                         $Result{ $ID }->{'Link'} = 1;
                         last SOURCE;
                     }
@@ -78,7 +78,7 @@ sub KIXSidebarCustomerSearch {
     # Search only if Search-String was given
     if ( $Param{SearchString} ) {
 
-        my %Customers = $Self->{CustomerUserObject}->CustomerSearch(
+        my %Customers = $Self->{ContactObject}->CustomerSearch(
             Search => $Param{SearchString},
             Valid  => 1,
         );
@@ -87,21 +87,21 @@ sub KIXSidebarCustomerSearch {
         for my $ID ( keys %Customers ) {
             next ID if ( $Result{ $ID } );
 
-            my %CustomerUser = $Self->{CustomerUserObject}->CustomerUserDataGet(
+            my %Contact = $Self->{ContactObject}->ContactGet(
                 User => $ID,
             );
 
             if (
-                %CustomerUser
-                && defined $CustomerUser{Source}
-                && defined $CustomerUser{ValidID}
-                && "$CustomerUser{ValidID}" eq "1"
+                %Contact
+                && defined $Contact{Source}
+                && defined $Contact{ValidID}
+                && "$Contact{ValidID}" eq "1"
             ) {
 
                 SOURCE:
                 for my $Source ( @{ $Param{CustomerBackends} } ) {
-                    if ($CustomerUser{Source} eq $Source) {
-                        $Result{ $ID } = \%CustomerUser;
+                    if ($Contact{Source} eq $Source) {
+                        $Result{ $ID } = \%Contact;
                         $Result{ $ID }->{'Link'} = 0;
                         last SOURCE;
                     }

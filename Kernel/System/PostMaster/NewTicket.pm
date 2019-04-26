@@ -15,7 +15,7 @@ use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     # KIX4OTRS-capeIT
@@ -187,14 +187,14 @@ sub Run {
 
 #rbo - T2016121190001552 - renamed X-OTRS headers
     # get customer id (sender email) if there is no customer id given
-    if ( (!$GetParam{'X-KIX-CustomerNo'} && $GetParam{'X-KIX-CustomerUser'}) || (!$GetParam{'X-OTRS-CustomerNo'} && $GetParam{'X-OTRS-CustomerUser'}) ) {
+    if ( (!$GetParam{'X-KIX-CustomerNo'} && $GetParam{'X-KIX-Contact'}) || (!$GetParam{'X-OTRS-CustomerNo'} && $GetParam{'X-OTRS-Contact'}) ) {
 
         # get customer user object
-        my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
-        # get customer user data form X-KIX-CustomerUser
-        my %CustomerData = $CustomerUserObject->CustomerUserDataGet(
-            User => $GetParam{'X-KIX-CustomerUser'} || $GetParam{'X-OTRS-CustomerUser'},
+        # get customer user data form X-KIX-Contact
+        my %CustomerData = $ContactObject->ContactGet(
+            User => $GetParam{'X-KIX-Contact'} || $GetParam{'X-OTRS-Contact'},
         );
 
         if (%CustomerData) {
@@ -204,7 +204,7 @@ sub Run {
 
 #rbo - T2016121190001552 - renamed X-OTRS headers
     # get customer user data form From: (sender address)
-    if ( !$GetParam{'X-KIX-CustomerUser'} && !$GetParam{'X-OTRS-CustomerUser'} ) {
+    if ( !$GetParam{'X-KIX-Contact'} && !$GetParam{'X-OTRS-Contact'} ) {
 
         my %CustomerData;
         if ( $GetParam{From} ) {
@@ -222,14 +222,14 @@ sub Run {
             if ( $GetParam{EmailFrom} ) {
 
                 # get customer user object
-                my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+                my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
-                my %List = $CustomerUserObject->CustomerSearch(
+                my %List = $ContactObject->CustomerSearch(
                     PostMasterSearch => lc( $GetParam{EmailFrom} ),
                 );
 
                 for my $UserLogin ( sort keys %List ) {
-                    %CustomerData = $CustomerUserObject->CustomerUserDataGet(
+                    %CustomerData = $ContactObject->ContactGet(
                         User => $UserLogin,
                     );
                 }
@@ -237,8 +237,8 @@ sub Run {
         }
 
         # take CustomerID from customer backend lookup or from from field
-        if ( $CustomerData{UserLogin} && !($GetParam{'X-KIX-CustomerUser'} || $GetParam{'X-OTRS-CustomerUser'}) ) {
-            $GetParam{'X-KIX-CustomerUser'} = $CustomerData{UserLogin};
+        if ( $CustomerData{UserLogin} && !($GetParam{'X-KIX-Contact'} || $GetParam{'X-OTRS-Contact'}) ) {
+            $GetParam{'X-KIX-Contact'} = $CustomerData{UserLogin};
 
             # notice that UserLogin is from customer source backend
             $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -262,8 +262,8 @@ sub Run {
     # KIX4OTRS-capeIT
     # if there is no customer id found
 #rbo - T2016121190001552 - renamed X-OTRS headers
-    if ( !($GetParam{'X-KIX-CustomerUser'} || $GetParam{'X-OTRS-CustomerUser'}) && $TicketTemplate{CustomerLogin} ) {
-        $GetParam{'X-KIX-CustomerUser'} = $TicketTemplate{CustomerLogin};
+    if ( !($GetParam{'X-KIX-Contact'} || $GetParam{'X-OTRS-Contact'}) && $TicketTemplate{CustomerLogin} ) {
+        $GetParam{'X-KIX-Contact'} = $TicketTemplate{CustomerLogin};
     }
 
     # EO KIX4OTRS-capeIT
@@ -274,8 +274,8 @@ sub Run {
     }
 
     # if there is no customer user found!
-    if ( !($GetParam{'X-KIX-CustomerUser'} || $GetParam{'X-OTRS-CustomerUser'}) ) {
-        $GetParam{'X-KIX-CustomerUser'} = $GetParam{SenderEmailAddress};
+    if ( !($GetParam{'X-KIX-Contact'} || $GetParam{'X-OTRS-Contact'}) ) {
+        $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress};
     }
 
     # get ticket owner
@@ -375,7 +375,7 @@ sub Run {
 
         # EO KIX4OTRS-capeIT
         CustomerID   => $GetParam{'X-KIX-CustomerNo'} || $GetParam{'X-OTRS-CustomerNo'},
-        CustomerUser => $GetParam{'X-KIX-CustomerUser'} || $GetParam{'X-OTRS-CustomerUser'},
+        Contact => $GetParam{'X-KIX-Contact'} || $GetParam{'X-OTRS-Contact'},
         OwnerID      => $OwnerID,
         UserID       => $Param{InmailUserID},
         %Opts,
@@ -393,7 +393,7 @@ sub Run {
         print "Priority: $Priority\n";
         print "State: $State\n";
         print "CustomerID: ".($GetParam{'X-KIX-CustomerNo'} || $GetParam{'X-OTRS-CustomerNo'})."\n";
-        print "CustomerUser: ".($GetParam{'X-KIX-CustomerUser'} || $GetParam{'X-OTRS-CustomerUser'})."\n";
+        print "Contact: ".($GetParam{'X-KIX-Contact'} || $GetParam{'X-OTRS-Contact'})."\n";
         for my $Value (qw(Type Service SLA Lock)) {
 
             if ( $GetParam{ 'X-KIX-' . $Value } || $GetParam{ 'X-OTRS-' . $Value } ) {

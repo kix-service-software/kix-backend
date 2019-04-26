@@ -99,7 +99,7 @@ for my $DynamicField (@DynamicFieldsToAdd) {
 # constructor
 my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
 
-my $TestCustomerLogin = $Helper->TestCustomerUserCreate(
+my $TestCustomerLogin = $Helper->TestContactCreate(
     Language => 'en',
 );
 
@@ -142,7 +142,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority      => '3 normal',
     State         => 'closed successful',
     CustomerNo    => '123465',
-    CustomerUser  => $TestCustomerLogin,
+    Contact  => $TestCustomerLogin,
     OwnerID       => $TestUser{UserID},
     ResponsibleID => $TestUser2{UserID},
     UserID        => $TestUser3{UserID},

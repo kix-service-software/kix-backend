@@ -1077,7 +1077,7 @@ sub Data {
     $Lang->{'Responsible Login'}       = 'Verantw. (Login)';
     $Lang->{'Responsible Information'} = 'Information Verantwortlicher';
     $Lang->{'CustomerCompanyName'}     = 'Firma';
-    $Lang->{'CustomerUserEmail'}       = 'Kunden-Email';
+    $Lang->{'ContactEmail'}       = 'Kunden-Email';
     $Lang->{'MarkedAs'}                = 'Markiert als';
     $Lang->{'at first select relevant marks above'}
         = 'relevante Markierungen zuvor oberhalb auswählen';
@@ -4111,7 +4111,7 @@ sub Data {
     $Lang->{'Print Richtext'}    = 'HTML-Ausdruck';
     $Lang->{'ascending'}         = 'aufsteigend';
     $Lang->{'descending'}        = 'absteigend';
-    $Lang->{'CustomerUserID'}    = 'KundennutzerID';
+    $Lang->{'ContactID'}    = 'KundennutzerID';
     $Lang->{'Defines whether the service should be translated in the selection box.'}
         = 'Legt fest, ob der Service in Auswahlfeldern übersetzt werden soll.';
     $Lang->{'Defines whether the sla should be translated in the selection box.'}

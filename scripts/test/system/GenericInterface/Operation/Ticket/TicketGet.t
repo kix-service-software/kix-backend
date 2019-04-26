@@ -59,12 +59,12 @@ my $UserLogin2 = $Helper->TestUserCreate();
 my $Password2  = $UserLogin2;
 
 # create a customer where a ticket will use and will have permissions
-my $CustomerUserLogin = $Helper->TestCustomerUserCreate();
-my $CustomerPassword  = $CustomerUserLogin;
+my $ContactLogin = $Helper->TestContactCreate();
+my $CustomerPassword  = $ContactLogin;
 
 # create a customer that will not have permissions
-my $CustomerUserLogin2 = $Helper->TestCustomerUserCreate();
-my $CustomerPassword2  = $CustomerUserLogin2;
+my $ContactLogin2 = $Helper->TestContactCreate();
+my $CustomerPassword2  = $ContactLogin2;
 
 my %SkipFields = (
     Age                       => 1,
@@ -172,7 +172,7 @@ my $TicketID1 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465',
-    CustomerUser => 'customerOne@example.com',
+    Contact => 'customerOne@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -314,7 +314,7 @@ my $TicketID2 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465',
-    CustomerUser => 'customerTwo@example.com',
+    Contact => 'customerTwo@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -424,7 +424,7 @@ my $TicketID3 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465',
-    CustomerUser => 'customerThree@example.com',
+    Contact => 'customerThree@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -466,8 +466,8 @@ my $TicketID4 = $TicketObject->TicketCreate(
     Lock         => 'lock',
     Priority     => '3 normal',
     State        => 'new',
-    CustomerID   => $CustomerUserLogin,
-    CustomerUser => 'customerFour@example.com',
+    CustomerID   => $ContactLogin,
+    Contact => 'customerFour@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -793,7 +793,7 @@ my $TicketID5 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465',
-    CustomerUser => 'customerOne@example.com',
+    Contact => 'customerOne@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1447,7 +1447,7 @@ my @Tests = (
             Attachments => 1,
         },
         Auth => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
             Password          => $CustomerPassword,
         },
         ExpectedReturnRemoteData => {
@@ -1483,7 +1483,7 @@ my @Tests = (
             Attachments => 1,
         },
         Auth => {
-            CustomerUserLogin => $CustomerUserLogin2,
+            ContactLogin => $ContactLogin2,
             Password          => $CustomerPassword2,
         },
         ExpectedReturnLocalData => {

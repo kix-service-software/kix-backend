@@ -32,7 +32,7 @@ my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
     Priority     => '3 normal',
     State        => 'open',
     CustomerNo   => '123465',
-    CustomerUser => 'customer@example.com',
+    Contact => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

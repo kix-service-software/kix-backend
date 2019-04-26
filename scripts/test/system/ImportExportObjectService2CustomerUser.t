@@ -24,7 +24,7 @@ for ( 1 .. 30 ) {
 
     # add a test template for later checks
     my $TemplateID = $ImportExportObject->TemplateAdd(
-        Object  => 'Service2CustomerUser',
+        Object  => 'Service2Contact',
         Format  => 'UnitTest' . int rand 1_000_000,
         Name    => 'UnitTest' . int rand 1_000_000,
         ValidID => 1,
@@ -46,8 +46,8 @@ my $ObjectList1 = $ImportExportObject->ObjectList();
 
 # check object list
 $Self->True(
-    $ObjectList1 && ref $ObjectList1 eq 'HASH' && $ObjectList1->{Service2CustomerUser},
-    "Test $TestCount: ObjectList() - Service2CustomerUser exists",
+    $ObjectList1 && ref $ObjectList1 eq 'HASH' && $ObjectList1->{Service2Contact},
+    "Test $TestCount: ObjectList() - Service2Contact exists",
 );
 
 $TestCount++;

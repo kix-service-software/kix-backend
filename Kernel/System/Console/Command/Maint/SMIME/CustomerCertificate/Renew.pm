@@ -19,7 +19,7 @@ our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::CheckItem',
     'Kernel::System::Crypt::SMIME',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
 );
 
 sub Configure {
@@ -61,12 +61,12 @@ sub Run {
 
     my ( $ListOfCertificates, $EmailsFromCertificates ) = $Self->_GetCurrentData();
 
-    my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
     EMAIL:
     for my $Email ( sort keys %{$EmailsFromCertificates} ) {
 
-        my %UserList = $CustomerUserObject->CustomerSearch(
+        my %UserList = $ContactObject->CustomerSearch(
             PostMasterSearch => $Email,
             Limit            => 1,
         );
@@ -75,13 +75,13 @@ sub Run {
 
         my @UserLogins = sort keys %UserList;
 
-        my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
+        my %Contact = $ContactObject->ContactGet(
             User => $UserLogins[0],
         );
 
-        next EMAIL if !%CustomerUser;
-        next EMAIL if !$CustomerUser{UserSMIMECertificate};
-        next EMAIL if $ListOfCertificates->{ $CustomerUser{UserSMIMECertificate} };
+        next EMAIL if !%Contact;
+        next EMAIL if !$Contact{UserSMIMECertificate};
+        next EMAIL if $ListOfCertificates->{ $Contact{UserSMIMECertificate} };
 
         my @Files = $CryptObject->FetchFromCustomer(
             Search => $Email,

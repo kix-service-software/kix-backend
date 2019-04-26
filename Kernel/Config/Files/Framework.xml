@@ -177,14 +177,14 @@
             <String Regex="">25</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ImportExport::ObjectBackendRegistration###Service2CustomerUser" Required="0" Valid="1">
+    <ConfigItem Name="ImportExport::ObjectBackendRegistration###Service2Contact" Required="0" Valid="1">
         <Description Translatable="1">Object backend module registration for the import/export module.</Description>
         <Group>Framework</Group>
         <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::Service2CustomerUser</Item>
-                <Item Key="Name">Service2CustomerUser</Item>
+                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::Service2Contact</Item>
+                <Item Key="Name">Service2Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -353,7 +353,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ExternalSupplierForwarding::CustomerUserAttrBlacklist" Required="0" Valid="1">
+    <ConfigItem Name="ExternalSupplierForwarding::ContactAttrBlacklist" Required="0" Valid="1">
         <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
         <Description Translatable="1">Defines contact attributes which should not be shown in forwarded documents.</Description>
         <Group>Framework</Group>
@@ -364,48 +364,48 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ImportExport::ObjectBackendRegistration###CustomerUser" Required="0" Valid="1">
+    <ConfigItem Name="ImportExport::ObjectBackendRegistration###Contact" Required="0" Valid="1">
         <Description Translatable="1">Object backend module registration for the import/export module.</Description>
         <Group>Framework</Group>
         <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::CustomerUser</Item>
-                <Item Key="Name">CustomerUser</Item>
+                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::Contact</Item>
+                <Item Key="Name">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerUserImport::DefaultCustomerID" Required="1" Valid="1">
+    <ConfigItem Name="ContactImport::DefaultCustomerID" Required="1" Valid="1">
         <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
         <Description Translatable="1">Defines which customer ID to use if no company defined - only relevant for new contacts.</Description>
         <Group>Framework</Group>
-        <SubGroup>CustomerUserImportExport</SubGroup>
+        <SubGroup>ContactImportExport</SubGroup>
         <Setting>
             <String Regex="">XMPLCustomerID</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerUserImport::DefaultEmailAddress" Required="1" Valid="1">
+    <ConfigItem Name="ContactImport::DefaultEmailAddress" Required="1" Valid="1">
         <Description Translatable="1">Defines which email address to use if not defined - strongly depends on backend configuration!!!.</Description>
         <Group>Framework</Group>
-        <SubGroup>CustomerUserImportExport</SubGroup>
+        <SubGroup>ContactImportExport</SubGroup>
         <Setting>
             <String Regex="">dummy@localhost</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerUserImport::EMailDomainCustomerIDMapping" Required="1" Valid="1">
+    <ConfigItem Name="ContactImport::EMailDomainCustomerIDMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines a mapping of email domains to customer IDs. A special key value is ANYTHINGELSE, which is similar to default customer ID but also affects updates.</Description>
         <Group>Framework</Group>
-        <SubGroup>CustomerUserImportExport</SubGroup>
+        <SubGroup>ContactImportExport</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="oexample.com">XMPLCustomerID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ImportExport::CustomerUserImportExport::ForceCSVMappingRecreation" Required="1" Valid="1">
+    <ConfigItem Name="ImportExport::ContactImportExport::ForceCSVMappingRecreation" Required="1" Valid="1">
         <Description Translatable="1">Defines if CSV-mappings are re-created on next package reinstallation or upgrade if already existent.</Description>
         <Group>Framework</Group>
-        <SubGroup>CustomerUserImportExport</SubGroup>
+        <SubGroup>ContactImportExport</SubGroup>
         <Setting>
             <Option SelectedID="0">
                 <Item Key="0">No</Item>
@@ -8136,7 +8136,7 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem Name="SMIME::FetchFromCustomer" Required="1" Valid="1">
-        <Description Translatable="1">Enables fetch S/MIME from CustomerUser backend support.</Description>
+        <Description Translatable="1">Enables fetch S/MIME from Contact backend support.</Description>
         <Group>Framework</Group>
         <SubGroup>Crypt::SMIME</SubGroup>
         <Setting>
@@ -8709,18 +8709,18 @@ via the Preferences button after logging in.
             </TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the module to authenticate customers.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/CustomerAuth/*.pm" SelectedID="Kernel::System::CustomerAuth::DB"></Option>
+            <Option Location="Kernel/System/ContactAuth/*.pm" SelectedID="Kernel::System::ContactAuth::DB"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::CryptType" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, the crypt type of passwords must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::CryptType" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the crypt type of passwords must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <Option SelectedID="sha2">
                 <Item Key="crypt">Crypt</Item>
@@ -8733,122 +8733,130 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::Table" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, the name of the table where your customer data should be stored must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::Table" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the table where your customer data should be stored must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
-            <String Regex="">customer_user</String>
+            <String Regex="">contact</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::CustomerKey" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, the name of the column for the CustomerKey in the customer table must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::Column::ID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the column holding the ID must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
+        <Setting>
+            <String Regex="">id</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Contact::AuthModule::DB::Column::Login" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the column holding the login must be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">login</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::CustomerPassword" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, the column name for the CustomerPassword in the customer table must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::Column::Password" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the column holding the password must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
-            <String Regex="">pw</String>
+            <String Regex="">password</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::DSN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, the DSN for the connection to the customer table must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::DSN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the DSN for the connection to the customer table must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">DBI:mysql:database=customerdb;host=customerdbhost</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::User" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, a username to connect to the customer table can be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::User" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, a username to connect to the customer table can be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">some_user</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::Password" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, a password to connect to the customer table can be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::Password" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, a password to connect to the customer table can be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="" Type="Password">some_password</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::DB::Type" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Customer::AuthModule, a database driver (normally autodetection is used) can be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::DB::Type" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, a database driver (normally autodetection is used) can be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">mysql</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::HTTPBasicAuth::Replace" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "HTTPBasicAuth" was selected for Customer::AuthModule, you can specify to strip leading parts of user names (e. g. for domains like example_domain\user to user).</Description>
+    <ConfigItem Name="Contact::AuthModule::HTTPBasicAuth::Replace" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "HTTPBasicAuth" was selected for Contact::AuthModule, you can specify to strip leading parts of user names (e. g. for domains like example_domain\user to user).</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">example_domain\\</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::HTTPBasicAuth::ReplaceRegExp" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "HTTPBasicAuth" was selected for Customer::AuthModule, you can specify (by using a RegExp) to strip parts of REMOTE_USER (e. g. for to remove trailing domains). RegExp-Note, $1 will be the new Login.</Description>
+    <ConfigItem Name="Contact::AuthModule::HTTPBasicAuth::ReplaceRegExp" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "HTTPBasicAuth" was selected for Contact::AuthModule, you can specify (by using a RegExp) to strip parts of REMOTE_USER (e. g. for to remove trailing domains). RegExp-Note, $1 will be the new Login.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">^(.+?)@.+?$</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule, the LDAP host can be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, the LDAP host can be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">ldap.example.com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule, the BaseDN must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, the BaseDN must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">dc=example,dc=com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule, the user identifier must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, the user identifier must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">uid</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use OTRS. Specify the group, who may access the system.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use OTRS. Specify the group, who may access the system.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">cn=otrsallow,ou=posixGroups,dc=example,dc=com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule, you can specify access attributes here.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, you can specify access attributes here.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">memberUid</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <Option SelectedID="UID">
                 <Item Key="UID">UID</Item>
@@ -8856,43 +8864,43 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">cn=binduser,ou=users,dc=example,dc=com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="" Type="Password">some_password</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
         <Description Translatable="1">If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">(!objectclass=computer)</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
         <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">@domain.com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="port">389</Item>
@@ -8902,10 +8910,10 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::LDAP::Die" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Customer::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
+    <ConfigItem Name="Contact::AuthModule::LDAP::Die" Required="0" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <Option SelectedID="1">
                 <Item Key="1" Translatable="1">Yes</Item>
@@ -8913,26 +8921,26 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::Radius::Host" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "Radius" was selected for Customer::AuthModule, the radius host must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::Radius::Host" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "Radius" was selected for Contact::AuthModule, the radius host must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="">radiushost</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::Radius::Password" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "Radius" was selected for Customer::AuthModule, the password to authenticate to the radius host must be specified.</Description>
+    <ConfigItem Name="Contact::AuthModule::Radius::Password" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "Radius" was selected for Contact::AuthModule, the password to authenticate to the radius host must be specified.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <String Regex="" Type="Password">radiussecret</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthModule::Radius::Die" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "Radius" was selected for Customer::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
+    <ConfigItem Name="Contact::AuthModule::Radius::Die" Required="0" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "Radius" was selected for Contact::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth</SubGroup>
+        <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
             <Option SelectedID="1">
                 <Item Key="1" Translatable="1">Yes</Item>
@@ -8940,26 +8948,26 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
         <Description Translatable="1">Defines the two-factor module to authenticate customers.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth::TwoFactor</SubGroup>
+        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/CustomerAuth/TwoFactor/*.pm" SelectedID="Kernel::System::CustomerAuth::TwoFactor::GoogleAuthenticator"></Option>
+            <Option Location="Kernel/System/ContactAuth/TwoFactor/*.pm" SelectedID="Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthTwoFactorModule::SecretPreferencesKey" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthTwoFactorModule::SecretPreferencesKey" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the customer preferences key where the shared secret key is stored.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth::TwoFactor</SubGroup>
+        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
         <Setting>
             <String Regex="">UserGoogleAuthenticatorSecretKey</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthTwoFactorModule::AllowEmptySecret" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthTwoFactorModule::AllowEmptySecret" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines if customers should be allowed to login if they have no shared secret stored in their preferences and therefore are not using two-factor authentication.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth::TwoFactor</SubGroup>
+        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
         <Setting>
             <Option SelectedID="1">
                 <Item Key="1" Translatable="1">Yes</Item>
@@ -8967,10 +8975,10 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Customer::AuthTwoFactorModule::AllowPreviousToken" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem Name="Contact::AuthTwoFactorModule::AllowPreviousToken" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines if the previously valid token should be accepted for authentication. This is slightly less secure but gives users 30 seconds more time to enter their one-time password.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Auth::TwoFactor</SubGroup>
+        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
         <Setting>
             <Option SelectedID="1">
                 <Item Key="1" Translatable="1">Yes</Item>
@@ -8978,46 +8986,25 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferences" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the parameters for the customer preferences table.</Description>
+    <ConfigItem Name="ContactPreferences" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the parameters for the contact preferences table.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::CustomerUser::Preferences::DB</Item>
+                <Item Key="Module">Kernel::System::Contact::Preferences::DB</Item>
                 <Item  Key="Params">
                     <Hash>
-                        <Item Key="Table">customer_preferences</Item>
+                        <Item Key="Table">contact_preferences</Item>
                         <Item Key="TableKey">preferences_key</Item>
                         <Item Key="TableValue">preferences_value</Item>
-                        <Item Key="TableUserID">user_id</Item>
+                        <Item Key="TableUserID">contact_id</Item>
                     </Hash>
                 </Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###Password" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences. 'PasswordRegExp' allows to match passwords against a regular expression. Define the minimum number of characters using 'PasswordMinSize'. Define if at least 2 lowercase and 2 uppercase letter characters are needed by setting the appropriate option to '1'. 'PasswordMin2Characters' defines if the password needs to contain at least 2 letter characters (set to 0 or 1). 'PasswordNeedDigit' controls the need of at least 1 digit (set to 0 or 1 to control).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Password</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Change password</Item>
-                <Item Key="Prio">1000</Item>
-                <Item Key="Area">Customer</Item>
-                <!-- <Item Key="PasswordRegExp">[a-z]|[A-z]|[0-9]|\.|;|,|:|-|\+|#|!|\$|&|\?</Item> -->
-                <Item Key="PasswordRegExp"></Item>
-                <Item Key="PasswordMinSize">0</Item>
-                <Item Key="PasswordMin2Lower2UpperCharacters">0</Item>
-                <Item Key="PasswordMin2Characters">0</Item>
-                <Item Key="PasswordNeedDigit">0</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###GoogleAuthenticatorSecretKey" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###GoogleAuthenticatorSecretKey" Required="0" Valid="1">
         <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9034,7 +9021,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###Language" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###Language" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9050,7 +9037,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###Theme" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###Theme" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9066,7 +9053,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###TimeZone" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###TimeZone" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9082,7 +9069,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###PGP" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###PGP" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9098,7 +9085,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###SMIME" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###SMIME" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9473,65 +9460,26 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Events###CustomerUser" Required="1" Valid="1">
-        <Description Translatable="1">List of all contact events to be displayed in the GUI.</Description>
+    <ConfigItem Name="Events###Contact" Required="1" Valid="1">
+        <Description Translatable="1">List of all contact events.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Admin</SubGroup>
         <Setting>
             <Array>
-                <Item>CustomerUserAdd</Item>
-                <Item>CustomerUserUpdate</Item>
+                <Item>ContactAdd</Item>
+                <Item>ContactUpdate</Item>
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Events###CustomerCompany" Required="1" Valid="1">
-        <Description Translatable="1">List of all CustomerCompany events to be displayed in the GUI.</Description>
+    <ConfigItem Name="Events###Organisation" Required="1" Valid="1">
+        <Description Translatable="1">List of all Organisation events.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Admin</SubGroup>
         <Setting>
             <Array>
-                <Item>CustomerCompanyAdd</Item>
-                <Item>CustomerCompanyUpdate</Item>
+                <Item>OrganisationAdd</Item>
+                <Item>OrganisationUpdate</Item>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerCompany::EventModulePost###100-UpdateCustomerUsers" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Event module that updates contacts after an update of the Customer.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::CustomerCompany</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::CustomerCompany::Event::CustomerUserUpdate</Item>
-                <Item Key="Event">CustomerCompanyUpdate</Item>
-                <Item Key="Transaction">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerUser::EventModulePost###100-UpdateSearchProfiles" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Event module that updates contact search profiles if login changes.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::CustomerUser</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::CustomerUser::Event::SearchProfileUpdate</Item>
-                <Item Key="Event">CustomerUserUpdate</Item>
-                <Item Key="Transaction">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerUser::EventModulePost###100-UpdateServiceMembership" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Event module that updates contact service membership if login changes.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::CustomerUser</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::CustomerUser::Event::ServiceMemberUpdate</Item>
-                <Item Key="Event">CustomerUserUpdate</Item>
-                <Item Key="Transaction">0</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Cache::Module" Required="1" Valid="1" ConfigLevel="200">
@@ -9673,7 +9621,7 @@ via the Preferences button after logging in.
             </FrontendModuleReg>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###DefaultTicketType" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###DefaultTicketType" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9689,7 +9637,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###DefaultTicketQueue" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###DefaultTicketQueue" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9705,7 +9653,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###DefaultService" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###DefaultService" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -9925,13 +9873,13 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerCompanyPreferences" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem Name="OrganisationPreferences" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the parameters for the customer company preferences table.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::CustomerCompany::Preferences::DB</Item>
+                <Item Key="Module">Kernel::System::Organisation::Preferences::DB</Item>
                 <Item  Key="Params">
                     <Hash>
                         <Item Key="Table">kix_customer_company_prefs</Item>
@@ -10254,26 +10202,26 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicFields::Driver###CustomerUser" Required="0" Valid="1">
+    <ConfigItem Name="DynamicFields::Driver###Contact" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>Framework</Group>
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::CustomerUser</Item>
+                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::Contact</Item>
                 <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicFields::Driver###CustomerCompany" Required="0" Valid="1">
+    <ConfigItem Name="DynamicFields::Driver###Organisation" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>Framework</Group>
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::CustomerCompany</Item>
+                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::Organisation</Item>
                 <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
             </Hash>
         </Setting>

@@ -84,12 +84,12 @@ checks if the given service or service ID is valid for this customer / customer 
 
     my $Success = $CommonObject->ValidateService(
         ServiceID    => 123,
-        CustomerUser => 'Test',
+        Contact => 'Test',
     );
 
     my $Success = $CommonObject->ValidateService(
         Service      => 'some service',
-        CustomerUser => 'Test',
+        Contact => 'Test',
     );
 
     returns
@@ -102,7 +102,7 @@ sub ValidateCustomerService {
 
     # check needed stuff
     return if !$Param{ServiceID} && !$Param{Service};
-    return if !$Param{CustomerUser};
+    return if !$Param{Contact};
 
     my %ServiceData;
 
@@ -146,8 +146,8 @@ sub ValidateCustomerService {
     }
 
     # get customer services
-    my %CustomerServices = $ServiceObject->CustomerUserServiceMemberList(
-        CustomerUserLogin => $Param{CustomerUser},
+    my %CustomerServices = $ServiceObject->ContactServiceMemberList(
+        ContactLogin => $Param{Contact},
         Result            => 'HASH',
         DefaultServices   => 1,
     );

@@ -893,7 +893,7 @@ sub Data {
         'Please enter a search term to look for customers.' => 'Bitte geben Sie einen Suchbegriff ein, um nach Kunden zu suchen.',
         'Add Customer' => 'Kunden hinzufügen',
 
-        # Template: AdminCustomerUser
+        # Template: AdminContact
         # rkaiser - T#2017020290001194 - changed customer user to contact
         'Contact Management' => 'Ansprechpartnerverwaltung',
         'Back to search results' => 'Zurück zum Suchergebnis',
@@ -916,7 +916,7 @@ sub Data {
             'DNS-Problem, bitte prüfen Sie ihre Konfiguration und das Fehlerprotokoll.',
         'The syntax of this email address is incorrect.' => 'Die Syntax dieser E-Mail-Adresse ist fehlerhaft.',
 
-        # Template: AdminCustomerUserGroup
+        # Template: AdminContactGroup
         'Manage Customer-Group Relations' => 'Kunden-Gruppen-Zuordnung verwalten',
         'Notice' => 'Bemerkung',
         'This feature is disabled!' => 'Dieses Feature ist inaktiv!',
@@ -948,7 +948,7 @@ sub Data {
         'Full read and write access to the tickets in this group/queue.' =>
             'Voller Schreib- und Lesezugriff auf Tickets in der Queue/Gruppe.',
 
-        # Template: AdminCustomerUserService
+        # Template: AdminContactService
         'Manage Customer-Services Relations' => 'Kunden-Service-Zuordnungen verwalten',
         'Edit default services' => 'Standardservices bearbeiten',
         'Filter for Services' => 'Filter für Services',
@@ -2449,7 +2449,7 @@ sub Data {
         # Template: AgentDashboardCustomerIDStatus
         'Escalated tickets' => 'Eskalierte Tickets',
 
-        # Template: AgentDashboardCustomerUserList
+        # Template: AgentDashboardContactList
         # rkaiser - T#2017020290001194 - changed customer user to contact
         'Contact information' => 'Ansprechpartner-Information',
         'Phone ticket' => 'Telefon-Ticket',
@@ -3280,7 +3280,7 @@ sub Data {
         # Perl Module: Kernel/Modules/AdminCustomerCompany.pm
         'Customer Company %s already exists!' => 'Die Kundenfirma %s existiert bereits!',
 
-        # Perl Module: Kernel/Modules/AdminCustomerUser.pm
+        # Perl Module: Kernel/Modules/AdminContact.pm
         'New phone ticket' => 'Neues Telefon-Ticket',
         'New email ticket' => 'Neues E-Mail-Ticket',
 
@@ -4636,22 +4636,22 @@ Ihr Helpdesk-Team
             'Cloud-Service-Admin-Modulregistrierung für den Transport-Layer.',
         'Collect support data for asynchronous plug-in modules.' => 'Sammelt Support Daten für asynchrone Erweiterungen.',
         'Column ticket filters for Ticket Overviews type "Small".' => 'Ticket-Filter-Spalte für Ticketübersichten vom Typ "Klein".',
-        'Columns that can be filtered in the escalation view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Eskalations-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the locked view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Gesperrt-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the queue view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Queue-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the responsible view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Verantwortlicher-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the service view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Service-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the status view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Status-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the ticket search result view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Suchergebnis-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
-        'Columns that can be filtered in the watch view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. CustomerUserPhone, CustomerCompanyName, ...) are allowed.' =>
-            'Spalten, auf die in der Beobachten-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. CustomerUserPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the escalation view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Eskalations-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the locked view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Gesperrt-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the queue view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Queue-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the responsible view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Verantwortlicher-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the service view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Service-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the status view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Status-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the ticket search result view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Suchergebnis-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
+        'Columns that can be filtered in the watch view of the agent interface. Possible settings: 0 = Disabled, 1 = Available, 2 = Enabled by default. Note: Only Ticket attributes, Dynamic Fields (DynamicField_NameX) and Customer attributes (e.g. ContactPhone, CustomerCompanyName, ...) are allowed.' =>
+            'Spalten, auf die in der Beobachten-Ansicht des Agentenbereichs ein Filter angewandt werden kann. Mögliche Werte: 0 = Deaktiviert, 1 = als Filter verfügbar, 2 = standardmäßig als Filter aktiviert. Hinweis: Es sind nur Ticket-Attribute, dynamische Felder (DynamicField_NameX) und Kundenattribute (z.B. ContactPhone, CustomerCompanyName) erlaubt.',
         'Comment for new history entries in the customer interface.' => 'Kommentar für neue Historieneinträge im Kunden-Interface.',
         'Comment2' => 'Kommentar2',
         'Communication' => 'Kommunikation',
@@ -4731,10 +4731,10 @@ Ihr Helpdesk-Team
         # rkaiser - T#2017020290001194 - changed customer user to contact
         'Contacts' => 'Ansprechpartner',
         'Customer called us.' => 'Kunde hat angerufen.',
-        'Customer item (icon) which shows the closed tickets of this customer as info block. Setting CustomerUserLogin to 1 searches for tickets based on login name rather than CustomerID.' =>
-            'Kunden-Tickets (Symbol), die die geschlossenen Tickets eines Kunden als Infoblock anzeigt. Setzen Sie die Einstellung CustomerUserLogin auf 1 um Tickets auf Basis des Login-Namens zu suchen anstatt auf Basis der CustomerID.',
-        'Customer item (icon) which shows the open tickets of this customer as info block. Setting CustomerUserLogin to 1 searches for tickets based on login name rather than CustomerID.' =>
-            'Kunden-Tickets (Symbol), die die offenen Tickets eines Kunden als Infoblock anzeigt. Setzen Sie die Einstellung CustomerUserLogin auf 1 um Tickets auf Basis des Login-Namens zu suchen anstatt auf Basis der CustomerID.',
+        'Customer item (icon) which shows the closed tickets of this customer as info block. Setting ContactLogin to 1 searches for tickets based on login name rather than CustomerID.' =>
+            'Kunden-Tickets (Symbol), die die geschlossenen Tickets eines Kunden als Infoblock anzeigt. Setzen Sie die Einstellung ContactLogin auf 1 um Tickets auf Basis des Login-Namens zu suchen anstatt auf Basis der CustomerID.',
+        'Customer item (icon) which shows the open tickets of this customer as info block. Setting ContactLogin to 1 searches for tickets based on login name rather than CustomerID.' =>
+            'Kunden-Tickets (Symbol), die die offenen Tickets eines Kunden als Infoblock anzeigt. Setzen Sie die Einstellung ContactLogin auf 1 um Tickets auf Basis des Login-Namens zu suchen anstatt auf Basis der CustomerID.',
         'Customer preferences.' => 'Persönliche Kunden-Einstellungen',
         'Customer request via web.' => 'Kunde stellte Anfrage über Web.',
         'Customer ticket overview' => 'Kunden-Ticket-Übersicht',
@@ -4744,7 +4744,7 @@ Ihr Helpdesk-Team
         'Contact search' => 'Ansprechpartner-Suche',
         'CustomerID search' => 'Kundennummernsuche',
         'CustomerName' => 'Kundenname',
-        'CustomerUser' => 'Ansprechpartner',
+        'Contact' => 'Ansprechpartner',
         'Customers <-> Groups' => 'Kunden <-> Gruppen',
         'Customizable stop words for fulltext index. These words will be removed from the search index.' =>
             'Anpassbare Stopworte für den Volltext-Index. Diese Worte werden aus dem Suchindex entfernt.',
@@ -5590,7 +5590,7 @@ Ihr Helpdesk-Team
             'Aktiviert PGP-Support. Wenn PGP-Support für das signieren und verschlüsseln von Mails eingeschaltet ist, wird dringend empfohlen, den Webserver unter dem OTRS-Benutzer zu betreiben. Andernfalls werden Probleme mit den Berechtigungen auftreten, wenn auf das .gnupg-Verzeichnis zugegriffen wird.',
         'Enables S/MIME support.' => 'Aktiviert unterstützung für S/MIME.',
         'Enables customers to create their own accounts.' => 'Erlaubt Kunden, eigene Konten anzulegen.',
-        'Enables fetch S/MIME from CustomerUser backend support.' => '',
+        'Enables fetch S/MIME from Contact backend support.' => '',
         'Enables file upload in the package manager frontend.' => 'Erlaubt den Datei-Upload im Paket-Manager.',
         'Enables or disables the caching for templates. WARNING: Do NOT disable template caching for production environments for it will cause a massive performance drop! This setting should only be disabled for debugging reasons!' =>
             'Schaltet das Caching von Templates an oder aus. Warnung: Schalten Sie auf Produktivsystemen das Template-Caching nicht ab, da hierdurch massive Performance-Beeinträchtigungen auftreten werden. Diese Einstellung sollte nur zur Fehlerbehebung abgeschaltet werden.',
@@ -5750,60 +5750,60 @@ Ihr Helpdesk-Team
             'Hilft beim Erweitern Ihres Artikel-Volltext-Indexes (Von-, An-, Cc-, Betreffs- und Text-Suche). Runtime führt Volltext-Suchen auf Livedaten aus (performant bis 50.000 Tickets). StaticDB erstellt nach der Artikelerstellung einen Index aus den Artikeldaten, wodurch die Geschwindigkeit von Volltextsuchen um rund 50% steigt. Nutzen Sie "bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild", um einen initialen Index zu erstellen.',
         'Hindi' => 'Hindi',
         'Hungarian' => 'Ungarisch',
-        'If "DB" was selected for Customer::AuthModule, a database driver (normally autodetection is used) can be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, kann hier ein Datenbanktreiber definiert werden. Ansonsten wird der benötigte Treiber automatisch ermittelt.',
-        'If "DB" was selected for Customer::AuthModule, a password to connect to the customer table can be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, kann hier ein Passwort zum Verbinden zur Datenbank hinterlegt werden.',
-        'If "DB" was selected for Customer::AuthModule, a username to connect to the customer table can be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, kann hier ein Benutzername zum Verbinden zur Datenbank hinterlegt werden.',
-        'If "DB" was selected for Customer::AuthModule, the DSN for the connection to the customer table must be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, muss hier der DSN zum Verbinden zur Datenbank hinterlegt werden.',
-        'If "DB" was selected for Customer::AuthModule, the column name for the CustomerPassword in the customer table must be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, muss hier der Name der Spalte, die das Kundenpasswort enthält, hinterlegt werden.',
-        'If "DB" was selected for Customer::AuthModule, the crypt type of passwords must be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, muss hier der Verschlüsselungstyp für Passwörter hinterlegt werden.',
-        'If "DB" was selected for Customer::AuthModule, the name of the column for the CustomerKey in the customer table must be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, muss hier der Name der Spalte, die CustomerKey enthält, hinterlegt werden.',
-        'If "DB" was selected for Customer::AuthModule, the name of the table where your customer data should be stored must be specified.' =>
-            'Wenn "DB" als Customer::AuthModule ausgewählt ist, muss hier der Name der Tabelle, in der Kundendaten gespeichert werden sollen, hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, a database driver (normally autodetection is used) can be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, kann hier ein Datenbanktreiber definiert werden. Ansonsten wird der benötigte Treiber automatisch ermittelt.',
+        'If "DB" was selected for Contact::AuthModule, a password to connect to the customer table can be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, kann hier ein Passwort zum Verbinden zur Datenbank hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, a username to connect to the customer table can be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, kann hier ein Benutzername zum Verbinden zur Datenbank hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, the DSN for the connection to the customer table must be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, muss hier der DSN zum Verbinden zur Datenbank hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, the column name for the CustomerPassword in the customer table must be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, muss hier der Name der Spalte, die das Kundenpasswort enthält, hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, the crypt type of passwords must be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, muss hier der Verschlüsselungstyp für Passwörter hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, the name of the column for the CustomerKey in the customer table must be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, muss hier der Name der Spalte, die CustomerKey enthält, hinterlegt werden.',
+        'If "DB" was selected for Contact::AuthModule, the name of the table where your customer data should be stored must be specified.' =>
+            'Wenn "DB" als Contact::AuthModule ausgewählt ist, muss hier der Name der Tabelle, in der Kundendaten gespeichert werden sollen, hinterlegt werden.',
         'If "DB" was selected for SessionModule, a table in database where session data will be stored must be specified.' =>
             'Wenn "DB" als SessionModule ausgewählt ist, muss hier der Name der Tabelle, in der Sitzungsdaten gespeichert werden sollen, hinterlegt werden.',
         'If "FS" was selected for SessionModule, a directory where the session data will be stored must be specified.' =>
             'Wenn "FS" als SessionModule ausgewählt ist, muss hier der Name des Verzeichnisses, in dem Sitzungsdaten gespeichert werden sollen, hinterlegt werden.',
-        'If "HTTPBasicAuth" was selected for Customer::AuthModule, you can specify (by using a RegExp) to strip parts of REMOTE_USER (e. g. for to remove trailing domains). RegExp-Note, $1 will be the new Login.' =>
-            'Wenn "HTTPBasicAuth" als Customer::AuthModule ausgewählt ist, kann hier ein regulärer Ausdruck definiert werden, um Teile von REMOTE_USER zu entfernen (z.B. für anhängende Domänen). Hinweis: $1 enthält den neuen Login-Namen.',
-        'If "HTTPBasicAuth" was selected for Customer::AuthModule, you can specify to strip leading parts of user names (e. g. for domains like example_domain\user to user).' =>
-            'Wenn "HTTPBasicAuth" als Customer::AuthModule ausgewählt ist, können Sie hier angeben, ob führende Teile von Benutzernamen (z.B. zur Umwandlung von Domänen wie "example_domain\user" zu "user").',
-        'If "LDAP" was selected for Customer::AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist und Sie einen Suffix zu jedem Kunden-Loginnamen hinzufügen möchten, können Sie dies hier festlegen (z.B. wenn "benutzername" im LDAP als "benutzername@domain" existiert).',
-        'If "LDAP" was selected for Customer::AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist und spezielle Parameter für das Perl-Modul Net::LDAP benötigt werden, können Sie diese hier angeben. Nutzen Sie "perldoc Net::LDAP" für weitere Informationen zu den Parametern.',
-        'If "LDAP" was selected for Customer::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist und Ihre Nutzer nur anonymen Zugriff auf den LDAP-Baum haben, Sie die Daten aber durchsuchen möchten, können Sie dies mithilfe eines speziellen Users tun, dessen Passwort Sie hier angeben können.',
-        'If "LDAP" was selected for Customer::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist und Ihre Nutzer nur anonymen Zugriff auf den LDAP-Baum haben, Sie die Daten aber durchsuchen möchten, können Sie dies mithilfe eines speziellen Users tun, dessen Benutzernamen Sie hier angeben können.',
-        'If "LDAP" was selected for Customer::AuthModule, the BaseDN must be specified.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, muss das BaseDN hier angegeben werden.',
-        'If "LDAP" was selected for Customer::AuthModule, the LDAP host can be specified.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, kann der LDAP-Host hier angegeben werden.',
-        'If "LDAP" was selected for Customer::AuthModule, the user identifier must be specified.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, muss der User-Identifier hier angegeben werden.',
-        'If "LDAP" was selected for Customer::AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, können hier Benutzer-Attribute spezifiziert werden. Nutzen Sie UID für LDAP-posixGroups, den vollen Benutzer-DN für nicht-LDAP-posixGroups.',
-        'If "LDAP" was selected for Customer::AuthModule, you can specify access attributes here.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, können hier Zugangs-Attribute bestimmt werden.',
-        'If "LDAP" was selected for Customer::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can\'t be established due to network problems.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, können Sie hier festlegen, ob Anwendungen stoppen sollen, wenn z.B. die Verbindung zum Server aufgrund von Netzwerkproblemen nicht hergestellt werden kann.',
-        'If "LDAP" was selected for Customer::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use OTRS. Specify the group, who may access the system.' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, können Sie prüfen, ob der Benutzer aufgrund seiner Mitgliedschaft in einer posixGroup Authentifizierungsberechtigt (z.B. wenn ein Nutzer Mitglied der Gruppe xyz sein muss, um OTRS nutzen zu dürfen). Legen Sie diese Gruppe hier fest.',
+        'If "HTTPBasicAuth" was selected for Contact::AuthModule, you can specify (by using a RegExp) to strip parts of REMOTE_USER (e. g. for to remove trailing domains). RegExp-Note, $1 will be the new Login.' =>
+            'Wenn "HTTPBasicAuth" als Contact::AuthModule ausgewählt ist, kann hier ein regulärer Ausdruck definiert werden, um Teile von REMOTE_USER zu entfernen (z.B. für anhängende Domänen). Hinweis: $1 enthält den neuen Login-Namen.',
+        'If "HTTPBasicAuth" was selected for Contact::AuthModule, you can specify to strip leading parts of user names (e. g. for domains like example_domain\user to user).' =>
+            'Wenn "HTTPBasicAuth" als Contact::AuthModule ausgewählt ist, können Sie hier angeben, ob führende Teile von Benutzernamen (z.B. zur Umwandlung von Domänen wie "example_domain\user" zu "user").',
+        'If "LDAP" was selected for Contact::AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist und Sie einen Suffix zu jedem Kunden-Loginnamen hinzufügen möchten, können Sie dies hier festlegen (z.B. wenn "benutzername" im LDAP als "benutzername@domain" existiert).',
+        'If "LDAP" was selected for Contact::AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist und spezielle Parameter für das Perl-Modul Net::LDAP benötigt werden, können Sie diese hier angeben. Nutzen Sie "perldoc Net::LDAP" für weitere Informationen zu den Parametern.',
+        'If "LDAP" was selected for Contact::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist und Ihre Nutzer nur anonymen Zugriff auf den LDAP-Baum haben, Sie die Daten aber durchsuchen möchten, können Sie dies mithilfe eines speziellen Users tun, dessen Passwort Sie hier angeben können.',
+        'If "LDAP" was selected for Contact::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist und Ihre Nutzer nur anonymen Zugriff auf den LDAP-Baum haben, Sie die Daten aber durchsuchen möchten, können Sie dies mithilfe eines speziellen Users tun, dessen Benutzernamen Sie hier angeben können.',
+        'If "LDAP" was selected for Contact::AuthModule, the BaseDN must be specified.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, muss das BaseDN hier angegeben werden.',
+        'If "LDAP" was selected for Contact::AuthModule, the LDAP host can be specified.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, kann der LDAP-Host hier angegeben werden.',
+        'If "LDAP" was selected for Contact::AuthModule, the user identifier must be specified.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, muss der User-Identifier hier angegeben werden.',
+        'If "LDAP" was selected for Contact::AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, können hier Benutzer-Attribute spezifiziert werden. Nutzen Sie UID für LDAP-posixGroups, den vollen Benutzer-DN für nicht-LDAP-posixGroups.',
+        'If "LDAP" was selected for Contact::AuthModule, you can specify access attributes here.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, können hier Zugangs-Attribute bestimmt werden.',
+        'If "LDAP" was selected for Contact::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can\'t be established due to network problems.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, können Sie hier festlegen, ob Anwendungen stoppen sollen, wenn z.B. die Verbindung zum Server aufgrund von Netzwerkproblemen nicht hergestellt werden kann.',
+        'If "LDAP" was selected for Contact::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use OTRS. Specify the group, who may access the system.' =>
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, können Sie prüfen, ob der Benutzer aufgrund seiner Mitgliedschaft in einer posixGroup Authentifizierungsberechtigt (z.B. wenn ein Nutzer Mitglied der Gruppe xyz sein muss, um OTRS nutzen zu dürfen). Legen Sie diese Gruppe hier fest.',
         'If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).' =>
-            'Wenn "LDAP" als Customer::AuthModule ausgewählt ist, können Sie hier Filter für jede LDAP-Anfrage festlegen, z.B. (mail=*), (objectclass=user) oder (!objectclass=computer).',
-        'If "Radius" was selected for Customer::AuthModule, the password to authenticate to the radius host must be specified.' =>
-            'Wenn "Radius" als Customer::AuthModule ausgewählt ist, muss hier das Passwort zur Authentifizierung beim Radius-Host hinterlegt werden.',
-        'If "Radius" was selected for Customer::AuthModule, the radius host must be specified.' =>
-            'Wenn "Radius" als Customer::AuthModule ausgewählt ist, muss hier der Radius-Host hinterlegt werden.',
-        'If "Radius" was selected for Customer::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can\'t be established due to network problems.' =>
-            'Wenn "Radius" als Customer::AuthModule ausgewählt ist, können Sie hier festlegen, ob Anwendungen stoppen sollen, wenn z.B. die Verbindung zum Server aufgrund von Netzwerkproblemen nicht hergestellt werden kann.',
+            'Wenn "LDAP" als Contact::AuthModule ausgewählt ist, können Sie hier Filter für jede LDAP-Anfrage festlegen, z.B. (mail=*), (objectclass=user) oder (!objectclass=computer).',
+        'If "Radius" was selected for Contact::AuthModule, the password to authenticate to the radius host must be specified.' =>
+            'Wenn "Radius" als Contact::AuthModule ausgewählt ist, muss hier das Passwort zur Authentifizierung beim Radius-Host hinterlegt werden.',
+        'If "Radius" was selected for Contact::AuthModule, the radius host must be specified.' =>
+            'Wenn "Radius" als Contact::AuthModule ausgewählt ist, muss hier der Radius-Host hinterlegt werden.',
+        'If "Radius" was selected for Contact::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can\'t be established due to network problems.' =>
+            'Wenn "Radius" als Contact::AuthModule ausgewählt ist, können Sie hier festlegen, ob Anwendungen stoppen sollen, wenn z.B. die Verbindung zum Server aufgrund von Netzwerkproblemen nicht hergestellt werden kann.',
         'If "Sendmail" was selected as SendmailModule, the location of the sendmail binary and the needed options must be specified.' =>
             'Wenn "Sendmail" als als SendmailModule konfiguriert wurde, müssen hier der Pfad zum Sendmail-binary und die benötigten Optionen hinterlegt werden.',
         'If "SysLog" was selected for LogModule, a special log facility can be specified.' =>
@@ -6028,8 +6028,8 @@ Ihr Helpdesk-Team
         'Module to generate ticket statistics.' => 'Modul zur Generierung von Ticket-Statistiken',
         'Module to grant access if the CustomerID of the ticket matches the CustomerID of the customer.' =>
             'Modul zum Gestatten des Zugriffs, wenn die CustomerID eines Tickets der CustomerID des Kunden entspricht.',
-        'Module to grant access if the CustomerUserID of the ticket matches the CustomerUserID of the customer.' =>
-            'Modul zum Gestatten des Zugriffs, wenn die CustomerUserID eines Tickets der CustomerUserID des Kunden entspricht.',
+        'Module to grant access if the ContactID of the ticket matches the ContactID of the customer.' =>
+            'Modul zum Gestatten des Zugriffs, wenn die ContactID eines Tickets der ContactID des Kunden entspricht.',
         'Module to grant access to any agent that has been involved in a ticket in the past (based on ticket history entries).' =>
             'Modul zum Gestatten des Zugriffs für jeden Agenten, der einmal in ein Ticket involviert war (basierend auf den Einträgen in der Ticket-Historie).',
         'Module to grant access to the agent responsible of a ticket.' =>
@@ -6240,8 +6240,8 @@ Ihr Helpdesk-Team
         'Runs an initial wildcard search of the existing customer company when accessing the AdminCustomerCompany module.' =>
             'Führt eine initiale Wildcard-Suche für bestehende Kundenfirmen aus, wenn auf AdminCustomerCompany zugegriffen wird.',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        'Runs an initial wildcard search of the existing contacts when accessing the AdminCustomerUser module.' =>
-            'Führt eine initiale Wildcard-Suche für bestehende Ansprechpartner aus, wenn auf AdminCustomerUser zugegriffen wird.',
+        'Runs an initial wildcard search of the existing contacts when accessing the AdminContact module.' =>
+            'Führt eine initiale Wildcard-Suche für bestehende Ansprechpartner aus, wenn auf AdminContact zugegriffen wird.',
         'Runs the system in "Demo" mode. If set to "Yes", agents can change preferences, such as selection of language and theme via the agent web interface. These changes are only valid for the current session. It will not be possible for agents to change their passwords.' =>
             'Führt das System im "Demo" Modus aus. Wenn die Einstellung auf "Ja" gesetzt ist, können Agenten Einstellungen, wie die Sprachauswahl oder das Design über die Agenten Weboberfläche ändern. Diese Einstellungen sind nur für die aktuelle Session gültig. Agenten können ihr Passwort nicht ändern.',
         'Russian' => 'Russisch',
@@ -6828,7 +6828,7 @@ Ihr Helpdesk-Team
             'Der Text am Anfang des Betreffs einer E-Mail Antwort, z.B. RE, AW oder AS.',
         'The text at the beginning of the subject when an email is forwarded, e.g. FW, Fwd, or WG.' =>
             'Der Text am Anfang des Betreffs, wenn eine E-Mail weitergeleitet wird, z.B. FW, Fwd oder WG.',
-        'This event module stores attributes from CustomerUser as DynamicFields tickets. Please see the setting above for how to configure the mapping.' =>
+        'This event module stores attributes from Contact as DynamicFields tickets. Please see the setting above for how to configure the mapping.' =>
             '',
         'This is the default orange - black skin for the customer interface.' =>
             '',

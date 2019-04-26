@@ -22,7 +22,7 @@ our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::DB',
     'Kernel::System::Cache',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Role',
     'Kernel::System::Main',
     'Kernel::System::UnitTest',
@@ -235,19 +235,19 @@ sub TestUserCreate {
     return $TestUserLogin;
 }
 
-=item TestCustomerUserCreate()
+=item TestContactCreate()
 
 creates a test customer user that can be used in tests. It will
 be set to invalid automatically during the destructor. Returns
 the login name of the new customer user, the password is the same.
 
-    my $TestUserLogin = $Helper->TestCustomerUserCreate(
+    my $TestUserLogin = $Helper->TestContactCreate(
         Language => 'de',   # optional, defaults to 'en' if not set
     );
 
 =cut
 
-sub TestCustomerUserCreate {
+sub TestContactCreate {
     my ( $Self, %Param ) = @_;
 
     # disable email checks to create new user
@@ -261,8 +261,8 @@ sub TestCustomerUserCreate {
 
         my $TestUserLogin = $Self->GetRandomID();
 
-        $TestUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-            Source         => 'CustomerUser',
+        $TestUser = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            Source         => 'Contact',
             UserFirstname  => $TestUserLogin,
             UserLastname   => $TestUserLogin,
             UserCustomerID => $TestUserLogin,
@@ -281,15 +281,15 @@ sub TestCustomerUserCreate {
 
     # Remember UserID of the test user to later set it to invalid
     #   in the destructor.
-    $Self->{TestCustomerUsers} ||= [];
-    push( @{ $Self->{TestCustomerUsers} }, $TestUser );
+    $Self->{TestContacts} ||= [];
+    push( @{ $Self->{TestContacts} }, $TestUser );
 
     # rkaiser - T#2017020290001194 - changed customer user to contact
     $Self->{UnitTestObject}->True( 1, "Created test contact $TestUser" );
 
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
-    $Kernel::OM->Get('Kernel::System::CustomerUser')->SetPreferences(
+    $Kernel::OM->Get('Kernel::System::Contact')->SetPreferences(
         UserID => $TestUser,
         Key    => 'UserLanguage',
         Value  => $UserLanguage,
@@ -527,15 +527,15 @@ sub DESTROY {
     }
 
     # invalidate test customer users
-    if ( ref $Self->{TestCustomerUsers} eq 'ARRAY' && @{ $Self->{TestCustomerUsers} } ) {
+    if ( ref $Self->{TestContacts} eq 'ARRAY' && @{ $Self->{TestContacts} } ) {
         TESTCUSTOMERUSERS:
-        for my $TestCustomerUser ( @{ $Self->{TestCustomerUsers} } ) {
+        for my $TestContact ( @{ $Self->{TestContacts} } ) {
 
-            my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-                User => $TestCustomerUser,
+            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                User => $TestContact,
             );
 
-            if ( !$CustomerUser{UserLogin} ) {
+            if ( !$Contact{UserLogin} ) {
 
                 # if no such customer user exists, there is no need to set it to invalid;
                 # happens when the test customer user is created inside a transaction
@@ -543,16 +543,16 @@ sub DESTROY {
                 next TESTCUSTOMERUSERS;
             }
 
-            my $Success = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
-                %CustomerUser,
-                ID      => $CustomerUser{UserID},
+            my $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+                %Contact,
+                ID      => $Contact{UserID},
                 ValidID => 2,
                 UserID  => 1,
             );
 
             $Self->{UnitTestObject}->True(
                 # rkaiser - T#2017020290001194 - changed customer user to contact
-                $Success, "Set test contact $TestCustomerUser to invalid"
+                $Success, "Set test contact $TestContact to invalid"
             );
         }
     }

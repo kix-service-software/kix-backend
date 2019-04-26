@@ -95,7 +95,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => 'example.com',
-    CustomerUser => $UserData{UserLogin},
+    Contact => $UserData{UserLogin},
     OwnerID      => $UserID,
     UserID       => $UserID,
 );

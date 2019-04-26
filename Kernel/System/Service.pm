@@ -1112,12 +1112,12 @@ sub ServiceSearch {
     return @ServiceList;
 }
 
-=item CustomerUserServiceMemberList()
+=item ContactServiceMemberList()
 
 returns a list of customeruser/service members
 
     ServiceID: service id
-    CustomerUserLogin: customer user login
+    ContactLogin: customer user login
     DefaultServices: activate or deactivate default services
 
     Result: HASH -> returns a hash of key => service id, value => service name
@@ -1126,22 +1126,22 @@ returns a list of customeruser/service members
 
     Example (get services of customer user):
 
-    $ServiceObject->CustomerUserServiceMemberList(
-        CustomerUserLogin => 'Test',
+    $ServiceObject->ContactServiceMemberList(
+        ContactLogin => 'Test',
         Result            => 'HASH',
         DefaultServices   => 0,
     );
 
     Example (get customer user of service):
 
-    $ServiceObject->CustomerUserServiceMemberList(
+    $ServiceObject->ContactServiceMemberList(
         ServiceID => $ID,
         Result    => 'HASH',
     );
 
 =cut
 
-sub CustomerUserServiceMemberList {
+sub ContactServiceMemberList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1168,29 +1168,29 @@ sub CustomerUserServiceMemberList {
         $DefaultServiceUnknownCustomer
         && $Param{DefaultServices}
         && !$Param{ServiceID}
-        && !$Param{CustomerUserLogin}
+        && !$Param{ContactLogin}
         )
     {
-        $Param{CustomerUserLogin} = '<DEFAULT>';
+        $Param{ContactLogin} = '<DEFAULT>';
     }
 
     # check more needed stuff
-    if ( !$Param{ServiceID} && !$Param{CustomerUserLogin} ) {
+    if ( !$Param{ServiceID} && !$Param{ContactLogin} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need ServiceID or CustomerUserLogin!',
+            Message  => 'Need ServiceID or ContactLogin!',
         );
         return;
     }
 
     # create cache key
-    my $CacheKey = 'CustomerUserServiceMemberList::' . $Param{Result} . '::'
+    my $CacheKey = 'ContactServiceMemberList::' . $Param{Result} . '::'
         . 'DefaultServices::' . $Param{DefaultServices} . '::';
     if ( $Param{ServiceID} ) {
         $CacheKey .= 'ServiceID::' . $Param{ServiceID};
     }
-    elsif ( $Param{CustomerUserLogin} ) {
-        $CacheKey .= 'CustomerUserLogin::' . $Param{CustomerUserLogin};
+    elsif ( $Param{ContactLogin} ) {
+        $CacheKey .= 'ContactLogin::' . $Param{ContactLogin};
     }
 
     # check cache
@@ -1226,8 +1226,8 @@ sub CustomerUserServiceMemberList {
     if ( $Param{ServiceID} ) {
         $SQL .= " scu.service_id = $Param{ServiceID}";
     }
-    elsif ( $Param{CustomerUserLogin} ) {
-        $SQL .= " scu.customer_user_login = '$Param{CustomerUserLogin}'";
+    elsif ( $Param{ContactLogin} ) {
+        $SQL .= " scu.customer_user_login = '$Param{ContactLogin}'";
     }
 
     $Self->{DBObject}->Prepare( SQL => $SQL );
@@ -1244,14 +1244,14 @@ sub CustomerUserServiceMemberList {
         }
     }
     if (
-        $Param{CustomerUserLogin}
-        && $Param{CustomerUserLogin} ne '<DEFAULT>'
+        $Param{ContactLogin}
+        && $Param{ContactLogin} ne '<DEFAULT>'
         && $Param{DefaultServices}
         && !keys(%Data)
         )
     {
-        %Data = $Self->CustomerUserServiceMemberList(
-            CustomerUserLogin => '<DEFAULT>',
+        %Data = $Self->ContactServiceMemberList(
+            ContactLogin => '<DEFAULT>',
             Result            => 'HASH',
             DefaultServices   => 0,
         );
@@ -1264,8 +1264,8 @@ sub CustomerUserServiceMemberList {
         && $Param{DefaultServices}
         )
     {
-        my %TmpData = $Self->CustomerUserServiceMemberList(
-            CustomerUserLogin => '<DEFAULT>',
+        my %TmpData = $Self->ContactServiceMemberList(
+            ContactLogin => '<DEFAULT>',
             Result            => 'HASH',
             DefaultServices   => 0,
         );
@@ -1302,14 +1302,14 @@ sub CustomerUserServiceMemberList {
     return @Data;
 }
 
-=item CustomerUserServiceMemberAdd()
+=item ContactServiceMemberAdd()
 
 to add a member to a service
 
 if 'Active' is 0, the customer is removed from the service
 
-    $ServiceObject->CustomerUserServiceMemberAdd(
-        CustomerUserLogin => 'Test1',
+    $ServiceObject->ContactServiceMemberAdd(
+        ContactLogin => 'Test1',
         ServiceID         => 6,
         Active            => 1,
         UserID            => 123,
@@ -1317,11 +1317,11 @@ if 'Active' is 0, the customer is removed from the service
 
 =cut
 
-sub CustomerUserServiceMemberAdd {
+sub ContactServiceMemberAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CustomerUserLogin ServiceID UserID)) {
+    for my $Argument (qw(ContactLogin ServiceID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1334,7 +1334,7 @@ sub CustomerUserServiceMemberAdd {
     # delete existing relation
     return if !$Self->{DBObject}->Do(
         SQL  => 'DELETE FROM service_customer_user WHERE customer_user_login = ? AND service_id = ?',
-        Bind => [ \$Param{CustomerUserLogin}, \$Param{ServiceID} ],
+        Bind => [ \$Param{ContactLogin}, \$Param{ServiceID} ],
     );
 
     # return if relation is not active
@@ -1350,7 +1350,7 @@ sub CustomerUserServiceMemberAdd {
         SQL => 'INSERT INTO service_customer_user '
             . '(customer_user_login, service_id, create_time, create_by) '
             . 'VALUES (?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{CustomerUserLogin}, \$Param{ServiceID}, \$Param{UserID} ]
+        Bind => [ \$Param{ContactLogin}, \$Param{ServiceID}, \$Param{UserID} ]
     );
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(

@@ -173,7 +173,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'removed',
-    CustomerUser => 'external@example.com',
+    Contact => 'external@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

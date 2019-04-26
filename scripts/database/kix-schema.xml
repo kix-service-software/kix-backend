@@ -484,8 +484,8 @@
     <Column Name="responsible_user_id" Required="true" Type="INTEGER"/>
     <Column Name="ticket_priority_id" Required="true" Type="SMALLINT"/>
     <Column Name="ticket_state_id" Required="true" Type="SMALLINT"/>
-    <Column Name="customer_id" Required="false" Size="150" Type="VARCHAR"/>
-    <Column Name="customer_user_id" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="organisation_id" Required="false" Size="150" Type="VARCHAR"/>
+    <Column Name="contact_id" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="timeout" Required="true" Type="INTEGER"/>
     <Column Name="until_time" Required="true" Type="INTEGER"/>
     <Column Name="escalation_time" Required="true" Type="INTEGER"/>
@@ -504,11 +504,11 @@
     <Index Name="ticket_title">
         <IndexColumn Name="title"/>
     </Index>
-    <Index Name="ticket_customer_user_id">
-        <IndexColumn Name="customer_user_id"/>
+    <Index Name="ticket_contact_id">
+        <IndexColumn Name="contact_id"/>
     </Index>
-    <Index Name="ticket_customer_id">
-        <IndexColumn Name="customer_id"/>
+    <Index Name="ticket_organisation_id">
+        <IndexColumn Name="organisation_id"/>
     </Index>
     <Index Name="ticket_queue_id">
         <IndexColumn Name="queue_id"/>
@@ -1357,12 +1357,12 @@
 </Table>
 
 <!-- customer user -->
-<Table Name="customer_user">
+<Table Name="contact">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="login" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="email" Required="true" Size="255" Type="VARCHAR"/>
-    <Column Name="customer_id" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="customer_ids" Required="false" Size="10000" Type="VARCHAR"/>
+    <Column Name="primary_org_id" Required="true" Type="INTEGER"/>
+    <Column Name="org_ids" Required="true" Size="10000" Type="VARCHAR"/>
     <Column Name="pw" Required="false" Size="64" Type="VARCHAR"/>
     <Column Name="title" Required="false" Size="50" Type="VARCHAR"/>
     <Column Name="first_name" Required="true" Size="100" Type="VARCHAR"/>
@@ -1380,7 +1380,7 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="customer_user_login">
+    <Unique Name="contact_login">
         <UniqueColumn Name="login"/>
     </Unique>
     <ForeignKey ForeignTable="valid">
@@ -1392,19 +1392,23 @@
     </ForeignKey>
 </Table>
 
-<!-- customer preferences -->
-<Table Name="customer_preferences">
-    <Column Name="user_id" Required="true" Size="250" Type="VARCHAR"/>
+<!-- contact preferences -->
+<Table Name="contact_preferences">
+    <Column Name="contact_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="preferences_value" Required="false" Size="250" Type="VARCHAR"/>
-    <Index Name="customer_preferences_user_id">
-        <IndexColumn Name="user_id"/>
+    <Index Name="contact_preferences_contact_id">
+        <IndexColumn Name="contact_id"/>
     </Index>
+    <ForeignKey ForeignTable="contact">
+        <Reference Local="contact_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 
-<!-- customer company -->
-<Table Name="customer_company">
-    <Column Name="customer_id" Required="true" PrimaryKey="true" Size="150" Type="VARCHAR"/>
+<!-- organisation -->
+<Table Name="organisation">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="number" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="street" Required="false" Size="200" Type="VARCHAR"/>
     <Column Name="zip" Required="false" Size="200" Type="VARCHAR"/>
@@ -1417,7 +1421,10 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="customer_company_name">
+    <Unique Name="organisation_number">
+        <UniqueColumn Name="number"/>
+    </Unique>
+    <Unique Name="organisation_name">
         <UniqueColumn Name="name"/>
     </Unique>
 </Table>
@@ -2551,10 +2558,13 @@
     <Column Name="note"        Required="true" Type="VARCHAR" Size="2000"/>
     <Column Name="create_by"   Required="true" Type="INTEGER"/>
 </Table>
-<Table Name="kix_customer_company_prefs">
-    <Column Name="user_id" Required="true" Type="VARCHAR" Size="250"/>
+<Table Name="organisation_prefs">
+    <Column Name="org_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key"   Required="true"  Type="VARCHAR" Size="100"/>
     <Column Name="preferences_value" Required="false" Type="VARCHAR" Size="10000"/>
+    <ForeignKey ForeignTable="organisation">
+        <Reference Local="org_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="kix_dep_dynamic_field">
     <Column Name="id"               Required="true" Type="INTEGER" PrimaryKey="true"/>

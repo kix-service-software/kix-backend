@@ -475,32 +475,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerCompany::EventModulePost###110-UpdateTickets" Required="0" Valid="1">
-        <Description Translatable="1">Event module that updates tickets after an update of the Customer.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::CustomerCompany</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::CustomerCompany::Event::TicketUpdate</Item>
-                <Item Key="Event">CustomerCompanyUpdate</Item>
-                <Item Key="Transaction">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerUser::EventModulePost###120-UpdateTickets" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Event module that updates tickets after an update of the Contact.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::CustomerCompany</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::CustomerUser::Event::TicketUpdate</Item>
-                <Item Key="Event">CustomerUserUpdate</Item>
-                <Item Key="Transaction">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DynamicFieldFromCustomerUser::Mapping" Required="0" Valid="0">
+    <ConfigItem Name="DynamicFieldFromContact::Mapping" Required="0" Valid="0">
         <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
         <Description Translatable="1">Define a mapping between variables of the contact data (keys) and dynamic fields of a ticket (values). The purpose is to store contact data in ticket dynamic fields. The dynamic fields must be present in the system and should be enabled for AgentTicketFreeText, so that they can be set/updated manually by the agent. They mustn't be enabled for AgentTicketPhone, AgentTicketEmail and AgentTicketCustomer. If they were, they would have precedence over the automatically set values. To use this mapping, you have to also activate the next setting below.</Description>
         <Group>Ticket</Group>
@@ -511,14 +486,14 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###950-DynamicFieldFromCustomerUser" Required="0" Valid="0">
-        <Description Translatable="1">This event module stores attributes from CustomerUser as DynamicFields tickets. Please see the setting above for how to configure the mapping.</Description>
+    <ConfigItem Name="Ticket::EventModulePost###950-DynamicFieldFromContact" Required="0" Valid="0">
+        <Description Translatable="1">This event module stores attributes from Contact as DynamicFields tickets. Please see the setting above for how to configure the mapping.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::DynamicFieldFromCustomerUser</Item>
-                <Item Key="Event">(TicketCreate|TicketCustomerUpdate)</Item>
+                <Item Key="Module">Kernel::System::Ticket::Event::DynamicFieldFromContact</Item>
+                <Item Key="Event">(TicketCreate|TicketContactUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1927,13 +1902,13 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerTicket::Permission###2-CustomerUserIDCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to grant access if the CustomerUserID of the ticket matches the CustomerUserID of the customer.</Description>
+    <ConfigItem Name="CustomerTicket::Permission###2-ContactIDCheck" Required="0" Valid="1">
+        <Description Translatable="1">Module to grant access if the ContactID of the ticket matches the ContactID of the customer.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::Ticket::CustomerPermission::CustomerUserIDCheck</Item>
+                <Item Key="Module">Kernel::System::Ticket::CustomerPermission::ContactIDCheck</Item>
                 <Item Key="Required">0</Item>
                 <Item Key="Granted">1</Item>
             </Hash>
@@ -2006,7 +1981,7 @@
             <Hash>
                 <Item Key="CustomerID" Translatable="1">Customer ID</Item>
                 <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-                <Item Key="CustomerUserID" Translatable="1">Contact</Item>
+                <Item Key="ContactID" Translatable="1">Contact</Item>
                 <Item Key="Priority" Translatable="1">Priority</Item>
                 <Item Key="Queue" Translatable="1">Queue</Item>
                 <Item Key="SLA" Translatable="1">SLA</Item>
@@ -2144,7 +2119,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###ShownTickets" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###ShownTickets" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for the ShownTickets object in the customer preferences of the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -2169,7 +2144,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerPreferencesGroups###RefreshTime" Required="0" Valid="1">
+    <ConfigItem Name="ContactPreferencesGroups###RefreshTime" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for the RefreshTime object in the customer preferences of the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -2269,6 +2244,8 @@
                 <Item>TicketServiceUpdate</Item>
                 <Item>TicketSLAUpdate</Item>
                 <Item>TicketCustomerUpdate</Item>
+                <Item>TicketOrganisationUpdate</Item>
+                <Item>TicketContactUpdate</Item>
                 <Item>TicketPendingTimeUpdate</Item>
                 <Item>TicketLockUpdate</Item>
                 <Item>TicketArchiveFlagUpdate</Item>
@@ -2612,7 +2589,7 @@
         <Setting>
             <Hash>
                 <Item Key="User" Translatable="1">User</Item>
-                <Item Key="CustomerUser" Translatable="1">CustomerUser</Item>
+                <Item Key="Contact" Translatable="1">Contact</Item>
                 <Item Key="Queue" Translatable="1">Queue</Item>
                 <Item Key="Service" Translatable="1">Service</Item>
                 <Item Key="Type" Translatable="1">Type</Item>
@@ -2635,7 +2612,7 @@
         <Setting>
             <Hash>
                 <Item Key="User" Translatable="1">User</Item>
-                <Item Key="CustomerUser" Translatable="1">CustomerUser</Item>
+                <Item Key="Contact" Translatable="1">Contact</Item>
                 <Item Key="Queue" Translatable="1">Queue</Item>
                 <Item Key="Service" Translatable="1">Service</Item>
                 <Item Key="Type" Translatable="1">Type</Item>
@@ -2852,7 +2829,7 @@
                 <Item>X-KIX-Service</Item>
                 <Item>X-KIX-SLA</Item>
                 <Item>X-KIX-CustomerNo</Item>
-                <Item>X-KIX-CustomerUser</Item>
+                <Item>X-KIX-Contact</Item>
                 <Item>X-KIX-SenderType</Item>
                 <Item>X-KIX-ArticleType</Item>
                 <Item>X-KIX-FollowUp-Priority</Item>
@@ -3723,7 +3700,7 @@ Thanks for your help!
                 <Item Key="Callback"></Item>
                 <Item Key="AutoSearch"></Item>
                 <Item Key="AutoSelectOne"></Item>
-                <Item Key="CustomerBackends">CustomerUser1</Item>
+                <Item Key="CustomerBackends">Contact1</Item>
                 <Item Key="LinkType"></Item>
                 <Item Key="MaxResultCount">20</Item>
                 <Item Key="MaxResultDisplay">5</Item>
@@ -4331,7 +4308,7 @@ Thanks for your help!
                 <Item Key="NoActionWithoutSelection"></Item>
                 <Item Key="QueryDelay">1000</Item>
                 <Item Key="QueryMinLength">1</Item>
-                <Item Key="RestrictedOTRSObjects">CustomerUser</Item>
+                <Item Key="RestrictedOTRSObjects">Contact</Item>
                 <Item Key="RestrictedOTRSAttributes">UserLogin</Item>
                 <Item Key="RestrictedDBAttributes">customer_user_id</Item>
                 <Item Key="RestrictedMandatory">0</Item>

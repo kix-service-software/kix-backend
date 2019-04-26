@@ -58,10 +58,10 @@ my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
 my $UserID = $UserData{UserID};
 
 # create new customer user for current test
-my $CustomerUserLogin = $Helper->TestCustomerUserCreate();
+my $ContactLogin = $Helper->TestContactCreate();
 
-my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-    User => $CustomerUserLogin,
+my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    User => $ContactLogin,
 );
 
 # get ticket object
@@ -75,7 +75,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => 'example.com',
-    CustomerUser => $CustomerUserData{UserEmail},
+    Contact => $ContactData{UserEmail},
     OwnerID      => $UserID,
     UserID       => $UserID,
 );
@@ -102,7 +102,7 @@ my $ArticleID = $TicketObject->ArticleCreate(
     Channel        => 'note',
     CustomerVisible => 1,
     SenderType     => 'customer',
-    From           => $CustomerUserData{UserEmail},
+    From           => $ContactData{UserEmail},
     To             => $UserData{UserEmail},
     Subject        => 'some short description',
     Body           => 'the message text',

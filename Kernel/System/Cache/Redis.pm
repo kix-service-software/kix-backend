@@ -212,7 +212,7 @@ sub CleanUp {
             my %KeepTypeLookup;
             @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
 
-            $CacheIndex = $Self->{RedisObject}->get(
+            my $CacheIndex = $Self->{RedisObject}->get(
                 "Memcached::CachedObjects",
             );
 

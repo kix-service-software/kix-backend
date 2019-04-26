@@ -144,7 +144,7 @@ for my $Cert ( sort @CertList ) {
 
 # first stage
 my $TableName             = 'UT_' . $Random;
-my @UnitTestCustomerUsers = (
+my @UnitTestContacts = (
     {
         FirstName       => 'Hans',
         LastName        => 'Hansen',
@@ -262,55 +262,55 @@ my $SQL = "INSERT INTO $TableName
 my $Pwd = $MainObject->GenerateRandomString(
     Length => 8,
 );
-foreach my $CustomerUser (@UnitTestCustomerUsers) {
+foreach my $Contact (@UnitTestContacts) {
     my $Return = $DBObject->Do(
         SQL  => $SQL,
         Bind => [
-            \$CustomerUser->{Login}, \$CustomerUser->{Email}, \'unittest_customer_id',
+            \$Contact->{Login}, \$Contact->{Email}, \'unittest_customer_id',
             \$Pwd,
-            \'Mr', \$CustomerUser->{FirstName}, \$CustomerUser->{LastName}, \$CustomerUser->{Certifiacate}
+            \'Mr', \$Contact->{FirstName}, \$Contact->{LastName}, \$Contact->{Certifiacate}
         ],
     );
     $DBObject->Prepare(
         SQL  => "SELECT id, email from $TableName where login = ?",
-        Bind => [ \$CustomerUser->{Login} ],
+        Bind => [ \$Contact->{Login} ],
     );
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Self->Is(
             $Row[1],
-            $CustomerUser->{Email},
-            "CustomerUser $Row[0] with $CustomerUser->{CertificateType} added into CustomerUserTable ",
+            $Contact->{Email},
+            "Contact $Row[0] with $Contact->{CertificateType} added into ContactTable ",
         );
     }
 }
 
-# Add Table as CustomerUser Table in Config
+# Add Table as Contact Table in Config
 my $NewConfig;
 my $FileLocation;
 
 $ConfigObject->Set(
-    Key   => "Customer::AuthModule10",
-    Value => 'Kernel::System::CustomerAuth::DB',
+    Key   => "Contact::AuthModule10",
+    Value => 'Kernel::System::ContactAuth::DB',
 );
 $ConfigObject->Set(
-    Key   => "Customer::AuthModule::DB::Table10",
+    Key   => "Contact::AuthModule::DB::Table10",
     Value => $TableName,
 );
 $ConfigObject->Set(
-    Key   => "Customer::AuthModule::DB::CustomerKey10",
+    Key   => "Contact::AuthModule::DB::CustomerKey10",
     Value => 'login',
 );
 $ConfigObject->Set(
-    Key   => "Customer::AuthModule::DB::CustomerPassword10",
+    Key   => "Contact::AuthModule::DB::CustomerPassword10",
     Value => 'pw',
 );
 $ConfigObject->Set(
-    Key   => "Customer::AuthModule::DB::CryptType10",
+    Key   => "Contact::AuthModule::DB::CryptType10",
     Value => 'plain',
 );
-my %CustomerUserConfig = (
+my %ContactConfig = (
     Name   => 'Database Backend',
-    Module => 'Kernel::System::CustomerUser::DB',
+    Module => 'Kernel::System::Contact::DB',
     Params => {
         Table => $TableName,
     },
@@ -321,17 +321,17 @@ my %CustomerUserConfig = (
 
     # customer #
     CustomerID                         => 'customer_id',
-    CustomerUserListFields             => [ 'first_name', 'last_name', 'email' ],
-    CustomerUserSearchFields           => [ 'login', 'first_name', 'last_name', 'customer_id' ],
-    CustomerUserSearchPrefix           => '*',
-    CustomerUserSearchSuffix           => '*',
-    CustomerUserSearchListLimit        => 250,
-    CustomerUserPostMasterSearchFields => ['email'],
-    CustomerUserNameFields     => [ 'title', 'first_name', 'last_name' ],
-    CustomerUserEmailUniqCheck => 1,
+    ContactListFields             => [ 'first_name', 'last_name', 'email' ],
+    ContactSearchFields           => [ 'login', 'first_name', 'last_name', 'customer_id' ],
+    ContactSearchPrefix           => '*',
+    ContactSearchSuffix           => '*',
+    ContactSearchListLimit        => 250,
+    ContactPostMasterSearchFields => ['email'],
+    ContactNameFields     => [ 'title', 'first_name', 'last_name' ],
+    ContactEmailUniqCheck => 1,
 
     # show now own tickets in customer panel, CompanyTickets
-    CustomerUserExcludePrimaryCustomerID => 0,
+    ContactExcludePrimaryCustomerID => 0,
 
     # admin can't change customer preferences
     AdminSetPreferences => 0,
@@ -354,11 +354,11 @@ my %CustomerUserConfig = (
     ],
 );
 my $Return = $ConfigObject->Set(
-    Key   => "CustomerUser10",
-    Value => \%CustomerUserConfig,
+    Key   => "Contact10",
+    Value => \%ContactConfig,
 );
 
-my $AuthObject = $Kernel::OM->Get('Kernel::System::CustomerAuth');
+my $AuthObject = $Kernel::OM->Get('Kernel::System::ContactAuth');
 
 # login check
 $DBObject->Prepare(
@@ -378,7 +378,7 @@ for my $Customer ( sort keys %Customers ) {
     $Self->Is(
         $AuthResult,
         $Customer,
-        "CustomerUser $Customer login OK",
+        "Contact $Customer login OK",
     );
 }
 
@@ -394,17 +394,17 @@ $Self->Is(
     "NewCertificates not yet imported",
 );
 
-# get CustomerUser-List
-my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
-my %List               = $CustomerUserObject->CustomerSearch(
+# get Contact-List
+my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my %List               = $ContactObject->CustomerSearch(
     CustomerID => 'unittest_customer_id',
     Valid      => 1,
 );
 
 CUSTOMERUSER:
-for my $CustomerUser ( sort keys %List ) {
-    my %User = $CustomerUserObject->CustomerUserDataGet(
-        User => $CustomerUser,
+for my $Contact ( sort keys %List ) {
+    my %User = $ContactObject->ContactGet(
+        User => $Contact,
     );
     next CUSTOMERUSER if !$User{UserSMIMECertificate};
 

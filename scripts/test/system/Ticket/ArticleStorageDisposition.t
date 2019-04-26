@@ -410,7 +410,7 @@ for my $Backend (qw(DB FS)) {
         Priority     => '3 normal',
         State        => 'closed successful',
         CustomerNo   => 'unittest',
-        CustomerUser => 'customer@example.com',
+        Contact => 'customer@example.com',
         OwnerID      => 1,
         UserID       => 1,
     );

@@ -1359,142 +1359,6 @@ sub Header {
         }
     }
 
-    # run tool bar item modules
-    if ( $Self->{UserID} && $Self->{UserType} eq 'User' ) {
-        my $ToolBarModule = $ConfigObject->Get('Frontend::ToolBarModule');
-        if ( $Param{ShowToolbarItems} && ref $ToolBarModule eq 'HASH' ) {
-
-            $Self->Block(
-                Name => 'ToolBar',
-                Data => \%Param,
-            );
-
-            my %Modules;
-            my %Jobs = %{$ToolBarModule};
-
-            # get group object
-            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-            MODULE:
-            for my $Job ( sort keys %Jobs ) {
-
-                # load and run module
-                next MODULE if !$MainObject->Require( $Jobs{$Job}->{Module} );
-                my $Object = $Jobs{$Job}->{Module}->new(
-                    %{$Self},    # UserID etc.
-                );
-                next MODULE if !$Object;
-
-                my $ToolBarAccessOk;
-
-                # if group restriction for tool-bar is set, check user permission
-                if ( $Jobs{$Job}->{Group} ) {
-
-                    # remove white-spaces
-                    $Jobs{$Job}->{Group} =~ s{\s}{}xmsg;
-
-                    # get group configurations
-                    my @Items = split( ';', $Jobs{$Job}->{Group} );
-
-                    ITEM:
-                    for my $Item (@Items) {
-
-                        # split values into permission and group
-                        my ( $Permission, $GroupName ) = split( ':', $Item );
-
-                        # log an error if not valid setting
-                        if ( !$Permission || !$GroupName ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                                Priority => 'error',
-                                Message  => "Invalid config for ToolBarModule $Job - Key Group: '$Item'! "
-                                    . "Need something like 'Permission:Group;'",
-                            );
-                        }
-
-                        # get groups for current user
-                        my %Groups = $GroupObject->PermissionUserGet(
-                            UserID => $Self->{UserID},
-                            Type   => $Permission,
-                        );
-
-                        # next job if user have not groups
-                        next ITEM if !%Groups;
-
-                        # check user belongs to the correct group
-                        my %GroupsReverse = reverse %Groups;
-                        next ITEM if !$GroupsReverse{$GroupName};
-
-                        $ToolBarAccessOk = 1;
-
-                        last ITEM;
-                    }
-
-                    # go to the next module if not permissions
-                    # for the current one
-                    next MODULE if !$ToolBarAccessOk;
-                }
-
-                %Modules = ( $Object->Run( %Param, Config => $Jobs{$Job} ), %Modules );
-            }
-
-            # show tool bar items
-            MODULE:
-            for my $Key ( sort keys %Modules ) {
-                next MODULE if !%{ $Modules{$Key} };
-                $Self->Block(
-                    Name => $Modules{$Key}->{Block},
-                    Data => {
-                        %{ $Modules{$Key} },
-                        AccessKeyReference => $Modules{$Key}->{AccessKey}
-                        ? " ($Modules{$Key}->{AccessKey})"
-                        : '',
-                    },
-                );
-            }
-            
-            # set toolbar position from UserPreferences
-            my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->GetPreferences(
-                UserID => $Self->{UserID},
-            );
-            # enforce default if empty
-            if (!$UserPreferences{UserToolbarPosition}) {
-                $UserPreferences{UserToolbarPosition} = 'ToolbarRight';
-                my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->SetPreferences(
-                    Key    => 'UserToolbarPosition',
-                    Value  => $UserPreferences{UserToolbarPosition},
-                    UserID => $Self->{UserID},
-                );
-            }
-            $Param{UserToolbarPosition} = $UserPreferences{UserToolbarPosition};
-        }
-
-        # show logged in notice
-        if ( $Param{ShowPrefLink} ) {
-            $Self->Block(
-                Name => 'Login',
-                Data => \%Param,
-            );
-        }
-        else {
-            $Self->Block(
-                Name => 'LoginWithoutLink',
-                Data => \%Param,
-            );
-        }
-
-        # show logout button (if registered)
-        if (
-            $Param{ShowLogoutButton}
-            && $ConfigObject->Get('Frontend::Module')->{Logout}
-            )
-        {
-            $Self->Block(
-                Name => 'Logout',
-                Data => \%Param,
-            );
-        }
-    }
-
     # create & return output
     $Output .= $Self->Output(
         TemplateFile => "Header$Type",
@@ -2340,7 +2204,7 @@ sub NoPermission {
 check if access to a frontend module exists
 
     my $Access = $LayoutObject->Permission(
-        Action => 'AdminCustomerUser',
+        Action => 'AdminContact',
         Type   => 'rw', # ro|rw possible
     );
 
@@ -3540,7 +3404,7 @@ sub CustomerLogin {
         # show 2 factor password input if we have at least one backend enabled
         COUNT:
         for my $Count ( '', 1 .. 10 ) {
-            next COUNT if !$ConfigObject->Get("Customer::AuthTwoFactorModule$Count");
+            next COUNT if !$ConfigObject->Get("Contact::AuthTwoFactorModule$Count");
 
             $Self->Block(
                 Name => 'AuthTwoFactor',
@@ -3552,8 +3416,8 @@ sub CustomerLogin {
         # get lost password output
         if (
             $ConfigObject->Get('CustomerPanelLostPassword')
-            && $ConfigObject->Get('Customer::AuthModule') eq
-            'Kernel::System::CustomerAuth::DB'
+            && $ConfigObject->Get('Contact::AuthModule') eq
+            'Kernel::System::ContactAuth::DB'
             )
         {
             $Self->Block(
@@ -3569,8 +3433,8 @@ sub CustomerLogin {
         # get create account output
         if (
             $ConfigObject->Get('CustomerPanelCreateAccount')
-            && $ConfigObject->Get('Customer::AuthModule') eq
-            'Kernel::System::CustomerAuth::DB'
+            && $ConfigObject->Get('Contact::AuthModule') eq
+            'Kernel::System::ContactAuth::DB'
             )
 
         {

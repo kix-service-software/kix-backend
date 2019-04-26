@@ -6,25 +6,25 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ImportExport::ObjectBackend::Service2CustomerUser;
+package Kernel::System::ImportExport::ObjectBackend::Service2Contact;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
     'Kernel::System::Service',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::ImportExport',
     'Kernel::System::Log',
 );
 
 =head1 NAME
 
-Kernel::System::ImportExport::ObjectBackend::CustomerUser - import/export backend for CustomerUser
+Kernel::System::ImportExport::ObjectBackend::Contact - import/export backend for Contact
 
 =head1 SYNOPSIS
 
-All functions to import and export CustomerUser entries
+All functions to import and export Contact entries
 
 =over 4
 
@@ -38,7 +38,7 @@ create an object
     use Kernel::System::DB;
     use Kernel::System::Log;
     use Kernel::System::Main;
-    use Kernel::System::ImportExport::ObjectBackend::CustomerUser;
+    use Kernel::System::ImportExport::ObjectBackend::Contact;
 
     my $ConfigObject = Kernel::Config->new();
     my $LogObject = Kernel::System::Log->new(
@@ -53,7 +53,7 @@ create an object
         LogObject    => $LogObject,
         MainObject   => $MainObject,
     );
-    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::CustomerUser->new(
+    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::Contact->new(
         ConfigObject       => $ConfigObject,
         LogObject          => $LogObject,
         DBObject           => $DBObject,
@@ -131,7 +131,7 @@ sub MappingObjectAttributesGet {
 
     my $ElementList = [
         {
-            Key   => 'CustomerUserLogin',
+            Key   => 'ContactLogin',
             # rkaiser - T#2017020290001194 - changed customer user to contact
             Value => 'Contact login',
         },
@@ -201,7 +201,7 @@ sub SearchAttributesGet {
 
     my $AttributeList = [
         {
-            Key   => 'CustomerUserLogin',
+            Key   => 'ContactLogin',
             # rkaiser - T#2017020290001194 - changed customer user to contact
             Name  => 'Contact login',
             Input => {
@@ -315,7 +315,7 @@ sub ExportDataGet {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message =>
-                "Service2CustomerUser: search data is not a hash ref - ignoring search limitation.",
+                "Service2Contact: search data is not a hash ref - ignoring search limitation.",
         );
     }
 
@@ -324,11 +324,11 @@ sub ExportDataGet {
     }
     if (
         $SearchData
-        && $SearchData->{CustomerUserLogin}
-        && $SearchData->{CustomerUserLogin} =~ /\*/
+        && $SearchData->{ContactLogin}
+        && $SearchData->{ContactLogin} =~ /\*/
         )
     {
-        $SearchData->{CustomerUserLogin} =~ s/\*/.*/g;
+        $SearchData->{ContactLogin} =~ s/\*/.*/g;
     }
 
     #search all services...
@@ -353,7 +353,7 @@ sub ExportDataGet {
         }
 
         #search all customers set for current service...
-        my %CustomerServiceHash = $Kernel::OM->Get('Kernel::System::Service')->CustomerUserServiceMemberList(
+        my %CustomerServiceHash = $Kernel::OM->Get('Kernel::System::Service')->ContactServiceMemberList(
             ServiceID       => $ServiceID,
             Result          => 'HASH',
             DefaultServices => 0,
@@ -362,10 +362,10 @@ sub ExportDataGet {
         for my $CurrentCUL ( keys(%CustomerServiceHash) ) {
             my @CurrRow = qw{};
 
-            #check for CustomerUserLogin export filter...
-            if ( $SearchData && $SearchData->{CustomerUserLogin} ) {
-                if ( $SearchData->{CustomerUserLogin} =~ /\*/ ) {
-                    next if ( $CurrentCUL !~ /$SearchData->{CustomerUserLogin}/ );
+            #check for ContactLogin export filter...
+            if ( $SearchData && $SearchData->{ContactLogin} ) {
+                if ( $SearchData->{ContactLogin} =~ /\*/ ) {
+                    next if ( $CurrentCUL !~ /$SearchData->{ContactLogin}/ );
                 }
                 else {
                     next if ( $CurrentCUL ne $SearchData->{ServiceName} );
@@ -375,7 +375,7 @@ sub ExportDataGet {
             for my $MappingObject (@MappingObjectList) {
                 my $Key = $MappingObject->{Key};
 
-                if ( $MappingObject->{Key} && $MappingObject->{Key} eq 'CustomerUserLogin' ) {
+                if ( $MappingObject->{Key} && $MappingObject->{Key} eq 'ContactLogin' ) {
                     push( @CurrRow, $CurrentCUL );
                 }
                 elsif ( $MappingObject->{Key} && $MappingObject->{Key} eq 'ServiceName' ) {
@@ -472,7 +472,7 @@ sub ImportDataSave {
     my %Identifier;
     my $Counter         = 0;
     my %ImportData      = qw{};
-    my $CustomerUserKey = "";
+    my $ContactKey = "";
 
     #--------------------------------------------------------------------------
     #BUILD MAPPING TABLE...
@@ -521,7 +521,7 @@ sub ImportDataSave {
             #service name does not exist or does not fit to ServiceID - drop line...
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Service2CustomerUser: service <"
+                Message  => "Service2Contact: service <"
                     . $ImportData{ServiceName}
                     . "> does not exist or does not match given ServiceID <"
                     . ( $ImportData{ServiceID} || '' )
@@ -532,21 +532,21 @@ sub ImportDataSave {
     }
 
     #(2) search customer user...
-    my %CustomerUserData;
-    if ( $ImportData{CustomerUserLogin} && $ImportData{CustomerUserLogin} !~ /DEFAULT/ ) {
-        %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $ImportData{CustomerUserLogin}
+    my %ContactData;
+    if ( $ImportData{ContactLogin} && $ImportData{ContactLogin} !~ /DEFAULT/ ) {
+        %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            User => $ImportData{ContactLogin}
         );
-        if ( !%CustomerUserData ) {
+        if ( !%ContactData ) {
 
             #customer user login does not exist - drop line...
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 # rkaiser - T#2017020290001194 - changed customer user to contact
-                Message  => "Service2CustomerUser: contact login <"
-                    . "$ImportData{CustomerUserLogin}> does not exist.",
+                Message  => "Service2Contact: contact login <"
+                    . "$ImportData{ContactLogin}> does not exist.",
             );
-            return (0, 'Failed');   # if got no CustomerUserLogin, then exit
+            return (0, 'Failed');   # if got no ContactLogin, then exit
         }
     }
 
@@ -562,10 +562,10 @@ sub ImportDataSave {
     my $Result     = 0;
     my $ReturnCode = "";    # Created | Changed | Failed
 
-    if ( $ImportData{CustomerUserLogin} !~ /DEFAULT/ ) {
-        if (%CustomerUserData) {
-            $Result = $Kernel::OM->Get('Kernel::System::Service')->CustomerUserServiceMemberAdd(
-                CustomerUserLogin => $ImportData{CustomerUserLogin},
+    if ( $ImportData{ContactLogin} !~ /DEFAULT/ ) {
+        if (%ContactData) {
+            $Result = $Kernel::OM->Get('Kernel::System::Service')->ContactServiceMemberAdd(
+                ContactLogin => $ImportData{ContactLogin},
                 ServiceID         => $ImportData{ServiceID},
                 Active            => $ImportData{AssignmentActive} || 0,
                 UserID            => $Param{UserID},
@@ -573,8 +573,8 @@ sub ImportDataSave {
             if ( !$Result && $ImportData{AssignmentActive}) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => 'ImportDataSave: adding Service2CustomerUser <'
-                        . $ImportData{CustomerUserLogin}
+                    Message  => 'ImportDataSave: adding Service2Contact <'
+                        . $ImportData{ContactLogin}
                         . "> failed (line $Param{Counter}).",
                 );
             }
@@ -585,8 +585,8 @@ sub ImportDataSave {
         }
     }
     else {
-        $Result = $Kernel::OM->Get('Kernel::System::Service')->CustomerUserServiceMemberAdd(
-            CustomerUserLogin => '<DEFAULT>',
+        $Result = $Kernel::OM->Get('Kernel::System::Service')->ContactServiceMemberAdd(
+            ContactLogin => '<DEFAULT>',
             ServiceID         => $ImportData{ServiceID},
             Active            => $ImportData{AssignmentActive} || 0,
             UserID            => $Param{UserID},
@@ -594,7 +594,7 @@ sub ImportDataSave {
         if ( !$Result && $ImportData{AssignmentActive} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => 'ImportDataSave: adding <DEFAULT> Service2CustomerUser <'
+                Message  => 'ImportDataSave: adding <DEFAULT> Service2Contact <'
                     . "> failed (line $Param{Counter}).",
             );
         }

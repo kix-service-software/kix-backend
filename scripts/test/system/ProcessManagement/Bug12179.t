@@ -92,7 +92,7 @@ my %Process = (
                 Body              => 'Ticket Copy',
                 ContentType       => 'text/plain; charset=UTF8',
                 CustomerID        => '',
-                CustomerUser      => '',
+                Contact      => '',
                 $DynamicFieldName => "<OTRS_TICKET_$DynamicFieldName>",
                 HistoryComment    => 'Created new ticket copy',
                 HistoryType       => 'AddNote',
@@ -178,7 +178,7 @@ my %TicketTemplate = (
     Priority     => '3 normal',
     State        => 'open',
     CustomerID   => "123465$RandomID",
-    CustomerUser => 'customer@example.com',
+    Contact => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

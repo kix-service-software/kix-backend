@@ -25,11 +25,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::ImportExport::ObjectBackend::CustomerUser - import/export backend for CustomerUser
+Kernel::System::ImportExport::ObjectBackend::Contact - import/export backend for Contact
 
 =head1 SYNOPSIS
 
-All functions to import and export CustomerUser entries
+All functions to import and export Contact entries
 
 =over 4
 
@@ -43,7 +43,7 @@ create an object
     use Kernel::System::DB;
     use Kernel::System::Log;
     use Kernel::System::Main;
-    use Kernel::System::ImportExport::ObjectBackend::CustomerUser;
+    use Kernel::System::ImportExport::ObjectBackend::Contact;
 
     my $ConfigObject = Kernel::Config->new();
     my $LogObject = Kernel::System::Log->new(
@@ -58,7 +58,7 @@ create an object
         LogObject    => $LogObject,
         MainObject   => $MainObject,
     );
-    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::CustomerUser->new(
+    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::Contact->new(
         ConfigObject       => $ConfigObject,
         LogObject          => $LogObject,
         DBObject           => $DBObject,

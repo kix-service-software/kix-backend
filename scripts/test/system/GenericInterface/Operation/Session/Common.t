@@ -84,9 +84,9 @@ my $UserID       = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
 );
 
 # set customer user details
-my $CustomerUserLogin    = $Helper->TestCustomerUserCreate();
-my $CustomerUserPassword = $CustomerUserLogin;
-my $CustomerUserID       = $CustomerUserLogin;
+my $ContactLogin    = $Helper->TestContactCreate();
+my $ContactPassword = $ContactLogin;
+my $ContactID       = $ContactLogin;
 
 # Tests for CreateSessionID
 my @Tests = (
@@ -103,9 +103,9 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name => 'CustomerUserLogin No Password',
+        Name => 'ContactLogin No Password',
         Data => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
         },
         Success => 0,
     },
@@ -125,9 +125,9 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name => 'CustomerUserLogin Invalid Password',
+        Name => 'ContactLogin Invalid Password',
         Data => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
             Password          => $RandomID,
         },
         Success => 0,
@@ -141,10 +141,10 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name => 'Invalid CustomerUserLogin Correct Password',
+        Name => 'Invalid ContactLogin Correct Password',
         Data => {
-            CustomerUserLogin => $RandomID,
-            Password          => $CustomerUserPassword,
+            ContactLogin => $RandomID,
+            Password          => $ContactPassword,
         },
         Success => 0,
     },
@@ -157,10 +157,10 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name => 'Correct CustomerUserLogin and Password',
+        Name => 'Correct ContactLogin and Password',
         Data => {
-            CustomerUserLogin => $CustomerUserLogin,
-            Password          => $CustomerUserPassword,
+            ContactLogin => $ContactLogin,
+            Password          => $ContactPassword,
         },
         Success => 1,
     },

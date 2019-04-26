@@ -19,8 +19,8 @@ use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
-    'Kernel::System::CustomerCompany',
+    'Kernel::System::Contact',
+    'Kernel::System::Organisation',
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
@@ -64,8 +64,8 @@ sub Configure {
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-customer-companies',
-        Description => "Specify how many customer companies should be generated.",
+        Name        => 'generate-organisations',
+        Description => "Specify how many organisations should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
@@ -156,8 +156,8 @@ sub Run {
     }
 
     # customer companies
-    if ( $Self->GetOption('generate-customer-companies') ) {
-        CompanyCreate( $Self->GetOption('generate-customer-companies') );
+    if ( $Self->GetOption('generate-organisations') ) {
+        OrganisationCreate( $Self->GetOption('generate-organisations') );
     }
 
     my $Counter = 1;
@@ -174,7 +174,7 @@ sub Run {
             Priority     => '3 normal',
             State        => 'new',
             CustomerNo   => int( rand(1000) ),
-            CustomerUser => RandomAddress(),
+            Contact => RandomAddress(),
             OwnerID      => $UserIDs[ int( rand($#UserIDs) ) ],
             UserID       => $UserIDs[ int( rand($#UserIDs) ) ],
             );
@@ -502,8 +502,8 @@ sub CustomerCreate {
 
     for ( 1 .. $Count ) {
         my $Name      = 'fill-up-user' . int( rand(100_000_000) );
-        my $UserLogin = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-            Source         => 'CustomerUser',            # CustomerUser source config
+        my $UserLogin = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            Source         => 'Contact',            # Contact source config
             UserFirstname  => $Name,
             UserLastname   => $Name,
             UserCustomerID => $Name,
@@ -512,31 +512,30 @@ sub CustomerCreate {
             ValidID        => 1,
             UserID         => 1,
         );
-        print "CustomerUser '$Name' created.\n";
+        print "Contact '$Name' created.\n";
     }
 }
 
-sub CompanyCreate {
+sub OrganisationCreate {
     my $Count = shift || return;
 
     for ( 1 .. $Count ) {
 
         my $Name       = 'fill-up-company' . int( rand(100_000_000) );
-        my $CustomerID = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyAdd(
-            Source                 => 'CustomerCompany',          # CustomerCompany source config
-            CustomerID             => $Name . '_CustomerID',
-            CustomerCompanyName    => $Name,
-            CustomerCompanyStreet  => '5201 Blue Lagoon Drive',
-            CustomerCompanyZIP     => '33126',
-            CustomerCompanyCity    => 'Miami',
-            CustomerCompanyCountry => 'USA',
-            CustomerCompanyURL     => 'http://www.example.org',
-            CustomerCompanyComment => 'some comment',
-            ValidID                => 1,
-            UserID                 => 1,
+        my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+            Number   => $Name . '_CustomerID',
+            Name     => $Name,
+            Street   => '5201 Blue Lagoon Drive',
+            Zip      => '33126',
+            City     => 'Miami',
+            Country  => 'USA',
+            Url      => 'http://www.example.org',
+            Comment  => 'some comment',
+            ValidID  => 1,
+            UserID   => 1,
         );
 
-        print "CustomerCompany '$Name' created.\n";
+        print "Organisation '$Name' created.\n";
     }
 }
 

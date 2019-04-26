@@ -88,7 +88,7 @@ sub new {
         Body                    => 'SCALAR',
         TimeUnit                => 'SCALAR',
         CustomerID              => 'SCALAR',
-        CustomerUserLogin       => 'SCALAR',
+        ContactLogin       => 'SCALAR',
         Agent                   => 'SCALAR',
         StateIDs                => 'ARRAY',
         StateTypeIDs            => 'ARRAY',
@@ -102,7 +102,7 @@ sub new {
         SLAIDs                  => 'ARRAY',
         NewTitle                => 'SCALAR',
         NewCustomerID           => 'SCALAR',
-        NewCustomerUserLogin    => 'SCALAR',
+        NewContactLogin    => 'SCALAR',
         NewStateID              => 'SCALAR',
         NewQueueID              => 'SCALAR',
         NewPriorityID           => 'SCALAR',
@@ -1108,24 +1108,24 @@ sub _JobRunTicket {
     }
 
     # set customer id and customer user
-    if ( $Param{Config}->{New}->{CustomerID} || $Param{Config}->{New}->{CustomerUserLogin} ) {
+    if ( $Param{Config}->{New}->{CustomerID} || $Param{Config}->{New}->{ContactLogin} ) {
         if ( $Param{Config}->{New}->{CustomerID} ) {
             if ( $Self->{NoticeSTDOUT} ) {
                 print
                     "  - set customer id of Ticket $Ticket to '$Param{Config}->{New}->{CustomerID}'\n";
             }
         }
-        if ( $Param{Config}->{New}->{CustomerUserLogin} ) {
+        if ( $Param{Config}->{New}->{ContactLogin} ) {
             if ( $Self->{NoticeSTDOUT} ) {
                 print
                     # rkaiser - T#2017020290001194 - changed customer user to contact
-                    "  - set contact id of Ticket $Ticket to '$Param{Config}->{New}->{CustomerUserLogin}'\n";
+                    "  - set contact id of Ticket $Ticket to '$Param{Config}->{New}->{ContactLogin}'\n";
             }
         }
         $TicketObject->TicketCustomerSet(
             TicketID => $Param{TicketID},
             No       => $Param{Config}->{New}->{CustomerID} || '',
-            User     => $Param{Config}->{New}->{CustomerUserLogin} || '',
+            User     => $Param{Config}->{New}->{ContactLogin} || '',
             UserID   => $Param{UserID},
         );
     }

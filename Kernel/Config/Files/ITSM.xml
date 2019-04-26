@@ -147,27 +147,27 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMCIAttributeCollection::CompanyBackendMapping" Required="1" Valid="1">
-        <Description Translatable="1">Defines information shown for CIACCustomerCompany (CustomerCompany before ITSM 3.1.7) attributes.</Description>
+    <ConfigItem Name="ITSMCIAttributeCollection::OrganisationBackendMapping" Required="1" Valid="1">
+        <Description Translatable="1">Defines information shown for Organisation attributes.</Description>
         <Group>ITSM</Group>
         <SubGroup>CIACCustomerCompany</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="1000">CustomerCompanyName</Item>
-                <Item Key="2000">CustomerCompanyStreet</Item>
-                <Item Key="3000">CustomerCompanyZIP</Item>
-                <Item Key="3001">CustomerCompanyCity</Item>
+                <Item Key="1000">Name</Item>
+                <Item Key="2000">Street</Item>
+                <Item Key="3000">Zip</Item>
+                <Item Key="3001">City</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMCIAttributeCollection::CustomerCompany::Content" Required="1" Valid="1">
-        <Description Translatable="1">Defines information imported/exported as CIACCustomerCompany (CustomerCompany before ITSM 3.1.7) attribute.</Description>
+    <ConfigItem Name="ITSMCIAttributeCollection::Organisation::Content" Required="1" Valid="1">
+        <Description Translatable="1">Defines information imported/exported as Organisation attribute.</Description>
         <Group>ITSM</Group>
         <SubGroup>CIACCustomerCompany</SubGroup>
         <Setting>
-            <Option SelectedID="CustomerID">
-                <Item Key="CustomerID">CustomerID</Item>
-                <Item Key="CustomerCompanyName">CustomerCompanyName</Item>
+            <Option SelectedID="Number">
+                <Item Key="Number">CustomerNumber</Item>
+                <Item Key="Name">Name</Item>
             </Option>
         </Setting>
     </ConfigItem>

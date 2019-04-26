@@ -38,9 +38,11 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
+my $RoleRandom = 'testrole' . $Helper->GetRandomID();
+
 # create role
-my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleAdd(
-    Name    => 'testrole',
+my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
+    Name    => $RoleRandom,
     ValidID => 1,
     UserID  => 1,
 );
@@ -77,7 +79,7 @@ $Self->False(
 my $Result = $ValidatorObject->Validate(
     Attribute => 'Role',
     Data      => {
-        'Role' => 'testrole',
+        'Role' => $RoleRandom,
     }
 );
 

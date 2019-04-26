@@ -33,7 +33,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465',
-    CustomerUser => 'customerOne@example.com',
+    Contact => 'customerOne@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -91,7 +91,7 @@ my $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
-my $TestCustomerUserLogin = $HelperObject->TestCustomerUserCreate();
+my $TestContactLogin = $HelperObject->TestContactCreate();
 
 # Cleanup and set ACLs.
 my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -112,15 +112,15 @@ $ConfigObject->Set(
             },
             StopAfterMatch => 1,
         },
-        UnitTestCustomerUser => {
+        UnitTestContact => {
             Possible => {
                 Ticket => {
                     Queue => [ "Queue2$RandomID", ],
                 },
             },
             Properties => {
-                CustomerUser => {
-                    UserLogin => [ $TestCustomerUserLogin, ],
+                Contact => {
+                    UserLogin => [ $TestContactLogin, ],
                 },
             },
             StopAfterMatch => 1,
@@ -135,7 +135,7 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name   => 'Missing UserID and CustomerUserID',
+        Name   => 'Missing UserID and ContactID',
         Config => {
             Type => 'create',
         },
@@ -187,28 +187,28 @@ my @Tests = (
 
     },
     {
-        Name   => 'Correct With Type and CustomerUserID',
+        Name   => 'Correct With Type and ContactID',
         Config => {
             Type           => 'create',
-            CustomerUserID => $RandomID,
+            ContactID => $RandomID,
         },
         Success         => 1,
         ExpectedResults => [ '1', $QueueID1, $QueueID2, ],
     },
     {
-        Name   => 'Correct With QueueID and CustomerUserID',
+        Name   => 'Correct With QueueID and ContactID',
         Config => {
             QueueID        => 1,
-            CustomerUserID => $RandomID,
+            ContactID => $RandomID,
         },
         Success         => 1,
         ExpectedResults => [ '1', $QueueID1, $QueueID2, ],
     },
     {
-        Name   => 'Correct With TicketID and CustomerUserID',
+        Name   => 'Correct With TicketID and ContactID',
         Config => {
             TicketID       => 1,
-            CustomerUserID => $RandomID,
+            ContactID => $RandomID,
         },
         Success         => 1,
         ExpectedResults => [ '1', $QueueID1, $QueueID2, ],
@@ -217,7 +217,7 @@ my @Tests = (
         Name   => 'Correct With TicketID UserID and ACLs',
         Config => {
             TicketID       => 1,
-            CustomerUserID => $TestCustomerUserLogin,
+            ContactID => $TestContactLogin,
         },
         Success            => 1,
         ExpectedResults    => [ $QueueID2, ],

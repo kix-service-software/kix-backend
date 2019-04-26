@@ -1,0 +1,123 @@
+# --
+# Kernel/API/Operation/Organisation/OrganisationSearch.pm - API Organisation Search operation backend
+# based upon Kernel/API/Operation/Ticket/TicketSearch.pm
+# original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+package Kernel::API::Operation::V1::Organisation::OrganisationSearch;
+
+use strict;
+use warnings;
+
+use Kernel::System::VariableCheck qw( :all );
+
+use base qw(
+    Kernel::API::Operation::V1::Common
+);
+
+our $ObjectManagerDisabled = 1;
+
+=head1 NAME
+
+Kernel::API::Operation::Organisation::OrganisationSearch - API Organisation Search Operation backend
+
+=head1 PUBLIC INTERFACE
+
+=over 4
+
+=cut
+
+=item new()
+
+usually, you want to create an instance of this
+by using Kernel::API::Operation->new();
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    my $Self = {};
+    bless( $Self, $Type );
+
+    # check needed objects
+    for my $Needed (qw(DebuggerObject WebserviceID)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
+        }
+
+        $Self->{$Needed} = $Param{$Needed};
+    }
+
+    return $Self;
+}
+
+=item Run()
+
+perform OrganisationSearch Operation. This will return a Organisation list.
+
+    my $Result = $OperationObject->Run(
+        Data => {
+        }
+    );
+
+    $Result = {
+        Success      => 1,                                # 0 or 1
+        Message => '',                               # In case of an error
+        Data         => {
+            Organisation => [
+                {
+                },
+                {                    
+                }
+            ],
+        },
+    };
+
+=cut
+
+sub Run {
+    my ( $Self, %Param ) = @_;
+
+    # perform Organisation search
+    my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+        Valid  => 0,
+    );
+
+    if (IsHashRefWithData(\%OrganisationSearch)) {
+        
+        # get already prepared Organisation data from OrganisationGet operation
+        my $OrganisationGetResult = $Self->ExecOperation(
+            OperationType => 'V1::Organisation::OrganisationGet',
+            Data          => {
+                OrganisationID => join(',', sort keys %OrganisationSearch),
+            }
+        );
+        if ( !IsHashRefWithData($OrganisationGetResult) || !$OrganisationGetResult->{Success} ) {
+            return $OrganisationGetResult;
+        }
+
+        my @ResultList = IsArrayRefWithData($OrganisationGetResult->{Data}->{Organisation}) ? @{$OrganisationGetResult->{Data}->{Organisation}} : ( $OrganisationGetResult->{Data}->{Organisation} );
+        
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                Organisation => \@ResultList,
+            )
+        }
+    }
+
+    # return result
+    return $Self->_Success(
+        Organisation => [],
+    );
+}
+
+1;

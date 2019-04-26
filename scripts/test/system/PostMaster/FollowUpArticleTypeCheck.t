@@ -46,7 +46,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'open',
     CustomerNo   => '123465',
-    CustomerUser => 'external@example.com',
+    Contact => 'external@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -333,19 +333,19 @@ for my $Test (@Tests) {
 }
 
 # Now add the customer to the customer database and run the tests again.
-my $TestCustomerLogin  = $Helper->TestCustomerUserCreate();
-my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
-my %CustomerData       = $CustomerUserObject->CustomerUserDataGet(
+my $TestCustomerLogin  = $Helper->TestContactCreate();
+my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my %CustomerData       = $ContactObject->ContactGet(
     User => $TestCustomerLogin,
 );
-$CustomerUserObject->CustomerUserUpdate(
+$ContactObject->ContactUpdate(
     %CustomerData,
-    Source    => 'CustomerUser',       # CustomerUser source config
+    Source    => 'Contact',       # Contact source config
     ID        => $TestCustomerLogin,
     UserEmail => $CustomerAddress,
     UserID    => 1,
 );
-%CustomerData = $CustomerUserObject->CustomerUserDataGet(
+%CustomerData = $ContactObject->ContactGet(
     User => $TestCustomerLogin,
 );
 $TicketObject->TicketCustomerSet(

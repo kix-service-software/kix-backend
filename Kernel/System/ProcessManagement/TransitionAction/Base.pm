@@ -74,7 +74,7 @@ sub ReplaceExtended {
     # ChannelID, ServiceID, FromRealname, From, Changed, MessageID, State,
     # References, TypeID, Subject, ContentType, SenderType, QueueID, Title,
     # Responsible, LockID, Age, Owner, TicketID, Priority, Created, Lock, Queue,
-    # CustomerUserID, CreatedBy, StateType, OwnerID, Service, ArticleID, Cc,
+    # ContactID, CreatedBy, StateType, OwnerID, Service, ArticleID, Cc,
     # CustomerID, StateID, IncomingTime, Type, RealTillTimeNotUsed, EscalationTime, SLAID, Charset,
     # Idea: Code from sub _Replace
 

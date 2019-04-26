@@ -48,7 +48,7 @@ $Self->Is(
 # create ConfigItem object
 my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
 
-my $TestCustomerUserLogin = $HelperObject->TestCustomerUserCreate();
+my $TestContactLogin = $HelperObject->TestContactCreate();
 
 # create webservice object
 my $WebserviceObject = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice');
@@ -826,7 +826,7 @@ my @Tests = (
                         },
                     ],
                     WarrantyExpirationDate => '1977-12-12',
-                    Owner                  => $TestCustomerUserLogin . $RandomID,
+                    Owner                  => $TestContactLogin . $RandomID,
                 },
             },
         },
@@ -864,7 +864,7 @@ my @Tests = (
                         },
                     ],
                     WarrantyExpirationDate => '1977-12-12',
-                    Owner                  => $TestCustomerUserLogin,
+                    Owner                  => $TestContactLogin,
                     Ram                    => [
                         1,
                         2,
@@ -915,7 +915,7 @@ my @Tests = (
                         },
                     ],
                     WarrantyExpirationDate => '1977-12-12',
-                    Owner                  => $TestCustomerUserLogin,
+                    Owner                  => $TestContactLogin,
                     Ram                    => [
                         4000,
                         4000,
@@ -958,7 +958,7 @@ my @Tests = (
                         },
                     ],
                     WarrantyExpirationDate => '1977-12-12',
-                    Owner                  => $TestCustomerUserLogin,
+                    Owner                  => $TestContactLogin,
                     Ram                    => [
                         4000,
                         4000,
@@ -1005,7 +1005,7 @@ my @Tests = (
                         },
                     ],
                     WarrantyExpirationDate => '1977-12-12',
-                    Owner                  => $TestCustomerUserLogin,
+                    Owner                  => $TestContactLogin,
                     Ram                    => [
                         4000,
                         4000,
@@ -1052,7 +1052,7 @@ my @Tests = (
                         },
                     ],
                     WarrantyExpirationDate => '1977-12-12',
-                    Owner                  => $TestCustomerUserLogin,
+                    Owner                  => $TestContactLogin,
                     Ram                    => [
                         4000,
                         4000,
@@ -1092,7 +1092,7 @@ my @Tests = (
                     Model           => 'Thinkpad',
                     Description     => 'Thinkpad X300',
                     Type            => 'Desktop',
-                    Owner           => $TestCustomerUserLogin,
+                    Owner           => $TestContactLogin,
                     SerialNumber    => 'abc12345abc',
                     OperatingSystem => 'CentOS 6.0',
                     CPU             => 'Intel Core i3',

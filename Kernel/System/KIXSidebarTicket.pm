@@ -161,7 +161,7 @@ sub KIXSidebarTicketSearch {
             $Search{UserID} = $Param{UserID};
         }
         elsif ( $Param{Frontend} =~ /customer/i ) {
-            $Search{CustomerUserID} = $Param{UserID};
+            $Search{ContactID} = $Param{UserID};
         }
         else {
             return;
@@ -171,7 +171,7 @@ sub KIXSidebarTicketSearch {
             $Search{CustomerID} = $Param{CustomerID};
         }
         elsif ( $Param{'SearchCustomer'} == 2 ) {
-            $Search{CustomerUserLogin} = $Param{CustomerUser};
+            $Search{ContactLogin} = $Param{Contact};
         }
 
         if ( scalar(@States) > 0 ) {

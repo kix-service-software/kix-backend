@@ -41,9 +41,9 @@ my $UserID       = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
 );
 
 # set customer user details
-my $CustomerUserLogin    = $Helper->TestCustomerUserCreate();
-my $CustomerUserPassword = $CustomerUserLogin;
-my $CustomerUserID       = $CustomerUserLogin;
+my $ContactLogin    = $Helper->TestContactCreate();
+my $ContactPassword = $ContactLogin;
+my $ContactID       = $ContactLogin;
 
 # create webservice object
 my $WebserviceObject = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice');
@@ -177,11 +177,11 @@ my @Tests = (
         Operation => 'SessionCreate',
     },
     {
-        Name           => 'CustomerUserLogin No Password',
+        Name           => 'ContactLogin No Password',
         SuccessRequest => 1,
         SuccessGet     => 0,
         RequestData    => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
         },
         ExpectedData => {
             Data => {
@@ -229,11 +229,11 @@ my @Tests = (
         Operation => 'SessionCreate',
     },
     {
-        Name           => 'CustomerUserLogin Invalid Password',
+        Name           => 'ContactLogin Invalid Password',
         SuccessRequest => 1,
         SuccessGet     => 0,
         RequestData    => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
             Password          => $RandomID,
         },
         ExpectedData => {
@@ -265,12 +265,12 @@ my @Tests = (
         Operation => 'SessionCreate',
     },
     {
-        Name           => 'Invalid CustomerUserLogin Correct Password',
+        Name           => 'Invalid ContactLogin Correct Password',
         SuccessRequest => 1,
         SuccessGet     => 0,
         RequestData    => {
-            CustomerUserLogin => $RandomID,
-            Password          => $CustomerUserPassword,
+            ContactLogin => $RandomID,
+            Password          => $ContactPassword,
         },
         ExpectedData => {
             Data => {
@@ -293,12 +293,12 @@ my @Tests = (
         Operation => 'SessionCreate',
     },
     {
-        Name           => 'Correct CustomerUserLogin and Password',
+        Name           => 'Correct ContactLogin and Password',
         SuccessRequest => 1,
         SuccessGet     => 1,
         RequestData    => {
-            CustomerUserLogin => $CustomerUserLogin,
-            Password          => $CustomerUserPassword,
+            ContactLogin => $ContactLogin,
+            Password          => $ContactPassword,
         },
         Operation => 'SessionCreate',
     },

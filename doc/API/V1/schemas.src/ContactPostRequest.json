@@ -7,10 +7,55 @@
     "Contact": {
       "type": "object",
       "properties": {
-        "Name": {
+        "City": {
           "type": "string"
         },
         "Comment": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "Fax": {
+          "type": "string"
+        },
+        "Firstname": {
+          "type": "string"
+        },
+        "Lastname": {
+          "type": "string"
+        },
+        "Login": {
+          "type": "string"
+        },
+        "Mobile": {
+          "type": "string"
+        },
+        "OrganisationIDs": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "Password": {
+          "type": "string"
+        },
+        "Phone": {
+          "type": "string"
+        },
+        "PrimaryOrganisationID": {
+          "type": "integer"
+        },
+        "Street": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "Zip": {
           "type": "string"
         },
         "ValidID": {
@@ -18,7 +63,12 @@
         }
       },
       "required": [
-        "Name"
+        "Firstname",
+        "Email",
+        "Lastname",
+        "Login",
+        "OrganisationIDs",
+        "PrimaryOrganisationID"
       ]
     }
   },

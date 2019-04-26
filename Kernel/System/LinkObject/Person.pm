@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::LinkObject',
     'Kernel::System::Log',
     'Kernel::System::User',
@@ -50,7 +50,7 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{CustomerUserObject} = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
     $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{UserObject}         = $Kernel::OM->Get('Kernel::System::User');
@@ -110,14 +110,14 @@ sub LinkListWithData {
                 }
                 else {
                     %PersonData =
-                        $Self->{CustomerUserObject}
-                        ->CustomerUserDataGet( User => $PersonID, );
+                        $Self->{ContactObject}
+                        ->ContactGet( User => $PersonID, );
                     $PersonData{Type} = 'Customer';
                 }
 
                 #                else {
 ##                    $Person = $1;
-                #                    %PersonData = $Self->{CustomerUserObject}->CustomerUserDataGet(
+                #                    %PersonData = $Self->{ContactObject}->ContactGet(
                 #                        User   => $PersonID,
                 #                    );
                 #                }
@@ -231,16 +231,16 @@ sub ObjectSearch {
     if ( $PersonType eq 'Customer' ) {
 
         # search customer
-        my %CustomerUsers = $Self->{CustomerUserObject}->CustomerSearch(
+        my %Contacts = $Self->{ContactObject}->CustomerSearch(
             Search => $Param{SearchParams}->{PersonAttributes},
             Valid  => 1,
             Limit  => $Limit,
         );
-        for my $ID ( keys %CustomerUsers ) {
-            my %CustomerUserData =
-                $Self->{CustomerUserObject}->CustomerUserDataGet( User => $ID, );
-            $CustomerUserData{Type} = 'Customer';
-            $FoundPersons{NOTLINKED}->{Source}->{$ID} = \%CustomerUserData;
+        for my $ID ( keys %Contacts ) {
+            my %ContactData =
+                $Self->{ContactObject}->ContactGet( User => $ID, );
+            $ContactData{Type} = 'Customer';
+            $FoundPersons{NOTLINKED}->{Source}->{$ID} = \%ContactData;
         }
     }
     else {
