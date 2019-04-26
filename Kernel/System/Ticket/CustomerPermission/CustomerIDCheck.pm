@@ -15,7 +15,7 @@ use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
 );
@@ -58,15 +58,15 @@ sub Run {
     return if !$Ticket{CustomerID};
 
     # get customer user object
-    my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
     # check customer id
-    my %CustomerData = $CustomerUserObject->CustomerUserDataGet(
+    my %CustomerData = $ContactObject->ContactGet(
         User => $Param{UserID},
     );
 
     # get customer ids
-    my @CustomerIDs = $CustomerUserObject->CustomerIDs(
+    my @CustomerIDs = $ContactObject->CustomerIDs(
         User => $Param{UserID},
     );
 

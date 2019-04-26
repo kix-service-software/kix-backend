@@ -150,11 +150,11 @@ sub GetObjectAttributes {
             Block            => 'InputField',
         },
         {
-            Name             => 'CustomerUserLogin',
+            Name             => 'ContactLogin',
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLogin',
+            Element          => 'ContactLogin',
             Block            => 'InputField',
         },
         {
@@ -313,7 +313,7 @@ sub GetObjectAttributes {
     if ( $Kernel::OM->Get('Kernel::Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
 
         # Get CustomerID
-        # (This way also can be the solution for the CustomerUserID)
+        # (This way also can be the solution for the ContactID)
         $Self->{DBSlaveObject}->Prepare(
             SQL => 'SELECT DISTINCT customer_id FROM ticket',
         );

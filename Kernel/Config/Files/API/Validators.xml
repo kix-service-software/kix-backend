@@ -56,14 +56,14 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###CustomerValidator" Required="0" Valid="1">
+    <ConfigItem Name="API::Validator::Module###ContactValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">CustomerValidator</Item>
-                <Item Key="Validates">CustomerContact</Item>
+                <Item Key="Module">ContactValidator</Item>
+                <Item Key="Validates">ContactID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(ContactGet|ContactCreate|ContactUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

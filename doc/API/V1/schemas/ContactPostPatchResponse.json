@@ -5,7 +5,7 @@
    "type" : "object",
    "properties" : {
       "ContactID" : {
-         "type" : "string"
+         "type" : "integer"
       }
    },
    "required" : [

@@ -18,7 +18,7 @@ use vars (qw($Self));
 my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
 my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
 my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
@@ -36,7 +36,7 @@ $ConfigObject->Set(
     Value => 0,
 );
 $ConfigObject->Set(
-    Key   => 'DynamicFieldFromCustomerUser::Mapping',
+    Key   => 'DynamicFieldFromContact::Mapping',
     Value => {
         UserLogin     => 'CustomerLogin' . $RandomID,
         UserFirstname => 'CustomerFirstname' . $RandomID,
@@ -44,9 +44,9 @@ $ConfigObject->Set(
     },
 );
 $ConfigObject->Set(
-    Key   => 'Ticket::EventModulePost###950-DynamicFieldFromCustomerUser',
+    Key   => 'Ticket::EventModulePost###950-DynamicFieldFromContact',
     Value => {
-        Module => 'Kernel::System::Ticket::Event::DynamicFieldFromCustomerUser',
+        Module => 'Kernel::System::Ticket::Event::DynamicFieldFromContact',
         Event  => '(TicketCreate|TicketCustomerUpdate)',
     },
 );
@@ -98,10 +98,10 @@ for my $DynamicFieldConfig (@DynamicFields) {
 }
 
 # create a customer user
-my $TestUserLogin = $Helper->TestCustomerUserCreate();
+my $TestUserLogin = $Helper->TestContactCreate();
 
 # get customer user data
-my %TestUserData = $CustomerUserObject->CustomerUserDataGet(
+my %TestUserData = $ContactObject->ContactGet(
     User => $TestUserLogin,
 );
 
@@ -110,9 +110,9 @@ $TestUserData{UserFirstname} = 'UserFirstName' . $RandomID;
 $TestUserData{UserLastname}  = 'UserLastName' . $RandomID;
 
 # update the user manually because First and LastNames are important
-$CustomerUserObject->CustomerUserUpdate(
+$ContactObject->ContactUpdate(
     %TestUserData,
-    Source  => 'CustomerUser',
+    Source  => 'Contact',
     ID      => $TestUserLogin,
     ValidID => 1,
     UserID  => 1,
@@ -126,7 +126,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => $TestUserData{CustomerID},
-    CustomerUser => $TestUserLogin,
+    Contact => $TestUserLogin,
     OwnerID      => 1,
     UserID       => 1,
 );

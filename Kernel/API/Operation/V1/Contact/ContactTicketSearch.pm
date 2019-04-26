@@ -118,7 +118,7 @@ sub Run {
         Search => {
             AND => [
                 {
-                    Field    => 'CustomerUserID',
+                    Field    => 'ContactID',
                     Operator => 'EQ',
                     Value    => $Param{Data}->{ContactID},
                 }

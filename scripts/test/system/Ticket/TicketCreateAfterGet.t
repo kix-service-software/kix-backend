@@ -42,7 +42,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'closed successful',
     CustomerNo   => '123465',
-    CustomerUser => 'customer@example.com',
+    Contact => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -75,7 +75,7 @@ my $TicketIDCreatedBy = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'closed successful',
     CustomerNo   => '123465',
-    CustomerUser => 'customer@example.com',
+    Contact => 'customer@example.com',
     OwnerID      => 1,
     UserID       => $TestUserID,
 );

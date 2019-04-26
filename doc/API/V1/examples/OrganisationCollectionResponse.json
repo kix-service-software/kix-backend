@@ -1,0 +1,36 @@
+{
+  "Organisation": [
+    {
+      "ChangeBy": 1,
+      "ChangeTime": "2019-03-12 18:24:18",
+      "City": "Rostock",
+      "Comment": "",
+      "Country": "Germany",
+      "CreateBy": 1,
+      "CreateTime": "2018-11-01 14:21:35",
+      "ID": 10,
+      "Name": "Albatros Reederei",
+      "Number": "ALB",
+      "Street": "Kurfürstendamm 89",
+      "Url": "http://www.albatros-shipping.eu",
+      "ValidID": 1,
+      "Zip": "18010"
+    },
+    {
+      "ChangeBy": 1,
+      "ChangeTime": "2019-03-12 18:24:18",
+      "City": "Iserlohn",
+      "Comment": "",
+      "Country": "Germany",
+      "CreateBy": 1,
+      "CreateTime": "2018-11-01 14:21:35",
+      "ID": 11,
+      "Name": "Delta-Hertz EDV-Beratung",
+      "Number": "DHZ",
+      "Street": "Knesebeckstraße 47",
+      "Url": "http://www.delta-hertz-edv.de",
+      "ValidID": 1,
+      "Zip": "58644"
+    }
+  ]
+}

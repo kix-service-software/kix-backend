@@ -95,7 +95,7 @@ $Self->IsNot(
     "QueueAdd() - Added queue '$QueueData3{Name}' for ACL check - should not be undef"
 );
 
-my $TestCustomerUserLogin = $Helper->TestCustomerUserCreate();
+my $TestContactLogin = $Helper->TestContactCreate();
 
 # Get ServiceObject.
 my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
@@ -112,8 +112,8 @@ my $ServiceID = $ServiceObject->ServiceAdd(
     UserID  => 1,
 );
 
-$ServiceObject->CustomerUserServiceMemberAdd(
-    CustomerUserLogin => $TestCustomerUserLogin,
+$ServiceObject->ContactServiceMemberAdd(
+    ContactLogin => $TestContactLogin,
     ServiceID         => $ServiceID,
     Active            => 1,
     UserID            => 1,
@@ -138,7 +138,7 @@ my $TicketID = $CommonObject{TicketObject}->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     OwnerID      => 1,
-    CustomerUser => $TestCustomerUserLogin,
+    Contact => $TestContactLogin,
     UserID       => 1,
 );
 $Self->True(

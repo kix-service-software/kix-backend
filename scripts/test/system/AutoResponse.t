@@ -36,10 +36,8 @@ my $QueueName = 'Some::Queue' . $RandomID;
 
 # create new queue
 my $QueueID = $QueueObject->QueueAdd(
-
     Name            => $QueueName,
     ValidID         => 1,
-    GroupID         => 1,
     SystemAddressID => 1,
     Signature       => '',
     Comment         => 'Some comment',
@@ -61,20 +59,21 @@ $ConfigObject->Set(
     Value => '0',
 );
 
-my $CustomerUserID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-    Source         => 'CustomerUser',
-    UserFirstname  => 'John',
-    UserLastname   => 'Doe',
-    UserCustomerID => "Customer#$RandomID",
-    UserCustomerIDs => "Customer#$RandomID",
-    UserLogin      => "CustomerLogin#$RandomID",
-    UserEmail      => "customer$RandomID\@example.com",
-    UserPassword   => 'some_pass',
-    ValidID        => 1,
-    UserID         => 1,
+my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+    Firstname  => 'John',
+    Lastname   => 'Doe',
+    PrimaryOrganisationID  => 1,
+    OrganisationIDs => [
+        1,
+    ],
+    Login      => "CustomerLogin#$RandomID",
+    Email      => "customer$RandomID\@example.com",
+    Password   => 'some_pass',
+    ValidID    => 1,
+    UserID     => 1,
 );
 $Self->True(
-    $CustomerUserID,
+    $ContactID,
     # rkaiser - T#2017020290001194 - changed customer user to contact
     "Customer contact created."
 );
@@ -85,7 +84,6 @@ my $SystemAddressID       = $SystemAddressObject->SystemAddressAdd(
     Name     => $SystemAddressNameRand . '@example.com',
     Realname => $SystemAddressNameRand,
     ValidID  => 1,
-    QueueID  => $QueueID,
     Comment  => 'Some Comment',
     UserID   => 1,
 );
@@ -215,7 +213,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => "Customer#$RandomID",
-    CustomerUser => "CustomerLogin#$RandomID",
+    Contact => "CustomerLogin#$RandomID",
     OwnerID      => 1,
     UserID       => 1,
 );

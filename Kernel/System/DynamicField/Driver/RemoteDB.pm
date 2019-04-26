@@ -470,13 +470,13 @@ sub EditFieldRender {
                 $ConstrictionString .= ';' . $ConstrictionRule[2];
             }
             elsif (
-                $ConstrictionRule[1] eq 'CustomerUser'
+                $ConstrictionRule[1] eq 'Contact'
             ) {
                 $CustomerConstriction = 1;
             }
         }
         if ( $CustomerConstriction ) {
-            $ConstrictionString .= ';CustomerUserID;SelectedCustomerUser';
+            $ConstrictionString .= ';ContactID;SelectedContact';
         }
     }
 

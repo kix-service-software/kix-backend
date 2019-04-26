@@ -46,7 +46,7 @@
 
   $('.examples code').each(function() {
     if ($(this).html().startsWith('{')) {
-      $(this).jsonHighlight(JSON.parse($(this).html()));
+      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true });
     }
   });
 
@@ -404,6 +404,7 @@ table tbody td,
   padding-left: 5px;
   overflow: auto;
   height: 90%;
+  width: 15%;
   border-left: 1px solid #ddd;
 }
 .top-resource-description {
@@ -469,6 +470,9 @@ pre code {
 }
 .nav > li > a.nav-resource {
   padding-left: 40px;
+}
+.nav-stacked > li {
+  white-space: nowrap
 }
 .uri {
   font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
@@ -5151,8 +5155,53 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="contacts_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ContactCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of contacts.",
+   "type" : "object",
+   "properties" : {
+      "Contact" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "Contact.json"
+         }
+      }
+   },
+   "required" : [
+      "Contact"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Contact": [
+    {
+      "ChangeBy":1,
+      "ChangeTime":"2019-03-12 18:26:07",
+      "City":"Musterstadt",
+      "Comment":"",
+      "Country":"Germany",
+      "CreateBy":1,
+      "CreateTime":"2018-11-01 15:13:53",
+      "Email":"contact047@nomail.org",
+      "Fax":"",
+      "Firstname":"George",
+      "ID":102,
+      "Lastname":"Back",
+      "Login":"contact047",
+      "Mobile":"+49 170 111 222 333",
+      "OrganisationIDs":[
+        1,
+        2
+      ],
+      "Phone":"+49 123 45 67 8",
+      "PrimaryOrganisationID":1,
+      "Street":"Musterstraße 1",
+      "Title":"Herr",
+      "ValidID":1,
+      "Zip":"12345"
+    }
+  ]
+}</code></pre></div></div><h2 class="response-title" id="contacts_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -5184,18 +5233,68 @@ pre code {
       "Contact" : {
          "type" : "object",
          "properties" : {
+            "City" : {
+               "type" : "string"
+            },
             "Comment" : {
                "type" : "string"
             },
-            "Name" : {
+            "Country" : {
+               "type" : "string"
+            },
+            "Email" : {
+               "type" : "string"
+            },
+            "Fax" : {
+               "type" : "string"
+            },
+            "Firstname" : {
+               "type" : "string"
+            },
+            "Lastname" : {
+               "type" : "string"
+            },
+            "Login" : {
+               "type" : "string"
+            },
+            "Mobile" : {
+               "type" : "string"
+            },
+            "OrganisationIDs" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               }
+            },
+            "Password" : {
+               "type" : "string"
+            },
+            "Phone" : {
+               "type" : "string"
+            },
+            "PrimaryOrganisationID" : {
+               "type" : "integer"
+            },
+            "Street" : {
+               "type" : "string"
+            },
+            "Title" : {
                "type" : "string"
             },
             "ValidID" : {
                "type" : "integer"
+            },
+            "Zip" : {
+               "type" : "string"
             }
          },
          "required" : [
-            "Name"
+            "Firstname",
+            "Email",
+            "Lastname",
+            "Login",
+            "OrganisationIDs",
+            "PrimaryOrganisationID"
          ]
       }
    },
@@ -5203,21 +5302,35 @@ pre code {
       "Contact"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactPostRequest.json</code></pre></div></div><div class="tab-pane" id="contacts_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Contact has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Contact": {
+    "Email": "mamu@example.org",
+    "Firstname": "Max",
+    "Lastname": "Mustermann",
+    "Login": "mamu",
+    "OrganisationIDs": [
+      1,
+      2
+    ],
+    "PrimaryOrganisationID": 1
+  }
+}</code></pre></div></div><div class="tab-pane" id="contacts_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Contact has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ContactPostPatchResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "The ID of the created or updated contact.",
    "type" : "object",
    "properties" : {
       "ContactID" : {
-         "type" : "string"
+         "type" : "integer"
       }
    },
    "required" : [
       "ContactID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactPostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="contacts_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ContactID": 1
+}</code></pre></div></div><h2 class="response-title" id="contacts_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -5263,8 +5376,48 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_contacts__contactid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/contacts</span><span class="uri">/{contactId}</span> <span class="methods"><a href="#contacts__contactid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts__contactid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__get_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__get_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactResponse.json</code></pre></div></div><h2 class="response-title" id="contacts__contactid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="contacts_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_contacts__contactid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/contacts</span><span class="uri">/{contactId}</span> <span class="methods"><a href="#contacts__contactid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts__contactid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts__contactid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__get_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__get_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ContactResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for contact GET request.",
+   "type" : "object",
+   "properties" : {
+      "Contact" : {
+         "$ref" : "Contact.json"
+      }
+   },
+   "required" : [
+      "Contact"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Contact": {
+    "ChangeBy":1,
+    "ChangeTime":"2019-03-12 18:26:07",
+    "City":"Musterstadt",
+    "Comment":"",
+    "Country":"Germany",
+    "CreateBy":1,
+    "CreateTime":"2018-11-01 15:13:53",
+    "Email":"contact047@nomail.org",
+    "Fax":"",
+    "Firstname":"George",
+    "ID":102,
+    "Lastname":"Back",
+    "Login":"contact047",
+    "Mobile":"+49 170 111 222 333",
+    "OrganisationIDs":[
+      1,
+      2
+    ],
+    "Phone":"+49 123 45 67 8",
+    "PrimaryOrganisationID":1,
+    "Street":"Musterstraße 1",
+    "Title":"Herr",
+    "ValidID":1,
+    "Zip":"12345"
+  }
+}</code></pre></div></div><h2 class="response-title" id="contacts__contactid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -5287,7 +5440,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="contacts__contactid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__patch_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__patch_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="contacts__contactid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__patch_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__patch_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ContactPatchRequest",
    "$schema" : "http://json-schema.org/schema",
    "description" : "The contact request object for update.",
@@ -5296,14 +5449,59 @@ pre code {
       "Contact" : {
          "type" : "object",
          "properties" : {
+            "City" : {
+               "type" : "string"
+            },
             "Comment" : {
                "type" : "string"
             },
-            "Name" : {
+            "Country" : {
+               "type" : "string"
+            },
+            "Email" : {
+               "type" : "string"
+            },
+            "Fax" : {
+               "type" : "string"
+            },
+            "Firstname" : {
+               "type" : "string"
+            },
+            "Lastname" : {
+               "type" : "string"
+            },
+            "Login" : {
+               "type" : "string"
+            },
+            "Mobile" : {
+               "type" : "string"
+            },
+            "OrganisationIDs" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               }
+            },
+            "Password" : {
+               "type" : "string"
+            },
+            "Phone" : {
+               "type" : "string"
+            },
+            "PrimaryOrganisationID" : {
+               "type" : "integer"
+            },
+            "Street" : {
+               "type" : "string"
+            },
+            "Title" : {
                "type" : "string"
             },
             "ValidID" : {
                "type" : "integer"
+            },
+            "Zip" : {
+               "type" : "string"
             }
          }
       }
@@ -5312,21 +5510,27 @@ pre code {
       "Contact"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactPatchRequest.json</code></pre></div></div><div class="tab-pane" id="contacts__contactid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Contact": {
+    "Title": "Dr."
+  }
+}</code></pre></div></div><div class="tab-pane" id="contacts__contactid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ContactPostPatchResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "The ID of the created or updated contact.",
    "type" : "object",
    "properties" : {
       "ContactID" : {
-         "type" : "string"
+         "type" : "integer"
       }
    },
    "required" : [
       "ContactID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactPostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="contacts__contactid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ContactID": 1
+}</code></pre></div></div><h2 class="response-title" id="contacts__contactid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -5395,7 +5599,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="contacts__contactid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__delete_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__delete_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="contacts__contactid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="contacts__contactid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts</span><span class="uri">/{contactId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__delete_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__delete_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="contacts__contactid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -5441,7 +5645,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_contacts__contactid__tickets" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/contacts/tickets.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/contacts/{contactId}</span><span class="uri">/tickets</span> <span class="methods"><a href="#contacts__contactid__tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts__contactid__tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts/{contactId}</span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Ticket items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__tickets_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="contacts__contactid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_contacts__contactid__tickets" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/contacts/tickets.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/contacts/{contactId}</span><span class="uri">/tickets</span> <span class="methods"><a href="#contacts__contactid__tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts__contactid__tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/contacts/{contactId}</span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Ticket items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts__contactid__tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts__contactid__tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts__contactid__tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts__contactid__tickets_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">contactId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts__contactid__tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="contacts__contactid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#Error",
    "$schema" : "http://json-schema.org/schema",
    "description" : "An error object.",
@@ -5464,344 +5668,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="customers" class="panel-title">Customers</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this customer. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_customers" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/customers</span> <span class="methods"><a href="#customers_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/customers</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers_get_request" data-toggle="tab">Request</a></li><li><a href="#customers_get_response" data-toggle="tab">Response</a></li><li><a href="#customers_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="customers_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="customers_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/customers</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers_post_request" data-toggle="tab">Request</a></li><li><a href="#customers_post_response" data-toggle="tab">Response</a></li><li><a href="#customers_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#CustomerPostRequest",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "The customer request object for creation.",
-   "type" : "object",
-   "properties" : {
-      "Customer" : {
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "type" : "string"
-            },
-            "Name" : {
-               "type" : "string"
-            },
-            "ValidID" : {
-               "type" : "integer"
-            }
-         },
-         "required" : [
-            "Name"
-         ]
-      }
-   },
-   "required" : [
-      "Customer"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerPostRequest.json</code></pre></div></div><div class="tab-pane" id="customers_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Customer has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#CustomerPostPatchResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "The ID of the created or updated customer.",
-   "type" : "object",
-   "properties" : {
-      "CustomerID" : {
-         "type" : "string"
-      }
-   },
-   "required" : [
-      "CustomerID"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerPostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="customers_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div><h2 class="response-title" id="customers_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers</span><span class="uri">/{customerId}</span> <span class="methods"><a href="#customers__customerid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers__customerid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#customers__customerid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers</span><span class="uri">/{customerId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerResponse.json</code></pre></div></div><h2 class="response-title" id="customers__customerid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="customers__customerid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers</span><span class="uri">/{customerId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__patch_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__patch_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#CustomerPatchRequest",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "The customer request object for update.",
-   "type" : "object",
-   "properties" : {
-      "Customer" : {
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "type" : "string"
-            },
-            "Name" : {
-               "type" : "string"
-            },
-            "ValidID" : {
-               "type" : "integer"
-            }
-         }
-      }
-   },
-   "required" : [
-      "Customer"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerPatchRequest.json</code></pre></div></div><div class="tab-pane" id="customers__customerid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CustomerPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#CustomerPostPatchResponse",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "The ID of the created or updated customer.",
-   "type" : "object",
-   "properties" : {
-      "CustomerID" : {
-         "type" : "string"
-      }
-   },
-   "required" : [
-      "CustomerID"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/CustomerPostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="customers__customerid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div><h2 class="response-title" id="customers__customerid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div><h2 class="response-title" id="customers__customerid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="customers__customerid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers</span><span class="uri">/{customerId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__delete_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__delete_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="customers__customerid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div><h2 class="response-title" id="customers__customerid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid__contacts" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/customers/contacts.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers/{customerId}</span><span class="uri">/contacts</span> <span class="methods"><a href="#customers__customerid__contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers/{customerId}</span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Contact items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__contacts_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ContactCollectionResponse.json</code></pre></div></div><h2 class="response-title" id="customers__customerid__contacts_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__contacts_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__contacts_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_customers__customerid__tickets" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/customers/tickets.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/customers/{customerId}</span><span class="uri">/tickets</span> <span class="methods"><a href="#customers__customerid__tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="customers__customerid__tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/customers/{customerId}</span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Ticket items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#customers__customerid__tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#customers__customerid__tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#customers__customerid__tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="customers__customerid__tickets_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">customerId</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="customers__customerid__tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="customers__customerid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "#Error",
-   "$schema" : "http://json-schema.org/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="customers__customerid__tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="customers__customerid__tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="i18n" class="panel-title">i18n</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/i18n.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_i18n_translations" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/i18n/translations.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/i18n</span><span class="uri">/translations</span> <span class="methods"><a href="#i18n_translations_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#i18n_translations_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="i18n_translations_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/i18n</span><span class="uri">/translations</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#i18n_translations_get_request" data-toggle="tab">Request</a></li><li><a href="#i18n_translations_get_response" data-toggle="tab">Response</a></li><li><a href="#i18n_translations_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="i18n_translations_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="i18n_translations_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="i18n_translations_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TranslationCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="contacts__contactid__tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts__contactid__tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="i18n" class="panel-title">i18n</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/i18n.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_i18n_translations" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/i18n/translations.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/i18n</span><span class="uri">/translations</span> <span class="methods"><a href="#i18n_translations_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#i18n_translations_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="i18n_translations_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/i18n</span><span class="uri">/translations</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#i18n_translations_get_request" data-toggle="tab">Request</a></li><li><a href="#i18n_translations_get_response" data-toggle="tab">Response</a></li><li><a href="#i18n_translations_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="i18n_translations_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="i18n_translations_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="i18n_translations_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TranslationCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#TranslationCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of translations.",
@@ -8176,7 +8043,520 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="objecticons__objecticonid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="priorities" class="panel-title">Priorities</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/priorities.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_priorities" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/priorities</span> <span class="methods"><a href="#priorities_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#priorities_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="priorities_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/priorities</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#priorities_get_request" data-toggle="tab">Request</a></li><li><a href="#priorities_get_response" data-toggle="tab">Response</a></li><li><a href="#priorities_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="priorities_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="priorities_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="priorities_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PriorityCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="objecticons__objecticonid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objecticons__objecticonid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="organisations" class="panel-title">Organisations</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/organisations.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_organisations" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/organisations</span> <span class="methods"><a href="#organisations_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#organisations_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="organisations_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/organisations</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations_get_request" data-toggle="tab">Request</a></li><li><a href="#organisations_get_response" data-toggle="tab">Response</a></li><li><a href="#organisations_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="organisations_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of organisations.",
+   "type" : "object",
+   "properties" : {
+      "Organisation" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "Organisation.json"
+         }
+      }
+   },
+   "required" : [
+      "Organisation"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Organisation": [
+    {
+      "ChangeBy": 1,
+      "ChangeTime": "2019-03-12 18:24:18",
+      "City": "Rostock",
+      "Comment": "",
+      "Country": "Germany",
+      "CreateBy": 1,
+      "CreateTime": "2018-11-01 14:21:35",
+      "ID": 10,
+      "Name": "Albatros Reederei",
+      "Number": "ALB",
+      "Street": "Kurfürstendamm 89",
+      "Url": "http://www.albatros-shipping.eu",
+      "ValidID": 1,
+      "Zip": "18010"
+    },
+    {
+      "ChangeBy": 1,
+      "ChangeTime": "2019-03-12 18:24:18",
+      "City": "Iserlohn",
+      "Comment": "",
+      "Country": "Germany",
+      "CreateBy": 1,
+      "CreateTime": "2018-11-01 14:21:35",
+      "ID": 11,
+      "Name": "Delta-Hertz EDV-Beratung",
+      "Number": "DHZ",
+      "Street": "Knesebeckstraße 47",
+      "Url": "http://www.delta-hertz-edv.de",
+      "ValidID": 1,
+      "Zip": "58644"
+    }
+  ]
+}</code></pre></div></div><h2 class="response-title" id="organisations_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="organisations_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/organisations</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations_post_request" data-toggle="tab">Request</a></li><li><a href="#organisations_post_response" data-toggle="tab">Response</a></li><li><a href="#organisations_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The organisation request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Organisation" : {
+         "type" : "object",
+         "properties" : {
+            "City" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Country" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Number" : {
+               "type" : "string"
+            },
+            "Street" : {
+               "type" : "string"
+            },
+            "Url" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            },
+            "Zip" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Name",
+            "Number"
+         ]
+      }
+   },
+   "required" : [
+      "Organisation"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Organisation": {
+    "Number": "K12345678",
+    "Name": "Test Organisation 123"
+  }
+}</code></pre></div></div><div class="tab-pane" id="organisations_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Organisation has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated organisation.",
+   "type" : "object",
+   "properties" : {
+      "OrganisationID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "OrganisationID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "OrganisationID": 1
+}</code></pre></div></div><h2 class="response-title" id="organisations_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="organisations_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_organisations__organisationid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/organisations</span><span class="uri">/{organisationId}</span> <span class="methods"><a href="#organisations__organisationid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#organisations__organisationid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#organisations__organisationid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="organisations__organisationid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/organisations</span><span class="uri">/{organisationId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations__organisationid__get_request" data-toggle="tab">Request</a></li><li><a href="#organisations__organisationid__get_response" data-toggle="tab">Response</a></li><li><a href="#organisations__organisationid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations__organisationid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">organisationId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="organisations__organisationid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for organisation GET request.",
+   "type" : "object",
+   "properties" : {
+      "Organisation" : {
+         "$ref" : "Organisation.json"
+      }
+   },
+   "required" : [
+      "Organisation"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Organisation": {
+    "ChangeBy": 1,
+    "ChangeTime": "2019-03-12 18:24:18",
+    "City": "Rostock",
+    "Comment": "",
+    "Country": "Germany",
+    "CreateBy": 1,
+    "CreateTime": "2018-11-01 14:21:35",
+    "ID": 10,
+    "Name": "Albatros Reederei",
+    "Number": "ALB",
+    "Street": "Kurfürstendamm 89",
+    "Url": "http://www.albatros-shipping.eu",
+    "ValidID": 1,
+    "Zip": "18010"
+  }
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations__organisationid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="organisations__organisationid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/organisations</span><span class="uri">/{organisationId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations__organisationid__patch_request" data-toggle="tab">Request</a></li><li><a href="#organisations__organisationid__patch_response" data-toggle="tab">Response</a></li><li><a href="#organisations__organisationid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations__organisationid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">organisationId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The organisation request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Organisation" : {
+         "type" : "object",
+         "properties" : {
+            "City" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Country" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Number" : {
+               "type" : "string"
+            },
+            "Street" : {
+               "type" : "string"
+            },
+            "Url" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            },
+            "Zip" : {
+               "type" : "string"
+            }
+         }
+      }
+   },
+   "required" : [
+      "Organisation"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Organisation": {
+    "City": "Rostock"
+  }
+}</code></pre></div></div><div class="tab-pane" id="organisations__organisationid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated organisation.",
+   "type" : "object",
+   "properties" : {
+      "OrganisationID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "OrganisationID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "OrganisationID": 1
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations__organisationid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="organisations__organisationid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/organisations</span><span class="uri">/{organisationId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations__organisationid__delete_request" data-toggle="tab">Request</a></li><li><a href="#organisations__organisationid__delete_response" data-toggle="tab">Response</a></li><li><a href="#organisations__organisationid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations__organisationid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">organisationId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="organisations__organisationid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="organisations__organisationid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations__organisationid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_organisations__organisationid__contacts" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/organisations/contacts.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/organisations/{organisationId}</span><span class="uri">/contacts</span> <span class="methods"><a href="#organisations__organisationid__contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="organisations__organisationid__contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/organisations/{organisationId}</span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Contact items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations__organisationid__contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#organisations__organisationid__contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#organisations__organisationid__contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations__organisationid__contacts_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">organisationId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="organisations__organisationid__contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#ContactCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of contacts.",
+   "type" : "object",
+   "properties" : {
+      "Contact" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "Contact.json"
+         }
+      }
+   },
+   "required" : [
+      "Contact"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Contact": [
+    {
+      "ChangeBy":1,
+      "ChangeTime":"2019-03-12 18:26:07",
+      "City":"Musterstadt",
+      "Comment":"",
+      "Country":"Germany",
+      "CreateBy":1,
+      "CreateTime":"2018-11-01 15:13:53",
+      "Email":"contact047@nomail.org",
+      "Fax":"",
+      "Firstname":"George",
+      "ID":102,
+      "Lastname":"Back",
+      "Login":"contact047",
+      "Mobile":"+49 170 111 222 333",
+      "OrganisationIDs":[
+        1,
+        2
+      ],
+      "Phone":"+49 123 45 67 8",
+      "PrimaryOrganisationID":1,
+      "Street":"Musterstraße 1",
+      "Title":"Herr",
+      "ValidID":1,
+      "Zip":"12345"
+    }
+  ]
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__contacts_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations__organisationid__contacts_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__contacts_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_organisations__organisationid__tickets" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/organisations/tickets.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/organisations/{organisationId}</span><span class="uri">/tickets</span> <span class="methods"><a href="#organisations__organisationid__tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="organisations__organisationid__tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/organisations/{organisationId}</span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Ticket items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations__organisationid__tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#organisations__organisationid__tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#organisations__organisationid__tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations__organisationid__tickets_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">organisationId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="organisations__organisationid__tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="organisations__organisationid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations__organisationid__tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="priorities" class="panel-title">Priorities</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/priorities.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_priorities" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/priorities</span> <span class="methods"><a href="#priorities_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#priorities_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="priorities_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/priorities</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#priorities_get_request" data-toggle="tab">Request</a></li><li><a href="#priorities_get_response" data-toggle="tab">Response</a></li><li><a href="#priorities_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="priorities_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="priorities_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="priorities_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PriorityCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#PriorityCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of priorities.",
@@ -9589,7 +9969,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__userids__userid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids__userid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_roles__roleid__permissions" class="panel"><div class="resource-description"><p>For each existing role permissions can be created. A permission item has a <code>TypeID</code> which references a permission type defined in the resource <a href="#roles_permissiontypes_get"><code>/roles/permissiontypes</code></a>. Additionally the target for the permission has to be defined. Each permission type has its own target schema. The following table lists the possible targets for each default permission type.</p><table class="table"><thead><tr><th>Permission Type</th><th>Permission Target</th><th>Example</th></tr></thead><tbody><tr><td>Resource</td><td>collection resource URI</td><td><code>/tickets</code></td></tr><tr><td>Object</td><td>item resource URI</td><td><code>/tickets/123</code></td></tr><tr><td>Object Property Value</td><td>\<objecttype\>.\<property\>[.\<property\>...]=\<value\></value\></property\></property\></objecttype\></td><td><code>Ticket.QueueID=123</code></td></tr></tbody></table><p>The permission value itself is a bitmask with the following values:</p><table class="table"><thead><tr><th>Value</th><th>Permission</th></tr></thead><tbody><tr><td><code>0x0001</code></td><td>CREATE</td></tr><tr><td><code>0x0002</code></td><td>READ</td></tr><tr><td><code>0x0004</code></td><td>UPDATE</td></tr><tr><td><code>0x0008</code></td><td>DELETE</td></tr><tr><td><code>0xf000</code></td><td>DENY</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span> <span class="methods"><a href="#roles__roleid__permissions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#roles__roleid__permissions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="roles__roleid__permissions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__permissions_get_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__permissions_get_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__permissions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__permissions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="roles__roleid__permissions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__permissions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PermissionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="roles__roleid__userids__userid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__userids__userid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_roles__roleid__permissions" class="panel"><div class="resource-description"><p>For each existing role permissions can be created. A permission item has a <code>TypeID</code> which references a permission type defined in the resource <a href="#roles_permissiontypes_get"><code>/roles/permissiontypes</code></a>. Additionally the target for the permission has to be defined. Each permission type has its own target schema. The following table lists the possible targets for each default permission type.</p><table class="table"><thead><tr><th>ID</th><th>Permission Type</th><th>Permission Target</th><th>Example</th></tr></thead><tbody><tr><td>1</td><td>Resource</td><td>collection resource URI</td><td><code>/tickets</code></td></tr><tr><td>2</td><td>Object</td><td>item resource URI</td><td><code>/tickets/123</code></td></tr><tr><td>3</td><td>PropertyValue</td><td>&lt;ObjectType&gt;.&lt;Property&gt; EQ &lt;Value&gt;</td><td><code>Ticket.QueueID EQ 123</code></td></tr></tbody></table><p>The permission value itself is a bitmask with the following values:</p><table class="table"><thead><tr><th>Value</th><th>Permission</th></tr></thead><tbody><tr><td><code>0x0000</code></td><td>NONE</td></tr><tr><td><code>0x0001</code></td><td>CREATE</td></tr><tr><td><code>0x0002</code></td><td>READ</td></tr><tr><td><code>0x0004</code></td><td>UPDATE</td></tr><tr><td><code>0x0008</code></td><td>DELETE</td></tr><tr><td><code>0xf000</code></td><td>DENY</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span> <span class="methods"><a href="#roles__roleid__permissions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#roles__roleid__permissions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="roles__roleid__permissions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/roles/{roleId}</span><span class="uri">/permissions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#roles__roleid__permissions_get_request" data-toggle="tab">Request</a></li><li><a href="#roles__roleid__permissions_get_response" data-toggle="tab">Response</a></li><li><a href="#roles__roleid__permissions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="roles__roleid__permissions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="roles__roleid__permissions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="roles__roleid__permissions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PermissionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#PermissionCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of permissions.",
@@ -13922,4 +14302,4 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#channels">Communication Channels</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#customers">Customers</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#queues">Queues</a></li><li><a class="nav-resource" href="#objecticons">Object Icons</a></li><li><a class="nav-resource" href="#priorities">Priorities</a></li><li><a class="nav-resource" href="#roles">Roles</a></li><li><a class="nav-resource" href="#sendertypes">Sender Types</a></li><li><a class="nav-resource" href="#services">Services</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#sessions">Sessions</a></li><li><a class="nav-resource" href="#statetypes">State Types</a></li><li><a class="nav-resource" href="#ticketlocks">Ticket Locks</a></li><li><a class="nav-resource" href="#ticketstates">Ticket States</a></li><li><a class="nav-resource" href="#tickettypes">Ticket Types</a></li><li><a class="nav-resource" href="#user">Current User</a></li><li><a class="nav-resource" href="#users">Users</a></li><li><a class="nav-resource" href="#valid">Valid</a></li></ul></div></div></div></div></body></html>
+}</code></pre></div></div></div><div class="tab-pane" id="valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#channels">Communication Channels</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#queues">Queues</a></li><li><a class="nav-resource" href="#objecticons">Object Icons</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#priorities">Priorities</a></li><li><a class="nav-resource" href="#roles">Roles</a></li><li><a class="nav-resource" href="#sendertypes">Sender Types</a></li><li><a class="nav-resource" href="#services">Services</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#sessions">Sessions</a></li><li><a class="nav-resource" href="#statetypes">State Types</a></li><li><a class="nav-resource" href="#ticketlocks">Ticket Locks</a></li><li><a class="nav-resource" href="#ticketstates">Ticket States</a></li><li><a class="nav-resource" href="#tickettypes">Ticket Types</a></li><li><a class="nav-resource" href="#user">Current User</a></li><li><a class="nav-resource" href="#users">Users</a></li><li><a class="nav-resource" href="#valid">Valid</a></li></ul></div></div></div></div></body></html>

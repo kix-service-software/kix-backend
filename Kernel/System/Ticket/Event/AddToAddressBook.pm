@@ -14,7 +14,7 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::AddressBook',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::SystemAddress',
     'Kernel::System::Ticket',
@@ -36,7 +36,7 @@ sub new {
     # create needed objects
     $Self->{ConfigObject}        = $Kernel::OM->Get('Kernel::Config');
     $Self->{AddressBookObject}   = $Kernel::OM->Get('Kernel::System::AddressBook');
-    $Self->{CustomerUserObject}  = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject}  = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LogObject}           = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{SystemAddressObject} = $Kernel::OM->Get('Kernel::System::SystemAddress');
     $Self->{TicketObject}        = $Kernel::OM->Get('Kernel::System::Ticket');
@@ -90,11 +90,11 @@ sub Run {
             # ignore system addresses
             next if ($Self->{SystemAddressObject}->SystemAddressIsLocalAddress( Address => $CurrEmailAddress ));
 
-            # check customer backends for this mail address
-            my %UserListCustomer = $Self->{CustomerUserObject}->CustomerSearch(
+            # check contacts for this mail address
+            my %ContactList = $Self->{ContactObject}->ContactSearch(
                 PostMasterSearch => $CurrEmailAddress,
             );
-            next MAILADDRESS if (%UserListCustomer);
+            next MAILADDRESS if (%ContactList);
             
             # check address book
             my %AddressList = $Self->{AddressBookObject}->AddressList(

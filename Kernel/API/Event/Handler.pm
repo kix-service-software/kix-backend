@@ -60,11 +60,10 @@ sub Run {
     # get web service objects
     my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
 
-    my %WebserviceList = %{
-        $WebserviceObject->WebserviceList(
-            Valid => 1,
-        ),
-    };
+    my $WebserviceListRef = $WebserviceObject->WebserviceList(
+        Valid => 1,
+    );
+    my %WebserviceList = IsHashRefWithData($WebserviceListRef) ? %{$WebserviceListRef} : ();
 
     # loop over web services
     WEBSERVICE:

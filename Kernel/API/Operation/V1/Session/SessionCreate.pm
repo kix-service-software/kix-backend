@@ -152,14 +152,14 @@ sub Run {
     }
     elsif ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Customer' ) {
         # check submitted data
-        $User = $Kernel::OM->Get('Kernel::System::CustomerAuth')->Auth(
+        $User = $Kernel::OM->Get('Kernel::System::ContactAuth')->Auth(
             User => $Param{Data}->{UserLogin} || '',
             Pw   => $PostPw,
         );
         if ( $User ) {
             $UserID = $Param{Data}->{UserLogin};
             # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
-            my $HasPermission = $Kernel::OM->Get('Kernel::System::CustomerUser')->CheckPermission(
+            my $HasPermission = $Kernel::OM->Get('Kernel::System::Contact')->CheckPermission(
                 UserID            => $UserID,
                 Target            => '/sessions',
                 RequestedPermission => 'CREATE'

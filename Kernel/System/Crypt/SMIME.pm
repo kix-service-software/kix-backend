@@ -22,7 +22,7 @@ our @ObjectDependencies = (
     'Kernel::System::FileTemp',
     'Kernel::System::Log',
     'Kernel::System::Main',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::CheckItem',
 );
 
@@ -677,7 +677,7 @@ sub _CheckCertificateList {
 
 =item FetchFromCustomer()
 
-add certificates from CustomerUserAttributes to local certificates
+add certificates from ContactAttributes to local certificates
 returns an array of filenames of added certificates
 
     my @Result = $CryptObject->FetchFromCustomer(
@@ -703,8 +703,8 @@ sub FetchFromCustomer {
     }
 
     # Check customer users for userSMIMECertificate
-    my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
-    my %CustomerUsers;
+    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my %Contacts;
     if ( $Param{Search} ) {
 
         my $ValidEmail = $Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail(
@@ -713,7 +713,7 @@ sub FetchFromCustomer {
 
         # If valid email address, only do a PostMasterSearch
         if ($ValidEmail) {
-            %CustomerUsers = $CustomerUserObject->CustomerSearch(
+            %Contacts = $ContactObject->CustomerSearch(
                 PostMasterSearch => $Param{Search},
             );
         }
@@ -721,21 +721,21 @@ sub FetchFromCustomer {
 
     my @CertFileList;
 
-    # Check found CustomerUsers
-    for my $Login ( sort keys %CustomerUsers ) {
-        my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
+    # Check found Contacts
+    for my $Login ( sort keys %Contacts ) {
+        my %Contact = $ContactObject->ContactGet(
             User => $Login,
         );
 
         # Add Certificate if available
-        if ( $CustomerUser{UserSMIMECertificate} ) {
+        if ( $Contact{UserSMIMECertificate} ) {
 
             # if don't add, maybe in UnitTests
             return @CertFileList if $Param{DontAdd};
 
             # Convert certificate to the correct format (pk7, pk12, pem, der)
             my $Cert = $Self->ConvertCertFormat(
-                String => $CustomerUser{UserSMIMECertificate},
+                String => $Contact{UserSMIMECertificate},
             );
             my %Result = $Self->CertificateAdd(
                 Certificate => $Cert,

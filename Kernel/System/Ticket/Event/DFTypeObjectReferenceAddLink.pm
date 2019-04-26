@@ -15,7 +15,7 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DynamicField',
     'Kernel::System::LinkObject',
     'Kernel::System::Log',
@@ -37,7 +37,7 @@ sub new {
 
     # create needed objects
     $Self->{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $Self->{CustomerUserObject} = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
     $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{TicketObject}       = $Kernel::OM->Get('Kernel::System::Ticket');
@@ -78,8 +78,8 @@ sub Run {
         my $DynamicFieldData =
             $Self->{DynamicFieldObject}->DynamicFieldGet( Name => $1 );
 
-        # nothing to do if Danamic Field not of type CustomerUser or if customer was deleted
-        return if ( $DynamicFieldData->{FieldType} ne "CustomerUser" );
+        # nothing to do if Danamic Field not of type Contact or if customer was deleted
+        return if ( $DynamicFieldData->{FieldType} ne "Contact" );
         return if ( !$Ticket{$Field} );
         return
             if ( ref( $Ticket{$Field} ) eq 'ARRAY'
@@ -88,19 +88,19 @@ sub Run {
 
         # check in customer backend for this login
         my %UserListCustomer =
-            $Self->{CustomerUserObject}
+            $Self->{ContactObject}
             ->CustomerSearch( UserLogin => $Ticket{$Field}->[0], );
 
         for my $CurrUserLogin ( keys(%UserListCustomer) ) {
 
-            my %CustomerUserData =
-                $Self->{CustomerUserObject}
-                ->CustomerUserDataGet( User => $CurrUserLogin, );
+            my %ContactData =
+                $Self->{ContactObject}
+                ->ContactGet( User => $CurrUserLogin, );
 
             # add links to database
             my $Success = $Self->{LinkObject}->LinkAdd(
                 SourceObject => 'Person',
-                SourceKey    => $CustomerUserData{UserLogin},
+                SourceKey    => $ContactData{UserLogin},
                 TargetObject => 'Ticket',
                 TargetKey    => $Ticket{TicketID},
                 Type         => 'Customer',

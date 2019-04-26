@@ -17,7 +17,7 @@ use vars (qw($Self));
 # get needed objects
 my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
 my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
-my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 my $ServiceObject      = $Kernel::OM->Get('Kernel::System::Service');
 my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
 my $TypeObject         = $Kernel::OM->Get('Kernel::System::Type');
@@ -62,20 +62,20 @@ my %NewUserData = $UserObject->GetUserData(
 );
 
 # set customer user options
-my $CustomerUserLogin = $Helper->TestCustomerUserCreate()
+my $ContactLogin = $Helper->TestContactCreate()
     # rkaiser - T#2017020290001194 - changed customer user to contact
     || die "Did not get test contact";
 
-my %CustomerUserData = $CustomerUserObject->CustomerUserDataGet(
-    User => $CustomerUserLogin,
+my %ContactData = $ContactObject->ContactGet(
+    User => $ContactLogin,
 );
 
-my $NewCustomerUserLogin = $Helper->TestCustomerUserCreate()
+my $NewContactLogin = $Helper->TestContactCreate()
     # rkaiser - T#2017020290001194 - changed customer user to contact
     || die "Did not get test contact";
 
-my %NewCustomerUserData = $CustomerUserObject->CustomerUserDataGet(
-    User => $NewCustomerUserLogin,
+my %NewContactData = $ContactObject->ContactGet(
+    User => $NewContactLogin,
 );
 
 my $RandomID = $Helper->GetRandomID();
@@ -316,10 +316,10 @@ my %TestACLs = (
             },
         },
     },
-    'CustomerUser-1' => {
+    'Contact-1' => {
         Properties => {
-            CustomerUser => {
-                UserLogin => [$CustomerUserLogin],
+            Contact => {
+                UserLogin => [$ContactLogin],
             },
         },
         Possible => {
@@ -453,7 +453,7 @@ my $TicketID = $TicketObject->TicketCreate(
     SLA           => $SLAName,
     State         => $StateName,
     CustomerID    => '123465',
-    CustomerUser  => $CustomerUserLogin,
+    Contact  => $ContactLogin,
     OwnerID       => $UserID,
     ResponsibleID => $UserID,
     UserID        => 1,
@@ -661,7 +661,7 @@ my @Tests = (
         },
     },
     {
-        Name   => 'ACL CustomerUser-1 - correct CustomerUser',
+        Name   => 'ACL Contact-1 - correct Contact',
         Config => {
             Data => {
                 1 => 'new',
@@ -669,7 +669,7 @@ my @Tests = (
             },
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
-            CustomerUserID => $CustomerUserData{UserID},
+            ContactID => $ContactData{UserID},
         },
         SuccessMatch => 1,
         ReturnData   => {
@@ -1434,12 +1434,12 @@ $Self->True(
 
     # customer based tests
     {
-        Name => 'ACL DB-CustomerUser-1 - Set new CustomerUser, Wrong PropertiesDatabase: ',
+        Name => 'ACL DB-Contact-1 - Set new Contact, Wrong PropertiesDatabase: ',
         ACLs => {
-            'DB-CustomerUser-1-A' => {
+            'DB-Contact-1-A' => {
                 PropertiesDatabase => {
-                    CustomerUser => {
-                        UserLogin => [$NewCustomerUserLogin],
+                    Contact => {
+                        UserLogin => [$NewContactLogin],
                     },
                 },
                 Possible => {
@@ -1457,18 +1457,18 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            CustomerUserID => $NewCustomerUserData{UserID},
+            ContactID => $NewContactData{UserID},
         },
         SuccessMatch => 0,
         ReturnData   => {},
     },
     {
-        Name => 'ACL DB-CustomerUser-1 - Set new CustomerUser, Correct PropertiesDatabase: ',
+        Name => 'ACL DB-Contact-1 - Set new Contact, Correct PropertiesDatabase: ',
         ACLs => {
-            'DB-CustomerUser-1-B' => {
+            'DB-Contact-1-B' => {
                 PropertiesDatabase => {
-                    CustomerUser => {
-                        UserLogin => [$CustomerUserLogin],
+                    Contact => {
+                        UserLogin => [$ContactLogin],
                     },
                 },
                 Possible => {
@@ -1486,7 +1486,7 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            CustomerUserID => $NewCustomerUserData{UserID},
+            ContactID => $NewContactData{UserID},
         },
         SuccessMatch => 1,
         ReturnData   => {
@@ -1494,18 +1494,18 @@ $Self->True(
         },
     },
     {
-        Name => 'ACL DB-CustomerUser-1 - Set new CustomerUser, Wrong Properties,'
+        Name => 'ACL DB-Contact-1 - Set new Contact, Wrong Properties,'
             . ' Correct PropertiesDatabase: ',
         ACLs => {
-            'DB-CustomerUser-1-C' => {
+            'DB-Contact-1-C' => {
                 Properties => {
-                    CustomerUser => {
-                        UserLogin => [$CustomerUserLogin],
+                    Contact => {
+                        UserLogin => [$ContactLogin],
                     },
                 },
                 PropertiesDatabase => {
-                    CustomerUser => {
-                        UserLogin => [$CustomerUserLogin],
+                    Contact => {
+                        UserLogin => [$ContactLogin],
                     },
                 },
                 Possible => {
@@ -1523,24 +1523,24 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            CustomerUserID => $NewCustomerUserData{UserID},
+            ContactID => $NewContactData{UserID},
         },
         SuccessMatch => 0,
         ReturnData   => {},
     },
     {
-        Name => 'ACL DB-CustomerUser-1 - Set new CustomerUser, Correct Properties,'
+        Name => 'ACL DB-Contact-1 - Set new Contact, Correct Properties,'
             . ' Correct PropertiesDatabase: ',
         ACLs => {
-            'DB-CustomerUser-1-S' => {
+            'DB-Contact-1-S' => {
                 Properties => {
-                    CustomerUser => {
-                        UserLogin => [$NewCustomerUserLogin],
+                    Contact => {
+                        UserLogin => [$NewContactLogin],
                     },
                 },
                 PropertiesDatabase => {
-                    CustomerUser => {
-                        UserLogin => [$CustomerUserLogin],
+                    Contact => {
+                        UserLogin => [$ContactLogin],
                     },
                 },
                 Possible => {
@@ -1558,7 +1558,7 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            CustomerUserID => $NewCustomerUserData{UserID},
+            ContactID => $NewContactData{UserID},
         },
         SuccessMatch => 1,
         ReturnData   => {

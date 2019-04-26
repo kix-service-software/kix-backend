@@ -64,12 +64,12 @@ my @Tests = (
             'X-KIX-FollowUp-State-PendingTime' => '2022-01-01 00:00:00',
         },
         CheckNewTicket => {
-            RealTillTimeNotUsed => $TimeObject->TimeStamp2SystemTime(
+            PendingTimeUnix => $TimeObject->TimeStamp2SystemTime(
                 String => '2021-01-01 00:00:00'
             ),
         },
         CheckFollowUp => {
-            RealTillTimeNotUsed => $TimeObject->TimeStamp2SystemTime(
+            PendingTimeUnix => $TimeObject->TimeStamp2SystemTime(
                 String => '2022-01-01 00:00:00'
             ),
         },
@@ -87,10 +87,10 @@ my @Tests = (
             'X-KIX-FollowUp-State-PendingTime' => '2022-01- 00:00:00',
         },
         CheckNewTicket => {
-            RealTillTimeNotUsed => 0,
+            PendingTimeUnix => 0,
         },
         CheckFollowUp => {
-            RealTillTimeNotUsed => 0,
+            PendingTimeUnix => 0,
         },
     },
     {

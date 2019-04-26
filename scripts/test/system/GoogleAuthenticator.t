@@ -71,7 +71,7 @@ my $UserRand     = 'example-user' . $Helper->GetRandomID();
 my $CustomerRand = 'example-customer' . $Helper->GetRandomID();
 
 my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
-my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
 # add test user and customer
 my $TestUserID = $UserObject->UserAdd(
@@ -83,8 +83,8 @@ my $TestUserID = $UserObject->UserAdd(
     ChangeUserID  => 1,
 ) || die "Could not create test user";
 
-my $TestCustomerUserID = $CustomerUserObject->CustomerUserAdd(
-    Source         => 'CustomerUser',
+my $TestContactID = $ContactObject->ContactAdd(
+    Source         => 'Contact',
     UserFirstname  => 'Firstname Test',
     UserLastname   => 'Lastname Test',
     UserCustomerID => $CustomerRand,
@@ -110,7 +110,7 @@ for my $ConfigKey ( sort keys %CurrentConfig ) {
         Value => $CurrentConfig{$ConfigKey},
     );
     $ConfigObject->Set(
-        Key   => 'Customer::AuthTwoFactorModule10::' . $ConfigKey,
+        Key   => 'Contact::AuthTwoFactorModule10::' . $ConfigKey,
         Value => $CurrentConfig{$ConfigKey},
     );
 }
@@ -120,12 +120,12 @@ $Kernel::OM->ObjectParamAdd(
     'Kernel::System::Auth::TwoFactor::GoogleAuthenticator' => {
         Count => 10,
     },
-    'Kernel::System::CustomerAuth::TwoFactor::GoogleAuthenticator' => {
+    'Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator' => {
         Count => 10,
     },
 );
 my $AuthTwoFactorObject         = $Kernel::OM->Get('Kernel::System::Auth::TwoFactor::GoogleAuthenticator');
-my $CustomerAuthTwoFactorObject = $Kernel::OM->Get('Kernel::System::CustomerAuth::TwoFactor::GoogleAuthenticator');
+my $ContactAuthTwoFactorObject = $Kernel::OM->Get('Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator');
 
 my @Tests = (
     {
@@ -209,7 +209,7 @@ for my $Test (@Tests) {
             Value  => $CurrentConfig{Secret},
             UserID => $TestUserID,
         );
-        $CustomerUserObject->SetPreferences(
+        $ContactObject->SetPreferences(
             Key    => 'UnitTestUserGoogleAuthenticatorSecretKey',
             Value  => $CurrentConfig{Secret},
             UserID => $CustomerRand,
@@ -240,7 +240,7 @@ for my $Test (@Tests) {
             Value => $CurrentConfig{$ConfigKey},
         );
         $ConfigObject->Set(
-            Key   => 'Customer::AuthTwoFactorModule10::' . $ConfigKey,
+            Key   => 'Contact::AuthTwoFactorModule10::' . $ConfigKey,
             Value => $CurrentConfig{$ConfigKey},
         );
     }
@@ -264,12 +264,12 @@ for my $Test (@Tests) {
     );
 
     # test customer auth
-    my $CustomerAuthResult = $CustomerAuthTwoFactorObject->Auth(
+    my $ContactAuthResult = $ContactAuthTwoFactorObject->Auth(
         User           => $CustomerRand,
         TwoFactorToken => $Test->{TwoFactorToken},
     );
     $Self->Is(
-        $CustomerAuthResult,
+        $ContactAuthResult,
         $Test->{ExpectedAuthResult},
         $Test->{Name} . ' (customer)',
     );

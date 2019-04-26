@@ -318,6 +318,7 @@ sub TicketSearch {
         $SQL .= ' '.($SQLPart->{BeginWith} || '').' '.$SQLDef{$SQLPart->{Name}};
     }
 
+print STDERR "SQL: $SQL\n";
     # check cache
     my $CacheObject;
     if ( $Param{CacheTTL} ) {
@@ -462,7 +463,7 @@ sub _CreatePermissionSQL {
 
     #     # get all customer ids
     #     $SQLWhere = '(';
-    #     my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
+    #     my @CustomerIDs = $Kernel::OM->Get('Kernel::System::Contact')->CustomerIDs(
     #         User => $Param{UserID},
     #     );
 

@@ -39,7 +39,7 @@ for my $IDCount ( 0 .. $Limit ) {
         Lock         => 'unlock',
         Priority     => '3 normal',
         CustomerNo   => '123456',
-        CustomerUser => 'customer@example.com',
+        Contact => 'customer@example.com',
         State        => 'new',
         OwnerID      => 1,
         UserID       => 1,

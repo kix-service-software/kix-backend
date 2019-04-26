@@ -82,7 +82,7 @@ my %NewJob  = (
         TicketCreateTimeStopDay    => 6,
 
         NewNoteBody           => '',
-        NewCustomerUserLogin  => '',
+        NewContactLogin  => '',
         NewModule             => '',
         NewSendNoNotification => 0,
         NewDelete             => 0,
@@ -299,8 +299,8 @@ $GenericAgentObject = Kernel::System::GenericAgent->new();
 my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
 
 $Self->True(
-    ( $Ticket{RealTillTimeNotUsed} > $SystemTime + 863500 )
-        && ( $Ticket{RealTillTimeNotUsed} < $SystemTime + 864500 )
+    ( $Ticket{PendingTimeUnix} > $SystemTime + 863500 )
+        && ( $Ticket{PendingTimeUnix} < $SystemTime + 864500 )
     ,
     "Check pending time",
 );

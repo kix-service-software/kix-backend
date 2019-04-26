@@ -1026,7 +1026,7 @@ sub SendLinkedPersonNotification {
             );
         }
         else {
-            %User = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+            %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
                 User => $RecipientID,
             );
         }
@@ -1164,16 +1164,16 @@ sub _GetUserInfoString {
     return '' if !$Param{UserType};
     my %User = %{ $Param{User} };
 
-    my %CustomerUserData
-        = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+    my %ContactData
+        = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         User => $User{UserLogin},
         );
 
     # if no customer data found use agent data
-    if ( !%CustomerUserData ) {
+    if ( !%ContactData ) {
         my @EmptyArray = ();
-        %CustomerUserData = %User;
-        $CustomerUserData{Config}->{Map} = \@EmptyArray;
+        %ContactData = %User;
+        $ContactData{Config}->{Map} = \@EmptyArray;
 
         my $AgentConfig
             = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarTicketInfo');
@@ -1187,13 +1187,13 @@ sub _GetUserInfoString {
             push @TempArray, '';
             push @TempArray, 1;
             push @TempArray, 0;
-            push @{ $CustomerUserData{Config}->{Map} }, \@TempArray;
+            push @{ $ContactData{Config}->{Map} }, \@TempArray;
         }
     }
 
     $Self->{LayoutObject} = $Param{LayoutObject};
     my $DetailsTable = $Self->{LayoutObject}->AgentCustomerDetailsViewTable(
-        Data   => \%CustomerUserData,
+        Data   => \%ContactData,
         Ticket => $Param{Ticket},
         Max =>
             $Kernel::OM->Get('Kernel::Config')

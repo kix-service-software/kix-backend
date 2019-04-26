@@ -6296,9 +6296,9 @@ DefaultValue: ''
     </Insert>
     <Insert Table="imexport_template">
         <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="imexport_object" Type="Quote">CustomerCompany</Data>
+        <Data Key="imexport_object" Type="Quote">Organisation</Data>
         <Data Key="imexport_format" Type="Quote">CSV</Data>
-        <Data Key="name" Type="Quote">CustomerCompany (auto-created map)</Data>
+        <Data Key="name" Type="Quote">Organisation (auto-created map)</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -6307,9 +6307,9 @@ DefaultValue: ''
     </Insert>
     <Insert Table="imexport_template">
         <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="imexport_object" Type="Quote">CustomerUser</Data>
+        <Data Key="imexport_object" Type="Quote">Contact</Data>
         <Data Key="imexport_format" Type="Quote">CSV</Data>
-        <Data Key="name" Type="Quote">CustomerUser - Database Backend (auto-created map)</Data>
+        <Data Key="name" Type="Quote">Contact - Database Backend (auto-created map)</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -6329,9 +6329,9 @@ DefaultValue: ''
     </Insert>
     <Insert Table="imexport_template">
         <Data Key="id" Type="AutoIncrement">5</Data>
-        <Data Key="imexport_object" Type="Quote">Service2CustomerUser</Data>
+        <Data Key="imexport_object" Type="Quote">Service2Contact</Data>
         <Data Key="imexport_format" Type="Quote">CSV</Data>
-        <Data Key="name" Type="Quote">Service2CustomerUser (auto-created map)</Data>
+        <Data Key="name" Type="Quote">Service2Contact (auto-created map)</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -6366,7 +6366,7 @@ DefaultValue: ''
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="template_id">2</Data>
         <Data Key="data_key" Type="Quote">CustomerBackend</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompany</Data>
+        <Data Key="data_value" Type="Quote">Organisation</Data>
     </Insert>
     <Insert Table="imexport_object">
         <Data Key="id" Type="AutoIncrement">2</Data>
@@ -6377,14 +6377,14 @@ DefaultValue: ''
     <Insert Table="imexport_object">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="template_id">2</Data>
-        <Data Key="data_key" Type="Quote">ForceImportInConfiguredCustomerCompanyBackend</Data>
+        <Data Key="data_key" Type="Quote">ForceImportInConfiguredOrganisationBackend</Data>
         <Data Key="data_value" Type="Quote">0</Data>
     </Insert>
     <Insert Table="imexport_object">
         <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="template_id">3</Data>
         <Data Key="data_key" Type="Quote">CustomerBackend</Data>
-        <Data Key="data_value" Type="Quote">CustomerUser</Data>
+        <Data Key="data_value" Type="Quote">Contact</Data>
     </Insert>
     <Insert Table="imexport_object">
         <Data Key="id" Type="AutoIncrement">5</Data>
@@ -7746,97 +7746,97 @@ DefaultValue: ''
         <Data Key="id" Type="AutoIncrement">85</Data>
         <Data Key="mapping_id">43</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerID</Data>
+        <Data Key="data_value" Type="Quote">Number</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">86</Data>
         <Data Key="mapping_id">43</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerID</Data>
+        <Data Key="data_value" Type="Quote">Number</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">87</Data>
         <Data Key="mapping_id">44</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyName</Data>
+        <Data Key="data_value" Type="Quote">Name</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">88</Data>
         <Data Key="mapping_id">44</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyName</Data>
+        <Data Key="data_value" Type="Quote">Name</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">89</Data>
         <Data Key="mapping_id">45</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyStreet</Data>
+        <Data Key="data_value" Type="Quote">Street</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">90</Data>
         <Data Key="mapping_id">45</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyStreet</Data>
+        <Data Key="data_value" Type="Quote">Street</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">91</Data>
         <Data Key="mapping_id">46</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyZIP</Data>
+        <Data Key="data_value" Type="Quote">Zip</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">92</Data>
         <Data Key="mapping_id">46</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyZIP</Data>
+        <Data Key="data_value" Type="Quote">Zip</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">93</Data>
         <Data Key="mapping_id">47</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyCity</Data>
+        <Data Key="data_value" Type="Quote">City</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">94</Data>
         <Data Key="mapping_id">47</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyCity</Data>
+        <Data Key="data_value" Type="Quote">City</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">95</Data>
         <Data Key="mapping_id">48</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyCountry</Data>
+        <Data Key="data_value" Type="Quote">Country</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">96</Data>
         <Data Key="mapping_id">48</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyCountry</Data>
+        <Data Key="data_value" Type="Quote">Country</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">97</Data>
         <Data Key="mapping_id">49</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyURL</Data>
+        <Data Key="data_value" Type="Quote">Url</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">98</Data>
         <Data Key="mapping_id">49</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyURL</Data>
+        <Data Key="data_value" Type="Quote">Url</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">99</Data>
         <Data Key="mapping_id">50</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyComment</Data>
+        <Data Key="data_value" Type="Quote">Comment</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">100</Data>
         <Data Key="mapping_id">50</Data>
         <Data Key="data_key" Type="Quote">Value</Data>
-        <Data Key="data_value" Type="Quote">CustomerCompanyComment</Data>
+        <Data Key="data_value" Type="Quote">Comment</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">101</Data>
@@ -8136,7 +8136,7 @@ DefaultValue: ''
         <Data Key="id" Type="AutoIncrement">150</Data>
         <Data Key="mapping_id">81</Data>
         <Data Key="data_key" Type="Quote">Key</Data>
-        <Data Key="data_value" Type="Quote">CustomerUserLogin</Data>
+        <Data Key="data_value" Type="Quote">ContactLogin</Data>
     </Insert>
     <Insert Table="imexport_mapping_object">
         <Data Key="id" Type="AutoIncrement">151</Data>

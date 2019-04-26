@@ -248,7 +248,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => 'example.com',
-    CustomerUser => 'customerOne@example.com',
+    Contact => 'customerOne@example.com',
     OwnerID      => $UserID,
     UserID       => $UserID,
 );
@@ -289,7 +289,7 @@ my $TicketID2 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => 'example.com',
-    CustomerUser => 'customerOne@example.com',
+    Contact => 'customerOne@example.com',
     OwnerID      => $UserID,
     UserID       => $UserID,
 );

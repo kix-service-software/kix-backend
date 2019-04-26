@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
 );
@@ -72,11 +72,11 @@ sub Run {
     );
     return if !@ArticleIndex;
 
-    # Check if it is a known customer, otherwise use email address from CustomerUserID field of the ticket.
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $ArticleIndex[0]->{CustomerUserID},
+    # Check if it is a known customer, otherwise use email address from ContactID field of the ticket.
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        User => $ArticleIndex[0]->{ContactID},
     );
-    my $CustomerEmailAddress = $CustomerData{UserEmail} || $ArticleIndex[0]->{CustomerUserID};
+    my $CustomerEmailAddress = $CustomerData{UserEmail} || $ArticleIndex[0]->{ContactID};
 
     # Email sender address
     my $SenderAddress = $Param{GetParam}->{'X-Sender'};

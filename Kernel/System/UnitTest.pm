@@ -114,6 +114,9 @@ Run all tests located in scripts/test/*.t and print result to stdout.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # set environment
+    $ENV{UnitTest} = 1;
+    
     my %ResultSummary;
     my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
 
@@ -145,7 +148,7 @@ sub Run {
     $Self->{TestCountOk}    = 0;
     $Self->{TestCountNotOk} = 0;
     FILE:
-    for my $File (@Files) {
+    for my $File (sort @Files) {
 
         # check if only some tests are requested
         if (@Names) {

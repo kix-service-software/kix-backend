@@ -32,11 +32,11 @@
       "type": "string",
       "readOnly": true
     },
-    "CustomerID": {
+    "PrimaryOrganisationID": {
       "type": "integer",
       "readOnly": true
     },
-    "CustomerIDs": {
+    "OrganisationIDs": {
       "type": "array",
       "readOnly": true,
       "items": {
@@ -71,10 +71,6 @@
       "type": "string",
       "readOnly": true
     },
-    "Password": {
-      "type": "string",
-      "readOnly": true
-    },
     "Phone": {
       "type": "string",
       "readOnly": true
@@ -95,7 +91,7 @@
       "type": "string",
       "readOnly": true
     },
-    "ZipCode": {
+    "Zip": {
       "type": "string",
       "readOnly": true
     },
@@ -107,11 +103,14 @@
   "required": [
     "ChangeBy",
     "ChangeTime",
-    "CustomerID",
-    "CustomerIDs",
+    "PrimaryOrganisationID",
+    "OrganisationIDs",
     "CreateBy",
     "CreateTime",
+    "Firstname",
+    "Email",
     "ID",
+    "Lastname",
     "Login",
     "ValidID"
   ]

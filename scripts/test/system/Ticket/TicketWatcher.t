@@ -46,7 +46,7 @@ for ( 1 .. 2 ) {
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',
-        CustomerUser => 'customer@example.com',
+        Contact => 'customer@example.com',
         CustomerID   => 'example.com',
         OwnerID      => 1,
         UserID       => 1,

@@ -25,12 +25,12 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-# configure CustomerAuth backend to db
-$ConfigObject->Set( 'CustomerAuthBackend', 'DB' );
+# configure ContactAuth backend to db
+$ConfigObject->Set( 'ContactAuthBackend', 'DB' );
 
-# no additional CustomerAuth backends
+# no additional ContactAuth backends
 for my $Count ( 1 .. 10 ) {
-    $ConfigObject->Set( "CustomerAuthBackend$Count", '' );
+    $ConfigObject->Set( "ContactAuthBackend$Count", '' );
 }
 
 # disable email checks to create new user
@@ -40,11 +40,11 @@ $ConfigObject->Set(
 );
 
 # add test user
-my $GlobalUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+my $GlobalUserObject = $Kernel::OM->Get('Kernel::System::Contact');
 
 my $UserRand = 'example-user' . $Helper->GetRandomID();
 
-my $TestUserID = $GlobalUserObject->CustomerUserAdd(
+my $TestUserID = $GlobalUserObject->ContactAdd(
     UserFirstname  => 'CustomerFirstname Test1',
     UserLastname   => 'CustomerLastname Test1',
     UserCustomerID => 'Customer246',
@@ -111,18 +111,18 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
     # make sure that the customer user objects gets recreated for each loop.
     $Kernel::OM->ObjectsDiscard(
         Objects => [
-            'Kernel::System::CustomerUser',
-            'Kernel::System::CustomerAuth',
+            'Kernel::System::Contact',
+            'Kernel::System::ContactAuth',
         ],
     );
 
     $ConfigObject->Set(
-        Key   => "Customer::AuthModule::DB::CryptType",
+        Key   => "Contact::AuthModule::DB::CryptType",
         Value => $CryptType
     );
 
-    my $UserObject         = $Kernel::OM->Get('Kernel::System::CustomerUser');
-    my $CustomerAuthObject = $Kernel::OM->Get('Kernel::System::CustomerAuth');
+    my $UserObject         = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ContactAuthObject = $Kernel::OM->Get('Kernel::System::ContactAuth');
 
     for my $Test (@Tests) {
 
@@ -136,49 +136,49 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
             "Password set"
         );
 
-        my $CustomerAuthResult = $CustomerAuthObject->Auth(
+        my $ContactAuthResult = $ContactAuthObject->Auth(
             User => $UserRand,
             Pw   => $Test->{Password},
         );
 
         $Self->True(
-            $CustomerAuthResult,
+            $ContactAuthResult,
             "CryptType $CryptType Password '$Test->{Password}'",
         );
 
-        $CustomerAuthResult = $CustomerAuthObject->Auth(
+        $ContactAuthResult = $ContactAuthObject->Auth(
             User => $UserRand,
             Pw   => $Test->{Password},
         );
 
         $Self->True(
-            $CustomerAuthResult,
+            $ContactAuthResult,
             "CryptType $CryptType Password '$Test->{Password}' (cached)",
         );
 
-        $CustomerAuthResult = $CustomerAuthObject->Auth(
+        $ContactAuthResult = $ContactAuthObject->Auth(
             User => $UserRand,
             Pw   => 'wrong_pw',
         );
 
         $Self->False(
-            $CustomerAuthResult,
+            $ContactAuthResult,
             "CryptType $CryptType Password '$Test->{Password}' (wrong password)",
         );
 
-        $CustomerAuthResult = $CustomerAuthObject->Auth(
+        $ContactAuthResult = $ContactAuthObject->Auth(
             User => 'non_existing_user_id',
             Pw   => $Test->{Password},
         );
 
         $Self->False(
-            $CustomerAuthResult,
+            $ContactAuthResult,
             "CryptType $CryptType Password '$Test->{Password}' (wrong user)",
         );
     }
 }
 
-my $Success = $GlobalUserObject->CustomerUserUpdate(
+my $Success = $GlobalUserObject->ContactUpdate(
     ID             => $TestUserID,
     UserFirstname  => 'CustomerFirstname Test1',
     UserLastname   => 'CustomerLastname Test1',

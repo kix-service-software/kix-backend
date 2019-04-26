@@ -13,7 +13,7 @@ use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Link',
     'Kernel::System::Log',
     'Kernel::System::SystemAddress',

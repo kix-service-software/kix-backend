@@ -37,7 +37,7 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 my $TestUserLogin = $Helper->TestUserCreate(
     Groups => ['admin'],
 );
-my $TestCustomerUserLogin = $Helper->TestCustomerUserCreate();
+my $TestContactLogin = $Helper->TestContactCreate();
 
 my $BaseURL = $ConfigObject->Get('HttpType') . '://';
 
@@ -67,7 +67,7 @@ if ( !$Response->is_success() ) {
 }
 
 $Response = $UserAgent->get(
-    $CustomerBaseURL . "Action=Login;User=$TestCustomerUserLogin;Password=$TestCustomerUserLogin;"
+    $CustomerBaseURL . "Action=Login;User=$TestContactLogin;Password=$TestContactLogin;"
 );
 
 if ( !$Response->is_success() ) {
@@ -75,7 +75,7 @@ if ( !$Response->is_success() ) {
         0,
         "Could not login to customer interface, aborting! URL: "
             . $CustomerBaseURL
-            . "Action=Login;User=$TestCustomerUserLogin;Password=$TestCustomerUserLogin;"
+            . "Action=Login;User=$TestContactLogin;Password=$TestContactLogin;"
     );
     return 1;
 }

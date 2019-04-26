@@ -87,6 +87,7 @@ sub ParameterDefinition {
 
     return {
         'ContactID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
         'Contact' => {
@@ -102,16 +103,16 @@ perform ContactUpdate Operation. This will return the updated ContactID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ContactID => '...'                                                  # required
+            ContactID => '...'                                              # required
             Contact => {
-                UserLogin       => '...'                                        # optional
-                UserFirstname   => '...'                                        # optional
-                UserLastname    => '...'                                        # optional
-                UserEmail       => '...'                                        # optional
-                UserPassword    => '...'                                        # optional                
-                UserPhone       => '...'                                        # optional                
-                UserTitle       => '...'                                        # optional
-                ValidID         = 0 | 1 | 2                                     # optional
+                Login       => '...'                                        # optional
+                Firstname   => '...'                                        # optional
+                Lastname    => '...'                                        # optional
+                Email       => '...'                                        # optional
+                Password    => '...'                                        # optional                
+                Phone       => '...'                                        # optional                
+                Title       => '...'                                        # optional
+                ValidID     => 0 | 1 | 2                                     # optional
                 ...
             },
         },
@@ -140,8 +141,8 @@ sub Run {
     );
 
     # check ContactLogin exists
-    my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Param{Data}->{ContactID},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Param{Data}->{ContactID},
     );
     if ( !%ContactData ) {
         return $Self->_Error(
@@ -149,24 +150,12 @@ sub Run {
         );
     }
 
-    # check if backend (Source) is writeable
-    
-    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
-        ReadOnly => 0
-    );    
-    if ( !$SourceList{$ContactData{Source}} ) {
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'Cannot update contact. Corresponding backend is not writable or does not exist.',
-        );        
-    }
-
     # check if ContactLogin already exists
-    if ( IsStringWithData($Contact->{UserLogin}) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-            UserLogin => $Contact->{UserLogin},
+    if ( IsStringWithData($Contact->{Login}) ) {
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+            Login => $Contact->{Login},
         );
-        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
+        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{Login}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update contact. Another contact with same login already exists.',
@@ -176,9 +165,9 @@ sub Run {
 
 
     # check ContactEmail exists
-    if ( IsStringWithData($Contact->{UserEmail}) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-            PostMasterSearch => $Contact->{UserEmail},
+    if ( IsStringWithData($Contact->{Email}) ) {
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+            PostMasterSearch => $Contact->{Email},
         );
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
             return $Self->_Error(
@@ -188,50 +177,49 @@ sub Run {
         }
     }
     
-    # check if primary CustomerID exists
-    if ( $Contact->{UserCustomerID} ) {
-        my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
-            CustomerID => $Contact->{UserCustomerID},
+    # check if primary OrganisationID exists
+    if ( $Contact->{PrimaryOrganisationID} ) {
+        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            ID => $Contact->{PrimaryOrganisationID},
         );
 
-        if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+        if ( !%OrgData || $OrgData{ValidID} != 1 ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => 'Validation failed. No valid customer found for primary customer ID "'.$Contact->{UserCustomerID}.'".',
+                Message => 'Validation failed. No valid organisation found for primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'".',
             );
         }
     }
     
-    if ( IsArrayRefWithData($Contact->{UserCustomerIDs}) || IsArrayRefWithData($ContactData{UserCustomerIDs}) ) {
+    if ( $Contact->{PrimaryOrganisationID} && (IsArrayRefWithData($Contact->{OrganisationIDs}) || IsArrayRefWithData($ContactData{OrganisationIDs})) ) {
         # check if primary CustomerID is contained in assigned CustomerIDs
-        my @CustomerIDs = @{IsArrayRefWithData($Contact->{UserCustomerIDs}) ? $Contact->{UserCustomerIDs} : $ContactData{UserCustomerIDs}};
-        if ( !grep /$Contact->{UserCustomerID}/, @CustomerIDs ) {
+        my @OrgIDs = @{IsArrayRefWithData($Contact->{OrganisationIDs}) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs}};
+        if ( !grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => 'Validation failed. Primary customer ID "'.$Contact->{UserCustomerID}.'" is not available in assigned customer IDs "'.(join(", ", @CustomerIDs)).'".',
+                Message => 'Validation failed. Primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'" is not available in assigned organisation IDs "'.(join(", ", @OrgIDs)).'".',
             );
         }
         # check each assigned customer 
-        foreach my $CustomerID ( @CustomerIDs ) {
-            my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyGet(
-                CustomerID => $CustomerID,
+        foreach my $OrgID ( @OrgIDs ) {
+            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                ID => $OrgID,
             );
-            if ( !%CustomerData || $CustomerData{ValidID} != 1 ) {
+            if ( !%OrgData || $OrgData{ValidID} != 1 ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => 'Validation failed. No valid customer found for assigned customer ID "'.$CustomerID.'".',
+                    Message => 'Validation failed. No valid organisation found for assigned organisation ID "'.$OrgID.'".',
                 );
             }
         }
     }
 
     # update Contact
-    my $Success = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
+    my $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
         %ContactData,
         %{$Contact},
-        UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $ContactData{UserCustomerIDs},
-        ID              => $ContactData{UserID},
-        UserID          => $Self->{Authorization}->{UserID},
+        ID     => $Param{Data}->{ContactID},
+        UserID => $Self->{Authorization}->{UserID},
     );    
     if ( !$Success ) {
         return $Self->_Error(
@@ -241,6 +229,6 @@ sub Run {
     }
     
     return $Self->_Success(
-        ContactID => $Contact->{UserLogin} || $ContactData{UserID},
+        ContactID => $Param{Data}->{ContactID}
     );   
 }

@@ -52,7 +52,7 @@ my @Tests = (
         Data => {
             Title        => 'Some Ticket_Title 1',
             CustomerNo   => '123456',
-            CustomerUser => 'customer1@example.com',
+            Contact => 'customer1@example.com',
         },
     },
 );
@@ -70,7 +70,7 @@ for my $Test (@Tests) {
         Priority     => '3 normal',
         State        => 'new',
         CustomerNo   => $Test->{Data}->{CustomerNo},
-        CustomerUser => $Test->{Data}->{CustomerUser},
+        Contact => $Test->{Data}->{Contact},
         OwnerID      => 1,
         UserID       => 1,
     );

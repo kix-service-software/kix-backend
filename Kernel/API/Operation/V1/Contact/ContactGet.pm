@@ -92,6 +92,7 @@ sub ParameterDefinition {
 
     return {
         'ContactID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         }                
@@ -131,14 +132,13 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @ContactList;
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('CustomerUser');
   
     # start loop
     foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
 
         # get the Contact data
-        my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $ContactID,
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            ID => $ContactID,
         );
 
         if ( !IsHashRefWithData( \%ContactData ) ) {
@@ -148,35 +148,8 @@ sub Run {
             );
         }
 
-        # map UserID to ContactID
-        $ContactData{ContactID} = $ContactData{UserID};
-        delete $ContactData{UserID};
-
-        # map Source to SourceID
-        $ContactData{SourceID} = $ContactData{Source};
-        delete $ContactData{Source};
-
-        my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
-
-        # add attributes from Map to whitelist
-        foreach my $Field ( @{$ContactData{Config}->{Map}} ) {
-            next if !$Field->{Exposed};
-            $AttributeWhitelist->{$Field->{Attribute}} = 1;
-        }
-
-        # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID DisplayValue UserCustomerIDs) ) {
-            $AttributeWhitelist->{$Attr} = 1;
-        } 
-
-        # always add UserCustomerIDs (override existing one)
-        my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
-            User => $ContactID,
-        );
-        $ContactData{UserCustomerIDs} = \@CustomerIDs;
-
         # filter valid attributes
-        if ( IsHashRefWithData($AttributeWhitelist) ) {
+        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
             foreach my $Attr (sort keys %ContactData) {
                 delete $ContactData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
             }
@@ -198,7 +171,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -217,7 +190,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -236,7 +209,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -255,7 +228,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },

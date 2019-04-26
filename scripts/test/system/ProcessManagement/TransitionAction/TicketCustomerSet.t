@@ -149,7 +149,7 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Correct ASCII CustomerUserID',
+        Name   => 'Correct ASCII ContactID',
         Config => {
             UserID => $UserID,
             Ticket => \%Ticket,
@@ -194,12 +194,12 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Correct UTF8 CustomerUserID',
+        Name   => 'Correct UTF8 ContactID',
         Config => {
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                CustomerUserID =>
+                ContactID =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
             },
         },
@@ -211,7 +211,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                CustomerUserID => '<OTRS_TICKET_Queue>',
+                ContactID => '<OTRS_TICKET_Queue>',
             },
         },
         Success => 1,
@@ -222,7 +222,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                CustomerUserID => '<OTRS_TICKET_NotExisting>',
+                ContactID => '<OTRS_TICKET_NotExisting>',
             },
         },
         Success => 0,
@@ -267,9 +267,9 @@ for my $Test (@Tests) {
             UserID   => 1,
         );
 
-        # set Attributes No as CustomerID and User as CustomerUserID
+        # set Attributes No as CustomerID and User as ContactID
         $Ticket{No}   = $Ticket{CustomerID}     || '';
-        $Ticket{User} = $Ticket{CustomerUserID} || '';
+        $Ticket{User} = $Ticket{ContactID} || '';
 
         ATTRIBUTE:
         for my $Attribute ( sort keys %{ $Test->{Config}->{Config} } ) {

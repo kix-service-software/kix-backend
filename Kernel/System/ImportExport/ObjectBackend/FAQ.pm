@@ -334,7 +334,7 @@ sub ExportDataGet {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message =>
-                "FAQ2CustomerUser: search data is not a hash ref - ignoring search limitation.",
+                "FAQ2Contact: search data is not a hash ref - ignoring search limitation.",
         );
     }
 

@@ -888,7 +888,7 @@ You can log in via the following URL:
 
     # CustomerGroupSupport (0 = compat. to OTRS 1.1 or lower)
     # (if this is 1, the you need to set the group <-> customer user
-    # relations! http://host/otrs/index.pl?Action=AdminCustomerUserGroup
+    # relations! http://host/otrs/index.pl?Action=AdminContactGroup
     # otherway, each user is ro/rw in each group!)
     $Self->{CustomerGroupSupport} = 0;
 
@@ -981,53 +981,54 @@ via the Preferences button after logging in.
     # --------------------------------------------------- #
     # This is the auth. module for the otrs db
     # you can also configure it using a remote database
-    $Self->{'Customer::AuthModule'}                       = 'Kernel::System::CustomerAuth::DB';
-    $Self->{'Customer::AuthModule::DB::Table'}            = 'customer_user';
-    $Self->{'Customer::AuthModule::DB::CustomerKey'}      = 'login';
-    $Self->{'Customer::AuthModule::DB::CustomerPassword'} = 'pw';
+    $Self->{'Contact::AuthModule'}               = 'Kernel::System::ContactAuth::DB';
+    $Self->{'Contact::AuthModule::DB::Table'}    = 'contact';
+    $Self->{'Contact::AuthModule::DB::Column::ID'}       = 'id';
+    $Self->{'Contact::AuthModule::DB::Column::Login'}    = 'login';
+    $Self->{'Contact::AuthModule::DB::Column::Password'} = 'password';
 
-#    $Self->{'Customer::AuthModule::DB::DSN'} = "DBI:mysql:database=customerdb;host=customerdbhost";
-#    $Self->{'Customer::AuthModule::DB::User'} = "some_user";
-#    $Self->{'Customer::AuthModule::DB::Password'} = "some_password";
+#    $Self->{'Contact::AuthModule::DB::DSN'} = "DBI:mysql:database=customerdb;host=customerdbhost";
+#    $Self->{'Contact::AuthModule::DB::User'} = "some_user";
+#    $Self->{'Contact::AuthModule::DB::Password'} = "some_password";
 
     # if you use odbc or you want to define a database type (without autodetection)
-#    $Self->{'Customer::AuthModule::DB::Type'} = 'mysql';
+#    $Self->{'Contact::AuthModule::DB::Type'} = 'mysql';
 
     # password crypt type (bcrypt|sha2|sha1|md5|apr1|crypt|plain)
-#    $Self->{'Customer::AuthModule::DB::CryptType'} = 'sha2';
+#    $Self->{'Contact::AuthModule::DB::CryptType'} = 'sha2';
 
     # This is an example configuration for an LDAP auth. backend.
     # (take care that Net::LDAP is installed!)
-#    $Self->{'Customer::AuthModule'} = 'Kernel::System::CustomerAuth::LDAP';
-#    $Self->{'Customer::AuthModule::LDAP::Host'} = 'ldap.example.com';
-#    $Self->{'Customer::AuthModule::LDAP::BaseDN'} = 'dc=example,dc=com';
-#    $Self->{'Customer::AuthModule::LDAP::UID'} = 'uid';
+#    $Self->{'Contact::AuthModule'} = 'Kernel::System::ContactAuth::LDAP';
+#    $Self->{'Contact::AuthModule::LDAP::Host'} = 'ldap.example.com';
+#    $Self->{'Contact::AuthModule::LDAP::BaseDN'} = 'dc=example,dc=com';
+#    $Self->{'Contact::AuthModule::LDAP::UID'} = 'uid';
 
     # Check if the user is allowed to auth in a posixGroup
     # (e. g. user needs to be in a group xyz to use otrs)
-#    $Self->{'Customer::AuthModule::LDAP::GroupDN'} = 'cn=otrsallow,ou=posixGroups,dc=example,dc=com';
-#    $Self->{'Customer::AuthModule::LDAP::AccessAttr'} = 'memberUid';
+#    $Self->{'Contact::AuthModule::LDAP::GroupDN'} = 'cn=otrsallow,ou=posixGroups,dc=example,dc=com';
+#    $Self->{'Contact::AuthModule::LDAP::AccessAttr'} = 'memberUid';
     # for ldap posixGroups objectclass (just uid)
-#    $Self->{'Customer::AuthModule::LDAP::UserAttr'} = 'UID';
+#    $Self->{'Contact::AuthModule::LDAP::UserAttr'} = 'UID';
     # for non ldap posixGroups objectclass (full user dn)
-#    $Self->{'Customer::AuthModule::LDAP::UserAttr'} = 'DN';
+#    $Self->{'Contact::AuthModule::LDAP::UserAttr'} = 'DN';
 
     # The following is valid but would only be necessary if the
     # anonymous user do NOT have permission to read from the LDAP tree
-#    $Self->{'Customer::AuthModule::LDAP::SearchUserDN'} = '';
-#    $Self->{'Customer::AuthModule::LDAP::SearchUserPw'} = '';
+#    $Self->{'Contact::AuthModule::LDAP::SearchUserDN'} = '';
+#    $Self->{'Contact::AuthModule::LDAP::SearchUserPw'} = '';
 
     # in case you want to add always one filter to each ldap query, use
     # this option. e. g. AlwaysFilter => '(mail=*)' or AlwaysFilter => '(objectclass=user)'
-#   $Self->{'Customer::AuthModule::LDAP::AlwaysFilter'} = '';
+#   $Self->{'Contact::AuthModule::LDAP::AlwaysFilter'} = '';
 
     # in case you want to add a suffix to each contact login name, then
     # you can use this option. e. g. user just want to use user but
     # in your ldap directory exists user@domain.
-#    $Self->{'Customer::AuthModule::LDAP::UserSuffix'} = '@domain.com';
+#    $Self->{'Contact::AuthModule::LDAP::UserSuffix'} = '@domain.com';
 
     # Net::LDAP new params (if needed - for more info see perldoc Net::LDAP)
-#    $Self->{'Customer::AuthModule::LDAP::Params'} = {
+#    $Self->{'Contact::AuthModule::LDAP::Params'} = {
 #        port    => 389,
 #        timeout => 120,
 #        async   => 0,
@@ -1035,29 +1036,29 @@ via the Preferences button after logging in.
 #    };
 
     # Die if backend can't work, e. g. can't connect to server.
-#    $Self->{'Customer::AuthModule::LDAP::Die'} = 1;
+#    $Self->{'Contact::AuthModule::LDAP::Die'} = 1;
 
     # This is an example configuration for an apache ($ENV{REMOTE_USER})
     # auth. backend. Use it if you want to have a singe login through
     # apache http-basic-auth
-#   $Self->{'Customer::AuthModule'} = 'Kernel::System::CustomerAuth::HTTPBasicAuth';
+#   $Self->{'Contact::AuthModule'} = 'Kernel::System::ContactAuth::HTTPBasicAuth';
 
     # In case there is a leading domain in the REMOTE_USER, you can
     # replace it by the next config option.
-#   $Self->{'Customer::AuthModule::HTTPBasicAuth::Replace'} = 'example_domain\\';
+#   $Self->{'Contact::AuthModule::HTTPBasicAuth::Replace'} = 'example_domain\\';
     # Note:
     # In case you need to replace some part of the REMOTE_USER, you can
     # use the following RegExp ($1 will be new login).
-#    $Self->{'Customer::AuthModule::HTTPBasicAuth::ReplaceRegExp'} = '^(.+?)@.+?$';
+#    $Self->{'Contact::AuthModule::HTTPBasicAuth::ReplaceRegExp'} = '^(.+?)@.+?$';
     # If you use this module, you should use as fallback the following
     # config settings if user isn't login through apache ($ENV{REMOTE_USER})
 #    $Self->{CustomerPanelLoginURL} = 'http://host.example.com/not-authorised-for-otrs.html';
 #    $Self->{CustomerPanelLogoutURL} = 'http://host.example.com/thanks-for-using-otrs.html';
 
     # This is example configuration to auth. agents against a radius server
-#    $Self->{'Customer::AuthModule'} = 'Kernel::System::Auth::Radius';
-#    $Self->{'Customer::AuthModule::Radius::Host'} = 'radiushost';
-#    $Self->{'Customer::AuthModule::Radius::Password'} = 'radiussecret';
+#    $Self->{'Contact::AuthModule'} = 'Kernel::System::Auth::Radius';
+#    $Self->{'Contact::AuthModule::Radius::Host'} = 'radiushost';
+#    $Self->{'Contact::AuthModule::Radius::Password'} = 'radiussecret';
 
     # --------------------------------------------------- #
     # 2 factor customer authentication settings           #
@@ -1066,30 +1067,30 @@ via the Preferences button after logging in.
     # as an extra security measure                        #
     # --------------------------------------------------- #
     # This is the auth module using the google authenticator mechanism
-#    $Self->{'Customer::AuthTwoFactorModule'} = 'Kernel::System::CustomerAuth::TwoFactor::GoogleAuthenticator';
+#    $Self->{'Contact::AuthTwoFactorModule'} = 'Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator';
 
     # defines user preference where the secret key is stored
-#    $Self->{'Customer::AuthTwoFactorModule::SecretPreferencesKey'} = 'UserGoogleAuthenticatorSecretKey';
+#    $Self->{'Contact::AuthTwoFactorModule::SecretPreferencesKey'} = 'UserGoogleAuthenticatorSecretKey';
 
     # defines if users can login without a 2 factor authentication if they have no stored shared secret
-#    $Self->{'Customer::AuthTwoFactorModule::AllowEmptySecret'} = '1';
+#    $Self->{'Contact::AuthTwoFactorModule::AllowEmptySecret'} = '1';
 
     # defines if the otp for the previous timespan (30-60sec ago) will also be valid
     # helpful to account for timing issues (server and entry based)
-#    $Self->{'Customer::AuthTwoFactorModule::AllowPreviousToken'} = '1';
+#    $Self->{'Contact::AuthTwoFactorModule::AllowPreviousToken'} = '1';
 
     # --------------------------------------------------- #
     #                                                     #
     #             Start of config options!!!              #
-    #                 CustomerUser stuff                  #
+    #                 Contact stuff                  #
     #                                                     #
     # --------------------------------------------------- #
 
-    # CustomerUser
+    # Contact
     # (customer user database backend and settings)
-    $Self->{CustomerUser} = {
+    $Self->{Contact} = {
         Name   => 'Database Backend',
-        Module => 'Kernel::System::CustomerUser::DB',
+        Module => 'Kernel::System::Contact::DB',
         Params => {
             # if you want to use an external database, add the
             # required settings
@@ -1124,15 +1125,15 @@ via the Preferences button after logging in.
 
         # defines the format of the DisplayValue attribute
         DisplayString                      => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
-#        CustomerUserListFields             => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
-        CustomerUserSearchPrefix           => '*',
-        CustomerUserSearchSuffix           => '*',
-        CustomerUserPostMasterSearchFields => ['email'],
-        CustomerUserNameFields             => [ 'title', 'first_name', 'last_name' ],
-        CustomerUserEmailUniqCheck         => 1,
+#        ContactListFields             => ['login', 'first_name', 'last_name', 'customer_id', 'email'],
+        ContactSearchPrefix           => '*',
+        ContactSearchSuffix           => '*',
+        ContactPostMasterSearchFields => ['email'],
+        ContactNameFields             => [ 'title', 'first_name', 'last_name' ],
+        ContactEmailUniqCheck         => 1,
 
 #        # show now own tickets in customer panel, CompanyTickets
-#        CustomerUserExcludePrimaryCustomerID => 0,
+#        ContactExcludePrimaryCustomerID => 0,
 #        # generate auto logins
 #        AutoLoginCreation => 0,
 #        # generate auto login prefix
@@ -1185,11 +1186,11 @@ via the Preferences button after logging in.
         },
     };
 
-# CustomerUser
+# Contact
 # (customer user ldap backend and settings)
-#    $Self->{CustomerUser} = {
+#    $Self->{Contact} = {
 #        Name => 'LDAP Backend',
-#        Module => 'Kernel::System::CustomerUser::LDAP',
+#        Module => 'Kernel::System::Contact::LDAP',
 #        Params => {
 #            # ldap host
 #            Host => 'bay.csuhayward.edu',
@@ -1222,15 +1223,15 @@ via the Preferences button after logging in.
 #        CustomerID => 'mail',
 #        # defines the format of the DisplayValue attribute
 #        DisplayString           => "<KIX_CUSTOMER_UserFirstname> <KIX_CUSTOMER_UserLastname> (<KIX_CUSTOMER_UserEmail>)",
-#        CustomerUserListFields => ['cn', 'mail'],
-#        CustomerUserSearchPrefix => '',
-#        CustomerUserSearchSuffix => '*',
-#        CustomerUserPostMasterSearchFields => ['mail'],
-#        CustomerUserNameFields => ['givenname', 'sn'],
+#        ContactListFields => ['cn', 'mail'],
+#        ContactSearchPrefix => '',
+#        ContactSearchSuffix => '*',
+#        ContactPostMasterSearchFields => ['mail'],
+#        ContactNameFields => ['givenname', 'sn'],
 #        # show now own tickets in customer panel, CompanyTickets
-#        CustomerUserExcludePrimaryCustomerID => 0,
+#        ContactExcludePrimaryCustomerID => 0,
 #        # add a ldap filter for valid users (expert setting)
-#        # CustomerUserValidFilter => '(!(description=gesperrt))',
+#        # ContactValidFilter => '(!(description=gesperrt))',
 #        # admin can't change customer preferences
 #        AdminSetPreferences => 0,
 #        # cache time to live in sec. - cache any ldap queries

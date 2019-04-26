@@ -215,7 +215,7 @@ sub GetObjectAttributes {
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLogin',
+            Element          => 'ContactLogin',
             Block            => 'InputField',
         },
         {
@@ -224,7 +224,7 @@ sub GetObjectAttributes {
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLoginRaw',
+            Element          => 'ContactLoginRaw',
             Block            => 'InputField',
         },
         {
@@ -483,7 +483,7 @@ sub GetObjectAttributes {
     if ( $ConfigObject->Get('Stats::CustomerIDAsMultiSelect') ) {
 
         # Get CustomerID
-        # (This way also can be the solution for the CustomerUserID)
+        # (This way also can be the solution for the ContactID)
         $DBObject->Prepare(
             SQL => "SELECT DISTINCT customer_id FROM ticket",
         );

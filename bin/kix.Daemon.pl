@@ -43,8 +43,8 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 );
 
 if ( !$IsWin32 ) {
-    # Don't allow to run these scripts as root.
-    if ( $> == 0 ) {    # $EFFECTIVE_USER_ID
+    # Don't allow to run these scripts as root, except we are in a test run
+    if ( $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
         print STDERR
             "Error: You cannot run kix.Daemon.pl as root. Please run it as the apache user or with the help of su:\n";
         print STDERR "  su -c \"bin/kix.Daemon.pl ...\" -s /bin/bash <apache user>\n";

@@ -67,7 +67,7 @@ sub new {
         Responsibles => 'ResponsibleIDs',
 
         #Customer => 'Customer',
-        #CustomerUser => 'CustomerUserLoginRaw',
+        #Contact => 'ContactLoginRaw',
     };
 
     return $Self;

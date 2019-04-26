@@ -21,7 +21,7 @@ use Kernel::System::VariableCheck qw(:all);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::AutoResponse',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Encode',
@@ -237,8 +237,8 @@ sub Template {
         );
 
         # get recipient
-        my %User = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $Ticket{CustomerUserID},
+        my %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            User => $Ticket{ContactID},
         );
         $Language = $User{UserLanguage};
     }
@@ -428,8 +428,8 @@ sub AutoResponse {
     }
 
     # get recipient
-    my %User = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket{CustomerUserID},
+    my %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        User => $Ticket{ContactID},
     );
 
     # get user language
@@ -1420,10 +1420,10 @@ sub _Replace {
 
                 my $From = '';
 
-                if ( $Ticket{CustomerUserID} ) {
+                if ( $Ticket{ContactID} ) {
 
-                    my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')
-                        ->CustomerUserDataGet( User => $Ticket{CustomerUserID} );
+                    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')
+                        ->ContactGet( User => $Ticket{ContactID} );
 
                     if (
 
@@ -1431,15 +1431,15 @@ sub _Replace {
                         # Or check if this is auto response replacement.
                         # Take ticket customer as 'From'.
                         (
-                            $CustomerUserData{UserEmail}
+                            $ContactData{UserEmail}
                             && $Data{From}
-                            && $CustomerUserData{UserEmail} =~ /$Data{From}/
+                            && $ContactData{UserEmail} =~ /$Data{From}/
                         )
                         || $Param{AutoResponse}
                         )
                     {
-                        $From = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerName(
-                            UserLogin => $Ticket{CustomerUserID}
+                        $From = $Kernel::OM->Get('Kernel::System::Contact')->CustomerName(
+                            UserLogin => $Ticket{ContactID}
                         );
                     }
                     else {
@@ -1487,30 +1487,30 @@ sub _Replace {
     $Tag2 = $Start . 'KIX_CUSTOMER_DATA_';
 
     # KIX4OTRS-capeIT
-    # if ( $Ticket{CustomerUserID} || $Param{Data}->{CustomerUserID} ) {
-    if ( $Ticket{CustomerUserID} || $Param{Data}->{CustomerUserID} || ( defined $Param{Frontend} && $Param{Frontend} eq 'Customer' ) )
+    # if ( $Ticket{ContactID} || $Param{Data}->{ContactID} ) {
+    if ( $Ticket{ContactID} || $Param{Data}->{ContactID} || ( defined $Param{Frontend} && $Param{Frontend} eq 'Customer' ) )
     {
 
-        my $CustomerUserID = $Param{Data}->{CustomerUserID} || $Ticket{CustomerUserID};
+        my $ContactID = $Param{Data}->{ContactID} || $Ticket{ContactID};
 
-        my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $CustomerUserID,
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            User => $ContactID,
         );
 
         # HTML quoting of content
         if ( $Param{RichText} ) {
 
             ATTRIBUTE:
-            for my $Attribute ( sort keys %CustomerUser ) {
-                next ATTRIBUTE if !$CustomerUser{$Attribute};
-                $CustomerUser{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
-                    String => $CustomerUser{$Attribute},
+            for my $Attribute ( sort keys %Contact ) {
+                next ATTRIBUTE if !$Contact{$Attribute};
+                $Contact{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                    String => $Contact{$Attribute},
                 );
             }
         }
 
         # replace it
-        $HashGlobalReplace->( "$Tag|$Tag2", %CustomerUser );
+        $HashGlobalReplace->( "$Tag|$Tag2", %Contact );
     }
 
     #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback

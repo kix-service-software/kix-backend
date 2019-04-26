@@ -2286,20 +2286,20 @@ sub SendAutoResponse {
     my $Cc;
 
     # also send CC to customer user if customer user id is used and addresses do not match
-    if ( $Ticket{CustomerUserID} ) {
+    if ( $Ticket{ContactID} ) {
 
-        my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $Ticket{CustomerUserID},
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            User => $Ticket{ContactID},
         );
 
         $Param{Channel} //= '';
         if (
-            $CustomerUser{UserEmail}
-            && $OrigHeader{From} !~ /\Q$CustomerUser{UserEmail}\E/i
+            $Contact{UserEmail}
+            && $OrigHeader{From} !~ /\Q$Contact{UserEmail}\E/i
             && $Param{Channel} ne 'email'
             )
         {
-            $Cc = $CustomerUser{UserEmail};
+            $Cc = $Contact{UserEmail};
         }
     }
 

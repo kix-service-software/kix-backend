@@ -83,7 +83,7 @@ sub new {
             Priority      => '3 normal',         # or PriorityID => 2,
             State         => 'new',              # or StateID => 5,
             CustomerID    => '123465',
-            CustomerUser  => 'customer@example.com',
+            Contact  => 'customer@example.com',
             Owner         => 'someuserlogin',    # or OwnerID => 123
 
             # ticket optional:
@@ -181,7 +181,7 @@ sub Run {
     my %TicketParam;
     for my $Attribute (
         qw( Title Queue QueueID Lock LockID Priority PriorityID State StateID
-        CustomerID CustomerUser Owner OwnerID TN Type TypeID Service ServiceID SLA SLAID
+        CustomerID Contact Owner OwnerID TN Type TypeID Service ServiceID SLA SLAID
         Responsible ResponsibleID ArchiveFlag
         )
         )

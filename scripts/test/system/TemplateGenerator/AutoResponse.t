@@ -57,10 +57,10 @@ $Self->True(
 my $RandomID = $Helper->GetRandomID();
 
 # create customer users
-my $TestUserLoginEN = $Helper->TestCustomerUserCreate(
+my $TestUserLoginEN = $Helper->TestContactCreate(
     Language => 'en',
 );
-my $TestUserLoginDE = $Helper->TestCustomerUserCreate(
+my $TestUserLoginDE = $Helper->TestContactCreate(
     Language => 'de',
 );
 
@@ -128,7 +128,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => '123465',
-    CustomerUser => 'customer@example.com',
+    Contact => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -143,17 +143,17 @@ my $HTMLTemplate
 my @Tests = (
     {
         Name           => 'English Language Customer',
-        CustomerUser   => $TestUserLoginEN,
+        Contact   => $TestUserLoginEN,
         ExpectedResult => sprintf( $HTMLTemplate, 'S:&nbsp;new' ),
     },
     {
         Name           => 'German Language Customer',
-        CustomerUser   => $TestUserLoginDE,
+        Contact   => $TestUserLoginDE,
         ExpectedResult => sprintf( $HTMLTemplate, 'S:&nbsp;neu' ),
     },
     {
         Name           => 'Not existing Customer',
-        CustomerUser   => 'customer@example.com',
+        Contact   => 'customer@example.com',
         ExpectedResult => sprintf( $HTMLTemplate, 'S:&nbsp;new' ),
     },
 );
@@ -165,13 +165,13 @@ for my $Test (@Tests) {
 
     # set ticket customer
     my $Success = $TicketObject->TicketCustomerSet(
-        User     => $Test->{CustomerUser},
+        User     => $Test->{Contact},
         TicketID => $TicketID,
         UserID   => 1,
     );
     $Self->True(
         $Success,
-        "$Test->{Name} TicketCustomerSet() - for customer $Test->{CustomerUser} with true",
+        "$Test->{Name} TicketCustomerSet() - for customer $Test->{Contact} with true",
     );
 
     # get assigned auto response
@@ -192,7 +192,7 @@ for my $Test (@Tests) {
         TicketID         => $TicketID,
         AutoResponseType => 'auto reply/new ticket',
         OrigHeader       => {
-            From => $Test->{CustomerUser},
+            From => $Test->{Contact},
         },
         UserID => 1,
     );

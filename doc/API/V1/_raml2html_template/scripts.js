@@ -45,7 +45,7 @@ $(document).ready(function() {
 
   $('.examples code').each(function() {
     if ($(this).html().startsWith('{')) {
-      $(this).jsonHighlight(JSON.parse($(this).html()));
+      $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true });
     }
   });
 

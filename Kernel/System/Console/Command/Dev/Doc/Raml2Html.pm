@@ -130,6 +130,10 @@ sub Run {
 
             if ( !$EvalResult ) {
                 $Self->Print("<red>$@</red>");
+                # instead of the bundled schema, use the unbundled version
+                $BundledSchema = $JSONObject->Decode(
+                    Data => $$Content,
+                );
             }
 
             # store schema URI for validation
@@ -166,13 +170,16 @@ sub Run {
             $BundledSchema =~ s/("readOnly"\s*:\s*)(0|1)/$1$Boolean{$2}/g;
 
             # validator resulting schema against the OpenAPI spec
-            my $ValidationResult = $ValidatorObject->load_and_validate_schema($BundledSchema, {schema => $DraftURI});
+            my $ValidationResult = eval {
+                $ValidatorObject->load_and_validate_schema($BundledSchema, {schema => $DraftURI});
+            };
+
             if ( !$ValidationResult ) {
                 $Self->Print("<red>Unable to validate bundled schema $File against OpenAPI specification ($DraftURI).</red>\n");
-                return $Self->ExitCodeError();
             }
-
-            $Self->Print("<green>valid</green>\n");
+            else {
+                $Self->Print("<green>valid</green>\n");
+            }
 
             my $Result = $MainObject->FileWrite(
                 Directory => "$TargetDirectory/schemas",
@@ -222,10 +229,13 @@ sub Run {
                 return $Self->ExitCodeError();
             }
 
-            $ValidatorObject->schema($$SchemaContent);
-            my @ValidationResult = $ValidatorObject->validate(
-                $JSONObject->Decode( Data => $$ExampleContent )
-            );
+            my @ValidationResult;
+            eval {
+                $ValidatorObject->schema($$SchemaContent);
+                @ValidationResult = $ValidatorObject->validate(
+                    $JSONObject->Decode( Data => $$ExampleContent )
+                );
+            };
 
             if ( @ValidationResult ) {
                 $Self->Print("<red>Unable to validate example $File against schema.</red>\n");

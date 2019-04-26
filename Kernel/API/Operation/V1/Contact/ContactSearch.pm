@@ -106,7 +106,7 @@ sub Run {
                    $Value = '*' . $Value;
                 }
 
-                if ($SearchItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
+                if ($SearchItem->{Field} =~ /^(PrimaryOrganisationID|Login)$/g) {
                     $SearchParam{$SearchItem->{Field}} = $Value;
                 }
                 elsif ($SearchItem->{Field} =~ /^(ValidID)$/g) {
@@ -117,7 +117,7 @@ sub Run {
                 }
 
                 # perform Contact search
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+                my %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
                    %SearchParam,
                 );
 
@@ -155,7 +155,7 @@ sub Run {
     }
     else {
         # perform Contact search without any search params
-        %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch();
+        %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch();
     }
 
     if (IsHashRefWithData(\%ContactList)) {

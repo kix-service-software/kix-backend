@@ -121,8 +121,8 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 Owner         => 'some user login',                             # optional
                 ResponsibleID => 123,                                           # optional
                 Responsible   => 'some user login',                             # optional
-                CustomerUserID => 'some customer user login',                   # optional
-                CustomerID    => 'some customer',                               # optional
+                ContactID      => 'some customer user login',                   # optional
+                OrganisationID => 'some customer',                              # optional
                 PendingTime   => '2011-12-03 23:05:00',                         # optional
                 DynamicFields => [                                              # optional
                     {
@@ -215,25 +215,20 @@ update a ticket with its dynamic fields
 sub _TicketUpdate {
     my ( $Self, %Param ) = @_;
 
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate');
-
     my $Ticket = $Param{Ticket};
-
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: get customer user');
 
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
-    my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket->{CustomerUserID},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Ticket->{ContactID},
     );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get customer user');
 
-    my $CustomerID = $CustomerUserData{UserCustomerID} || '';
+    my $OrgID = $ContactData{PrimaryOrganisationID} || '';
 
-    # use user defined CustomerID if defined
-    if ( defined $Ticket->{CustomerID} && $Ticket->{CustomerID} ne '' ) {
-        $CustomerID = $Ticket->{CustomerID};
+    # use user defined OrganisationID if defined
+    if ( defined $Ticket->{OrganisationID} && $Ticket->{OrganisationID} ne '' ) {
+        $OrgID = $Ticket->{OrganisationID};
     }
 
     # get database object
@@ -241,12 +236,10 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get customer user');
 
     my $OwnerID;
     if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: get user (Owner)');
         my %OwnerData = $UserObject->GetUserData(
             User => $Ticket->{Owner},
         );
         $OwnerID = $OwnerData{UserID};
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get user (Owner)');
     }
     elsif ( defined $Ticket->{OwnerID} ) {
         $OwnerID = $Ticket->{OwnerID};
@@ -254,12 +247,10 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get user (Owner)');
 
     my $ResponsibleID;
     if ( $Ticket->{Responsible} && !$Ticket->{ResponsibleID} ) {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: get user (Responsible)');
         my %ResponsibleData = $UserObject->GetUserData(
             User => $Ticket->{Responsible},
         );
         $ResponsibleID = $ResponsibleData{UserID};
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get user (Responsible)');
     }
     elsif ( defined $Ticket->{ResponsibleID} ) {
         $ResponsibleID = $Ticket->{ResponsibleID};
@@ -268,15 +259,12 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get user (Responsible)');
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: get ticket (again)');
-
     # get current ticket data
     my %TicketData = $TicketObject->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 0,
         UserID        => $Param{UserID},
     );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get ticket (again)');
 
     # update ticket parameters
     # update Ticket->Title
@@ -286,13 +274,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get ticket (again)');
         && $Ticket->{Title} ne $TicketData{Title}
         )
     {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update title');
         my $Success = $TicketObject->TicketTitleUpdate(
             Title    => $Ticket->{Title},
             TicketID => $Param{TicketID},
             UserID   => $Param{UserID},
         );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update title');
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToUpdate',
@@ -312,13 +298,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update title');
             );
         }
         elsif ( defined $Ticket->{QueueID} && $Ticket->{QueueID} ne $TicketData{QueueID} ) {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update queue');
             $Success = $TicketObject->TicketQueueSet(
                 QueueID  => $Ticket->{QueueID},
                 TicketID => $Param{TicketID},
                 UserID   => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update queue');
         }
         else {
 
@@ -345,13 +329,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update queue');
             );
         }
         elsif ( defined $Ticket->{LockID} && $Ticket->{LockID} ne $TicketData{LockID} ) {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update lock');
             $Success = $TicketObject->TicketLockSet(
                 LockID   => $Ticket->{LockID},
                 TicketID => $Param{TicketID},
                 UserID   => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update lock');
         }
         else {
 
@@ -379,13 +361,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update lock');
         }
         elsif ( defined $Ticket->{TypeID} && $Ticket->{TypeID} ne $TicketData{TypeID} )
         {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update type');
             $Success = $TicketObject->TicketTypeSet(
                 TypeID   => $Ticket->{TypeID},
                 TicketID => $Param{TicketID},
                 UserID   => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update type');
         }
         else {
 
@@ -421,16 +401,12 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update type');
             );
         }
 
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: get state');
         %StateData = $StateObject->StateGet(
             ID => $StateID,
         );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: get state');
 
         # force unlock if state type is close
         if ( $StateData{TypeName} =~ /^close/i ) {
-
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: unlock ticket');
 
             # set lock
             $TicketObject->TicketLockSet(
@@ -438,7 +414,6 @@ $Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: unlock ticket');
                 Lock     => 'unlock',
                 UserID   => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: unlock ticket');
         }
 
         # set pending time
@@ -446,14 +421,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: unlock ticket');
 
             # set pending time
             if ( defined $Ticket->{PendingTime} ) {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: set pending time');
                 my $Success = $TicketObject->TicketPendingTimeSet(
                     UserID   => $Param{UserID},
                     TicketID => $Param{TicketID},
                     String   => $Ticket->{PendingTime},
                 );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: set pending time');
-
                 if ( !$Success ) {
                     return $Self->_Error(
                         Code    => 'Object.UnableToUpdate',
@@ -479,13 +451,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: set pending time');
         }
         elsif ( defined $Ticket->{StateID} && $Ticket->{StateID} ne $TicketData{StateID} )
         {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update state');
             $Success = $TicketObject->TicketStateSet(
                 StateID  => $Ticket->{StateID},
                 TicketID => $Param{TicketID},
                 UserID   => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update state');
         }
         else {
 
@@ -514,13 +484,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update state');
 
     if ( $Ticket->{ServiceID} ne $TicketData{ServiceID} )
     {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update service');
         $Success = $TicketObject->TicketServiceSet(
             ServiceID => $Ticket->{ServiceID},
             TicketID  => $Param{TicketID},
             UserID    => $Param{UserID},
         );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update state');
     }
     else {
 
@@ -545,13 +513,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update state');
 
     if ( $Ticket->{SLAID} ne $TicketData{SLAID} )
     {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update SLA');
         $Success = $TicketObject->TicketSLASet(
             SLAID    => $Ticket->{SLAID},
             TicketID => $Param{TicketID},
             UserID   => $Param{UserID},
         );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update SLA');
     }
     else {
 
@@ -566,36 +532,34 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update SLA');
         );
     }
 
-    # update Ticket->CustomerUserID && Ticket->CustomerID
-    if ( $Ticket->{CustomerUserID} || $Ticket->{CustomerID} ) {
+    # update Ticket->ContactID && Ticket->OrganisationID
+    if ( $Ticket->{ContactID} || $Ticket->{OrganisationID} ) {
 
         # set values to empty if they are not defined
-        $TicketData{CustomerUserID} = $TicketData{CustomerUserID} || '';
-        $TicketData{CustomerID}     = $TicketData{CustomerID}     || '';
-        $Ticket->{CustomerUserID}   = $Ticket->{CustomerUserID}   || '';
-        $Ticket->{CustomerID}       = $Ticket->{CustomerID}       || '';
+        $TicketData{ContactID}      = $TicketData{ContactID} || '';
+        $TicketData{OrganisationID} = $TicketData{OrganisationID}     || '';
+        $Ticket->{ContactID}        = $Ticket->{ContactID}   || '';
+        $Ticket->{OrganisationID}   = $Ticket->{OrganisationID}       || '';
 
         my $Success;
         if (
-            $Ticket->{CustomerUserID} ne $TicketData{CustomerUserID}
-            || $Ticket->{CustomerID} ne $TicketData{CustomerID}
+            $Ticket->{ContactID} ne $TicketData{ContactID}
+            || $Ticket->{OrganisationID} ne $TicketData{OrganisationID}
             )
         {
-            my $CustomerID = $CustomerUserData{UserCustomerID} || '';
+            my $OrgID = $ContactData{PrimaryOrganisationID} || '';
 
-            # use user defined CustomerID if defined
-            if ( defined $Ticket->{CustomerID} && $Ticket->{CustomerID} ne '' ) {
-                $CustomerID = $Ticket->{CustomerID};
+            # use user defined OrganisationID if defined
+            if ( defined $Ticket->{OrganisationID} && $Ticket->{OrganisationID} ne '' ) {
+                $OrgID = $Ticket->{OrganisationID};
             }
 
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update customer');
             $Success = $TicketObject->TicketCustomerSet(
-                No       => $CustomerID,
-                User     => $Ticket->{CustomerUserID},
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
+                OrganisationID => $OrgID,
+                ContactID      => $Ticket->{ContactID},
+                TicketID       => $Param{TicketID},
+                UserID         => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update customer');
         }
         else {
 
@@ -623,13 +587,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update customer');
         }
         elsif ( defined $Ticket->{PriorityID} && $Ticket->{PriorityID} ne $TicketData{PriorityID} )
         {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update priority');
             $Success = $TicketObject->TicketPrioritySet(
                 PriorityID => $Ticket->{PriorityID},
                 TicketID   => $Param{TicketID},
                 UserID     => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update priority');
         }
         else {
 
@@ -660,13 +622,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update priority');
         }
         elsif ( defined $Ticket->{OwnerID} && $Ticket->{OwnerID} ne $TicketData{OwnerID} )
         {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update owner');
             $Success = $TicketObject->TicketOwnerSet(
                 NewUserID => $Ticket->{OwnerID},
                 TicketID  => $Param{TicketID},
                 UserID    => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update owner');
             $UnlockOnAway = 0;
         }
         else {
@@ -702,13 +662,11 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update owner');
             && $Ticket->{ResponsibleID} ne $TicketData{ResponsibleID}
             )
         {
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update responsible');
             $Success = $TicketObject->TicketResponsibleSet(
                 NewUserID => $Ticket->{ResponsibleID},
                 TicketID  => $Param{TicketID},
                 UserID    => $Param{UserID},
             );
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update responsible');
         }
         else {
 
@@ -727,8 +685,6 @@ $Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update responsible');
     # set dynamic fields
     if ( IsArrayRefWithData($Ticket->{DynamicFields}) ) {
 
-$Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update dynamic fields');
-
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Ticket->{DynamicFields}} ) {
             next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
@@ -746,7 +702,6 @@ $Self->PerfLogStart('API::TicketUpdate::_TicketUpdate: update dynamic fields');
                 );
             }
         }
-$Self->PerfLogStop('API::TicketUpdate::_TicketUpdate: update dynamic fields');
     }
 
     return $Self->_Success(

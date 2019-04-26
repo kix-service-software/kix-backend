@@ -110,9 +110,10 @@ sub Search {
         push( @SQLWhere, $Field." LIKE ".$Value );
     }
     elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
+        my $Field;
         my $Value = $Param{Search}->{Value};
         $Value =~ s/\*/%/g;
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
+        ($Field, $Value) = $Self->_PrepareFieldAndValue(
             Field => 'st.title',
             Value => $Value
         );        

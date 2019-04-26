@@ -20,7 +20,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerCompany::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem Name="Organisation::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -30,7 +30,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerUser::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem Name="Contact::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>

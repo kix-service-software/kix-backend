@@ -2028,7 +2028,7 @@ sub _SetParameter {
 sub _Trim {
     my ( $Self, %Param ) = @_;
 
-    return if ( !$Param{Data} );
+    return $Param{Data} if ( !$Param{Data} );
 
     # remove leading and trailing spaces
     if ( ref($Param{Data}) eq 'HASH' ) {

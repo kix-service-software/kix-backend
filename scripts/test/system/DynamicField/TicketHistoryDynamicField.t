@@ -373,7 +373,7 @@ for my $Test (@Tests) {
         Priority     => '3 normal',
         State        => 'new',
         CustomerID   => 'unittest' . $RandomID,
-        CustomerUser => 'customer@example.com',
+        Contact => 'customer@example.com',
         OwnerID      => 1,
         UserID       => 1,
     );

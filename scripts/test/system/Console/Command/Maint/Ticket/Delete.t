@@ -30,7 +30,7 @@ $Kernel::OM->Get('Kernel::System::Cache')->Configure(
     CacheInMemory => 0,
 );
 
-my $CustomerUser = $Helper->GetRandomID() . '@example.com';
+my $Contact = $Helper->GetRandomID() . '@example.com';
 
 # create a new tickets
 my @Tickets;
@@ -44,7 +44,7 @@ for ( 1 .. 4 ) {
         Priority     => '3 normal',
         State        => 'open',
         CustomerNo   => '123465',
-        CustomerUser => $CustomerUser,
+        Contact => $Contact,
         OwnerID      => 1,
         UserID       => 1,
     );
@@ -79,7 +79,7 @@ $Self->Is(
 
 my %TicketIDs = $TicketObject->TicketSearch(
     Result            => 'HASH',
-    CustomerUserLogin => $CustomerUser,
+    ContactLogin => $Contact,
     UserID            => 1,
 );
 
@@ -103,7 +103,7 @@ $Self->Is(
 
 %TicketIDs = $TicketObject->TicketSearch(
     Result            => 'HASH',
-    CustomerUserLogin => $CustomerUser,
+    ContactLogin => $Contact,
     UserID            => 1,
 );
 

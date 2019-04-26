@@ -35,7 +35,7 @@ my $ModuleName = 'TicketServiceSet';
 my $RandomID   = $Helper->GetRandomID();
 
 # add a customer user
-my $TestCustomerUserLogin = $Helper->TestCustomerUserCreate();
+my $TestContactLogin = $Helper->TestContactCreate();
 
 # set user details
 my $TestUserLogin = $Helper->TestUserCreate();
@@ -99,8 +99,8 @@ for my $ServiceData (@Services) {
 #
 # Assign services to customer (0 and 1)
 #
-my $Success = $ServiceObject->CustomerUserServiceMemberAdd(
-    CustomerUserLogin => $TestCustomerUserLogin,
+my $Success = $ServiceObject->ContactServiceMemberAdd(
+    ContactLogin => $TestContactLogin,
     ServiceID         => $Services[0]->{ServiceID},
     Active            => 1,
     UserID            => 1,
@@ -109,12 +109,12 @@ my $Success = $ServiceObject->CustomerUserServiceMemberAdd(
 # sanity test
 $Self->True(
     $Success,
-    "CustomerUserServiceMemberAdd() for user $TestCustomerUserLogin, and Service $Services[0]->{Name}"
+    "ContactServiceMemberAdd() for user $TestContactLogin, and Service $Services[0]->{Name}"
         . " with true",
 );
 
-$Success = $ServiceObject->CustomerUserServiceMemberAdd(
-    CustomerUserLogin => $TestCustomerUserLogin,
+$Success = $ServiceObject->ContactServiceMemberAdd(
+    ContactLogin => $TestContactLogin,
     ServiceID         => $Services[1]->{ServiceID},
     Active            => 1,
     UserID            => 1,
@@ -123,7 +123,7 @@ $Success = $ServiceObject->CustomerUserServiceMemberAdd(
 # sanity test
 $Self->True(
     $Success,
-    "CustomerUserServiceMemberAdd() for user $TestCustomerUserLogin, and Service $Services[1]->{Name}"
+    "ContactServiceMemberAdd() for user $TestContactLogin, and Service $Services[1]->{Name}"
         . " with true",
 );
 
@@ -139,7 +139,7 @@ for my $Item ( 0 .. 1 ) {
         Priority      => '3 normal',
         StateID       => 1,
         TypeID        => 1,
-        CustomerUser  => ( $Item == 0 ) ? $TestCustomerUserLogin : undef,
+        Contact  => ( $Item == 0 ) ? $TestContactLogin : undef,
         OwnerID       => 1,
         ResponsibleID => 1,
         UserID        => $UserID,

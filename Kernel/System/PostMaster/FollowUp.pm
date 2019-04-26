@@ -16,7 +16,7 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     # KIX4OTRS-capeIT
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     # EO KIX4OTRS-capeIT
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
@@ -455,19 +455,19 @@ sub Run {
 #rbo - T2016121190001552 - renamed X-OTRS headers
         $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
         for my $FromAddress (@SplitFrom) {
-            my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
-            my %UserListCustomer = $CustomerUserObject->CustomerSearch(
+            my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+            my %UserListCustomer = $ContactObject->CustomerSearch(
                 PostMasterSearch => $FromAddress,
             );
 
             if (keys %UserListCustomer) {
                 for my $CurrKey ( keys(%UserListCustomer) ) {
-                    my %CustomerUserData = $CustomerUserObject->CustomerUserDataGet(
+                    my %ContactData = $ContactObject->ContactGet(
                         User => $CurrKey,
                     );
                     if (
-                        $CustomerUserData{UserCustomerID} && $Ticket{CustomerID}
-                        && $Ticket{CustomerID} eq $CustomerUserData{UserCustomerID}
+                        $ContactData{UserCustomerID} && $Ticket{CustomerID}
+                        && $Ticket{CustomerID} eq $ContactData{UserCustomerID}
                         )
                     {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -477,8 +477,8 @@ sub Run {
                     }
                 }
             }
-            # seems to be a customer user not existing in the database -> check if this one is identical to Ticket{CustomerUserID}
-            elsif ($FromAddress && $Ticket{CustomerUserID} && $Ticket{CustomerUserID} eq $FromAddress) {
+            # seems to be a customer user not existing in the database -> check if this one is identical to Ticket{ContactID}
+            elsif ($FromAddress && $Ticket{ContactID} && $Ticket{ContactID} eq $FromAddress) {
 #rbo - T2016121190001552 - renamed X-OTRS headers
                 $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
                 $GetParam{CustomerVisible} = 1;

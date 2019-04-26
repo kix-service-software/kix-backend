@@ -19,7 +19,7 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
@@ -609,7 +609,7 @@ sub _RecipientsGet {
 
         # get needed objects
         my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
-        my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
         # KIX4OTRS-capeIT
         my @LinkedAgents = ();
@@ -793,7 +793,7 @@ sub _RecipientsGet {
                     @CustomerRecipients = @LinkedCustomers;
                 }
                 else {
-                    push @CustomerRecipients, $Article{CustomerUserID};
+                    push @CustomerRecipients, $Article{ContactID};
                 }
 
                 for my $Customer ( @CustomerRecipients ) {
@@ -817,7 +817,7 @@ sub _RecipientsGet {
                     if (
                         $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
                         # KIX4OTRS-capeIT
-                        # && !$Article{CustomerUserID}
+                        # && !$Article{ContactID}
                         && !$Customer
                         # EO KIX4OTRS-capeIT
                         )
@@ -832,29 +832,29 @@ sub _RecipientsGet {
                     # get language and send recipient
                     $Recipient{Language} = $ConfigObject->Get('DefaultLanguage') || 'en';
 
-                    if ( $Article{CustomerUserID} ) {
+                    if ( $Article{ContactID} ) {
 
-                        my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
+                        my %Contact = $ContactObject->ContactGet(
                             # KIX4OTRS-capeIT
-                            # User => $Article{CustomerUserID},
+                            # User => $Article{ContactID},
                             User => $Customer,
                             # EO KIX4OTRS-capeIT
                         );
 
-                        # join Recipient data with CustomerUser data
-                        %Recipient = ( %Recipient, %CustomerUser );
+                        # join Recipient data with Contact data
+                        %Recipient = ( %Recipient, %Contact );
 
                         # get user language
-                        if ( $CustomerUser{UserLanguage} ) {
-                            $Recipient{Language} = $CustomerUser{UserLanguage};
+                        if ( $Contact{UserLanguage} ) {
+                            $Recipient{Language} = $Contact{UserLanguage};
                         }
                     }
 
                     # get real name
-                    if ( $Article{CustomerUserID} ) {
-                        $Recipient{Realname} = $CustomerUserObject->CustomerName(
+                    if ( $Article{ContactID} ) {
+                        $Recipient{Realname} = $ContactObject->CustomerName(
                             # KIX4OTRS-capeIT
-                            # UserLogin => $Article{CustomerUserID},
+                            # UserLogin => $Article{ContactID},
                             UserLogin => $Customer,
                             # EO KIX4OTRS-capeIT
                         );

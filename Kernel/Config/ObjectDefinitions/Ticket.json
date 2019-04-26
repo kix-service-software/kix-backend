@@ -47,7 +47,7 @@
             "ReferencedObject": "Customer"
         },        
         {
-            "Name": "CustomerUserID",
+            "Name": "ContactID",
             "Datatype": "STRING",
             "ReferencedObject": "Contact"
         },        
@@ -291,8 +291,8 @@
             "Sortable": true
         },        
         {
-            "Name": "CustomerUserID",
-            "CorrespondingAttribute": "CustomerUserID",
+            "Name": "ContactID",
+            "CorrespondingAttribute": "ContactID",
             "Datatype": "STRING",
             "ReferencedObject": "Contact",
             "Operators": [

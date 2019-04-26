@@ -311,19 +311,19 @@ sub GetObjectAttributes {
             Block            => 'InputField',
         },
         {
-            Name             => Translatable('CustomerUserLogin (complex search)'),
+            Name             => Translatable('ContactLogin (complex search)'),
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLogin',
+            Element          => 'ContactLogin',
             Block            => 'InputField',
         },
         {
-            Name             => Translatable('CustomerUserLogin (exact match)'),
+            Name             => Translatable('ContactLogin (exact match)'),
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLoginRaw',
+            Element          => 'ContactLoginRaw',
             Block            => 'InputField',
         },
         {
@@ -589,7 +589,7 @@ sub GetObjectAttributes {
     if ( $ConfigObject->Get('Stats::CustomerIDAsMultiSelect') ) {
 
         # Get CustomerID
-        # (This way also can be the solution for the CustomerUserID)
+        # (This way also can be the solution for the ContactID)
         $DBObject->Prepare(
             SQL => "SELECT DISTINCT customer_id FROM ticket",
         );
@@ -1554,7 +1554,7 @@ sub _TicketAttributes {
 
         #CreateTimeUnix => 'CreateTimeUnix',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        CustomerUserID => 'Contact',
+        ContactID => 'Contact',
         Lock           => 'lock',
 
         #LockID         => 'LockID',
@@ -1657,7 +1657,7 @@ sub _SortedAttributes {
         Queue
         State
         Priority
-        CustomerUserID
+        ContactID
         CustomerID
         Service
         SLA

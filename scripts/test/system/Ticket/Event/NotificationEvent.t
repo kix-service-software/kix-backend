@@ -134,7 +134,7 @@ my $SetInvalid = $UserObject->UserUpdate(
 );
 
 # create a new customer user for current test
-my $CustomerUserLogin = $Helper->TestCustomerUserCreate();
+my $ContactLogin = $Helper->TestContactCreate();
 
 # get a random id
 my $RandomID = $Helper->GetRandomID();
@@ -265,7 +265,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority      => '3 normal',
     State         => 'new',
     CustomerID    => 'example.com',
-    CustomerUser  => $CustomerUserLogin,
+    Contact  => $ContactLogin,
     OwnerID       => $UserID,
     ResponsibleID => $UserID,
     UserID        => $UserID,
@@ -883,7 +883,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
-                ToArray => ["$CustomerUserLogin\@localunittest.com"],
+                ToArray => ["$ContactLogin\@localunittest.com"],
             },
         ],
         Success => 1,

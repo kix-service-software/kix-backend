@@ -58,7 +58,7 @@ for my $Item ( 1 .. 2 ) {
         Priority     => '3 normal',
         State        => 'new',
         CustomerID   => '123465' . $RandomID,
-        CustomerUser => 'customerOne@example.com',
+        Contact => 'customerOne@example.com',
         OwnerID      => 1,
         UserID       => 1,
     );
@@ -283,7 +283,7 @@ my @Tests = (
         Name   => 'AttachmentName (AsCustomer)',
         Config => {
             AttachmentName => 'StdAttachment-Test1' . $RandomID . '.txt',
-            CustomerUserID => 'customerOne@example.com',
+            ContactID => 'customerOne@example.com',
         },
         ExpectedResultsArticleStorageDB => [ $TicketIDs[0], $TicketIDs[1] ],
         ExpectedResultsArticleStorageFS => [ $TicketIDs[0], $TicketIDs[1] ],
@@ -293,7 +293,7 @@ my @Tests = (
         Config => {
             AttachmentName => 'StdAttachment-Test1' . $RandomID . '.txt',
             Subject        => 'Ticket2Article2' . $RandomID,
-            CustomerUserID => 'customerOne@example.com',
+            ContactID => 'customerOne@example.com',
         },
         ExpectedResultsArticleStorageDB => [ $TicketIDs[1] ],
         ExpectedResultsArticleStorageFS => [ $TicketIDs[1] ],
@@ -303,7 +303,7 @@ my @Tests = (
         Config => {
             AttachmentName => 'StdAttachment-Test1' . $RandomID . '.txt',
             Subject        => 'Ticket2Article3' . $RandomID,
-            CustomerUserID => 'customerOne@example.com',
+            ContactID => 'customerOne@example.com',
         },
         ExpectedResultsArticleStorageDB => [],
         ExpectedResultsArticleStorageFS => [],

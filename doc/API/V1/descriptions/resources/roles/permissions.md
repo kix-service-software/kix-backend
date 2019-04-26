@@ -4,12 +4,13 @@ For each existing role permissions can be created. A permission item has a ```Ty
 |-|-|-|-|
 |1|Resource|collection resource URI|```/tickets```|
 |2|Object|item resource URI|```/tickets/123```|
-|3|PropertyValue|\<ObjectType\>.\<Property\> EQ \<Value\>|```Ticket.QueueID EQ 123```|
+|3|PropertyValue|&lt;ObjectType&gt;.&lt;Property&gt; EQ &lt;Value&gt;|```Ticket.QueueID EQ 123```|
 
 The permission value itself is a bitmask with the following values:
 
 |Value|Permission|
 |-|-|
+|```0x0000```|NONE|
 |```0x0001```|CREATE|
 |```0x0002```|READ|
 |```0x0004```|UPDATE|

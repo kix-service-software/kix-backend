@@ -99,21 +99,21 @@ $Self->True(
 );
 
 # add customer user
-my $CustomerUser   = $RandomID;
-my $CustomerUserID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-    Source         => 'CustomerUser',
-    UserFirstname  => $CustomerUser,
-    UserLastname   => $CustomerUser,
+my $Contact   = $RandomID;
+my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+    Source         => 'Contact',
+    UserFirstname  => $Contact,
+    UserLastname   => $Contact,
     UserCustomerID => 'TestCompany',
-    UserLogin      => $CustomerUser,
-    UserPassword   => $CustomerUser,
-    UserEmail      => $CustomerUser . '@home.com',
+    UserLogin      => $Contact,
+    UserPassword   => $Contact,
+    UserEmail      => $Contact . '@home.com',
     ValidID        => 1,
     UserID         => 1,
 );
 $Self->True(
-    $CustomerUserID,
-    "CustomerUserAdd() - $CustomerUser, $CustomerUserID",
+    $ContactID,
+    "ContactAdd() - $Contact, $ContactID",
 );
 
 # add notificaiton with customer as recipient
@@ -173,14 +173,14 @@ my @Tests = (
     {
         Name => 'Email with CustomerID',
         Email =>
-            "From: $CustomerUser\@home.com\nTo: TestTo\@home.com\nSubject: Email with valid CustomerID\nTest Body Email.\n",
+            "From: $Contact\@home.com\nTo: TestTo\@home.com\nSubject: Email with valid CustomerID\nTest Body Email.\n",
         ResultAutoResponse => {
-            To   => "$CustomerUser\@home.com",
-            Body => "OTRS_CUSTOMER_REALNAME tag: $CustomerUser $CustomerUser",
+            To   => "$Contact\@home.com",
+            Body => "OTRS_CUSTOMER_REALNAME tag: $Contact $Contact",
         },
         ResultNotification => {
-            To   => "$CustomerUser\@home.com",
-            Body => "OTRS_CUSTOMER_REALNAME tag: $CustomerUser $CustomerUser",
+            To   => "$Contact\@home.com",
+            Body => "OTRS_CUSTOMER_REALNAME tag: $Contact $Contact",
             }
     },
     {

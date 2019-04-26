@@ -16,7 +16,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
 );
 
@@ -67,7 +67,7 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %CustomerSearchList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
+    my %CustomerSearchList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
         Search => $Param{Value},
     );
 
@@ -201,7 +201,7 @@ sub ValidateValue {
 
     return if !$Value;
 
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         User => $Param{Value},
     );
 

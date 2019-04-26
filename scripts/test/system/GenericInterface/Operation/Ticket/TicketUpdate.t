@@ -51,12 +51,12 @@ my $UserLogin2 = $Helper->TestUserCreate();
 my $Password2  = $UserLogin2;
 
 # create a customer where a ticket will use and will have permissions
-my $CustomerUserLogin = $Helper->TestCustomerUserCreate();
-my $CustomerPassword  = $CustomerUserLogin;
+my $ContactLogin = $Helper->TestContactCreate();
+my $CustomerPassword  = $ContactLogin;
 
 # create a customer that will not have permissions
-my $CustomerUserLogin2 = $Helper->TestCustomerUserCreate();
-my $CustomerPassword2  = $CustomerUserLogin2;
+my $ContactLogin2 = $Helper->TestContactCreate();
+my $CustomerPassword2  = $ContactLogin2;
 
 # create dynamic field object
 my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
@@ -157,8 +157,8 @@ my $TicketID1 = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
-    CustomerID   => $CustomerUserLogin,
-    CustomerUser => 'unittest@otrs.com',
+    CustomerID   => $ContactLogin,
+    Contact => 'unittest@otrs.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -464,7 +464,7 @@ my @Tests = (
             },
         },
         Auth => {
-            CustomerUserLogin => $CustomerUserLogin,
+            ContactLogin => $ContactLogin,
             Password          => $CustomerPassword,
         },
         ExpectedReturnRemoteData => {
@@ -493,7 +493,7 @@ my @Tests = (
             },
         },
         Auth => {
-            CustomerUserLogin => $CustomerUserLogin2,
+            ContactLogin => $ContactLogin2,
             Password          => $CustomerPassword2,
         },
         ExpectedReturnLocalData => {
@@ -806,8 +806,8 @@ my $TicketIDNoOutOfOffice = $TicketObject->TicketCreate(
     Lock         => 'lock',
     Priority     => '3 normal',
     State        => 'new',
-    CustomerID   => $CustomerUserLogin,
-    CustomerUser => 'unittest@otrs.com',
+    CustomerID   => $ContactLogin,
+    Contact => 'unittest@otrs.com',
     OwnerID      => $UserIDNoOutOfOffice,
     UserID       => 1,
 );
@@ -819,8 +819,8 @@ my $TicketIDOutOfOffice = $TicketObject->TicketCreate(
     Lock         => 'lock',
     Priority     => '3 normal',
     State        => 'new',
-    CustomerID   => $CustomerUserLogin,
-    CustomerUser => 'unittest@otrs.com',
+    CustomerID   => $ContactLogin,
+    Contact => 'unittest@otrs.com',
     OwnerID      => $UserIDOutOfOffice,
     UserID       => 1,
 );

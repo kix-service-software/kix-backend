@@ -23,7 +23,7 @@ use base qw(Kernel::System::Ticket::Event::NotificationEvent::Transport::Base);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::Output::HTML::Layout',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Email',
     'Kernel::System::Log',
     'Kernel::System::Main',
@@ -105,7 +105,7 @@ sub SendNotification {
         && $Recipient{DynamicFieldType}
     ) {
         # get objects
-        my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
         my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
         my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
 
@@ -140,12 +140,12 @@ sub SendNotification {
                 );
                 next FIELDRECIPIENT if !$UserData{UserEmail};
                 $AddressLine = $UserData{UserEmail};
-            } elsif ($Recipient{DynamicFieldType} eq 'CustomerUser') {
-                my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
+            } elsif ($Recipient{DynamicFieldType} eq 'Contact') {
+                my %Contact = $ContactObject->ContactGet(
                     User => $FieldRecipient,
                 );
-                next FIELDRECIPIENT if !$CustomerUser{UserEmail};
-                $AddressLine = $CustomerUser{UserEmail};
+                next FIELDRECIPIENT if !$Contact{UserEmail};
+                $AddressLine = $Contact{UserEmail};
             } else {
                 $AddressLine = $FieldRecipient;
             }
@@ -184,21 +184,21 @@ sub SendNotification {
     # Verify a customer have an email
     if ( $Recipient{Type} eq 'Customer' && $Recipient{UserID} && !$Recipient{UserEmail} ) {
 
-        my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             User => $Recipient{UserID},
         );
 
-        if ( !$CustomerUser{UserEmail} ) {
+        if ( !$Contact{UserEmail} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'info',
                 Message  => "Send no customer notification because of missing "
-                    . "customer email (CustomerUserID=$CustomerUser{CustomerUserID})!",
+                    . "customer email (ContactID=$Contact{ContactID})!",
             );
             return;
         }
 
         # Set calculated email.
-        $Recipient{UserEmail} = $CustomerUser{UserEmail};
+        $Recipient{UserEmail} = $Contact{UserEmail};
     }
 
     return if !$Recipient{UserEmail};

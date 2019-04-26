@@ -657,7 +657,7 @@ get all subcategory ids of of a category
     my $SubCategoryIDArrayRef = $FAQObject->CategorySubCategoryIDList(
         ParentID     => 1,
         Mode         => 'Public', # (Agent, Customer, Public)
-        CustomerUser => 'tt',
+        Contact => 'tt',
         UserID       => 1,
     );
 
@@ -710,7 +710,7 @@ sub CategorySubCategoryIDList {
         # get customer categories
         $Categories = $Self->GetCustomerCategories(
             Type         => 'ro',
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             UserID       => $Param{UserID},
         );
     }
@@ -991,7 +991,7 @@ sub AgentCategorySearch {
 get the category search as hash
 
     my $CategoryIDArrayRef = @{$FAQObject->CustomerCategorySearch(
-        CustomerUser  => 'tt',
+        Contact  => 'tt',
         ParentID      => 3,   # (optional, default 0)
         Mode          => 'Customer',
         UserID        => 1,
@@ -1010,7 +1010,7 @@ sub CustomerCategorySearch {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CustomerUser Mode UserID)) {
+    for my $Argument (qw(Contact Mode UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1027,7 +1027,7 @@ sub CustomerCategorySearch {
     }
 
     my $Categories = $Self->GetCustomerCategories(
-        CustomerUser => $Param{CustomerUser},
+        Contact => $Param{Contact},
         Type         => 'ro',
         UserID       => $Param{UserID},
     );
@@ -1074,7 +1074,7 @@ sub CustomerCategorySearch {
         my $SubCategoryIDs = $Self->CategorySubCategoryIDList(
             ParentID     => $CategoryID,
             Mode         => $Param{Mode},
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             UserID       => $Param{UserID},
         );
 
@@ -1154,7 +1154,7 @@ sub PublicCategorySearch {
         my $SubCategoryIDs = $Self->CategorySubCategoryIDList(
             ParentID     => $CategoryID,
             Mode         => $Param{Mode},
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             UserID       => $Param{UserID},
         );
 
@@ -1346,7 +1346,7 @@ sub CheckCategoryUserPermission {
 get customer user permission for a category
 
     my $PermissionString $FAQObject->CheckCategoryCustomerPermission(
-        CustomerUser => 'mm',
+        Contact => 'mm',
         CategoryID   => '123',
         UserID       => 1,
     );
@@ -1361,7 +1361,7 @@ sub CheckCategoryCustomerPermission {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CustomerUser CategoryID UserID)) {
+    for my $Argument (qw(Contact CategoryID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1374,7 +1374,7 @@ sub CheckCategoryCustomerPermission {
 
     for my $Permission (qw(rw ro)) {
         my $CustomerCategories = $Self->GetCustomerCategories(
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             Type         => 'ro',
             UserID       => $Param{UserID},
         );

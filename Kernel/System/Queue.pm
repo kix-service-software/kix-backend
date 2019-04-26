@@ -424,9 +424,9 @@ sub GetAllQueues {
                 . " valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )",
         );
     }
-    elsif ( $Param{CustomerUserID} ) {
+    elsif ( $Param{ContactID} ) {
 
-        $CacheKey = "GetAllQueues::CustomerUserID::${Type}::$Param{CustomerUserID}";
+        $CacheKey = "GetAllQueues::ContactID::${Type}::$Param{ContactID}";
 
         # check cache
         my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(

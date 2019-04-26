@@ -6,24 +6,24 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ITSMConfigItem::XML::Type::CustomerUserCompany;
+package Kernel::System::ITSMConfigItem::XML::Type::ContactCompany;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerCompany',
+    'Kernel::System::Organisation',
     'Kernel::System::Log'
 );
 
 =head1 NAME
 
-Kernel::System::ITSMConfigItem::XML::Type::CustomerUserCompany - xml backend module
+Kernel::System::ITSMConfigItem::XML::Type::ContactCompany - xml backend module
 
 =head1 SYNOPSIS
 
-All xml functions of CustomerUserCompany objects
+All xml functions of ContactCompany objects
 
 =over 4
 
@@ -35,7 +35,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::CustomerUserCompany');
+    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::ContactCompany');
 
 =cut
 
@@ -46,9 +46,9 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{ConfigObject}          = $Kernel::OM->Get('Kernel::Config');
-    $Self->{CustomerCompanyObject} = $Kernel::OM->Get('Kernel::System::CustomerCompany');
-    $Self->{LogObject}             = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigObject}       = $Kernel::OM->Get('Kernel::Config');
+    $Self->{OrganisationObject} = $Kernel::OM->Get('Kernel::System::Organisation');
+    $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
 
     return $Self;
 }

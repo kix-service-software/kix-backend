@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#OrganisationCollectionResponse",
+  "type": "object",
+  "description": "A list of organisations.",
+  "properties": {
+    "Organisation": {
+      "type": "array",
+      "items": {
+        "$ref": "Organisation.json"
+      }
+    }
+  },
+  "required": [
+    "Organisation"
+  ]
+}
