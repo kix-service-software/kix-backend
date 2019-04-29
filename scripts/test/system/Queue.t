@@ -34,12 +34,6 @@ my $QueueID   = $QueueObject->QueueAdd(
     Name                => $QueueRand,
     ValidID             => 1,
     GroupID             => 1,
-    FirstResponseTime   => 30,
-    FirstResponseNotify => 70,
-    UpdateTime          => 240,
-    UpdateNotify        => 80,
-    SolutionTime        => 2440,
-    SolutionNotify      => 90,
     SystemAddressID     => 1,
     UserID              => 1,
     Comment             => 'Some Comment',
@@ -58,12 +52,6 @@ my $QueueIDWrong = $QueueObject->QueueAdd(
     Name                => $QueueRand,
     ValidID             => 1,
     GroupID             => 1,
-    FirstResponseTime   => 30,
-    FirstResponseNotify => 70,
-    UpdateTime          => 240,
-    UpdateNotify        => 80,
-    SolutionTime        => 2440,
-    SolutionNotify      => 90,
     SystemAddressID     => 1,
     UserID              => 1,
     Comment             => 'Some Comment',
@@ -92,32 +80,6 @@ $Self->True(
     $QueueGet{Comment} eq 'Some Comment',
     'QueueGet() - Comment',
 );
-$Self->True(
-    $QueueGet{FirstResponseTime} eq 30,
-    'QueueGet() - FirstResponseTime',
-);
-$Self->True(
-    $QueueGet{FirstResponseNotify} eq 70,
-    'QueueGet() - FirstResponseNotify',
-);
-
-$Self->True(
-    $QueueGet{UpdateTime} eq 240,
-    'QueueGet() - UpdateTime',
-);
-$Self->True(
-    $QueueGet{UpdateNotify} eq 80,
-    'QueueGet() - UpdateNotify',
-);
-
-$Self->True(
-    $QueueGet{SolutionTime} eq 2440,
-    'QueueGet() - SolutionTime',
-);
-$Self->True(
-    $QueueGet{SolutionNotify} eq 90,
-    'QueueGet() - SolutionNotify',
-);
 
 my $Queue = $QueueObject->QueueLookup( QueueID => $QueueID );
 
@@ -141,12 +103,6 @@ my $QueueUpdate2 = $QueueObject->QueueUpdate(
     ValidID             => 1,
     GroupID             => 1,
     Calendar            => '',
-    FirstResponseTime   => '',
-    FirstResponseNotify => '',
-    UpdateTime          => '',
-    UpdateNotify        => '',
-    SolutionTime        => '',
-    SolutionNotify      => '',
     SystemAddressID     => 1,
     FollowUpID          => 1,
     UserID              => 1,
@@ -169,12 +125,6 @@ my $QueueUpdate1     = $QueueObject->QueueUpdate(
     ValidID             => 2,
     GroupID             => 1,
     Calendar            => '1',
-    FirstResponseTime   => 60,
-    FirstResponseNotify => 60,
-    UpdateTime          => 480,
-    UpdateNotify        => 70,
-    SolutionTime        => 4880,
-    SolutionNotify      => 80,
     SystemAddressID     => 1,
     FollowUpID          => 1,
     UserID              => 1,
@@ -417,33 +367,6 @@ $Self->True(
 $Self->True(
     $QueueGet{Comment} eq 'Some Comment1',
     'QueueGet() - Comment',
-);
-
-$Self->True(
-    $QueueGet{FirstResponseTime} eq 60,
-    'QueueGet() - FirstResponseTime',
-);
-$Self->True(
-    $QueueGet{FirstResponseNotify} eq 60,
-    'QueueGet() - FirstResponseNotify',
-);
-
-$Self->True(
-    $QueueGet{UpdateTime} eq 480,
-    'QueueGet() - UpdateTime',
-);
-$Self->True(
-    $QueueGet{UpdateNotify} eq 70,
-    'QueueGet() - UpdateNotify',
-);
-
-$Self->True(
-    $QueueGet{SolutionTime} eq 4880,
-    'QueueGet() - SolutionTime',
-);
-$Self->True(
-    $QueueGet{SolutionNotify} eq 80,
-    'QueueGet() - SolutionNotify',
 );
 
 $Queue = $QueueObject->QueueLookup( QueueID => $QueueID );

@@ -400,9 +400,6 @@ sub QueueCreate {
         my $ID   = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
             Name              => $Name,
             ValidID           => 1,
-            FirstResponseTime => 0,
-            UpdateTime        => 0,
-            SolutionTime      => 0,
             SystemAddressID   => 1,
             UserID            => 1,
             MoveNotify        => 0,

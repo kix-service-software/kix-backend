@@ -105,12 +105,6 @@ perform QueueCreate Operation. This will return the created QueueID.
 	        	Comment             => '...',     # (optional)
 	        	ValidID             => '...',     # (optional)	        	
 		        Calendar            => '...',     # (optional)
-		        FirstResponseTime   => '...',     # (optional)
-		        FirstResponseNotify => '...',     # (optional, notify agent if first response escalation is 60% reached)
-		        UpdateTime          => '...',     # (optional)
-		        UpdateNotify        => '...',     # (optional, notify agent if update escalation is 80% reached)
-		        SolutionTime        => '...',     # (optional)
-		        SolutionNotify      => '...',     # (optional, notify agent if solution escalation is 80% reached)
 		        UnlockTimeout       => '...',,    # (optional)
 		        FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
 		        FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
@@ -171,12 +165,6 @@ sub Run {
         Comment             => $Queue->{Comment} || '',
         ValidID             => $Queue->{ValidID} || 1,
         Calendar            => $Queue->{Calendar} || '',
-        FirstResponseTime   => $Queue->{FirstResponseTime} || '',
-        FirstResponseNotify => $Queue->{FirstResponseNotify} || '',
-        UpdateTime          => $Queue->{UpdateTime} || '',
-        UpdateNotify        => $Queue->{UpdateNotify} || '',
-        SolutionTime        => $Queue->{SolutionTime} || '',
-        SolutionNotify      => $Queue->{SolutionNotify} || '',
         UnlockTimeout       => $Queue->{UnlockTimeout} || '',
         FollowUpID          => $Queue->{FollowUpID} || '',
         FollowUpLock        => $Queue->{FollowUpLock} || '',

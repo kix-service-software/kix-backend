@@ -109,12 +109,6 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 Comment             => '...',     # (optional)
                 ValidID             => '...',     # (optional)              
                 Calendar            => '...',     # (optional)
-                FirstResponseTime   => '...',     # (optional)
-                FirstResponseNotify => '...',     # (optional, notify agent if first response escalation is 60% reached)
-                UpdateTime          => '...',     # (optional)
-                UpdateNotify        => '...',     # (optional, notify agent if update escalation is 80% reached)
-                SolutionTime        => '...',     # (optional)
-                SolutionNotify      => '...',     # (optional, notify agent if solution escalation is 80% reached)
                 UnlockTimeout       => '...',,    # (optional)
                 FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
                 FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
@@ -190,12 +184,6 @@ sub Run {
         QueueID             => $Param{Data}->{QueueID},
         Name                => $Queue->{Name} || $QueueData{Name},
         Calendar            => $Queue->{Calendar} || $QueueData{Calendar},
-        FirstResponseTime   => $Queue->{FirstResponseTime} || $QueueData{FirstResponseTime},
-        FirstResponseNotify => $Queue->{FirstResponseNotify} || $QueueData{FirstResponseNotify},
-        UpdateTime          => $Queue->{UpdateTime} || $QueueData{UpdateTime},
-        UpdateNotify        => $Queue->{UpdateNotify} || $QueueData{UpdateNotify},
-        SolutionTime        => $Queue->{SolutionTime} || $QueueData{SolutionTime},
-        SolutionNotify      => $Queue->{SolutionNotify} || $QueueData{SolutionNotify},
         UnlockTimeout       => $Queue->{UnlockTimeout} || $QueueData{UnlockTimeout},
         FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID},
         FollowUpLock        => $Queue->{FollowUpLock} || $QueueData{FollowUpLock},
