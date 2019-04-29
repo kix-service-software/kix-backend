@@ -121,6 +121,7 @@
 /queues/:QueueID                                                        |   DELETE          | V1::Queue::QueueDelete
 /queues/:QueueID                                                        |   GET             | V1::Queue::QueueGet
 /queues/:QueueID                                                        |   PATCH           | V1::Queue::QueueUpdate
+/queues/followuptypes                                                   |   GET             | V1::Queue::FollowUpTypeSearch
 /roles                                                                  |   GET             | V1::Role::RoleSearch
 /roles/permissiontypes                                                  |   GET             | V1::Role::PermissionTypeSearch
 /roles                                                                  |   POST            | V1::Role::RoleCreate

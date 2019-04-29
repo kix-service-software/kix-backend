@@ -59,6 +59,19 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="API::Operation::Module###V1::Queue::FollowUpTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FollowUpTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">FollowUpTypeCollectionResponse</Item>
+                <Item Key="CacheType">API_queues</Item>
+                <Item Key="CacheTypeDependency">Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem Name="API::Operation::GenericExpand###Queue.SubQueues" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>

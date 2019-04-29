@@ -13,7 +13,10 @@ package Kernel::System::Queue;
 use strict;
 use warnings;
 
-use base qw(Kernel::System::EventHandler);
+use base qw(
+    Kernel::System::Queue::FollowUp
+    Kernel::System::EventHandler
+);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -633,78 +636,6 @@ sub QueueLookup {
     }
 
     return $ReturnData;
-}
-
-=item GetFollowUpOption()
-
-get FollowUpOption for the given QueueID
-
-    my $FollowUpOption = $QueueObject->GetFollowUpOption( QueueID => $QueueID );
-
-returns any of 'possible', 'reject', 'new ticket'.
-
-=cut
-
-sub GetFollowUpOption {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID!'
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # fetch queues data
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT sf.name FROM follow_up_possible sf, queue sq '
-            . ' WHERE sq.follow_up_id = sf.id AND sq.id = ?',
-        Bind  => [ \$Param{QueueID} ],
-        Limit => 1,
-    );
-
-    my $Return = '';
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Return = $Row[0];
-    }
-
-    return $Return;
-}
-
-=item GetFollowUpLockOption()
-
-get FollowUpLockOption for the given QueueID
-
-    my $FollowUpLockOption = $QueueObject->GetFollowUpLockOption( QueueID => $QueueID );
-
-returns '1' if ticket should be locked after a follow up, '0' if not.
-
-=cut
-
-sub GetFollowUpLockOption {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID!'
-        );
-        return;
-    }
-
-    # get (already cached) queue data
-    my %Queue = $Self->QueueGet(
-        ID => $Param{QueueID},
-    );
-
-    return if !%Queue;
-    return $Queue{FollowUpLock};
 }
 
 =item QueueAdd()
