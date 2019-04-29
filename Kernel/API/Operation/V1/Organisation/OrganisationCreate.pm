@@ -133,8 +133,6 @@ sub Run {
         Number => $Organisation->{Number},
     );
     if ( %OrganisationSearch ) {
-        use Data::Dumper;
-        print STDERR "Number check: $Organisation->{Number}: ".Dumper(\%OrganisationSearch);
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => 'Cannot create organisation. Another organisation with same number already exists.',
@@ -146,8 +144,6 @@ sub Run {
         Name => $Organisation->{Name},
     );
     if ( %OrganisationSearch ) {
-        use Data::Dumper;
-        print STDERR "Name check: $Organisation->{Name}: ".Dumper(\%OrganisationSearch);
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => 'Cannot create organisation. Another organisation with same name already exists.',
