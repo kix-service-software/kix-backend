@@ -431,6 +431,18 @@ sub CategoryGet {
         );
     }
 
+    # build fullname
+    if ( $Data{ParentID} ) {
+        my %ParentCategory = $Self->CategoryGet(
+            CategoryID => $Data{ParentID},
+            UserID     => 1,
+        );
+        $Data{Fullname} = $ParentCategory{Fullname}.'::'.$Data{Name};
+    }
+    else {
+        $Data{Fullname} = $Data{Name};
+    } 
+
     # cache result
     $CacheObject->Set(
         Type  => $Self->{CacheType},
