@@ -140,7 +140,7 @@ sub Run {
     }
 
     # check Name exists
-    my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+    %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
         Search => $Organisation->{Name},
     );
     if ( %OrganisationSearch ) {
