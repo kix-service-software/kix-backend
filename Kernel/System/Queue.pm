@@ -880,7 +880,7 @@ sub QueueGet {
         . 'q.system_address_id, q.signature, q.comments, q.valid_id, '
         . 'q.first_response_time, q.first_response_notify, '
         . 'q.update_time, q.update_notify, q.solution_time, q.solution_notify, '
-        . 'q.follow_up_id, q.follow_up_lock, sa.value0, sa.value1, q.id, '
+        . 'q.follow_up_id, q.follow_up_lock, q.id, '
         . 'q.default_sign_key, q.calendar_name, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
         . 'system_address sa WHERE q.system_address_id = sa.id AND ';
 
@@ -920,15 +920,13 @@ sub QueueGet {
             SolutionNotify      => $Data[11],
             FollowUpID          => $Data[12],
             FollowUpLock        => $Data[13],
-            Email               => $Data[14],
-            RealName            => $Data[15],
-            QueueID             => $Data[16],
-            DefaultSignKey      => $Data[17],
-            Calendar            => $Data[18] || '',
-            CreateBy            => $Data[19],
-            CreateTime          => $Data[20],
-            ChangeBy            => $Data[21],
-            ChangeTime          => $Data[22],
+            QueueID             => $Data[14],
+            DefaultSignKey      => $Data[15],
+            Calendar            => $Data[16] || '',
+            CreateBy            => $Data[17],
+            CreateTime          => $Data[18],
+            ChangeBy            => $Data[19],
+            ChangeTime          => $Data[20],
         );
     }
 
