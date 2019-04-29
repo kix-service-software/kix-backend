@@ -790,6 +790,13 @@ sub QueueAdd {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Queue',
+        ObjectID  => $QueueID,
+    );
+
     return $QueueID if !$StandardTemplateID2QueueByCreating;
     return $QueueID if ref $StandardTemplateID2QueueByCreating ne 'ARRAY';
     return $QueueID if !@{$StandardTemplateID2QueueByCreating};
@@ -804,13 +811,6 @@ sub QueueAdd {
             UserID             => $Param{UserID},
         );
     }
-
-    # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
-        Namespace => 'Queue',
-        ObjectID  => $QueueID,
-    );
 
     return $QueueID;
 }
