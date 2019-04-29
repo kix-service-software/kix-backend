@@ -860,6 +860,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Queue::QueueUpdate
+    V1::Queue::FollowUpTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::FollowUpTypeSearch
     V1::Role::RoleSearch:
         Description: ''
         MappingInbound:
@@ -2216,6 +2223,10 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /queues/:QueueID
+        V1::Queue::FollowUpTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /queues/followuptypes
         V1::Role::RoleSearch:
           RequestMethod:
           - GET

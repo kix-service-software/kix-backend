@@ -7062,7 +7062,131 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="queues_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_queues__queueid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/queues</span><span class="uri">/{queueId}</span> <span class="methods"><a href="#queues__queueid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues__queueid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues__queueid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="queues__queueid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/queues</span><span class="uri">/{queueId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues__queueid__get_request" data-toggle="tab">Request</a></li><li><a href="#queues__queueid__get_response" data-toggle="tab">Response</a></li><li><a href="#queues__queueid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues__queueid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">queueId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="queues__queueid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueueResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="queues_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_queues_followuptypes" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/roles/followuptypes.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/queues</span><span class="uri">/followuptypes</span> <span class="methods"><a href="#queues_followuptypes_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="queues_followuptypes_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/queues</span><span class="uri">/followuptypes</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all FollowUpType items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues_followuptypes_get_request" data-toggle="tab">Request</a></li><li><a href="#queues_followuptypes_get_response" data-toggle="tab">Response</a></li><li><a href="#queues_followuptypes_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues_followuptypes_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="queues_followuptypes_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_followuptypes_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: FollowUpTypeCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#FollowUpTypeCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of followup types.",
+   "type" : "object",
+   "properties" : {
+      "FollowUpType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/FollowUpType"
+         }
+      }
+   },
+   "required" : [
+      "FollowUpType"
+   ],
+   "definitions" : {
+      "FollowUpType" : {
+         "$id" : "#FollowUpType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The followup type object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "FollowUpType": [
+        {
+          "ChangeBy": 1,
+          "ChangeTime": "2017-08-08 09:23:11",
+          "Comment": "Follow-ups for closed tickets are possible. Ticket will be reopened.",
+          "CreateBy": 1,
+          "CreateTime": "2017-08-08 09:23:11",
+          "ID": 1,
+          "Name": "possible",
+          "ValidID": 1
+        },
+        {
+          "ChangeBy": 1,
+          "ChangeTime": "2017-08-08 09:23:11",
+          "Comment": "Follow-ups for closed tickets are not possible. No new ticket will be created.",
+          "CreateBy": 1,
+          "CreateTime": "2017-08-08 09:23:11",
+          "ID": 2,
+          "Name": "reject",
+          "ValidID": 1
+        },
+        {
+          "ChangeBy": 1,
+          "ChangeTime": "2017-08-08 09:23:11",
+          "Comment": "Follow-ups for closed tickets are not possible. A new ticket will be created..",
+          "CreateBy": 1,
+          "CreateTime": "2017-08-08 09:23:11",
+          "ID": 3,
+          "Name": "new ticket",
+          "ValidID": 1
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="queues_followuptypes_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="queues_followuptypes_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues_followuptypes_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_queues__queueid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/queues</span><span class="uri">/{queueId}</span> <span class="methods"><a href="#queues__queueid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues__queueid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#queues__queueid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="queues__queueid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/queues</span><span class="uri">/{queueId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#queues__queueid__get_request" data-toggle="tab">Request</a></li><li><a href="#queues__queueid__get_response" data-toggle="tab">Response</a></li><li><a href="#queues__queueid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="queues__queueid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">queueId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="queues__queueid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="queues__queueid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueueResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#QueueResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A response for queue GET request.",
