@@ -1363,10 +1363,10 @@
     <Column Name="email" Required="true" Size="255" Type="VARCHAR"/>
     <Column Name="primary_org_id" Required="true" Type="INTEGER"/>
     <Column Name="org_ids" Required="true" Size="10000" Type="VARCHAR"/>
-    <Column Name="pw" Required="false" Size="64" Type="VARCHAR"/>
+    <Column Name="password" Required="false" Size="64" Type="VARCHAR"/>
     <Column Name="title" Required="false" Size="50" Type="VARCHAR"/>
-    <Column Name="first_name" Required="true" Size="100" Type="VARCHAR"/>
-    <Column Name="last_name" Required="true" Size="100" Type="VARCHAR"/>
+    <Column Name="firstname" Required="true" Size="100" Type="VARCHAR"/>
+    <Column Name="lastname" Required="true" Size="100" Type="VARCHAR"/>
     <Column Name="phone" Required="false" Size="150" Type="VARCHAR"/>
     <Column Name="fax" Required="false" Size="150" Type="VARCHAR"/>
     <Column Name="mobile" Required="false" Size="150" Type="VARCHAR"/>

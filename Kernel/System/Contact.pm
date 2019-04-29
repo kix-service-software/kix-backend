@@ -135,7 +135,7 @@ sub ContactAdd {
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => "INSERT INTO contact "
-             . "(login, pw, firstname, lastname, email, primary_org_id, org_ids, title, "
+             . "(login, password, firstname, lastname, email, primary_org_id, org_ids, title, "
              . "phone, fax, mobile, street, zip, city, country, comments, valid_id, "
              . "create_time, create_by, change_time, change_by) "
              . "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
@@ -851,7 +851,7 @@ sub SetPassword {
     );    
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL  => "UPDATE contact SET pw = ?, change_by = ?, change_time = current_timestamp WHERE id = ?",
+        SQL  => "UPDATE contact SET password = ?, change_by = ?, change_time = current_timestamp WHERE id = ?",
         Bind => [ \$Password, \$Param{UserID}, \$Param{ID} ],
     );
 
