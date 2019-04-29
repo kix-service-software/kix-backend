@@ -106,10 +106,6 @@
          "type" : "integer",
          "readOnly" : true
       },
-      "RealName" : {
-         "type" : "string",
-         "readOnly" : true
-      },
       "Signature" : {
          "type" : "string",
          "readOnly" : true
@@ -213,7 +209,6 @@
       "Fullname",
       "QueueID",
       "Name",
-      "RealName",
       "ValidID"
    ]
 }
