@@ -88,10 +88,10 @@ sub ParameterDefinition {
             Type     => 'HASH',
             Required => 1
         },          
-        'Contact::Number' => {
+        'Organisation::Number' => {
             Required => 1
         },            
-        'Contact::Name' => {
+        'Organisation::Name' => {
             Required => 1
         },
     }
