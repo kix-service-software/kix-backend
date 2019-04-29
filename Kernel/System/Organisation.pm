@@ -380,6 +380,14 @@ search organisations
         Search => 'somecompany',
     );
 
+    my %List = $OrganisationObject->OrganisationSearch(
+        Number => '1234567',
+    );
+
+    my %List = $OrganisationObject->OrganisationSearch(
+        Name => 'somename',
+    );
+
 Returns:
 
 %List = {
@@ -399,7 +407,7 @@ sub OrganisationSearch {
     }
 
     # check cache
-    my $CacheKey = "OrganisationSearch::${Valid}::" . ( $Param{Limit} || 0) . "::" . ( $Param{Search} || '' );
+    my $CacheKey = "OrganisationSearch::${Valid}::" . ( $Param{Limit} || 0) . "::" . ( $Param{Search} || '' ) . "::" . ( $Param{Number} || '' ) . "::" . ( $Param{Name} || '' );
     my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -445,6 +453,44 @@ sub OrganisationSearch {
             if (@SQLParts) {
                 $SQL .= '(' . join( ' OR ', @SQLParts ) . ')';
             }
+        }
+    }
+    elsif ( $Param{Number} ) {
+
+        if ( defined $SQL ) {
+            $SQL .= " AND ";
+        }
+
+        my $Number = $Param{Number};
+        $Number =~ s/\*/%/g;
+        $Number =~ s/%%/%/g;
+
+        if ( $Self->{CaseSensitive} ) {
+            $SQL .= "number LIKE ?";
+            push(@Bind, \$Number);
+        }
+        else {
+            $SQL .= "LOWER(number) LIKE LOWER(?)";
+            push(@Bind, \$Number);
+        }
+    }
+    elsif ( $Param{Name} ) {
+
+        if ( defined $SQL ) {
+            $SQL .= " AND ";
+        }
+
+        my $Name = $Param{Name};
+        $Name =~ s/\*/%/g;
+        $Name =~ s/%%/%/g;
+
+        if ( $Self->{CaseSensitive} ) {
+            $SQL .= "name LIKE ?";
+            push(@Bind, \$Name);
+        }
+        else {
+            $SQL .= "LOWER(name) LIKE LOWER(?)";
+            push(@Bind, \$Name);
         }
     }
 

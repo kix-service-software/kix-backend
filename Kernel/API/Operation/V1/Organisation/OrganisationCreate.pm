@@ -130,7 +130,7 @@ sub Run {
 
     # check Number exists
     my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
-        Search => $Organisation->{Number},
+        Number => $Organisation->{Number},
     );
     if ( %OrganisationSearch ) {
         use Data::Dumper;
@@ -143,7 +143,7 @@ sub Run {
 
     # check Name exists
     %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
-        Search => $Organisation->{Name},
+        Name => $Organisation->{Name},
     );
     if ( %OrganisationSearch ) {
         use Data::Dumper;
