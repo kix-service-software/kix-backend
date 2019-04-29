@@ -571,8 +571,8 @@
         <IndexColumn Name="queue_id"/>
         <IndexColumn Name="id"/>
     </Index>
-    <Index Name="ticket_custid_aflag_id">
-        <IndexColumn Name="customer_id"/>
+    <Index Name="ticket_orgid_aflag_id">
+        <IndexColumn Name="organisation_id"/>
         <IndexColumn Name="archive_flag"/>
         <IndexColumn Name="id"/>
     </Index>

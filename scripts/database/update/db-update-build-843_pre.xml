@@ -45,11 +45,17 @@
         <ColumnChange NameOld="customer_user_id" NameNew="contact_id" Required="false" Size="250" Type="VARCHAR"/>
         <IndexDrop Name="ticket_customer_user_id"/>
         <IndexDrop Name="ticket_customer_id"/>
+        <IndexDrop Name="ticket_custid_aflag_id"/>
         <IndexCreate Name="ticket_contact_id">
             <IndexColumn Name="contact_id"/>
         </IndexCreate>
         <IndexCreate Name="ticket_organisation_id">
             <IndexColumn Name="organisation_id"/>
+        </IndexCreate>
+        <IndexCreate Name="ticket_orgid_aflag_id">
+            <IndexColumn Name="organisation_id"/>
+            <IndexColumn Name="archive_flag"/>
+            <IndexColumn Name="id"/>
         </IndexCreate>
     </TableAlter>
 
