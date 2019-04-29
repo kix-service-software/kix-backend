@@ -15,8 +15,8 @@ When requesting items and using the optional function [```include```](#include_m
 
 ** Example **
 
-Query all customers and include a list of tickets and contacts of each customer. Expand the list of tickets with the actual ticket objects.
+Query all organisations and include a list of tickets and contacts of each organisation. Expand the list of tickets with the actual ticket objects.
 
 ``` bash
-.../customers?include=Tickets,Contacts&expand=Tickets
+.../organisations?include=Tickets,Contacts&expand=Tickets
 ```

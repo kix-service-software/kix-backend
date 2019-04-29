@@ -26,8 +26,8 @@ The ```ConfiguredPermissions``` include will include an object with two arrays t
 
 ** Example **
 
-Query all customers and include a list of tickets and contacts of each customer.
+Query all organisations and include a list of tickets and contacts of each organisation.
 
 ``` bash
-.../customers?include=Tickets,Contacts
+.../organisations?include=Tickets,Contacts
 ```

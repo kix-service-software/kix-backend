@@ -610,9 +610,9 @@ pre code {
 </code></pre><p>Compact:</p><pre><code class="lang-bash">.../users?fields=User.[UserLogin;UserID]
 </code></pre><p>Fieldset:</p><pre><code class="lang-bash">.../users?fields=:Short
 </code></pre></div><div class="chapter"><h2 id="include_more_information"><a href="#include_more_information">Include more information</a></h2><p>When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter <code>include</code>. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?include=&lt;What&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td style="text-align:center">yes</td><td>The additional data to include into the response. You can separate multiple ones by comma.</td></tr></tbody></table><p>There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are:</p><table class="table"><thead><tr><th>Generic Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Links</code></td><td>Include all the the linked objects of this item.</td></tr><tr><td><code>ObjectIcon</code></td><td>Include the icon for this item.</td></tr><tr><td><code>ConfiguredPermissions</code></td><td>Include the configured permissions for this item and its dependent items.</td></tr></tbody></table><p>Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function <a href="#expand_objects"><code>expand</code></a> for information on how to tranform these IDs to actual objects.</p><p>The <code>ConfiguredPermissions</code> include will include an object with two arrays that each contain the relevant configured permissions <code>Assigned</code> and <code>DependingObjects</code>. The <code>Assigned</code> list contains the permissions that are configured exactly for this specific object. The second list <code>DependingObjects</code> contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz).</p><p><strong>Example</strong></p><p>Query all customers and include a list of tickets and contacts of each customer.</p><pre><code class="lang-bash">.../customers?include=Tickets,Contacts
+</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td style="text-align:center">yes</td><td>The additional data to include into the response. You can separate multiple ones by comma.</td></tr></tbody></table><p>There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are:</p><table class="table"><thead><tr><th>Generic Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Links</code></td><td>Include all the the linked objects of this item.</td></tr><tr><td><code>ObjectIcon</code></td><td>Include the icon for this item.</td></tr><tr><td><code>ConfiguredPermissions</code></td><td>Include the configured permissions for this item and its dependent items.</td></tr></tbody></table><p>Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function <a href="#expand_objects"><code>expand</code></a> for information on how to tranform these IDs to actual objects.</p><p>The <code>ConfiguredPermissions</code> include will include an object with two arrays that each contain the relevant configured permissions <code>Assigned</code> and <code>DependingObjects</code>. The <code>Assigned</code> list contains the permissions that are configured exactly for this specific object. The second list <code>DependingObjects</code> contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz).</p><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation.</p><pre><code class="lang-bash">.../organisations?include=Tickets,Contacts
 </code></pre></div><div class="chapter"><h2 id="expand_objects"><a href="#expand_objects">Expand objects</a></h2><p>When requesting items and using the optional function <a href="#include_more_information"><code>include</code></a> to include another depending resource, a list of IDs will be the result. This can be used to count the relevant objects without the need to include unnecessary and huge additional data. To replace this list of IDs with the actual objects you can use the optional query parameter <code>expand</code>. Whether a resource supports expanding of includes and which includes can be expanded can be found in the documentation of the specific resource.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?expand=&lt;What&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td style="text-align:center">yes</td><td>The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.</td></tr></tbody></table><p><strong>Example</strong></p><p>Query all customers and include a list of tickets and contacts of each customer. Expand the list of tickets with the actual ticket objects.</p><pre><code class="lang-bash">.../customers?include=Tickets,Contacts&amp;expand=Tickets
+</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td style="text-align:center">yes</td><td>The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.</td></tr></tbody></table><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation. Expand the list of tickets with the actual ticket objects.</p><pre><code class="lang-bash">.../organisations?include=Tickets,Contacts&amp;expand=Tickets
 </code></pre></div></div><div class="chapter"><h2 id="resources"><a href="#resources">Resources</a></h2><div class="panel panel-default resource"><div class="panel-heading"><h3 id="channels" class="panel-title">Communication Channels</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/channels.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_channels" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/channels</span> <span class="methods"><a href="#channels_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="channels_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/channels</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Channel items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#channels_get_request" data-toggle="tab">Request</a></li><li><a href="#channels_get_response" data-toggle="tab">Response</a></li><li><a href="#channels_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="channels_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="channels_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="channels_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ChannelCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ChannelCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
@@ -6656,28 +6656,6 @@ pre code {
                ],
                "readOnly" : true
             },
-            "FirstResponseNotify" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "FirstResponseTime" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "FollowUpID" : {
                "anyOf" : [
                   {
@@ -6727,28 +6705,6 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
-            "SolutionNotify" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "SolutionTime" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "SubQueues" : {
                "type" : "object",
                "readOnly" : true
@@ -6791,28 +6747,6 @@ pre code {
                ],
                "readOnly" : true
             },
-            "UpdateNotify" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "UpdateTime" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "ValidID" : {
                "type" : "integer",
                "readOnly" : true
@@ -6841,8 +6775,6 @@ pre code {
 			"CreateBy": 1,
 			"CreateTime": "2018-11-08 09:37:53",
 			"DefaultSignKey": 1,
-			"FirstResponseNotify": 0,
-			"FirstResponseTime": 0,
 			"FollowUpID": 3,
 			"FollowUpLock": 0,
 			"Fullname": "2nd-Level",
@@ -6850,12 +6782,8 @@ pre code {
 			"ParentID": null,
 			"QueueID": 7,
 			"Signature": "",
-			"SolutionNotify": 0,
-			"SolutionTime": 0,
 			"SystemAddressID": 1,
 			"UnlockTimeout": 0,
-			"UpdateNotify": 0,
-			"UpdateTime": 0,
 			"ValidID": 1
 		},
 		{
@@ -6866,8 +6794,6 @@ pre code {
 			"CreateBy": 1,
 			"CreateTime": "2018-11-08 09:37:53",
 			"DefaultSignKey": 1,
-			"FirstResponseNotify": 0,
-			"FirstResponseTime": 0,
 			"FollowUpID": 3,
 			"FollowUpLock": 0,
 			"Fullname": "2nd-Level::Application Support",
@@ -6875,12 +6801,8 @@ pre code {
 			"ParentID": 7,
 			"QueueID": 8,
 			"Signature": "",
-			"SolutionNotify": 0,
-			"SolutionTime": 0,
 			"SystemAddressID": 1,
 			"UnlockTimeout": 0,
-			"UpdateNotify": 0,
-			"UpdateTime": 0,
 			"ValidID": 1
 		}
 	]
@@ -6925,12 +6847,6 @@ pre code {
             "DefaultSignKey" : {
                "type" : "integer"
             },
-            "FirstResponseNotify" : {
-               "type" : "integer"
-            },
-            "FirstResponseTime" : {
-               "type" : "integer"
-            },
             "FollowUpID" : {
                "type" : "integer"
             },
@@ -6946,22 +6862,10 @@ pre code {
             "Signature" : {
                "type" : "string"
             },
-            "SolutionNotify" : {
-               "type" : "integer"
-            },
-            "SolutionTime" : {
-               "type" : "integer"
-            },
             "SystemAddressID" : {
                "type" : "integer"
             },
             "UnlockTimeout" : {
-               "type" : "integer"
-            },
-            "UpdateNotify" : {
-               "type" : "integer"
-            },
-            "UpdateTime" : {
                "type" : "integer"
             },
             "ValidID" : {
@@ -7232,28 +7136,6 @@ pre code {
                ],
                "readOnly" : true
             },
-            "FirstResponseNotify" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "FirstResponseTime" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "FollowUpID" : {
                "anyOf" : [
                   {
@@ -7303,28 +7185,6 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
-            "SolutionNotify" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "SolutionTime" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "SubQueues" : {
                "type" : "object",
                "readOnly" : true
@@ -7367,28 +7227,6 @@ pre code {
                ],
                "readOnly" : true
             },
-            "UpdateNotify" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "UpdateTime" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "ValidID" : {
                "type" : "integer",
                "readOnly" : true
@@ -7416,8 +7254,6 @@ pre code {
         "CreateBy": 1,
         "CreateTime": "2018-11-08 10:35:37",
         "DefaultSignKey": null,
-        "FirstResponseNotify": null,
-        "FirstResponseTime": null,
         "FollowUpID": 1,
         "FollowUpLock": 0,
         "Fullname": "Postmaster",
@@ -7425,12 +7261,8 @@ pre code {
         "ParentID": null,
         "QueueID": 1,
         "Signature": "",
-        "SolutionNotify": null,
-        "SolutionTime": null,
         "SystemAddressID": 1,
         "UnlockTimeout": 0,
-        "UpdateNotify": null,
-        "UpdateTime": null,
         "ValidID": 1
 	}
 }</code></pre></div></div><h2 class="response-title" id="queues__queueid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -7474,12 +7306,6 @@ pre code {
             "DefaultSignKey" : {
                "type" : "integer"
             },
-            "FirstResponseNotify" : {
-               "type" : "integer"
-            },
-            "FirstResponseTime" : {
-               "type" : "integer"
-            },
             "FollowUpID" : {
                "type" : "integer"
             },
@@ -7495,22 +7321,10 @@ pre code {
             "Signature" : {
                "type" : "string"
             },
-            "SolutionNotify" : {
-               "type" : "integer"
-            },
-            "SolutionTime" : {
-               "type" : "integer"
-            },
             "SystemAddressID" : {
                "type" : "integer"
             },
             "UnlockTimeout" : {
-               "type" : "integer"
-            },
-            "UpdateNotify" : {
-               "type" : "integer"
-            },
-            "UpdateTime" : {
                "type" : "integer"
             },
             "ValidID" : {

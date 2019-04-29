@@ -16,12 +16,6 @@
             "DefaultSignKey" : {
                "type" : "integer"
             },
-            "FirstResponseNotify" : {
-               "type" : "integer"
-            },
-            "FirstResponseTime" : {
-               "type" : "integer"
-            },
             "FollowUpID" : {
                "type" : "integer"
             },
@@ -37,22 +31,10 @@
             "Signature" : {
                "type" : "string"
             },
-            "SolutionNotify" : {
-               "type" : "integer"
-            },
-            "SolutionTime" : {
-               "type" : "integer"
-            },
             "SystemAddressID" : {
                "type" : "integer"
             },
             "UnlockTimeout" : {
-               "type" : "integer"
-            },
-            "UpdateNotify" : {
-               "type" : "integer"
-            },
-            "UpdateTime" : {
                "type" : "integer"
             },
             "ValidID" : {
