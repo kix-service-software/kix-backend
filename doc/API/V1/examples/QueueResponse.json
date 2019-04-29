@@ -7,8 +7,6 @@
         "CreateBy": 1,
         "CreateTime": "2018-11-08 10:35:37",
         "DefaultSignKey": null,
-        "FirstResponseNotify": null,
-        "FirstResponseTime": null,
         "FollowUpID": 1,
         "FollowUpLock": 0,
         "Fullname": "Postmaster",
@@ -16,12 +14,8 @@
         "ParentID": null,
         "QueueID": 1,
         "Signature": "",
-        "SolutionNotify": null,
-        "SolutionTime": null,
         "SystemAddressID": 1,
         "UnlockTimeout": 0,
-        "UpdateNotify": null,
-        "UpdateTime": null,
         "ValidID": 1
 	}
 }

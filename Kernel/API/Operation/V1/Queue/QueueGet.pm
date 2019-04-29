@@ -127,20 +127,14 @@ one or more ticket entries in one call.
                     "CreateTime": "...",
                     "ValidID": ...,
                     "QueueID": ...,
-                    "FirstResponseNotify":...,
-                    "UpdateNotify": ...,
                     "FollowUpLock": ...,
                     "Comment": "...",
                     "ParentID": ...,
                     "DefaultSignKey": ...,
-                    "SolutionTime": ...,
                     "FollowUpID": ...,
                     "Name": "...",
-                    "SolutionNotify": ...,
                     "RealName": "...",
                     "Signature": "...",
-                    "UpdateTime": ...,
-                    "FirstResponseTime": ... 
                     # If Include=TicketStats was passed, you'll get an entry like this:
                     "TicketStats": {
                         "EscalatedCount":...,

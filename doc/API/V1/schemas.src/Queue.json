@@ -35,20 +35,6 @@
       ],
       "readOnly": true
     },
-    "FirstResponseNotify": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "FirstResponseTime": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
     "FollowUpID": {
       "anyOf": [
         {"type": "integer"},
@@ -86,20 +72,6 @@
       "type": "string",
       "readOnly": true
     },
-    "SolutionNotify": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "SolutionTime": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
     "SubQueues": {
       "type": "object",
       "readOnly": true
@@ -132,20 +104,6 @@
       "readOnly": true
     },
     "UnlockTimeout": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "UpdateNotify": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "UpdateTime": {
       "anyOf": [
         {"type": "integer"},
         {"type": "null"}

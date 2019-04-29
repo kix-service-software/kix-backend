@@ -8,8 +8,6 @@
 			"CreateBy": 1,
 			"CreateTime": "2018-11-08 09:37:53",
 			"DefaultSignKey": 1,
-			"FirstResponseNotify": 0,
-			"FirstResponseTime": 0,
 			"FollowUpID": 3,
 			"FollowUpLock": 0,
 			"Fullname": "2nd-Level",
@@ -17,12 +15,8 @@
 			"ParentID": null,
 			"QueueID": 7,
 			"Signature": "",
-			"SolutionNotify": 0,
-			"SolutionTime": 0,
 			"SystemAddressID": 1,
 			"UnlockTimeout": 0,
-			"UpdateNotify": 0,
-			"UpdateTime": 0,
 			"ValidID": 1
 		},
 		{
@@ -33,8 +27,6 @@
 			"CreateBy": 1,
 			"CreateTime": "2018-11-08 09:37:53",
 			"DefaultSignKey": 1,
-			"FirstResponseNotify": 0,
-			"FirstResponseTime": 0,
 			"FollowUpID": 3,
 			"FollowUpLock": 0,
 			"Fullname": "2nd-Level::Application Support",
@@ -42,12 +34,8 @@
 			"ParentID": 7,
 			"QueueID": 8,
 			"Signature": "",
-			"SolutionNotify": 0,
-			"SolutionTime": 0,
 			"SystemAddressID": 1,
 			"UnlockTimeout": 0,
-			"UpdateNotify": 0,
-			"UpdateTime": 0,
 			"ValidID": 1
 		}
 	]

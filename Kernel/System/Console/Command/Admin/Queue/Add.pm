@@ -60,27 +60,6 @@ sub Configure {
         ValueRegex  => qr/\d/smx,
     );
     $Self->AddOption(
-        Name        => 'first-response-time',
-        Description => 'Ticket first respone time in minutes for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/\d/smx,
-    );
-    $Self->AddOption(
-        Name        => 'update-time',
-        Description => 'Ticket update in minutes for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/\d/smx,
-    );
-    $Self->AddOption(
-        Name        => 'solution-time',
-        Description => 'Ticket solution time in minutes for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/\d/smx,
-    );
-    $Self->AddOption(
         Name        => 'calendar',
         Description => 'Name of the calendar for the new queue.',
         Required    => 0,
@@ -126,9 +105,6 @@ sub Run {
         SystemAddressID   => $SystemAddressID || $Self->GetOption('system-address-id') || undef,
         Comment           => $Self->GetOption('comment'),
         UnlockTimeout     => $Self->GetOption('unlock-timeout'),
-        FirstResponseTime => $Self->GetOption('first-response-time'),
-        UpdateTime        => $Self->GetOption('update-time'),
-        SolutionTime      => $Self->GetOption('solution-time'),
         Calendar          => $Self->GetOption('calendar'),
         ValidID           => 1,
         UserID            => 1,

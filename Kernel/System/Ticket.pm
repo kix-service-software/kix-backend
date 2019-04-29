@@ -2587,13 +2587,6 @@ sub TicketEscalationPreferences {
             Cache  => 1,
         );
     }
-    else {
-        %Escalation = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
-            ID     => $Ticket{QueueID},
-            UserID => $Param{UserID},
-            Cache  => 1,
-        );
-    }
 
     return %Escalation;
 }

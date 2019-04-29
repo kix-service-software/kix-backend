@@ -310,12 +310,6 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="unlock_timeout" Required="false" Type="INTEGER"/>
-    <Column Name="first_response_time" Required="false" Type="INTEGER"/>
-    <Column Name="first_response_notify" Required="false" Type="SMALLINT"/>
-    <Column Name="update_time" Required="false" Type="INTEGER"/>
-    <Column Name="update_notify" Required="false" Type="SMALLINT"/>
-    <Column Name="solution_time" Required="false" Type="INTEGER"/>
-    <Column Name="solution_notify" Required="false" Type="SMALLINT"/>
     <Column Name="system_address_id" Required="true" Type="SMALLINT"/>
     <Column Name="calendar_name" Required="false" Size="100" Type="VARCHAR"/>
     <Column Name="default_sign_key" Required="false" Size="100" Type="VARCHAR"/>

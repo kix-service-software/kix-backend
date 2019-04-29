@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="queue">
+        <ColumnDrop Name="first_response_time"/>
+        <ColumnDrop Name="first_response_notify"/>
+        <ColumnDrop Name="update_time"/>
+        <ColumnDrop Name="update_notify"/>
+        <ColumnDrop Name="solution_time"/>
+        <ColumnDrop Name="solution_notify"/>
+    </TableAlter>
+
+</database>
