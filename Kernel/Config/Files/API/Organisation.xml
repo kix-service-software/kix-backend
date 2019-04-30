@@ -7,7 +7,7 @@
             <Hash>
                 <Item Key="Name">OrganisationGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ObjectID">ID</Item>
+                <Item Key="ObjectID">OrganisationID</Item>
                 <Item Key="ResponseObject">OrganisationResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>
                 <Item Key="CacheTypeDependency">Organisation</Item>
@@ -70,7 +70,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseObject">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                
-                <Item Key="CacheTypeDependency">OrganisationUser</Item>
+                <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>

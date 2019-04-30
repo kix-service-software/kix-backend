@@ -546,7 +546,7 @@ sub ContactSearch {
             $SQL .= " AND ";
         }
 
-        $SQL .= "(primary_org_id = ? OR org_ids LIKE '%,'||?||',%'";
+        $SQL .= "(primary_org_id = ? OR org_ids LIKE '%,'||?||',%')";
         push(@Bind, \$Param{OrganisationID});
         push(@Bind, \$Param{OrganisationID});
     }
