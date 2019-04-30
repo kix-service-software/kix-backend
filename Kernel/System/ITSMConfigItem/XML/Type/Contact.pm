@@ -206,15 +206,15 @@ sub ValidateValue {
     );
 
     # if customer is not registered in the database
-     if (!IsHashRefWithData( \%CustomerData )) {
+     if (!IsHashRefWithData( \%ContactData )) {
         return 'contact not found';
     }
 
     # if ValidID is present, check if it is valid!
-    if ( defined $CustomerData{ValidID} ) {
+    if ( defined $ContactData{ValidID} ) {
 
         # return false if customer is not valid
-        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $CustomerData{ValidID} ) ne 'valid') {
+        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $ContactData{ValidID} ) ne 'valid') {
             return 'invalid contact';
         }
     }
