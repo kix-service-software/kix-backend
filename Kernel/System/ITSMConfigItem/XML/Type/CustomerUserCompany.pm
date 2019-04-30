@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ITSMConfigItem::XML::Type::ContactCompany;
+package Kernel::System::ITSMConfigItem::XML::Type::CustomerUserCompany;
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::ITSMConfigItem::XML::Type::ContactCompany - xml backend module
+Kernel::System::ITSMConfigItem::XML::Type::CustomerUserCompany - xml backend module
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::ContactCompany');
+    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::CustomerUserCompany');
 
 =cut
 

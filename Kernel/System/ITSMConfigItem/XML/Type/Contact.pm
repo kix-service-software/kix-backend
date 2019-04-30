@@ -67,11 +67,11 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %CustomerSearchList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+    my %ContactSearchList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
         Search => $Param{Value},
     );
 
-    return $CustomerSearchList{ $Param{Value} } || $Param{Value};
+    return $ContactSearchList{ $Param{Value} } || $Param{Value};
 }
 
 =item StatsAttributeCreate()
@@ -201,8 +201,8 @@ sub ValidateValue {
 
     return if !$Value;
 
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $Param{Value},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Param{Value},
     );
 
     # if customer is not registered in the database
