@@ -11,7 +11,7 @@
                 <Item Key="ResponseObject">TicketResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
-                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; CustomerID; ContactID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy; Unseen]</Item>
+                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; OrganisationID; ContactID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangedBy; Unseen]</Item>
                 <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
             </Hash>
         </Setting>

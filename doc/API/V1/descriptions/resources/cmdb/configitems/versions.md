@@ -82,8 +82,8 @@ When creating a version of a Config Item only the following attribute types are 
 |-|-|-|-|
 |```Attachment```|An attachment object containing the attributes ```Filename```, ```ContentType```, ```Content```. The content has to be base64 encoded.|attachment object|```"MyAttachment": [ {     "Filename": "test.pdf", "ContentType": "application/pdf", "Content": "..." } ]```|
 |```CIClassReference```|A reference to another Config Item|numeric ID of the referenced Config Item|```"ReferencedCI": 612```|
-|```Contact```|A reference to a contact|CustomerKey of the contact|```"MyContact": "mamu"```|
-|```Customer```|A reference to a customer|CustomerID of the customer|```"MyCustomer": "capeIT"```|
+|```Contact```|A reference to a contact|ContactID|```"MyContact": 123```|
+|```Organisation```|A reference to an organisation|OrganisationID|```"MyOrganisation": 456```|
 |```Date```|A date value in the form "```YYYY-MM-DD```"|string|```"MyDate": "2018-08-28"```|
 |```DateTime```|A date+time value in the form "```YYYY-MM-DD HH24:MI:SS```"|string|```"MyDateTime": "2018-08-28 09:23:58"```|
 |```Dummy```|An empty object to create sub-structures|sub-structure|```"MyDummy": {}```|

@@ -570,7 +570,7 @@ sub _HandleDependingCacheTypes {
         );
     }
 
-    if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
+    if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {        
         $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
 
         foreach my $DependentType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {

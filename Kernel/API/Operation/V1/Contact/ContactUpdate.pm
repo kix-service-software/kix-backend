@@ -192,7 +192,7 @@ sub Run {
     }
     
     if ( $Contact->{PrimaryOrganisationID} && (IsArrayRefWithData($Contact->{OrganisationIDs}) || IsArrayRefWithData($ContactData{OrganisationIDs})) ) {
-        # check if primary CustomerID is contained in assigned CustomerIDs
+        # check if primary OrganisationID is contained in assigned OrganisationIDs
         my @OrgIDs = @{IsArrayRefWithData($Contact->{OrganisationIDs}) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs}};
         if ( !grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs ) {
             return $Self->_Error(

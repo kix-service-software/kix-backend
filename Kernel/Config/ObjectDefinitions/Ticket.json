@@ -42,9 +42,9 @@
             "ReadOnly": true
         },        
         {
-            "Name": "CustomerID",
+            "Name": "OrganisationID",
             "Datatype": "STRING",
-            "ReferencedObject": "Customer"
+            "ReferencedObject": "Organisation"
         },        
         {
             "Name": "ContactID",
@@ -280,10 +280,10 @@
             "Sortable": true
         },        
         {
-            "Name": "CustomerID",
-            "CorrespondingAttribute": "CustomerID",
+            "Name": "OrganisationID",
+            "CorrespondingAttribute": "OrganisationID",
             "Datatype": "STRING",
-            "ReferencedObject": "Customer",
+            "ReferencedObject": "Organisation",
             "Operators": [
                 "EQ", "STARTSWITH", "ENDSWITH", "CONTAINS", "LIKE", "IN"
             ],
