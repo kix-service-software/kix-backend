@@ -428,12 +428,12 @@ sub AutoResponse {
     }
 
     # get recipient
-    my %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $Ticket{ContactID},
+    my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Ticket{ContactID},
     );
 
     # get user language
-    my $Language = $User{UserLanguage} || $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+    my $Language = $Contact{Language} || $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
 
     # do text/plain to text/html convert
     if ( $Self->{RichText} && $AutoResponse{ContentType} =~ /text\/plain/i ) {

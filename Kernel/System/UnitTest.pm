@@ -145,6 +145,9 @@ sub Run {
 
     my @Names = split( /:/, $Param{Name} || '' );
 
+    my $FileCount = 0;
+    my $FileTotal = scalar(@Files);
+
     $Self->{TestCountOk}    = 0;
     $Self->{TestCountNotOk} = 0;
     FILE:
@@ -173,7 +176,7 @@ sub Run {
             print STDERR "ERROR: $!: $File\n";
         }
         else {
-            $Self->_PrintHeadlineStart($File);
+            $Self->_PrintHeadlineStart($File, ++$FileCount, $FileTotal);
 
             # create a new scope to be sure to destroy local object of the test files
             {
@@ -795,19 +798,21 @@ sub _PrintSummary {
 }
 
 sub _PrintHeadlineStart {
-    my ( $Self, $Name ) = @_;
+    my ( $Self, $Name, $FileCount, $FileTotal ) = @_;
 
     # set default name
     $Name ||= '->>No Name!<<-';
 
+    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    $Name =~ s/^$Home\/scripts\/test\///;
+
     if ( $Self->{Output} eq 'HTML' ) {
         $Self->{Content} .= "<table width='600' border='1'>\n";
+        $Self->{Content} .= "<tr><td colspan='2'>$FileCount/$FileTotal</td></tr>\n";
         $Self->{Content} .= "<tr><td colspan='2'>$Name</td></tr>\n";
     }
     elsif ( $Self->{Output} eq 'ASCII' ) {
-        print "+-------------------------------------------------------------------+\n";
-        print "$Name:\n";
-        print "+-------------------------------------------------------------------+\n";
+        printf("(%4i/%i) %s: ", $FileCount, $FileTotal, $Name);
     }
 
     $Self->{XMLUnit} = $Name;

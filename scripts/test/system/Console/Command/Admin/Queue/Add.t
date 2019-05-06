@@ -36,7 +36,7 @@ $Self->Is(
 );
 
 # provide minimum options
-$ExitCode = $CommandObject->Execute( '--name', $QueueName, '--group', 'admin' );
+$ExitCode = $CommandObject->Execute( '--name', $QueueName );
 $Self->Is(
     $ExitCode,
     0,
@@ -44,7 +44,7 @@ $Self->Is(
 );
 
 # provide name which already exists
-$ExitCode = $CommandObject->Execute( '--name', $QueueName, '--group', 'admin' );
+$ExitCode = $CommandObject->Execute( '--name', $QueueName );
 $Self->Is(
     $ExitCode,
     1,
@@ -54,7 +54,7 @@ $Self->Is(
 # provide illegal system-address-name
 my $SystemAddressName = "address" . $Helper->GetRandomID();
 $ExitCode = $CommandObject->Execute(
-    '--name', "$QueueName-second", '--group', 'admin', '--system-address-name',
+    '--name', "$QueueName-second", '--system-address-name',
     $SystemAddressName
 );
 $Self->Is(

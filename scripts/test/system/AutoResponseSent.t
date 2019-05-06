@@ -154,8 +154,8 @@ for my $Test (@Tests) {
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',
-        CustomerID   => '12345',
-        Contact => 'test@localunittest.com',
+        OrganisationID => '12345',
+        ContactID    => 'test@localunittest.com',
         OwnerID      => 1,
         UserID       => 1,
     );
@@ -242,8 +242,8 @@ for my $Test (@Tests) {
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',
-        CustomerID   => '12345',
-        Contact => 'test@localunittest.com',
+        OrganisationID => '12345',
+        ContactID    => 'test@localunittest.com',
         OwnerID      => 1,
         UserID       => 1,
     );
