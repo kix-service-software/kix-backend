@@ -79,6 +79,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'pretty',
+        Description => "Break lines in non-verbose mode.",
+        Required    => 0,
+        HasValue    => 0,
+    );
 }
 
 sub PreRun {
@@ -108,6 +114,7 @@ sub Run {
         SubmitURL              => $Self->GetOption('submit-url')                 || '',
         SubmitResultAsExitCode => $Self->GetOption('submit-result-as-exit-code') || '',
         Verbose                => $Self->GetOption('verbose')                    || '',
+        Pretty                 => $Self->GetOption('pretty')                     || '',
     );
 
     if ($FunctionResult) {

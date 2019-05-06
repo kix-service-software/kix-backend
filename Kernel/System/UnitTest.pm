@@ -16,6 +16,7 @@ use warnings;
 use Term::ANSIColor();
 use SOAP::Lite;
 use FileHandle;
+use Time::HiRes qw(time);
 
 use Kernel::System::ObjectManager;
 ## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectManagerCreation)
@@ -91,6 +92,8 @@ sub new {
 
     $Self->{OriginalSTDOUT} = *STDOUT;
     $Self->{OriginalSTDOUT}->autoflush(1);
+    $Self->{OriginalSTDERR} = *STDERR;
+    $Self->{OriginalSTDERR}->autoflush(1);
 
     return $Self;
 }
@@ -129,6 +132,7 @@ sub Run {
     }
 
     $Self->{Verbose} = $Param{Verbose};
+    $Self->{Pretty}  = $Param{Pretty};
 
     my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
         Directory => $Directory,
@@ -263,9 +267,9 @@ sub Run {
 
         $XML .= "<Unit Name=\"$Key\" Duration=\"$Duration\">\n";
 
-        for my $TestCount ( sort { $a <=> $b } keys %{ $Self->{XML}->{Test}->{$Key} } ) {
-            my $Result  = $Self->{XML}->{Test}->{$Key}->{$TestCount}->{Result};
-            my $Content = $Self->{XML}->{Test}->{$Key}->{$TestCount}->{Name};
+        for my $TestCount ( sort { $a <=> $b } keys %{ $Self->{XML}->{Test}->{$Key}->{Tests} } ) {
+            my $Result  = $Self->{XML}->{Test}->{$Key}->{Tests}->{$TestCount}->{Result};
+            my $Content = $Self->{XML}->{Test}->{$Key}->{Tests}->{$TestCount}->{Name};
             $Content =~ s/&/&amp;/g;
             $Content =~ s/</&lt;/g;
             $Content =~ s/>/&gt;/g;
@@ -286,23 +290,23 @@ sub Run {
     if ( $Param{SubmitURL} ) {
         $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$XML );
 
-        my $RPC = SOAP::Lite->new(
-            proxy => $Param{SubmitURL},
-            uri   => 'http://localhost/Core',
-        );
+        # my $RPC = SOAP::Lite->new(
+        #     proxy => $Param{SubmitURL},
+        #     uri   => 'http://localhost/Core',
+        # );
 
-        eval {
-            my $Key = $RPC->Submit( '', '', $XML )->result();
-        };
-        if ($@) {
-            die "Could not submit results to server: $@";
-        }
+        # eval {
+        #     my $Key = $RPC->Submit( '', '', $XML )->result();
+        # };
+        # if ($@) {
+        #     die "Could not submit results to server: $@";
+        # }
 
-        print "Sent results to $Param{SubmitURL}.\n";
+        # print "Sent results to $Param{SubmitURL}.\n";
 
-        if ( $Param{SubmitResultAsExitCode} ) {
-            return 1;
-        }
+        # if ( $Param{SubmitResultAsExitCode} ) {
+        #     return 1;
+        # }
     }
 
     return $ResultSummary{TestNotOk} ? 0 : 1;
@@ -812,13 +816,13 @@ sub _PrintHeadlineStart {
         $Self->{Content} .= "<tr><td colspan='2'>$Name</td></tr>\n";
     }
     elsif ( $Self->{Output} eq 'ASCII' ) {
-        printf("(%4i/%i) %s: ", $FileCount, $FileTotal, $Name);
+        printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
     }
 
     $Self->{XMLUnit} = $Name;
 
     # set duration start time
-    $Self->{DurationStartTime}->{$Name} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    $Self->{DurationStartTime}->{$Name} = time();
 
     return 1;
 }
@@ -829,23 +833,37 @@ sub _PrintHeadlineEnd {
     # set default name
     $Name ||= '->>No Name!<<-';
 
-    if ( $Self->{Output} eq 'HTML' ) {
-        $Self->{Content} .= "</table><br>\n";
-    }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
-        print "\n";
-    }
+    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    $Name =~ s/^$Home\/scripts\/test\///;
 
     # calculate duration time
     my $Duration = '';
     if ( $Self->{DurationStartTime}->{$Name} ) {
 
-        $Duration = $Kernel::OM->Get('Kernel::System::Time')->SystemTime()
-            - $Self->{DurationStartTime}->{$Name};
+        $Duration = time() - $Self->{DurationStartTime}->{$Name};
 
         delete $Self->{DurationStartTime}->{$Name};
     }
     $Self->{Duration}->{$Name} = $Duration;
+
+    if ( $Self->{Output} eq 'HTML' ) {
+        $Self->{Content} .= "</table><br>\n";
+    }
+    elsif ( $Self->{Output} eq 'ASCII' ) {
+        if ( $Self->{Pretty} || $Self->{Verbose} ) {
+            print { $Self->{OriginalSTDOUT} } "\n";
+        }
+        if ( !$Self->{Verbose} ) {
+            if ( $Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED' ) {
+                print { $Self->{OriginalSTDOUT} } $Self->_Color('red', 'FAILED');
+            }
+            else  {
+                print { $Self->{OriginalSTDOUT} } $Self->_Color('green', 'OK');
+            }
+
+            printf { $Self->{OriginalSTDOUT} } " (%i tests in %i ms)\n", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
+        }
+    }
 
     return 1;
 }
@@ -860,61 +878,69 @@ sub _Print {
         $PrintName = substr( $PrintName, 0, 1000 ) . "...";
     }
 
-    if ( $Self->{Output} eq 'ASCII' && ( $Self->{Verbose} || !$Test ) ) {
+    if ( $Self->{Output} eq 'ASCII' && $Self->{Verbose} ) {
         print { $Self->{OriginalSTDOUT} } $Self->{OutputBuffer};
     }
     $Self->{OutputBuffer} = '';
 
     $Self->{TestCount}++;
+    if ( $Self->{Pretty} && ( $Self->{TestCount} == 1 || $Self->{TestCount} % 160 == 1 ) && !$Self->{Verbose} ) {
+        print { $Self->{OriginalSTDOUT} } "\n";
+    }
     if ($Test) {
         $Self->{TestCountOk}++;
         if ( $Self->{Output} eq 'HTML' ) {
             $Self->{Content}
-                .= "<tr><td width='70' bgcolor='green'>ok $Self->{TestCount}</td><td>$Name</td></tr>\n";
+                .= "<tr><td width='70' bgcolor='green'>OK $Self->{TestCount}</td><td>$Name</td></tr>\n";
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {
             if ( $Self->{Verbose} ) {
                 print { $Self->{OriginalSTDOUT} } " "
-                    . $Self->_Color( 'green', "ok" )
+                    . $Self->_Color( 'green', "OK" )
                     . " $Self->{TestCount} - $PrintName\n";
             }
             else {
                 print { $Self->{OriginalSTDOUT} } $Self->_Color( 'green', "." );
             }
         }
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ $Self->{TestCount} }->{Result} = 'ok';
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ $Self->{TestCount} }->{Name}   = $Name;
+        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Result} = 'OK';
+        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Name}   = $Name;
         return 1;
     }
     else {
+        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{Result} = 'FAILED';
+
         $Self->{TestCountNotOk}++;
         if ( $Self->{Output} eq 'HTML' ) {
             $Self->{Content}
-                .= "<tr><td width='70' bgcolor='red'>not ok $Self->{TestCount}</td><td>$Name</td></tr>\n";
+                .= "<tr><td width='70' bgcolor='red'>FAILED $Self->{TestCount}</td><td>$Name</td></tr>\n";
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {
-            if ( !$Self->{Verbose} ) {
+            if ( $Self->{Verbose} ) {
                 print { $Self->{OriginalSTDOUT} } "\n";
+                print { $Self->{OriginalSTDOUT} } " "
+                    . $Self->_Color( 'red', "FAILED" )
+                    . " $Self->{TestCount} - $PrintName\n";
+
+                my $TestFailureDetails = $Name;
+                $TestFailureDetails =~ s{\(.+\)$}{};
+                if ( length $TestFailureDetails > 200 ) {
+                    $TestFailureDetails = substr( $TestFailureDetails, 0, 200 ) . "...";
+                }
+
+                # Store information about failed tests, but only if we are running in a toplevel unit test object
+                #   that is actually processing filed, and not in an embedded object that just runs individual tests.
+                if ( ref $Self->{NotOkInfo} eq 'ARRAY' ) {
+                    push @{ $Self->{NotOkInfo}->[-1] }, sprintf "%s - %s", $Self->{TestCount},
+                        $TestFailureDetails;
+                }
             }
-            print { $Self->{OriginalSTDOUT} } " "
-                . $Self->_Color( 'red', "not ok" )
-                . " $Self->{TestCount} - $PrintName\n";
+            else {
+                print { $Self->{OriginalSTDOUT} } $Self->_Color( 'red', "x" );
+            }
         }
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ $Self->{TestCount} }->{Result} = 'not ok';
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ $Self->{TestCount} }->{Name}   = $Name;
-
-        my $TestFailureDetails = $Name;
-        $TestFailureDetails =~ s{\(.+\)$}{};
-        if ( length $TestFailureDetails > 200 ) {
-            $TestFailureDetails = substr( $TestFailureDetails, 0, 200 ) . "...";
-        }
-
-        # Store information about failed tests, but only if we are running in a toplevel unit test object
-        #   that is actually processing filed, and not in an embedded object that just runs individual tests.
-        if ( ref $Self->{NotOkInfo} eq 'ARRAY' ) {
-            push @{ $Self->{NotOkInfo}->[-1] }, sprintf "%s - %s", $Self->{TestCount},
-                $TestFailureDetails;
-        }
+        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Result} = 'FAILED';
+        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Name}   = $Name;
 
         return;
     }
