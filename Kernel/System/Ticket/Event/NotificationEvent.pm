@@ -981,14 +981,13 @@ sub _RecipientsGet {
             next RECIPIENT if $TimeStart < $Time && $TimeEnd > $Time;
         }
 
-        # skip users with out ro permissions
-        my $Permission = $TicketObject->TicketPermission(
-            Type     => 'ro',
-            TicketID => $Ticket{TicketID},
-            UserID   => $User{UserID}
-        );
-
-        next RECIPIENT if !$Permission;
+        # TODO # skip users with out READ permissions
+        # my $Permission = $UserObject->CheckPermission(
+        #     UserID              => $User{UserID},
+        #     Target              => '/tickets/' . $Ticket{TicketID},
+        #     RequestedPermission => 'READ'
+        # );
+        # next RECIPIENT if !$Permission;
 
         # skip PostMasterUserID
         my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;

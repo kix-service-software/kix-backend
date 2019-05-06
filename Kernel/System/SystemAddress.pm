@@ -386,11 +386,18 @@ sub SystemAddressLookup {
         return;
     }
 
+    my $CacheKey = 'SystemAddressLookup::' . ($Param{SystemAddressID} || '') . '::' . ($Param{Name} || '');
+
+    my $Cached = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cached if $Cached;
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     if ( $Param{SystemAddressID} ) {
-
         # lookup
         $DBObject->Prepare(
             SQL => "SELECT value0 FROM system_address WHERE "
@@ -405,10 +412,12 @@ sub SystemAddressLookup {
         while ( my @Row = $DBObject->FetchrowArray() ) {
             $Name = $Row[0];
         }
-        
-        # reset cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-            Type => $Self->{CacheType},
+
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $SystemAddressID,
         );
 
         return $Name;
@@ -430,10 +439,12 @@ sub SystemAddressLookup {
             $SystemAddressID = $Row[0];
         }
         
-	    # reset cache
-	    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-	        Type => $Self->{CacheType},
-	    );
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $SystemAddressID,
+        );
 
         return $SystemAddressID;
     }
