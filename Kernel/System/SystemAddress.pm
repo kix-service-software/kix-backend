@@ -417,7 +417,7 @@ sub SystemAddressLookup {
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
-            Value => $SystemAddressID,
+            Value => $Name,
         );
 
         return $Name;
