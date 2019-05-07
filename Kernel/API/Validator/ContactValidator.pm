@@ -103,13 +103,15 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'ContactID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            ID => $Param{Data}->{$Param{Attribute}},
-        );
+        if ( $Param{Data}->{$Param{Attribute}} =~ /^\d+$/ ) {
+            $Found = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                ID => $Param{Data}->{$Param{Attribute}},
+            );
+        }
         if ( !$Found ) {
-            # contact is not in database, check if email is valid
+            # contact is not in database, check if it is a valid email address
             $Found = 0;            
-            for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {                
+            for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
                 $Found = 1;
                 if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                     $Found = 0;
