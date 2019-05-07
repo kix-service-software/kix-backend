@@ -13,6 +13,10 @@ package Kernel::System::UnitTest;
 use strict;
 use warnings;
 
+use base qw(
+    Kernel::System::UnitTest::Method
+);
+
 use Term::ANSIColor();
 use SOAP::Lite;
 use FileHandle;
@@ -80,11 +84,26 @@ sub new {
             . $Kernel::OM->Get('Kernel::Config')->Get('Product') . " "
             . $Kernel::OM->Get('Kernel::Config')->Get('Version')
             . " - Test Summary</title>
+    <style>
+       body, td {
+         font-family: Courier New;
+         font-size: 0.75em;
+       }
+       table {
+         border: 2px solid #aaa;
+         border-collapse: collapse;
+       }
+       td {
+         padding: 2px 5px;
+         border: 1px solid #ccc;
+         vertical-align: top;
+       }
+    </style>
 </head>
 <a name='top'></a>
 <body>
-
 \n";
+        $Self->{Content} = "<table width='100%' border='0'>\n";
     }
 
     $Self->{XML}     = undef;
@@ -234,10 +253,10 @@ sub Run {
     $ResultSummary{Time}      = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
         SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
     );
-    $ResultSummary{Product} = $Product;
-    $ResultSummary{Host}    = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
-    $ResultSummary{Perl}    = sprintf "%vd", $^V;
     my %OSInfo = $Kernel::OM->Get('Kernel::System::Environment')->OSInfoGet();
+    $ResultSummary{Product}   = $Product;
+    $ResultSummary{Host}      = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    $ResultSummary{Perl}      = sprintf "%vd", $^V;
     $ResultSummary{OS}        = $OSInfo{OS};
     $ResultSummary{Vendor}    = $OSInfo{OSName};
     $ResultSummary{Database}  = lc $Kernel::OM->Get('Kernel::System::DB')->Version();
@@ -312,438 +331,72 @@ sub Run {
     return $ResultSummary{TestNotOk} ? 0 : 1;
 }
 
-=item True()
+sub _PrintHeadlineStart {
+    my ( $Self, $Name, $FileCount, $FileTotal ) = @_;
 
-test for a scalar value that evaluates to true.
+    # set default name
+    $Name ||= '->>No Name!<<-';
 
-Send a scalar value to this function along with the test's name:
+    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    $Name =~ s/^$Home\/scripts\/test\///;
 
-    $UnitTestObject->True(1, 'Test Name');
-
-    $UnitTestObject->True($ParamA, 'Test Name');
-
-Internally, the function receives this value and evaluates it to see
-if it's true, returning 1 in this case or undef, otherwise.
-
-    my $TrueResult = $UnitTestObject->True(
-        $TestValue,
-        'Test Name',
-    );
-
-=cut
-
-sub True {
-    my ( $Self, $True, $Name ) = @_;
-
-    if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name! E. g. True(\$A, \'Test Name\')!'
-        );
-        $Self->_Print( 0, 'ERROR: Need Name! E. g. True(\$A, \'Test Name\')' );
-        return;
+    if ( $Self->{Output} eq 'HTML' ) {
+        $Self->{Content} .= "<tr><td nowrap style='text-align:right'>$FileCount/$FileTotal</td>";
+        $Self->{Content} .= "<td nowrap>$Name</td><td width='100%'>";
+    }
+    elsif ( $Self->{Output} eq 'ASCII' ) {
+        printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
     }
 
-    if ($True) {
-        $Self->_Print( 1, $Name );
-        return 1;
-    }
-    else {
-        $Self->_Print( 0, $Name );
-        return;
-    }
+    $Self->{XMLUnit} = $Name;
+    $Self->{CurrentColor} = undef;
+
+    # set duration start time
+    $Self->{DurationStartTime}->{$Name} = time();
+
+    return 1;
 }
 
-=item False()
+sub _PrintHeadlineEnd {
+    my ( $Self, $Name ) = @_;
 
-test for a scalar value that evaluates to false.
+    # set default name
+    $Name ||= '->>No Name!<<-';
 
-It has the same interface as L</True()>, but tests
-for a false value instead.
+    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    $Name =~ s/^$Home\/scripts\/test\///;
 
-=cut
+    # calculate duration time
+    my $Duration = '';
+    if ( $Self->{DurationStartTime}->{$Name} ) {
 
-sub False {
-    my ( $Self, $False, $Name ) = @_;
+        $Duration = time() - $Self->{DurationStartTime}->{$Name};
 
-    if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name! E. g. False(\$A, \'Test Name\')!'
-        );
-        $Self->_Print( 0, 'ERROR: Need Name! E. g. False(\$A, \'Test Name\')' );
-        return;
+        delete $Self->{DurationStartTime}->{$Name};
     }
+    $Self->{Duration}->{$Name} = $Duration;
 
-    if ( !$False ) {
-        $Self->_Print( 1, $Name );
-        return 1;
-    }
-    else {
-        $Self->_Print( 0, $Name );
-        return;
-    }
-}
-
-=item Is()
-
-compares two scalar values for equality.
-
-To this function you must send a pair of scalar values to compare them,
-and the name that the test will take, this is done as shown in the examples
-below.
-
-    $UnitTestObject->Is($A, $B, 'Test Name');
-
-Returns 1 if the values were equal, or undef otherwise.
-
-    my $IsResult = $UnitTestObject->Is(
-        $ValueFromFunction,      # test data
-        1,                       # expected value
-        'Test Name',
-    );
-
-=cut
-
-sub Is {
-    my ( $Self, $Test, $ShouldBe, $Name ) = @_;
-
-    if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name! E. g. Is(\$A, \$B, \'Test Name\')!'
-        );
-        $Self->_Print( 0, 'ERROR: Need Name! E. g. Is(\$A, \$B, \'Test Name\')' );
-        return;
-    }
-
-    if ( !defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is 'undef')" );
-        return 1;
-    }
-    elsif ( !defined $Test && defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is 'undef' should be '$ShouldBe')" );
-        return;
-    }
-    elsif ( defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is '$Test' should be 'undef')" );
-        return;
-    }
-    elsif ( $Test eq $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is '$ShouldBe')" );
-        return 1;
-    }
-    else {
-        $Self->_Print( 0, "$Name (is '$Test' should be '$ShouldBe')" );
-        return;
-    }
-}
-
-=item IsNot()
-
-compares two scalar values for inequality.
-
-It has the same interface as L</Is()>, but tests
-for inequality instead.
-
-=cut
-
-sub IsNot {
-    my ( $Self, $Test, $ShouldBe, $Name ) = @_;
-
-    if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name! E. g. IsNot(\$A, \$B, \'Test Name\')!'
-        );
-        $Self->_Print( 0, 'ERROR: Need Name! E. g. IsNot(\$A, \$B, \'Test Name\')' );
-        return;
-    }
-
-    if ( !defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is 'undef')" );
-        return;
-    }
-    elsif ( !defined $Test && defined $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is 'undef')" );
-        return 1;
-    }
-    elsif ( defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is '$Test')" );
-        return 1;
-    }
-    if ( $Test ne $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is '$Test')" );
-        return 1;
-    }
-    else {
-        $Self->_Print( 0, "$Name (is '$Test' should not be '$ShouldBe')" );
-        return;
-    }
-}
-
-=item IsDeeply()
-
-compares complex data structures for equality.
-
-To this function you must send the references to two data structures to be compared,
-and the name that the test will take, this is done as shown in the examples
-below.
-
-    $UnitTestObject-> IsDeeply($ParamA, $ParamB, 'Test Name');
-
-Where $ParamA and $ParamB must be references to a structure (scalar, list or hash).
-
-Returns 1 if the data structures are the same, or undef otherwise.
-
-    my $IsDeeplyResult = $UnitTestObject->IsDeeply(
-        \%ResultHash,           # test data
-        \%ExpectedHash,         # expected value
-        'Dummy Test Name',
-    );
-
-=cut
-
-sub IsDeeply {
-    my ( $Self, $Test, $ShouldBe, $Name ) = @_;
-
-    if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name! E. g. Is(\$A, \$B, \'Test Name\')!'
-        );
-        $Self->_Print( 0, 'ERROR: Need Name! E. g. Is(\$A, \$B, \'Test Name\')' );
-        return;
-    }
-
-    my $Diff = $Self->_DataDiff(
-        Data1 => $Test,
-        Data2 => $ShouldBe,
-    );
-
-    if ( !defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is 'undef')" );
-        return 1;
-    }
-    elsif ( !defined $Test && defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is 'undef' should be defined)" );
-        return;
-    }
-    elsif ( defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is defined should be 'undef')" );
-        return;
-    }
-    elsif ( !$Diff ) {
-        $Self->_Print( 1, "$Name matches expected value" );
-        return 1;
-    }
-    else {
-        my $ShouldBeDump = $Kernel::OM->Get('Kernel::System::Main')->Dump($ShouldBe);
-        my $TestDump     = $Kernel::OM->Get('Kernel::System::Main')->Dump($Test);
-        $Self->_Print( 0, "$Name (is '$TestDump' should be '$ShouldBeDump')" );
-        return;
-    }
-}
-
-=item IsNotDeeply()
-
-compares two data structures for inequality.
-
-It has the same interface as L</IsDeeply()>, but tests
-for inequality instead.
-
-=cut
-
-sub IsNotDeeply {
-    my ( $Self, $Test, $ShouldBe, $Name ) = @_;
-
-    if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name! E. g. IsNot(\$A, \$B, \'Test Name\')!'
-        );
-        $Self->_Print( 0, 'ERROR: Need Name! E. g. IsNot(\$A, \$B, \'Test Name\')' );
-        return;
-    }
-
-    my $Diff = $Self->_DataDiff(
-        Data1 => $Test,
-        Data2 => $ShouldBe,
-    );
-
-    if ( !defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is 'undef')" );
-        return;
-    }
-    elsif ( !defined $Test && defined $ShouldBe ) {
-        $Self->_Print( 1, "$Name (is 'undef')" );
-        return 1;
-    }
-    elsif ( defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 1, "$Name (differs from expected value)" );
-        return 1;
-    }
-
-    if ($Diff) {
-        $Self->_Print( 1, "$Name (The structures are not equal.)" );
-        return 1;
-    }
-    else {
-
-        #        $Self->_Print( 0, "$Name (matches the expected value)" );
-        my $TestDump = $Kernel::OM->Get('Kernel::System::Main')->Dump($Test);
-        $Self->_Print( 0, "$Name (The structures are equal: '$TestDump')" );
-
-        return;
-    }
-}
-
-=begin Internal:
-
-=cut
-
-=item _DataDiff()
-
-compares two data structures with each other. Returns 1 if
-they are different, undef otherwise.
-
-Data parameters need to be passed by reference and can be SCALAR,
-ARRAY or HASH.
-
-    my $DataIsDifferent = $UnitTestObject->_DataDiff(
-        Data1 => \$Data1,
-        Data2 => \$Data2,
-    );
-
-=cut
-
-sub _DataDiff {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(Data1 Data2)) {
-        if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
+    if ( $Self->{Output} eq 'HTML' ) {
+        if ( $Self->{CurrentColor} ) {
+            $Self->{Content} .= "</span>";
         }
+        $Self->{Content} .= "</td><td nowrap>" . sprintf "%i tests in %i ms", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
+        $Self->{Content} .= "</td></tr>\n";
     }
-
-    # ''
-    if ( ref $Param{Data1} eq '' && ref $Param{Data2} eq '' ) {
-
-        # do nothing, it's ok
-        return if !defined $Param{Data1} && !defined $Param{Data2};
-
-        # return diff, because its different
-        return 1 if !defined $Param{Data1} || !defined $Param{Data2};
-
-        # return diff, because its different
-        return 1 if $Param{Data1} ne $Param{Data2};
-
-        # return, because its not different
-        return;
-    }
-
-    # SCALAR
-    if ( ref $Param{Data1} eq 'SCALAR' && ref $Param{Data2} eq 'SCALAR' ) {
-
-        # do nothing, it's ok
-        return if !defined ${ $Param{Data1} } && !defined ${ $Param{Data2} };
-
-        # return diff, because its different
-        return 1 if !defined ${ $Param{Data1} } || !defined ${ $Param{Data2} };
-
-        # return diff, because its different
-        return 1 if ${ $Param{Data1} } ne ${ $Param{Data2} };
-
-        # return, because its not different
-        return;
-    }
-
-    # ARRAY
-    if ( ref $Param{Data1} eq 'ARRAY' && ref $Param{Data2} eq 'ARRAY' ) {
-        my @A = @{ $Param{Data1} };
-        my @B = @{ $Param{Data2} };
-
-        # check if the count is different
-        return 1 if $#A ne $#B;
-
-        # compare array
-        COUNT:
-        for my $Count ( 0 .. $#A ) {
-
-            # do nothing, it's ok
-            next COUNT if !defined $A[$Count] && !defined $B[$Count];
-
-            # return diff, because its different
-            return 1 if !defined $A[$Count] || !defined $B[$Count];
-
-            if ( $A[$Count] ne $B[$Count] ) {
-                if ( ref $A[$Count] eq 'ARRAY' || ref $A[$Count] eq 'HASH' ) {
-                    return 1 if $Self->_DataDiff(
-                        Data1 => $A[$Count],
-                        Data2 => $B[$Count]
-                    );
-                    next COUNT;
-                }
-                return 1;
-            }
+    elsif ( $Self->{Output} eq 'ASCII' ) {
+        if ( $Self->{Pretty} || $Self->{Verbose} ) {
+            print { $Self->{OriginalSTDOUT} } "\n";
         }
-        return;
-    }
-
-    # HASH
-    if ( ref $Param{Data1} eq 'HASH' && ref $Param{Data2} eq 'HASH' ) {
-        my %A = %{ $Param{Data1} };
-        my %B = %{ $Param{Data2} };
-
-        # compare %A with %B and remove it if checked
-        KEY:
-        for my $Key ( sort keys %A ) {
-
-            # Check if both are undefined
-            if ( !defined $A{$Key} && !defined $B{$Key} ) {
-                delete $A{$Key};
-                delete $B{$Key};
-                next KEY;
+        if ( !$Self->{Verbose} ) {
+            if ( $Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED' ) {
+                print { $Self->{OriginalSTDOUT} } $Self->_Color('red', 'FAILED');
+            }
+            else  {
+                print { $Self->{OriginalSTDOUT} } $Self->_Color('green', 'OK');
             }
 
-            # return diff, because its different
-            return 1 if !defined $A{$Key} || !defined $B{$Key};
-
-            if ( $A{$Key} eq $B{$Key} ) {
-                delete $A{$Key};
-                delete $B{$Key};
-                next KEY;
-            }
-
-            # return if values are different
-            if ( ref $A{$Key} eq 'ARRAY' || ref $A{$Key} eq 'HASH' ) {
-                return 1 if $Self->_DataDiff(
-                    Data1 => $A{$Key},
-                    Data2 => $B{$Key}
-                );
-                delete $A{$Key};
-                delete $B{$Key};
-                next KEY;
-            }
-            return 1;
+            printf { $Self->{OriginalSTDOUT} } " (%i tests in %i ms)\n", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
         }
-
-        # check rest
-        return 1 if %B;
-        return;
-    }
-
-    if ( ref $Param{Data1} eq 'REF' && ref $Param{Data2} eq 'REF' ) {
-        return 1 if $Self->_DataDiff(
-            Data1 => ${ $Param{Data1} },
-            Data2 => ${ $Param{Data2} }
-        );
-        return;
     }
 
     return 1;
@@ -754,16 +407,17 @@ sub _PrintSummary {
 
     # show result
     if ( $Self->{Output} eq 'HTML' ) {
-        print "<table width='600' border='1'>\n";
+        print "</table>\n";
+        print "<table width='600' border='0'>\n";
         if ( $ResultSummary{TestNotOk} ) {
             print "<tr><td bgcolor='red' colspan='2'>Summary</td></tr>\n";
         }
         else {
             print "<tr><td bgcolor='green' colspan='2'>Summary</td></tr>\n";
         }
-        print "<tr><td>Product: </td><td>$ResultSummary{Product}</td></tr>\n";
+        print "<tr><td>Product:  </td><td>$ResultSummary{Product}</td></tr>\n";
         print "<tr><td>Test Time:</td><td>$ResultSummary{TimeTaken} s</td></tr>\n";
-        print "<tr><td>Time:     </td><td> $ResultSummary{Time}</td></tr>\n";
+        print "<tr><td>Time:     </td><td>$ResultSummary{Time}</td></tr>\n";
         print "<tr><td>Host:     </td><td>$ResultSummary{Host}</td></tr>\n";
         print "<tr><td>Perl:     </td><td>$ResultSummary{Perl}</td></tr>\n";
         print "<tr><td>OS:       </td><td>$ResultSummary{OS}</td></tr>\n";
@@ -801,73 +455,6 @@ sub _PrintSummary {
     return 1;
 }
 
-sub _PrintHeadlineStart {
-    my ( $Self, $Name, $FileCount, $FileTotal ) = @_;
-
-    # set default name
-    $Name ||= '->>No Name!<<-';
-
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    $Name =~ s/^$Home\/scripts\/test\///;
-
-    if ( $Self->{Output} eq 'HTML' ) {
-        $Self->{Content} .= "<table width='600' border='1'>\n";
-        $Self->{Content} .= "<tr><td colspan='2'>$FileCount/$FileTotal</td></tr>\n";
-        $Self->{Content} .= "<tr><td colspan='2'>$Name</td></tr>\n";
-    }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
-        printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
-    }
-
-    $Self->{XMLUnit} = $Name;
-
-    # set duration start time
-    $Self->{DurationStartTime}->{$Name} = time();
-
-    return 1;
-}
-
-sub _PrintHeadlineEnd {
-    my ( $Self, $Name ) = @_;
-
-    # set default name
-    $Name ||= '->>No Name!<<-';
-
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    $Name =~ s/^$Home\/scripts\/test\///;
-
-    # calculate duration time
-    my $Duration = '';
-    if ( $Self->{DurationStartTime}->{$Name} ) {
-
-        $Duration = time() - $Self->{DurationStartTime}->{$Name};
-
-        delete $Self->{DurationStartTime}->{$Name};
-    }
-    $Self->{Duration}->{$Name} = $Duration;
-
-    if ( $Self->{Output} eq 'HTML' ) {
-        $Self->{Content} .= "</table><br>\n";
-    }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
-        if ( $Self->{Pretty} || $Self->{Verbose} ) {
-            print { $Self->{OriginalSTDOUT} } "\n";
-        }
-        if ( !$Self->{Verbose} ) {
-            if ( $Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED' ) {
-                print { $Self->{OriginalSTDOUT} } $Self->_Color('red', 'FAILED');
-            }
-            else  {
-                print { $Self->{OriginalSTDOUT} } $Self->_Color('green', 'OK');
-            }
-
-            printf { $Self->{OriginalSTDOUT} } " (%i tests in %i ms)\n", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
-        }
-    }
-
-    return 1;
-}
-
 sub _Print {
     my ( $Self, $Test, $Name ) = @_;
 
@@ -890,14 +477,16 @@ sub _Print {
     if ($Test) {
         $Self->{TestCountOk}++;
         if ( $Self->{Output} eq 'HTML' ) {
-            $Self->{Content}
-                .= "<tr><td width='70' bgcolor='green'>OK $Self->{TestCount}</td><td>$Name</td></tr>\n";
+            if ( $Self->{Verbose} ) {
+                $Self->{Content} .= "<span style='color:green'>OK</span> $Self->{TestCount} - $PrintName<br/>";
+            }
+            else {
+                $Self->{Content} .= $Self->_Color('green', '&#x25FC');
+            }
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {
             if ( $Self->{Verbose} ) {
-                print { $Self->{OriginalSTDOUT} } " "
-                    . $Self->_Color( 'green', "\n OK" )
-                    . " $Self->{TestCount} - $PrintName\n";
+                print { $Self->{OriginalSTDOUT} } " " . $Self->_Color( 'green', "\n OK" ) . " $Self->{TestCount} - $PrintName\n";
             }
             else {
                 print { $Self->{OriginalSTDOUT} } $Self->_Color( 'green', "." );
@@ -912,8 +501,12 @@ sub _Print {
 
         $Self->{TestCountNotOk}++;
         if ( $Self->{Output} eq 'HTML' ) {
-            $Self->{Content}
-                .= "<tr><td width='70' bgcolor='red'>FAILED $Self->{TestCount}</td><td>$Name</td></tr>\n";
+            if ( $Self->{Verbose} ) {
+                $Self->{Content} .= "<span style='color:red'>FAILED</span> $Self->{TestCount} - $PrintName<br/>";
+            }
+            else {
+                $Self->{Content} .= $Self->_Color('red', '&#x25FC');
+            }
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {
             if ( $Self->{Verbose} ) {
@@ -958,14 +551,28 @@ ANSI output is available and active, otherwise the text stays unchanged.
 sub _Color {
     my ( $Self, $Color, $Text ) = @_;
 
-    return $Text if !$Self->{ANSI};
-    return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
+    if ( $Self->{Output} eq 'HTML' ) {
+        if ( !$Self->{CurrentColor} ) {
+            $Text = "<span style='color:$Color'>$Text";
+        }
+        elsif ( $Self->{CurrentColor} ne $Color ) {
+            $Text = "</span><span style='color:$Color'>$Text";
+        }
+        $Self->{CurrentColor} = $Color;
+    }
+    elsif ( $Self->{Output} eq 'ASCII' ) {
+        return $Text if !$Self->{ANSI};
+        return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
+    }
+
+    return $Text;
 }
 
 sub DESTROY {
     my $Self = shift;
 
     if ( $Self->{Output} eq 'HTML' ) {
+        print "</table>\n";
         print "</body>\n";
         print "</html>\n";
     }
