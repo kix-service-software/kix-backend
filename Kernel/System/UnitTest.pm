@@ -896,7 +896,7 @@ sub _Print {
         elsif ( $Self->{Output} eq 'ASCII' ) {
             if ( $Self->{Verbose} ) {
                 print { $Self->{OriginalSTDOUT} } " "
-                    . $Self->_Color( 'green', "OK" )
+                    . $Self->_Color( 'green', "\n OK" )
                     . " $Self->{TestCount} - $PrintName\n";
             }
             else {

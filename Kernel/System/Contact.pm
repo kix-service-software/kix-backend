@@ -129,7 +129,7 @@ sub ContactAdd {
 
     my $Password = $Self->_EncryptPassword(
         Login    => $Param{Login},
-        Password => $Param{Password} || $Self->_GenerateRandomPassword()
+        Password => $Param{Password} || $Self->GenerateRandomPassword()
     );    
     my $OrganisationIDs = ','.join(',', @{$Param{OrganisationIDs}}).',';
 

@@ -272,7 +272,7 @@ sub _ArticleCreate {
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
     my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $Ticket->{ContactID},
+        ID => $Ticket->{ContactID},
     );
 
     # get user object

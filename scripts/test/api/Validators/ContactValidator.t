@@ -38,61 +38,56 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-# create customer contact
-$Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
-    Firstname  => 'ValidatorTestCustomer',
-    Lastname   => 'ValidatorTestCustomer',
-    CustomerID => 'ValidatorTestCustomer',
-    CustomerIDs =>'ValidatorTestCustomer',
-    Login      => 'ValidatorTestCustomer',
-    Email      => 'ValidatorTestCustomer@validatortest.kix',
+# create organisation
+my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+    Number  => 'ValidatorTestCustomer',
+    Name    => 'ValidatorTestCustomer',
+    ValidID => 1,
+    UserID  => 1,
+);
+
+# create contact
+my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+    Firstname  => 'ValidatorTestContact',
+    Lastname   => 'ValidatorTestContact',
+    PrimaryOrganisationID => $OrgID,
+    OrganisationIDs => [
+        $OrgID
+    ],
+    Login      => 'ValidatorTestContact',
+    Email      => 'ValidatorTestContact@validatortest.kix',
     ValidID    => 1,
     UserID     => 1,
 );
 
 my $ValidData = {
-    CustomerContact => 'ValidatorTestCustomer'
-};
-
-my $ValidData_Email = {
-    CustomerContact => 'ValidatorTestCustomer@validatortest.kix'
+    ContactID => $ContactID
 };
 
 my $InvalidData = {
-    Customer => 'invalid-Customer'
+    ContactID => 9999
 };
 
-# validate valid CustomerContact
+# validate valid Contact
 my $Result = $ValidatorObject->Validate(
-    Attribute => 'CustomerContact',
+    Attribute => 'ContactID',
     Data      => $ValidData,
 );
 
 $Self->True(
     $Result->{Success},
-    'Validate() - valid CustomerContact',
+    'Validate() - valid Contact',
 );
 
-# validate valid CustomerContact email
-my $Result = $ValidatorObject->Validate(
-    Attribute => 'CustomerContact',
-    Data      => $ValidData_Email,
-);
-
-$Self->True(
-    $Result->{Success},
-    'Validate() - valid CustomerContact (Email)',
-);
-
-# validate invalid CustomerContact
+# validate invalid Contact
 $Result = $ValidatorObject->Validate(
-    Attribute => 'CustomerContact',
+    Attribute => 'ContactID',
     Data      => $InvalidData,
 );
 
 $Self->False(
     $Result->{Success},
-    'Validate() - invalid CustomerContact',
+    'Validate() - invalid Contact',
 );
 
 # validate invalid attribute
