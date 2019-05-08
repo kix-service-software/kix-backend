@@ -316,6 +316,9 @@ sub Send {
         $Header{'Message-ID'} = $Self->_MessageIDCreate();
     }
 
+    # save MessageID for later use
+    my $MessageID = $Header{'Message-ID'};
+
     # add date header
     $Header{Date} = 'Date: ' . $Kernel::OM->Get('Kernel::System::Time')->MailTimeStamp();
 
@@ -783,7 +786,7 @@ sub Send {
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Email',
-        ObjectID  => $Param{Header}->{MessageID},
+        ObjectID  => $MessageID,
     );
 
     return ( \$Param{Header}, \$Param{Body} );
