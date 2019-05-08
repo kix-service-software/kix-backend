@@ -92,18 +92,20 @@ sub new {
        table {
          border: 2px solid #aaa;
          border-collapse: collapse;
+         table-layout: fixed;
        }
        td {
          padding: 2px 5px;
          border: 1px solid #ccc;
          vertical-align: top;
+         word-wrap: break-word;
        }
     </style>
 </head>
 <a name='top'></a>
 <body>
 \n";
-        $Self->{Content} = "<table width='100%' border='0'>\n";
+        $Self->{Content} = "<table width='100%'>\n";
     }
 
     $Self->{XML}     = undef;
@@ -341,8 +343,8 @@ sub _PrintHeadlineStart {
     $Name =~ s/^$Home\/scripts\/test\///;
 
     if ( $Self->{Output} eq 'HTML' ) {
-        $Self->{Content} .= "<tr><td nowrap style='text-align:right'>$FileCount/$FileTotal</td>";
-        $Self->{Content} .= "<td nowrap>$Name</td><td width='100%'>";
+        $Self->{Content} .= "<tr><td nowrap style='width:60px;text-align:right'>$FileCount/$FileTotal</td>";
+        $Self->{Content} .= "<td nowrap style='width:500px'>$Name</td><td>";
     }
     elsif ( $Self->{Output} eq 'ASCII' ) {
         printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
@@ -380,8 +382,15 @@ sub _PrintHeadlineEnd {
         if ( $Self->{CurrentColor} ) {
             $Self->{Content} .= "</span>";
         }
-        $Self->{Content} .= "</td><td nowrap>" . sprintf "%i tests in %i ms", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
-        $Self->{Content} .= "</td></tr>\n";
+        my $Color = 'green';
+        my $Result = 'OK';
+        if ( $Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED' ) {
+            $Color = 'red';
+            $Result = 'FAILED';
+        }
+        $Self->{Content} .= "</td><td nowrap style='width:170px'>" . sprintf "%i tests in %i ms", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
+        $Self->{Content} .= "<td style='width:50px;color:$Color'>$Result</td>\n";
+        $Self->{Content} .= "</tr>\n";
     }
     elsif ( $Self->{Output} eq 'ASCII' ) {
         if ( $Self->{Pretty} || $Self->{Verbose} ) {

@@ -68,72 +68,48 @@ sub Set {
         }
     }
 
-    if ($Self->{Config}->{CacheMetaInfo}) {
-		my $Result;
-		
-        # update indexes
-        $Result->{'Memcached::CachedObjects'} = $Self->{RedisObject}->get(
-            "Memcached::CachedObjects",
-		);
-		
-		$Result->{"Memcached::CacheIndex::$Param{Type}"} = $Self->{RedisObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
-		
-        # update global object index
-        if ( !$Result->{'Memcached::CachedObjects'} || ref( $Result->{'Memcached::CachedObjects'} ) ne 'HASH' ) {
-            $Result->{'Memcached::CachedObjects'} = {};
-        }
-        $Result->{'Memcached::CachedObjects'}->{ $Param{Type} } = 1;
-
-        # update cache index for Type
-        if (
-            !$Result->{"Memcached::CacheIndex::$Param{Type}"}
-            || ref( $Result->{"Memcached::CacheIndex::$Param{Type}"} ) ne 'HASH'
-            )
-        {
-            $Result->{"Memcached::CacheIndex::$Param{Type}"} = {};
-        }
-        $Result->{"Memcached::CacheIndex::$Param{Type}"}->{$PreparedKey} = 1;
-
-		$Self->{RedisObject}->set(
-			"Memcached::CacheIndex::$Param{Type}", 
-			$Result->{"Memcached::CacheIndex::$Param{Type}"},
-		);
-
-		$Self->{RedisObject}->set(
-			"Memcached::CachedObjects",
-			$Result->{"Memcached::CachedObjects"},
-		);
-
-        return $Self->{RedisObject}->setex(
-            $PreparedKey, 
-			$TTL, 
-			$Param{Value},
-        );
+    my $Result;
+    
+    # update indexes
+    $Result->{'Memcached::CachedObjects'} = $Self->{RedisObject}->get(
+        "Memcached::CachedObjects",
+    );
+    
+    $Result->{"Memcached::CacheIndex::$Param{Type}"} = $Self->{RedisObject}->get(
+        "Memcached::CacheIndex::$Param{Type}",
+    );
+    
+    # update global object index
+    if ( !$Result->{'Memcached::CachedObjects'} || ref( $Result->{'Memcached::CachedObjects'} ) ne 'HASH' ) {
+        $Result->{'Memcached::CachedObjects'} = {};
     }
-    else {
-        # update indexes
-        my $Result = $Self->{RedisObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
+    $Result->{'Memcached::CachedObjects'}->{ $Param{Type} } = 1;
 
-        # update cache index for Type
-        if (!$Result || ref( $Result ) ne 'HASH') {
-            $Result = {};
-        }
-        $Result->{$PreparedKey} = 1;
-
-        $Self->{RedisObject}->set(
-			"Memcached::CacheIndex::$Param{Type}", $Result
-		),
-
-        return $Self->{RedisObject}->setex(
-            $PreparedKey, 
-			$TTL, 
-			$Param{Value},
-        );
+    # update cache index for Type
+    if (
+        !$Result->{"Memcached::CacheIndex::$Param{Type}"}
+        || ref( $Result->{"Memcached::CacheIndex::$Param{Type}"} ) ne 'HASH'
+        )
+    {
+        $Result->{"Memcached::CacheIndex::$Param{Type}"} = {};
     }
+    $Result->{"Memcached::CacheIndex::$Param{Type}"}->{$PreparedKey} = 1;
+
+    $Self->{RedisObject}->set(
+        "Memcached::CacheIndex::$Param{Type}", 
+        $Result->{"Memcached::CacheIndex::$Param{Type}"},
+    );
+
+    $Self->{RedisObject}->set(
+        "Memcached::CachedObjects",
+        $Result->{"Memcached::CachedObjects"},
+    );
+
+    return $Self->{RedisObject}->setex(
+        $PreparedKey, 
+        $TTL, 
+        $Param{Value},
+    );
 }
 
 sub Get {
@@ -193,17 +169,15 @@ sub CleanUp {
                 "Memcached::CacheIndex::$Param{Type}",
             );
 
-            if ($Self->{Config}->{CacheMetaInfo}) {
-                # delete from global object index
-                $CacheIndex = $Self->{RedisObject}->get(
-                    "Memcached::CachedObjects",
-                );
-                delete $CacheIndex->{ $Param{Type} };
-                $Self->{RedisObject}->set(
-                    "Memcached::CachedObjects",
-                    $CacheIndex,
-                );
-            }
+            # delete from global object index
+            $CacheIndex = $Self->{RedisObject}->get(
+                "Memcached::CachedObjects",
+            );
+            delete $CacheIndex->{ $Param{Type} };
+            $Self->{RedisObject}->set(
+                "Memcached::CachedObjects",
+                $CacheIndex,
+            );
         }
         return 1;
     }

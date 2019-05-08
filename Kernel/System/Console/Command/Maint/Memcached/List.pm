@@ -39,9 +39,6 @@ sub Run {
             print $Type. "\n";
         }
     }
-    else {
-        $Self->Print("You can't use the \"all\" option, because there is no information about the cached objects stored in the memcache. This is the case if you've deaktivated the option \"Cache::Module::Memcached###CacheMetaInfo\" in the SysConfig.");
-    }
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
