@@ -1816,9 +1816,7 @@ sub _ApplyInclude {
                 }
             }
 
-            if ( $Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') ) {
-                $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}."    type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}}));
-            }
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug($Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: ".join(',', keys %{$Self->{CacheDependencies}}));
         }
     }
 

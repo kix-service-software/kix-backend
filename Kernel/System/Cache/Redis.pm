@@ -160,9 +160,12 @@ sub CleanUp {
             "Memcached::CacheIndex::$Param{Type}",
         );
         if ( $CacheIndex && ref($CacheIndex) eq 'HASH' ) {
-            $Self->{RedisObject}->delete_multi(
+            my @Result = $Self->{RedisObject}->delete_multi(
                 keys %{$CacheIndex},
             );
+            my $OK = grep(/1/, @Result);
+            my $FAILED = grep(/0/, @Result);
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed delete_multi for " . ( scalar(keys %{$CacheIndex}) ) . " keys of type \"$Param{Type}\" ($OK success, $FAILED failed)");
 
             # delete cache index
             $Self->{RedisObject}->del(
@@ -178,6 +181,7 @@ sub CleanUp {
                 "Memcached::CachedObjects",
                 $CacheIndex,
             );
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
         }
         return 1;
     }
@@ -199,6 +203,7 @@ sub CleanUp {
             }        
         } 
         else {
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executing flushall()");
             return $Self->{RedisObject}->flushall();
         }        
     }

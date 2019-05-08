@@ -402,14 +402,8 @@ sub CleanUp {
 
     $Param{Indent} = $Param{Indent} || '';
 
-    my @AdditionalKeepTypes;
-    my $AlwaysKeepTypes = $Kernel::OM->Get('Kernel::Config')->Get('Cache::AlwaysKeepTypesOnCompleteCleanUp');
-    if ( IsHashRefWithData($AlwaysKeepTypes) ) {
-        # extend relevant param with the list of activated types
-        @AdditionalKeepTypes = grep { defined $_ } map { $AlwaysKeepTypes->{$_} ? $_ : undef } keys %{$AlwaysKeepTypes};
-        if ( @AdditionalKeepTypes ) {
-            $Param{KeepTypes} = \(@{$Param{KeepTypes} || []}, @AdditionalKeepTypes);
-        }
+    if ( $Param{KeepTypes} ) {
+        $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
     }
 
     # cleanup in-memory cache
@@ -450,6 +444,16 @@ sub CleanUp {
         }
     }
     else {
+        my @AdditionalKeepTypes;
+        my $AlwaysKeepTypes = $Kernel::OM->Get('Kernel::Config')->Get('Cache::AlwaysKeepTypesOnCompleteCleanUp');
+        if ( IsHashRefWithData($AlwaysKeepTypes) ) {
+            # extend relevant param with the list of activated types
+            @AdditionalKeepTypes = grep { defined $_ } map { $AlwaysKeepTypes->{$_} ? $_ : undef } keys %{$AlwaysKeepTypes};
+            if ( @AdditionalKeepTypes ) {
+                $Param{KeepTypes} = \(@{$Param{KeepTypes} || []}, @AdditionalKeepTypes);
+            }
+        }
+
         delete $Self->{Cache};
         delete $Self->{TypeDependencies};
 
@@ -462,17 +466,17 @@ sub CleanUp {
         }
 
         # some debug output
-        $Self->_Debug($Param{Indent}, "cleaning up everything");
+        if ( !$Param{KeepTypes} ) {
+            $Self->_Debug($Param{Indent}, "cleaning up everything");
+        }
+        else {
+            $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
+        }
 
         $Self->_UpdateCacheStats(
             Operation => 'CleanUp',
             %Param,
         );        
-    }
-
-    if ( $Param{KeepTypes} ) {
-        # some debug output
-        $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
     }
 
     # cleanup persistent cache
