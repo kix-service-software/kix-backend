@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#GeneralCatalogItemCollectionResponse",
+  "type": "object",
+  "description": "A list of GeneralCatalog items.",
+  "properties": {
+    "GeneralCatalogItem": {
+      "type": "array",
+      "items": {
+        "$ref": "GeneralCatalogItem.json"
+      }
+    }
+  },
+  "required": [
+    "GeneralCatalogItem"
+  ]
+}

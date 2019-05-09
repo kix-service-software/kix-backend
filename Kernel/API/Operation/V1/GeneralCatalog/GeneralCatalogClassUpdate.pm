@@ -89,7 +89,7 @@ sub ParameterDefinition {
         'GeneralCatalogClass' => {
             Required => 1
         },
-        'NewClassName' => {
+        'Name' => {
             Required => 1
         },   
     }
@@ -102,7 +102,7 @@ perform GeneralCatalogClassUpdate Operation. This will return the updated Genera
     my $Result = $OperationObject->Run(
         Data => {
             GeneralCatalogClass => 'ITSM::Service::Type',
-            NewClassName        => '...'
+            Name        => '...'
         },
     );
     
@@ -122,9 +122,9 @@ perform GeneralCatalogClassUpdate Operation. This will return the updated Genera
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # trim NewClassName parameter
-    my $NewClassName = $Self->_Trim( 
-        Data => $Param{Data}->{NewClassName},
+    # trim Name parameter
+    my $Name = $Self->_Trim( 
+        Data => $Param{Data}->{Name},
     );
 
     # check if Class exists 
@@ -139,7 +139,7 @@ sub Run {
     # update GeneralCatalog
     my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassRename(
         ClassOld => $Param{Data}->{GeneralCatalogClass},
-        ClassNew => $NewClassName,
+        ClassNew => $Param{Data}->{Name},
         UserID   => $Self->{Authorization}->{UserID},                        
     );
 
@@ -151,7 +151,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        GeneralCatalogClass => $NewClassName,
+        GeneralCatalogClass => $Param{Data}->{Name},
     );    
 }
 

@@ -1,0 +1,19 @@
+  displayName: General Catalog
+  description: !include ../descriptions/resources/generalcatalog.md
+  type: { collection: { typeName: GeneralCatalogItem } }
+  /{generalCatalogItemId}:
+    type: { item: { typeName: GeneralCatalogItem } }
+    uriParameters:
+      generalCatalogItemId:
+        displayName: GeneralCatalogItemID
+        type: integer
+  /classes:
+    description: !include ../descriptions/resources/generalcatalog/classes.md
+    type: { collection-readonly: { typeName: GeneralCatalogClass } }
+    /{className}:
+      type: { item-patchonly: { typeName: GeneralCatalogClass } }
+      uriParameters:
+        className:
+          displayName: ClassName
+          type: string
+

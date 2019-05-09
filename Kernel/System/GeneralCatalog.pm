@@ -402,13 +402,14 @@ sub ItemGet {
         return;
     }
 
-    # get general catalog preferences
-    my %Preferences = $Self->GeneralCatalogPreferencesGet( ItemID => $ItemData{ItemID} );
+    # TODO - ignore that for now
+    # # get general catalog preferences
+    # my %Preferences = $Self->GeneralCatalogPreferencesGet( ItemID => $ItemData{ItemID} );
 
-    # merge hash
-    if (%Preferences) {
-        %ItemData = ( %ItemData, %Preferences );
-    }
+    # # merge hash
+    # if (%Preferences) {
+    #     $ItemData->{Preferences} = \%Preferences;
+    # }
 
     # cache the result
     $Kernel::OM->Get('Kernel::System::Cache')->Set(

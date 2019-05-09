@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SystemAddressPostRequest",
+  "type": "object",
+  "description": "The system address request object for creation.",
+  "properties": {
+    "SystemAddress": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Realname": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Name",
+        "Realname"
+      ]
+    }
+  },
+  "required": [
+    "SystemAddress"
+  ]
+}
