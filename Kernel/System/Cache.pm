@@ -181,6 +181,9 @@ sub Set {
             );
         }
         foreach my $Type (@{$Param{Depends}}) {
+            # ignore same type as dependency
+            next if $Type eq $Param{Type};
+
             if ( !exists $Self->{TypeDependencies}->{$Type} || !exists $Self->{TypeDependencies}->{$Type}->{$Param{Type}} ) {
                 $Self->_Debug('', "adding dependent cache type \"$Param{Type}\" to cache type \"$Type\".");
                 $Self->{TypeDependencies}->{$Type}->{$Param{Type}} = 1;

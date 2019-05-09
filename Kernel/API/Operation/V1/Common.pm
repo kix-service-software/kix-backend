@@ -802,6 +802,9 @@ sub AddCacheDependency {
     }
 
     foreach my $Type (split(/,/, $Param{Type})) {
+        # ignore the same type as dependency
+        next if $Type eq $Self->{OperationConfig}->{CacheType};
+
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
             $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type...already exists");
             next;
