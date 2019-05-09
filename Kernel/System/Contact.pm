@@ -241,8 +241,8 @@ sub ContactGet {
 
         my @OrganisationIDs = split(',', $Row[5]);
         
-        # remove dummy
-        pop @OrganisationIDs;
+        # remove dummy (first element)
+        shift @OrganisationIDs;
 
         $Contact{ID}                    = $Row[0];
         $Contact{Login}                 = $Row[1];
