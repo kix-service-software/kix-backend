@@ -782,6 +782,15 @@ add a new cache dependency to inform the system about foreign depending objects 
 sub AddCacheDependency {
     my ( $Self, %Param ) = @_;
 
+    # if the operation has no CacheType configured, ignore the additional dependencies but log an error
+    if ( !$Self->{OperationConfig}->{CacheType} ) {
+        $Self->_Error(
+            Code    => 'AddCacheDependency.NoCacheType',
+            Message => "Should add cache dependencies but no CacheType has been configured for this operation!",
+        );
+        return;
+    }
+
     # check needed stuff
     for my $Needed (qw(Type)) {
         if ( !$Param{$Needed} ) {
@@ -794,10 +803,10 @@ sub AddCacheDependency {
 
     foreach my $Type (split(/,/, $Param{Type})) {
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
-            $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies: $Type...already exists");
+            $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type...already exists");
             next;
         }
-        $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies: $Type");
+        $Self->_Debug($Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type");
         $Self->{CacheDependencies}->{$Type} = 1;
     }
 }

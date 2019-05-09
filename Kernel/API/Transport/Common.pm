@@ -107,7 +107,7 @@ sub _MapReturnCode {
     }
 
     # log to debugger
-    $Self->{DebuggerObject}->Error(
+    $Self->{DebuggerObject}->Debug(
         Summary => $MappedCode.': '.($MappedMessage || ''),
     );
 
