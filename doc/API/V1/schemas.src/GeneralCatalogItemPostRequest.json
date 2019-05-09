@@ -21,12 +21,12 @@
         }
       },
       "required": [
-        "Name",
-        "Realname"
+        "Class",
+        "Name"
       ]
     }
   },
   "required": [
-    "SystemAddress"
+    "GeneralCatalogItem"
   ]
 }

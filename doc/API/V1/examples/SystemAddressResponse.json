@@ -5,7 +5,7 @@
         "Comment": "Standard Address.",
         "CreateBy": 1,
         "CreateTime": "2019-05-09 15:27:10",
-        "ID": "1",
+        "ID": 1,
         "Name": "kix@localhost",
         "Realname": "KIX System",
         "ValidID": 1
