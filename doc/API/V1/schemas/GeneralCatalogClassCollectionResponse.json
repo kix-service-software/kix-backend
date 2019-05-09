@@ -1,0 +1,17 @@
+{
+   "$id" : "#GeneralCatalogClassCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of GeneralCatalog classes",
+   "type" : "object",
+   "properties" : {
+      "GeneralCatalogClass" : {
+         "type" : "array",
+         "items" : {
+            "type" : "string"
+         }
+      }
+   },
+   "required" : [
+      "GeneralCatalogClass"
+   ]
+}

@@ -1,0 +1,70 @@
+{
+   "$id" : "#GeneralCatalogItemResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for GeneralCatalog item GET request.",
+   "type" : "object",
+   "properties" : {
+      "GeneralCatalogItem" : {
+         "$ref" : "#/definitions/GeneralCatalogItem"
+      }
+   },
+   "required" : [
+      "GeneralCatalogItem"
+   ],
+   "definitions" : {
+      "GeneralCatalogItem" : {
+         "$id" : "#GeneralCatalogItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The GeneralCatalog item object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "Class",
+            "CreateBy",
+            "CreateTime",
+            "ItemID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
+}

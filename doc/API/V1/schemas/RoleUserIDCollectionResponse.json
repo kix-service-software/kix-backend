@@ -1,5 +1,5 @@
 {
-   "$id" : "#RoleUserIDList",
+   "$id" : "#RoleUserIDCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of user IDs.",
    "type" : "object",
