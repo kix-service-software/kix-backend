@@ -90,7 +90,9 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Queue search
-    my %QueueList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
+    my %QueueList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList(
+        Valid => 0
+    );
 
 	# get already prepared Queue data from QueueGet operation
     if ( IsHashRefWithData(\%QueueList) ) {  	

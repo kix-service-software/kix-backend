@@ -91,7 +91,7 @@ sub Run {
 
     # perform SystemAddress search
     my %SystemAddressList = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressList(
-        Valid => 1,
+        Valid => 0,
     );
 
 	# get already prepared SystemAddress data from SystemAddressGet operation
