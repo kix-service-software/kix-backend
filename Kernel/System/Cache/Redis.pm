@@ -12,6 +12,8 @@ use strict;
 use warnings;
 
 use Redis;
+use Storable qw();
+use MIME::Base64;
 use Digest::MD5 qw();
 umask 002;
 
@@ -68,47 +70,16 @@ sub Set {
         }
     }
 
-    my $Result;
-    
-    # update indexes
-    $Result->{'Memcached::CachedObjects'} = $Self->{RedisObject}->get(
-        "Memcached::CachedObjects",
-    );
-    
-    $Result->{"Memcached::CacheIndex::$Param{Type}"} = $Self->{RedisObject}->get(
-        "Memcached::CacheIndex::$Param{Type}",
-    );
-    
-    # update global object index
-    if ( !$Result->{'Memcached::CachedObjects'} || ref( $Result->{'Memcached::CachedObjects'} ) ne 'HASH' ) {
-        $Result->{'Memcached::CachedObjects'} = {};
+    # prepare value for Redis
+    my $Value = $Param{Value};
+    if ( ref $Value ) {
+        $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );     
     }
-    $Result->{'Memcached::CachedObjects'}->{ $Param{Type} } = 1;
-
-    # update cache index for Type
-    if (
-        !$Result->{"Memcached::CacheIndex::$Param{Type}"}
-        || ref( $Result->{"Memcached::CacheIndex::$Param{Type}"} ) ne 'HASH'
-        )
-    {
-        $Result->{"Memcached::CacheIndex::$Param{Type}"} = {};
-    }
-    $Result->{"Memcached::CacheIndex::$Param{Type}"}->{$PreparedKey} = 1;
-
-    $Self->{RedisObject}->set(
-        "Memcached::CacheIndex::$Param{Type}", 
-        $Result->{"Memcached::CacheIndex::$Param{Type}"},
-    );
-
-    $Self->{RedisObject}->set(
-        "Memcached::CachedObjects",
-        $Result->{"Memcached::CachedObjects"},
-    );
 
     return $Self->{RedisObject}->setex(
         $PreparedKey, 
         $TTL, 
-        $Param{Value},
+        $Value,
     );
 }
 
@@ -125,9 +96,15 @@ sub Get {
 
     return if !$Self->{RedisObject};
 
-    return $Self->{RedisObject}->get(
+    my $Value = $Self->{RedisObject}->get(
         $Self->_prepareMemCacheKey(%Param),
     );
+
+    return $Value if !$Value || substr($Value, 0, 10) ne '__base64::';
+
+    # restore Value
+    $Value = substr($Value, 10);
+    return eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
 }
 
 sub Delete {
@@ -154,35 +131,16 @@ sub CleanUp {
     return if ( !$Self->{RedisObject} );
 
     if ( $Param{Type} ) {
+        # get keys for type 
+        my @Keys = $Self->{RedisObject}->keys($Param{Type}.'::*');
+        my $KeyCount = @Keys;
+        return 1 if !$KeyCount;
 
-        # get cache index for Type
-        my $CacheIndex = $Self->{RedisObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
-        if ( $CacheIndex && ref($CacheIndex) eq 'HASH' ) {
-            my @Result = $Self->{RedisObject}->delete_multi(
-                keys %{$CacheIndex},
-            );
-            my $OK = grep(/1/, @Result);
-            my $FAILED = grep(/0/, @Result);
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed delete_multi for " . ( scalar(keys %{$CacheIndex}) ) . " keys of type \"$Param{Type}\" ($OK success, $FAILED failed)");
+        # delete keys
+        my $OK = $Self->{RedisObject}->del(@Keys);
 
-            # delete cache index
-            $Self->{RedisObject}->del(
-                "Memcached::CacheIndex::$Param{Type}",
-            );
-
-            # delete from global object index
-            $CacheIndex = $Self->{RedisObject}->get(
-                "Memcached::CachedObjects",
-            );
-            delete $CacheIndex->{ $Param{Type} };
-            $Self->{RedisObject}->set(
-                "Memcached::CachedObjects",
-                $CacheIndex,
-            );
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
-        }
+        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
+        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
         return 1;
     }
     else {
@@ -190,16 +148,14 @@ sub CleanUp {
             my %KeepTypeLookup;
             @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
 
-            my $CacheIndex = $Self->{RedisObject}->get(
-                "Memcached::CachedObjects",
-            );
+            # get all keys
+            my @Keys = $Self->{RedisObject}->keys('*');
 
-            TYPE:
-            for my $Type ( sort keys %{ $CacheIndex || {} } ) {
-                next TYPE if exists $KeepTypeLookup{$Type};
-                $Self->CleanUp(
-                    Type => $Type
-                );
+            for my $Key ( @Keys ) {                
+                $Key =~ /^(.+?)::/;
+                my $Type = $1;
+                next if $KeepTypeLookup{$Type};
+                $Self->CleanUp( Type => $Type );
             }        
         } 
         else {
@@ -222,7 +178,7 @@ sub _initRedis {
 
     my %InitParams = (
         server => $Self->{Config}->{Server},
-        %{ $Self->{Config}->{Parameters} },
+        %{ $Self->{Config}->{Parameters} || {} },
     );
 
     $Self->{RedisObject} = Redis->new(%InitParams)
