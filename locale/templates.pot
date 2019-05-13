@@ -202,10 +202,10 @@ msgstr ""
 msgid "Owner Information"
 msgstr ""
 
-msgid "Assigned Customer"
+msgid "Assigned Organisation"
 msgstr ""
 
-msgid "Assigned Owner"
+msgid "Assigned Contact"
 msgstr ""
 
 msgid "Network Information"

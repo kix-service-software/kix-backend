@@ -5047,16 +5047,16 @@ DefaultValue: ''
         },
         Sub => [
             {
-                Key        => 'OwnerCustomer',
-                Name       => 'Assigned Customer',
+                Key        => 'OwnerOrganisation',
+                Name       => 'Assigned Organisation',
                 Searchable => 1,
                 Input      => {
                     Type => 'Organisation',
                 },
             },
             {
-                Key        => 'OwnerUser',
-                Name       => 'Assigned Owner',
+                Key        => 'OwnerContact',
+                Name       => 'Assigned Contact',
                 Searchable => 1,
                 Input      => {
                     Type => 'Contact',
@@ -5402,16 +5402,16 @@ DefaultValue: ''
         },
         Sub => [
             {
-                Key        => 'OwnerCustomer',
-                Name       => 'Assigned Customer',
+                Key        => 'OwnerOrganisation',
+                Name       => 'Assigned Organisation',
                 Searchable => 1,
                 Input      => {
                     Type => 'Organisation',
                 },
             },
             {
-                Key        => 'OwnerUser',
-                Name       => 'Assigned Owner',
+                Key        => 'OwnerContact',
+                Name       => 'Assigned Contact',
                 Searchable => 1,
                 Input      => {
                     Type => 'Contact',
@@ -6170,16 +6170,16 @@ DefaultValue: ''
         },
         Sub => [
             {
-                Key        => 'OwnerCustomer',
-                Name       => 'Assigned Customer',
+                Key        => 'OwnerOrganisation',
+                Name       => 'Assigned Organisation',
                 Searchable => 1,
                 Input      => {
                     Type => 'Organisation',
                 },
             },
             {
-                Key        => 'OwnerUser',
-                Name       => 'Assigned Owner',
+                Key        => 'OwnerContact',
+                Name       => 'Assigned Contact',
                 Searchable => 1,
                 Input      => {
                     Type => 'Contact',

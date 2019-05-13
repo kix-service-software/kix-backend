@@ -231,11 +231,11 @@ msgstr "Anhänge"
 msgid "Owner Information"
 msgstr "Besitzer Informationen"
 
-msgid "Assigned Customer"
-msgstr "Zugeordneter Kunde"
+msgid "Assigned Organisation"
+msgstr "Zugeordnete Organisation"
 
-msgid "Assigned Owner"
-msgstr "Zugeordneter Besitzer"
+msgid "Assigned Contact"
+msgstr "Zugeordneter Kontakt"
 
 msgid "Network Information"
 msgstr "Netzwerk Informationen"
