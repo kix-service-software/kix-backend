@@ -117,6 +117,7 @@ perform UserCreate Operation. This will return the created UserLogin.
                 UserPassword    => '...'                                        # optional                
                 UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
+                ValidID         => 1,
                 RoleIDs         => [                                            # optional          
                     123
                 ],
@@ -173,9 +174,9 @@ sub Run {
     
     # create User
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        ValidID      => 1,
         %{$User},
-        ChangeUserID     => $Self->{Authorization}->{UserID},
-        ValidID          => 1,
+        ChangeUserID => $Self->{Authorization}->{UserID},
     );    
     if ( !$UserID ) {
         return $Self->_Error(
