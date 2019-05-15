@@ -221,7 +221,6 @@ sub Set {
                 TTL   => 60 * 60 * 24 * 20,         # 20 days
             );
         }
-        $Self->_Debug('', "set backend cache key \"$Param{Key}\"");
         return $Self->{CacheObject}->Set(%Param);
     }
 
@@ -298,6 +297,9 @@ sub Get {
 
     # set in-memory cache
     if ( defined $Value ) {
+        use Data::Dumper;
+        $Self->_Debug('', "get backend cache for key \"$Param{Key}\": ".Dumper($Value));
+
         $Self->_UpdateCacheStats(
             Operation => 'Get',
             Result    => 'HIT',
