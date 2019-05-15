@@ -76,11 +76,15 @@ sub Set {
         $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );     
     }
 
-    return $Self->{RedisObject}->setex(
+    my $Result = $Self->{RedisObject}->setex(
         $PreparedKey, 
         $TTL, 
         $Value,
     );
+
+    $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
+
+    return $Result;
 }
 
 sub Get {
