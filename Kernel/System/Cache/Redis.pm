@@ -106,7 +106,7 @@ sub Get {
         $PreparedKey,
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed get() for key \"$PreparedKey\" (Value=$Value)");
+    #$Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed get() for key \"$PreparedKey\" (Value=$Value)");
 
     return $Value if !$Value || substr($Value, 0, 10) ne '__base64::';
 
