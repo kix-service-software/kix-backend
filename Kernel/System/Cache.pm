@@ -211,9 +211,9 @@ sub Set {
 
     # Set persistent cache.
     if ( $Self->{CacheInBackend} && ( $Param{CacheInBackend} // 1 ) ) {
-        use Data::Dumper;
-        $Self->_Debug('', "storing cache dependency information: ".Dumper($Self->{TypeDependencies}));
         if ($Self->{TypeDependencies}) {
+            use Data::Dumper;
+            $Self->_Debug('', "updating gobal cache dependency information: ".Dumper($Self->{TypeDependencies}));
             $Self->{CacheObject}->Set(
                 Type => 'Cache',
                 Key  => 'TypeDependencies',
