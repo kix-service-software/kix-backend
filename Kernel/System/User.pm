@@ -329,6 +329,8 @@ sub GetUserData {
             }
         }
 
+use Data:Dumper;
+print STDERR "GetUserData($Data{UserID}): Preferences=".Dumper(\%Preferences);
         # add preferences to data hash
         $Data{Preferences} = \%Preferences;
     }
@@ -1511,6 +1513,7 @@ sub SetPreferences {
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
+print STDERR "User::SetPreferences($Param{UserID}): $Param{Key} = $Param{Value}\n";
     # set preferences
     return $PreferencesObject->SetPreferences(%Param);
 }
