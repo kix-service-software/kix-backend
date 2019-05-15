@@ -144,6 +144,9 @@ sub CleanUp {
         my $KeyCount = @Keys;
         return 1 if !$KeyCount;
 
+        use Data::Dumper;
+        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
+
         # delete keys
         my $OK = $Self->{RedisObject}->del(@Keys);
 
