@@ -193,6 +193,7 @@ sub Set {
 
     # Set in-memory cache.
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
+        $Self->_Debug('', "set in-memory cache key \"$Param{Key}\"");
         $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } = $Param{Value};
     }
 
@@ -210,6 +211,8 @@ sub Set {
 
     # Set persistent cache.
     if ( $Self->{CacheInBackend} && ( $Param{CacheInBackend} // 1 ) ) {
+        use Data::Dumper;
+        $Self->_Debug('', "storing cache dependency information: ".Dumper($Self->{TypeDependencies}));
         if ($Self->{TypeDependencies}) {
             $Self->{CacheObject}->Set(
                 Type => 'Cache',
@@ -218,6 +221,7 @@ sub Set {
                 TTL   => 60 * 60 * 24 * 20,         # 20 days
             );
         }
+        $Self->_Debug('', "set backend cache key \"$Param{Key}\"");
         return $Self->{CacheObject}->Set(%Param);
     }
 

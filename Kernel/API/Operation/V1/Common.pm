@@ -216,7 +216,7 @@ sub RunOperation {
         );
 
         if ( IsHashRefWithData($CacheResult) ) {
-            $Self->_Debug($Self->{LevelIndent}, "return cached response");
+            $Self->_Debug($Self->{LevelIndent}, "return cached response (Key: ".Dumper($CacheKey));
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
                 %{$CacheResult}
