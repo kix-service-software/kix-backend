@@ -82,7 +82,9 @@ sub Set {
         $Value,
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
+    if ( $Self->{Config}->{Debug} ) {
+        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
+    }
 
     return $Result;
 }
@@ -106,7 +108,7 @@ sub Get {
         $PreparedKey,
     );
 
-    if ($Value) {
+    if ($Value && $Self->{Config}->{Debug} ) {
         $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: get() for key \"$PreparedKey\" returned value");
     }
 
@@ -146,14 +148,18 @@ sub CleanUp {
         my $KeyCount = @Keys;
         return 1 if !$KeyCount;
 
-        use Data::Dumper;
-        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
+        if ( $Self->{Config}->{Debug} ) {
+            use Data::Dumper;
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
+        }
 
         # delete keys
         my $OK = $Self->{RedisObject}->del(@Keys);
 
-        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
-        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
+        if ( $Self->{Config}->{Debug} ) {
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
+        }
         return 1;
     }
     else {
@@ -172,7 +178,9 @@ sub CleanUp {
             }        
         } 
         else {
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executing flushall()");
+            if ( $Self->{Config}->{Debug} ) {
+                $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executing flushall()");
+            }
             return $Self->{RedisObject}->flushall();
         }        
     }
