@@ -782,12 +782,13 @@ sub Send {
         return;
     }
 
-    # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
-        Namespace => 'Email',
-        ObjectID  => $MessageID,
-    );
+    # don't push notification for email at the moment
+    # # push client callback event
+    # $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    #     Event     => 'CREATE',
+    #     Namespace => 'Email',
+    #     ObjectID  => $MessageID,
+    # );
 
     return ( \$Param{Header}, \$Param{Body} );
 }
