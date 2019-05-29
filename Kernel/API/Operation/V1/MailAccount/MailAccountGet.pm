@@ -144,6 +144,9 @@ sub Run {
             );
         }
         
+        # remove password
+        delete $MailAccountData{Password};
+
         # add
         push(@MailAccountList, \%MailAccountData);
     }
