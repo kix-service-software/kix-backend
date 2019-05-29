@@ -16,7 +16,7 @@ package Kernel::API::Operation::V1::Queue::QueueUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -141,11 +141,11 @@ sub Run {
     );
 
     # check if Queue exists
-    my $QueueName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    my $QueueFullName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
         QueueID => $Param{Data}->{QueueID},
     );
         
-    if ( !$QueueName ) {
+    if ( !$QueueFullName ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
@@ -156,9 +156,9 @@ sub Run {
     );
 
     # set name to support internal representation of hierarchy
-    if ( $Queue->{Name} ) {
+    if ( $Queue->{Name} || exists $Queue->{ParentID} ) {
         if ( $Queue->{ParentID} ) {
-            # ParentID given
+            # ParentID given, create a new queue Name
             my $ParentQueueName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
                 QueueID => $Queue->{ParentID},
             );
@@ -168,11 +168,19 @@ sub Run {
                     Message => "Cannot update Queue. No Queue with ParentID '$Queue->{ParentID}' found.",
                 );
             }
-            $Queue->{Name} = $ParentQueueName.'::'.$Queue->{Name};
+            my @NameParts = split(/::/, $QueueData{Name});
+            my $QueueName = pop @NameParts;
+            $Queue->{Name} = $ParentQueueName.'::'.($Queue->{Name} || $QueueName);
+        }
+        elsif ( exists $Queue->{ParentID} ) {
+            # ParentID is set to NULL, so move queue to the top-level
+            my @NameParts = split(/::/, $QueueFullName);
+            my $QueueName = pop @NameParts;
+            $Queue->{Name} = ($Queue->{Name} || $QueueName);
         }
         else {
-            # no ParentID given
-            my @NameParts = split(/::/, $QueueData{Name});
+            # no ParentID given but the Name should be updated
+            my @NameParts = split(/::/, $QueueFullName);
             pop @NameParts;
             push(@NameParts, $Queue->{Name});
             $Queue->{Name} = join('::', @NameParts);
