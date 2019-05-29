@@ -187,7 +187,7 @@ sub Run {
         Type          => $MailAccount->{Type} || $MailAccountData{Type},
         IMAPFolder    => $MailAccount->{IMAPFolder} || $MailAccountData{IMAPFolder},
         ValidID       => $MailAccount->{ValidID} || $MailAccountData{ValidID},
-        Trusted       => $MailAccount->{Trusted} || $MailAccountData{Trusted},
+        Trusted       => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
         DispatchingBy => $MailAccount->{DispatchingBy} || $MailAccountData{DispatchingBy},
         QueueID       => $MailAccount->{QueueID} || $MailAccountData{QueueID},
         Comment       => $MailAccount->{Comment} || $MailAccountData{Comment},        
