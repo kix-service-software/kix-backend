@@ -329,7 +329,6 @@ sub GetUserData {
             }
         }
 
-print STDERR "GetUserData($Data{UserID}): Preferences=".Dumper(\%Preferences);
         # add preferences to data hash
         $Data{Preferences} = \%Preferences;
     }
