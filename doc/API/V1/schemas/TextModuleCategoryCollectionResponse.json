@@ -1,0 +1,17 @@
+{
+   "$id" : "#TextModuleCategoryCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of text module categories",
+   "type" : "object",
+   "properties" : {
+      "TextModuleCategory" : {
+         "type" : "array",
+         "items" : {
+            "type" : "string"
+         }
+      }
+   },
+   "required" : [
+      "TextModuleCategory"
+   ]
+}

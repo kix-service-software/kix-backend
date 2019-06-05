@@ -101,28 +101,7 @@ sub ParameterDefinition {
         'TextModule::Language' => {
             RequiresValueIfUsed => 1,
             OneOf => \@LanguageIDs
-        },
-        'TextModule::AgentFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::CustomerFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::PublicFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
+        }
     }
 }
 
@@ -142,9 +121,6 @@ perform TextModuleCreate Operation. This will return the created TextModuleID.
                     'some', 'keyword'
                 ],                                  # optional
                 Subject             => '...',       # optional
-                AgentFrontend       => 0|1,         # optional
-                CustomerFrontend    => 0|1,         # optional
-                PublicFrontend      => 0|1,         # optional
                 ValidID             => 1            # optional
             },
         },
@@ -190,9 +166,6 @@ sub Run {
         Subject            => $TextModule->{Subject} || '',
         Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
         Comment            => $TextModule->{Comment} || '',
-        AgentFrontend      => $TextModule->{AgentFrontend},
-        CustomerFrontend   => $TextModule->{CustomerFrontend},
-        PublicFrontend     => $TextModule->{PublicFrontend},        
         ValidID            => $TextModule->{ValidID} || 1,
         UserID             => $Self->{Authorization}->{UserID},
     );
