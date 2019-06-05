@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TextModulePostRequest",
+  "type": "object",
+  "description": "The text module request object for creation.",
+  "properties": {
+    "TextModule": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },        
+        "Language": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Text": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Name",
+        "Text"
+      ]    
+    }
+  },
+  "required": [
+    "TextModule"
+  ]
+}

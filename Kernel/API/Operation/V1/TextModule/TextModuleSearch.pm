@@ -94,7 +94,7 @@ sub Run {
     if ( IsArrayRefWithData($Self->{Search}->{TextModule}->{AND}) && !defined $Self->{Search}->{TextModule}->{OR} ) {
         foreach my $SearchItem ( @{$Self->{Search}->{TextModule}->{AND}} ) {
             # ignore everything that we don't support in the core DB search (the rest will be done in the generic API Searching)
-            next if ($SearchItem->{Field} !~ /^(Name|Category|AgentFrontend|CustomerFrontend|PublicFrontend|Language|ValidID)$/g);
+            next if ($SearchItem->{Field} !~ /^(Name|Category|Language|ValidID)$/g);
             next if ($SearchItem->{Operator} ne 'EQ');
 
             $SearchParam{$SearchItem->{Field}} = $SearchItem->{Value};

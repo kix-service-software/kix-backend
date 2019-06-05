@@ -102,9 +102,6 @@ Adds a new TextModule
         Language   => 'de',               #optional
         Keywords   => 'key1, key2, key3', #optional
         Comment    => '',                 #optional
-        AgentFrontend    => 1,            #optional
-        CustomerFrontend => 1,            #optional
-        PublicFrontend   => 1,            #optional
         Subject    => '',                 #optional
         UserID     => 1,
         ValidID    => 1,
@@ -128,23 +125,12 @@ sub TextModuleAdd {
         $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
     }
 
-    # set frontend display flags...
-    for my $CurrKey (qw(AgentFrontend CustomerFrontend PublicFrontend)) {
-        if ( $Param{$CurrKey} ) {
-            $Param{$CurrKey} = 1;
-        }
-        else {
-            $Param{$CurrKey} = 0;
-        }
-    }
-
     # build sql...
     my $SQL = "INSERT INTO kix_text_module "
         . "(name, valid_id, keywords, category, comment, text, subject, language, "
-        . "f_agent, f_customer, f_public, "
         . "create_time, create_by, change_time, change_by ) "
         . "VALUES "
-        . "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+        . "(?, ?, ?, ?, ?, ?, ?, ?, "
         . "current_timestamp, ?, current_timestamp, ?) ";
 
     # do the db insert...
@@ -153,7 +139,6 @@ sub TextModuleAdd {
         Bind => [
             \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Category}, 
             \$Param{Comment}, \$Param{Text}, \$Param{Subject}, \$Param{Language},
-            \$Param{AgentFrontend}, \$Param{CustomerFrontend}, \$Param{PublicFrontend},
             \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -231,7 +216,7 @@ sub TextModuleGet {
     # sql
     my $SQL
         = 'SELECT name, valid_id, keywords, category, comment, text, '
-        . 'language, subject, f_agent, f_customer, f_public '
+        . 'language, subject, create_time, create_by, change_time, change_by '
         . 'FROM kix_text_module '
         . 'WHERE id = ?';
 
@@ -242,18 +227,19 @@ sub TextModuleGet {
 
     if ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
         my %Data = (
-            ID         => $Param{ID},
-            Name       => $Data[0],
-            ValidID    => $Data[1],
-            Keywords   => $Data[2],
-            Category   => $Data[3],
-            Comment    => $Data[4],
-            Text       => $Data[5],
-            Language   => $Data[6],
-            Subject    => $Data[7],
-            AgentFrontend      => $Data[8],
-            CustomerFrontend   => $Data[9],
-            PublicFrontend     => $Data[10],
+            ID                  => $Param{ID},
+            Name                => $Data[0],
+            ValidID             => $Data[1],
+            Keywords            => $Data[2],
+            Category            => $Data[3],
+            Comment             => $Data[4],
+            Text                => $Data[5],
+            Language            => $Data[6],
+            Subject             => $Data[7],
+            CreateTime          => $Data[8],
+            CreateBy            => $Data[9],
+            ChangeTime          => $Data[10],
+            ChangeBy            => $Data[11],            
         );
 
         # set cache
@@ -279,13 +265,11 @@ Updates an existing TextModule
         ValidID    => 1,                  #required
         Text       => 'some blabla...',   #required
         UserID     => 1,                  #required
+        Subject    => '',                 #optional
         Category   => '',                 #optional
         Language   => 'de',               #optional
         Keywords   => 'key1, key2, key3', #optional
         Comment    => '',                 #optional
-        AgentFrontend      => 1,          #optional
-        CustomerFrontend   => 1,          #optional
-        PublicFrontend     => 1,          #optional
     );
 
 =cut
@@ -306,21 +290,10 @@ sub TextModuleUpdate {
         $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
     }
 
-    # set frontend display flags...
-    for my $CurrKey (qw(AgentFrontend CustomerFrontend PublicFrontend )) {
-        if ( $Param{$CurrKey} ) {
-            $Param{$CurrKey} = 1;
-        }
-        else {
-            $Param{$CurrKey} = 0;
-        }
-    }
-
     # build sql...
     my $SQL = "UPDATE kix_text_module SET "
         . " name = ?, text = ?, subject = ?, keywords = ?, language = ?, "
         . " category = ?, comment = ?, valid_id = ?, "
-        . " f_agent = ?, f_customer = ?, f_public = ?, "
         . " change_time = current_timestamp, change_by = ? "
         . "WHERE id = ?";
 
@@ -331,7 +304,6 @@ sub TextModuleUpdate {
             \$Param{Name}, \$Param{Text}, \$Param{Subject},
             \$Param{Keywords}, \$Param{Language},
             \$Param{Category}, \$Param{Comment}, \$Param{ValidID},
-            \$Param{AgentFrontend}, \$Param{CustomerFrontend}, \$Param{PublicFrontend},
             \$Param{UserID},   \$Param{ID}
         ],
     );
@@ -410,9 +382,6 @@ Returns all TextModuleIDs depending on given parameters.
         Name          => '...'   #optional
         Category      => '...',  #optional
         Language      => 'de',   #optional
-        AgentFrontend => 1,      #optional
-        CustomerFrontend => 1    #optional
-        PublicFrontend => 1,     #optional
         ValidID        => 1,     #optional: 1 is assumed as default
     );
 
@@ -429,7 +398,7 @@ sub TextModuleList {
     my $CacheKey = 'TextModuleList::';
     my @Params;
     foreach my $ParamKey (
-        qw{Category Name AgentFrontend CustomerFrontend PublicFrontend Language ValidID}
+        qw{Category Name Language ValidID}
         )
     {
         if ( $Param{$ParamKey} ) {
@@ -450,17 +419,6 @@ sub TextModuleList {
     if ( exists( $Param{ValidID} ) ) {
         push(@SQLWhere, 'valid_id = ?');
         push(@BindVars, \$Param{ValidID});
-    }
-
-    # set frontend display flags...
-    if ( $Param{AgentFrontend} ) {
-        push(@SQLWhere, 'f_agent = 1');
-    }
-    elsif ( $Param{CustomerFrontend} ) {
-        push(@SQLWhere, 'f_customer = 1');
-    }
-    elsif ( $Param{PublicFrontend} ) {
-        push(@SQLWhere, 'f_public = 1');
     }
 
     if ( $Param{Name} ) {

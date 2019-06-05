@@ -102,27 +102,6 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => \@LanguageIDs
         },
-        'TextModule::AgentFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::CustomerFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::PublicFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
     }
 }
 
@@ -143,9 +122,6 @@ perform TextModuleUpdate Operation. This will return the updated TypeID.
                     'some', 'keywords'
                 ],                                  # optional
                 Subject             => '...',       # optional
-                AgentFrontend       => 0|1,         # optional
-                CustomerFrontend    => 0|1,         # optional
-                PublicFrontend      => 0|1,         # optional
                 ValidID             => 1            # optional
             },
         },
@@ -201,14 +177,11 @@ sub Run {
         ID                 => $Param{Data}->{TextModuleID},
         Name               => $TextModule->{Name} || $TextModuleData{Name},
         Text               => $TextModule->{Text} || $TextModuleData{Text},
-        Category           => $TextModule->{Category} || $TextModuleData{Category},
+        Category           => exists $TextModule->{Category} ? $TextModule->{Category} : $TextModuleData{Category},
         Language           => $TextModule->{Language} || $TextModuleData{Language},
-        Subject            => $TextModule->{Subject} || $TextModuleData{Subject},
-        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
-        Comment            => $TextModule->{Comment} || $TextModuleData{Comment},
-        AgentFrontend      => $TextModule->{AgentFrontend} || $TextModuleData{AgentFrontend},
-        CustomerFrontend   => $TextModule->{CustomerFrontend} || $TextModuleData{CustomerFrontend},
-        PublicFrontend     => $TextModule->{PublicFrontend} || $TextModuleData{PublicFrontend},        
+        Subject            => exists $TextModule->{Subject} ? $TextModule->{Subject} : $TextModuleData{Subject},
+        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : $TextModuleData{Keywords},
+        Comment            => exists $TextModule->{Comment} ? $TextModule->{Comment} : $TextModuleData{Comment},
         ValidID            => $TextModule->{ValidID} || $TextModuleData{ValidID},        
         UserID             => $Self->{Authorization}->{UserID},
     );

@@ -1,0 +1,14 @@
+{
+   "$id" : "#TextModulePostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated text module.",
+   "type" : "object",
+   "properties" : {
+      "TextModuleID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "TextModuleID"
+   ]
+}
