@@ -114,12 +114,12 @@ sub Run {
     # start loop
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
-        # search Role user       
-        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserGet(
+        # get all users assigned to this role
+        my @UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
             RoleID => $RoleID,
         );
    
-        if ( IsHashRefWithData(\%ResultUserList) ) {
+        if ( IsArrayRefWithData(\@UserList) ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete Role. At least one user is assigned to this Role.',

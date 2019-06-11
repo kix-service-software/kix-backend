@@ -98,7 +98,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ServiceUpdate Operation. This will return the updated TypeID.
+perform ServiceUpdate Operation. This will return the updated ServcieID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -149,13 +149,18 @@ sub Run {
 
     # check if Service exists
     # prepare full name for lookup
-    my $FullName = $Service->{Name};
-    if ( $Service->{ParentID} ) {
+    my $FullName = $Service->{Name} || $ServiceData{Name};
+    if ( $Service->{ParentID} || $ServiceData{ParentID} ) {
         my $ParentName = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
             ServiceID => $Service->{ParentID} || $ServiceData{ParentID},
-        );
+        );        
         if ($ParentName) {
-            $FullName = $ParentName . '::' . $Service->{Name};
+            $FullName = $ParentName . '::' . ( $Service->{Name} || $ServiceData{Name} );
+        }
+        else {
+            return $Self->_Error(
+                Code => 'ParentObject.NotFound',
+            );
         }
     }
 
@@ -165,7 +170,7 @@ sub Run {
         UserID  => 1,
     );
     
-    if ( $ServiceID != $ServiceData{ServiceID} ) {
+    if ( $ServiceID && $ServiceID != $ServiceData{ServiceID} ) {
         return $Self->_Error(
             Code => 'Object.AlreadyExists',
         );
@@ -175,9 +180,9 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::Service')->ServiceUpdate(
         ServiceID   => $Service->{ServiceID} || $ServiceData{ServiceID},    
         Name        => $Service->{Name} || $ServiceData{Name},
-        Comment     => $Service->{Comment} || $ServiceData{Comment},
+        Comment     => exists $Service->{Comment} ? $Service->{Comment} : $ServiceData{Comment},
         ValidID     => $Service->{ValidID} || $ServiceData{ValidID},
-        ParentID    => $Service->{ParentID} || $ServiceData{ParentID},
+        ParentID    => exists $Service->{ParentID} ? $Service->{ParentID} : $ServiceData{ParentID},
         TypeID      => $Service->{TypeID} || $ServiceData{TypeID},
         Criticality => $Service->{Criticality} || $ServiceData{Criticality},
         UserID      => $Self->{Authorization}->{UserID},
@@ -191,7 +196,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        ServiceID => $Param{Data}->{ServiceID},
+        ServiceID => $ServiceData{ServiceID},
     );    
 }
 
