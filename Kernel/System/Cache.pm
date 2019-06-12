@@ -623,8 +623,8 @@ update the cache statistics
 sub _UpdateCacheStats {
     my ( $Self, %Param ) = @_;
 
-    # if cache stats are not disabled, manage them
-    return if $Kernel::OM->Get('Kernel::Config')->Get('Cache::DisableStats');
+    # do nothing if cache stats are not enabled
+    return if !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Stats');
 
     # read stats from disk if empty
     my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats.'.$$;
