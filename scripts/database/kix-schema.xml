@@ -176,9 +176,9 @@
 </Table>
 
 <Table Name="role_permission">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="role_id" Required="true" Type="INTEGER"/>
-    <Column Name="type_id" Required="true" Type="INTEGER"/>
+    <Column Name="type_id" Required="true" Type="SMALLINT"/>
     <Column Name="target" Required="true" Size="1000" Type="VARCHAR"/>
     <Column Name="value" Required="true" Type="INTEGER"/>
     <Column Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
@@ -2809,7 +2809,7 @@
         <IndexColumn Name="id"/>
     </Index>
     <Index Name="kix_translation_pattern_value">
-        <IndexColumn Name="value"/>
+        <IndexColumn Name="value" Size="100"/>
     </Index>
 </Table>
 
