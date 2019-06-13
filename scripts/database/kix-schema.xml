@@ -2803,7 +2803,7 @@
     <Column Name="change_time" Required="true" Type="DATE" />
     <Column Name="change_by" Required="true" Type="INTEGER" />
     <Unique Name="kix_translation_pattern_uvalue">
-        <UniqueColumn Name="value"/>
+        <UniqueColumn Name="value" Size="255"/>
     </Unique>
     <Index Name="kix_translation_pattern_id">
         <IndexColumn Name="id"/>
