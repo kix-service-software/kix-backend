@@ -152,7 +152,7 @@ sub Run {
 
     # check if ContactLogin already exists
     if ( IsStringWithData($Contact->{Login}) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
             Login => $Contact->{Login},
         );
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{Login}})) {        
@@ -163,10 +163,9 @@ sub Run {
         }
     }
 
-
     # check ContactEmail exists
     if ( IsStringWithData($Contact->{Email}) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
             PostMasterSearch => $Contact->{Email},
         );
         if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
