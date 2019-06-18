@@ -1,18 +1,29 @@
 {
-   "$id" : "#TranslationLanguageCollectionResponse",
+   "$id" : "#TranslationPatternPostRequest",
    "$schema" : "http://json-schema.org/schema",
-   "description" : "A list of translation languages.",
+   "description" : "The translation pattern request object for creation.",
    "type" : "object",
    "properties" : {
-      "TranslationLanguage" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TranslationLanguage"
-         }
+      "TranslationPattern" : {
+         "type" : "object",
+         "properties" : {
+            "Languages" : {
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TranslationLanguage"
+               }
+            },
+            "Value" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Value"
+         ]
       }
    },
    "required" : [
-      "TranslationLanguage"
+      "TranslationPattern"
    ],
    "definitions" : {
       "TranslationLanguage" : {

@@ -1,9 +1,16 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "#Translation",
+  "$id": "#TranslationPattern",
   "type": "object",
-  "description": "The translation object.",
+  "description": "The translation pattern object.",
   "properties": {
+    "AvailableLanguages": {
+      "type": "array",
+      "item": {
+        "type": "string"
+      },
+      "readOnly": true
+    },
     "ChangeBy": {
       "type": "integer",
       "readOnly": true
@@ -24,7 +31,7 @@
       "type": "integer",
       "readOnly": true
     },
-    "Pattern": {
+    "Value": {
       "type": "string",
       "readOnly": true
     },
@@ -43,6 +50,6 @@
     "CreateBy",
     "CreateTime",
     "ID",
-    "Pattern"
+    "Value"
   ]
 }

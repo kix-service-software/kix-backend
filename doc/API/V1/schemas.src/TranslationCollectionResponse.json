@@ -7,7 +7,26 @@
     "Translation": {
       "type": "array",
       "items": {
-        "$ref": "Translation.json"
+        "type": "object",
+        "properties": {
+          "Languages": {
+            "type": "object",
+            "patternProperties": {
+              "^[0-9]+$": {
+                "type": "string",
+                "readOnly": true
+              }
+            }
+          },
+          "Pattern": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "Languages",
+          "Pattern"
+        ]
       }
     }
   },

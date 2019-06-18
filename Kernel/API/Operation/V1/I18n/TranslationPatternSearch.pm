@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Translation/TranslationSearch.pm - API Translation Search operation backend
+# Kernel/API/Operation/Translation/TranslationPatternSearch.pm - API Translation Search operation backend
 # based upon Kernel/API/Operation/Ticket/TicketSearch.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -9,7 +9,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::I18n::TranslationSearch;
+package Kernel::API::Operation::V1::I18n::TranslationPatternSearch;
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::I18n::TranslationSearch - API Translation Search Operation backend
+Kernel::API::Operation::I18n::TranslationPatternSearch - API Translation Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -62,7 +62,7 @@ sub new {
 
 =item Run()
 
-perform TranslationSearch Operation. This will return a Translation ID list.
+perform TranslationPatternSearch Operation. This will return a Translation ID list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -73,7 +73,7 @@ perform TranslationSearch Operation. This will return a Translation ID list.
         Success      => 1,                                # 0 or 1
         Message => '',                               # In case of an error
         Data         => {
-            Translation => [
+            TranslationPattern => [
                 {
                 },
                 {                    
@@ -88,13 +88,35 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform pattern search
-    my @TranslationList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationList(
-        UserID => $Self->{Authorization}->{UserID}
+    my %PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternList(
+        UserID    => $Self->{Authorization}->{UserID}
     );
+
+    if (IsHashRefWithData(\%PatternList)) {
+
+        # get already prepared Pattern data from TranslationPatternGet operation
+        my $PatternGetResult = $Self->ExecOperation(
+            OperationType => 'V1::I18n::TranslationPatternGet',
+            Data          => {
+                PatternID => join(',', sort keys %PatternList),
+            }
+        );
+        if ( !IsHashRefWithData($PatternGetResult) || !$PatternGetResult->{Success} ) {
+            return $PatternGetResult;
+        }
+
+        my @ResultList = IsArrayRefWithData($PatternGetResult->{Data}->{TranslationPattern}) ? @{$PatternGetResult->{Data}->{TranslationPattern}} : ( $PatternGetResult->{Data}->{TranslationPattern} );
+        
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                TranslationPattern => \@ResultList,
+            )
+        }
+    }
 
     # return result
     return $Self->_Success(
-        Translation => \@TranslationList,
+        TranslationPattern => [],
     );
 }
 

@@ -82,7 +82,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             Required => 1
         },
     }
@@ -94,7 +94,7 @@ perform TranslationLanguageSearch Operation. This will return a list of preferen
 
     my $Result = $OperationObject->Run(
         Data => {
-            TranslationID  => 123
+            PatternID  => 123
         }
     );
 
@@ -116,7 +116,8 @@ sub Run {
 
     # check if pattern already exists
     my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-        ID => $Param{Data}->{TranslationID},
+        ID => $Param{Data}->{PatternID},
+        IncludeAvailableLanguages => 1,
     );
     if ( !%PatternData ) {
         return $Self->_Error(
@@ -124,19 +125,14 @@ sub Run {
         );
     }
 
-    # perform translation search
-    my %TranslationList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageList(
-        PatternID => $Param{Data}->{TranslationID},
-    );
-
-    if (IsHashRefWithData(\%TranslationList)) {
+    if ( IsArrayRefWithData($PatternData{AvailableLanguages}) ) {
 
         # get already prepared Translation data from TranslationLanguageGet operation
         my $TranslationLanguageGetResult = $Self->ExecOperation(
             OperationType => 'V1::I18n::TranslationLanguageGet',
             Data          => {
-                TranslationID => $Param{Data}->{TranslationID},
-                Language      => join(',', sort keys %TranslationList),
+                PatternID => $Param{Data}->{PatternID},
+                Language      => join(',', @{$PatternData{AvailableLanguages}}),
             }
         );
         if ( !IsHashRefWithData($TranslationLanguageGetResult) || !$TranslationLanguageGetResult->{Success} ) {

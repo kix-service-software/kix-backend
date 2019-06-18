@@ -1,0 +1,20 @@
+  displayName: "[System] i18n"
+  description: !include ../../descriptions/resources/system/i18n.md
+  /translations:
+    description: !include ../../descriptions/resources/system/i18n/translations.md
+    type: { collection: { typeName: TranslationPattern } }
+    /{patternId}:
+      type: { item: { typeName: TranslationPattern } }
+      uriParameters:
+        patternId:
+          displayName: PatternID
+          type: integer        
+      /languages:
+        description: !include ../../descriptions/resources/system/i18n/translations/languages.md
+        type: { collection: { typeName: TranslationLanguage } }
+        /{language}:
+          type: { item: { typeName: TranslationLanguage } }
+          uriParameters:
+            language:
+              displayName: Language
+              type: string

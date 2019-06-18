@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Translation/TranslationCreate.pm - API Translation Create operation backend
+# Kernel/API/Operation/Translation/TranslationPatternCreate.pm - API Translation Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::I18n::TranslationCreate;
+package Kernel::API::Operation::V1::I18n::TranslationPatternCreate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::I18n::TranslationCreate - API TranslationCreate Operation backend
+Kernel::API::Operation::V1::I18n::TranslationPatternCreate - API TranslationPatternCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -84,11 +84,11 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'Translation' => {
+        'TranslationPattern' => {
             Type     => 'HASH',
             Required => 1
         },
-        'Translation::Pattern' => {
+        'TranslationPattern::Value' => {
             Required => 1
         },            
     }
@@ -96,13 +96,13 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform TranslationCreate Operation. This will return the created TranslationID.
+perform TranslationPatternCreate Operation. This will return the created TranslationID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Translation => {
-                Pattern       => '...'                                        # required
-                Languages     => [                                            # optional
+            TranslationPattern => {
+                Value     => '...'                                        # required
+                Languages => [                                            # optional
                     {
                         Language  => '...',
                         Value => '...'
@@ -126,14 +126,14 @@ perform TranslationCreate Operation. This will return the created TranslationID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # isolate and trim Translation parameter
-    my $Translation = $Self->_Trim(
-        Data => $Param{Data}->{Translation},
+    # isolate and trim TranslationPattern parameter
+    my $TranslationPattern = $Self->_Trim(
+        Data => $Param{Data}->{TranslationPattern},
     );
 
-    # check Translation exists
+    # check if pattern exists
     my $Exists = $Kernel::OM->Get('Kernel::System::Translation')->PatternExistsCheck(
-        Value  => $Translation->{Pattern},
+        Value  => $TranslationPattern->{Value},
         UserID => $Self->{Authorization}->{UserID}
     );
     if ( $Exists ) {
@@ -142,9 +142,9 @@ sub Run {
         );
     }
     
-    # create translation
+    # create pattern
     my $PatternID = $Kernel::OM->Get('Kernel::System::Translation')->PatternAdd(
-        Value  => $Translation->{Pattern},
+        Value  => $TranslationPattern->{Value},
         UserID => $Self->{Authorization}->{UserID},
     );    
     if ( !$PatternID ) {
@@ -154,13 +154,13 @@ sub Run {
     }
 
     # add preferences
-    if ( IsArrayRefWithData($Translation->{Languages}) ) {
+    if ( IsArrayRefWithData($TranslationPattern->{Languages}) ) {
 
-        foreach my $Language ( @{$Translation->{Languages}} ) {
+        foreach my $Language ( @{$TranslationPattern->{Languages}} ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::I18n::TranslationLanguageCreate',
                 Data          => {
-                    TranslationID       => $PatternID,
+                    PatternID           => $PatternID,
                     TranslationLanguage => $Language
                 }
             );
@@ -172,7 +172,7 @@ sub Run {
     }
     
     return $Self->_Success(
-        Code          => 'Object.Created',
-        TranslationID => $PatternID,
+        Code      => 'Object.Created',
+        PatternID => $PatternID,
     );    
 }

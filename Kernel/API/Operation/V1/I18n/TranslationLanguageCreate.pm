@@ -84,7 +84,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             Required => 1
         },
         'TranslationLanguage' => {
@@ -106,7 +106,7 @@ perform TranslationLanguageCreate Operation. This will return success.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TranslationID      => 12,
+            PatternID      => 12,
             TranslationLanguage  => {
                 Language => '...',
                 Value    => '...'
@@ -135,7 +135,7 @@ sub Run {
 
     # check if pattern already exists
     my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-        ID => $Param{Data}->{TranslationID},
+        ID => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
         return $Self->_Error(
@@ -145,7 +145,7 @@ sub Run {
 
     # check if translation already exists for this pattern
     my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageGet(
-        PatternID => $Param{Data}->{TranslationID},
+        PatternID => $Param{Data}->{PatternID},
         Language  => $Language->{Language}
     );
     if ( %TranslationData ) {
@@ -156,7 +156,7 @@ sub Run {
 
     # add language
     my $Success = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageAdd(
-        PatternID => $Param{Data}->{TranslationID},
+        PatternID => $Param{Data}->{PatternID},
         Language  => $Language->{Language},
         Value     => $Language->{Value},
         UserID    => $Self->{Authorization}->{UserID}

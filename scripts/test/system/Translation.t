@@ -175,6 +175,21 @@ $Self->True(
     'TranslationLanguageAdd()',
 );
 
+# check if language is contained in available languages
+%PatternData = $TranslationObject->PatternGet(
+    ID => $PatternID,
+    IncludeAvailableLanguages => 1,
+    UserID    => 1,
+);
+
+$Self->IsDeeply(
+    $PatternData{AvailableLanguages},
+    [
+        'de'
+    ],
+    'PatternGet() - with available languages',
+);
+
 # add existing TranslationLanguage
 $Success = $TranslationObject->TranslationLanguageAdd(
     %TranslationLanguage,
