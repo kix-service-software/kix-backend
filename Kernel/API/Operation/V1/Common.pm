@@ -1720,8 +1720,6 @@ sub _ApplyInclude {
                 if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
                     my $Index = 0;
                     foreach my $ObjectID ( split(/\s*,\s*/, $Self->{RequestData}->{$Self->{OperationConfig}->{ObjectID}}) ) {
-                        # if the attribute is already there (for whatever reason), don't override it
-                        next if exists $Param{Data}->{$Object}->[$Index++]->{$Include};
 
                         # we found a sub-resource include
                         my $Result = $Self->ExecOperation(
@@ -1738,9 +1736,7 @@ sub _ApplyInclude {
                     }
                 }
                 else {
-                    # if the attribute is already there (for whatever reason), don't override it
-                    next if exists $Param{Data}->{$Object}->{$Include};
-
+                    
                     # we found a sub-resource include
                     my $Result = $Self->ExecOperation(
                         OperationType => $IncludeOperation,
