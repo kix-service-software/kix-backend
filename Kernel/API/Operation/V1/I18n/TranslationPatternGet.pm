@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Translation/TranslationGet.pm - API Translation Get operation backend
+# Kernel/API/Operation/Translation/TranslationPatternGet.pm - API Translation Get operation backend
 # based upon Kernel/API/Operation/Ticket/TicketGet.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -13,7 +13,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::I18n::TranslationGet;
+package Kernel::API::Operation::V1::I18n::TranslationPatternGet;
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::I18n::TranslationGet - API Translation Get Operation backend
+Kernel::API::Operation::V1::I18n::TranslationPatternGet - API Translation Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ Kernel::API::Operation::V1::I18n::TranslationGet - API Translation Get Operation
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::I18n::TranslationGet->new();
+by using Kernel::API::Operation::V1::I18n::TranslationPatternGet->new();
 
 =cut
 
@@ -66,7 +66,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationPatternGet');
 
     return $Self;
 }
@@ -91,7 +91,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
@@ -101,12 +101,12 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform TranslationGet Operation. This function is able to return
+perform TranslationPatternGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TranslationID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            PatternID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -115,7 +115,7 @@ one or more ticket entries in one call.
         Code         => '...'
         Message      => '',                               # In case of an error
         Data         => {
-            Translation => [
+            TranslationPattern => [
                 {
                     ...
                 },
@@ -131,54 +131,28 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @TranslationList;
+    # get the pattern data
+    my @PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+        ID     => $Param{Data}->{PatternID},
+        IncludeAvailableLanguages => $Param{Data}->{include}->{AvailableLanguages} ? 1 : 0,
+        UserID => $Self->{Authorization}->{UserID}
+    );
 
-    # start loop
-    foreach my $TranslationID ( @{$Param{Data}->{TranslationID}} ) {
+    if ( !IsArrayRefWithData( \@PatternList ) ) {
 
-        # get the Translation data
-        my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-            ID     => $TranslationID,
-            UserID => $Self->{Authorization}->{UserID}
+        return $Self->_Error(
+            Code => 'Object.NotFound',
         );
-
-        if ( !IsHashRefWithData( \%TranslationData ) ) {
-
-            return $Self->_Error(
-                Code => 'Object.NotFound',
-            );
-        }
-
-        # replace Value with Pattern
-        $TranslationData{Pattern} = $TranslationData{Value};
-        delete $TranslationData{Value};
-
-        # include languages if requested
-        if ( $Param{Data}->{include}->{Languages} ) {
-            # get already prepared preferences data from TranslationLanguageSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::I18n::TranslationLanguageSearch',
-                Data          => {
-                    TranslationID => $TranslationID
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $TranslationData{Languages} = $Result->{Data}->{TranslationLanguage};
-            }
-        }
-                
-        # add
-        push(@TranslationList, \%TranslationData);
     }
 
-    if ( scalar(@TranslationList) == 1 ) {
+    if ( scalar(@PatternList) == 1 ) {
         return $Self->_Success(
-            Translation => $TranslationList[0],
+            TranslationPattern => $PatternList[0],
         );    
     }
 
     return $Self->_Success(
-        Translation => \@TranslationList,
+        TranslationPattern => \@PatternList,
     );
 }
 

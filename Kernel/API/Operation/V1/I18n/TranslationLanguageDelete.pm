@@ -84,7 +84,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             DataType => 'NUMERIC',
             Required => 1
         },
@@ -101,7 +101,7 @@ perform TranslationLanguageDelete Operation. This will return success.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TranslationID  => 12,
+            PatternID  => 12,
             Language       => 'de',
         },
     );
@@ -121,7 +121,7 @@ sub Run {
 
     # check if pattern already exists
     my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-        ID => $Param{Data}->{TranslationID},
+        ID => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
         return $Self->_Error(
@@ -131,7 +131,7 @@ sub Run {
 
     # check if language entry exists
     my %TranslationList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageList(
-        PatternID => $Param{Data}->{TranslationID},
+        PatternID => $Param{Data}->{PatternID},
     );
     if ( !IsHashRefWithData(\%TranslationList) || !$TranslationList{$Param{Data}->{Language}} ) {
         return $Self->_Error(
@@ -141,7 +141,7 @@ sub Run {
 
     # delete translation Language
     my $Success = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageDelete(
-        PatternID => $Param{Data}->{TranslationID},
+        PatternID => $Param{Data}->{PatternID},
         Language  => $Param{Data}->{Language},
     );
 

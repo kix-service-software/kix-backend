@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Translation/TranslationUpdate.pm - API Translation Create operation backend
+# Kernel/API/Operation/Translation/TranslationPatternUpdate.pm - API Translation Create operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::I18n::TranslationUpdate;
+package Kernel::API::Operation::V1::I18n::TranslationPatternUpdate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::I18n::TranslationUpdate - API Translation Create Operation backend
+Kernel::API::Operation::V1::I18n::TranslationPatternUpdate - API Translation Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationPatternUpdate');
 
     return $Self;
 }
@@ -86,15 +86,15 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             DataType => 'NUMERIC',
             Required => 1
         },
-        'Translation' => {
+        'TranslationPattern' => {
             Type     => 'HASH',
             Required => 1
         },
-        'Translation::Pattern' => {
+        'TranslationPattern::Value' => {
             RequiresValueIfUsed => 1
         },
     }
@@ -102,12 +102,12 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform TranslationUpdate Operation. This will return the updated TranslationID.
+perform TranslationPatternUpdate Operation. This will return the updated TranslationID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Translation => {
-                Pattern       => '...'                                        # requires a value if given
+            TranslationPattern => {
+                Value       => '...'                                        # requires a value if given
             },
         },
     );
@@ -129,14 +129,14 @@ perform TranslationUpdate Operation. This will return the updated TranslationID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # isolate and trim Translation parameter
-    my $Translation = $Self->_Trim(
-        Data => $Param{Data}->{Translation},
+    # isolate and trim TranslationPattern parameter
+    my $TranslationPattern = $Self->_Trim(
+        Data => $Param{Data}->{TranslationPattern},
     );
 
     # check if pattern exists
     my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-        ID     => $Param{Data}->{TranslationID},
+        ID     => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
         return $Self->_Error(
@@ -145,11 +145,11 @@ sub Run {
     }
 
     # check if pattern already exists
-    if ( IsStringWithData($Translation->{Pattern}) ) {
+    if ( IsStringWithData($TranslationPattern->{Value}) ) {
         my $PatternID = $Kernel::OM->Get('Kernel::System::Translation')->PatternExistsCheck(
-            Value => $Translation->{Pattern},
+            Value => $TranslationPattern->{Value},
         );
-        if ( $PatternID && $PatternID != $Param{Data}->{TranslationID} ) {        
+        if ( $PatternID && $PatternID != $Param{Data}->{PatternID} ) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
             );
@@ -158,8 +158,8 @@ sub Run {
 
     # update Translation
     my $Success = $Kernel::OM->Get('Kernel::System::Translation')->PatternUpdate(
-        ID     => $Param{Data}->{TranslationID},
-        Value  => $Translation->{Pattern} || $PatternData{Value},
+        ID     => $Param{Data}->{PatternID},
+        Value  => $TranslationPattern->{Value} || $PatternData{Value},
         UserID => $Self->{Authorization}->{UserID}
     );    
     if ( !$Success ) {
@@ -169,6 +169,6 @@ sub Run {
     }
     
     return $Self->_Success(
-        TranslationID => $Param{Data}->{TranslationID},
+        PatternID => $PatternData{ID},
     );   
 }

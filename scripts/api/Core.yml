@@ -601,27 +601,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::I18n::TranslationSearch
-    V1::I18n::TranslationCreate:
+    V1::I18n::TranslationPatternSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::I18n::TranslationCreate
-    V1::I18n::TranslationDelete:
+        Type: V1::I18n::TranslationPatternSearch
+    V1::I18n::TranslationPatternCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::I18n::TranslationDelete
-    V1::I18n::TranslationGet:
+        Type: V1::I18n::TranslationPatternCreate
+    V1::I18n::TranslationPatternDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::I18n::TranslationGet
+        Type: V1::I18n::TranslationPatternDelete
+    V1::I18n::TranslationPatternGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternGet
+    V1::I18n::TranslationPatternUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternUpdate
     V1::I18n::TranslationLanguageSearch:
         Description: ''
         MappingInbound:
@@ -657,13 +671,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::I18n::TranslationLanguageCreate
-    V1::I18n::TranslationUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationUpdate
     V1::Link::LinkSearch:
         Description: ''
         MappingInbound:
@@ -2075,42 +2082,46 @@ Provider:
           RequestMethod:
           - GET
           Route: /i18n/translations
-        V1::I18n::TranslationCreate:
-          RequestMethod:
-          - POST
-          Route: /i18n/translations
-        V1::I18n::TranslationDelete:
-          RequestMethod:
-          - DELETE
-          Route: /i18n/translations/:TranslationID
-        V1::I18n::TranslationGet:
+        V1::I18n::TranslationPatternSearch:
           RequestMethod:
           - GET
-          Route: /i18n/translations/:TranslationID
+          Route: /system/i18n/translations
+        V1::I18n::TranslationPatternCreate:
+          RequestMethod:
+          - POST
+          Route: /system/i18n/translations
+        V1::I18n::TranslationPatternDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/i18n/translations/:PatternID
+        V1::I18n::TranslationPatternGet:
+          RequestMethod:
+          - GET
+          Route: /system/i18n/translations/:PatternID
+        V1::I18n::TranslationPatternUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/i18n/translations/:PatternID
         V1::I18n::TranslationLanguageSearch:
           RequestMethod:
           - GET
-          Route: /i18n/translations/:TranslationID/languages
+          Route: /system/i18n/translations/:PatternID/languages
         V1::I18n::TranslationLanguageDelete:
           RequestMethod:
           - DELETE
-          Route: /i18n/translations/:TranslationID/languages/:Language
+          Route: /system/i18n/translations/:PatternID/languages/:Language
         V1::I18n::TranslationLanguageGet:
           RequestMethod:
           - GET
-          Route: /i18n/translations/:TranslationID/languages/:Language
+          Route: /system/i18n/translations/:PatternID/languages/:Language
         V1::I18n::TranslationLanguageUpdate:
           RequestMethod:
           - PATCH
-          Route: /i18n/translations/:TranslationID/languages/:Language
+          Route: /system/i18n/translations/:PatternID/languages/:Language
         V1::I18n::TranslationLanguageCreate:
           RequestMethod:
           - POST
-          Route: /i18n/translations/:TranslationID/languages
-        V1::I18n::TranslationUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /i18n/translations/:TranslationID
+          Route: /system/i18n/translations/:PatternID/languages
         V1::Link::LinkSearch:
           RequestMethod:
           - GET

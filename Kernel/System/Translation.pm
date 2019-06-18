@@ -57,7 +57,15 @@ sub new {
 get Pattern
 
     my %Pattern = $TranslationObject->PatternGet(
-        ID => 123           # required
+        ID => 123                            # required
+        IncludeAvailableLanguages => 0|1     # optional
+    );
+
+or 
+
+    my @PatterList = $TranslationObject->PatternGet(
+        ID => [ 123, 124, 125 ]              # required
+        IncludeAvailableLanguages => 0|1     # optional
     );
 
 =cut
@@ -76,28 +84,89 @@ sub PatternGet {
         }
     }
 
+    if ( IsArrayRefWithData($Param{ID}) ) {
+        # get multiple
+        my $Result = $Self->_PatternGet(
+            IDs                       => $Param{ID},
+            IncludeAvailableLanguages => $Param{IncludeAvailableLanguages} || 0,
+        );
+        return IsArrayRefWithData($Result) ? @{$Result} : ();
+    }
+    else {
+        # get single
+        my $Result = $Self->_PatternGet(
+            IDs                       => [ $Param{ID} ],
+            IncludeAvailableLanguages => $Param{IncludeAvailableLanguages} || 0,
+        );
+        return IsArrayRefWithData($Result) ? %{$Result->[0]} : ();
+    }
+}
+
+sub _PatternGet {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsArrayRefWithData($Param{IDs}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need IDs!"
+        );
+        return;
+    }
+
+    my $IDStrg = join(',', @{$Param{IDs}});
+
     # check cache
-    my $CacheKey = "PatternGet::$Param{ID}";
+    my $CacheKey = "PatternGet::" . $IDStrg . "::" . $Param{IncludeAvailableLanguages};
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return %{$Cache} if $Cache;
+    return $Cache if $Cache;
+
+    my @BindRefList = map { \$_ } @{$Param{IDs}};
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL  => 'SELECT id, value, create_time, create_by, change_time, change_by FROM kix_translation_pattern WHERE id = ?',
-        Bind => [ \$Param{ID} ] 
+        SQL  => 'SELECT id, value, create_time, create_by, change_time, change_by FROM kix_translation_pattern WHERE id IN ('.(join( ',', map { '?' } @{$Param{IDs}})).')',
+        Bind => \@BindRefList
     );
 
     # fetch the result
-    my %Pattern;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
-        $Pattern{ID}         = $Row[0];
-        $Pattern{Value}      = $Row[1];
-        $Pattern{CreateTime} = $Row[2];
-        $Pattern{CreateBy}   = $Row[3];
-        $Pattern{ChangeTime} = $Row[4];
-        $Pattern{ChangeBy}   = $Row[5];
+    my $Result = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'ID', 'Value', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
+    );
+
+    if ( !IsArrayRefWithData($Result) ) {
+        return;
+    }
+
+    # add array of available languages if requests
+    if ( $Param{IncludeAvailableLanguages} ) {
+        my @BindRefList = map { \$_->{ID} } @{$Result};
+        return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+            SQL  => 'SELECT pattern_id, language FROM kix_translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Result})).') ORDER by language',
+            Bind => \@BindRefList
+        );
+        # fetch the result
+        my $LanguageData = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+            Columns => [ 'PatternID', 'Language' ],
+        );
+
+        foreach my $Pattern ( @{$Result} ) {
+            $Pattern->{AvailableLanguages} = [];
+            next if !IsArrayRefWithData($LanguageData);
+
+            my @AvailableLanguages;
+            foreach my $Language ( @{$LanguageData} ) {
+                next if $Language->{PatternID} != $Pattern->{ID};
+
+                if ( ref $Pattern->{AvailableLanguages} eq 'ARRAY' ) {
+                    $Pattern->{AvailableLanguages} = [];
+                } 
+                
+                push(@AvailableLanguages, $Language->{Language});
+            }
+            $Pattern->{AvailableLanguages} = \@AvailableLanguages;
+        }
     }
 
     # set cache
@@ -105,10 +174,10 @@ sub PatternGet {
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
-        Value => \%Pattern,
+        Value => $Result,
     );
 
-    return %Pattern;
+    return $Result;
 }
 
 =item PatternList()
@@ -121,6 +190,7 @@ get Pattern list
 
 sub PatternList {
     my ( $Self, %Param ) = @_;
+    my %PatternList;
 
     # check cache
     my $CacheKey = "PatternList";
@@ -130,23 +200,31 @@ sub PatternList {
     );
     return %{$Cache} if $Cache;
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'SELECT id, value FROM kix_translation_pattern'
     );
 
     # fetch the result
-    my %PatternList;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
-        $PatternList{ $Row[0] } = $Row[1];
-    }
-
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \%PatternList,
+    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'ID', 'Value' ],
     );
+
+    # data found...
+    if ( IsArrayRefWithData($Data) ) {
+
+        # prepare the result
+        foreach my $Row ( @{$Data} ) {
+            $PatternList{ $Row->{ID} } = $Row->{Value};
+        }
+
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => \%PatternList,
+        );
+    }
 
     return %PatternList;
 }
@@ -484,6 +562,13 @@ get translation language
         Language  => '...'          # required
     );
 
+or 
+
+    my @Translation = $TranslationObject->TranslationLanguageGet(
+        PatternID => [ 123, 124, 125 ]      # required
+        Language  => '...'                  # required
+    );
+
 =cut
 
 sub TranslationLanguageGet {
@@ -500,41 +585,66 @@ sub TranslationLanguageGet {
         }
     }
 
+    if ( IsArrayRefWithData($Param{PatternID}) ) {
+        # get multiple
+        my $Result = $Self->_TranslationLanguageGet(
+            PatternIDs => $Param{PatternID},
+            Language   => $Param{Language},
+        );
+        return @{$Result};
+    }
+    else {
+        # get single
+        my $Result = $Self->_TranslationLanguageGet(
+            PatternIDs => [ $Param{PatternID} ],
+            Language   => $Param{Language},
+        );
+        return IsArrayRefWithData($Result) ? %{$Result->[0]} : ();
+    }
+}
+
+sub _TranslationLanguageGet {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsArrayRefWithData($Param{PatternIDs}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need IDs!"
+        );
+        return;
+    }
+
+    my $IDStrg = join(',', @{$Param{PatternIDs}});
+
     # check cache
-    my $CacheKey = "TranslationLanguageGet::$Param{PatternID}::$Param{Language}";
+    my $CacheKey = "TranslationLanguageGet::$IDStrg::$Param{Language}";
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return %{$Cache} if $Cache;
+    return $Cache if $Cache;
+
+    my @BindRefList = map { \$_ } ( $Param{Language}, @{$Param{PatternIDs}} );
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL  => 'SELECT pattern_id, language, value, is_default, create_time, create_by, change_time, change_by FROM kix_translation_language WHERE pattern_id = ? AND language = ?',
-        Bind => [ \$Param{PatternID}, \$Param{Language} ] 
+        SQL  => 'SELECT pattern_id, language, value, is_default, create_time, create_by, change_time, change_by FROM kix_translation_language WHERE language = ? AND pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
+        Bind => \@BindRefList
     );
 
     # fetch the result
-    my %TranslationLanguage;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
-        $TranslationLanguage{PatternID}  = $Row[0];
-        $TranslationLanguage{Language}   = $Row[1];
-        $TranslationLanguage{Value}      = $Row[2];
-        $TranslationLanguage{IsDefault}  = $Row[3];
-        $TranslationLanguage{CreateTime} = $Row[4];
-        $TranslationLanguage{CreateBy}   = $Row[5];
-        $TranslationLanguage{ChangeTime} = $Row[6];
-        $TranslationLanguage{ChangeBy}   = $Row[7];
-    }
+    my $Result = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'PatternID', 'Language', 'Value', 'IsDefault', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
+    );
 
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
-        Value => \%TranslationLanguage,
+        Value => $Result,
     );
 
-    return %TranslationLanguage;
+    return $Result;
 }
 
 =item TranslationLanguageList()
@@ -543,6 +653,12 @@ get list of translation languages for a given PatternID
 
     my %List = $TranslationObject->TranslationLanguageList(
         PatternID => 123           # required
+    );
+
+or 
+
+    my @List = $TranslationObject->TranslationLanguageList(
+        PatternID => [ 123, 124, 125 ]          # required
     );
 
 =cut
@@ -561,34 +677,75 @@ sub TranslationLanguageList {
         }
     }
 
+    if ( IsArrayRefWithData($Param{PatternID}) ) {
+        # get multiple
+        my $Result = $Self->_TranslationLanguageList(
+            PatternIDs => $Param{PatternID}
+        );
+        return @{$Result};
+    }
+    else {
+        # get single
+        my $Result = $Self->_TranslationLanguageList(
+            PatternIDs => [ $Param{PatternID} ]
+        );
+        return IsArrayRefWithData($Result) ? %{$Result->[0]} : ();
+    }
+}
+
+sub _TranslationLanguageList {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsArrayRefWithData($Param{PatternIDs}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need PatternIDs!"
+        );
+        return;
+    }
+
+    my $IDStrg = join(',', @{$Param{PatternIDs}});
+
     # check cache
-    my $CacheKey = "TranslationLanguageList::$Param{PatternID}";
+    my $CacheKey = "TranslationLanguageList::$IDStrg";
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return %{$Cache} if $Cache;
+    return $Cache if $Cache;
+
+    my @BindRefList = map { \$_ } ( @{$Param{PatternIDs}} );
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => 'SELECT language, value FROM kix_translation_language WHERE pattern_id = ?',
-        Bind  => [ \$Param{PatternID} ],
+        SQL => 'SELECT pattern_id, language, value FROM kix_translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
+        Bind  => \@BindRefList,
     );
 
     # fetch the result
-    my %TranslationLanguageList;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
-        $TranslationLanguageList{ $Row[0] } = $Row[1];
+    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'PatternID', 'Language', 'Value' ],
+    );
+
+    if ( !IsArrayRefWithData($Data) ) {
+        return;
     }
 
+    my @Result;
+    foreach my $Row ( @{$Data} ) {
+        push(@Result, {
+            $Row->{Language} => $Row->{Value}
+        });
+    }
+    
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
-        Value => \%TranslationLanguageList,
+        Value => \@Result,
     );
 
-    return %TranslationLanguageList;
+    return \@Result;
 }
 
 =item TranslationLanguageUpdate()
@@ -701,6 +858,73 @@ sub TranslationLanguageDelete {
     );
 
     return 1;
+}
+
+=item TranslationList()
+
+get the translation list
+
+    my @List = $TranslationObject->TranslationList();
+
+returns
+
+    [
+        {
+            'Pattern'   => 'this is a pattern',
+            'Languages' => {
+                'de' => '...',
+                'en' => '...'
+            }
+        },
+        {
+            ...
+        }
+    ]
+
+=cut
+
+sub TranslationList {
+    my ( $Self, %Param ) = @_;
+    my @TranslationList;
+
+    # check cache
+    my $CacheKey = "TranslationList";
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        SQL => 'SELECT tp.value, tl.language, tl.value FROM kix_translation_pattern tp, kix_translation_language tl WHERE tl.pattern_id = tp.id ORDER BY tp.value'
+    );
+
+    # fetch the result
+    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'Pattern', 'Language', 'Value' ],
+    );
+
+    # data found...
+    if ( IsArrayRefWithData($Data) ) {
+        # prepare the result
+        my %Result;
+        foreach my $Row ( @{$Data} ) {
+            $Result{$Row->{Pattern}}->{Pattern} = $Row->{Pattern};
+            $Result{$Row->{Pattern}}->{Languages}->{$Row->{Language}} = $Row->{Value};
+        }
+
+        @TranslationList = values %Result;
+
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => \@TranslationList,
+        );
+    }
+
+    return @TranslationList;
 }
 
 =item ImportPO()

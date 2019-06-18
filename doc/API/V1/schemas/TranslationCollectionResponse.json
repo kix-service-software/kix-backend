@@ -7,86 +7,30 @@
       "Translation" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Translation"
+            "type" : "object",
+            "properties" : {
+               "Languages" : {
+                  "type" : "object",
+                  "patternProperties" : {
+                     "^[0-9]+$" : {
+                        "type" : "string",
+                        "readOnly" : true
+                     }
+                  }
+               },
+               "Pattern" : {
+                  "type" : "string",
+                  "readOnly" : true
+               }
+            },
+            "required" : [
+               "Languages",
+               "Pattern"
+            ]
          }
       }
    },
    "required" : [
       "Translation"
-   ],
-   "definitions" : {
-      "Translation" : {
-         "$id" : "#Translation",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The translation object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Languages" : {
-               "description" : "added via include \"Languages\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/TranslationLanguage"
-               },
-               "readOnly" : true
-            },
-            "Pattern" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Pattern"
-         ]
-      },
-      "TranslationLanguage" : {
-         "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "TranslationID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "TranslationID",
-            "Language",
-            "Value"
-         ]
-      }
-   }
+   ]
 }

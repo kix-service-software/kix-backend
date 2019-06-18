@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/Translation/TranslationDelete.pm - API Translation Get operation backend
+# Kernel/API/Operation/Translation/TranslationPatternDelete.pm - API Translation Get operation backend
 # based upon Kernel/API/Operation/Ticket/TicketGet.pm
 # original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
@@ -13,7 +13,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::I18n::TranslationDelete;
+package Kernel::API::Operation::V1::I18n::TranslationPatternDelete;
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::I18n::TranslationDelete - API Translation Delete Operation backend
+Kernel::API::Operation::V1::I18n::TranslationPatternDelete - API Translation Delete Operation backend
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ Kernel::API::Operation::V1::I18n::TranslationDelete - API Translation Delete Ope
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::I18n::TranslationDelete->new();
+by using Kernel::API::Operation::V1::I18n::TranslationPatternDelete->new();
 
 =cut
 
@@ -66,7 +66,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationDelete');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationPatternDelete');
 
     return $Self;
 }
@@ -91,7 +91,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
@@ -101,12 +101,12 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform TranslationDelete Operation. This function is able to return
+perform TranslationPatternDelete Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TranslationID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            PatternID => 123       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -115,14 +115,6 @@ one or more ticket entries in one call.
         Code         => '...'
         Message      => '',                               # In case of an error
         Data         => {
-            Translation => [
-                {
-                    ...
-                },
-                {
-                    ...
-                },
-            ]
         },
     };
 
@@ -131,18 +123,16 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @TranslationList;
-
     # start loop
-    foreach my $TranslationID ( @{$Param{Data}->{TranslationID}} ) {
+    foreach my $PatternID ( @{$Param{Data}->{PatternID}} ) {
 
-        # get the Translation data
-        my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-            ID     => $TranslationID,
+        # get the pattern data
+        my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+            ID     => $PatternID,
             UserID => $Self->{Authorization}->{UserID}
         );
 
-        if ( !IsHashRefWithData( \%TranslationData ) ) {
+        if ( !IsHashRefWithData( \%PatternData ) ) {
 
             return $Self->_Error(
                 Code => 'Object.NotFound',
@@ -151,7 +141,7 @@ sub Run {
 
         # delete the translation
         my $Success = $Kernel::OM->Get('Kernel::System::Translation')->PatternDelete(
-            ID     => $TranslationID,
+            ID     => $PatternID,
             UserID => $Self->{Authorization}->{UserID}
         );
 

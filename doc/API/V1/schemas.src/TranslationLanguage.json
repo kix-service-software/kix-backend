@@ -4,7 +4,7 @@
   "type": "object",
   "description": "The translation language object.",
   "properties": {
-    "TranslationID": {
+    "PatternID": {
       "type": "integer",
       "readOnly": true
     },
@@ -18,7 +18,7 @@
     }
   },
   "required": [
-    "TranslationID",
+    "PatternID",
     "Language",
     "Value"
   ]

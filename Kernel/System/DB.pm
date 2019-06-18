@@ -784,6 +784,88 @@ sub FetchrowArray {
     return @Row;
 }
 
+=item FetchAllArrayRef()
+
+to process the results of a SELECT statement
+
+    $DBObject->Prepare(
+        SQL   => "SELECT id, name FROM table",
+        Limit => 10
+    );
+
+    my $Rows = $DBObject->FetchAllArrayRef(
+        Columns => [ 'ID', 'Name' ]
+    );
+
+=cut
+
+sub FetchAllArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !IsArrayRefWithData($Param{Columns}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need Columns!',
+        );
+        return;
+    }
+
+    if ( $Self->{_PreparedOnSlaveDB} ) {
+        return $Self->{SlaveDBObject}->FetchAllArrayRef();
+    }
+
+    # work with cursors if database don't support limit
+    if ( !$Self->{Backend}->{'DB::Limit'} && $Self->{Limit} ) {
+        if ( $Self->{Limit} <= $Self->{LimitCounter} ) {
+            $Self->{Cursor}->finish();
+            return;
+        }
+        $Self->{LimitCounter}++;
+    }
+
+    # return
+    my $Rows = $Self->{Cursor}->fetchall_arrayref();
+
+    # map columns
+    my @Result;
+    foreach my $Row ( @{$Rows} ) {
+        my %RowData;
+        my $Counter = 0;
+        foreach my $Column ( @{$Param{Columns}} ) {
+            $RowData{$Column} = $Row->[$Counter++];
+        }
+        push(@Result, \%RowData);
+    }
+
+    if ( !$Self->{Backend}->{'DB::Encode'} ) {
+        return \@Result;
+    }
+
+    # get encode object
+    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+
+    # e. g. set utf-8 flag
+    ROW:
+    foreach my $Row (@{$Rows}) {
+        my $Counter = 0;
+        ELEMENT:
+        for my $Element (@{$Row}) {
+
+            next ELEMENT if !defined $Element;
+
+            if ( !defined $Self->{Encode} || ( $Self->{Encode} && $Self->{Encode}->[$Counter] ) ) {
+                $EncodeObject->EncodeInput( \$Element );
+            }
+        }
+        continue {
+            $Counter++;
+        }
+    }
+
+    return \@Result;
+}
+
 =item GetColumnNames()
 
 to retrieve the column names of a database statement
