@@ -185,11 +185,11 @@ sub EventHandler {
     MODULE:
     for my $Module ( sort keys %{$Modules} ) {
 
-print STDERR "EventHandler ($Param{Transaction}): Module = $Module\n";
+print STDERR "EventHandler ($Param{Event}, $Param{Transaction}): Module = $Module\n";
         # If the module has an event configuration, determine if it should be executed for this event,
         #   and store the result in a small cache to avoid repetition on jobs involving many tickets.
         if ( !defined $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } ) {
-            print STDERR "here!\n";
+
             if ( !$Modules->{$Module}->{Event} ) {
                 $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } = 1;
             }
