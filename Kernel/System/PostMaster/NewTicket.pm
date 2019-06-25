@@ -224,7 +224,7 @@ sub Run {
                 # get customer user object
                 my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
-                my %List = $ContactObject->CustomerSearch(
+                my %List = $ContactObject->ContactSearch(
                     PostMasterSearch => lc( $GetParam{EmailFrom} ),
                 );
 

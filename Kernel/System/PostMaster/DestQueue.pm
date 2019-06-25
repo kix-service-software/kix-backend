@@ -73,9 +73,14 @@ sub GetQueueID {
         next EMAIL if !$Address;
 
         # lookup queue id if recipiend address
-        $QueueID = $SystemAddressObject->SystemAddressQueueID(
-            Address => $Address,
+        my $SystemAddressID = $SystemAddressObject->SystemAddressLookup(
+            Name => $Address,
         );
+        if ( $SystemAddressID ) {
+            $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                SystemAddressID => $SystemAddressID
+            );
+        }
 
         # debug
         if ( $Self->{Debug} > 1 ) {

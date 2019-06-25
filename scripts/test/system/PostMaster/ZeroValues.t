@@ -146,6 +146,7 @@ for my $Test (@Tests) {
         );
 
         @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
     }
     $Self->Is(
         $Return[0] || 0,

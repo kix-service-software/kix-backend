@@ -17,6 +17,8 @@ use MIME::Base64;
 use Digest::MD5 qw();
 umask 002;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Encode',
@@ -61,7 +63,7 @@ sub Set {
 
     my $PreparedKey = $Self->_prepareMemCacheKey(%Param);
     my $TTL = $Param{TTL};
-    if ($Self->{Config}->{OverrideTTL}) {
+    if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
         foreach my $TypePattern (keys %{$Self->{Config}->{OverrideTTL}}) {
             if ($Param{Type} =~ /^$TypePattern$/g) {
                 $TTL = $Self->{Config}->{OverrideTTL}->{$TypePattern};

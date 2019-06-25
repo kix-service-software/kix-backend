@@ -4607,10 +4607,10 @@ sub OwnerCheck {
 
     # search for owner_id and owner
     return if !$DBObject->Prepare(
-        SQL => "SELECT st.user_id, su.$ConfigObject->{DatabaseUserTableUser} "
-            . " FROM ticket st, $ConfigObject->{DatabaseUserTable} su "
+        SQL => "SELECT st.user_id, su.login"
+            . " FROM ticket st, users su "
             . " WHERE st.id = ? AND "
-            . " st.user_id = su.$ConfigObject->{DatabaseUserTableUserID}",
+            . " st.user_id = su.id",
         Bind => [ \$Param{TicketID}, ],
     );
 

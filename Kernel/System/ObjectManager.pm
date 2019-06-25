@@ -147,14 +147,7 @@ sub new {
     #   already create an instance here to make sure it is always done and done
     #   at the beginning of things.
     $Self->Get('Kernel::System::Encode');
-
-    $Self->{PerfLogConfig} = $Self->Get('Kernel::Config')->Get('PerfLogConfig');
-
-    # init PerfLog
-    if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{OutputTo}) {
-        $Self->{PerfLogFile} = $Self->{PerfLogConfig}->{OutputTo};
-    }
-
+    
     return $Self;
 }
 
@@ -306,32 +299,41 @@ sub _ObjectBuild {
 
     $Self->{Objects}->{$Package} = $NewObject;
 
-    # check if we have to wrap a method for performance logging
-    if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{Methods} && $Self->{PerfLogConfig}->{Methods}->{$Package} && ref $Self->{PerfLogConfig}->{Methods}->{$Package} eq 'HASH') {
-        my $PreparedCount = 0;
-        foreach my $Method ( sort keys %{$Self->{PerfLogConfig}->{Methods}->{$Package}} ) {
-            my $PackageMethod = "$Package::$Method";
-            next if $PerfLogWrappedMethods{"$PackageMethod"};
+    # TODO
+    # # check if we have to wrap a method for performance logging
+    # if ( !$Self->{StartUp} && !$Self->{PerfLogConfig} ) {
+    #     $Self->{PerfLogConfig} = $Self->Get('Kernel::Config')->Get('PerfLogConfig') || {};
 
-            if (!$PreparedCount++) {
-                print STDERR "preparing package $Package for performance logging\n";
-            }
+    #     # init PerfLog
+    #     if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{OutputTo}) {
+    #         $Self->{PerfLogFile} = $Self->{PerfLogConfig}->{OutputTo};
+    #     }
+    # }
+    # if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{Methods} && $Self->{PerfLogConfig}->{Methods}->{$Package} && ref $Self->{PerfLogConfig}->{Methods}->{$Package} eq 'HASH') {
+    #     my $PreparedCount = 0;
+    #     foreach my $Method ( sort keys %{$Self->{PerfLogConfig}->{Methods}->{$Package}} ) {
+    #         my $PackageMethod = "$Package::$Method";
+    #         next if $PerfLogWrappedMethods{"$PackageMethod"};
 
-            print STDERR "    hooking method $Method...";
+    #         if (!$PreparedCount++) {
+    #             print STDERR "preparing package $Package for performance logging\n";
+    #         }
 
-            my $ReturnType = $Self->{PerfLogConfig}->{Methods}->{$Package}->{$Method};
+    #         print STDERR "    hooking method $Method...";
 
-            $PerfLogWrappedMethods{"$PackageMethod"} = \&$PackageMethod;
-            no strict 'refs';
-            no warnings 'redefine';
-            *{$PackageMethod} = sub {
-                my ($ObjRef, %Param) = @_;
-                Kernel::System::ObjectManager::_PerfLogMethodWrapper($Self, "$PackageMethod", $ReturnType, $ObjRef, %Param);
-            };
+    #         my $ReturnType = $Self->{PerfLogConfig}->{Methods}->{$Package}->{$Method};
 
-            print STDERR "OK\n";
-        }
-    }
+    #         $PerfLogWrappedMethods{"$PackageMethod"} = \&$PackageMethod;
+    #         no strict 'refs';
+    #         no warnings 'redefine';
+    #         *{$PackageMethod} = sub {
+    #             my ($ObjRef, %Param) = @_;
+    #             Kernel::System::ObjectManager::_PerfLogMethodWrapper($Self, "$PackageMethod", $ReturnType, $ObjRef, %Param);
+    #         };
+
+    #         print STDERR "OK\n";
+    #     }
+    # }
 
     return $NewObject;
 }

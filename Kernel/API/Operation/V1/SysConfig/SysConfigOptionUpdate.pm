@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/SysConfigItem/SysConfigItemUpdate.pm - API SysConfigItem Update operation backend
+# Kernel/API/Operation/SysConfigOption/SysConfigOptionUpdate.pm - API SysConfigOption Update operation backend
 # Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SysConfig::SysConfigItemUpdate;
+package Kernel::API::Operation::V1::SysConfig::SysConfigOptionUpdate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::SysConfig::SysConfigItemUpdate - API SysConfigItem Update Operation backend
+Kernel::API::Operation::V1::SysConfig::SysConfigOptionUpdate - API SysConfigOption Update Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfigItemUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfigOptionUpdate');
 
     return $Self;
 }
@@ -86,10 +86,10 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'SysConfigItemID' => {
+        'Option' => {
             Required => 1
         },
-        'SysConfigItem' => {
+        'SysConfigOption' => {
             Type => 'HASH',
             Required => 1
         },
@@ -98,14 +98,14 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform SysConfigItemUpdate Operation. This will return the updated SysConfigItemID.
+perform SysConfigOptionUpdate Operation. This will return the updated SysConfigOptionID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SysConfigItemID => 123,
-            SysConfigItem   => {
-                Data   => {}                # optional 
-	            Active => 1,                # optional
+            Option => 'DefaultLanguage',
+            SysConfigOption => {
+                Value   => ...                # optional 
+                ValidID => 1                  # optional  
             }
 	    },
 	);
@@ -116,7 +116,7 @@ perform SysConfigItemUpdate Operation. This will return the updated SysConfigIte
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            SysConfigItemID  => 123,             # ID of the updated SysConfigItem 
+            Option  => 123,                     # ID of the updated SysConfigOption 
         },
     };
    
@@ -126,33 +126,32 @@ perform SysConfigItemUpdate Operation. This will return the updated SysConfigIte
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # isolate SysConfigItem parameter
-    my $SysConfigItem = $Param{Data}->{SysConfigItem};    
+    # isolate SysConfigOption parameter
+    my $SysConfigOption = $Param{Data}->{SysConfigOption};    
 
-    if ( $SysConfigItem->{Active} && !defined($SysConfigItem->{Data}) ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Need a value if item should be active!',
-        );
-    }
+    # get option
+    my %OptionData = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
+        Name => $Param{Data}->{Option},
+    );
 
-    # update SysConfigItem
-    my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemUpdate(
-        Key   => $Param{Data}->{SysConfigItemID},
-        Value => $SysConfigItem->{Data},
-        Valid => $SysConfigItem->{Active},
+    # update option
+    my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
+        %OptionData,
+        Value   => exists $SysConfigOption->{Value} ? $SysConfigOption->{Value} : $OptionData{Value},
+        ValidID => $SysConfigOption->{ValidID} || $OptionData{ValidID},
+        UserID  => $Self->{Authorization}->{UserID}
     );
 
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update SysConfigItem, please contact the system administrator',
+            Message => 'Could not update SysConfig option, please contact the system administrator',
         );
     }
 
     # return result    
     return $Self->_Success(
-        SysConfigItemID => $Param{Data}->{SysConfigItemID},
+        Option => $Param{Data}->{Option},
     );    
 }
 
