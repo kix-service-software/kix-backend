@@ -1,0 +1,9 @@
+  displayName: "[System] Sessions"
+  description: !include ../../descriptions/resources/system/sessions.md
+  type: { collection-readonly: { typeName: Sessions } }
+  /{token}:
+    type: { item: { typeName: Session } }
+    uriParameters:
+      token:
+        displayName: Token
+        type: string  

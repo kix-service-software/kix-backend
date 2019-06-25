@@ -1,3 +1,9 @@
   displayName: Current Session
   description: !include ../descriptions/resources/session.md
-  type: [ item-readonly: { typeName: Session } ]
+  type: [ item-nopatch: { typeName: Session } ]
+  /user:
+    displayName: Current User
+    description: !include ../descriptions/resources/session/user.md
+    type: [ item-readonly: { typeName: User } ]
+    /preferences:
+      type: { collection-readonly: { typeName: UserPreference } }  

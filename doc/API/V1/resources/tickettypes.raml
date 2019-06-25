@@ -1,9 +1,0 @@
-  displayName: Ticket Types
-  description: !include ../descriptions/resources/tickettypes.md
-  type: { collection: { typeName: TicketType } }
-  /{typeId}:
-    type: { item: { typeName: TicketType } }
-    uriParameters:
-      typeId:
-        displayName: TicketTypeID
-        type: integer

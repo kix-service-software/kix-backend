@@ -1,0 +1,9 @@
+  displayName: "[System] Services"
+  description: !include ../../descriptions/resources/system/services.md
+  type: { collection: { typeName: Service } }
+  /{serviceId}:
+    type: { item: { typeName: Service } }
+    uriParameters:
+      serviceId:
+        displayName: ServiceID
+        type: integer

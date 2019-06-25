@@ -1,0 +1,9 @@
+  displayName: "[System] Communication Channels"
+  description: !include ../../../descriptions/resources/system/communication/channels.md
+  type: { collection-readonly: { typeName: Channel } }
+  /{channelId}:
+    type: { item-readonly: { typeName: Channel } }
+    uriParameters:
+      channelId:
+        displayName: ChannelID
+        type: integer

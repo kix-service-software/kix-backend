@@ -1,0 +1,12 @@
+  displayName: "[System] Ticket Queues"
+  description: !include ../../../descriptions/resources/system/ticket/queues.md
+  type: { collection: { typeName: Queue } }
+  /followuptypes:
+    description: !include ../descriptions/resources/system/ticket/queues/followuptypes.md
+    type: { collection-readonly: { typeName: FollowUpType } }
+  /{queueId}:
+    type: { item: { typeName: Queue } }
+    uriParameters:
+      queueId:
+        displayName: QueueID
+        type: integer
