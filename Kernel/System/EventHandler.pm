@@ -199,7 +199,7 @@ print STDERR "EventHandler ($Param{Transaction}): Module = $Module\n";
             }
         }
 
-print STDER "event1\n";
+print STDERR "event1\n";
         if ( $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } ) {
 
 print STDERR "event2\n";
