@@ -185,6 +185,7 @@ sub EventHandler {
     MODULE:
     for my $Module ( sort keys %{$Modules} ) {
 
+print STDERR "EventHandler: Module = $Module\n";
         # If the module has an event configuration, determine if it should be executed for this event,
         #   and store the result in a small cache to avoid repetition on jobs involving many tickets.
         if ( !defined $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } ) {
@@ -218,12 +219,17 @@ sub EventHandler {
                 next MODULE if $Param{Transaction} && !$Modules->{$Module}->{Transaction};
             }
 
+print STDERR "Require()\n";
+
             # load event module
             next MODULE if !$MainObject->Require( $Modules->{$Module}->{Module} );
+
+print STDERR "new()\n";
 
             # execute event backend
             my $Generic = $Modules->{$Module}->{Module}->new();
 
+print STDERR "Run()\n";
             $Generic->Run(
                 %Param,
                 Config => $Modules->{$Module},
