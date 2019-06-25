@@ -199,10 +199,8 @@ print STDERR "EventHandler ($Param{Transaction}): Module = $Module\n";
             }
         }
 
-print STDERR "event1\n";
         if ( $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } ) {
 
-print STDERR "event2\n";
             if ( $Self->{EventHandlerTransaction} && !$Param{Transaction} ) {
 
                 # This is a special case. A new event was fired during processing of
@@ -222,22 +220,16 @@ print STDERR "event2\n";
                 next MODULE if $Param{Transaction} && !$Modules->{$Module}->{Transaction};
             }
 
-print STDERR "Require()\n";
-
             # load event module
             next MODULE if !$MainObject->Require( $Modules->{$Module}->{Module} );
-
-print STDERR "new()\n";
 
             # execute event backend
             my $Generic = $Modules->{$Module}->{Module}->new();
 
-print STDERR "Run()\n";
             $Generic->Run(
                 %Param,
                 Config => $Modules->{$Module},
             );
-print STDERR "after Run()\n";
         }
     }
 
