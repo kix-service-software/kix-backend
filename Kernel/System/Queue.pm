@@ -1113,10 +1113,10 @@ sub QueueUpdate {
     );
     
     # check all SysConfig options
-    return 1 if !$Param{CheckSysConfig};
+    #return 1 if !$Param{CheckSysConfig};
 
     # check all SysConfig options and correct them automatically if necessary
-    $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }

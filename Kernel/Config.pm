@@ -75,7 +75,8 @@ sub LoadLocalConfig {
     my %Config = %{$Self->{Config}};
 
     if ( opendir(my $DIR, $ConfigDir) ) {
-        my @Files = grep { -f "$ConfigDir/$_" } readdir($DIR);
+        # filter files and ignore file with .dist extension
+        my @Files = grep { -f "$ConfigDir/$_" && $_ !~ /\.dist$/ } readdir($DIR);
         closedir $DIR;
 
         foreach my $File ( sort @Files ) {

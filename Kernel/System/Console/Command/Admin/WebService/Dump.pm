@@ -26,11 +26,11 @@ sub Configure {
 
     $Self->Description('Print a web service configuration (in YAML format) into a file.');
     $Self->AddOption(
-        Name        => 'webservice-id',
-        Description => "The ID of an existing web service.",
+        Name        => 'name',
+        Description => "The name of an existing web service.",
         Required    => 1,
         HasValue    => 1,
-        ValueRegex  => qr/\A\d+\z/smx,
+        ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'target-path',
@@ -46,10 +46,12 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     my $WebServiceList = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceList();
+    my %WebServiceListReverse = reverse %{$WebServiceList};
 
-    my $WebServiceID = $Self->GetOption('webservice-id');
-    if ( !$WebServiceList->{$WebServiceID} ) {
-        die "A web service with the ID $WebServiceID does not exists in this system.\n";
+    my $WebServiceName = $Self->GetOption('name');
+    $Self->{WebServiceID} = $WebServiceListReverse{$WebServiceName};
+    if ( !$Self->{WebServiceID} ) {
+        die "A web service with the name $WebServiceName does not exists in this system.\n";
     }
 
     return;
@@ -60,16 +62,14 @@ sub Run {
 
     $Self->Print("<yellow>Dumping web service...</yellow>\n");
 
-    # get current web service
-    my $WebServiceID = $Self->GetOption('webservice-id');
-
     my $WebService =
         $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
-        ID => $WebServiceID,
+        ID => $Self->{WebServiceID},
         );
 
     if ( !$WebService ) {
-        $Self->PrintError("Could not get a web service with the ID $WebServiceID from the database!");
+        my $WebServiceName = $Self->GetOption('name');
+        $Self->PrintError("Could not get a web service with the name $WebServiceName from the database!");
         return $Self->ExitCodeError();
     }
 

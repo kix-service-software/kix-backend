@@ -311,10 +311,10 @@ sub PriorityUpdate {
     );
 
     # check all sysconfig options
-    return 1 if !$Param{CheckSysConfig};
+    #return 1 if !$Param{CheckSysConfig};
 
     # check all sysconfig options and correct them automatically if neccessary
-    $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
 }
 
 =item PriorityLookup()

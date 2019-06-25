@@ -664,41 +664,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Template::TemplateUpdate
-    V1::SysConfig::SysConfigItemDefinitionSearch:
+    V1::SysConfig::SysConfigOptionDefinitionSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemDefinitionSearch
-    V1::SysConfig::SysConfigItemDefinitionGet:
+        Type: V1::SysConfig::SysConfigOptionDefinitionSearch
+    V1::SysConfig::SysConfigOptionDefinitionGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemDefinitionGet
-    V1::SysConfig::SysConfigItemSearch:
+        Type: V1::SysConfig::SysConfigOptionDefinitionGet
+    V1::SysConfig::SysConfigOptionSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemSearch
-    V1::SysConfig::SysConfigItemGet:
+        Type: V1::SysConfig::SysConfigOptionSearch
+    V1::SysConfig::SysConfigOptionGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemGet
-    V1::SysConfig::SysConfigItemUpdate:
+        Type: V1::SysConfig::SysConfigOptionGet
+    V1::SysConfig::SysConfigOptionUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SysConfig::SysConfigItemUpdate
+        Type: V1::SysConfig::SysConfigOptionUpdate
     V1::TextModule::TextModuleCategorySearch:
         Description: ''
         MappingInbound:
@@ -2090,26 +2090,26 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /system/templates/:TemplateID
-        V1::SysConfig::SysConfigItemDefinitionSearch:
+        V1::SysConfig::SysConfigOptionDefinitionSearch:
           RequestMethod:
           - GET
           Route: /system/config/definitions
-        V1::SysConfig::SysConfigItemDefinitionGet:
+        V1::SysConfig::SysConfigOptionDefinitionGet:
           RequestMethod:
           - GET
-          Route: /system/config/definitions/:SysConfigItemDefinitionID
-        V1::SysConfig::SysConfigItemSearch:
+          Route: /system/config/definitions/:Option
+        V1::SysConfig::SysConfigOptionSearch:
           RequestMethod:
           - GET
           Route: /system/config
-        V1::SysConfig::SysConfigItemGet:
+        V1::SysConfig::SysConfigOptionGet:
           RequestMethod:
           - GET
-          Route: /system/config/:SysConfigItemID
-        V1::SysConfig::SysConfigItemUpdate:
+          Route: /system/config/:Option
+        V1::SysConfig::SysConfigOptionUpdate:
           RequestMethod:
           - PATCH
-          Route: /system/config/:SysConfigItemID
+          Route: /system/config/:Option
         V1::TextModule::TextModuleCategorySearch:
           RequestMethod:
           - GET

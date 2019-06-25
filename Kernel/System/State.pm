@@ -303,18 +303,18 @@ sub StateUpdate {
         Type => $Self->{CacheType},
     );
 
-    # check all sysconfig options
-    return 1 if !$Param{CheckSysConfig};
-
-    # check all sysconfig options and correct them automatically if neccessary
-    $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
-
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'State',
         ObjectID  => $Param{ID},
     );
+
+    # check all sysconfig options
+    #return 1 if !$Param{CheckSysConfig};
+
+    # check all sysconfig options and correct them automatically if neccessary
+    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }

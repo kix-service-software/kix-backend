@@ -93,11 +93,11 @@
 /system/templates/:TemplateID                                                  |   DELETE          | V1::Template::TemplateDelete
 /system/templates/:TemplateID                                                  |   GET             | V1::Template::TemplateGet
 /system/templates/:TemplateID                                                  |   PATCH           | V1::Template::TemplateUpdate
-/system/config/definitions                                                     |   GET             | V1::SysConfig::SysConfigItemDefinitionSearch
-/system/config/definitions/:SysConfigItemDefinitionID                          |   GET             | V1::SysConfig::SysConfigItemDefinitionGet
-/system/config                                                                 |   GET             | V1::SysConfig::SysConfigItemSearch
-/system/config/:SysConfigItemID                                                |   GET             | V1::SysConfig::SysConfigItemGet
-/system/config/:SysConfigItemID                                                |   PATCH           | V1::SysConfig::SysConfigItemUpdate
+/system/config/definitions                                                     |   GET             | V1::SysConfig::SysConfigOptionDefinitionSearch
+/system/config/definitions/:Option                                             |   GET             | V1::SysConfig::SysConfigOptionDefinitionGet
+/system/config                                                                 |   GET             | V1::SysConfig::SysConfigOptionSearch
+/system/config/:Option                                                         |   GET             | V1::SysConfig::SysConfigOptionGet
+/system/config/:Option                                                         |   PATCH           | V1::SysConfig::SysConfigOptionUpdate
 /system/textmodules/categories                                                 |   GET             | V1::TextModule::TextModuleCategorySearch
 /system/textmodules                                                            |   GET             | V1::TextModule::TextModuleSearch
 /system/textmodules                                                            |   POST            | V1::TextModule::TextModuleCreate
