@@ -535,6 +535,7 @@ get the category search as an array ref
         CategoryIDs => [ 2, 5, 7 ],
         OrderBy     => 'Name',
         SortBy      => 'down',
+        Valid       => 1,
         UserID      => 1,
     );
 
@@ -559,14 +560,14 @@ sub CategorySearch {
         return;
     }
 
-    # SQL
-    my $SQL = '
-        SELECT id
-        FROM faq_category
-        WHERE valid_id IN ('
-        . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
-        . ')';
+    # set default
+    my $Valid = 0;
+    if ( defined $Param{Valid} ) {
+        $Valid = $Param{Valid};
+    }
 
+    # SQL
+    my $SQL = 'SELECT id FROM faq_category WHERE 1=1';
     my $Ext = '';
 
     # get database object
@@ -628,6 +629,13 @@ sub CategorySearch {
         $Ext = ' AND id IN (' . $InString . ')';
     }
 
+    # valid
+    if ( $Valid ) {
+        $Ext = ' AND valid_id IN ('
+             . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
+             . ')';
+    }
+
     # ORDER BY
     if ( $Param{OrderBy} ) {
         $Ext .= " ORDER BY name";
@@ -649,9 +657,10 @@ sub CategorySearch {
     # SQL STATEMENT
     $SQL .= $Ext;
 
+print STDERR "SQL: $SQL\n";
+
     return if !$DBObject->Prepare(
         SQL   => $SQL,
-        Limit => 500,
     );
 
     my @List;

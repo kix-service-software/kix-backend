@@ -91,7 +91,7 @@ sub Run {
 
     # perform FAQCategory search
     my $FAQCategoryList = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryList(
-        UserID   => $Self->{Authorization}->{UserID},
+        UserID => $Self->{Authorization}->{UserID},
     );
 
     # get already prepared FAQ data from FAQCategoryGet operation
