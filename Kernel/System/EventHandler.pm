@@ -237,8 +237,11 @@ print STDERR "Run()\n";
                 %Param,
                 Config => $Modules->{$Module},
             );
+print STDERR "after Run()\n";
         }
     }
+
+print STDERR "EventHandler: End\n";
 
     return 1;
 }
