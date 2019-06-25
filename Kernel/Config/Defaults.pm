@@ -122,6 +122,12 @@ sub LoadDefaults {
     $Self->{CustomTemplateDir} = '<KIX_CONFIG_Home>/Custom/Kernel/Output';
 
     # --------------------------------------------------- #
+    # webserver settings                                  #
+    # --------------------------------------------------- #
+    # The plack server to use
+    $Self->{PlackServer} = 'Starman';
+
+    # --------------------------------------------------- #
     # database settings                                   #
     # --------------------------------------------------- #
     # DatabaseHost

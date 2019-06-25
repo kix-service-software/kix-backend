@@ -1,0 +1,9 @@
+  displayName: "[System] Communication Sender Types"
+  description: !include ../../../descriptions/resources/system/communication/sendertypes.md
+  type: { collection-readonly: { typeName: SenderType } }
+  /{senderTypeId}:
+    type: { item-readonly: { typeName: SenderType } }
+    uriParameters:
+      senderTypeId:
+        displayName: SenderTypeID
+        type: integer

@@ -1,0 +1,9 @@
+  displayName: "[System] Communication System Addresses"
+  description: !include ../../../descriptions/resources/system/communication/systemaddresses.md
+  type: { collection: { typeName: SystemAddress } }
+  /{systemAddressId}:
+    type: { item: { typeName: SystemAddress } }
+    uriParameters:
+      systemAddressId:
+        displayName: SystemAddressID
+        type: integer

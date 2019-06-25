@@ -1,0 +1,27 @@
+  displayName: "[System] Users"
+  description: !include ../../descriptions/resources/system/users.md
+  type: { collection: { typeName: User } }
+  /{userId}:
+    type: { item: { typeName: User } }
+    uriParameters:
+      userId:
+        displayName: UserID
+        type: integer
+    /preferences:
+      description: !include ../../descriptions/resources/system/users/preferences.md
+      type: { collection: { typeName: UserPreference } }
+      /{preferenceId}:
+        type: { item: { typeName: UserPreference } }
+        uriParameters:
+          preferenceId:
+            displayName: PeferenceID
+            type: string
+    /roleids:
+      description: !include ../../descriptions/resources/system/users/roleids.md
+      type: { collection-nopatch: { typeName: UserRoleID } }
+      /{roleId}:
+        type: { item-deleteonly: { typeName: UserRoleID } }
+        uriParameters:
+          roleId:
+            displayName: RoleID
+            type: number

@@ -1,4 +1,4 @@
-You can use an optional ```filter``` function to filter the items in the response of collections. The ```filter``` function will be execute at API level and therefore is a lot more powerful in terms of complexity than the [```search```](#search_objects) function. Also the ```filter``` function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of [```search```](#search_objects) and ```filter``` to achieve the best performance.
+You can use an optional ```filter``` function to filter the items in the response of collections. The ```filter``` function will be executed at API level and therefore is a lot more powerful in terms of complexity than the [```search```](#search_objects) function. Also the ```filter``` function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of [```search```](#search_objects) and ```filter``` to achieve the best performance.
 
 ** Usage in URL **
 ``` bash

@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Session::SessionGet - API Logout Operation backend
+Kernel::API::Operation::V1::Session::SessionGet - API Operation backend
 
 =head1 SYNOPSIS
 
@@ -60,39 +60,12 @@ sub new {
     return $Self;
 }
 
-=item ParameterDefinition()
-
-define parameter preparation and check for this operation
-
-    my $Result = $OperationObject->ParameterDefinition(
-        Data => {
-            ...
-        },
-    );
-
-    $Result = {
-        ...
-    };
-
-=cut
-
-sub ParameterDefinition {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        'Token' => {
-            Required => 1
-        }                
-    }
-}
-
 =item Run()
 
 remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
-            Token => '...'                                # required
         },
     );
 
@@ -104,7 +77,6 @@ remove token (invalidate)
                 ...
             },
         },
-    }
 };
 
 =cut
@@ -113,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
-        Token => $Param{Data}->{Token}
+        Token => $Self->{Authorization}->{Token}
     );
 
     # check result

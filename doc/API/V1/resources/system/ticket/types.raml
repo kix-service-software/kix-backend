@@ -1,0 +1,9 @@
+  displayName: "[System] Ticket Types"
+  description: !include ../../../descriptions/resources/system/ticket/types.md
+  type: { collection: { typeName: TicketType } }
+  /{typeId}:
+    type: { item: { typeName: TicketType } }
+    uriParameters:
+      typeId:
+        displayName: TicketTypeID
+        type: integer

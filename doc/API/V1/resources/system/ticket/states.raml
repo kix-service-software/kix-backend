@@ -1,0 +1,18 @@
+  displayName: "[System] Ticket States"
+  description: !include ../../../descriptions/resources/system/ticket/states.md
+  type: { collection: { typeName: TicketState } }
+  /types:
+    description: !include ../../../descriptions/resources/system/ticket/states/types.md
+    type: { collection-readonly: { typeName: StateType } }
+    /{stateTypeId}:
+      type: { item-readonly: { typeName: StateType } }
+      uriParameters:
+        stateTypeId:
+          displayName: StateTypeID
+          type: integer
+  /{stateId}:
+    type: { item: { typeName: TicketState } }
+    uriParameters:
+      stateId:
+        displayName: TicketStateID
+        type: integer

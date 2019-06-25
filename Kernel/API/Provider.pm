@@ -85,10 +85,8 @@ sub Run {
 
     my $Webservice;
 
-    # on Microsoft IIS 7.0, $ENV{REQUEST_URI} is not set. See bug#9172.
-    my $RequestURI = $ENV{REQUEST_URI} || $ENV{PATH_INFO};
-
-    my ($WebserviceName) = $RequestURI =~ m{ api[.]pl [/] webservice [/] ([^/?]+) }smx;
+    my ($Tmp, $Entrypoint, $WebserviceName, $RequestURI) = split(/\//, $ENV{REQUEST_URI}, 4);
+    $ENV{REQUEST_URI} = '/'.$RequestURI;
 
     if ( !$WebserviceName ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(

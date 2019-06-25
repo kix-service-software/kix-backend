@@ -1,6 +1,6 @@
 ##### Supported Includes
 
-In addition to its sub-resources (as far as they exist), this resource supports the following includes.
+In addition to its sub-resources this resource supports the following includes.
 
 |Include|Description|
 |-|-|

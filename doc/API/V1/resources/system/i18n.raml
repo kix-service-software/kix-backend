@@ -2,12 +2,12 @@
   description: !include ../../descriptions/resources/system/i18n.md
   /translations:
     description: !include ../../descriptions/resources/system/i18n/translations.md
-    type: { collection: { typeName: TranslationPattern } }
-    /{patternId}:
-      type: { item: { typeName: TranslationPattern } }
+    type: { collection: { typeName: Translation } }
+    /{translationId}:
+      type: { item: { typeName: Translation } }
       uriParameters:
-        patternId:
-          displayName: PatternID
+        translationId:
+          displayName: TranslationID
           type: integer        
       /languages:
         description: !include ../../descriptions/resources/system/i18n/translations/languages.md

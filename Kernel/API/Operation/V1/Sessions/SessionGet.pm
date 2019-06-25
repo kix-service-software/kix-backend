@@ -8,7 +8,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::Session::SessionDelete;
+package Kernel::API::Operation::V1::Sessions::SessionGet;
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Session::SessionDelete - API Logout Operation backend
+Kernel::API::Operation::V1::Sessions::SessionGet - API Logout Operation backend
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Kernel::API::Operation::V1::Session::SessionDelete - API Logout Operation backen
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::Session::SessionDelete->new();
+by using Kernel::API::Operation::Sessions::SessionGet->new();
 
 =cut
 
@@ -60,37 +60,72 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'Token' => {
+            Required => 1
+        }                
+    }
+}
+
 =item Run()
 
 remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
+            Token => '...'                                # required
         },
     );
 
     $Result = {
         Success      => 1,                                # 0 or 1
         Message => '',                               # In case of an error
-    };
+        Data         => {
+            Session => {
+                ...
+            },
+        },
+    }
+};
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
-        Token => $Self->{Authorization}->{Token}
+    my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
+        Token => $Param{Data}->{Token}
     );
 
     # check result
-    if ( !$Result ) {
+    if ( !$Payload ) {
         return $Self->_Error(
-            Code => 'Object.UnableToDelete',
+            Code => 'Object.Invalid',
         );
     }
 
-    return $Self->_Success();
+    return $Self->_Success(
+        Session => $Payload,
+    );
 }
 
 1;
