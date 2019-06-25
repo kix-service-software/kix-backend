@@ -68,7 +68,7 @@ sub new {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # get user table
-    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'user';
+    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'users';
     $Self->{UserTableUserID} = $ConfigObject->Get('DatabaseUserTableUserID') || 'id';
     $Self->{UserTableUserPW} = $ConfigObject->Get('DatabaseUserTableUserPW') || 'pw';
     $Self->{UserTableUser}   = $ConfigObject->Get('DatabaseUserTableUser')   || 'login';
@@ -1056,16 +1056,16 @@ sub UserList {
 
     my $SelectStr;
     if ( $Type eq 'Short' ) {
-        $SelectStr = "$ConfigObject->{DatabaseUserTableUserID}, "
-            . " $ConfigObject->{DatabaseUserTableUser}";
+        $SelectStr = "$Self->{UserTableUserID}, "
+            . " $Self->{UserTableUser}";
     }
     else {
-        $SelectStr = "$ConfigObject->{DatabaseUserTableUserID}, "
+        $SelectStr = "$Self->{UserTableUserID}, "
             . " last_name, first_name, "
-            . " $ConfigObject->{DatabaseUserTableUser}";
+            . " $Self->{UserTableUser}";
     }
 
-    my $SQL = "SELECT $SelectStr FROM $ConfigObject->{DatabaseUserTable}";
+    my $SQL = "SELECT $SelectStr FROM $Self->{UserTable}";
 
     # sql query
     if ($Valid) {

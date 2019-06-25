@@ -286,6 +286,7 @@ my $RunTest = sub {
         );
 
         @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
     }
     $Self->Is(
         $Return[0] || 0,

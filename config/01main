@@ -1,0 +1,19 @@
+SystemID => 17,
+
+# ---------------------------------------------------- #
+# database settings                                    #
+# ---------------------------------------------------- #
+
+DatabaseHost => '__DBHOST__',
+Database     => '__DBNAME__',
+DatabaseUser => '__DBUSER__',
+DatabasePw   => '__DBPASSWORD__',         # The password of database user. You also can use bin/kix.Console.pm for crypted passwords
+DatabaseDSN  => "DBI:__DBD__:__DBATTR__=<KIX_CONFIG_Database>;host=<KIX_CONFIG_DatabaseHost>;",
+
+# ---------------------------------------------------- #
+# insert your own config settings "here"               #
+# ---------------------------------------------------- #
+CheckMXRecord => 0,
+SecureMode    => 1,
+FQDN          => '__FQDN__',
+Home          => '__HOME__',

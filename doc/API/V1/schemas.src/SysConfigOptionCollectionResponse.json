@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SysConfigOptionCollectionResponse",
+  "type": "object",
+  "description": "A list of SysConfig option value.",
+  "properties": {
+    "SysConfigOption": {
+      "type": "array",
+      "items": {
+        "$ref": "SysConfigOption.json"
+      }
+    }
+  },
+  "required": [
+    "SysConfigOption"
+  ]
+}

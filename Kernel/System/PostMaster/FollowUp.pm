@@ -125,17 +125,16 @@ sub Run {
 
     # set state
     # KIX4OTRS-capeIT
-    # my $State = $ConfigObject->Get('PostmasterFollowUpState') || 'open';
-    # if (
-    #     $Ticket{StateType} =~ /^close/
-    #     && $ConfigObject->Get('PostmasterFollowUpStateClosed')
-    #     )
-    # {
-    #     $State = $ConfigObject->Get('PostmasterFollowUpStateClosed');
-    # }
+    my $State = $ConfigObject->Get('PostmasterFollowUpState') || 'open';
+    if (
+        $Ticket{StateType} =~ /^close/
+        && $ConfigObject->Get('PostmasterFollowUpStateClosed')
+        )
+    {
+        $State = $ConfigObject->Get('PostmasterFollowUpStateClosed');
+    }
 
     my $NextStateRef = $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpState');
-    my $State        = '';
 
     if (
         $NextStateRef->{ $Ticket{Type} . ':::' . $Ticket{State} }
@@ -456,14 +455,14 @@ sub Run {
         $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
         for my $FromAddress (@SplitFrom) {
             my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-            my %UserListCustomer = $ContactObject->CustomerSearch(
+            my %UserListCustomer = $ContactObject->ContactSearch(
                 PostMasterSearch => $FromAddress,
             );
 
             if (keys %UserListCustomer) {
                 for my $CurrKey ( keys(%UserListCustomer) ) {
                     my %ContactData = $ContactObject->ContactGet(
-                        User => $CurrKey,
+                        ID => $CurrKey,
                     );
                     if (
                         $ContactData{UserCustomerID} && $Ticket{CustomerID}

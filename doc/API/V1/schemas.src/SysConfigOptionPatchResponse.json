@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#SysConfigOptionPatchResponse",
+    "type": "object",
+    "description": "The name of the updated SysConfig option.",
+    "properties": {
+        "Option": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "Option"
+    ]
+}

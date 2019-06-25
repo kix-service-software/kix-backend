@@ -1,0 +1,21 @@
+  displayName: SysConfig
+  description: !include ../descriptions/resources/sysconfig.md
+  type: { collection-readonly: { typeName: SysConfigOption } }
+  /optiontypes:
+    description: !include ../descriptions/resources/sysconfig/optiontypes.md
+    type: { collection-readonly: { typeName: SysConfigOptionType } }
+  /{option}:
+    type: { item-nodelete: { typeName: SysConfigOption } }
+    uriParameters:
+      option:
+        displayName: Option
+        type: string
+  /definitions:
+    description: !include ../descriptions/resources/sysconfig/definitions.md
+    type: { collection-readonly: { typeName: SysConfigOptionDefinition } }
+    /{option}:
+      type: { item-readonly: { typeName: SysConfigOptionDefinition } }
+      uriParameters:
+        option:
+          displayName: Option
+          type: string

@@ -592,16 +592,18 @@ get id or name for queue
 
     my $QueueID = $QueueObject->QueueLookup( Queue => $Queue );
 
+    my $QueueID = $QueueObject->QueueLookup( SystemAddressID => $SystemAddressID );
+
 =cut
 
 sub QueueLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{Queue} && !$Param{QueueID} ) {
+    if ( !$Param{Queue} && !$Param{QueueID} && !$Param{SystemAddressID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Got no Queue or QueueID!'
+            Message  => 'Got no Queue or QueueID or SystemAddressID!'
         );
         return;
     }
@@ -619,11 +621,21 @@ sub QueueLookup {
         $Value      = $Param{QueueID};
         $ReturnData = $QueueList{ $Param{QueueID} };
     }
-    else {
+    elsif ( $Param{Queue} ) {
         $Key   = 'Queue';
         $Value = $Param{Queue};
         my %QueueListReverse = reverse %QueueList;
         $ReturnData = $QueueListReverse{ $Param{Queue} };
+    }
+    elsif ( $Param{SystemAddressID} ) {
+        foreach my $QueueID ( keys %QueueList ) {
+            my %QueueData = $Self->QueueGet(
+                QueueID => $QueueID
+            );
+            next if $QueueData{SystemAddressID} ne $Param{SystemAddressID};
+            $ReturnData = $QueueID;
+            last;
+        }
     }
 
     # check if data exists

@@ -64,6 +64,9 @@ sub Run {
 
     my $CommandName;
 
+    # always disable cache debugging
+    $Kernel::OM->Get('Kernel::Config')->Set(Key => 'Cache::Debug', Value => 0);
+
     # Catch bash completion calls
     if ( $ENV{COMP_LINE} ) {
         $CommandName = 'Kernel::System::Console::Command::Internal::BashCompletion';

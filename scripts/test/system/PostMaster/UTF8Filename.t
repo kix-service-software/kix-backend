@@ -53,6 +53,7 @@ for my $Backend (qw(DB FS)) {
         );
 
         my @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
 
         $TicketID = $Return[1];
     }

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
+    <ConfigItem Name="TempDir" Required="1" Valid="1">
+        <Description Translatable="1">The directory to use for temporary files.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Web</SubGroup>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="ImprintLink" Required="0" Valid="1">
         <Description Translatable="1">Defines the language dependent link to an online imprint.</Description>
         <Group>Framework</Group>
@@ -631,8 +639,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ImportExport::ObjectBackendRegistration###User" Required="0" Valid="1">
-        <Description Lang="en">Object backend module registration for the import/export modul.</Description>
-        <Description Lang="de">Objekt-Backend Modul Registration des Import/Export Moduls.</Description>
+        <Description Translatable="1">Object backend module registration for the import/export modul.</Description>
         <Group>Framework</Group>
         <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
         <Setting>
@@ -643,8 +650,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="UserImport::DefaultEmailAddress" Required="1" Valid="1">
-        <Description Lang="en">Defines which email address to use if not defined - strongly depends on backend configuration!!!</Description>
-        <Description Lang="de">Definiert welche Mailadresse genutzt wird, wenn nicht gegeben - stark abhaengig von Backendkonfiguration!!!</Description>
+        <Description Translatable="1">Defines which email address to use if not defined - strongly depends on backend configuration!!!</Description>
         <Group>Framework</Group>
         <SubGroup>UserImportExport</SubGroup>
         <Setting>
@@ -652,8 +658,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="UserImport::DefaultPassword" Required="1" Valid="1">
-        <Description Lang="en">Defines which default password-suffix to use for import if not defined - strongly depends on backend configuration!!!</Description>
-        <Description Lang="de">Definiert welches Standard-Passwort-Suffix f�r Import genutzt wird, wenn nicht gegeben - stark abhaengig von Backendkonfiguration!!!</Description>
+        <Description Translatable="1">Defines which default password-suffix to use for import if not defined - strongly depends on backend configuration!!!</Description>
         <Group>Framework</Group>
         <SubGroup>UserImportExport</SubGroup>
         <Setting>
@@ -1322,8 +1327,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::FirstArticleOnly" Required="1" Valid="1">
-        <Description Lang="en">Defines whether EventHandler runs only for the first article in a ticket.</Description>
-        <Description Lang="de">Definiert, ob EventHandler nur fuer den ersten Artikel eines Tickets laeuft.</Description>
+        <Description Translatable="1">Defines whether EventHandler runs only for the first article in a ticket.</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1334,8 +1338,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchPattern" Required="1" Valid="1">
-        <Description Lang="en">Defines CI search pattern which is extracted from the ticket. Each regexp needs to return the search value in $1!. In ArticleCreate-Events only keys named like Article_* are considered (e.g. Article_Body), while TicketFreeText values are only considered in Ticketfreetext-Update events. However, you may define more than one Ticketfreetextfield for a regexp-match. In this case the different results are considered as different CI-searches, thus implementing some sort of OR (disjunction). If you want to use more than one regexp on a attribute just add a similar named key with the suffix _OR123 (see defaults).</Description>
-        <Description Lang="de">Definiert CI-Suchmuster, welches aus den Ticketdaten extrahiert wird. Jeder reg. Ausdruck muss den zu suchenden Wert in $1 zurueckgeben! Bei ArticleCreate-Events sind nur Schluesselnamen die mit Article_ beginnen relevant (z.B. Article_Body), waehrend TicketFreeText-werte nur in Ticketfreitext-Update-Events betrachtet werden. Es ist moeglich mehrere Ticketfreitextfelder mit einer reg. Ausdruck Suche zu versehen. In diesem Fall werden die einzelnen Suchergebnisse als getrennte CI-Suchen interpretiert und somit eine ODER-verknuepfte Suche abgebildet. Wenn Sie mehr als einen reg. Ausdruck auf ein Attribut anwenden wollen, legen Sie einfach einen zusaetzl. gleichnamigen Eintrag mit einem Suffix _OR123 an (siehe Standardkonfig).</Description>
+        <Description Translatable="1">Defines CI search pattern which is extracted from the ticket. Each regexp needs to return the search value in $1!. In ArticleCreate-Events only keys named like Article_* are considered (e.g. Article_Body), while TicketFreeText values are only considered in Ticketfreetext-Update events. However, you may define more than one Ticketfreetextfield for a regexp-match. In this case the different results are considered as different CI-searches, thus implementing some sort of OR (disjunction). If you want to use more than one regexp on a attribute just add a similar named key with the suffix _OR123 (see defaults).</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1362,8 +1365,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::LinkType" Required="1" Valid="1">
-        <Description Lang="en">Defines the link type which is used for the link creation.</Description>
-        <Description Lang="de">Definiert den Linktyp, der fuer die Verknuepfung genutzt wird.</Description>
+        <Description Translatable="1">Defines the link type which is used for the link creation.</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1371,8 +1373,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchInClassesPerRecipient" Required="0" Valid="1">
-        <Description Lang="en">Restricts CI-classes which are searched for certain article to-address (comma separated).</Description>
-        <Description Lang="de">Schraenkt zu durchsuchende CI-Klassen nach Artikelempfaenger ein (To-Adresse, komma-getrennt).</Description>
+        <Description Translatable="1">Restricts CI-classes which are searched for certain article to-address (comma separated).</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1383,8 +1384,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchInClasses" Required="1" Valid="1">
-        <Description Lang="en">Defines in which CI-classes which attributes need to match the search pattern (comma separated).</Description>
-        <Description Lang="de">Definiert in welcher CI-Klasse welche Attribute dem Suchmuster entsprechen sollen (Komma-getrennt).</Description>
+        <Description Translatable="1">Defines in which CI-classes which attributes need to match the search pattern (comma separated).</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -2637,8 +2637,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::Registration" Required="1" Valid="1">
-        <Description Lang="en">Registration for possible system monitoring tool acknowledge. Content is used as allocation in following config options. Key must be some of AcknowledgeName-value, used in PostMasterFilter.</Description>
-        <Description Lang="de">Registrierung der m\xF6glichen System Monitoring R\xFCckmeldungen. Der Inhalt wird als Zuordnung in den folgenden Konfigurationsoptionen genutzt. Der Schl\xFCssel muss einem AcknowledgeName-Wert aus den PostMasterFiltern entsprechen.</Description>
+        <Description Translatable="1">Registration for possible system monitoring tool acknowledge. Content is used as allocation in following config options. Key must be some of AcknowledgeName-value, used in PostMasterFilter.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2649,8 +2648,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::RegistrationAllocation" Required="1" Valid="1">
-        <Description Lang="en">Set Dynamic Field, which contains allocation for system monitoring acknowledge.</Description>
-        <Description Lang="de">Festlegung des Dynamischen Feldes, welches die Zuordnung f\xFCr die System Monitoring R\xFCckmeldung beinhaltet.</Description>
+        <Description Translatable="1">Set Dynamic Field, which contains allocation for system monitoring acknowledge.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2658,8 +2656,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::DynamicField::Host" Required="1" Valid="1">
-        <Description Lang="en">Name of Dynamic Field for Host.</Description>
-        <Description Lang="de">Name des Dynamischen Feldes f\xFCr Host.</Description>
+        <Description Translatable="1">Name of Dynamic Field for Host.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2669,8 +2666,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::DynamicField::Address" Required="1" Valid="1">
-        <Description Lang="en">Name of Dynamic Field for Address.</Description>
-        <Description Lang="de">Name des Dynamischen Feldes f\xFCr die Addresse.</Description>
+        <Description Translatable="1">Name of Dynamic Field for Address.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -8242,6 +8238,13 @@ You can log in via the following URL:
             <String Regex="">25</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="AuthModule" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines default auth module.</Description>
+        <Group>Framework</Group>
+        <Setting>
+            <Option Location="Kernel/System/Auth/*.pm" SelectedID="Kernel::System::Auth::DB"></Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
         <Description Translatable="1">Defines the two-factor module to authenticate agents.</Description>
         <Group>Framework</Group>
@@ -8971,7 +8974,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Contact::Preferences::DB</Item>
-                <Item  Key="Params">
+                <Item Key="Params">
                     <Hash>
                         <Item Key="Table">contact_preferences</Item>
                         <Item Key="TableKey">preferences_key</Item>
@@ -9491,6 +9494,28 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="Cache::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable cache debugging.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Cache</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Cache::Stats" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable cache statistics.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Cache</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>    
     <ConfigItem Name="Cache::SubdirLevels" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Specify how many sub directory levels to use when creating cache files. This should prevent too many cache files being in one directory.</Description>
         <Group>Framework</Group>
@@ -10024,7 +10049,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::SysConfig::Event::LogSysConfigChanges</Item>
-                <Item Key="Event">SysConfigItemUpdate</Item>
+                <Item Key="Event">SysConfigOptionUpdate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10317,8 +10342,19 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="Permission::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable permission debugging.</Description>
+        <Group>Permission</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="Permission::PropertyValue###Queue-to-Ticket" Required="0" Valid="1">
         <Description Translatable="1">Registration of a supported permission of type PropertyValue.</Description>
+        <Group>Permission</Group>
         <Setting>
             <Hash>
                 <Item Key="CREATE">/tickets{Ticket.QueueID EQ &lt;QueueID&gt;}</Item>
@@ -10326,9 +10362,9 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-
     <ConfigItem Name="Permission::PropertyValue###CIClass-to-ConfigItem" Required="0" Valid="1">
         <Description Translatable="1">Registration of a supported permission of type PropertyValue.</Description>
+        <Group>Permission</Group>
         <Setting>
             <Hash>
                 <Item Key="CREATE">/cmdb/configitems{ConfigItem.ClassID EQ &lt;ClassID&gt;}</Item>

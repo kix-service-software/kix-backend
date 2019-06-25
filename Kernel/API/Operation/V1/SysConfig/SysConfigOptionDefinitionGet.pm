@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SysConfig::SysConfigItemGet;
+package Kernel::API::Operation::V1::SysConfig::SysConfigOptionDefinitionGet;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::SysConfig::SysConfigItemGet - API SysConfigItem Get Operation backend
+Kernel::API::Operation::V1::SysConfig::SysConfigOptionDefinitionGet - API SysConfigOption Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Kernel::API::Operation::V1::SysConfig::SysConfigItemGet - API SysConfigItem Get 
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::SysConfig::SysConfigItemGet->new();
+by using Kernel::API::Operation::V1::SysConfig::SysConfigOptionDefinitionGet->new();
 
 =cut
 
@@ -64,7 +64,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfig::SysConfigItemGet');
+    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfig::SysConfigOptionDefinitionGet');
 
     return $Self;
 }
@@ -89,7 +89,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'SysConfigItemID' => {
+        'Option' => {
             Type     => 'ARRAY',
             Required => 1
         },           
@@ -98,12 +98,12 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform SysConfigItemGet Operation. This function is able to return
+perform SysConfigOptionDefinitionGet Operation. This function is able to return
 one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SysConfigItemID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            Option => 'Productname'       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -112,7 +112,7 @@ one or more ticket entries in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            SysConfigItem => [
+            SysConfigOptionDefinition => [
                 {
                     ...
                 },
@@ -130,42 +130,35 @@ sub Run {
 
     my @SysConfigList;
 
-    # start loop 
-    foreach my $ItemID ( @{$Param{Data}->{SysConfigItemID}} ) {
+    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
 
-        my $SubItemID;
-        if ( $ItemID =~ /^(.*?)###(.*?)$/g ) {
-            $ItemID = $1;
-            $SubItemID = $2;
-        }
+    # start loop 
+    foreach my $Option ( @{$Param{Data}->{Option}} ) {
 
         # get the SysConfig data
-        my $Data = $Kernel::OM->Get('Kernel::Config')->Get(
-            $ItemID,
+        my %Config = $SysConfigObject->OptionGet(
+            Name => $Option,    
         );
 
-        # extract sub item if requested
-        if ( $SubItemID ) {
-            $ItemID = $SubItemID;
-            $Data   = $Data->{$SubItemID};
+        if ( !IsHashRefWithData(\%Config) ) {
+            return $Self->_Error(
+                Code => 'Object.NotFound',
+            );
         }
 
         # add
-        push(@SysConfigList, { 
-            ID   => $ItemID,
-            Data => $Data
-        });
+        push(@SysConfigList, \%Config);
     }
 
     if ( scalar(@SysConfigList) == 1 ) {
         return $Self->_Success(
-            SysConfigItem => $SysConfigList[0],
+            SysConfigOptionDefinition => $SysConfigList[0],
         );    
     }
 
     # return result
     return $Self->_Success(
-        SysConfigItem => \@SysConfigList,
+        SysConfigOptionDefinition => \@SysConfigList,
     );
 }
 

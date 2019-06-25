@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SysConfigOption",
+  "type": "object",
+  "description": "The SysConfig option object.",
+  "properties": {
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Value": {
+      "anyOf": [
+        {"type": "object"},
+        {"type": "string"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Name"
+  ]
+}

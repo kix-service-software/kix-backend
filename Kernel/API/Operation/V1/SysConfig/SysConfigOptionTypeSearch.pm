@@ -11,12 +11,11 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::SysConfig::SysConfigItemSearch;
+package Kernel::API::Operation::V1::SysConfig::SysConfigOptionTypeSearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::SysConfig::SysConfigItemGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -27,7 +26,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::SysConfig::SysConfigItemSearch - API SysConfig Search Operation backend
+Kernel::API::Operation::SysConfig::SysConfigOptionTypeSearch - API SysConfigOptionTypeSearch Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -65,10 +64,11 @@ sub new {
 
 =item Run()
 
-perform SysConfigItemSearch Operation. This will return a SysConfig item list with data.
+perform SysConfigOptionTypeSearch Operation. This will return a SysConfigOptionType list.
 
     my $Result = $OperationObject->Run(
         Data => {
+            SysConfigID => 123
         }
     );
 
@@ -77,9 +77,9 @@ perform SysConfigItemSearch Operation. This will return a SysConfig item list wi
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            SysConfigItem => [
-                {},
-                {}
+            SysConfigOptionType => [
+                'String',
+                'Array'
             ]
         },
     };
@@ -89,35 +89,20 @@ perform SysConfigItemSearch Operation. This will return a SysConfig item list wi
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform SysConfig search
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+    # perform search
+    my @OptionTypeList = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionTypeList();
 
-	# get already prepared SysConfig data from SysConfigGet operation
-    if ( IsHashRefWithData($SysConfigObject->{Config}) ) {  	
-        my $SysConfigGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SysConfig::SysConfigItemGet',
-            Data      => {
-                SysConfigItemID => join(',', sort keys %{$SysConfigObject->{Config}}),
-                include         => $Param{Data}->{include},
-            }
-        );    
+	# get prepare 
+    if ( IsArrayRefWithData(\@OptionTypeList) ) {  	
 
-        if ( !IsHashRefWithData($SysConfigGetResult) || !$SysConfigGetResult->{Success} ) {
-            return $SysConfigGetResult;
-        }
-
-        my @SysConfigDataList = IsArrayRefWithData($SysConfigGetResult->{Data}->{SysConfigItem}) ? @{$SysConfigGetResult->{Data}->{SysConfigItem}} : ( $SysConfigGetResult->{Data}->{SysConfigItem} );
-
-        if ( IsArrayRefWithData(\@SysConfigDataList) ) {
-            return $Self->_Success(
-                SysConfigItem => \@SysConfigDataList,
-            )
-        }
+        return $Self->_Success(
+            SysConfigOptionType => \@OptionTypeList,
+        )
     }
 
     # return result
     return $Self->_Success(
-        SysConfigItem => [],
+        SysConfigOptionType => [],
     );
 }
 

@@ -1,0 +1,13 @@
+{
+    "SysConfigOptionType": [
+        "Array",
+        "Base",
+        "Hash",
+        "Option",
+        "RichText",
+        "String",
+        "TextArea",
+        "TimeVacationDays",
+        "TimeVacationDaysOneTime"
+    ]
+}

@@ -100,6 +100,8 @@ my $PostMasterObject = Kernel::System::PostMaster->new(
 );
 
 my @Return = $PostMasterObject->Run();
+@Return = @{ $Return[0] || [] };
+
 $Self->Is(
     $Return[0] || 0,
     1,
@@ -150,6 +152,8 @@ $PostMasterObject = Kernel::System::PostMaster->new(
 );
 
 @Return = $PostMasterObject->Run();
+@Return = @{ $Return[0] || [] };
+
 $Self->Is(
     $Return[0] || 0,
     2,

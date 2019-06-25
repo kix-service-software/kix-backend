@@ -72,11 +72,16 @@ sub Run {
     );
     return if !@ArticleIndex;
 
+    # get ticket for Article
+    my %Ticket = $TicketObject->TicketGet(
+        TicketID => $Param{TicketID}
+    );
+
     # Check if it is a known customer, otherwise use email address from ContactID field of the ticket.
     my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $ArticleIndex[0]->{ContactID},
+        ID => $Ticket{ContactID},
     );
-    my $CustomerEmailAddress = $CustomerData{UserEmail} || $ArticleIndex[0]->{ContactID};
+    my $CustomerEmailAddress = $CustomerData{UserEmail} || $Ticket{ContactID};
 
     # Email sender address
     my $SenderAddress = $Param{GetParam}->{'X-Sender'};

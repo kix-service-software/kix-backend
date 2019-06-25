@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableCreate Name="sysconfig">
+        <Column Name="name" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true" />
+        <Column Name="description" Required="true" Type="VARCHAR" Size="10000" />
+        <Column Name="level" Required="false" Default="0" Type="INTEGER" />        
+        <Column Name="type" Required="true" Type="VARCHAR" Size="50" />
+        <Column Name="group_name" Required="false" Type="VARCHAR" Size="255" />
+        <Column Name="setting" Required="false" Type="VARCHAR" Size="10000" />
+        <Column Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
+        <Column Name="is_modified" Required="true" Default="0" Type="SMALLINT"/>
+        <Column Name="default_value" Required="false" Type="VARCHAR" Size="100000" />
+        <Column Name="value" Required="false" Type="VARCHAR" Size="100000" />
+        <Column Name="comments" Required="false" Type="VARCHAR" Size="255" />
+        <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+        <Column Name="create_time" Required="true" Type="DATE" />
+        <Column Name="create_by" Required="true" Type="INTEGER" />
+        <Column Name="change_time" Required="true" Type="DATE" />
+        <Column Name="change_by" Required="true" Type="INTEGER" />
+        <ForeignKey ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>    
+    </TableCreate>
+    
+</database>

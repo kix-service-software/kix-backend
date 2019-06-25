@@ -12,316 +12,293 @@ use strict;
 use warnings;
 use utf8;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use vars (qw($Self));
 
-use Kernel::Config;
-
-## nofilter(TidyAll::Plugin::OTRS::Perl::UnitTestConfigChanges)
+# get SysConfigLanguage object
 my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
 
-#
-# ConfigItemUpdate
-#
+# get helper object
+$Kernel::OM->ObjectParamAdd(
+    'Kernel::System::UnitTest::Helper' => {
+        RestoreDatabase => 1,
+    },
+);
+my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-my @Tests = (
-    {
-        Value => 'some string',
-        Name  => 'Simple string',
-    },
-    {
-        Value => 'some unicode string Россия',
-        Name  => 'String with unicode',
-    },
-    {
-        Value => {
-            String => 'Simple hash',
-        },
-        Name => 'Simple hash',
-    },
-    {
-        Value => {
-            String => 'some unicode string Россия',
-            Hash   => {
-                ''    => 'some unicode string Россия',
-                Empty => undef,
-                List  => [
-                    Hash => {
-                        Value => 123,
-                    },
-                    456,
-                ],
-            },
-        },
-        Name => 'Complex structure with unicode data',
-    }
+########################################################################################################################################
+# OptionType handling
+########################################################################################################################################
+
+my @TypeList = $SysConfigObject->OptionTypeList();
+
+$Self->True(
+    IsArrayRefWithData(\@TypeList),
+    'OptionTypeList()',
 );
 
-for my $Test (@Tests) {
+########################################################################################################################################
+# Option handling
+########################################################################################################################################
 
-    # We 'abuse' the setting UnitTest::Option. It will be
-    #   restored to the original value in the destructor by
-    #   the HelperObject.
+# add option
+my $Random = 'Option' . $Helper->GetRandomID();
 
-    $SysConfigObject->ConfigItemUpdate(
-        Valid => 1,
-        Key   => 'UnitTest::Option',
-        Value => $Test->{Value},
-    );
-
-    # force a reload of ZZZAuto.pm to get the new value
-    for my $Module ( sort keys %INC ) {
-        if ( $Module =~ m/ZZZAuto\.pm$/ ) {
-            delete $INC{$Module};
-        }
-    }
-
-    # create a new config object to check the new settings
-    my $ConfigObject = Kernel::Config->new();
-
-    $Self->IsDeeply(
-        $ConfigObject->Get('UnitTest::Option'),
-        $Test->{Value},
-        "ConfigItemUdpate() - $Test->{Name}",
-    );
-
-    $SysConfigObject->ConfigItemReset(
-        Name => 'UnitTest::Option',
-    );
-}
-
-#
-# _XML2Perl()
-#
-my %Config = $SysConfigObject->ConfigItemGet(
-    Name    => 'FQDN',
-    Default => 1,
+my $Result = $SysConfigObject->OptionAdd(
+    Name        => $Random.'String',
+    Description => 'some description',
+    Setting     => { 
+        "RegEx" => "" 
+    },
+    Type        => 'String',
+    UserID      => 1,
 );
-my $FQDN = $SysConfigObject->_XML2Perl( Data => \%Config );
+
+$Self->True(
+    $Result,
+    'OptionAdd() - String',
+);
+
+$Result = $SysConfigObject->OptionAdd(
+    Name        => $Random.'Option',
+    Description => 'some description',
+    Setting     => { 
+        "0" => "No",
+        "1" => "Yes" 
+    },
+    Default     => 0,
+    Type        => 'Option',
+    UserID      => 1,
+);
+
+$Self->True(
+    $Result,
+    'OptionAdd() - Option',
+);
+
+$Result = $SysConfigObject->OptionAdd(
+    Name        => $Random.'Array',
+    Description => 'some description',
+    Setting     => [ "Normal", "ParentChild" ],
+    Type        => 'Array',
+    UserID      => 1,
+);
+
+$Self->True(
+    $Result,
+    'OptionAdd() - Array',
+);
+
+$Result = $SysConfigObject->OptionAdd(
+    Name        => $Random.'Hash',
+    Description => 'some description',
+    Setting     => { 
+        "SourceName" => "Parent", 
+        "TargetName" => "Child" 
+    },
+    Type        => 'Hash',
+    UserID      => 1,
+);
+
+$Self->True(
+    $Result,
+    'OptionAdd() - Hash',
+);
+
+my @List = $SysConfigObject->OptionList();
+
+$Self->True(
+    IsArrayRefWithData(\@List),
+    'OptionList() after create',
+);
+
+my %AllOptions = $SysConfigObject->OptionGetAll();
+
+$Self->True(
+    IsHashRefWithData(\%AllOptions),
+    'OptionGetAll()',
+);
+
+my %Option = $SysConfigObject->OptionGet(
+    Name => $Random.'Hash',
+);
+
+$Self->IsDeeply(
+    $AllOptions{$Option{Name}}->{Setting},
+    $Option{Setting},
+    'OptionGetAll() - option match',
+);
+
+my $Exists = $SysConfigObject->Exists(
+    Name => $Random.'Hash',
+);
+
+$Self->True(
+    $Exists,
+    'Exists()',
+);
+
+my %AllValues = $SysConfigObject->ValueGetAll();
+
+$Self->True(
+    IsHashRefWithData(\%AllOptions),
+    'ValueGetAll()',
+);
+
 $Self->Is(
-    $FQDN || '',
-    " 'yourhost.example.com';\n",
-    '_XML2Perl() SCALAR',
+    $AllValues{$Option{Name}},
+    $Option{Value},
+    'OptionGetAll() - option match',
 );
 
-#
-# _DataDiff()
-#
-my $A    = 'Test';
-my $B    = 'Test';
-my $Diff = $SysConfigObject->_DataDiff(
-    Data1 => \$A,
-    Data2 => \$B,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() SCALAR',
-);
-
-$A    = 'Test';
-$B    = 'Test2';
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \$A,
-    Data2 => \$B,
-);
-$Self->True(
-    $Diff,
-    'DataDiff() SCALAR',
-);
-
-my @Ar = ('Test');
-my @Br = ('Test');
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \@Ar,
-    Data2 => \@Br,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() ARRAY',
-);
-
-@Ar   = ('Test2');
-@Br   = ('Test');
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \@Ar,
-    Data2 => \@Br,
-);
-$Self->True(
-    $Diff,
-    'DataDiff() ARRAY',
-);
-
-my %Ah = ( 'Test' => 123 );
-my %Bh = ( 'Test' => 123 );
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \%Ah,
-    Data2 => \%Bh,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() HASH',
-);
-
-%Ah = ( 'Test' => 123 );
-%Bh = (
-    'Test' => 123,
-    ''     => ''
-);
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \%Ah,
-    Data2 => \%Bh,
-);
-$Self->True(
-    $Diff,
-    'DataDiff() HASH',
-);
-
-%Ah = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ]
-);
-%Bh = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ]
-);
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \%Ah,
-    Data2 => \%Bh,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() HASH',
-);
-
-%Ah = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ]
-);
-%Bh = (
-    'Test' => 123,
-    A      => [ 1, 4, 4 ]
-);
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \%Ah,
-    Data2 => \%Bh,
-);
-$Self->True(
-    $Diff,
-    'DataDiff() HASH',
-);
-
-%Ah = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ],
-    B => { a => 1 },
-    special => undef
-);
-%Bh = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ],
-    B => { a => 1 },
-    special => undef
-);
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \%Ah,
-    Data2 => \%Bh,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() HASH',
-);
-
-%Ah = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ],
-    B => { a => 1 },
-);
-%Bh = (
-    'Test' => 123,
-    A      => [ 1, 3, 4 ],
-    B      => {
-        a  => 1,
-        '' => undef,
+# update option - change description and setting
+$Result = $SysConfigObject->OptionUpdate(
+    %Option,
+    Description => 'some other description',
+    Setting     => { 
+        "SomeUpdateKey" => "some Value",
+        "SourceName" => "Parent", 
+        "TargetName" => "Child" 
     },
-);
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \%Ah,
-    Data2 => \%Bh,
-);
-$Self->True(
-    $Diff,
-    'DataDiff() HASH',
+    UserID      => 1
 );
 
-@Ar = ( 'Test', { a => 1 } );
-@Br = ( 'Test', { a => 1 } );
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \@Ar,
-    Data2 => \@Br,
+$Self->True(
+    $Result,
+    'OptionUpdate() - change description and setting',
 );
+
+my %UpdatedOption = $SysConfigObject->OptionGet(
+    Name => $Random.'Hash',
+);
+
+$Self->Is(
+    $UpdatedOption{Description},
+    'some other description',
+    'OptionGet() - updated description',
+);
+
+$Self->IsDeeply(
+    $UpdatedOption{Setting},
+    { 
+        "SomeUpdateKey" => "some Value",
+        "SourceName" => "Parent",
+        "TargetName" => "Child" 
+    },
+    'OptionGet() - updated setting',
+);
+
+# update option - change value
+$Result = $SysConfigObject->OptionUpdate(
+    %Option,
+    Description => 'some other description',
+    Value  => { 
+        "SourceName" => "Parent", 
+        "TargetName" => "Child" 
+    },
+    UserID      => 1
+);
+
+$Self->True(
+    $Result,
+    'OptionUpdate() - change value',
+);
+
+my %UpdatedOption = $SysConfigObject->OptionGet(
+    Name => $Random.'Hash',
+);
+
+$Self->Is(
+    $UpdatedOption{Description},
+    'some other description',
+    'OptionGet() - updated value',
+);
+
+$Self->IsDeeply(
+    $UpdatedOption{Value},
+    { 
+        "SourceName" => "Parent",
+        "TargetName" => "Child" 
+    },
+    'OptionGet() - updated value',
+);
+
+# update option - set to invalid
+$Result = $SysConfigObject->OptionUpdate(
+    %Option,
+    ValidID => 2,   # invalid
+    UserID  => 1
+);
+
+$Self->True(
+    $Result,
+    'OptionUpdate() - set to invalid',
+);
+
+# check if invalid values will be returned
+%AllValues = $SysConfigObject->ValueGetAll(Valid => 1);
+
 $Self->False(
-    $Diff,
-    'DataDiff() ARRAY',
+    exists $AllValues{$Option{Name}},
+    'ValueAllGet() - invalid option',
 );
 
-@Ar = ( 'Test', { a => 2 } );
-@Br = ( 'Test', { a => 1 } );
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \@Ar,
-    Data2 => \@Br,
+$Result = $SysConfigObject->ValueSet(
+    Name   => $Random.'String',
+    Value  => 'test123',
+    UserID => 1
 );
+
 $Self->True(
-    $Diff,
-    'DataDiff() ARRAY',
+    $Result,
+    'ValueSet()',
 );
 
-@Ar = ( 'Test', { a => 1 }, [ 1, 3 ] );
-@Br = ( 'Test', { a => 1 }, [ 1, 3 ] );
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \@Ar,
-    Data2 => \@Br,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() ARRAY',
+%UpdatedOption = $SysConfigObject->OptionGet(
+    Name => $Random.'String',
 );
 
-@Ar = ( 'Test', { a => 1 }, [ 1,     3 ] );
-@Br = ( 'Test', { a => 1 }, [ undef, 3 ] );
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \@Ar,
-    Data2 => \@Br,
+$Self->Is(
+    $UpdatedOption{Value},
+    'test123',
+    'OptionGet() - after value set',
 );
+
+my $Value = $SysConfigObject->ValueGet(
+    Name => $Random.'String',
+);
+
+$Self->Is(
+    $Value,
+    'test123',
+    'ValueGet() - after value set',
+);
+
+%AllValues = $SysConfigObject->ValueGetAll();
+
 $Self->True(
-    $Diff,
-    'DataDiff() ARRAY',
+    IsHashRefWithData(\%AllOptions),
+    'ValueGetAll() - after value set',
 );
 
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \undef,
-    Data2 => \undef,
-);
-$Self->False(
-    $Diff,
-    'DataDiff() undef/undef',
+$Self->Is(
+    $AllValues{$Random.'String'},
+    'test123',
+    'ValueGetAll() - option value after value set',
 );
 
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \undef,
-    Data2 => \'String',
+$Result = $SysConfigObject->OptionDelete(
+    Name   => $Random.'Hash',
+    UserID => 1,
 );
+
 $Self->True(
-    $Diff,
-    'DataDiff() undef/Scalar',
+    $Result,
+    'OptionDelete()',
 );
 
-$Diff = $SysConfigObject->_DataDiff(
-    Data1 => \'String',
-    Data2 => \undef,
-);
-$Self->True(
-    $Diff,
-    'DataDiff() Scalar/undef',
-);
+# cleanup is done by RestoreDatabase.
 
 1;
 

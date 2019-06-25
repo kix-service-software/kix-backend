@@ -289,6 +289,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
 
                 if ( $File != 22 ) {
@@ -529,7 +530,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -580,7 +583,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -607,7 +612,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -634,7 +641,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -661,7 +670,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -716,6 +727,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
 
                 $Self->Is(
@@ -879,7 +891,9 @@ Some Content in Body
         );
 
         @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
     }
+
     $Self->Is(
         $Return[0] || 0,
         1,
@@ -1017,7 +1031,9 @@ for my $Test (@Tests) {
             );
 
             @Return = $PostMasterObject->Run();
+            @Return = @{ $Return[0] || [] };
         }
+
         $Self->Is(
             $Return[0] || 0,
             1,
@@ -1154,6 +1170,7 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
     );
 
     my @Return = $PostMasterObject->Run();
+    @Return = @{ $Return[0] || [] };
 
     $Self->Is(
         $Return[0] || 0,

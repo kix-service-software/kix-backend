@@ -71,6 +71,7 @@ sub new {
     }
 
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        
     $Self->{ProductVersion} = $ConfigObject->Get('Product') . ' ';
     $Self->{ProductVersion} .= $ConfigObject->Get('Version');
 
