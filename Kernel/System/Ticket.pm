@@ -450,6 +450,8 @@ print STDERR "Ticket.TicketCreate: ".Dumper(\%Param);
         );
     }
 
+$Param{SLAID} = undef;
+
     # get sla object
     my $SLAObject = $Kernel::OM->Get('Kernel::System::SLA');
 
