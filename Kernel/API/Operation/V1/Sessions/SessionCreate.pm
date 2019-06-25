@@ -139,8 +139,8 @@ sub Run {
             );
             # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
             my $HasPermission = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
-                UserID            => $UserID,
-                Target            => '/sessions',
+                UserID              => $UserID,
+                Target              => '/auth',
                 RequestedPermission => 'CREATE'
             );
             if ( !$HasPermission ) {
@@ -160,8 +160,8 @@ sub Run {
             $UserID = $Param{Data}->{UserLogin};
             # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
             my $HasPermission = $Kernel::OM->Get('Kernel::System::Contact')->CheckPermission(
-                UserID            => $UserID,
-                Target            => '/sessions',
+                UserID              => $UserID,
+                Target              => '/auth',
                 RequestedPermission => 'CREATE'
             );
             if ( !$HasPermission ) {
