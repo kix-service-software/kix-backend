@@ -312,6 +312,8 @@ sub TicketCreate {
         }
     }
 
+
+print STDERR "here1\n";
     # set default values if no values are specified
     my $Age = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
 
@@ -324,6 +326,8 @@ sub TicketCreate {
 
     # get type object
     my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
+
+print STDERR "here2\n";
 
     if ( !$Param{TypeID} && !$Param{Type} ) {
 
@@ -341,6 +345,8 @@ sub TicketCreate {
         }
     }
 
+print STDERR "here3\n";
+
     # TypeID/Type lookup!
     if ( !$Param{TypeID} && $Param{Type} ) {
         $Param{TypeID} = $TypeObject->TypeLookup( Type => $Param{Type} );
@@ -355,6 +361,8 @@ sub TicketCreate {
         );
         return;
     }
+
+print STDERR "here4\n";
 
     # get queue object
     my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
@@ -373,6 +381,8 @@ sub TicketCreate {
         );
         return;
     }
+
+print STDERR "here5\n";
 
     # get state object
     my $StateObject = $Kernel::OM->Get('Kernel::System::State');
@@ -394,6 +404,8 @@ sub TicketCreate {
         return;
     }
 
+print STDERR "here6\n";
+
     # LockID lookup!
     if ( !$Param{LockID} && $Param{Lock} ) {
 
@@ -409,6 +421,8 @@ sub TicketCreate {
         );
         return;
     }
+
+print STDERR "here7\n";
 
     # get priority object
     my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
@@ -432,6 +446,8 @@ sub TicketCreate {
         return;
     }
 
+print STDERR "here8\n";
+
     # get service object
     my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
 
@@ -447,6 +463,8 @@ sub TicketCreate {
         );
     }
 
+print STDERR "here9\n";
+
     # get sla object
     my $SLAObject = $Kernel::OM->Get('Kernel::System::SLA');
 
@@ -457,6 +475,8 @@ sub TicketCreate {
     elsif ( $Param{SLAID} && !$Param{SLA} ) {
         $Param{SLA} = $SLAObject->SLALookup( SLAID => $Param{SLAID} );
     }
+
+print STDERR "here10\n";
 
     # create ticket number if none is given
     if ( !$Param{TN} ) {
@@ -472,6 +492,8 @@ sub TicketCreate {
     else {
         $Param{Title} = substr( $Param{Title}, 0, 255 );
     }
+
+print STDERR "here11\n";
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
     $Param{ServiceID} ||= undef;
@@ -495,11 +517,15 @@ sub TicketCreate {
         ],
     );
 
+print STDERR "here12\n";
+
     # get ticket id
     my $TicketID = $Self->TicketIDLookup(
         TicketNumber => $Param{TN},
         UserID       => $Param{UserID},
     );
+
+print STDERR "here13\n";
 
     # add history entry
     $Self->HistoryAdd(
@@ -509,6 +535,8 @@ sub TicketCreate {
         Name         => "\%\%$Param{TN}\%\%$Param{Queue}\%\%$Param{Priority}\%\%$Param{State}\%\%$TicketID",
         CreateUserID => $Param{UserID},
     );
+
+print STDERR "here14\n";
 
     if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Service') ) {
 
@@ -533,6 +561,8 @@ sub TicketCreate {
         );
     }
 
+print STDERR "here15\n";
+
     # set customer data if given
     if ( $Param{OrganisationID} || $Param{ContactID} ) {
         $Self->TicketCustomerSet(
@@ -542,6 +572,8 @@ sub TicketCreate {
             UserID => $Param{UserID},
         );
     }
+
+print STDERR "here16\n";
 
     # update ticket view index
     $Self->TicketAcceleratorAdd( TicketID => $TicketID );
@@ -553,8 +585,12 @@ sub TicketCreate {
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 
+print STDERR "here17\n";
+
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+
+print STDERR "here18\n";
 
     # trigger event
     $Self->EventHandler(
@@ -568,12 +604,16 @@ sub TicketCreate {
         UserID => $Param{UserID},
     );
 
+print STDERR "here19\n";
+
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket',
         ObjectID  => $TicketID,
     );
+
+print STDERR "here20\n";
 
     return $TicketID;
 }
