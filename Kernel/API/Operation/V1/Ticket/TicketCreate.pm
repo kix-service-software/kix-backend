@@ -202,17 +202,21 @@ sub Run {
         Data => $Param{Data}->{Ticket}
     );
 
+use Data::Dumper;
+print STDERR "TicketCreate: ".Dumper($Ticket);
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket( 
         Ticket => $Ticket 
     );
 
+print STDERR "TicketCheck: $TicketCheck\n";
     if ( !$TicketCheck->{Success} ) {
         return $Self->_Error(
             %{$TicketCheck},
         );
     }
 
+print STDERR "create ticket\n";
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
         Ticket => $Ticket,
