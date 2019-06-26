@@ -7,7 +7,7 @@
       "ConfigItemClass" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemClass"
+            "$ref" : "#/definitions/_ConfigItemClass_json"
          }
       }
    },
@@ -15,84 +15,7 @@
       "ConfigItemClass"
    ],
    "definitions" : {
-      "ConfigItemClass" : {
-         "$id" : "#ConfigItemClass",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item class object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ConfigItemStats" : {
-               "description" : "result of include \"ConfigItemStats\"",
-               "type" : "object",
-               "properties" : {
-                  "PostProductiveCount" : {
-                     "type" : "integer",
-                     "readOnly" : true
-                  },
-                  "ProductiveCount" : {
-                     "type" : "integer",
-                     "readOnly" : true
-                  }
-               },
-               "required" : [
-                  "PostProductiveCount",
-                  "ProductiveCount"
-               ]
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CurrentDefinition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition"
-            },
-            "Definitions" : {
-               "description" : "added via include \"Definitions\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/ConfigItemClassDefinition"
-               }
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      },
-      "ConfigItemClassDefinition" : {
+      "_ConfigItemClassDefinition_json" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item class definition object.",
@@ -143,6 +66,83 @@
             "DefinitionID",
             "DefinitionString",
             "Version"
+         ]
+      },
+      "_ConfigItemClass_json" : {
+         "$id" : "#ConfigItemClass",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ConfigItemStats" : {
+               "description" : "result of include \"ConfigItemStats\"",
+               "type" : "object",
+               "properties" : {
+                  "PostProductiveCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "ProductiveCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "PostProductiveCount",
+                  "ProductiveCount"
+               ]
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurrentDefinition" : {
+               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+            },
+            "Definitions" : {
+               "description" : "added via include \"Definitions\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+               }
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
          ]
       }
    }

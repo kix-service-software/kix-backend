@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MailFilterPostRequest",
+  "type": "object",
+  "description": "The mail filter request object for creation.",
+  "properties": {
+    "MailFilter": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        },
+        "StopAfterMatch": {
+          "type": "integer"
+        },
+        "Match": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Key": {
+                "type": "string",
+                "description": "relevant email or x-kix header"
+              },
+              "Value": {
+                "type": "string",
+                "description": "value of header, regular expression is possible"
+              },
+              "Not": {
+                "type": "integer",
+                "description": "to negate value"
+              }
+            },
+            "required": [
+              "Key",
+              "Value"
+            ]
+          }
+        },
+        "Set": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Key": {
+                "type": "string",
+                "description": "relevant x-kix header"
+              },
+              "Value": {
+                "type": "string",
+                "description": "value for header"
+              }
+            },
+            "required": [
+              "Key",
+              "Value"
+            ]
+          }
+        }
+      },
+      "required": [
+        "Name",
+        "Match",
+        "Set"
+      ]
+    }
+  },
+  "required": [
+    "MailFilter"
+  ]
+}

@@ -7,7 +7,7 @@
       "ConfigItemHistory" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
+            "$ref" : "#/definitions/_ConfigItemHistory_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "ConfigItemHistory"
    ],
    "definitions" : {
-      "ConfigItemHistory" : {
+      "_ConfigItemHistory_json" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item history object.",

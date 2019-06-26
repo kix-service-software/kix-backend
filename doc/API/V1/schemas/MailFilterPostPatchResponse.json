@@ -1,0 +1,14 @@
+{
+   "$id" : "#MailFilterPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated mail filter.",
+   "type" : "object",
+   "properties" : {
+      "MailFilterID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "MailFilterID"
+   ]
+}

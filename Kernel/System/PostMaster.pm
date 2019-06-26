@@ -93,7 +93,7 @@ sub new {
             || die "Found no '$Option' option in configuration!";
     }
 
-    # should I use x-otrs headers?
+    # should I use x-kix headers?
     $Self->{Trusted} = defined $Param{Trusted} ? $Param{Trusted} : 1;
 
     if ( $Self->{Trusted} ) {

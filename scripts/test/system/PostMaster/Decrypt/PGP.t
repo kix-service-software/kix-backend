@@ -38,7 +38,7 @@ $ConfigObject->Set(
 );
 
 $ConfigObject->Set(
-    Key   => 'PGP::Key::Password',
+    Key => 'PGP::Key::Password',
     Value => { '04A17B7A' => 'somepass' },
 );
 
@@ -172,8 +172,11 @@ my $FilterRand1      = 'filter' . $Helper->GetRandomID();
 $PostMasterFilter->FilterAdd(
     Name           => $FilterRand1,
     StopAfterMatch => 0,
-#rbo - T2016121190001552 - renamed X-KIX headers
-    Match          => {
+    ValidID        => 1,
+    UserID         => 1,
+
+    #rbo - T2016121190001552 - renamed X-KIX headers
+    Match => {
         'X-KIX-BodyDecrypted' => 'test',
     },
     Set => {
@@ -357,7 +360,6 @@ for my $Count ( 1 .. 2 ) {
 # Cleanup is done by RestoreDatabase.
 
 1;
-
 
 =back
 

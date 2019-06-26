@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -65,7 +65,7 @@ sub new {
 
 =item Run()
 
-perform MailAccountSearch Operation. This will return a MailAccount ID list.
+perform MailAccountSearch Operation. This will return a MailAccount list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -92,25 +92,27 @@ sub Run {
     # perform MailAccount search
     my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList();
 
-	# get already prepared MailAccount data from MailAccountGet operation
-    if ( IsHashRefWithData(\%MailAccountList) ) {  	
+    # get already prepared MailAccount data from MailAccountGet operation
+    if ( IsHashRefWithData( \%MailAccountList ) ) {
         my $MailAccountGetResult = $Self->ExecOperation(
             OperationType => 'V1::MailAccount::MailAccountGet',
-            Data      => {
-                MailAccountID => join(',', sort keys %MailAccountList),
-            }
-        );    
+            Data          => {
+                MailAccountID => join( ',', sort keys %MailAccountList ),
+                }
+        );
 
         if ( !IsHashRefWithData($MailAccountGetResult) || !$MailAccountGetResult->{Success} ) {
             return $MailAccountGetResult;
         }
 
-        my @MailAccountDataList = IsArrayRefWithData($MailAccountGetResult->{Data}->{MailAccount}) ? @{$MailAccountGetResult->{Data}->{MailAccount}} : ( $MailAccountGetResult->{Data}->{MailAccount} );
+        my @MailAccountDataList = IsArrayRefWithData( $MailAccountGetResult->{Data}->{MailAccount} )
+            ? @{ $MailAccountGetResult->{Data}->{MailAccount} }
+            : ( $MailAccountGetResult->{Data}->{MailAccount} );
 
-        if ( IsArrayRefWithData(\@MailAccountDataList) ) {
+        if ( IsArrayRefWithData( \@MailAccountDataList ) ) {
             return $Self->_Success(
                 MailAccount => \@MailAccountDataList,
-            )
+            );
         }
     }
 

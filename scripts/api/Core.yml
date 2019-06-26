@@ -125,6 +125,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::MailAccount::MailAccountTypeSearch
+    V1::MailFilter::MailFilterSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterSearch
+    V1::MailFilter::MailFilterDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterDelete
+    V1::MailFilter::MailFilterGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterGet
+    V1::MailFilter::MailFilterUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterUpdate
+    V1::MailFilter::MailFilterCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterCreate
     V1::SenderType::SenderTypeSearch:
         Description: ''
         MappingInbound:
@@ -1782,6 +1817,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /system/communication/mailaccounts/types
+        V1::MailFilter::MailFilterSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailfilters
+        V1::MailFilter::MailFilterDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/communication/mailfilters/:MailFilterID
+        V1::MailFilter::MailFilterGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailfilters/:MailFilterID
+        V1::MailFilter::MailFilterUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/communication/mailfilters/:MailFilterID
+        V1::MailFilter::MailFilterCreate:
+          RequestMethod:
+          - POST
+          Route: /system/communication/mailfilters
         V1::SenderType::SenderTypeSearch:
           RequestMethod:
           - GET

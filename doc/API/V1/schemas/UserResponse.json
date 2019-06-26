@@ -5,14 +5,34 @@
    "type" : "object",
    "properties" : {
       "User" : {
-         "$ref" : "#/definitions/User"
+         "$ref" : "#/definitions/_User_json"
       }
    },
    "required" : [
       "User"
    ],
    "definitions" : {
-      "User" : {
+      "_UserPreference_json" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      },
+      "_User_json" : {
          "$id" : "#User",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user object.",
@@ -38,7 +58,7 @@
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference"
+                  "$ref" : "#/definitions/_UserPreference_json"
                }
             },
             "RoleIDs" : {
@@ -123,26 +143,6 @@
             "UserFirstname",
             "UserLastname",
             "UserLogin"
-         ]
-      },
-      "UserPreference" : {
-         "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The user preference object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "Value"
          ]
       }
    }
