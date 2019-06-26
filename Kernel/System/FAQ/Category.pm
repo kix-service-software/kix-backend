@@ -533,9 +533,10 @@ get the category search as an array ref
         ParentID    => 3,
         ParentIDs   => [ 1, 3, 8 ],
         CategoryIDs => [ 2, 5, 7 ],
+        ValidIDs    => [ 1, 2 ],
         OrderBy     => 'Name',
         SortBy      => 'down',
-        Valid       => 1,
+        Limit       => 500,
         UserID      => 1,
     );
 
@@ -560,14 +561,11 @@ sub CategorySearch {
         return;
     }
 
-    # set default
-    my $Valid = 0;
-    if ( defined $Param{Valid} ) {
-        $Valid = $Param{Valid};
-    }
-
     # SQL
-    my $SQL = 'SELECT id FROM faq_category WHERE 1=1';
+    my $SQL = '
+        SELECT id
+        FROM faq_category
+        WHERE 1 = 1';
     my $Ext = '';
 
     # get database object
@@ -583,7 +581,7 @@ sub CategorySearch {
     }
 
     # search for parent id
-    elsif ( defined $Param{ParentID} ) {
+    if ( defined $Param{ParentID} ) {
 
         # db integer quote
         $Param{ParentID} = $DBObject->Quote( $Param{ParentID}, 'Integer' );
@@ -592,7 +590,7 @@ sub CategorySearch {
     }
 
     # search for parent ids
-    elsif (
+    if (
         defined $Param{ParentIDs}
         && ref $Param{ParentIDs} eq 'ARRAY'
         && @{ $Param{ParentIDs} }
@@ -611,7 +609,7 @@ sub CategorySearch {
     }
 
     # search for category ids
-    elsif (
+    if (
         defined $Param{CategoryIDs}
         && ref $Param{CategoryIDs} eq 'ARRAY'
         && @{ $Param{CategoryIDs} }
@@ -627,6 +625,23 @@ sub CategorySearch {
         my $InString = join ', ', @{ $Param{CategoryIDs} };
 
         $Ext = ' AND id IN (' . $InString . ')';
+    }
+    
+    if (
+        defined $Param{ValidIDs}
+        && ref $Param{ValidIDs} eq 'ARRAY'
+        && @{ $Param{ValidIDs} }
+        ) 
+    {
+        # integer quote the valid ids
+        for my $ValidID ( @{ $Param{ValidIDs} } ) {
+            $ValidID = $DBObject->Quote( $ValidID, 'Integer' );
+        }
+
+        # create string
+        my $InString = join ', ', @{ $Param{ValidIDs} };
+
+        $Ext = ' AND valid_id IN (' . $InString . ')';
     }
 
     # valid
@@ -661,6 +676,7 @@ print STDERR "SQL: $SQL\n";
 
     return if !$DBObject->Prepare(
         SQL   => $SQL,
+        Limit => $Param{Limit},
     );
 
     my @List;
