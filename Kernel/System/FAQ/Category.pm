@@ -644,13 +644,6 @@ sub CategorySearch {
         $Ext = ' AND valid_id IN (' . $InString . ')';
     }
 
-    # valid
-    if ( $Valid ) {
-        $Ext = ' AND valid_id IN ('
-             . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
-             . ')';
-    }
-
     # ORDER BY
     if ( $Param{OrderBy} ) {
         $Ext .= " ORDER BY name";
@@ -671,8 +664,6 @@ sub CategorySearch {
 
     # SQL STATEMENT
     $SQL .= $Ext;
-
-print STDERR "SQL: $SQL\n";
 
     return if !$DBObject->Prepare(
         SQL   => $SQL,
