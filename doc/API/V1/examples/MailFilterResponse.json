@@ -1,0 +1,31 @@
+{
+    "MailFilter": {
+        "ChangeBy": 1,
+        "ChangeTime": "2019-06-11 09:00:00",
+        "Comment": "...",
+        "CreateBy": 1,
+        "CreateTime": "2019-05-28 11:35:42",
+        "ID": 1,
+        "Match": [
+            {
+                "Key": "From",
+                "Value": "email@example.com",
+                "Not": 0
+            },
+            {
+                "Key": "Subject",
+                "Value": "Test",
+                "Not": 1
+            }
+        ],
+        "Name": "filter one name",
+        "Set": [
+            {
+                "Key": "X-KIX-Queue",
+                "Value": "Some::Queue"
+            }
+        ],
+        "StopAfterMatch": 1,
+        "ValidID": 1
+    }
+}

@@ -7,7 +7,7 @@
       "TicketType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/TicketType"
+            "$ref" : "#/definitions/_TicketType_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "TicketType"
    ],
    "definitions" : {
-      "TicketType" : {
+      "_TicketType_json" : {
          "$id" : "#TicketType",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The ticket type object.",

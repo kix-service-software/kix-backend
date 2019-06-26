@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -92,14 +92,14 @@ sub ParameterDefinition {
         'MailAccountID' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
-    }
+            }
+    };
 }
 
 =item Run()
 
 perform MailAccountGet Operation. This function is able to return
-one or more ticket entries in one call.
+one or more mail accounts in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -131,7 +131,7 @@ sub Run {
     my @MailAccountList;
 
     # start loop
-    foreach my $MailAccountID ( @{$Param{Data}->{MailAccountID}} ) {
+    foreach my $MailAccountID ( @{ $Param{Data}->{MailAccountID} } ) {
 
         # get the MailAccount data
         my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
@@ -143,18 +143,18 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
-        
+
         # remove password
         delete $MailAccountData{Password};
 
         # add
-        push(@MailAccountList, \%MailAccountData);
+        push( @MailAccountList, \%MailAccountData );
     }
 
     if ( scalar(@MailAccountList) == 1 ) {
         return $Self->_Success(
             MailAccount => $MailAccountList[0],
-        );    
+        );
     }
 
     # return result

@@ -16,6 +16,11 @@
 /system/communication/mailaccounts/:MailAccountID                              |   PATCH           | V1::MailAccount::MailAccountUpdate
 /system/communication/mailaccounts                                             |   POST            | V1::MailAccount::MailAccountCreate
 /system/communication/mailaccounts/types                                       |   GET             | V1::MailAccount::MailAccountTypeSearch
+/system/communication/mailfilters                                              |   GET             | V1::MailFilter::MailFilterSearch
+/system/communication/mailfilters/:MailFilterID                                |   DELETE          | V1::MailFilter::MailFilterDelete
+/system/communication/mailfilters/:MailFilterID                                |   GET             | V1::MailFilter::MailFilterGet
+/system/communication/mailfilters/:MailFilterID                                |   PATCH           | V1::MailFilter::MailFilterUpdate
+/system/communication/mailfilters                                              |   POST            | V1::MailFilter::MailFilterCreate
 /system/communication/sendertypes                                              |   GET             | V1::SenderType::SenderTypeSearch
 /system/communication/sendertypes/:SenderTypeID                                |   GET             | V1::SenderType::SenderTypeGet
 /system/communication/systemaddresses                                          |   GET             | V1::SystemAddress::SystemAddressSearch

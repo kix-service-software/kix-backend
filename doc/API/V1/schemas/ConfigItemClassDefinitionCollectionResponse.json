@@ -7,7 +7,7 @@
       "ConfigItemClassDefinition" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemClassDefinition"
+            "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "ConfigItemClassDefinition"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition" : {
+      "_ConfigItemClassDefinition_json" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item class definition object.",

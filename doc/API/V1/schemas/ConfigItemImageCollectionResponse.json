@@ -7,7 +7,7 @@
       "Image" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemImage"
+            "$ref" : "#/definitions/_ConfigItemImage_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Image"
    ],
    "definitions" : {
-      "ConfigItemImage" : {
+      "_ConfigItemImage_json" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item image object.",

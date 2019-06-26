@@ -133,6 +133,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Validator::Module###MailFilterValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">MailFilterValidator</Item>
+                <Item Key="Validates">Match,Set</Item>
+                <Item Key="ConsiderOperationRegEx">(MailFilterCreate|MailFilterUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="API::Validator::Module###MimeTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>

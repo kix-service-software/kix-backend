@@ -7,7 +7,7 @@
       "TextModule" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/TextModule"
+            "$ref" : "#/definitions/_TextModule_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "TextModule"
    ],
    "definitions" : {
-      "TextModule" : {
+      "_TextModule_json" : {
          "$id" : "#TicketState",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The ticket state object.",

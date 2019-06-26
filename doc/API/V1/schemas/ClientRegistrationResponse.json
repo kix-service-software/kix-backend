@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ClientRegistration" : {
-         "$ref" : "#/definitions/ClientRegistration"
+         "$ref" : "#/definitions/_ClientRegistration_json"
       }
    },
    "required" : [
       "ClientRegistration"
    ],
    "definitions" : {
-      "ClientRegistration" : {
+      "_ClientRegistration_json" : {
          "$id" : "#ClientRegistration",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The client registration object.",

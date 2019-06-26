@@ -1,0 +1,14 @@
+{
+    "MailFilter": {
+        "Comment": "new comment",
+        "Match": [
+            {
+                "Key": "From",
+                "Value": "email@example.com",
+                "Not": 0
+            }
+        ],
+        "Name": "new filter name",
+        "ValidID": 2
+    }
+}

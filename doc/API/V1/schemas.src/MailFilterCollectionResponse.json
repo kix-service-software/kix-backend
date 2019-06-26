@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MailFilterCollectionResponse",
+  "type": "object",
+  "description": "A list of mail filters.",
+  "properties": {
+    "MailFilter": {
+      "type": "array",
+      "items": {
+        "$ref": "MailFilter.json"
+      }
+    }
+  },
+  "required": [
+    "MailFilter"
+  ]
+}

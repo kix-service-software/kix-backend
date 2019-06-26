@@ -1448,17 +1448,37 @@
     </ForeignKey>
 </Table>
 
-<!-- postmaster_filter -->
-<Table Name="postmaster_filter">
-    <Column Name="f_name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="f_stop" Required="false" Type="SMALLINT"/>
-    <Column Name="f_type" Required="true" Size="20" Type="VARCHAR"/>
-    <Column Name="f_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="f_value" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="f_not" Required="false" Type="SMALLINT"/>
-    <Index Name="postmaster_filter_f_name">
-        <IndexColumn Name="f_name"/>
+<!-- mail_filter -->
+<Table Name="mail_filter">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="stop" Required="false" Type="SMALLINT"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Index Name="mail_filter_name">
+        <IndexColumn Name="name"/>
     </Index>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+<Table Name="mail_filter_properties">
+    <Column Name="id" Required="true" Type="INTEGER"/>
+    <Column Name="type" Required="true" Size="20" Type="VARCHAR"/>
+    <Column Name="key" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="value" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="negate" Required="false" Type="SMALLINT"/>
+    <ForeignKey ForeignTable="mail_filter">
+        <Reference Local="id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 
 <!-- generic_agent_jobs -->

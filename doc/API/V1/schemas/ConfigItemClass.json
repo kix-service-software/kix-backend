@@ -43,13 +43,13 @@
          "readOnly" : true
       },
       "CurrentDefinition" : {
-         "$ref" : "#/definitions/ConfigItemClassDefinition"
+         "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
       },
       "Definitions" : {
          "description" : "added via include \"Definitions\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemClassDefinition"
+            "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
          }
       },
       "ID" : {
@@ -75,7 +75,7 @@
       "ValidID"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition" : {
+      "_ConfigItemClassDefinition_json" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item class definition object.",

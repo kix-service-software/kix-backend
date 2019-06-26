@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -85,7 +85,6 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-
     my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
 
     return {
@@ -93,28 +92,28 @@ sub ParameterDefinition {
             Required => 1
         },
         'MailAccount' => {
-            Type => 'HASH',
+            Type     => 'HASH',
             Required => 1
-        },   
+        },
         'MailAccount::Type' => {
             RequiresValueIfUsed => 1,
-            OneOf => sort keys %BackendList,
+            OneOf               => sort keys %BackendList,
         },
         'MailAccount::DispatchingBy' => {
             RequiresValueIfUsed => 1,
-            OneOf => [
+            OneOf               => [
                 'Queue',
                 'From'
-            ]
-        },            
+                ]
+        },
         'MailAccount::Trusted' => {
             RequiresValueIfUsed => 1,
-            OneOf => [
+            OneOf               => [
                 0,
                 1
-            ]
-        },            
-    }
+                ]
+        },
+        }
 }
 
 =item Run()
@@ -150,7 +149,6 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
    
 =cut
 
-
 sub Run {
     my ( $Self, %Param ) = @_;
 
@@ -158,13 +156,13 @@ sub Run {
     my $MailAccount = $Self->_Trim(
         Data => $Param{Data}->{MailAccount}
     );
-    
-    # check if MailAccount exists 
+
+    # check if MailAccount exists
     my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
         ID     => $Param{Data}->{MailAccountID},
         UserID => $Self->{Authorization}->{UserID},
     );
- 
+
     if ( !%MailAccountData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -175,7 +173,7 @@ sub Run {
         return $Self->_Error(
             Code    => 'BadRequest',
             Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
-        );        
+        );
     }
 
     # update MailAccount
@@ -187,11 +185,11 @@ sub Run {
         Type          => $MailAccount->{Type} || $MailAccountData{Type},
         IMAPFolder    => $MailAccount->{IMAPFolder} || $MailAccountData{IMAPFolder},
         ValidID       => $MailAccount->{ValidID} || $MailAccountData{ValidID},
-        Trusted       => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
         DispatchingBy => $MailAccount->{DispatchingBy} || $MailAccountData{DispatchingBy},
         QueueID       => $MailAccount->{QueueID} || $MailAccountData{QueueID},
-        Comment       => $MailAccount->{Comment} || $MailAccountData{Comment},        
-        UserID        => $Self->{Authorization}->{UserID},                      
+        Trusted       => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
+        Comment       => exists $MailAccount->{Comment} ? $MailAccount->{Comment} : $MailAccountData{Comment},
+        UserID        => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -200,10 +198,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         MailAccountID => $Param{Data}->{MailAccountID},
-    );    
+    );
 }
 
 1;

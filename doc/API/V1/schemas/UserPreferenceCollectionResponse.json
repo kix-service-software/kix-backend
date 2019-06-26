@@ -7,7 +7,7 @@
       "UserPreference" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/UserPreference"
+            "$ref" : "#/definitions/_UserPreference_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "UserPreference"
    ],
    "definitions" : {
-      "UserPreference" : {
+      "_UserPreference_json" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user preference object.",

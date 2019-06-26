@@ -237,6 +237,8 @@ my $FilterRand1      = 'filter' . $Helper->GetRandomID();
 $PostMasterFilter->FilterAdd(
     Name           => $FilterRand1,
     StopAfterMatch => 0,
+    ValidID        => 1,
+    UserID         => 1,
     Match          => {
         'X-OTRS-BodyDecrypted' => 'Hi',
     },
@@ -333,7 +335,6 @@ for my $Directory ( $CertPath, $PrivatePath ) {
 # Cleanup is done by RestoreDatabase.
 
 1;
-
 
 =back
 

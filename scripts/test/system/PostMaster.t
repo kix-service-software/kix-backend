@@ -195,6 +195,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand1,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'test',
                     To      => 'EMAILADDRESS:darthvader@otrs.org',
@@ -209,6 +211,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand2,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'test',
                     To      => 'EMAILADDRESS:darthvader2@otrs.org',
@@ -222,6 +226,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand3,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'test 1',
                     To      => 'otrs.org',
@@ -235,6 +241,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand4,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'NOT REGEX',
                     To      => 'darthvader@otrs.org',
@@ -863,6 +871,8 @@ for my $Type (qw(Config DB)) {
             $PostMasterFilter->FilterAdd(
                 Name           => $Test->{Name},
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 %{$Test},
             );
         }
@@ -1011,6 +1021,8 @@ for my $Test (@Tests) {
             $PostMasterFilter->FilterAdd(
                 Name           => $Test->{Name},
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 %{$Test},
             );
         }
