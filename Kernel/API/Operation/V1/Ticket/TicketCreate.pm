@@ -202,21 +202,17 @@ sub Run {
         Data => $Param{Data}->{Ticket}
     );
 
-use Data::Dumper;
-print STDERR "TicketCreate: ".Dumper($Ticket);
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket( 
         Ticket => $Ticket 
     );
 
-print STDERR "TicketCheck: $TicketCheck\n";
     if ( !$TicketCheck->{Success} ) {
         return $Self->_Error(
             %{$TicketCheck},
         );
     }
 
-print STDERR "create ticket\n";
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
         Ticket => $Ticket,
@@ -446,7 +442,6 @@ print STDERR "TicketID: $TicketID\n";
     if ( IsArrayRefWithData($Ticket->{Articles}) ) {
 
         foreach my $Article ( @{$Ticket->{Articles}} ) {
-print STDERR "creating article: ".Dumper($Article);
 
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Ticket::ArticleCreate',
@@ -455,8 +450,6 @@ print STDERR "creating article: ".Dumper($Article);
                     Article  => $Article,
                 }
             );
-
-            print STDERR "Result: $Result\n";
             
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
