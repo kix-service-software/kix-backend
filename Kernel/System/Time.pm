@@ -21,6 +21,8 @@ use Time::Local;
 use DateTime;
 use DateTime::TimeZone;
 
+use Kernel::System::VariableCheck qw( :all );
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Cache',
@@ -489,15 +491,14 @@ sub WorkingTime {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
-    my $TimeVacationDays        = $ConfigObject->Get('TimeVacationDays');
-    my $TimeVacationDaysOneTime = $ConfigObject->Get('TimeVacationDaysOneTime');
+    my $TimeVacationDays        = $Self->GetVacationDays();
+    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
             $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
-            $TimeVacationDays        = $ConfigObject->Get( "TimeVacationDays::Calendar" . $Param{Calendar} );
-            $TimeVacationDaysOneTime = $ConfigObject->Get(
-                "TimeVacationDaysOneTime::Calendar" . $Param{Calendar}
-            );
+            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
+            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
+            
             my $Zone = $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} );
             if ($Zone) {
                 my $TimeZoneObject   = DateTime::TimeZone->new(
@@ -821,15 +822,14 @@ sub DestinationTime {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
-    my $TimeVacationDays        = $ConfigObject->Get('TimeVacationDays');
-    my $TimeVacationDaysOneTime = $ConfigObject->Get('TimeVacationDaysOneTime');
+    my $TimeVacationDays        = $Self->GetVacationDays();
+    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
             $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
-            $TimeVacationDays        = $ConfigObject->Get( "TimeVacationDays::Calendar" . $Param{Calendar} );
-            $TimeVacationDaysOneTime = $ConfigObject->Get(
-                "TimeVacationDaysOneTime::Calendar" . $Param{Calendar}
-            );
+            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
+            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
+
             my $TimeZoneObject   = DateTime::TimeZone->new(
                 name => $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} )
             );
@@ -1092,14 +1092,12 @@ sub VacationCheck {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    my $TimeVacationDays        = $ConfigObject->Get('TimeVacationDays');
-    my $TimeVacationDaysOneTime = $ConfigObject->Get('TimeVacationDaysOneTime');
+    my $TimeVacationDays        = $Self->GetVacationDays();
+    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            my $Prefix = 'TimeVacationDays';
-            my $Key    = '::Calendar' . $Param{Calendar};
-            $TimeVacationDays        = $ConfigObject->Get( $Prefix . $Key );
-            $TimeVacationDaysOneTime = $ConfigObject->Get( $Prefix . 'OneTime' . $Key );
+            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
+            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
         }
     }
 
@@ -1122,6 +1120,68 @@ sub VacationCheck {
     }
 
     return;
+}
+
+=item GetVacationDays()
+
+get TimeVacationDays from Config and prepare internal representation
+
+    $TimeObject->GetVacationDays(
+        Calendar => '...'           # optional
+    );
+
+
+=cut
+
+sub GetVacationDays {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get('TimeVacationDays');
+    if ( $Param{Calendar} ) {
+        if ( $Kernel::OM->Get('Kernel::Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
+            $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
+        }
+    }
+
+    return {} if !IsArrayRefWithData($TimeVacationDays);
+
+    foreach my $Item ( @{$TimeVacationDays} ) {
+        $Result->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
+    }
+    
+    return $Result;
+}
+
+=item GetVacationDaysOneTime()
+
+get TimeVacationDaysOneTime from Config and prepare internal representation
+
+    $TimeObject->GetVacationDaysOneTime(
+        Calendar => '...'           # optional
+    );
+
+
+=cut
+
+sub GetVacationDaysOneTime {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get('TimeVacationDaysOneTime');
+    if ( $Param{Calendar} ) {
+        if ( $Kernel::OM->Get('Kernel::Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
+            $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
+        }
+    }
+
+    return {} if !IsArrayRefWithData($TimeVacationDays);
+
+    foreach my $Item ( @{$TimeVacationDays} ) {
+        $Result->{$Item->{Year}}->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
+    }
+    
+    return $Result;
 }
 
 sub _GetTimeWorking {
