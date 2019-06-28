@@ -682,7 +682,7 @@ sub QueueAdd {
 
             # I added default values in the Load Routine
             if ( !$Param{$_} ) {
-                $Param{$_} = $Self->{QueueDefaults}->{$_} || 0;
+                $Param{$_} = exists $Self->{QueueDefaults}->{$_} ? $Self->{QueueDefaults}->{$_} : 0;
             }
         }
     }
