@@ -487,7 +487,7 @@ sub FilterGet {
     return if !$Filter{ID};
 
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT type, key, value, negate FROM mail_filter_properties WHERE id = ?',
+        SQL  => 'SELECT type, filter_key, filter_value, negate FROM mail_filter_properties WHERE id = ?',
         Bind => [ \$Filter{ID} ]
     );
 
@@ -518,7 +518,7 @@ sub _addProperties {
         my %Data = %{ $Param{$Type} };
         for my $Key ( sort keys %Data ) {
             return if !$DBObject->Do(
-                SQL => 'INSERT INTO mail_filter_properties (id, type, key, value, negate)'
+                SQL => 'INSERT INTO mail_filter_properties (id, type, filter_key, filter_value, negate)'
                     . ' VALUES (?, ?, ?, ?, ?)',
                 Bind => [ \$Param{FilterID}, \$Type, \$Key, \$Data{$Key}, \$Not{$Key} ]
             );

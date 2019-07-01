@@ -1473,8 +1473,8 @@
 <Table Name="mail_filter_properties">
     <Column Name="id" Required="true" Type="INTEGER"/>
     <Column Name="type" Required="true" Size="20" Type="VARCHAR"/>
-    <Column Name="key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="value" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="filter_key" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="filter_value" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="negate" Required="false" Type="SMALLINT"/>
     <ForeignKey ForeignTable="mail_filter">
         <Reference Local="id" Foreign="id"/>
