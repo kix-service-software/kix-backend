@@ -301,9 +301,6 @@ Events:
 sub TicketCreate {
     my ( $Self, %Param ) = @_;
 
-use Data::Dumper;
-print STDERR "Ticket.TicketCreate: ".Dumper(\%Param);
-
     # check needed stuff
     for my $Needed (qw(OwnerID UserID)) {
         if ( !$Param{$Needed} ) {
