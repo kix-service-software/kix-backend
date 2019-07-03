@@ -27,8 +27,8 @@
         <ColumnDrop Name="f_name"/>
         <ColumnDrop Name="f_stop"/>
         <ColumnChange NameOld="f_type" NameNew="type" Required="true" Size="20" Type="VARCHAR"/>
-        <ColumnChange NameOld="f_key" NameNew="key" Required="true" Size="200" Type="VARCHAR"/>
-        <ColumnChange NameOld="f_value" NameNew="value" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_key" NameNew="filter_key" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_value" NameNew="filter_value" Required="true" Size="200" Type="VARCHAR"/>
         <ColumnChange NameOld="f_not" NameNew="negate" Required="false" Type="SMALLINT"/>
         <ForeignKeyCreate ForeignTable="mail_filter">
             <Reference Local="id" Foreign="id"/>
