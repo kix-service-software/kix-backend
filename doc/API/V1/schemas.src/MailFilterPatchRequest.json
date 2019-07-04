@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/schema",
   "$id": "#MailFilterPostRequest",
   "type": "object",
-  "description": "The mail filter request object for creation.",
+  "description": "The mail filter request object for update.",
   "properties": {
     "MailFilter": {
       "type": "object",
