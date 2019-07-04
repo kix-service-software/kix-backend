@@ -1,0 +1,14 @@
+{
+   "$id" : "#LinkPostResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created link.",
+   "type" : "object",
+   "properties" : {
+      "LinkID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "LinkID"
+   ]
+}

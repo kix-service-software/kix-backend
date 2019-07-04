@@ -1,0 +1,31 @@
+{
+    "LinkType": [
+        {
+            "Name": "Normal",
+            "Pointed": 0,
+            "Source": "Ticket",
+            "SourceName": "Normal",
+            "Target": "Ticket",
+            "TargetName": "Normal",
+            "TypeID": 1
+        },
+        {
+            "Name": "ParentChild",
+            "Pointed": 1,
+            "Source": "Ticket",
+            "SourceName": "Parent",
+            "Target": "Ticket",
+            "TargetName": "Child",
+            "TypeID": 2
+        },
+        {
+            "Name": "Normal",
+            "Pointed": 0,
+            "Source": "Ticket",
+            "SourceName": "Normal",
+            "Target": "FAQArticle",
+            "TargetName": "Normal",
+            "TypeID": 1
+        }
+    ]
+}

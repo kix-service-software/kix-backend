@@ -1,0 +1,44 @@
+{
+    "Link": [
+        {
+            "CreateBy": 1,
+            "CreateTime": "2009-01-20 09:27:53",
+            "ID": 1781974,
+            "SourceKey": "180",
+            "SourceObject": "Ticket",
+            "TargetKey": "22",
+            "TargetObject": "Ticket",
+            "Type": "Normal"
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2017-12-21 16:54:26",
+            "ID": 2208907,
+            "SourceKey": "1",
+            "SourceObject": "Ticket",
+            "TargetKey": "2",
+            "TargetObject": "Ticket",
+            "Type": "Normal"
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2017-12-27 12:16:54",
+            "ID": 2208908,
+            "SourceKey": "1",
+            "SourceObject": "Ticket",
+            "TargetKey": "3",
+            "TargetObject": "Ticket",
+            "Type": "Normal"
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2017-12-27 12:23:03",
+            "ID": 2208909,
+            "SourceKey": "1",
+            "SourceObject": "Ticket",
+            "TargetKey": "4",
+            "TargetObject": "Ticket",
+            "Type": "Normal"
+        }
+    ]
+}

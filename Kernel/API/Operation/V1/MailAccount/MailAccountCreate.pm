@@ -101,7 +101,7 @@ sub ParameterDefinition {
         },
         'MailAccount::Type' => {
             Required => 1,
-            OneOf    => sort keys %BackendList,
+            OneOf    => \(sort keys %BackendList),
         },
         'MailAccount::DispatchingBy' => {
             Required => 1,

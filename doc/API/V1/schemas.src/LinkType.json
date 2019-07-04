@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#LinkType",
+  "type": "object",
+  "description": "The link type object.",
+  "properties": {
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Pointed": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "If set to 1, what is source and what is target matters."
+    },
+    "Source": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The type of the source object."
+    },
+    "SourceName": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The name of the link when viewed from the target object."
+    },
+    "Target": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The type of the target object."
+    },
+    "TargetName": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The name of the link when viewed from the source object."
+    },
+    "TypeID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Name",
+    "Pointed",
+    "Source",
+    "SourceName",
+    "Target",
+    "TargetName",
+    "TypeID"
+  ]
+}

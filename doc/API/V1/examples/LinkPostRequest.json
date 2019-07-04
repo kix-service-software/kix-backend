@@ -1,0 +1,9 @@
+{
+    "Link": {
+        "SourceKey": "180",
+        "SourceObject": "Ticket",
+        "TargetKey": "22",
+        "TargetObject": "Ticket",
+        "Type": "Normal"
+    }
+}
