@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">MailFilterGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailFilter</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">MailFilterID</Item>
+                <Item Key="ResponseObject">MailFilterResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,8 +18,7 @@
             <Hash>
                 <Item Key="Name">MailFilterSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailFilter</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">MailFilterCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -30,8 +28,8 @@
             <Hash>
                 <Item Key="Name">MailFilterCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailFilter</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">MailFilterPostRequest</Item>
+                <Item Key="ResponseObject">MailFilterPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -41,8 +39,8 @@
             <Hash>
                 <Item Key="Name">MailFilterUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailFilter</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">MailFilterPatchRequest</Item>
+                <Item Key="ResponseObject">MailFilterPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -52,8 +50,6 @@
             <Hash>
                 <Item Key="Name">MailFilterDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailFilter</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -1,5 +1,5 @@
 # --
-# Kernel/API/Operation/MailFilter/MailFilterDelete.pm - API MailFilter Delete operation backend
+# Kernel/API/Operation/Notification/NotificationDelete.pm - API Notification Delete operation backend
 # Copyright (C) 2006-2019 c.a.p.e. IT GmbH, http://www.cape-it.de
 #
 # written/edited by:
@@ -11,12 +11,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::MailFilter::MailFilterDelete;
+package Kernel::API::Operation::V1::Notification::NotificationDelete;
 
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::API::Operation::V1::Common);
 
@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::MailFilter::MailFilterDelete - API MailFilter Delete Operation backend
+Kernel::API::Operation::V1::Notification::NotificationDelete - API Notification Delete Operation backend
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'MailFilterID' => {
+        'NotificationID' => {
             DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
@@ -92,11 +92,11 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform MailFilterDelete Operation. This will return the deleted MailFilterID.
+perform NotificationDelete Operation. This will return the deleted NotificationID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            MailFilterID => 1,
+            NotificationID => 1,
         },
     );
 
@@ -110,18 +110,28 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # start loop
-    foreach my $MailFilterID ( @{ $Param{Data}->{MailFilterID} } ) {
+    foreach my $NotificationID ( @{ $Param{Data}->{NotificationID} } ) {
 
-        # delete MailFilter
-        my $Success = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterDelete(
-            ID     => $MailFilterID,
-            UserID => $Self->{Authorization}->{UserID},
+        # check if Notification exists
+        my %NotificationData = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
+            ID => $NotificationID,
+        );
+        if ( !IsHashRefWithData(\%NotificationData) ) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+            );
+        }
+
+        # delete Notification
+        my $Success = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationDelete(
+            ID     => $NotificationID,
+            UserID => $Self->{Authorization}->{UserID}
         );
 
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete MailFilter, please contact the system administrator',
+                Message => 'Could not delete Notification, please contact the system administrator',
             );
         }
     }

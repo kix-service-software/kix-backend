@@ -12,7 +12,7 @@
                "Languages" : {
                   "type" : "object",
                   "patternProperties" : {
-                     "^[0-9]+$" : {
+                     "^[a-zA-Z]+$" : {
                         "type" : "string",
                         "readOnly" : true
                      }

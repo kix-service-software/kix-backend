@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#NotificationResponse",
+  "type": "object",
+  "description": "A response for notification GET request.",
+  "properties": {
+    "Notification": {
+      "$ref": "Notification.json"
+    }
+  },
+  "required": [
+    "Notification"
+  ]
+}

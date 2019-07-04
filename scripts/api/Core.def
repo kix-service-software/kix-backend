@@ -21,6 +21,11 @@
 /system/communication/mailfilters/:MailFilterID                                |   GET             | V1::MailFilter::MailFilterGet
 /system/communication/mailfilters/:MailFilterID                                |   PATCH           | V1::MailFilter::MailFilterUpdate
 /system/communication/mailfilters                                              |   POST            | V1::MailFilter::MailFilterCreate
+/system/communication/notifications                                            |   GET             | V1::Notification::NotificationSearch
+/system/communication/notifications/:NotificationID                            |   DELETE          | V1::Notification::NotificationDelete
+/system/communication/notifications/:NotificationID                            |   GET             | V1::Notification::NotificationGet
+/system/communication/notifications/:NotificationID                            |   PATCH           | V1::Notification::NotificationUpdate
+/system/communication/notifications                                            |   POST            | V1::Notification::NotificationCreate
 /system/communication/sendertypes                                              |   GET             | V1::SenderType::SenderTypeSearch
 /system/communication/sendertypes/:SenderTypeID                                |   GET             | V1::SenderType::SenderTypeGet
 /system/communication/systemaddresses                                          |   GET             | V1::SystemAddress::SystemAddressSearch
@@ -28,6 +33,11 @@
 /system/communication/systemaddresses/:SystemAddressID                         |   DELETE          | V1::SystemAddress::SystemAddressDelete
 /system/communication/systemaddresses/:SystemAddressID                         |   GET             | V1::SystemAddress::SystemAddressGet
 /system/communication/systemaddresses/:SystemAddressID                         |   PATCH           | V1::SystemAddress::SystemAddressUpdate
+/system/config/definitions                                                     |   GET             | V1::SysConfig::SysConfigOptionDefinitionSearch
+/system/config/definitions/:Option                                             |   GET             | V1::SysConfig::SysConfigOptionDefinitionGet
+/system/config                                                                 |   GET             | V1::SysConfig::SysConfigOptionSearch
+/system/config/:Option                                                         |   GET             | V1::SysConfig::SysConfigOptionGet
+/system/config/:Option                                                         |   PATCH           | V1::SysConfig::SysConfigOptionUpdate
 /system/dynamicfields/types                                                    |   GET             | V1::DynamicField::DynamicFieldTypeSearch
 /system/dynamicfields/objecttypes                                              |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
 /system/dynamicfields/:DynamicFieldID/config                                   |   GET             | V1::DynamicField::DynamicFieldConfigGet
@@ -98,11 +108,6 @@
 /system/templates/:TemplateID                                                  |   DELETE          | V1::Template::TemplateDelete
 /system/templates/:TemplateID                                                  |   GET             | V1::Template::TemplateGet
 /system/templates/:TemplateID                                                  |   PATCH           | V1::Template::TemplateUpdate
-/system/config/definitions                                                     |   GET             | V1::SysConfig::SysConfigOptionDefinitionSearch
-/system/config/definitions/:Option                                             |   GET             | V1::SysConfig::SysConfigOptionDefinitionGet
-/system/config                                                                 |   GET             | V1::SysConfig::SysConfigOptionSearch
-/system/config/:Option                                                         |   GET             | V1::SysConfig::SysConfigOptionGet
-/system/config/:Option                                                         |   PATCH           | V1::SysConfig::SysConfigOptionUpdate
 /system/textmodules/categories                                                 |   GET             | V1::TextModule::TextModuleCategorySearch
 /system/textmodules                                                            |   GET             | V1::TextModule::TextModuleSearch
 /system/textmodules                                                            |   POST            | V1::TextModule::TextModuleCreate

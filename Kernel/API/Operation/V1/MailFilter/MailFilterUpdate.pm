@@ -18,7 +18,7 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
-use base qw(Kernel::API::Operation::V1::Common);
+use base qw(Kernel::API::Operation::V1::MailFilter::Common);
 
 our $ObjectManagerDisabled = 1;
 
@@ -96,17 +96,13 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => [ 0, 1 ]
         },
-        'MailFilter::ValidID' => {
-            RequiresValueIfUsed => 1,
-            OneOf => [ 1, 2, 3 ]
-        },
         'MailFilter::Match' => {
             RequiresValueIfUsed => 1,
-            Type                => 'ARRAY'
+            Type => 'ARRAY'
         },
         'MailFilter::Set' => {
             RequiresValueIfUsed => 1,
-            Type                => 'ARRAY'
+            Type => 'ARRAY'
         },
     };
 }
@@ -162,13 +158,6 @@ sub Run {
     # isolate and trim MailFilter parameter
     my $MailFilter = $Self->_Trim( Data => $Param{Data}->{MailFilter} );
 
-    if ( exists $MailFilter->{Name} && !$MailFilter->{Name} ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => "Name is invalid!"
-        );
-    }
-
     # check if another filter with name already exists
     my $Exists = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->NameExistsCheck(
         Name => $MailFilter->{Name},
@@ -177,8 +166,16 @@ sub Run {
     if ($Exists) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "The name of the filter is already used."
+            Message => "Another MailFilter with the same name already exists."
         );
+    }
+
+    # validate MailFilter
+    my $Check = $Self->_CheckMailFilter(
+        MailFilter => $MailFilter
+    );
+    if ( !$Check->{Success} )  {
+        return $Check;
     }
 
     # get "old" data of MailFilter
@@ -210,7 +207,7 @@ sub Run {
     }
 
     # return result
-    return $Self->_Success( MailFilterID => $Param{Data}->{MailFilterID} );
+    return $Self->_Success( MailFilterID => $MailFilterData{ID} );
 }
 
 sub _PrepareFilter {

@@ -16,9 +16,9 @@ package Kernel::API::Operation::V1::MailFilter::MailFilterCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
-use base qw(Kernel::API::Operation::V1::Common);
+use base qw(Kernel::API::Operation::V1::MailFilter::Common);
 
 our $ObjectManagerDisabled = 1;
 
@@ -93,10 +93,6 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => [ 0, 1 ]
         },
-        'MailFilter::ValidID' => {
-            RequiresValueIfUsed => 1,
-            OneOf => [ 1, 2, 3 ]
-        },
         'MailFilter::Match' => {
             Required => 1,
             Type     => 'ARRAY'
@@ -158,17 +154,18 @@ sub Run {
     # isolate and trim MailFilter parameter
     my $MailFilter = $Self->_Trim( Data => $Param{Data}->{MailFilter} );
 
-    if ( exists $MailFilter->{Name} && !$MailFilter->{Name} ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => "Name is invalid!"
-        );
-    }
-
     # check if filter exists
     my $Exists = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->NameExistsCheck( Name => $MailFilter->{Name} );
     if ($Exists) {
         return $Self->_Error( Code => 'Object.AlreadyExists' );
+    }
+
+    # validate MailFilter
+    my $Check = $Self->_CheckMailFilter(
+        MailFilter => $MailFilter
+    );
+    if ( !$Check->{Success} )  {
+        return $Check;
     }
 
     $Self->_PrepareFilter( Filter => $MailFilter );
@@ -178,11 +175,11 @@ sub Run {
         Name           => $MailFilter->{Name},
         StopAfterMatch => $MailFilter->{StopAfterMatch} || 0,
         ValidID        => $MailFilter->{ValidID} || 1,
-        UserID         => $Self->{Authorization}->{UserID},
         Comment        => $MailFilter->{Comment} || '',
         Match          => $MailFilter->{Match},
         Set            => $MailFilter->{Set},
         Not            => $MailFilter->{Not}
+        UserID         => $Self->{Authorization}->{UserID},
     );
 
     if ( !$MailFilterID ) {

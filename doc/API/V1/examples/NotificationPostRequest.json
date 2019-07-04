@@ -1,0 +1,20 @@
+{
+    "Notification": {
+        "Name": "test",
+        "Message": {
+            "de": {
+                "Subject": "test",
+                "Body": "something to tell...",
+                "ContentType": "text/plain"
+            }
+        },
+        "Data": {
+            "Events": [
+                "TicketQueueUpdate"
+            ],
+            "Queues": [
+                "Postmaster"
+            ]
+        }
+    }
+}
