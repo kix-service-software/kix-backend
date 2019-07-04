@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Channel" : {
-         "$ref" : "#/definitions/_Channel_json"
+         "$ref" : "#/definitions/Channel"
       }
    },
    "required" : [
       "Channel"
    ],
    "definitions" : {
-      "_Channel_json" : {
+      "Channel" : {
          "$id" : "#Channel",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The channel object.",

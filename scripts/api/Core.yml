@@ -1526,13 +1526,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Session::UserGet
-    V1::Session::UserPreferenceSearch:
+    V1::Session::UserPreferenceSearch :
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Session::UserPreferenceSearch
+        Type: V1::Session::UserPreferenceSearch 
+    V1::Session::UserPreferenceCreate :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Session::UserPreferenceCreate 
+    V1::Session::UserPreferenceDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Session::UserPreferenceDelete
+    V1::Session::UserPreferenceGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Session::UserPreferenceGet
+    V1::Session::UserPreferenceUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Session::UserPreferenceUpdate
     V1::Session::UserRoleIDSearch:
         Description: ''
         MappingInbound:
@@ -2617,10 +2645,26 @@ Provider:
           RequestMethod:
           - GET
           Route: /session/user
-        V1::Session::UserPreferenceSearch:
+        V1::Session::UserPreferenceSearch :
           RequestMethod:
           - GET
           Route: /session/user/preferences
+        V1::Session::UserPreferenceCreate :
+          RequestMethod:
+          - POST
+          Route: /session/user/preferences
+        V1::Session::UserPreferenceDelete:
+          RequestMethod:
+          - DELETE
+          Route: /session/user/preferences/:UserPreferenceID
+        V1::Session::UserPreferenceGet:
+          RequestMethod:
+          - GET
+          Route: /session/user/preferences/:UserPreferenceID
+        V1::Session::UserPreferenceUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /session/user/preferences/:UserPreferenceID
         V1::Session::UserRoleIDSearch:
           RequestMethod:
           - GET

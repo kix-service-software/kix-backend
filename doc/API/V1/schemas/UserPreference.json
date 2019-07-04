@@ -8,6 +8,10 @@
          "type" : "string",
          "readOnly" : true
       },
+      "UserID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
       "Value" : {
          "type" : "string",
          "readOnly" : true
@@ -15,6 +19,7 @@
    },
    "required" : [
       "ID",
+      "UserID",
       "Value"
    ]
 }

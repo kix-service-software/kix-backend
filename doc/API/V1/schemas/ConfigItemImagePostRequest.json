@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Image" : {
-         "$ref" : "#/definitions/_ConfigItemImagePostItem_json"
+         "$ref" : "#/definitions/ConfigItemImagePostItem"
       }
    },
    "required" : [
       "Image"
    ],
    "definitions" : {
-      "_ConfigItemImagePostItem_json" : {
+      "ConfigItemImagePostItem" : {
          "$id" : "#ConfigItemImagePostItem",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item image request object for creation.",

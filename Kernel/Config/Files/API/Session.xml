@@ -61,6 +61,50 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Session::UserPreferenceGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserPreferenceGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">UserPreferenceID</Item>
+                <Item Key="ResponseObject">UserPreferenceResponse</Item>
+                <Item Key="CacheType">API_users</Item>
+                <Item Key="CacheTypeDependency">User</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Session::UserPreferenceCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserPreferenceCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">UserPreferencePostRequest</Item>
+                <Item Key="ResponseObject">UserPreferencePostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Session::UserPreferenceUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserPreferenceUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">UserPreferencePatchRequest</Item>
+                <Item Key="ResponseObject">UserPreferencePostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Session::UserPreferenceDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserPreferenceDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem Name="API::Operation::Module###V1::Session::UserRoleIDSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>

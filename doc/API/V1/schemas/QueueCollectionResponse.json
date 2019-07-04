@@ -7,7 +7,7 @@
       "Queue" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Queue_json"
+            "$ref" : "#/definitions/Queue"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Queue"
    ],
    "definitions" : {
-      "_Queue_json" : {
+      "Queue" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The priority object.",

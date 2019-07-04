@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Attachment" : {
-         "$ref" : "#/definitions/_ConfigItemAttachment_json"
+         "$ref" : "#/definitions/ConfigItemAttachment"
       }
    },
    "required" : [
       "Attachment"
    ],
    "definitions" : {
-      "_ConfigItemAttachment_json" : {
+      "ConfigItemAttachment" : {
          "$id" : "#ConfigItemAttachment",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item attachment object.",
