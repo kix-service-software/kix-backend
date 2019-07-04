@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Session" : {
-         "$ref" : "#/definitions/_Session_json"
+         "$ref" : "#/definitions/Session"
       }
    },
    "required" : [
       "Session"
    ],
    "definitions" : {
-      "_Session_json" : {
+      "Session" : {
          "$id" : "#Session",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The extracted web token data.",

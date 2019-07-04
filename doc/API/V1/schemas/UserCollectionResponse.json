@@ -7,7 +7,7 @@
       "User" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_User_json"
+            "$ref" : "#/definitions/User"
          }
       }
    },
@@ -15,27 +15,7 @@
       "User"
    ],
    "definitions" : {
-      "_UserPreference_json" : {
-         "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The user preference object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "Value"
-         ]
-      },
-      "_User_json" : {
+      "User" : {
          "$id" : "#User",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user object.",
@@ -61,7 +41,7 @@
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/_UserPreference_json"
+                  "$ref" : "#/definitions/UserPreference"
                }
             },
             "RoleIDs" : {
@@ -146,6 +126,31 @@
             "UserFirstname",
             "UserLastname",
             "UserLogin"
+         ]
+      },
+      "UserPreference" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "UserID",
+            "Value"
          ]
       }
    }

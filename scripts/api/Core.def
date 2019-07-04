@@ -218,7 +218,11 @@
 /session                                                                       |   GET             | V1::Session::SessionGet
 /session                                                                       |   DELETE          | V1::Session::SessionDelete
 /session/user                                                                  |   GET             | V1::Session::UserGet
-/session/user/preferences                                                      |   GET             | V1::Session::UserPreferenceSearch
+/session/user/preferences                                                      |   GET             | V1::Session::UserPreferenceSearch 
+/session/user/preferences                                                      |   POST            | V1::Session::UserPreferenceCreate 
+/session/user/preferences/:UserPreferenceID                                    |   DELETE          | V1::Session::UserPreferenceDelete
+/session/user/preferences/:UserPreferenceID                                    |   GET             | V1::Session::UserPreferenceGet
+/session/user/preferences/:UserPreferenceID                                    |   PATCH           | V1::Session::UserPreferenceUpdate
 /session/user/roleids                                                          |   GET             | V1::Session::UserRoleIDSearch
 /tickets                                                                       |   GET             | V1::Ticket::TicketSearch
 /tickets                                                                       |   POST            | V1::Ticket::TicketCreate

@@ -7,7 +7,7 @@
       "MailFilter" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_MailFilter_json"
+            "$ref" : "#/definitions/MailFilter"
          }
       }
    },
@@ -15,7 +15,7 @@
       "MailFilter"
    ],
    "definitions" : {
-      "_MailFilter_json" : {
+      "MailFilter" : {
          "$id" : "#MailFilter",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The mail filter object.",

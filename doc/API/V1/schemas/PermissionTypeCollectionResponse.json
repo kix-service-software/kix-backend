@@ -7,7 +7,7 @@
       "PermissionType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_PermissionType_json"
+            "$ref" : "#/definitions/PermissionType"
          }
       }
    },
@@ -15,7 +15,7 @@
       "PermissionType"
    ],
    "definitions" : {
-      "_PermissionType_json" : {
+      "PermissionType" : {
          "$id" : "#PermissionType",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The permission type object.",

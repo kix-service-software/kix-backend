@@ -7,7 +7,7 @@
       "SystemAddress" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_SystemAddress_json"
+            "$ref" : "#/definitions/SystemAddress"
          }
       }
    },
@@ -15,7 +15,7 @@
       "SystemAddress"
    ],
    "definitions" : {
-      "_SystemAddress_json" : {
+      "SystemAddress" : {
          "$id" : "#SystemAddress",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The system address object.",

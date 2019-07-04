@@ -6,4 +6,10 @@
     description: !include ../descriptions/resources/session/user.md
     type: [ item-readonly: { typeName: User } ]
     /preferences:
-      type: { collection-readonly: { typeName: UserPreference } }  
+      type: { collection: { typeName: UserPreference } }  
+      /{preferenceId}:
+        type: { item: { typeName: UserPreference } }
+        uriParameters:
+          preferenceId:
+            displayName: PeferenceID
+            type: string

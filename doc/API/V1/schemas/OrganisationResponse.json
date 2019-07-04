@@ -5,102 +5,10 @@
    "type" : "object",
    "properties" : {
       "Organisation" : {
-         "$ref" : "#/definitions/_Organisation_json"
+         "$ref" : "Organisation.json"
       }
    },
    "required" : [
       "Organisation"
-   ],
-   "definitions" : {
-      "_Organisation_json" : {
-         "$id" : "#Organisation",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The organisation object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "City" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Contacts" : {
-               "description" : "added via include \"Contacts\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "Contact.json"
-               },
-               "readOnly" : true
-            },
-            "Country" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Number" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Street" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Tickets" : {
-               "description" : "added via include \"Tickets\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "Ticket.json"
-               },
-               "readOnly" : true
-            },
-            "Url" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Zip" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "Number",
-            "ValidID"
-         ]
-      }
-   }
+   ]
 }

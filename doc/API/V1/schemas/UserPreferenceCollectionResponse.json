@@ -7,7 +7,7 @@
       "UserPreference" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_UserPreference_json"
+            "$ref" : "#/definitions/UserPreference"
          }
       }
    },
@@ -15,7 +15,7 @@
       "UserPreference"
    ],
    "definitions" : {
-      "_UserPreference_json" : {
+      "UserPreference" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user preference object.",
@@ -25,6 +25,10 @@
                "type" : "string",
                "readOnly" : true
             },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Value" : {
                "type" : "string",
                "readOnly" : true
@@ -32,6 +36,7 @@
          },
          "required" : [
             "ID",
+            "UserID",
             "Value"
          ]
       }
