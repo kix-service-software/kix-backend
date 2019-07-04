@@ -160,6 +160,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::MailFilter::MailFilterCreate
+    V1::Notification::NotificationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationSearch
+    V1::Notification::NotificationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationDelete
+    V1::Notification::NotificationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationGet
+    V1::Notification::NotificationUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationUpdate
+    V1::Notification::NotificationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationCreate
     V1::SenderType::SenderTypeSearch:
         Description: ''
         MappingInbound:
@@ -209,6 +244,41 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SystemAddress::SystemAddressUpdate
+    V1::SysConfig::SysConfigOptionDefinitionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionSearch
+    V1::SysConfig::SysConfigOptionDefinitionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionGet
+    V1::SysConfig::SysConfigOptionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionSearch
+    V1::SysConfig::SysConfigOptionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionGet
+    V1::SysConfig::SysConfigOptionUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionUpdate
     V1::DynamicField::DynamicFieldTypeSearch:
         Description: ''
         MappingInbound:
@@ -699,41 +769,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Template::TemplateUpdate
-    V1::SysConfig::SysConfigOptionDefinitionSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigOptionDefinitionSearch
-    V1::SysConfig::SysConfigOptionDefinitionGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigOptionDefinitionGet
-    V1::SysConfig::SysConfigOptionSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigOptionSearch
-    V1::SysConfig::SysConfigOptionGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigOptionGet
-    V1::SysConfig::SysConfigOptionUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigOptionUpdate
     V1::TextModule::TextModuleCategorySearch:
         Description: ''
         MappingInbound:
@@ -1865,6 +1900,26 @@ Provider:
           RequestMethod:
           - POST
           Route: /system/communication/mailfilters
+        V1::Notification::NotificationSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/notifications
+        V1::Notification::NotificationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/communication/notifications/:NotificationID
+        V1::Notification::NotificationGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/notifications/:NotificationID
+        V1::Notification::NotificationUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/communication/notifications/:NotificationID
+        V1::Notification::NotificationCreate:
+          RequestMethod:
+          - POST
+          Route: /system/communication/notifications
         V1::SenderType::SenderTypeSearch:
           RequestMethod:
           - GET
@@ -1893,6 +1948,26 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /system/communication/systemaddresses/:SystemAddressID
+        V1::SysConfig::SysConfigOptionDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/config/definitions
+        V1::SysConfig::SysConfigOptionDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /system/config/definitions/:Option
+        V1::SysConfig::SysConfigOptionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/config
+        V1::SysConfig::SysConfigOptionGet:
+          RequestMethod:
+          - GET
+          Route: /system/config/:Option
+        V1::SysConfig::SysConfigOptionUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/config/:Option
         V1::DynamicField::DynamicFieldTypeSearch:
           RequestMethod:
           - GET
@@ -2173,26 +2248,6 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /system/templates/:TemplateID
-        V1::SysConfig::SysConfigOptionDefinitionSearch:
-          RequestMethod:
-          - GET
-          Route: /system/config/definitions
-        V1::SysConfig::SysConfigOptionDefinitionGet:
-          RequestMethod:
-          - GET
-          Route: /system/config/definitions/:Option
-        V1::SysConfig::SysConfigOptionSearch:
-          RequestMethod:
-          - GET
-          Route: /system/config
-        V1::SysConfig::SysConfigOptionGet:
-          RequestMethod:
-          - GET
-          Route: /system/config/:Option
-        V1::SysConfig::SysConfigOptionUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /system/config/:Option
         V1::TextModule::TextModuleCategorySearch:
           RequestMethod:
           - GET

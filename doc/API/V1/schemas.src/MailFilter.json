@@ -32,14 +32,6 @@
       "type": "string",
       "readOnly": true
     },
-    "ValidID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "StopAfterMatch": {
-      "type": "integer",
-      "readOnly": true
-    },
     "Match": {
       "type": "array",
       "readOnly": true,
@@ -77,6 +69,14 @@
           }
         }
       }
+    },
+    "StopAfterMatch": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
     }
   },
   "required": [

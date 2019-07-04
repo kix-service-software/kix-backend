@@ -1,0 +1,9 @@
+  displayName: "[System] Communication - Notifications"
+  description: !include ../../../descriptions/resources/system/communication/notifications.md
+  type: { collection: { typeName: Notification } }
+  /{notificationId}:
+    type: { item: { typeName: Notification } }
+    uriParameters:
+      notificationId:
+        displayName: NotificationID
+        type: integer

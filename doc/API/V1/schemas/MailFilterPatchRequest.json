@@ -56,13 +56,13 @@
                      "Value"
                   ]
                }
-            },
-            "StopAfterMatch" : {
-               "type" : "integer"
-            },
-            "ValidID" : {
-               "type" : "integer"
             }
+         },
+         "StopAfterMatch" : {
+            "type" : "integer"
+         },
+         "ValidID" : {
+            "type" : "integer"
          }
       }
    },

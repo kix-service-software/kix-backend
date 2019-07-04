@@ -317,7 +317,6 @@ sub _TicketCreate {
         UserID       => $Param{UserID},
     );
 
-print STDERR "TicketID: $TicketID\n";
     if ( !$TicketID ) {
         return $Self->_Error(
             Code         => 'Object.UnableToCreate',

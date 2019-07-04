@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Notification",
+  "type": "object",
+  "description": "The notification object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Data": {
+      "type": "object",
+      "readOnly": true,
+      "patternProperties": {
+        "^[a-zA-Z]+$": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "integer"}
+            ]
+          }
+        }
+      }
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Message": {
+      "type": "object",
+      "readOnly": true,      
+      "patternProperties": {
+        "^[a-zA-Z]+$": {
+          "type": "object",
+          "properties": {
+            "Body": {
+              "type": "string"
+            },
+            "ContentType": {
+              "type": "string"
+            },
+            "Subject": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Body",
+            "ContentType",
+            "Subject"
+          ]
+        }
+      }
+    },    
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "Data",
+    "ID",
+    "Name",
+    "Message",
+    "ValidID"
+  ]
+}

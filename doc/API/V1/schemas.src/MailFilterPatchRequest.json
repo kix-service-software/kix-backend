@@ -1,23 +1,17 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "#MailFilterPostRequest",
+  "$id": "#MailFilterPatchRequest",
   "type": "object",
   "description": "The mail filter request object for update.",
   "properties": {
     "MailFilter": {
       "type": "object",
       "properties": {
-        "Name": {
-          "type": "string"
-        },
         "Comment": {
           "type": "string"
         },
-        "ValidID": {
-          "type": "integer"
-        },
-        "StopAfterMatch": {
-          "type": "integer"
+        "Name": {
+          "type": "string"
         },
         "Match": {
           "type": "array",
@@ -62,7 +56,13 @@
               "Value"
             ]
           }
-        }
+        },
+        "StopAfterMatch": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }  
       }
     }
   },

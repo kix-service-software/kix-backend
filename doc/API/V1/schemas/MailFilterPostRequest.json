@@ -65,8 +65,8 @@
             }
          },
          "required" : [
-            "Name",
             "Match",
+            "Name",
             "Set"
          ]
       }

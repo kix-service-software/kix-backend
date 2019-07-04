@@ -196,7 +196,7 @@ sub RunOperation {
     # check result
     if ( !$Result->{Success} ) {
         return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
+            Code    => 'BadRequest',
             Message => $Result->{Message},
         );
     }
@@ -636,14 +636,16 @@ sub PrepareData {
 
             # add pseudo entries for substructures for requirement checking
             foreach my $Entry ( keys %{$FlatData} ) {
-                next if $Entry !~ /^.*?::.*?::/g;
 
-                my @Parts = split(/::/, $Entry);
-                pop(@Parts);
-                my $DummyKey = join('::', @Parts);
+                while ( split(/::/, $Entry) > 2 ) {
+                    my @Parts = split(/::/, $Entry);
+                    pop(@Parts);
+                    my $DummyKey = join('::', @Parts);
+                    $Entry = $DummyKey;     # prepare next iteration
 
-                next if exists($FlatData->{$DummyKey});
-                $FlatData->{$DummyKey} = {};
+                    next if exists($FlatData->{$DummyKey});
+                    $FlatData->{$DummyKey} = {};
+                }
             }
 
             # combine flattened array for requirement checking

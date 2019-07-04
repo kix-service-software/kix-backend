@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">MailAccountGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailAccount</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">MailAccountID</Item>
+                <Item Key="ResponseObject">MailAccountResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -19,8 +18,7 @@
             <Hash>
                 <Item Key="Name">MailAccountSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailAccount</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">MailAccountCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -30,8 +28,8 @@
             <Hash>
                 <Item Key="Name">MailAccountCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailAccount</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">MailAccountPostRequest</Item>
+                <Item Key="ResponseObject">MailAccountPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -41,8 +39,8 @@
             <Hash>
                 <Item Key="Name">MailAccountUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailAccount</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">MailAccountPatchRequest</Item>
+                <Item Key="ResponseObject">MailAccountPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -52,8 +50,6 @@
             <Hash>
                 <Item Key="Name">MailAccountDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailAccount</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -64,8 +60,7 @@
             <Hash>
                 <Item Key="Name">MailAccountTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">MailAccount</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">MailAccountTypeCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

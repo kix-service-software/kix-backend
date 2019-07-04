@@ -7,17 +7,8 @@
     "MailFilter": {
       "type": "object",
       "properties": {
-        "Name": {
-          "type": "string"
-        },
         "Comment": {
           "type": "string"
-        },
-        "ValidID": {
-          "type": "integer"
-        },
-        "StopAfterMatch": {
-          "type": "integer"
         },
         "Match": {
           "type": "array",
@@ -43,6 +34,9 @@
             ]
           }
         },
+        "Name": {
+          "type": "string"
+        },
         "Set": {
           "type": "array",
           "items": {
@@ -62,11 +56,17 @@
               "Value"
             ]
           }
+        },
+        "StopAfterMatch": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
         }
       },
       "required": [
-        "Name",
         "Match",
+        "Name",
         "Set"
       ]
     }
