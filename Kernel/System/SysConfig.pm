@@ -910,10 +910,14 @@ sub Rebuild {
     # update all keys
     my $Total = @{ $Self->{XMLConfig} };
     my $Count = 0;
+    my %ExistingKeys;
     OPTIONRAW:
     for my $OptionRaw ( @{ $Self->{XMLConfig} } ) {
         # ignore options without name
         next if !$OptionRaw->{Name};
+
+        # store key for cleanup
+        $ExistingKeys{$OptionRaw->{Name}} = 1;
 
         # get Type
         my $Type = (keys %{$OptionRaw->{Setting}})[0];
@@ -964,6 +968,17 @@ sub Rebuild {
         }
 
         $Count++;
+    }
+
+    # cleanup all no-longer existing options
+    my @OptionList = $Self->OptionList();
+    foreach my $Name ( @OptionList ) {
+        next if $ExistingKeys{$Name};
+
+        # delete DB entry
+        $Self->OptionDelete(
+            Name => $Name
+        );
     }
 
     return 1;

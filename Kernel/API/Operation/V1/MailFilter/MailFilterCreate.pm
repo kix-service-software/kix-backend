@@ -178,7 +178,7 @@ sub Run {
         Comment        => $MailFilter->{Comment} || '',
         Match          => $MailFilter->{Match},
         Set            => $MailFilter->{Set},
-        Not            => $MailFilter->{Not}
+        Not            => $MailFilter->{Not},
         UserID         => $Self->{Authorization}->{UserID},
     );
 

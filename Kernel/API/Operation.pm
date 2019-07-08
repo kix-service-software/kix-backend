@@ -141,7 +141,7 @@ sub new {
 
     # if validator init failed, bail out
     if ( ref $Self->{ValidatorObject} ne 'Kernel::API::Validator' ) {
-        return $Self->_GenerateErrorResponse(
+        return $Self->_Error(
             %{$Self->{ValidatorObject}},
         );
     }
