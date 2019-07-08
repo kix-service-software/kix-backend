@@ -1,0 +1,9 @@
+  displayName: "[System] SLAs"
+  description: !include ../../descriptions/resources/system/slas.md
+  type: { collection: { typeName: SLA } }
+  /{slaId}:
+    type: { item: { typeName: SLA } }
+    uriParameters:
+      slaId:
+        displayName: SLAID
+        type: integer

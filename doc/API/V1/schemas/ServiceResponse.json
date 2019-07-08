@@ -4,7 +4,7 @@
    "description" : "A response for service GET request.",
    "type" : "object",
    "properties" : {
-      "Priority" : {
+      "Service" : {
          "$ref" : "#/definitions/Service"
       }
    },
@@ -55,7 +55,14 @@
                "readOnly" : true
             },
             "ParentID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "ServiceID" : {
@@ -63,6 +70,7 @@
                "readOnly" : true
             },
             "TypeID" : {
+               "description" : "See GeneralCatalog class \"ITSM::Service::Type\" for the list of possible types.",
                "type" : "integer",
                "readOnly" : true
             },

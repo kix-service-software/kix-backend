@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SLAPatchRequest",
+  "type": "object",
+  "description": "The SLA request object for update.",
+  "properties": {
+    "SLA": {
+      "type": "object",
+      "properties": {
+        "Calendar": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "FirstResponseNotify": {
+          "type": "integer",
+          "description": "Notify the respponsible agents when ... % of the FirstResponseTime are reached."
+        },
+        "FirstResponseTime": {
+          "type": "integer",
+          "description": "The first response time in minutes."
+        },
+        "MinTimeBetweenIncidents": {
+          "type": "integer",
+          "description": "Just for reporting purposes. No automated functions."
+        },
+        "Name": {
+          "type": "string"
+        },
+        "SolutionNotify": {
+          "type": "integer",
+          "description": "Notify the respponsible agents when ... % of the SolutionTime are reached."
+        },
+        "SolutionTime": {
+          "type": "integer",
+          "description": "The solution time in minutes."
+        },
+        "TypeID": {
+          "type": "integer"
+        },
+        "UpdateNotify": {
+          "type": "integer",
+          "description": "Notify the respponsible agents when ... % of the UpdateTime are reached."
+        },
+        "UpdateTime": {
+          "type": "integer",
+          "description": "The update time in minutes."
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "SLA"
+  ]
+}

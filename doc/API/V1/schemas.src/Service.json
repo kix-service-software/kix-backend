@@ -41,7 +41,10 @@
       "readOnly": true
     },
     "ParentID": {
-      "type": "integer",
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],      
       "readOnly": true
     },
     "ServiceID": {
@@ -50,7 +53,8 @@
     },
     "TypeID": {
       "type": "integer",
-      "readOnly": true
+      "readOnly": true,
+      "description": "See GeneralCatalog class \"ITSM::Service::Type\" for the list of possible types."
     },
     "ValidID": {
       "type": "integer",

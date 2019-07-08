@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SLA",
+  "type": "object",
+  "description": "The SLA object.",
+  "properties": {
+    "Calendar": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "FirstResponseNotify": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Notify the respponsible agents when ... % of the FirstResponseTime are reached."
+    },
+    "FirstResponseTime": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "The first response time in minutes."
+    },
+    "MinTimeBetweenIncidents": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Just for reporting purposes. No automated functions."
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "SLAID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "SolutionNotify": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Notify the respponsible agents when ... % of the SolutionTime are reached."
+    },
+    "SolutionTime": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "The solution time in minutes."
+    },
+    "Type": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The resolved name of TypeID."
+    },
+    "TypeID": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "See GeneralCatalog class \"ITSM::SLA::Type\" for the list of possible types."
+    },
+    "UpdateNotify": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Notify the respponsible agents when ... % of the UpdateTime are reached."
+    },
+    "UpdateTime": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "The update time in minutes."
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "Name",
+    "SLAID",
+    "TypeID",
+    "ValidID"
+  ]
+}

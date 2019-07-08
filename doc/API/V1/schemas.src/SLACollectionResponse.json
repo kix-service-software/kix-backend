@@ -1,17 +1,17 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "$id": "#ServiceCollectionResponse",
+  "$id": "#SLACollectionResponse",
   "type": "object",
-  "description": "A list of service.",
+  "description": "A list of SLAs.",
   "properties": {
-    "Service": {
+    "SLA": {
       "type": "array",
       "items": {
-        "$ref": "Service.json"
+        "$ref": "SLA.json"
       }
     }
   },
   "required": [
-    "Service"
+    "SLA"
   ]
 }

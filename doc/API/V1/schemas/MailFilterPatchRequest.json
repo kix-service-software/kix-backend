@@ -1,5 +1,5 @@
 {
-   "$id" : "#MailFilterPostRequest",
+   "$id" : "#MailFilterPatchRequest",
    "$schema" : "http://json-schema.org/schema",
    "description" : "The mail filter request object for update.",
    "type" : "object",
@@ -56,13 +56,13 @@
                      "Value"
                   ]
                }
+            },
+            "StopAfterMatch" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
             }
-         },
-         "StopAfterMatch" : {
-            "type" : "integer"
-         },
-         "ValidID" : {
-            "type" : "integer"
          }
       }
    },

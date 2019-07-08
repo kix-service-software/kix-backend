@@ -1,0 +1,63 @@
+{
+   "$id" : "#SLAPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The SLA request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "SLA" : {
+         "type" : "object",
+         "properties" : {
+            "Calendar" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "FirstResponseNotify" : {
+               "description" : "Notify the respponsible agents when ... % of the FirstResponseTime are reached.",
+               "type" : "integer"
+            },
+            "FirstResponseTime" : {
+               "description" : "The first response time in minutes.",
+               "type" : "integer"
+            },
+            "MinTimeBetweenIncidents" : {
+               "description" : "Just for reporting purposes. No automated functions.",
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "SolutionNotify" : {
+               "description" : "Notify the respponsible agents when ... % of the SolutionTime are reached.",
+               "type" : "integer"
+            },
+            "SolutionTime" : {
+               "description" : "The solution time in minutes.",
+               "type" : "integer"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "UpdateNotify" : {
+               "description" : "Notify the respponsible agents when ... % of the UpdateTime are reached.",
+               "type" : "integer"
+            },
+            "UpdateTime" : {
+               "description" : "The update time in minutes.",
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "TypeID"
+         ]
+      }
+   },
+   "required" : [
+      "SLA"
+   ]
+}

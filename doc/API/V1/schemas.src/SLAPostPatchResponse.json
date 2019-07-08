@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SLAPostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated SLA.",
+  "properties": {
+    "SLAID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "SLAID"
+  ]
+}
