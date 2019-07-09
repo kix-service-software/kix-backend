@@ -2758,6 +2758,7 @@
 
 <!-- client_notification - core events to notify the registered clients about -->
 <Table Name="client_notification">
+    <Column Name="id" Required="true" Type="BIGINT" AutoIncrement="true" PrimaryKey="true" />
     <Column Name="timestamp" Required="true" Type="DECIMAL" Size="20,6"/>
     <Column Name="event" Required="true" Type="VARCHAR" Size="10"/>
     <Column Name="request_id" Required="true" Type="VARCHAR" Size="40"/>
