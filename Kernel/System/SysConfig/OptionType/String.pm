@@ -63,6 +63,23 @@ sub ValidateSetting {
     return (\%Setting, $DefaultValue);
 }
 
+=item Decode()
+
+Decodes the JSON data
+
+    my $DecodedData = $OptionTypeObject->Decode(
+        Data => '...',
+    );
+
+=cut
+
+sub Decode {
+    my ( $Self, %Param ) = @_;
+
+    # return data or an empty string to prevent undef errors
+    return $Param{Data} || '';
+}
+
 1;
 
 =back
