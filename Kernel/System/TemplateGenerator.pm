@@ -238,7 +238,7 @@ sub Template {
 
         # get recipient
         my %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $Ticket{ContactID},
+            ID => $Ticket{ContactID},
         );
         $Language = $User{UserLanguage};
     }
@@ -1423,7 +1423,7 @@ sub _Replace {
                 if ( $Ticket{ContactID} ) {
 
                     my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')
-                        ->ContactGet( User => $Ticket{ContactID} );
+                        ->ContactGet( ID => $Ticket{ContactID} );
 
                     if (
 
@@ -1494,7 +1494,7 @@ sub _Replace {
         my $ContactID = $Param{Data}->{ContactID} || $Ticket{ContactID};
 
         my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $ContactID,
+            ID => $ContactID,
         );
 
         # HTML quoting of content
