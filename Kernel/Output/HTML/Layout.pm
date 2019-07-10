@@ -97,11 +97,6 @@ sub new {
 
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    # get/set some common params
-    if ( !$Self->{UserTheme} ) {
-        $Self->{UserTheme} = $ConfigObject->Get('DefaultTheme');
-    }
-
     # We'll keep one default TimeObject and one for the user's time zone (if needed)
     $Self->{TimeObject} = $Kernel::OM->Get('Kernel::System::Time');
 
@@ -394,77 +389,51 @@ EOF
         }
     }
 
-    # load theme
-    my $Theme = $Self->{UserTheme} || $ConfigObject->Get('DefaultTheme') || Translatable('Standard');
-
-    # force a theme based on host name
-    my $DefaultThemeHostBased = $ConfigObject->Get('DefaultTheme::HostBased');
-    if ( $DefaultThemeHostBased && $ENV{HTTP_HOST} ) {
-
-        THEME:
-        for my $RegExp ( sort keys %{$DefaultThemeHostBased} ) {
-
-            # do not use empty regexp or theme directories
-            next THEME if !$RegExp;
-            next THEME if $RegExp eq '';
-            next THEME if !$DefaultThemeHostBased->{$RegExp};
-
-            # check if regexp is matching
-            if ( $ENV{HTTP_HOST} =~ /$RegExp/i ) {
-                $Theme = $DefaultThemeHostBased->{$RegExp};
-            }
-        }
-    }
-
     # locate template files
-    $Self->{TemplateDir}         = $ConfigObject->Get('TemplateDir') . '/HTML/Templates/' . $Theme;
-    $Self->{StandardTemplateDir} = $ConfigObject->Get('TemplateDir') . '/HTML/Templates/' . 'Standard';
+    $Self->{TemplateDir} = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/Output/HTML/Templates';
 
-    # Check if 'Standard' fallback exists
-    if ( !-e $Self->{StandardTemplateDir} ) {
+    # Check if TemplateDir exists
+    if ( !-e $Self->{TemplateDir} ) {
         $Self->FatalDie(
             Message =>
-                "No existing template directory found ('$Self->{TemplateDir}')! Check your Home in Kernel/Config.pm."
+                "No existing template directory found ('$Self->{TemplateDir}')! Check your Home configuration."
         );
     }
 
+    # TODO new solution needed for extensions
     # KIXCore-capeIT
-    my $ThemePath   = $Self->{TemplateDir};
-    my $HomeDir     = $ConfigObject->Get('Home');
-    my $ThemeKIXDir = '';
-    $ThemePath =~ s/$HomeDir//g;
+    # my $ThemePath   = $Self->{TemplateDir};
+    # my $HomeDir     = $ConfigObject->Get('Home');
+    # my $ThemeKIXDir = '';
+    # $ThemePath =~ s/$HomeDir//g;
 
-    for my $ThemeDir (@INC) {
-        $ThemeKIXDir = $ThemeDir . $ThemePath;
-        last if ( -e $ThemeKIXDir )
-    }
+    # for my $ThemeDir (@INC) {
+    #     $ThemeKIXDir = $ThemeDir . $ThemePath;
+    #     last if ( -e $ThemeKIXDir )
+    # }
 
-    # if ( !-e $Self->{TemplateDir} ) {
-    if ( !-e ( $ThemeKIXDir || $Self->{TemplateDir} ) ) {
+    # # if ( !-e $Self->{TemplateDir} ) {
+    # if ( !-e ( $ThemeKIXDir || $Self->{TemplateDir} ) ) {
 
-        # EO KIXCore-capeIT
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message =>
-                "No existing template directory found ('$Self->{TemplateDir}')!.
-                Default theme used instead.",
-        );
+    #     # EO KIXCore-capeIT
+    #     $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #         Priority => 'error',
+    #         Message =>
+    #             "No existing template directory found ('$Self->{TemplateDir}')!.
+    #             Default theme used instead.",
+    #     );
 
-        # Set TemplateDir to 'Standard' as a fallback.
-        $Theme = 'Standard';
-        $Self->{TemplateDir} = $Self->{StandardTemplateDir};
-    }
-
-    $Self->{CustomTemplateDir}         = $ConfigObject->Get('CustomTemplateDir') . '/HTML/Templates/' . $Theme;
-    $Self->{CustomStandardTemplateDir} = $ConfigObject->Get('CustomTemplateDir') . '/HTML/Templates/' . 'Standard';
+    #     # Set TemplateDir to 'Standard' as a fallback.
+    #     $Self->{TemplateDir} = $Self->{StandardTemplateDir};
+    # }
 
     # get main object
     my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
     # load sub layout files
     # KIXCore-capeIT
-    my $LayoutPath    = $ConfigObject->Get('TemplateDir') . '/HTML/Layout';
     my $Home          = $ConfigObject->Get('Home');
+    my $LayoutPath    = $Home . '/Kernel/Output/HTML/Layout';
     my $LayoutPathKIX = $LayoutPath;
     $LayoutPathKIX =~ s/$Home//g;
     my %LayoutFiles = ();
@@ -496,37 +465,6 @@ EOF
     }
 
     # EO KIXCore-capeIT
-
-    my $NewDir = $ConfigObject->Get('TemplateDir') . '/HTML/Layout';
-    if ( -e $NewDir ) {
-        my @NewFiles = $MainObject->DirectoryRead(
-            Directory => $NewDir,
-            Filter    => '*.pm',
-        );
-        for my $NewFile (@NewFiles) {
-
-            # KIXCore-capeIT
-            # if ( $NewFile !~ /Layout.pm$/ ) {
-            if ( ( $NewFile !~ /Layout.pm$/ ) && !exists( $LayoutFiles{$NewFile} ) ) {
-
-                # EO KIXCore-capeIT
-
-                $NewFile =~ s{\A.*\/(.+?).pm\z}{$1}xms;
-                my $NewClassName = "Kernel::Output::HTML::Layout::$NewFile";
-                if ( !$MainObject->RequireBaseClass($NewClassName) ) {
-                    $Self->FatalDie(
-                        Message => "Could not load class Kernel::Output::HTML::Layout::$NewFile.",
-                    );
-                }
-
-                # KIXCore-capeIT
-                $LayoutFiles{$NewFile} = $NewFile;
-                push @ISA, "Kernel::Output::HTML::Layout::$NewFile";
-
-                # EO KIXCore-capeIT
-            }
-        }
-    }
 
     if ( $Self->{SessionID} && $Self->{UserChallengeToken} ) {
         $Self->{ChallengeTokenParam} = "ChallengeToken=$Self->{UserChallengeToken};";
