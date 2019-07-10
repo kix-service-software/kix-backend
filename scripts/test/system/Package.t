@@ -1012,6 +1012,9 @@ $Self->True(
 # _FileInstall checks with not allowed files
 my $FilesNotAllowed = [
     'Kernel/Config.pm',
+    'Kernel/Config/Files/ZZZAuto.pm',
+    'Kernel/Config/Files/ZZZAAuto.pm',
+    'Kernel/Config/Files/ZZZProcessManagement.pm',
     'var/tmp/Cache/Tmp.cache',
     'var/log/some_log',
     '../../etc/passwd',

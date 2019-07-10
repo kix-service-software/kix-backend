@@ -4,11 +4,11 @@ SystemID => 17,
 # database settings                                    #
 # ---------------------------------------------------- #
 
-DatabaseHost => 'localhost',
-Database     => 'kix18',
-DatabaseUser => 'kix18',
-DatabasePw   => 'kix18',         # The password of database user. You also can use bin/kix.Console.pm for crypted passwords
-DatabaseDSN  => "DBI:Pg:dbname=<KIX_CONFIG_Database>;host=<KIX_CONFIG_DatabaseHost>;",
+DatabaseHost => '__DBHOST__',
+Database     => '__DBNAME__',
+DatabaseUser => '__DBUSER__',
+DatabasePw   => '__DBPASSWORD__',         # The password of database user. You also can use bin/kix.Console.pm for crypted passwords
+DatabaseDSN  => "DBI:__DBD__:__DBATTR__=<KIX_CONFIG_Database>;host=<KIX_CONFIG_DatabaseHost>;",
 
 # ---------------------------------------------------- #
 # insert your own config settings "here"               #
@@ -16,4 +16,4 @@ DatabaseDSN  => "DBI:Pg:dbname=<KIX_CONFIG_Database>;host=<KIX_CONFIG_DatabaseHo
 CheckMXRecord => 0,
 SecureMode    => 1,
 FQDN          => '__FQDN__',
-Home          => '/opt/kix18',
+Home          => '__HOME__',

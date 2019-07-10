@@ -1934,7 +1934,7 @@ Your KIX Team
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">14</Data>
-        <Data Key="event_key" Type="Quote">ChannelID</Data>
+        <Data Key="event_key" Type="Quote">NotificationChannelID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2005,7 +2005,7 @@ Your KIX Team
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">15</Data>
-        <Data Key="event_key" Type="Quote">ChannelID</Data>
+        <Data Key="event_key" Type="Quote">NotificationChannelID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2076,7 +2076,7 @@ Your KIX Team
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">16</Data>
-        <Data Key="event_key" Type="Quote">ChannelID</Data>
+        <Data Key="event_key" Type="Quote">NotificationChannelID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">

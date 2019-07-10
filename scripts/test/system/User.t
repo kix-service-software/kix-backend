@@ -448,7 +448,7 @@ $Self->Is(
 );
 
 $Self->False(
-    $UserData{Preferences}->{OutOfOfficeMessage},
+    $UserData{OutOfOfficeMessage},
     'GetUserData() - OutOfOfficeMessage',
 );
 
@@ -460,7 +460,7 @@ $Self->False(
 );
 
 $Self->False(
-    $UserData{Preferences}->{OutOfOfficeMessage},
+    $UserData{OutOfOfficeMessage},
     'GetUserData() - OutOfOfficeMessage',
 );
 
@@ -492,7 +492,7 @@ for my $Key ( sort keys %Values ) {
 );
 
 $Self->True(
-    $UserData{Preferences}->{OutOfOfficeMessage},
+    $UserData{OutOfOfficeMessage},
     'GetUserData() - OutOfOfficeMessage',
 );
 
@@ -502,7 +502,7 @@ $Self->True(
 );
 
 $Self->True(
-    $UserData{Preferences}->{OutOfOfficeMessage},
+    $UserData{OutOfOfficeMessage},
     'GetUserData() - OutOfOfficeMessage',
 );
 

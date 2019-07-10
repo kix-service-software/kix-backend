@@ -1116,8 +1116,8 @@ sub UserList {
             my %User = $Self->GetUserData(
                 UserID => $UserID,
             );
-            if ( $User{Preferences}->{OutOfOfficeMessage} ) {
-                $Users{$UserID} .= ' ' . $User{Preferences}->{OutOfOfficeMessage};
+            if ( $User{OutOfOfficeMessage} ) {
+                $Users{$UserID} .= ' ' . $User{OutOfOfficeMessage};
             }
         }
     }
@@ -1315,7 +1315,7 @@ sub RoleList {
 
 returns true if the requested permission is granted
 
-    my ($Granted, $ResultingPermission) = $UserObject->CheckPermission(
+    my @List = $UserObject->CheckPermission(
         UserID              => 123,
         Types               => [ 'Resource', 'Object' ]
         Target              => '/tickets',

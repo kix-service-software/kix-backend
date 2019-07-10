@@ -1,7 +1,7 @@
 # --
 # Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 KIX AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -92,36 +92,56 @@ if ($IsDevelopmentSystem) {
             1,
             "ARCHIVE file was generated for a developer system",
         );
+
+        # delete Kernel/Config.pm file from archive file
+        my $ArchiveContent = $MainObject->FileRead(
+            Location => $Home . '/ARCHIVE',
+            Result   => 'ARRAY',
+        );
+        my $Output;
+        my $File = 'Kernel/Config.pm';
+        LINE:
+        for my $Line ( @{$ArchiveContent} ) {
+            if ( $Line =~ m(\A\w+::$File\n\z) ) {
+                next LINE;
+            }
+            $Output .= $Line;
+        }
+
+        my $FileLocation = $MainObject->FileWrite(
+            Location => $Home . '/ARCHIVE',
+            Content  => \$Output,
+        );
     }
 
 }
 
-# get KIX Version
-my $KIXVersion = $ConfigObject->Get('Version');
+# get OTRS Version
+my $OTRSVersion = $ConfigObject->Get('Version');
 
 # leave only mayor and minor level versions
-$KIXVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
+$OTRSVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
 
 # add x as patch level version
-$KIXVersion .= '.x';
+$OTRSVersion .= '.x';
 
 my $TestPackage = '<?xml version="1.0" encoding="utf-8" ?>
-<kix_package version="1.0">
+<otrs_package version="1.0">
   <Name>Test</Name>
   <Version>0.0.1</Version>
-  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <Vendor>OTRS AG</Vendor>
   <URL>http://otrs.org/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
-  <Framework>' . $KIXVersion . '</Framework>
+  <Framework>' . $OTRSVersion . '</Framework>
   <BuildDate>2005-11-10 21:17:16</BuildDate>
   <BuildHost>yourhost.example.com</BuildHost>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</kix_package>
+</otrs_package>
 ';
 
 # tests for GenerateCustom Files Archive

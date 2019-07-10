@@ -92,32 +92,32 @@ sub Run {
     }
 
     # check if user's out of office-time is configured
-    return if !%User || !$User{Preferences}->{OutOfOffice} || !$User{Preferences}->{OutOfOfficeSubstitute};
+    return if !%User || !$User{OutOfOffice} || !$User{OutOfOfficeSubstitute};
 
     # check if user is out of office right now
     my $CurrTime = $Self->{TimeObject}->SystemTime();
     my $StartTime
-        = "$User{Preferences}->{OutOfOfficeStartYear}-$User{Preferences}->{OutOfOfficeStartMonth}-$User{Preferences}->{OutOfOfficeStartDay} 00:00:00";
+        = "$User{OutOfOfficeStartYear}-$User{OutOfOfficeStartMonth}-$User{OutOfOfficeStartDay} 00:00:00";
     $StartTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $StartTime );
     my $EndTime
-        = "$User{Preferences}->{OutOfOfficeEndYear}-$User{Preferences}->{OutOfOfficeEndMonth}-$User{Preferences}->{OutOfOfficeEndDay} 23:59:59";
+        = "$User{OutOfOfficeEndYear}-$User{OutOfOfficeEndMonth}-$User{OutOfOfficeEndDay} 23:59:59";
     $EndTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $EndTime );
     return if ( $StartTime > $CurrTime || $EndTime < $CurrTime );
 
     # get substitute data
     my %SubstituteUser = $Self->{UserObject}->GetUserData(
-        UserID => $User{Preferences}->{OutOfOfficeSubstitute},
+        UserID => $User{OutOfOfficeSubstitute},
         Valid  => 1,
     );
     return if !%SubstituteUser || !$SubstituteUser{UserEmail};
 
     # prepare notification body
-    if ( $User{Preferences}->{OutOfOfficeSubstituteNote} ) {
+    if ( $User{OutOfOfficeSubstituteNote} ) {
         if ( $Notification{ContentType} && $Notification{ContentType} eq 'text/html' ) {
             $Notification{Body} = $Self->{HTMLUtilsObject}->DocumentStrip(
                 String => $Notification{Body},
             );
-            $Notification{Body} = $User{Preferences}->{OutOfOfficeSubstituteNote}
+            $Notification{Body} = $User{OutOfOfficeSubstituteNote}
                 . "<br/>**********************************************************************<br/><br/>"
                 . $Notification{Body};
             $Notification{Body} = $Self->{HTMLUtilsObject}->DocumentComplete(
@@ -126,7 +126,7 @@ sub Run {
             );
         }
         else {
-            $Notification{Body} = $User{Preferences}->{OutOfOfficeSubstituteNote}
+            $Notification{Body} = $User{OutOfOfficeSubstituteNote}
                 . "\n**********************************************************************\n\n"
                 . $Notification{Body};
         }
