@@ -174,7 +174,7 @@ sub GetUserData {
     my @Bind;
     my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, "
         . " title, first_name, last_name, $Self->{UserTableUserPW}, email, phone, mobile, "
-        . " comments, valid_id, create_time, change_time FROM $Self->{UserTable} WHERE ";
+        . " comments, valid_id, create_time, change_time, create_by, change_by FROM $Self->{UserTable} WHERE ";
 
     if ( $Param{User} ) {
         my $User = lc $Param{User};
@@ -210,6 +210,8 @@ sub GetUserData {
         $Data{ValidID}       = $Row[10];
         $Data{CreateTime}    = $Row[11];
         $Data{ChangeTime}    = $Row[12];
+        $Data{CreateBy}      = $Row[13];
+        $Data{ChangeBy}      = $Row[14];
     }
 
     # check data
