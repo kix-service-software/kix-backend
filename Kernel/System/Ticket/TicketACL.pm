@@ -173,6 +173,10 @@ sub TicketAcl {
         }
     }
 
+    # TODO
+    # at the moment always return since we do not support ACLs 
+    return;
+
     # do not execute ACLs if UserID 1 is used
     return if $Param{UserID} && $Param{UserID} == 1;
 
