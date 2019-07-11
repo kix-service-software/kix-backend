@@ -33,7 +33,6 @@ my @Objects = (
     'Kernel::System::CheckItem',
     'Kernel::System::CSV',
     'Kernel::System::ContactAuth',
-    'Kernel::System::CustomerGroup',
     'Kernel::System::Contact',
     'Kernel::System::Daemon::SchedulerDB',
     'Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker',
