@@ -194,10 +194,10 @@ sub Run {
 
     # check authorization if needed
     my $Authorization;
-    if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
+    if ( $ProcessRequestResult{RequestMethod} ne 'OPTIONS' && !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
         $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
 
-        if ( $ProcessRequestResult{RequestMethod} ne 'OPTIONS' && !$FunctionResult->{Success} ) {
+        if ( !$FunctionResult->{Success} ) {
             return $Self->_GenerateErrorResponse(
                 %{$FunctionResult},
             );
