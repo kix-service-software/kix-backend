@@ -1201,7 +1201,8 @@ sub PermissionList {
     return %{$Cache} if $Cache;
 
     my @Bind;
-    my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ?';
+    # get all permissions from every valid role the user is assigned to
+    my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ? AND role_id IN (SELECT id FROM roles WHERE valid_id = 1)';
     push(@Bind, \$Param{UserID});
 
     # filter specific permission types
