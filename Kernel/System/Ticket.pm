@@ -3618,48 +3618,36 @@ sub GetSubscribedUserIDsByQueueID {
         return;
     }
 
-    # get queues
-    my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{QueueID} );
-
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     # fetch all queues
     my @UserIDs;
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT user_id FROM personal_queues WHERE queue_id = ?',
+        SQL => "SELECT distinct(user_id) FROM user_preferences WHERE preferences_key = 'MyQueues' AND preferences_value = ?",
         Bind => [ \$Param{QueueID} ],
     );
+    
     while ( my @Row = $DBObject->FetchrowArray() ) {
         push @UserIDs, $Row[0];
     }
 
-    # get needed objects
-    my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
+    # get user object
+    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
-    # check if user is valid and check permissions
+    # check if user is valid
     my @CleanUserIDs;
-
     USER:
     for my $UserID (@UserIDs) {
 
         my %User = $UserObject->GetUserData(
             UserID => $UserID,
-            Valid  => 1
+            Valid  => 1,
         );
 
         next USER if !%User;
 
-        # TODO!!! rbo-190327
-        # # just send emails to permitted agents
-        # my %GroupMember = $GroupObject->PermissionUserGet(
-        #     UserID => $UserID,
-        #     Type   => 'ro',
-        # );
-
-        # if ( $GroupMember{ $Queue{GroupID} } ) {
-        #     push @CleanUserIDs, $UserID;
-        # }
+        push @CleanUserIDs, $UserID;
     }
 
     return @CleanUserIDs;
@@ -3698,10 +3686,7 @@ sub GetSubscribedUserIDsByServiceID {
     # fetch all users
     my @UserIDs;
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT user_id
-            FROM personal_services
-            WHERE service_id = ?',
+        SQL => "SELECT distinct(user_id) FROM user_preferences WHERE preferences_key = 'MyServices' AND preferences_value = ?",
         Bind => [ \$Param{ServiceID} ],
     );
 

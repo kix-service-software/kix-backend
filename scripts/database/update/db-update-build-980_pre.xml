@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableDrop Name="personal_queues"/>
+    <TableDrop Name="personal_services"/>
+
+</database>

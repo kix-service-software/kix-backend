@@ -476,60 +476,6 @@ sub GetAllQueues {
     return %MoveQueues;
 }
 
-=item GetAllCustomQueues()
-
-get all custom queues of one user
-
-    my @Queues = $QueueObject->GetAllCustomQueues( UserID => 123 );
-
-=cut
-
-sub GetAllCustomQueues {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
-    }
-
-    # check cache
-    my $CacheKey = 'GetAllCustomQueues::' . $Param{UserID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return @{$Cache} if $Cache;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # search all custom queues
-    return if !$DBObject->Prepare(
-        SQL  => 'SELECT queue_id FROM personal_queues WHERE user_id = ?',
-        Bind => [ \$Param{UserID} ],
-    );
-
-    # fetch the result
-    my @QueueIDs;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        push @QueueIDs, $Row[0];
-    }
-
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \@QueueIDs,
-    );
-
-    return @QueueIDs;
-}
-
 =item GetAllSubQueues()
 
 get all sub queues of a queue
