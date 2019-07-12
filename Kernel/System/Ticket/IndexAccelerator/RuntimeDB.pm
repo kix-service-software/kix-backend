@@ -122,12 +122,13 @@ sub TicketAcceleratorIndex {
         # Differentiate between total and unlocked tickets
         SQL => "
             SELECT count(*), st.ticket_lock_id
-            FROM ticket st, queue sq, personal_queues suq
+            FROM ticket st, queue sq, user_preferences up
             WHERE st.ticket_state_id IN ( ${\(join ', ', @ViewableStateIDs)} )
                 AND st.queue_id = sq.id
                 AND st.archive_flag = 0
-                AND suq.queue_id = st.queue_id
-                AND suq.user_id = $Param{UserID}
+                AND up.preferences_key = 'MyQueues'
+                AND up.preferences_value = st.queue_id
+                AND up.user_id = $Param{UserID}
                 GROUP BY st.ticket_lock_id",
     );
 

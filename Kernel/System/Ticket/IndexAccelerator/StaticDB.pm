@@ -390,10 +390,11 @@ sub TicketAcceleratorIndex {
     #    );
     my $SQL = "
             SELECT count(*), ti.s_lock
-            FROM ticket_index ti, personal_queues suq, ticket_lock_type tl
-            WHERE suq.queue_id = ti.queue_id
+            FROM ticket_index ti, user_preferences up, ticket_lock_type tl
+            WHERE up.preferences_value = ti.queue_id
                 AND tl.name = ti.s_lock
-                AND suq.user_id = $Param{UserID}";
+                AND up.preferences_key = 'MyQueues'
+                AND up.user_id = $Param{UserID}";
 
     if ( $Self->{UserPreferences}->{UserViewAllTickets} ) {
         $SQL .= " AND tl.id IN ( ${\(join ', ', @ViewableLockIDs)} )";

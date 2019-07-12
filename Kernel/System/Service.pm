@@ -1497,61 +1497,6 @@ sub ServiceParentsGet {
     return \@Data;
 }
 
-=item GetAllCustomServices()
-
-get all custom services of one user
-
-    my @Services = $ServiceObject->GetAllCustomServices( UserID => 123 );
-
-=cut
-
-sub GetAllCustomServices {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
-    }
-
-    # check cache
-    my $CacheKey = 'GetAllCustomServices::' . $Param{UserID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-
-    return @{$Cache} if $Cache;
-
-    # search all custom services
-    return if !$Self->{DBObject}->Prepare(
-        SQL => '
-            SELECT service_id
-            FROM personal_services
-            WHERE user_id = ?',
-        Bind => [ \$Param{UserID} ],
-    );
-
-    # fetch the result
-    my @ServiceIDs;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        push @ServiceIDs, $Row[0];
-    }
-
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \@ServiceIDs,
-    );
-
-    return @ServiceIDs;
-}
-
 =item GetAllSubServices()
 
 get all sub Services of a Service

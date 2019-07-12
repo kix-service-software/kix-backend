@@ -202,42 +202,6 @@
     </ForeignKey>
 </Table>
 
-<!-- personal_queues - stores all "my queues" -->
-<Table Name="personal_queues">
-    <Column Name="user_id" Required="true" Type="INTEGER"/>
-    <Column Name="queue_id" Required="true" Type="INTEGER"/>
-    <Index Name="personal_queues_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <Index Name="personal_queues_queue_id">
-        <IndexColumn Name="queue_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="user_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="queue">
-        <Reference Local="queue_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- personal_services - stores all "my services" -->
-<Table Name="personal_services">
-    <Column Name="user_id" Required="true" Type="INTEGER"/>
-    <Column Name="service_id" Required="true" Type="INTEGER"/>
-    <Index Name="personal_services_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <Index Name="personal_services_service_id">
-        <IndexColumn Name="service_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="user_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="service">
-        <Reference Local="service_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- system_address - all email addresses of the system -->
 <Table Name="system_address">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>

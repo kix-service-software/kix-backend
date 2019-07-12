@@ -13,6 +13,8 @@ package Kernel::System::User::Preferences::DB;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw( :all );
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Cache',
@@ -66,7 +68,14 @@ sub SetPreferences {
         }
     }
 
-    my $Value = $Param{Value} // '';
+    # prepare multiple values (i.e. MyQueues, MyServices, ...)
+    my @Values;
+    if ( IsArrayRefWithData($Param{Value}) ) {
+        @Values = @{$Param{Value}};
+    }
+    else {
+        push @Values, ($Param{Value} // '');
+    }
 
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -79,14 +88,16 @@ sub SetPreferences {
         Bind => [ \$Param{UserID}, \$Param{Key} ],
     );
 
-    # insert new data
-    return if !$DBObject->Do(
-        SQL => "
-            INSERT INTO $Self->{PreferencesTable}
-            ($Self->{PreferencesTableUserID}, $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue})
-            VALUES (?, ?, ?)",
-        Bind => [ \$Param{UserID}, \$Param{Key}, \$Value ],
-    );
+    foreach my $Value ( @Values ) {
+        # insert new data
+        return if !$DBObject->Do(
+            SQL => "
+                INSERT INTO $Self->{PreferencesTable}
+                ($Self->{PreferencesTableUserID}, $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue})
+                VALUES (?, ?, ?)",
+            Bind => [ \$Param{UserID}, \$Param{Key}, \$Value ],
+        );
+    }
 
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
@@ -131,7 +142,19 @@ sub GetPreferences {
     # fetch the result
     my %Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Data{ $Row[0] } = $Row[1];
+        if ( exists $Data{ $Row[0] } && !IsArrayRefWithData($Data{ $Row[0] }) ) {
+            # create array if there are multiple attributes
+            my $Value = $Data{ $Row[0] };
+            $Data{ $Row[0] } = [
+                $Value
+            ];
+        }
+        if ( IsArrayRefWithData($Data{ $Row[0] }) ) {
+            push @{$Data{ $Row[0] }}, $Row[1];
+        }
+        else {
+            $Data{ $Row[0] } = $Row[1];
+        }
     }
 
     # set cache

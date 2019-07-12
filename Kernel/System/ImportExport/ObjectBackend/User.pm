@@ -449,24 +449,6 @@ sub ExportDataGet {
             else                          { $UserData{$Argument} = 'no' }
         }
 
-        # get CustomQueues
-        my @QueueIDs = $Kernel::OM->Get('Kernel::System::Queue')->GetAllCustomQueues(
-            UserID => $CurrUser,
-        );
-        if (@QueueIDs) {
-            my $CurrIndex = 0;
-            my $NumberOfCustomQueues = $ObjectData->{NumberOfCustomQueues} || 10;
-            for my $QueueID (@QueueIDs) {
-                if ( $CurrIndex < $NumberOfCustomQueues ) {
-                    my $Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-                        QueueID => $QueueID,
-                    );
-                    $UserData{ 'CustomQueue' . sprintf( "%03d", $CurrIndex ) } = $Queue;
-                }
-                $CurrIndex++;
-            }
-        }
-
         # get roles
         my %Roles = $Kernel::OM->Get('Kernel::System::User')->RolesList(
             UserID => $CurrUser,
@@ -746,13 +728,6 @@ sub ImportDataSave {
             $UserID = $UserData{UserID};
         }
 
-        # set CustomQueues
-        # delete existing entries
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
-            SQL  => 'DELETE FROM personal_queues WHERE user_id = ?',
-            Bind => [ \$UserID ],
-        );
-
         my $CurrIndex = 0;
         my $NumberOfCustomQueues = $ObjectData->{NumberOfCustomQueues} || 10;
         while ( $CurrIndex < $NumberOfCustomQueues ) {
@@ -765,16 +740,7 @@ sub ImportDataSave {
 
                 # create new entry
                 if ($QueueID) {
-                    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
-                        SQL => 'INSERT INTO personal_queues (user_id, queue_id) VALUES ('
-                            . $UserID . ','
-                            . $QueueID
-                            . ')',
-                    );
-                    $ReturnCode = "Partially changed - see log for details" if ( !$Success );
-                }
-                else {
-                    $ReturnCode = "Partially changed - see log for details";
+                    # TODO
                 }
             }
             $CurrIndex++;
