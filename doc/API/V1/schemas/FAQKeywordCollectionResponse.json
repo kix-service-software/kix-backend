@@ -1,0 +1,18 @@
+{
+   "$id" : "#FAQKeywordCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of all FAQ article keywords.",
+   "type" : "object",
+   "properties" : {
+      "FAQKeyword" : {
+         "type" : "array",
+         "items" : {
+            "type" : "string",
+            "readOnly" : true
+         }
+      }
+   },
+   "required" : [
+      "FAQKeyword"
+   ]
+}

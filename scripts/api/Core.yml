@@ -1302,6 +1302,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Contact::ContactCreate
+    V1::FAQ::FAQArticleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleSearch
+    V1::FAQ::FAQArticleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQArticleCreate
     V1::FAQ::FAQArticleAttachmentDelete:
         Description: ''
         MappingInbound:
@@ -1393,20 +1407,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::FAQ::FAQArticleVoteCreate
-    V1::FAQ::FAQArticleSearch:
+    V1::FAQ::FAQArticleKeywordSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::FAQ::FAQArticleSearch
-    V1::FAQ::FAQArticleCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQArticleCreate
+        Type: V1::FAQ::FAQArticleKeywordSearch
     V1::I18n::TranslationSearch:
         Description: ''
         MappingInbound:
@@ -2552,6 +2559,14 @@ Provider:
           RequestMethod:
           - POST
           Route: /contacts
+        V1::FAQ::FAQArticleSearch:
+          RequestMethod:
+          - GET
+          Route: /faq/articles
+        V1::FAQ::FAQArticleCreate:
+          RequestMethod:
+          - POST
+          Route: /faq/articles
         V1::FAQ::FAQArticleAttachmentDelete:
           RequestMethod:
           - DELETE
@@ -2604,14 +2619,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /faq/articles/:FAQArticleID/votes
-        V1::FAQ::FAQArticleSearch:
+        V1::FAQ::FAQArticleKeywordSearch:
           RequestMethod:
           - GET
-          Route: /faq/articles
-        V1::FAQ::FAQArticleCreate:
-          RequestMethod:
-          - POST
-          Route: /faq/articles
+          Route: /faq/articles/keywords
         V1::I18n::TranslationSearch:
           RequestMethod:
           - GET
