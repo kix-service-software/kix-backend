@@ -186,6 +186,8 @@
 /contacts/:ContactID/tickets                                                   |   GET             | V1::Contact::ContactTicketSearch
 /contacts                                                                      |   GET             | V1::Contact::ContactSearch
 /contacts                                                                      |   POST            | V1::Contact::ContactCreate
+/faq/articles                                                                  |   GET             | V1::FAQ::FAQArticleSearch
+/faq/articles                                                                  |   POST            | V1::FAQ::FAQArticleCreate
 /faq/articles/:FAQArticleID/attachments/:FAQAttachmentID                       |   DELETE          | V1::FAQ::FAQArticleAttachmentDelete
 /faq/articles/:FAQArticleID/attachments/:FAQAttachmentID                       |   GET             | V1::FAQ::FAQArticleAttachmentGet
 /faq/articles/:FAQArticleID/attachments                                        |   GET             | V1::FAQ::FAQArticleAttachmentSearch
@@ -199,8 +201,7 @@
 /faq/articles/:FAQArticleID/votes/:FAQVoteID                                   |   GET             | V1::FAQ::FAQArticleVoteGet
 /faq/articles/:FAQArticleID/votes                                              |   GET             | V1::FAQ::FAQArticleVoteSearch
 /faq/articles/:FAQArticleID/votes                                              |   POST            | V1::FAQ::FAQArticleVoteCreate
-/faq/articles                                                                  |   GET             | V1::FAQ::FAQArticleSearch
-/faq/articles                                                                  |   POST            | V1::FAQ::FAQArticleCreate
+/faq/articles/keywords                                                         |   GET             | V1::FAQ::FAQArticleKeywordSearch
 /i18n/translations                                                             |   GET             | V1::I18n::TranslationSearch
 /links                                                                         |   GET             | V1::Link::LinkSearch
 /links/:LinkID                                                                 |   DELETE          | V1::Link::LinkDelete

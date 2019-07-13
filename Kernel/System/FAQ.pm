@@ -1777,12 +1777,7 @@ sub KeywordList {
 
         my $KeywordList = lc $Row[0];
 
-        for my $Keyword ( split /,/, $KeywordList ) {
-
-            # remove leading/tailing spaces
-            $Keyword =~ s{ \A \s+ }{}xmsg;
-            $Keyword =~ s{ \s+ \z }{}xmsg;
-
+        for my $Keyword ( split /\s/, $KeywordList ) {
             # increase keyword counter
             $Data{$Keyword}++;
         }
