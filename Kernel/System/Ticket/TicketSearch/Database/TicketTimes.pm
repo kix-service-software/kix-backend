@@ -116,10 +116,6 @@ sub Search {
     $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
         String => $Param{Search}->{Value},
     );
-    if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
-        # return in case of some format error or if the date is in the future
-        return;
-    }
 
     if ( $Param{Search}->{Field} !~ /^(Create|Pending|Escalation)/ ) {
         # use original string value
