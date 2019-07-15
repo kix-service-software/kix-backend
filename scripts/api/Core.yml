@@ -496,6 +496,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::I18n::TranslationLanguageCreate
+    V1::Log::LogFileSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Log::LogFileSearch
+    V1::Log::LogFileGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Log::LogFileGet
     V1::ObjectDefinition::ObjectDefinitionSearch:
         Description: ''
         MappingInbound:
@@ -2099,6 +2113,14 @@ Provider:
           RequestMethod:
           - POST
           Route: /system/i18n/translations/:PatternID/languages
+        V1::Log::LogFileSearch:
+          RequestMethod:
+          - GET
+          Route: /system/logs
+        V1::Log::LogFileGet:
+          RequestMethod:
+          - GET
+          Route: /system/logs/:LogFileID
         V1::ObjectDefinition::ObjectDefinitionSearch:
           RequestMethod:
           - GET

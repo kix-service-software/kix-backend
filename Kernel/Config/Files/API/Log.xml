@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Channel::ChannelGet" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Log::LogFileGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">ChannelGet</Item>
+                <Item Key="Name">LogFileGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ObjectID">ChannelID</Item>
-                <Item Key="ResponseObject">ChannelResponse</Item>
+                <Item Key="ObjectID">LogFileID</Item>
+                <Item Key="ResponseObject">LogFileResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Channel::ChannelSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Log::LogFileSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">ChannelSearch</Item>
+                <Item Key="Name">LogFileSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ChannelCollectionResponse</Item>
+                <Item Key="ResponseObject">LogFileCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

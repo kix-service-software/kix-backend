@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#LogFileResponse",
+  "type": "object",
+  "description": "A response for log file GET request.",
+  "properties": {
+    "LogFile": {
+      "$ref": "LogFile.json"
+    }
+  },
+  "required": [
+    "LogFile"
+  ]
+}

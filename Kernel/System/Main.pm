@@ -604,6 +604,29 @@ get timestamp of file change time
 sub FileGetMTime {
     my ( $Self, %Param ) = @_;
 
+    my $Stat = $Self->FileStat(
+        %Param
+    );
+
+    return $Stat->mtime();
+}
+
+=item FileStat()
+
+get stat of given file
+
+    my $FileStat = $MainObject->FileStat(
+        Directory => 'c:\some\location',
+        Filename  => 'me_to/alal.xml',
+        # or Location
+        Location  => 'c:\some\location\me_to\alal.xml'
+    );
+
+=cut
+
+sub FileStat {
+    my ( $Self, %Param ) = @_;
+
     my $FH;
     if ( $Param{Filename} && $Param{Directory} ) {
 
@@ -649,7 +672,7 @@ sub FileGetMTime {
         return;
     }
 
-    return $Stat->mtime();
+    return $Stat;
 }
 
 =item MD5sum()
