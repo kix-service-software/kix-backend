@@ -1,0 +1,9 @@
+  displayName: "[System] Logs"
+  description: !include ../../descriptions/resources/system/logs.md
+  type: { collection-readonly: { typeName: LogFile } }
+  /{logFileId}:
+    type: { item-readonly: { typeName: LogFile } }
+    uriParameters:
+      logFileId:
+        displayName: LogFileID
+        type: string

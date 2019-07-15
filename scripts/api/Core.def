@@ -69,6 +69,8 @@
 /system/i18n/translations/:PatternID/languages/:Language                       |   GET             | V1::I18n::TranslationLanguageGet
 /system/i18n/translations/:PatternID/languages/:Language                       |   PATCH           | V1::I18n::TranslationLanguageUpdate
 /system/i18n/translations/:PatternID/languages                                 |   POST            | V1::I18n::TranslationLanguageCreate
+/system/logs                                                                   |   GET             | V1::Log::LogFileSearch
+/system/logs/:LogFileID                                                        |   GET             | V1::Log::LogFileGet
 /system/objectdefinitions                                                      |   GET             | V1::ObjectDefinition::ObjectDefinitionSearch
 /system/objectdefinitions/:ObjectType                                          |   GET             | V1::ObjectDefinition::ObjectDefinitionGet
 /system/objecticons                                                            |   GET             | V1::ObjectIcon::ObjectIconSearch
