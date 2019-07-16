@@ -277,7 +277,7 @@ sub Run {
             );
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
-            }
+            }            
             $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
@@ -286,23 +286,18 @@ sub Run {
                 Result => 'COUNT',
             );
 
-            # open tickets
+            # all relevant tickets
             @Filter = (
                 {
                     Field    => 'QueueID',
                     Operator => 'EQ',
                     Value    => $QueueID,
                 },
-                {
-                    Field    => 'StateType',
-                    Operator => 'EQ',
-                    Value    => 'open',
-                },
             );
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
             }
-            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{TotalCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
                 },
