@@ -736,7 +736,7 @@ sub _TranslationLanguageList {
             $Row->{Language} => $Row->{Value}
         });
     }
-    
+
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
         Type  => $Self->{CacheType},
@@ -1016,8 +1016,10 @@ sub ImportPO {
             $CountTotal++;
 
             my $MsgStr = $EncodeObject->EncodeInput($Items->{$MsgId}->msgstr);
-            $MsgId =~ s/"//g;
-            $MsgStr =~ s/"//g;
+            $MsgId =~ s/(?<!\\)"//g;
+            $MsgStr =~ s/(?<!\\)"//g;
+            $MsgId =~ s/\\"/"/g;
+            $MsgStr =~ s/\\"/"/g;
 
             # the pattern is empty, go to the next one
             next if !$MsgId;
