@@ -1047,19 +1047,19 @@ sub ExecOperation {
             Message => "Could not load web service configuration for web service with ID $Self->{WebserviceID}!",
         );
     }
-    my $Config = $Webservice->{Config}->{Provider}->{Transport}->{Config};
+    my $TransportConfig = $Webservice->{Config}->{Provider}->{Transport}->{Config};
 
     # prepare RequestURI
-    my $RequestURI = $Config->{RouteOperationMapping}->{$Param{OperationType}}->{Route};
+    my $RequestURI = $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route};
     $RequestURI =~ s/:(\w*)/$Param{Data}->{$1}/egx;
 
     # determine available methods
     my %AvailableMethods;
-    for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+    for my $CurrentOperation ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
 
-        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
+        next if !IsHashRefWithData( $TransportConfig->{RouteOperationMapping}->{$CurrentOperation} );
 
-        my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
+        my %RouteMapping = %{ $TransportConfig->{RouteOperationMapping}->{$CurrentOperation} };
         my $RouteRegEx = $RouteMapping{Route};
         $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
@@ -1080,7 +1080,7 @@ sub ExecOperation {
         RequestMethod           => $Param{RequestMethod} || $Self->{RequestMethod},
         AvailableMethods        => \%AvailableMethods,
         RequestURI              => $RequestURI,
-        CurrentRoute            => $Webservice->{Config}->{Provider}->{Transport}->{Config}->{RouteOperationMapping}->{$Param{OperationType}}->{Route},
+        CurrentRoute            => $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route},
         OperationRouteMapping   => $Self->{OperationRouteMapping},
         Authorization           => $Self->{Authorization},
         Level                   => $Self->{Level} + 1,
@@ -1095,9 +1095,18 @@ sub ExecOperation {
 
     $Self->_Debug($Self->{LevelIndent}, "executing operation $OperationObject->{OperationConfig}->{Name}");
 
+    # check and prepare additional data
+    my %AdditionalData;
+    if ( $OperationObject->{OperationConfig}->{AdditionalUriParameters} ) {
+        foreach my $AddParam ( sort split(/\s*,\s*/, $OperationObject->{OperationConfig}->{AdditionalUriParameters}) ) {            
+            $AdditionalData{$AddParam} = $Self->{RequestData}->{$AddParam};
+        }
+    } 
+
     my $Result = $OperationObject->Run(
         Data    => {
             %{$Param{Data}},
+            %AdditionalData,
             include => $Self->{RequestData}->{include},
             expand  => $Self->{RequestData}->{expand},
         }

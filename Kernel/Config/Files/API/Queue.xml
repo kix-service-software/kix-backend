@@ -11,6 +11,7 @@
                 <Item Key="ResponseObject">QueueResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
+                <Item Key="AdditionalUriParameters">TicketStats.StateType, TicketStats.StateID</Item>
                 <Item Key="RelevantPropertyValuePermissions">Queue-to-Ticket</Item>
             </Hash>
         </Setting>

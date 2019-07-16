@@ -107,7 +107,7 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "OpenCount" : {
+            "TotalCount" : {
                "type" : "integer",
                "readOnly" : true
             }
