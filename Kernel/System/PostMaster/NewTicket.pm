@@ -254,7 +254,7 @@ sub Run {
 
     # KIX4OTRS-capeIT
     # if there is no customer id found
-    if ( !$GetParam{'X-KIX-Contact'} || && $TicketTemplate{CustomerLogin} ) {
+    if ( !$GetParam{'X-KIX-Contact'} && $TicketTemplate{CustomerLogin} ) {
         $GetParam{'X-KIX-Contact'} = $TicketTemplate{CustomerLogin};
     }
 
