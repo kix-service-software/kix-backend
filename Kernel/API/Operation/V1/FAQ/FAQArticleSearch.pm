@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -89,34 +89,38 @@ perform FAQArticleSearch Operation. This will return a FAQArticle ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
+
     # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
     my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
-        UserID     => $Self->{Authorization}->{UserID},
+        UserID   => $Self->{Authorization}->{UserID},
+        ValidIDs => \@ValidIDs
     );
 
     # get already prepared FAQ data from FAQArticleGet operation
-    if ( @ArticleIDs ) {
+    if (@ArticleIDs) {
 
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
 
         my $FAQArticleGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleGet',
-            Data      => {
-                FAQArticleID => join(',', sort @ArticleIDs),
+            Data          => {
+                FAQArticleID => join( ',', sort @ArticleIDs ),
             }
         );
-  
+
         if ( !IsHashRefWithData($FAQArticleGetResult) || !$FAQArticleGetResult->{Success} ) {
             return $FAQArticleGetResult;
         }
 
-        my @FAQArticleDataList = IsArrayRefWithData($FAQArticleGetResult->{Data}->{FAQArticle}) ? @{$FAQArticleGetResult->{Data}->{FAQArticle}} : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
+        my @FAQArticleDataList = IsArrayRefWithData( $FAQArticleGetResult->{Data}->{FAQArticle} ) ? @{ $FAQArticleGetResult->{Data}->{FAQArticle} } : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
 
-        if ( IsArrayRefWithData(\@FAQArticleDataList) ) {
+        if ( IsArrayRefWithData( \@FAQArticleDataList ) ) {
             return $Self->_Success(
                 FAQArticle => \@FAQArticleDataList,
-            )
+                )
         }
     }
 
@@ -125,6 +129,5 @@ sub Run {
         FAQArticle => [],
     );
 }
-
 
 1;
