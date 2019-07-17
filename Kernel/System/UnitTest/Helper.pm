@@ -43,8 +43,6 @@ construct a helper object.
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         'Kernel::System::UnitTest::Helper' => {
-            RestoreSystemConfiguration => 1,        # optional, save ZZZAuto.pm
-                                                    # and restore it in the destructor
             RestoreDatabase            => 1,        # runs the test in a transaction,
                                                     # and roll it back in the destructor
                                                     #
@@ -69,15 +67,6 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     $Self->{UnitTestObject} = $Kernel::OM->Get('Kernel::System::UnitTest');
-
-    # make backup of system configuration if needed
-    if ( $Param{RestoreSystemConfiguration} ) {
-        $Self->{SysConfigObject} = Kernel::System::SysConfig->new();
-
-        $Self->{SysConfigBackup} = $Self->{SysConfigObject}->Download();
-
-        $Self->{UnitTestObject}->True( 1, 'Creating backup of the system configuration.' );
-    }
 
     # remove any leftover configuration changes from aborted previous runs
     $Self->ConfigSettingCleanup();
@@ -260,17 +249,23 @@ sub TestContactCreate {
 
         my $TestUserLogin = $Self->GetRandomID();
 
+        my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+            Number  => $TestUserLogin,
+            Name    => $TestUserLogin,
+            ValidID => 1,
+            UserID  => 1,
+        );
+
         $TestUser = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
-            Source         => 'Contact',
-            UserFirstname  => $TestUserLogin,
-            UserLastname   => $TestUserLogin,
-            UserCustomerID => $TestUserLogin,
-            UserCustomerIDs => $TestUserLogin,
-            UserLogin      => $TestUserLogin,
-            UserPassword   => $TestUserLogin,
-            UserEmail      => $TestUserLogin . '@localunittest.com',
-            ValidID        => 1,
-            UserID         => 1,
+            Firstname             => $TestUserLogin,
+            Lastname              => $TestUserLogin,
+            PrimaryOrganisationID => $OrgID,
+            OrganisationIDs       => [ $OrgID ],
+            Login                 => $TestUserLogin,
+            Password              => $TestUserLogin,
+            Email                 => $TestUserLogin . '@localunittest.com',
+            ValidID               => 1,
+            UserID                => 1,
         );
 
         last COUNT if $TestUser;
@@ -289,9 +284,9 @@ sub TestContactCreate {
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
     $Kernel::OM->Get('Kernel::System::Contact')->SetPreferences(
-        UserID => $TestUser,
-        Key    => 'UserLanguage',
-        Value  => $UserLanguage,
+        ContactID => $TestUser,
+        Key       => 'UserLanguage',
+        Value     => $UserLanguage,
     );
     # rkaiser - T#2017020290001194 - changed customer user to contact
     $Self->{UnitTestObject}->True( 1, "Set contact UserLanguage to $UserLanguage" );
@@ -490,7 +485,7 @@ sub DESTROY {
 
     # disable email checks to create new user
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    local $ConfigObject->{CheckEmailAddresses} = 0;
+    local $ConfigObject->{Config}->{CheckEmailAddresses} = 0;
 
     # cleanup temporary article directory
     if ( $Self->{TmpArticleDir} && -d $Self->{TmpArticleDir} ) {
@@ -531,7 +526,7 @@ sub DESTROY {
         for my $TestContact ( @{ $Self->{TestContacts} } ) {
 
             my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-                User => $TestContact,
+                ID => $TestContact,
             );
 
             if ( !$Contact{UserLogin} ) {
@@ -595,7 +590,7 @@ sub ConfigSettingChange {
         Key   => $Key,
         Value => $Valid ? $Value : undef,
     );
-    
+
     return 1;
 }
 
@@ -608,16 +603,6 @@ remove all config setting changes from ConfigSettingChange();
 sub ConfigSettingCleanup {
     my ( $Self, %Param ) = @_;
 
-    my $Home  = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => "$Home/Kernel/Config/Files",
-        Filter    => "ZZZZUnitTest*.pm",
-    );
-    for my $File (@Files) {
-        $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
-            Location => $File,
-        ) || die "Could not delete $File";
-    }
     return 1;
 }
 

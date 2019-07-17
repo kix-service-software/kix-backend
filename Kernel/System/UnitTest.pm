@@ -472,6 +472,8 @@ sub _Print {
     if ( length $PrintName > 1000 ) {
         $PrintName = substr( $PrintName, 0, 1000 ) . "...";
     }
+    my $TestStep = $Name;
+    $TestStep =~ s/^(.*?)\s\(.+?\)$/$1/s;
 
     if ( $Self->{Output} eq 'ASCII' && $Self->{Verbose} ) {
         print { $Self->{OriginalSTDOUT} } $Self->{OutputBuffer};
@@ -489,7 +491,7 @@ sub _Print {
                 $Self->{Content} .= "<span style='color:green'>OK</span> $Self->{TestCount} - $PrintName<br/>";
             }
             else {
-                $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $PrintName'>&#x25FC</span>";
+                $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $TestStep'>&#x25FC</span>";
             }
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {
@@ -513,7 +515,7 @@ sub _Print {
                 $Self->{Content} .= "<span style='color:red'>FAILED</span> $Self->{TestCount} - $PrintName<br/>";
             }
             else {
-                $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $PrintName'>&#x25FC</span>";
+                $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $TestStep'>&#x25FC</span>";
             }
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {

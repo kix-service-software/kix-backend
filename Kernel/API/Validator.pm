@@ -74,11 +74,11 @@ sub new {
     my $ValidatorList = $Kernel::OM->Get('Kernel::Config')->Get('API::Validator::Module');
     
     foreach my $Validator (sort keys %{$ValidatorList}) {
-        if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/g ) {
+        if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/ ) {
             # next validator if this one doesn't consider our current operation
             next;
         }
-        elsif ( $ValidatorList->{$Validator}->{IgnoreOperationRegEx} && $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/g ) {
+        elsif ( $ValidatorList->{$Validator}->{IgnoreOperationRegEx} && $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/ ) {
             # next validator if this one ignores our current operation
             next;
         }

@@ -1,7 +1,7 @@
 # --
 # Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 KIX AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -91,26 +91,6 @@ if ($IsDevelopmentSystem) {
         $Self->True(
             1,
             "ARCHIVE file was generated for a developer system",
-        );
-
-        # delete Kernel/Config.pm file from archive file
-        my $ArchiveContent = $MainObject->FileRead(
-            Location => $Home . '/ARCHIVE',
-            Result   => 'ARRAY',
-        );
-        my $Output;
-        my $File = 'Kernel/Config.pm';
-        LINE:
-        for my $Line ( @{$ArchiveContent} ) {
-            if ( $Line =~ m(\A\w+::$File\n\z) ) {
-                next LINE;
-            }
-            $Output .= $Line;
-        }
-
-        my $FileLocation = $MainObject->FileWrite(
-            Location => $Home . '/ARCHIVE',
-            Content  => \$Output,
         );
     }
 
