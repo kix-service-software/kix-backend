@@ -23,7 +23,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('OTRS Nagios checker.');
+    $Self->Description('KIX Nagios checker.');
     $Self->AddOption(
         Name        => 'config-file',
         Description => "Path to configuration file.",

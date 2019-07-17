@@ -35,7 +35,7 @@ my @Tests = (
     #             'TagLevel' => '2',
     #             'Minimum' => '5.0.10',
     #             'Content' => '5.0.x',
-    #             'TagLastLevel' => 'otrs_package',
+    #             'TagLastLevel' => 'kix_package',
     #             'TagCount' => '24',
     #             'Tag' => 'Framework'
     #           }

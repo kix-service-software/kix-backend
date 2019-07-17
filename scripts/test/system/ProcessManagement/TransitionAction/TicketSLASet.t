@@ -367,7 +367,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => $TicketData[0],
             Config => {
-                SLAID => '<OTRS_TICKET_Title>',
+                SLAID => '<KIX_TICKET_Title>',
             },
         },
         Success => 1,
@@ -378,7 +378,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => $TicketData[0],
             Config => {
-                SLAID => '<OTRS_TICKET_NotExisting>',
+                SLAID => '<KIX_TICKET_NotExisting>',
             },
         },
         Success => 0,
@@ -439,7 +439,7 @@ for my $Test (@Tests) {
             my $ExpectedValue = $Test->{Config}->{Config}->{$Attribute};
             if (
                 $OrigTest->{Config}->{Config}->{$Attribute}
-                =~ m{\A<OTRS_TICKET_([A-Za-z0-9_]+)>\z}msx
+                =~ m{\A<KIX_TICKET_([A-Za-z0-9_]+)>\z}msx
                 )
             {
                 $ExpectedValue = $Ticket{$1} // '';

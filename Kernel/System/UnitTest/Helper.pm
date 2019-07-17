@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::UnitTest::Helper;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
 use warnings;
@@ -596,40 +595,7 @@ sub ConfigSettingChange {
         Key   => $Key,
         Value => $Valid ? $Value : undef,
     );
-
-    my $ValueDump;
-    if ($Valid) {
-        $ValueDump = $Kernel::OM->Get('Kernel::System::Main')->Dump($Value);
-        $ValueDump =~ s/\$VAR1/$KeyDump/;
-    }
-    else {
-        $ValueDump = "delete $KeyDump;"
-    }
-
-    my $PackageName = "ZZZZUnitTest$RandomNumber";
-
-    my $Content = <<"EOF";
-# OTRS config file (automatically generated)
-# VERSION:1.1
-package Kernel::Config::Files::$PackageName;
-use strict;
-use warnings;
-no warnings 'redefine';
-use utf8;
-sub Load {
-    my (\$File, \$Self) = \@_;
-    $ValueDump
-}
-1;
-EOF
-    my $Home     = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my $FileName = "$Home/Kernel/Config/Files/$PackageName.pm";
-    $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-        Location => $FileName,
-        Mode     => 'utf8',
-        Content  => \$Content,
-    ) || die "Could not write $FileName";
-
+    
     return 1;
 }
 

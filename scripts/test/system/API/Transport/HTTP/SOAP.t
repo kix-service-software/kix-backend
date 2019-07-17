@@ -129,7 +129,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -216,7 +216,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -267,7 +267,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace      => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace      => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding       => 'UTF-8',
                         Endpoint       => $RemoteSystem,
                         Authentication => {
@@ -344,7 +344,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -395,7 +395,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace      => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace      => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding       => 'UTF-8',
                         Endpoint       => $RemoteSystem,
                         Authentication => {
@@ -475,7 +475,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -489,7 +489,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace      => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace      => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding       => 'UTF-8',
                         Endpoint       => $RemoteSystem,
                         Authentication => {
@@ -532,7 +532,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -546,7 +546,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace      => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace      => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding       => 'UTF-8',
                         Endpoint       => $RemoteSystem,
                         Authentication => {
@@ -599,7 +599,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -613,7 +613,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace      => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace      => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding       => 'UTF-8',
                         Endpoint       => $RemoteSystem,
                         Authentication => {
@@ -658,7 +658,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -672,7 +672,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace      => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace      => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding       => 'UTF-8',
                         Endpoint       => $RemoteSystem,
                         Authentication => {
@@ -701,8 +701,8 @@ my @Tests = (
             Success => 0,
             ErrorMessage =>
                 "faultcode: Server, faultstring: Namespace from SOAPAction"
-                . " 'http://otrs.org/InvalidSoapTestInterface' does not match namespace"
-                . " from configuration 'http://otrs.org/SoapTestInterface'",
+                . " 'http://test.kixdesk.com/InvalidSoapTestInterface' does not match namespace"
+                . " from configuration 'http://test.kixdesk.com/SoapTestInterface'",
 
         },
         WebserviceConfig => {
@@ -717,7 +717,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -731,7 +731,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/InvalidSoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/InvalidSoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -768,7 +768,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'WillBeOverwritten',
                         ResponseNameScheme   => 'Plain',
@@ -784,7 +784,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -822,7 +822,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'WillBeOverwritten',
                         ResponseNameScheme   => 'Response',
@@ -838,7 +838,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -875,7 +875,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'Test',
                         ResponseNameScheme   => 'Replace',
@@ -891,7 +891,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -929,7 +929,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'PriorityIDNameResponse',
                         ResponseNameScheme   => 'Replace',
@@ -945,7 +945,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -982,7 +982,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => '',
                         ResponseNameScheme   => 'Append',
@@ -998,7 +998,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1036,7 +1036,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'Response',
                         ResponseNameScheme   => 'Append',
@@ -1052,7 +1052,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1089,7 +1089,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength           => 10000000,
-                        NameSpace           => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace           => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint            => $RemoteSystem,
                         RequestNameFreeText => 'Name',
                         RequestNameScheme   => 'Append',
@@ -1105,7 +1105,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1143,7 +1143,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         RequestNameFreeText  => 'Test',
                         RequestNameScheme    => 'Append',
@@ -1161,7 +1161,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1198,7 +1198,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength         => 10000000,
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Request',
                     },
@@ -1213,7 +1213,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1251,7 +1251,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength            => 10000000,
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint             => $RemoteSystem,
                         RequestNameScheme    => 'Request',
                         ResponseNameFreeText => 'PriorityIDNameRequestResponse',
@@ -1268,7 +1268,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1306,7 +1306,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength         => 10000000,
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Plain',
                     },
@@ -1321,7 +1321,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding  => 'UTF-8',
                         Endpoint  => $RemoteSystem,
                     },
@@ -1359,7 +1359,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength         => 10000000,
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Request',
                     },
@@ -1374,7 +1374,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding          => 'UTF-8',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Request',
@@ -1412,7 +1412,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1426,7 +1426,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding          => 'UTF-8',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Request',
@@ -1465,7 +1465,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength         => 10000000,
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Request',
                     },
@@ -1480,7 +1480,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace           => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace           => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding            => 'UTF-8',
                         Endpoint            => $RemoteSystem,
                         RequestNameFreeText => 'Request',
@@ -1518,7 +1518,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength         => 10000000,
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'equest',
                     },
@@ -1533,7 +1533,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace           => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace           => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding            => 'UTF-8',
                         Endpoint            => $RemoteSystem,
                         RequestNameFreeText => 'Request',
@@ -1572,7 +1572,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength         => 10000000,
-                        NameSpace         => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace         => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint          => $RemoteSystem,
                         RequestNameScheme => 'Request',
                     },
@@ -1587,7 +1587,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace           => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace           => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding            => 'UTF-8',
                         Endpoint            => $RemoteSystem,
                         RequestNameFreeText => 'Test',
@@ -1626,7 +1626,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1640,7 +1640,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'WillBeOverwritten',
@@ -1680,7 +1680,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1694,7 +1694,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'WillBeOverwritten',
@@ -1733,7 +1733,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1747,7 +1747,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'Test',
@@ -1787,7 +1787,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1801,7 +1801,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'PriorityIDNameResponse',
@@ -1840,7 +1840,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1854,7 +1854,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => '',
@@ -1894,7 +1894,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1908,7 +1908,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         ResponseNameFreeText => 'Response',
@@ -1947,7 +1947,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -1961,7 +1961,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace           => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace           => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding            => 'UTF-8',
                         Endpoint            => $RemoteSystem,
                         RequestNameFreeText => 'Name',
@@ -2001,7 +2001,7 @@ my @Tests = (
                     Type   => 'HTTP::SOAP',
                     Config => {
                         MaxLength => 10000000,
-                        NameSpace => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace => 'http://test.kixdesk.com/SoapTestInterface/',
                         Endpoint  => $RemoteSystem,
                     },
                 },
@@ -2015,7 +2015,7 @@ my @Tests = (
                 Transport => {
                     Type   => 'HTTP::SOAP',
                     Config => {
-                        NameSpace            => 'http://otrs.org/SoapTestInterface/',
+                        NameSpace            => 'http://test.kixdesk.com/SoapTestInterface/',
                         Encoding             => 'UTF-8',
                         Endpoint             => $RemoteSystem,
                         RequestNameFreeText  => 'Test',

@@ -1359,6 +1359,7 @@ sub ProcessDump {
             my $Location = $Param{Location};
             $Location =~ s{$Home\/}{}xmsg;
 
+# TODO refactoring
             # build comment (therefore we need to trick out the filter)
             my $FileStart = <<'EOF';
 # OTRS config file (automatically generated)

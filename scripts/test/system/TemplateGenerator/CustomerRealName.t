@@ -74,7 +74,7 @@ my $AutoResponseNameRand = 'AutoResponse' . $RandomID;
 my $AutoResponseID       = $AutoResponseObject->AutoResponseAdd(
     Name        => $AutoResponseNameRand,
     Subject     => 'Unit Test AutoResponse Bug#4640',
-    Response    => 'OTRS_CUSTOMER_REALNAME tag: <OTRS_CUSTOMER_REALNAME>',
+    Response    => 'KIX_CUSTOMER_REALNAME tag: <KIX_CUSTOMER_REALNAME>',
     Comment     => 'Unit test auto response',
     AddressID   => $SystemAddressID,
     TypeID      => 1,
@@ -120,7 +120,7 @@ $Self->True(
 my $NotificationName = 'Notification' . $RandomID;
 my $NotificationID   = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationAdd(
     Name    => $NotificationName,
-    Comment => 'Unit Test Notification <OTRS_CUSTOMER_REALNAME> tag',
+    Comment => 'Unit Test Notification <KIX_CUSTOMER_REALNAME> tag',
     Data    => {
         Transports => ['Email'],
         Events     => ['NotificationNewTicket'],
@@ -130,7 +130,7 @@ my $NotificationID   = $Kernel::OM->Get('Kernel::System::NotificationEvent')->No
     Message => {
         en => {
             Subject     => 'Notification subject',
-            Body        => 'OTRS_CUSTOMER_REALNAME tag: <OTRS_CUSTOMER_REALNAME>',
+            Body        => 'KIX_CUSTOMER_REALNAME tag: <KIX_CUSTOMER_REALNAME>',
             ContentType => 'text/plain',
         },
     },
@@ -150,11 +150,11 @@ my @Tests = (
             "From: TestFrom\@home.com\nTo: TestTo\@home.com\nSubject: Email without Reply-To tag\nTest Body Email.\n",
         ResultAutoResponse => {
             To   => 'TestFrom@home.com',
-            Body => 'OTRS_CUSTOMER_REALNAME tag: TestTo@home.com',
+            Body => 'KIX_CUSTOMER_REALNAME tag: TestTo@home.com',
         },
         ResultNotification => {
             To   => 'TestFrom@home.com',
-            Body => 'OTRS_CUSTOMER_REALNAME tag: TestFrom@home.com',
+            Body => 'KIX_CUSTOMER_REALNAME tag: TestFrom@home.com',
             }
     },
     {
@@ -163,11 +163,11 @@ my @Tests = (
             "From: TestFrom\@home.com\nTo: TestTo\@home.com\nReply-To: TestReplyTo\@home.com\nSubject: Email with Reply-To tag\nTest Body Email.\n",
         ResultAutoResponse => {
             To   => 'TestReplyTo@home.com',
-            Body => 'OTRS_CUSTOMER_REALNAME tag: TestReplyTo@home.com',
+            Body => 'KIX_CUSTOMER_REALNAME tag: TestReplyTo@home.com',
         },
         ResultNotification => {
             To   => 'TestFrom@home.com',
-            Body => 'OTRS_CUSTOMER_REALNAME tag: TestReplyTo@home.com',
+            Body => 'KIX_CUSTOMER_REALNAME tag: TestReplyTo@home.com',
             }
     },
     {
@@ -176,11 +176,11 @@ my @Tests = (
             "From: $Contact\@home.com\nTo: TestTo\@home.com\nSubject: Email with valid CustomerID\nTest Body Email.\n",
         ResultAutoResponse => {
             To   => "$Contact\@home.com",
-            Body => "OTRS_CUSTOMER_REALNAME tag: $Contact $Contact",
+            Body => "KIX_CUSTOMER_REALNAME tag: $Contact $Contact",
         },
         ResultNotification => {
             To   => "$Contact\@home.com",
-            Body => "OTRS_CUSTOMER_REALNAME tag: $Contact $Contact",
+            Body => "KIX_CUSTOMER_REALNAME tag: $Contact $Contact",
             }
     },
     {
@@ -189,11 +189,11 @@ my @Tests = (
             "From: TestRecipient\@home.com\nTo: TestTo\@home.com\nSubject: Email with Recipient\nTest Body Email.\n",
         ResultAutoResponse => {
             To   => 'TestRecipient@home.com',
-            Body => 'OTRS_CUSTOMER_REALNAME tag: TestTo@home.com',
+            Body => 'KIX_CUSTOMER_REALNAME tag: TestTo@home.com',
         },
         ResultNotification => {
             To   => 'TestRecipient@home.com',
-            Body => 'OTRS_CUSTOMER_REALNAME tag: TestRecipient@home.com',
+            Body => 'KIX_CUSTOMER_REALNAME tag: TestRecipient@home.com',
             }
     },
 );

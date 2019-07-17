@@ -116,32 +116,32 @@ if ($IsDevelopmentSystem) {
 
 }
 
-# get OTRS Version
-my $OTRSVersion = $ConfigObject->Get('Version');
+# get KIX Version
+my $KIXVersion = $ConfigObject->Get('Version');
 
 # leave only mayor and minor level versions
-$OTRSVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
+$KIXVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
 
 # add x as patch level version
-$OTRSVersion .= '.x';
+$KIXVersion .= '.x';
 
 my $TestPackage = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
-  <Framework>' . $OTRSVersion . '</Framework>
+  <Framework>' . $KIXVersion . '</Framework>
   <BuildDate>2005-11-10 21:17:16</BuildDate>
   <BuildHost>yourhost.example.com</BuildHost>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 # tests for GenerateCustom Files Archive

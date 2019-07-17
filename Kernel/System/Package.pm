@@ -1595,7 +1595,7 @@ download of an online package and put it into the local repository
 
     $PackageObject->PackageOnlineGet(
         Source => 'http://host.example.com/',
-        File   => 'SomePackage-1.0.opm',
+        File   => 'SomePackage-1.0.kpm',
     );
 
 =cut
@@ -1731,8 +1731,6 @@ sub DeployCheckInfo {
     return ();
 }
 
-#rbo - T2016121190001552 - removed CloudServices and PackageVerify
-
 =item PackageBuild()
 
 build an opm package
@@ -1745,10 +1743,10 @@ build an opm package
             Content => '1.0',
         },
         Vendor => {
-            Content => 'OTRS AG',
+            Content => 'c.a.p.e. IT GmbH',
         },
         URL => {
-            Content => 'L<http://otrs.org/>',
+            Content => 'L<http://www.cape-it.de/>',
         },
         License => {
             Content => 'GNU GENERAL PUBLIC LICENSE Version 2, June 1991',
@@ -1815,7 +1813,7 @@ sub PackageBuild {
     if ( !$Param{Type} ) {
         $XML .= '<?xml version="1.0" encoding="utf-8" ?>';
         $XML .= "\n";
-        $XML .= '<otrs_package version="1.1">';
+        $XML .= '<kix_package version="1.1">';
         $XML .= "\n";
     }
 
@@ -2044,7 +2042,7 @@ sub PackageBuild {
         }
     }
 
-    $XML .= '</otrs_package>';
+    $XML .= '</kix_package>';
 
     return $XML;
 }
@@ -2356,7 +2354,7 @@ sub PackageInstallDefaultFiles {
     my $Directory    = $Self->{ConfigObject}->Get('Home') . '/var/packages';
     my @PackageFiles = $Self->{MainObject}->DirectoryRead(
         Directory => $Directory,
-        Filter    => '*.opm',
+        Filter    => '*.kpm',
     );
 
     # read packages and install
@@ -3458,7 +3456,7 @@ CodeUninstall are not called.
 
     $Success = $PackageObject->_PackageUninstallMerged(
         Name        => 'some package name',
-        Home        => 'OTRS Home path',      # Optional
+        Home        => 'KIX Home path',       # Optional
         DeleteSaved => 1,                     # or 0, 1 Default, Optional: if set to 1 it also
                                               # delete .save files
     );

@@ -117,11 +117,6 @@ sub GetTrustedQueueID {
     # get email headers
     my %GetParam = %{ $Param{Params} };
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
-    if( !$GetParam{'X-KIX-Queue'} ) {
-        $GetParam{'X-KIX-Queue'} = $GetParam{'X-OTRS-Queue'};       # fallback
-    }
-
     return if !$GetParam{'X-KIX-Queue'};
 
     if ( $Self->{Debug} > 0 ) {

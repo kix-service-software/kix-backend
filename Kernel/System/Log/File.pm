@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::Log::File;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
 use warnings;

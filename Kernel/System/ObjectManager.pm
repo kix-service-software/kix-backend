@@ -9,9 +9,6 @@
 # --
 
 package Kernel::System::ObjectManager;
-## nofilter(TidyAll::Plugin::OTRS::Perl::PodSpelling)
-## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
-## nofilter(TidyAll::Plugin::OTRS::Perl::SyntaxCheck)
 
 use strict;
 use warnings;
@@ -50,7 +47,7 @@ Kernel::System::ObjectManager - object and dependency manager
 
 =head1 SYNOPSIS
 
-The ObjectManager is the central place to create and access singleton OTRS objects.
+The ObjectManager is the central place to create and access singleton KIX objects.
 
 =head2 How does it work?
 
@@ -59,13 +56,13 @@ are destroyed in the correct order, based on their dependencies (see below).
 
 =head2 How to use it?
 
-The ObjectManager must always be provided to OTRS by the toplevel script like this:
+The ObjectManager must always be provided to KIX by the toplevel script like this:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         # options for module constructors here
         LogObject {
-            LogPrefix => 'OTRS-MyTestScript',
+            LogPrefix => 'KIX-MyTestScript',
         },
     );
 
@@ -120,7 +117,7 @@ The hash reference will be flattened and passed to the constructor of the object
 
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         Kernel::System::Log => {
-            LogPrefix => 'OTRS-MyTestScript',
+            LogPrefix => 'KIX-MyTestScript',
         },
     );
 
@@ -488,7 +485,7 @@ sub ObjectsDiscard {
         push @AllObjects, $Object;
     }
 
-    # During an OTRS package upgrade the packagesetup code module has just
+    # During a KIX package upgrade the packagesetup code module has just
     # recently been copied to it's location in the file system.
     # In a persistent Perl environment an old version of the module might still be loaded,
     # as watchdogs like Apache2::Reload haven't had a chance to reload it.

@@ -85,7 +85,6 @@ sub Run {
 
     if ( $EncryptionMethod eq 'PGP' ) {
 
-##rbo - T2016121190001552 - renamed X-OTRS headers
         # Try to decrypt body with PGP.
         $Param{GetParam}->{'X-KIX-BodyDecrypted'} = $Self->_DecryptPGP(
             Body        => $Message,

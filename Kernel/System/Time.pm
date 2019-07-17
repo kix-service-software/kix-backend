@@ -12,7 +12,6 @@
 # --
 
 package Kernel::System::Time;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
 use warnings;

@@ -1,7 +1,7 @@
 # --
 # Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, http://kix.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -155,9 +155,9 @@ my @MappingTests = (
             Template => qq{<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
- xmlns:otrs="http://otrs.org"
- extension-element-prefixes="otrs">
-<xsl:import href="$Home/Kernel/API/Mapping/OTRSFunctions.xsl" />
+ xmlns:kix="http://www.kixdesk.com"
+ extension-element-prefixes="kix">
+<xsl:import href="$Home/Kernel/API/Mapping/KIXFunctions.xsl" />
 <xsl:output method="xml" encoding="utf-8" indent="yes"/>
 <xsl:template match="/RootElement">
 <NewRootElement>
@@ -170,11 +170,11 @@ my @MappingTests = (
     <NewStructure>
         <DateFromISO>
             <xsl:variable name="dateiso" select="/RootElement/DateISO" />
-            <xsl:value-of select="otrs:date-iso-to-xsd(\$dateiso)" />
+            <xsl:value-of select="kix:date-iso-to-xsd(\$dateiso)" />
         </DateFromISO>
         <DateToISO>
             <xsl:variable name="datexsd" select="/RootElement/DateXSD" />
-            <xsl:value-of select="otrs:date-xsd-to-iso(\$datexsd)" />
+            <xsl:value-of select="kix:date-xsd-to-iso(\$datexsd)" />
         </DateToISO>
         <NewKey1>
             <xsl:value-of select="/RootElement/Key1" />

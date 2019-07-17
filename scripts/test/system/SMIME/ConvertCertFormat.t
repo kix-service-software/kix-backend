@@ -197,7 +197,7 @@ my @Certificates = (
         Success              => 1
     },
     {
-        CertificateName      => 'OTRSUserCert',
+        CertificateName      => 'KIXUserCert',
         CertificateFileName1 => 'SMIMECertificate-smimeuser1.crt',
         CertificateFileName2 => 'SMIMECertificate-smimeuser1.p7b',
         CertificateFileName3 => 'SMIMECertificate-smimeuser1.der',

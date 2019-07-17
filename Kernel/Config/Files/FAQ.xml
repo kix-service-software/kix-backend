@@ -99,7 +99,7 @@ If you want to do this, click on this link:
 
 &lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN&gt;/&lt;KIX_CONFIG_ScriptAlias&gt;index.pl?Action=AgentFAQEdit;ItemID=&lt;KIX_FAQ_ITEMID&gt;
 
-Your OTRS Notification Master
+Your KIX Notification Master
             </TextArea>
         </Setting>
     </ConfigItem>
@@ -319,83 +319,6 @@ Your OTRS Notification Master
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Output::OutputFilterTextAutoLink###FAQ" Required="0" Valid="0">
-        <Description Translatable="1">A filter for HTML output to add links behind a defined string. The element Image allows two input kinds. First the name of an image (e.g. faq.png). In this case the OTRS image path will be used. The second possibility is to insert the link to the image.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::Web</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="RegExp">
-                    <Array>
-                        <Item>(FAQ)[#\s]*?1(\d{4})</Item>
-                    </Array>
-                </Item>
-                <Item Key="URL1">
-                    <Hash>
-                        <Item Translatable="1" Key="Description">FAQ</Item>
-                        <Item Key="URL">/otrs/index.pl?Action=AgentFAQZoom;ItemID=&lt;MATCH2&gt;</Item>
-                        <Item Key="Image">/otrs-web/skins/Agent/default/img/help-small.png</Item>
-                        <Item Key="Target">_blank</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerFAQZoom" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Title></Title>
-                <Description Translatable="1">Customer FAQ Zoom.</Description>
-                <NavBarName>FAQ</NavBarName>
-                <Loader>
-                    <CSS>FAQ.Customer.Detail.css</CSS>
-                    <CSS>FAQ.Customer.Default.css</CSS>
-                    <CSS>FAQ.FAQZoom.css</CSS>
-                    <JavaScript>FAQ.Customer.FAQZoom.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerFAQSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Customer FAQ search.</Description>
-                <NavBarName>FAQ</NavBarName>
-                <Title Translatable="1">Search FAQ</Title>
-                <NavBar>
-                    <Description Translatable="1">Search</Description>
-                    <Name Translatable="1">Search</Name>
-                    <Block></Block>
-                    <Type>Submenu</Type>
-                    <NavBar>FAQ</NavBar>
-                    <Link>Action=CustomerFAQSearch</Link>
-                    <LinkOption></LinkOption>
-                    <AccessKey>S</AccessKey>
-                    <Prio>780</Prio>
-                </NavBar>
-                <Loader>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerFAQPrint" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Title></Title>
-                <Description Translatable="1">Customer FAQ Print.</Description>
-                <NavBarName>FAQ</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="FAQ::TicketCompose###InsertMethod" Required="1" Valid="1">
         <Description Translatable="1">Defines the information to be inserted in a FAQ based Ticket. "Full FAQ" includes text, attachments and inline images.</Description>
         <Group>FAQ</Group>
@@ -490,54 +413,6 @@ Your OTRS Notification Master
         <SubGroup>Core</SubGroup>
         <Setting>
             <String Regex="">172800</String> <!-- default 172,800 (60 * 60 * 24 * 2) -->
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###FAQ::LanguageList" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">LanguageList</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###FAQ::PublicCategoryList" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">PublicCategoryList</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###FAQ::PublicFAQGet" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">PublicFAQGet</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###FAQ::PublicFAQSearch" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">PublicFAQSearch</Item>
-                <Item Key="Controller">FAQ</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="DynamicFields::ObjectType###FAQ" Required="0" Valid="1">

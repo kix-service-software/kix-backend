@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:func="http://exslt.org/functions"
-                xmlns:otrs="http://otrs.org"
+                xmlns:kix="http://www.kixdesk.com"
                 extension-element-prefixes="func otrs">
 
 <func:function name="otrs:date-xsd-to-iso">

@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::Main;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Dumper)
 
 use strict;
 use warnings;

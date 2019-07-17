@@ -147,7 +147,6 @@ sub PreEventHandler {
             );
 
             # compatable to old
-            # OTRS 3.x: REMOVE ME
             if ( $Param{Data} ) {
                 %Param = ( %Param, %{ $Param{Data} } );
             }

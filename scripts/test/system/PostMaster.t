@@ -199,7 +199,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 UserID         => 1,
                 Match          => {
                     Subject => 'test',
-                    To      => 'EMAILADDRESS:darthvader@otrs.org',
+                    To      => 'EMAILADDRESS:darthvader@test.org',
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -215,7 +215,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 UserID         => 1,
                 Match          => {
                     Subject => 'test',
-                    To      => 'EMAILADDRESS:darthvader2@otrs.org',
+                    To      => 'EMAILADDRESS:darthvader2@test.org',
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -230,7 +230,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 UserID         => 1,
                 Match          => {
                     Subject => 'test 1',
-                    To      => 'otrs.org',
+                    To      => 'test.org',
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -245,7 +245,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 UserID         => 1,
                 Match          => {
                     Subject => 'NOT REGEX',
-                    To      => 'darthvader@otrs.org',
+                    To      => 'darthvader@test.org',
                 },
                 Not => {
                     To => 1,

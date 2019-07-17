@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::Stats::Static::StateAction;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
 use warnings;
