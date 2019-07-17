@@ -103,7 +103,8 @@ example with "Charset & MimeType" and no "ContentType"
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
-        Channel          => 'note',                                 # ...
+        Channel          => 'note',                                 # Channel or 
+        ChannelID        => 1,                                      # ChannelID
         CustomerVisible  => 0|1,                                    # optional
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
@@ -496,7 +497,7 @@ sub ArticleCreate {
             UserID => $OldTicketData{OwnerID},
         );
 
-        if ( $OwnerInfo{OutOfOfficeMessage} ) {
+        if ( $OwnerInfo{Preferences}->{OutOfOfficeMessage} ) {
             $Self->TicketLockSet(
                 TicketID => $Param{TicketID},
                 Lock     => 'unlock',
@@ -1248,7 +1249,7 @@ attachment / body as attachment (html body will be shown as attachment)
     );
 
 returns an array with hash ref (hash contains result of ArticleGet())
-only with given article types
+only with given channels
 
     my @ArticleBox = $TicketObject->ArticleContentIndex(
         TicketID    => 123,
@@ -1256,6 +1257,15 @@ only with given article types
         Channel     => [ $Channel1, $Channel2 ],
         # or
         ChannelID   => [ $ChannelID1, $ChannelID2 ],
+    );
+
+returns an array with hash ref (hash contains result of ArticleGet())
+only visible for the customer
+
+    my @ArticleBox = $TicketObject->ArticleContentIndex(
+        TicketID        => 123,
+        UserID          => 1,
+        CustomerVisible => 1
     );
 
 Likewise C<ArticleSenderTypeID> allows filtering of only articles with
@@ -1371,7 +1381,7 @@ returns articles in array / hash by given ticket id
     );
 
 returns articles in array / hash by given ticket id but
-only requested article types
+only requested channel(s)
 
     my @ArticleIndex = $TicketObject->ArticleGet(
         TicketID      => 123,
@@ -1379,6 +1389,15 @@ only requested article types
         # or
         ChannelID     => [ $ChannelID1, $ChannelID2 ],
         UserID        => 123,
+    );
+
+returns articles in array / hash by given ticket id but
+only articles visible for the customer
+
+    my @ArticleIndex = $TicketObject->ArticleGet(
+        TicketID        => 123,
+        CustomerVisible => 1,
+        UserID          => 123,
     );
 
 returns articles in array / hash by given ticket id but
@@ -1468,6 +1487,11 @@ sub ArticleGet {
         $ChannelIDSQL = " AND sa.channel_id IN ($QuotedIDs)";
     }
 
+    my $CustomerVisibleSQL = '';
+    if ( $Param{CustomerVisible} ) {
+        $CustomerVisibleSQL = " AND sa.customer_visible = 1";
+    }
+
     # sender type lookup
     my $SenderTypeSQL = '';
     if ( $Param{ArticleSenderType} && ref $Param{ArticleSenderType} eq 'ARRAY' ) {
@@ -1530,13 +1554,18 @@ sub ArticleGet {
         push @Bind, \$Param{TicketID};
     }
 
-    # add article types
+    # add channels
     if ($ChannelSQL) {
         $SQL .= $ChannelSQL;
     }
     if ($ChannelIDSQL) {
         $SQL .= $ChannelIDSQL;
     }
+
+    # add customer visibility
+    if ($CustomerVisibleSQL) {
+        $SQL .= $CustomerVisibleSQL;
+    }    
 
     # add sender types
     if ($SenderTypeSQL) {
@@ -2720,11 +2749,16 @@ sub ArticleAccountedTimeDelete {
         Bind => [ \$Param{ArticleID} ],
     );
 
+    # get article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
-        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;

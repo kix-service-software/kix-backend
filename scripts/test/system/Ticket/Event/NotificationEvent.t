@@ -26,6 +26,19 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
+# disable debugging
+foreach my $Type ( qw(Permission Cache) ) {
+    my $Success = $ConfigObject->Set(
+        Key   => $Type."::Debug",
+        Value => 0,
+    );
+
+    $Self->True(
+        $Success,
+        "Disabled $Type debugging",
+    );
+}
+
 # disable rich text editor
 my $Success = $ConfigObject->Set(
     Key   => 'Frontend::RichText',
@@ -90,13 +103,73 @@ $ConfigObject->Set(
     Value => 1,
 );
 
-# create a new user for current test
-my $UserLogin = $Helper->TestUserCreate(
-    Groups => ['users'],
+# get a random id
+my $RandomID = $Helper->GetRandomID();
+
+# get role object
+my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+
+# add simple role
+my $RoleID = $RoleObject->RoleAdd(
+    Name    => "example-role$RandomID",
+    Comment => 'comment describing the role',
+    ValidID => 1,
+    UserID  => 1,
 );
 
-# get user object
+# add ticket_deny role
+my $TicketDenyRoleID = $RoleObject->RoleAdd(
+    Name    => "ticket_deny_$RandomID",
+    ValidID => 1,
+    UserID  => 1,
+);
+
+$RoleObject->PermissionAdd(
+    RoleID => $TicketDenyRoleID,
+    TypeID => 1,
+    Target => '/tickets',
+    Value  => Kernel::System::Role::Permission->PERMISSION->{DENY},
+    UserID => 1,
+);
+
+# add ticket_read role
+my $TicketReadRoleID = $RoleObject->RoleAdd(
+    Name    => "ticket_read_$RandomID",
+    ValidID => 1,
+    UserID  => 1,
+);
+
+$RoleObject->PermissionAdd(
+    RoleID => $TicketReadRoleID,
+    TypeID => 1,
+    Target => '/tickets',
+    Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+    UserID => 1,
+);
+
+# add ticket_read role
+my $TicketWriteRoleID = $RoleObject->RoleAdd(
+    Name    => "ticket_write_$RandomID",
+    ValidID => 1,
+    UserID  => 1,
+);
+
+$RoleObject->PermissionAdd(
+    RoleID => $TicketWriteRoleID,
+    TypeID => 1,
+    Target => '/tickets',
+    Value  => Kernel::System::Role::Permission->PERMISSION->{UPDATE},
+    UserID => 1,
+);
+
+# get objects
+my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+
+# create a new user for current test
+my $UserLogin = $Helper->TestUserCreate(
+    Roles => ["example-role$RandomID", "ticket_read_$RandomID", "ticket_write_$RandomID"],
+);
 
 my %UserData = $UserObject->GetUserData(
     User => $UserLogin,
@@ -105,132 +178,44 @@ my %UserData = $UserObject->GetUserData(
 my $UserID = $UserData{UserID};
 
 # create a new user without permissions
-my $UserLogin2 = $Helper->TestUserCreate();
+my $UserLogin2 = $Helper->TestUserCreate(
+    Roles => ["ticket_deny_$RandomID"],
+);
 
 my %UserData2 = $UserObject->GetUserData(
     User => $UserLogin2,
 );
 
-# create a new user invalid
+# create a new user with read permissions but invalid
 my $UserLogin3 = $Helper->TestUserCreate(
-    Groups => ['users'],
+    Roles => ["ticket_read_$RandomID"],
 );
 
 my %UserData3 = $UserObject->GetUserData(
     User => $UserLogin3,
 );
 
-# create a new user with permissions via roles only
-my $UserLogin4 = $Helper->TestUserCreate();
-
-my %UserData4 = $UserObject->GetUserData(
-    User => $UserLogin4,
-);
-
+# set User3 invalid
 my $SetInvalid = $UserObject->UserUpdate(
     %UserData3,
     ValidID      => 2,
     ChangeUserID => 1,
 );
 
-# create a new customer user for current test
-my $ContactLogin = $Helper->TestContactCreate();
-
-# get a random id
-my $RandomID = $Helper->GetRandomID();
-
-# get group object
-my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-# add group
-my $GID = $GroupObject->GroupAdd(
-    Name    => "example-group$RandomID",
-    Comment => 'comment describing the group',
-    ValidID => 1,
-    UserID  => 1,
+# create a new user with role without explicit permissions
+my $UserLogin4 = $Helper->TestUserCreate(
+    Roles => ["example-role$RandomID", "ticket_read_$RandomID"]
 );
 
-$Self->IsNot(
-    $GID,
-    undef,
-    "GroupAdd() should not be undef",
+my %UserData4 = $UserObject->GetUserData(
+    User => $UserLogin4,
 );
 
-$Success = $GroupObject->PermissionGroupUserAdd(
-    GID        => $GID,
-    UID        => $UserID,
-    Permission => {
-        ro        => 1,
-        move_into => 1,
-        create    => 1,
-        owner     => 1,
-        priority  => 1,
-        rw        => 1,
-    },
-    UserID => 1,
-);
+# create a new contact for current test
+my $ContactID = $Helper->TestContactCreate();
 
-$Self->True(
-    $Success,
-    "Added User ID $UserID to Group ID $GID",
-);
-
-# add role
-my $RoleID = $GroupObject->RoleAdd(
-    Name    => "example-role$RandomID",
-    Comment => 'comment describing the role',
-    ValidID => 1,
-    UserID  => 1,
-);
-
-$Self->IsNot(
-    $GID,
-    undef,
-    "RoleAdd() should not be undef",
-);
-
-# add role to group
-$Success = $GroupObject->PermissionGroupRoleAdd(
-    GID        => $GID,
-    RID        => $RoleID,
-    Permission => {
-        ro        => 1,
-        move_into => 1,
-        create    => 1,
-        owner     => 1,
-        priority  => 1,
-        rw        => 1,
-    },
-    UserID => 1,
-);
-
-$Self->True(
-    $Success,
-    "Added Role ID $RoleID to Group ID $GID",
-);
-
-$Success = $GroupObject->PermissionRoleUserAdd(
-    RID    => $RoleID,
-    UID    => $UserID,
-    Active => 1,
-    UserID => 1,
-);
-
-$Self->True(
-    $Success,
-    "Added User ID $UserID to Role ID $RoleID",
-);
-
-$Success = $GroupObject->PermissionRoleUserAdd(
-    RID    => $RoleID,
-    UID    => $UserData4{UserID},
-    Active => 1,
-    UserID => 1,
-);
-
-$Self->True(
-    $Success,
-    "Added User ID $UserData4{UserID} to Role ID $RoleID",
+my %Contact = $ContactObject->ContactGet(
+    ID => $ContactID
 );
 
 # get queue object
@@ -239,19 +224,6 @@ my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
 # get queue data
 my %Queue = $QueueObject->QueueGet(
     ID => 1,
-);
-
-# set queue to special group
-$Success = $QueueObject->QueueUpdate(
-    QueueID => 1,
-    %Queue,
-    GroupID => $GID,
-    UserID  => 1,
-);
-
-$Self->True(
-    $Success,
-    "Set Queue ID 1 to Group ID $GID",
 );
 
 # get ticket object
@@ -264,8 +236,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock          => 'unlock',
     Priority      => '3 normal',
     State         => 'new',
-    CustomerID    => 'example.com',
-    Contact  => $ContactLogin,
+    OrganisationID => 'example.com',
+    ContactID     => $ContactID,
     OwnerID       => $UserID,
     ResponsibleID => $UserID,
     UserID        => $UserID,
@@ -325,11 +297,6 @@ my $SuccessWatcher = $TicketObject->TicketWatchSubscribe(
 $Self->True(
     $SuccessWatcher,
     "TicketWatchSubscribe() successful for Ticket ID $TicketID",
-);
-
-# get channel ID of 'email' channel
-my $ChannelID = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
-    Name => 'email',
 );
 
 my @Tests = (
@@ -675,10 +642,10 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name => 'Recipients Write Permissions',
+        Name => 'Recipients Read Permissions',
         Data => {
             Events     => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
-            Recipients => ['AgentWritePermissions'],
+            Recipients => ['AgentReadPermissions'],
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -695,6 +662,28 @@ my @Tests = (
             },
             {
                 ToArray => [ $UserData4{UserEmail} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'Recipients Write Permissions',
+        Data => {
+            Events     => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            Recipients => ['AgentWritePermissions'],
+        },
+        Config => {
+            Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
+            Data  => {
+                TicketID => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                ToArray => [ $UserData{UserEmail} ],
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
             },
         ],
@@ -749,7 +738,7 @@ my @Tests = (
         Data => {
             Events          => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientAgents => [$UserID],
-            RecipientEmail  => ['test@otrsexample.com'],
+            RecipientEmail  => ['test@kixexample.com'],
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -765,7 +754,7 @@ my @Tests = (
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
             },
             {
-                ToArray => ['test@otrsexample.com'],
+                ToArray => ['test@kixexample.com'],
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
             },
         ],
@@ -788,28 +777,6 @@ my @Tests = (
         },
         ExpectedResults => [],
         Success         => 1,
-    },
-    {
-        Name => 'RecipientGroups',
-        Data => {
-            Events          => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
-            RecipientGroups => [$GID],
-        },
-        Config => {
-            Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
-            Data  => {
-                TicketID => $TicketID
-            },
-            Config => {},
-            UserID => 1,
-        },
-        ExpectedResults => [
-            {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
-            },
-        ],
-        Success => 1,
     },
     {
         Name => 'RecipientRoles',
@@ -838,11 +805,10 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name => 'RecipientAgents + RecipientGroups + RecipientRoles',
+        Name => 'RecipientAgents + RecipientRoles',
         Data => {
             Events          => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientAgents => [$UserID],
-            RecipientGroups => [$GID],
             RecipientRoles  => [$RoleID],
         },
         Config => {
@@ -866,11 +832,12 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name => 'RecipientCustomer + NotificationChannel email',
+        Name => 'RecipientCustomer + Channel email',
         Data => {
-            Events                    => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
-            Recipients                => ['Customer'],
-            NotificationChannelID     => [$ChannelID],
+            Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            Recipients         => ['Customer'],
+            Channel            => ['email'],
+            VisibleForCustomer => [1]
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -883,7 +850,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
-                ToArray => ["$ContactLogin\@localunittest.com"],
+                ToArray => [$Contact{Email}],
             },
         ],
         Success => 1,
@@ -892,7 +859,7 @@ my @Tests = (
         Name => 'RecipientEmail filter by unchecked dynamic field',
         Data => {
             Events         => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
-            RecipientEmail => ['test@otrsexample.com'],
+            RecipientEmail => ['test@kixexample.com'],
 
             # Filter by unchecked checbox dynamic field value. Note that the search value (-1) is
             #   different than the match value (0). See bug#12257 for more information.
@@ -908,7 +875,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => ['test@otrsexample.com'],
+                ToArray => ['test@kixexample.com'],
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
             },
         ],
@@ -1155,13 +1122,13 @@ for my $Test (@Tests) {
         "$Test->{Name} - Recipients",
     );
 
-    # check if there is email-notification-int article type when sending notification
+    # check if there is an article visible for the customer when sending notification
     # to customer see bug#11592
     if ( $Test->{Name} =~ /RecipientCustomer/i ) {
         my @ArticleBox = $TicketObject->ArticleContentIndex(
-            TicketID      => $TicketID,
-            UserID        => 1,
-            ChannelID     => [$ChannelID],
+            TicketID        => $TicketID,
+            UserID          => 1,
+            CustomerVisible => 1,
         );
         $Self->Is(
             scalar @ArticleBox,

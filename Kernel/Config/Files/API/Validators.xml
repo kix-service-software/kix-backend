@@ -8,7 +8,7 @@
                 <Item Key="Module">ArticleValidator</Item>
                 <Item Key="Validates">ArticleID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">ArticleGet</Item>
+                <Item Key="IgnoreOperationRegEx">(ArticleGet|NotificationCreate|NotificationUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -30,7 +30,7 @@
                 <Item Key="Module">AutoResponseTypeValidator</Item>
                 <Item Key="Validates">AutoResponseType</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(NotificationCreate|NotificationUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -129,7 +129,7 @@
                 <Item Key="Module">LockValidator</Item>
                 <Item Key="Validates">Lock,LockID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">LockGet</Item>
+                <Item Key="IgnoreOperationRegEx">(LockGet|NotificationCreate|NotificationUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -260,8 +260,8 @@
             <Hash>
                 <Item Key="Module">TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
-                <Item Key="ConsiderOperationRegEx">(TicketCreate|TicketUpdate|NotificationCreate|NotificationUpdate)</Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="ConsiderOperationRegEx">(TicketCreate|TicketUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(NotificationCreate|NotificationUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
