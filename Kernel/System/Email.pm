@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::Email;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
 
 use strict;
 use warnings;
@@ -290,7 +289,6 @@ sub Send {
     }
     else {
         $Header{'X-Mailer'}     = "$Product Mail Service ($Version)";
-#rbo - T2016121190001552 - renamed OTRS to KIX
         $Header{'X-Powered-By'} = 'KIX (https://www.kixdesk.com/)';
     }
     $Header{Type} = $Param{MimeType} || 'text/plain';

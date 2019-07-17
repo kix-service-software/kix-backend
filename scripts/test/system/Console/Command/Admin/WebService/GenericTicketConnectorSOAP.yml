@@ -34,7 +34,7 @@ Provider:
   Transport:
     Config:
       MaxLength: 100000000
-      NameSpace: http://www.otrs.org/TicketConnector/
+      NameSpace: http://test.kixdesk.com/TicketConnector/
     Type: HTTP::SOAP
 RemoteSystem: ''
 Requester:

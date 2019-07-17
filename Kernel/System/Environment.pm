@@ -334,17 +334,15 @@ sub DBInfoGet {
     return %EnvDB;
 }
 
-#rbo - T2016121190001552 - renamed OTRS to KIX
-
 =item KIXInfoGet()
 
 collect information about KIX installation
 
-    my %OTRSInfo = $EnvironmentObject->KIXInfoGet();
+    my %Info = $EnvironmentObject->KIXInfoGet();
 
 returns:
 
-    %KIXInfo = (
+    %Info = (
         Product         => "KIX",
         Version         => "17.0.0",
         DefaultLanguage => "en",

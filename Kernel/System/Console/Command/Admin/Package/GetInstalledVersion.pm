@@ -189,7 +189,7 @@ sub _PackageContentGet {
                 }
             }
         }
-        if ( $PackageName !~ /^.+?.opm$/ ) {
+        if ( $PackageName !~ /^.+?.kpm$/ ) {
             my @Packages = $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineList(
                 URL  => $URL,
                 Lang => $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage'),

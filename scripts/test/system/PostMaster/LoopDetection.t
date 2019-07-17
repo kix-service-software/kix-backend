@@ -24,7 +24,7 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-# This test checks if OTRS correctly detects that an email must not be auto-responded to.
+# This test checks if KIX correctly detects that an email must not be auto-responded to.
 my @Tests = (
     {
         Name => 'Regular mail',
@@ -37,7 +37,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => '',
         },
     },
@@ -53,7 +52,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => 'yes',
         },
     },
@@ -69,7 +67,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => 'yes',
         },
     },
@@ -85,7 +82,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => 'yes',
         },
     },
@@ -101,7 +97,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => 'yes',
         },
     },
@@ -117,7 +112,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => 'yes',
         },
     },
@@ -133,7 +127,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => 'yes',
         },
     },
@@ -149,7 +142,6 @@ Body
 ',
         EmailParams => {
             From          => 'test@home.com',
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-Loop' => '',
         },
     },

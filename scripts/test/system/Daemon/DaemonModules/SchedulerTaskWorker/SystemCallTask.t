@@ -237,8 +237,8 @@ $Self->False(
 
 my @TicketIDs = $TicketObject->TicketSearch(
     Result  => 'ARRAY',
-    From    => '%skywalker@otrs.org%',
-    To      => '%darthvader@otrs.org%',
+    From    => '%skywalker@test.org%',
+    To      => '%darthvader@test.org%',
     Subject => '%test 1%',
     UserID  => 1,
 );

@@ -19,14 +19,14 @@ use Kernel::System::VariableCheck qw(:all);
 # get package object
 my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
 
-# get OTRS Version
-my $OTRSVersion = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+# get KIX Version
+my $KIXVersion = $Kernel::OM->Get('Kernel::Config')->Get('Version');
 
 # leave only major and minor level versions
-$OTRSVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
+$KIXVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
 
 # add x as patch level version
-$OTRSVersion .= '.x';
+$KIXVersion .= '.x';
 
 my @Tests = (
     {
@@ -58,17 +58,17 @@ for a package file.',
     {
         Name   => 'Normal package content',
         String => '<?xml version="1.0" encoding="utf-8" ?>
-    <otrs_package version="1.0">
+    <kix_package version="1.0">
       <Name>TestPackage</Name>
       <Version>1.0.1</Version>
-      <Vendor>OTRS AG</Vendor>
-      <URL>http://otrs.org/</URL>
+      <Vendor>c.a.p.e. IT GmbH</Vendor>
+      <URL>http://www.cape-it.de/</URL>
       <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
       <ChangeLog>2013-08-14 New package (some test &lt; &gt; &amp;).</ChangeLog>
       <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
       <Description Lang="de">Ein Test Paket (some test &lt; &gt; &amp;).</Description>
       <ModuleRequired Version="1.112">Encode</ModuleRequired>
-      <Framework>' . $OTRSVersion . '</Framework>
+      <Framework>' . $KIXVersion . '</Framework>
       <BuildDate>2005-11-10 21:17:16</BuildDate>
       <BuildHost>yourhost.example.com</BuildHost>
       <Filelist>
@@ -76,7 +76,7 @@ for a package file.',
         <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
         <File Location="bin/otrs.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
       </Filelist>
-    </otrs_package>
+    </kix_package>
 ',
         Success => 1,
     },
@@ -110,7 +110,7 @@ for my $Test (@Tests) {
 
         $Self->Is(
             $Structure{Vendor}->{Content},
-            'OTRS AG',
+            'c.a.p.e. IT GmbH',
             "PackageParse() - $Test->{Name} | Vendor",
         );
     }

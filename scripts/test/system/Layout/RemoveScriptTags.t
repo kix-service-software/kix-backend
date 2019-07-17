@@ -47,14 +47,14 @@ my @Tests = (
     {
         Input => '
 <script type="text/javascript">//<![CDATA[
-    OTRS.UI.Tables.InitTableFilter($(\'#FilterCustomers\'), $(\'#Customers\'));
-    OTRS.UI.Tables.InitTableFilter($(\'#FilterGroups\'), $(\'#Groups\'));
+    KIX.UI.Tables.InitTableFilter($(\'#FilterCustomers\'), $(\'#Customers\'));
+    KIX.UI.Tables.InitTableFilter($(\'#FilterGroups\'), $(\'#Groups\'));
 //]]></script>
         ',
         Result => '
 
-    OTRS.UI.Tables.InitTableFilter($(\'#FilterCustomers\'), $(\'#Customers\'));
-    OTRS.UI.Tables.InitTableFilter($(\'#FilterGroups\'), $(\'#Groups\'));
+    KIX.UI.Tables.InitTableFilter($(\'#FilterCustomers\'), $(\'#Customers\'));
+    KIX.UI.Tables.InitTableFilter($(\'#FilterGroups\'), $(\'#Groups\'));
 
         ',
         Name => '_RemoveScriptTags - complete content test',

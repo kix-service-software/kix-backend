@@ -217,7 +217,7 @@ sub Fetch {
                         $Kernel::OM->Get('Kernel::System::Log')->Log(
                             Priority => 'error',
                             Message  => "$AuthType: Can't process mail, mail saved ("
-                                . "$File, report it on http://bugs.otrs.org/)!",
+                                . "$File, report it on http://www.kixdesk.com/)!",
                         );
                     }
                     undef $PostMasterObject;

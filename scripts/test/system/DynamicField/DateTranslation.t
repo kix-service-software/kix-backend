@@ -532,21 +532,21 @@ for my $Test (@Tests) {
         $HTMLResult{Day} = $1;
 
         #reset capturing groups
-        "OTRS" =~ m{OTRS};
+        "KIX" =~ m{KIX};
 
         # get month from HTML
         $FieldHTML->{Field} =~ m{title="Month" [^s]+ selected="selected">([^<]+)</option>}msx;
         $HTMLResult{Month} = $1;
 
         #reset capturing groups
-        "OTRS" =~ m{OTRS};
+        "KIX" =~ m{KIX};
 
         # get year from HTML
         $FieldHTML->{Field} =~ m{title="Year" [^s]+ selected="selected">([^<]+)</option>}msx;
         $HTMLResult{Year} = $1;
 
         #reset capturing groups
-        "OTRS" =~ m{OTRS};
+        "KIX" =~ m{KIX};
 
         # also get Hour and Minute for DateTime fields
         if ( $Test->{Config}->{Type} eq 'DateTime' ) {
@@ -556,14 +556,14 @@ for my $Test (@Tests) {
             $HTMLResult{Hour} = $1;
 
             #reset capturing groups
-            "OTRS" =~ m{OTRS};
+            "KIX" =~ m{KIX};
 
             # get minute from HTML
             $FieldHTML->{Field} =~ m{title="Minutes" [^s]+ selected="selected">([^<]+)</option>}msx;
             $HTMLResult{Minute} = $1;
 
             #reset capturing groups
-            "OTRS" =~ m{OTRS};
+            "KIX" =~ m{KIX};
         }
 
         $Self->IsDeeply(

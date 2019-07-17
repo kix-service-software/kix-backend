@@ -6252,14 +6252,13 @@ sub TicketMerge {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-#rbo - T2016121190001552 - added KIX placeholders
     my $Body = $ConfigObject->Get('Ticket::Frontend::AutomaticMergeText');
-    $Body =~ s{<(KIX|OTRS)_TICKET>}{$MergeTicket{TicketNumber}}xms;
+    $Body =~ s{<KIX_TICKET>}{$MergeTicket{TicketNumber}}xms;
 
     # KIX4OTRS-capeIT
     # $Body =~ s{<KIX_MERGE_TO_TICKET>}{$MainTicket{TicketNumber}}xms;
     $Body =~
-        s{<(KIX|OTRS)_MERGE_TO_TICKET>}{<!-- KIX4OTRS MergeTargetLinkStart ::$Param{MainTicketID}:: -->$MainTicket{TicketNumber}<!-- KIX4OTRS MergeTargetLinkEnd -->}xms;
+        s{<KIX_MERGE_TO_TICKET>}{<!-- KIX MergeTargetLinkStart ::$Param{MainTicketID}:: -->$MainTicket{TicketNumber}<!-- KIX MergeTargetLinkEnd -->}xms;
 
     # EO KIX4OTRS-capeIT
 
@@ -7178,7 +7177,7 @@ sub TicketArticleStorageSwitch {
     for my $ArticleID (@ArticleIndex) {
 
         # create source object
-        # We have to create it for every article because of the way OTRS uses base classes here.
+        # We have to create it for every article because of the way KIX uses base classes here.
         # We cannot have two ticket objects with different base classes.
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',

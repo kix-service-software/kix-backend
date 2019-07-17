@@ -23,7 +23,6 @@ use FileHandle;
 use Time::HiRes qw(time);
 
 use Kernel::System::ObjectManager;
-## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectManagerCreation)
 
 # UnitTest helper must be loaded to override the builtin time functions!
 use Kernel::System::UnitTest::Helper;

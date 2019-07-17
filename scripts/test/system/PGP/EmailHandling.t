@@ -224,7 +224,7 @@ for my $Test (@Tests) {
         Result   => 'ARRAY',
     );
 
-    # use post master to import mail into OTRS
+    # use post master to import mail into KIX
     my $PostMasterObject = Kernel::System::PostMaster->new(
         Email   => $Email,
         Trusted => 1,
@@ -525,7 +525,7 @@ for my $Test (@Tests) {
         VerifyDecryption => 1,
     };
 
-    # TODO: currently inline signatures tests does not work as OTRS does not save the signature
+    # TODO: currently inline signatures tests does not work as KIX does not save the signature
     #    in the Article{Body}, the body remains intact after sending the email, only the email has
     #    the signature
 }
@@ -536,8 +536,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed successful',
-    CustomerNo   => '123465',
-    Contact => 'customer@example.com',
+    OrganisationID => '123465',
+    ContactID    => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

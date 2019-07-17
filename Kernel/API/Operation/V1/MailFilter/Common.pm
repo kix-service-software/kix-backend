@@ -70,7 +70,7 @@ sub _CheckMailFilter {
     for my $Header ( @{$XHeaders} ) {
         if ($Header) {
             $MatchHeaders{$Header} = 1;
-            if ( $Header =~ m/^(X-KIX-|X-OTRS-)/ ) {
+            if ( $Header =~ m/^(X-KIX-)/ ) {
                 $SetHeaders{$Header} = 1;
             }
         }

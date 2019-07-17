@@ -243,7 +243,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                $DFName1 => '<OTRS_TICKET_Queue>',
+                $DFName1 => '<KIX_TICKET_Queue>',
             },
         },
         Success => 1,
@@ -254,7 +254,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                $DFName1 => '<OTRS_TICKET_Queue> <OTRS_TICKET_QueueID>',
+                $DFName1 => '<KIX_TICKET_Queue> <KIX_TICKET_QueueID>',
             },
         },
         Success => 1,
@@ -265,7 +265,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                $DFName1 => '<OTRS_TICKET_NotExisting>',
+                $DFName1 => '<KIX_TICKET_NotExisting>',
             },
         },
         NoValue => 1,
@@ -340,7 +340,7 @@ for my $Test (@Tests) {
         my $ExpectedValue = $Test->{Config}->{Config}->{$Attribute};
         if (
             $OrigTest->{Config}->{Config}->{$Attribute}
-            =~ m{\A<OTRS_TICKET_([A-Za-z0-9_]+)>\z}msx
+            =~ m{\A<KIX_TICKET_([A-Za-z0-9_]+)>\z}msx
             )
         {
             $ExpectedValue = $Ticket{$1} // '';
@@ -352,7 +352,7 @@ for my $Test (@Tests) {
         }
         elsif (
             $OrigTest->{Config}->{Config}->{$Attribute}
-            =~ m{\A<OTRS_TICKET_([A-Za-z0-9_]+)> [ ] <OTRS_TICKET_([A-Za-z0-9_]+)>\z}msx
+            =~ m{\A<KIX_TICKET_([A-Za-z0-9_]+)> [ ] <KIX_TICKET_([A-Za-z0-9_]+)>\z}msx
             )
         {
             $ExpectedValue = ( $Ticket{$1} // '' ) . ' ' . ( $Ticket{$2} // '' );

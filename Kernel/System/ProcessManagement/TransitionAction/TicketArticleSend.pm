@@ -160,7 +160,7 @@ sub Run {
 
     # check Channel
     # BPMX-capeIT
-    #    TODO Test => consultation tto => ReleaseTicket => sopm
+    #    TODO Test => consultation tto => ReleaseTicket => skpm
     #    if ( $Param{Config}->{Channel} =~ m{\A email }msxi ) {
     if ( !( $Param{Config}->{Channel} =~ m{\A email }msxi ) ) {
 

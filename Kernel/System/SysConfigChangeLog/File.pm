@@ -37,9 +37,8 @@ sub new {
     $Self->{LogFile} = $ConfigObject->Get('SysConfigChangeLog::LogModule::LogFile')
         || die 'Need SysConfigChangeLog::LogModule::LogFile param in Config.pm';
 
-#rbo - T2016121190001552 - added KIX placeholders
     # replace config tags
-    $Self->{LogFile} =~ s{<(KIX|OTRS)_CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($2)}egx;
+    $Self->{LogFile} =~ s{<KIX_CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($2)}egx;
 
     # EO KIX4OTRS-capeIT
 

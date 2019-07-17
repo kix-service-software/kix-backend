@@ -1236,7 +1236,7 @@ sub EmbeddedImagesExtract {
 
 =item HTMLTruncate()
 
-DEPRECATED: This function will be removed in further versions of OTRS
+DEPRECATED: This function will be removed in further versions
 
 truncate an HTML string to certain amount of characters without loosing the HTML tags, the resulting
 string will contain the specified amount of text characters plus the HTML tags, and ellipsis string.

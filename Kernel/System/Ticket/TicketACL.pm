@@ -357,7 +357,7 @@ sub TicketAcl {
             next DEBUGFILTER if !$Self->{ACLDebugFilters}->{$DebugFilter};
 
 #rbo - T2016121190001552 - added KIX placeholders
-            if ( $DebugFilter =~ m{<(KIX|OTRS)_TICKET_([^>]+)>}msx ) {
+            if ( $DebugFilter =~ m{<KIX_TICKET_([^>]+)>}msx ) {
                 my $TicketParam = $2;
 
                 if (

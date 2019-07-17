@@ -172,7 +172,7 @@ sub Run {
         #check and replace placeholders...
         for my $QueueNamePart (@SingleQueueNames) {
 #rbo - T2016121190001552 - added KIX placeholders
-            $QueueNamePart =~ s/<(KIX|OTRS)_Ticket_(.+)>/$Ticket{$2}/e;
+            $QueueNamePart =~ s/<KIX_Ticket_(.+)>/$Ticket{$2}/e;
             $SingleQueueNames[$Index] = $QueueNamePart;
             $Index++;
         }
@@ -235,7 +235,7 @@ sub Run {
                     TicketID    => $Param{Data}->{TicketID},
                     Channel     => 'note',
                     SenderType  => 'system',
-                    From        => 'KIX4OTRS Systeminformation',
+                    From        => 'KIX Systeminformation',
                     Subject     => 'Automatic move failed due to a misconfiguration.',
                     Body        => 'Hello,
 

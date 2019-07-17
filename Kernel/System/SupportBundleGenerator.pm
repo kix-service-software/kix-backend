@@ -72,7 +72,7 @@ sub new {
 
 Generates a support bundle tar or tar.gz with the following contents: Registration Information,
 Support Data, Installed Packages, and another tar or tar.gz with all changed or new files in the
-OTRS installation directory.
+KIX installation directory.
 
     my $Result = $SupportBundleGeneratorObject->Generate();
 

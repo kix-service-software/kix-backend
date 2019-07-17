@@ -66,9 +66,8 @@ sub Run {
     # do db insert
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $Param{TicketID},
-#rbo - T2016121190001552 - renamed X-KIX headers
-        Channel          => $GetParam{'X-KIX-Channel'} || $GetParam{'X-OTRS-Channel'},
-        SenderType       => $GetParam{'X-KIX-SenderType'} || $GetParam{'X-OTRS-SenderType'},
+        Channel          => $GetParam{'X-KIX-Channel'},
+        SenderType       => $GetParam{'X-KIX-SenderType'},
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
@@ -137,12 +136,7 @@ sub Run {
     for my $DynamicFieldID ( sort keys %{$DynamicFieldList} ) {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
-#rbo - T2016121190001552 - renamed X-KIX headers
         my $Key = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
-        if ( !defined $GetParam{$Key} || !length $GetParam{$Key} ) {
-            # fallback
-            $Key = 'X-OTRS-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
-        }
         
         if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
 
@@ -170,11 +164,8 @@ sub Run {
     # set free article text
     my %Values =
         (
-#rbo - T2016121190001552 - renamed X-KIX headers
         'X-KIX-FollowUp-ArticleKey'   => 'ArticleFreeKey',
         'X-KIX-FollowUp-ArticleValue' => 'ArticleFreeText',
-        'X-OTRS-FollowUp-ArticleKey'   => 'ArticleFreeKey',
-        'X-OTRS-FollowUp-ArticleValue' => 'ArticleFreeText',
         );
     for my $Item ( sort keys %Values ) {
         for my $Count ( 1 .. 16 ) {

@@ -269,12 +269,12 @@ for my $Test (@Tests) {
         Message => {
             en => {
                 Subject     => 'JobName',
-                Body        => 'JobName <OTRS_TICKET_TicketID> <OTRS_CONFIG_SendmailModule> <OTRS_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
                 ContentType => 'text/plain',
             },
             de => {
                 Subject     => 'JobName',
-                Body        => 'JobName <OTRS_TICKET_TicketID> <OTRS_CONFIG_SendmailModule> <OTRS_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
                 ContentType => 'text/plain',
             },
         },
