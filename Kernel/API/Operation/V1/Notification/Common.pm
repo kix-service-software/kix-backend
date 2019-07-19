@@ -72,7 +72,7 @@ sub _CheckNotification {
             if ( !IsArrayRefWithData($Notification->{Data}->{$Key}) ) {
                 return $Self->_Error( 
                     Code    => 'BadRequest',
-                    Message => 'Parameter $Key is invalid!'
+                    Message => "Parameter $Key is invalid!"
                 );
             }
         }
