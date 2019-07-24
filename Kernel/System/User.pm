@@ -1175,6 +1175,7 @@ return a list of all permission of a given user
 
     my %List = $UserObject->PermissionList(
         UserID => 123
+        RoleID => 456,                           # optional, restrict result to this role
         Types  => [ 'Resource', 'Object' ]       # optional
     );
 
@@ -1193,17 +1194,21 @@ sub PermissionList {
     }
 
     # check cache
-    my $CacheKey = 'PermissionList::'.$Param{UserID}.'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
+    my $CacheKey = 'PermissionList::'.$Param{UserID}.'::'.$Param{RoleID}.'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    my @Bind;
     # get all permissions from every valid role the user is assigned to
+    my @Bind;
     my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ? AND role_id IN (SELECT id FROM roles WHERE valid_id = 1)';
     push(@Bind, \$Param{UserID});
+    if ( $Param{RoleID} ) {
+        $SQL .= ' AND role_id = ?';
+        push(@Bind, \$Param{RoleID});
+    }
 
     # filter specific permission types
     if ( IsArrayRefWithData($Param{Types}) ) {
@@ -1340,27 +1345,111 @@ sub CheckPermission {
     }
 
     # UserID 1 has God Mode ;)
-    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD)  if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD) if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
 
     $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for target $Param{Target}");
 
-    # check one level up (parent resource)
-    my $ParentGranted;
-    my $ParentPermission;
-    my @URIParts = split('/', $Param{Target});
-    pop @URIParts;
-    my $ParentTarget = join('/', @URIParts);
-    if ( $ParentTarget ) {
-        ($ParentGranted, $ParentPermission) = $Self->CheckPermission(
-            %Param,
-            Target => $ParentTarget
+    # get list of all roles to resolve names
+    my %RoleList = $Kernel::OM->Get('Kernel::System::Role')->RoleList();
+
+    # get all roles the user is assigned to
+    my @UserRoleList = $Self->RoleList(
+        UserID => $Param{UserID}
+    );
+    
+    $Self->_PermissionDebug("roles assigned to UserID $Param{UserID}: " . join(', ', map { "\"$RoleList{$_}\" (ID $_)" } sort @UserRoleList));
+
+    # check the permission for each target level (from top to bottom) and role
+    my $ResultingPermission;
+    my $Target;
+    foreach my $TargetPart ( split(/\//, $Param{Target}) ) {
+        next if !$TargetPart;
+
+        $Target .= "/$TargetPart";
+
+        my $TargetPermission;
+        foreach my $RoleID ( sort @UserRoleList ) {
+            my ($RoleGranted, $RolePermission) = $Self->_CheckPermissionForRole(
+                %Param,
+                Target => $Target,
+                RoleID => $RoleID,
+            );
+
+            # if no permissions have been found, go to the next role
+            next if !$RolePermission;
+
+            # init the value
+            if ( !defined $TargetPermission ) {
+                $TargetPermission = 0;
+            }
+
+            # combine permissions
+            $TargetPermission |= ($RolePermission || 0);
+        }
+
+        # if we don't have a target permission don't try use it
+        next if !defined $TargetPermission;
+
+        # combine permissions
+        if ( defined $ResultingPermission ) {
+            $ResultingPermission &= ($TargetPermission || 0);
+        }
+        else {
+            $ResultingPermission = ($TargetPermission || 0);
+        }
+
+        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $ResultingPermission,
+            Format => 'Short'
         );
-        # permission denied, back out
-        return ($ParentGranted, $ParentPermission) if !$ParentGranted;
+
+        $Self->_PermissionDebug("resulting permission on target $Target: $ResultingPermissionShort");
     }
+
+    # check if we have a DENY 
+    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    my $Granted = ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}}) == Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}};
+
+    return ( $Granted, $ResultingPermission);
+}
+
+=item CheckPermissionForRole()
+
+returns true if the requested permission is granted for a given role
+
+    my ($Granted, $ResultingPermission) = $UserObject->CheckPermissionForRole(
+        UserID              => 123,
+        RoleID              => 456,
+        Types               => [ 'Resource', 'Object' ]
+        Target              => '/tickets',
+        RequestedPermission => 'READ'
+    );
+
+=cut
+
+sub _CheckPermissionForRole {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(UserID RoleID Target RequestedPermission) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    # UserID 1 has God Mode ;)
+    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD)  if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+
+    $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}");
 
     my %PermissionList = $Self->PermissionList(
         UserID => $Param{UserID},
+        RoleID => $Param{RoleID},
         Types  => $Param{Types},
     );
 
@@ -1385,12 +1474,18 @@ sub CheckPermission {
         $RelevantPermissions{$PermissionType{Name}}->{$ID} = $Permission;
     }
 
-    $Self->_PermissionDebug("relevant permissions for target $Param{Target}: ".Dumper(\%RelevantPermissions));
+    $Self->_PermissionDebug("relevant permissions for role $Param{RoleID} on target $Param{Target}: ".Dumper(\%RelevantPermissions));
 
     # return if no relevant permissions exist
-    # if our parent is granted then we are granted as well, if not we have to deny the access
-    return ($ParentGranted, $ParentPermission) if !IsHashRefWithData(\%RelevantPermissions) && $ParentGranted;
-    return 0 if !IsHashRefWithData(\%RelevantPermissions);
+    if ( !IsHashRefWithData(\%RelevantPermissions) ) {
+        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => 0,
+            Format => 'Short'
+        );
+        $Self->_PermissionDebug("no relevant permissions found, returning");
+
+        return 0;
+    }
     
     # sum up all the relevant permissions
     my $ResultingPermission = 0;
@@ -1401,7 +1496,7 @@ sub CheckPermission {
             my $Permission = $RelevantPermissions{$Type}->{$ID};
             $ResultingPermission |= $Permission->{Value};
             if ( ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} for target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} for role $Param{RoleID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
                 last TYPE_RELEVANT;
             }
         }
@@ -1415,24 +1510,7 @@ sub CheckPermission {
         Format => 'Short'
     );
 
-    $Self->_PermissionDebug("resulting permission for target $Param{Target}: $ResultingPermissionShort");
-
-    # combine parent and our permission if they differ
-    if ( defined $ParentPermission && $ParentPermission != $ResultingPermission ) {
-        my $ParentPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
-            Value  => $ParentPermission,
-            Format => 'Short'
-        );
-
-        $ResultingPermission &= $ParentPermission;
-
-        $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
-            Value  => $ResultingPermission,
-            Format => 'Short'
-        );
-
-        $Self->_PermissionDebug("resulting permission for target $Param{Target} after combination with parent permission ($ParentPermissionShort): $ResultingPermissionShort");
-    }
+    $Self->_PermissionDebug("resulting permissions for role $Param{RoleID} on target $Param{Target}: $ResultingPermissionShort");
 
     # check if we have a DENY 
     return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};

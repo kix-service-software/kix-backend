@@ -329,7 +329,7 @@ sub _CheckPermission {
             Format => 'Short'
         );
 
-        $Self->_PermissionDebug(sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: $Granted, allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
+        $Self->_PermissionDebug(sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
 
         if ( $Granted ) {
             # build new list of allowed (item) resources
@@ -345,7 +345,7 @@ sub _CheckPermission {
             Value  => $AllowedPermission || 0,
             Format => 'Short'
         );
-        $Self->_PermissionDebug(sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: $Granted, allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
+        $Self->_PermissionDebug(sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
     }
 
     my @AllowedMethods;
