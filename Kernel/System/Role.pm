@@ -382,7 +382,7 @@ sub RoleList {
     my $SQL = 'SELECT id, name FROM roles';
 
     if ( $Param{Valid} ) {
-        $SQL .= ' WHERE valid = 1'
+        $SQL .= ' WHERE valid_id = 1'
     }
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
