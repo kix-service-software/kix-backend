@@ -11,7 +11,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::API::Operation::V1::User::UserUpdate;
+package Kernel::API::Operation::V1::Session::UserUpdate;
 
 use strict;
 use warnings;
@@ -86,10 +86,6 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'UserID' => {
-            DataType => 'NUMERIC',
-            Required => 1
-        },
         'User' => {
             Type     => 'HASH',
             Required => 1
@@ -153,7 +149,7 @@ sub Run {
 
     # check UserLogin exists
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        UserID => $Param{Data}->{UserID},
+        UserID => $Self->{Authorization}->{UserID},
     );
     if ( !%UserData ) {
         return $Self->_Error(
