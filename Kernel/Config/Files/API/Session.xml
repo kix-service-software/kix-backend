@@ -14,6 +14,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Session::UserUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">UserPatchRequest</Item>
+                <Item Key="ResponseObject">UserPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem Name="API::Operation::Module###V1::Session::SessionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
