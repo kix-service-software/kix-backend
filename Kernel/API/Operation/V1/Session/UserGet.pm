@@ -6,7 +6,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -108,7 +108,7 @@ sub Run {
         %UserData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             User          => $Self->{Authorization}->{UserID},
             NoPreferences => 1
-        );        
+        );
     }
 
     if ( !IsHashRefWithData( \%UserData ) ) {
@@ -119,15 +119,15 @@ sub Run {
     }
 
     # filter valid attributes
-    if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
-        foreach my $Attr (sort keys %UserData) {
+    if ( IsHashRefWithData( $Self->{Config}->{AttributeWhitelist} ) ) {
+        foreach my $Attr ( sort keys %UserData ) {
             delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
         }
     }
 
     # filter valid attributes
-    if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
-        foreach my $Attr (sort keys %UserData) {
+    if ( IsHashRefWithData( $Self->{Config}->{AttributeBlacklist} ) ) {
+        foreach my $Attr ( sort keys %UserData ) {
             delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
         }
     }
@@ -136,6 +136,7 @@ sub Run {
 
         # include preferences if requested - we can't do that with our generic sub-resource include function, because we don't have a UserID in our request
         if ( $Param{Data}->{include}->{Preferences} ) {
+
             # get already prepared preferences data from UserPreferenceSearch operation
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Session::UserPreferenceSearch',
@@ -156,23 +157,37 @@ sub Run {
             $UserData{Tickets}->{OwnedAndUnseen} = $Tickets->{Unseen};
 
             # get tickets owned by user and locked
-            $Tickets = $Self->_GetOwnedAndLockedTickets();
+            $Tickets                                      = $Self->_GetOwnedAndLockedTickets();
             $UserData{Tickets}->{OwnedAndLocked}          = $Tickets->{All};
             $UserData{Tickets}->{OwnedAndLockedAndUnseen} = $Tickets->{Unseen};
 
             # get tickets watched by user
-            $Tickets = $Self->_GetWatchedTickets();
+            $Tickets                               = $Self->_GetWatchedTickets();
             $UserData{Tickets}->{Watched}          = $Tickets->{All};
             $UserData{Tickets}->{WatchedAndUnseen} = $Tickets->{Unseen};
 
             # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
+            $Self->AddCacheDependency( Type => 'Ticket' );
+        }
+
+        # include roleids if requested
+        if ( $Param{Data}->{include}->{RoleIDs} ) {
+
+            # get roles list
+            my @RoleList = $Kernel::OM->Get('Kernel::System::User')->RoleList(
+                UserID => $Self->{Authorization}->{UserID},
+            );
+            my @RoleIDs;
+            foreach my $RoleID ( sort @RoleList ) {
+                push( @RoleIDs, 0 + $RoleID );    # enforce nummeric ID
+            }
+            $UserData{RoleIDs} = \@RoleIDs;
         }
     }
 
     return $Self->_Success(
         User => \%UserData,
-    );    
+    );
 }
 
 sub _GetOwnedTickets {
@@ -188,7 +203,7 @@ sub _GetOwnedTickets {
                     Operator => 'EQ',
                     Value    => $Self->{Authorization}->{UserID},
                 },
-            ]
+                ]
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
@@ -207,24 +222,25 @@ sub _GetOwnedTickets {
                 {
                     Field    => 'TicketFlag',
                     Operator => 'EQ',
-                    Value    => [ 
+                    Value    => [
                         {
                             Flag   => 'Seen',
                             Value  => '1',
                             UserID => $Self->{Authorization}->{UserID},
                         }
-                    ]
+                        ]
                 },
-            ]
+                ]
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
     );
+
     # extract all unseen tickets
     my @UnseenTicketIDs;
     foreach my $TicketID (@TicketIDs) {
-        next if grep(/^$TicketID$/, @SeenTicketIDs);
-        push(@UnseenTicketIDs, $TicketID);
+        next if grep( /^$TicketID$/, @SeenTicketIDs );
+        push( @UnseenTicketIDs, $TicketID );
     }
     $Tickets{Unseen} = \@UnseenTicketIDs;
 
@@ -249,7 +265,7 @@ sub _GetOwnedAndLockedTickets {
                     Operator => 'EQ',
                     Value    => 2,
                 },
-            ]
+                ]
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
@@ -273,24 +289,25 @@ sub _GetOwnedAndLockedTickets {
                 {
                     Field    => 'TicketFlag',
                     Operator => 'EQ',
-                    Value    => [ 
+                    Value    => [
                         {
                             Flag   => 'Seen',
                             Value  => '1',
                             UserID => $Self->{Authorization}->{UserID},
                         }
-                    ]
+                        ]
                 },
-            ]
+                ]
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
     );
+
     # extract all unseen tickets
     my @UnseenTicketIDs;
     foreach my $TicketID (@TicketIDs) {
-        next if grep(/^$TicketID$/, @SeenTicketIDs);
-        push(@UnseenTicketIDs, $TicketID);
+        next if grep( /^$TicketID$/, @SeenTicketIDs );
+        push( @UnseenTicketIDs, $TicketID );
     }
     $Tickets{Unseen} = \@UnseenTicketIDs;
 
@@ -310,7 +327,7 @@ sub _GetWatchedTickets {
                     Operator => 'EQ',
                     Value    => $Self->{Authorization}->{UserID},
                 },
-            ]
+                ]
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
@@ -329,24 +346,25 @@ sub _GetWatchedTickets {
                 {
                     Field    => 'TicketFlag',
                     Operator => 'EQ',
-                    Value    => [ 
+                    Value    => [
                         {
                             Flag   => 'Seen',
                             Value  => '1',
                             UserID => $Self->{Authorization}->{UserID},
                         }
-                    ]
+                        ]
                 },
-            ]
+                ]
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
     );
+
     # extract all unseen tickets
     my @UnseenTicketIDs;
     foreach my $TicketID (@TicketIDs) {
-        next if grep(/^$TicketID$/, @SeenTicketIDs);
-        push(@UnseenTicketIDs, $TicketID);
+        next if grep( /^$TicketID$/, @SeenTicketIDs );
+        push( @UnseenTicketIDs, $TicketID );
     }
     $Tickets{Unseen} = \@UnseenTicketIDs;
 

@@ -1582,6 +1582,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Session::UserGet
+    V1::Session::UserUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Session::UserUpdate
     V1::Session::UserPreferenceSearch :
         Description: ''
         MappingInbound:
@@ -2732,6 +2739,10 @@ Provider:
         V1::Session::UserGet:
           RequestMethod:
           - GET
+          Route: /session/user
+        V1::Session::UserUpdate:
+          RequestMethod:
+          - PATCH
           Route: /session/user
         V1::Session::UserPreferenceSearch :
           RequestMethod:
