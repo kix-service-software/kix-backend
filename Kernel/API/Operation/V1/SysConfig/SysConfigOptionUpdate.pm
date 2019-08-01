@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -149,10 +149,8 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Option => $Param{Data}->{Option},
-    );    
+    );
 }
-
-

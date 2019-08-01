@@ -188,7 +188,7 @@ sub OptionGet {
             return;
         }
     }
-   
+
     # check cache
     my $CacheKey = 'OptionGet::' . $Param{Name};
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -196,7 +196,7 @@ sub OptionGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
+
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
         SQL   => "SELECT name, description, level, type, group_name, setting,
                   is_required, is_modified, default_value, value, comments, valid_id,
@@ -254,7 +254,7 @@ sub OptionGet {
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Data,
-    ); 
+    );
        
     return %Data;   
 }
@@ -471,10 +471,11 @@ sub OptionUpdate {
 
     # determine if this option has been modified
     my $IsModified = 0;
-    if ( $Param{Value} && DataIsDifferent(Data1 => \($Param{Default} || $OptionData{Default} || ''), Data2 => \$Param{Value}) ) {
+    if ( defined $Param{Value} && DataIsDifferent(Data1 => \($Param{Default} || $OptionData{Default} || ''), Data2 => \$Param{Value}) ) {
         $IsModified = 1;
     }
     else {
+
         # if there is no difference to the default, remove value
         $Param{Value} = undef;
     }
@@ -687,7 +688,7 @@ sub ValueGetAll {
     }
 
     my %Result = map { 
-        my $Value = $_->{Value} || $_->{Default};
+        my $Value = defined $_->{Value} ? $_->{Value} : $_->{Default};
         if ( $Value ) {
             $Value = $Self->{OptionTypeModules}->{$_->{Type}}->Decode(
                 Data => $Value
