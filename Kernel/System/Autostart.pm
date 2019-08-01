@@ -95,7 +95,7 @@ sub Run {
             my @Command = Text::ParseWords::quotewords('\s+', 0, $Line);
     
             if ( @Command ) {
-                my $Result = $Kernel::OM->Get('Kernel::System::Console::InterfaceConsole')->Run(@Command);
+                my $Result = $Kernel::OM->Get('Kernel::System::Console')->Run(@Command);
                 if ( $Result ) {
                     $Self->{LogObject}->Log( 
                         Priority => 'error', 

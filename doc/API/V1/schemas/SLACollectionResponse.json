@@ -7,7 +7,7 @@
       "SLA" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/SLA"
+            "$ref" : "#/definitions/_SLA_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "SLA"
    ],
    "definitions" : {
-      "SLA" : {
+      "_SLA_json" : {
          "$id" : "#SLA",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The SLA object.",

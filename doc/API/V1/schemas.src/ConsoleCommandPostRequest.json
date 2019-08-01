@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConsoleCommand",
+  "type": "object",
+  "description": "The console command request object for creation/execution.",
+  "properties": {
+    "ConsoleExecute": {
+      "type": "object",
+      "properties": {
+        "Command": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Command"
+      ]
+    }
+  },
+  "required": [
+    "ConsoleExecute"
+  ]
+}

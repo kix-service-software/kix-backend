@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "StateType" : {
-         "$ref" : "#/definitions/StateType"
+         "$ref" : "#/definitions/_StateType_json"
       }
    },
    "required" : [
       "StateType"
    ],
    "definitions" : {
-      "StateType" : {
+      "_StateType_json" : {
          "$id" : "#StateType",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The state type object.",

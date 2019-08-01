@@ -38,6 +38,12 @@
 /system/config                                                                 |   GET             | V1::SysConfig::SysConfigOptionSearch
 /system/config/:Option                                                         |   GET             | V1::SysConfig::SysConfigOptionGet
 /system/config/:Option                                                         |   PATCH           | V1::SysConfig::SysConfigOptionUpdate
+/system/console                                                                |   GET             | V1::Console::ConsoleCommandSearch
+/system/console                                                                |   POST            | V1::Console::ConsoleCommandExecute
+/system/console/:Command                                                       |   GET             | V1::Console::ConsoleCommandGet
+/system/console/files                                                          |   GET             | V1::Console::ConsoleFileSearch
+/system/console/files                                                          |   POST            | V1::Console::ConsoleFileCreate
+/system/console/files/:FileID                                                  |   DELETE          | V1::Console::ConsoleFileDelete
 /system/dynamicfields/types                                                    |   GET             | V1::DynamicField::DynamicFieldTypeSearch
 /system/dynamicfields/objecttypes                                              |   GET             | V1::DynamicField::DynamicFieldObjectTypeSearch
 /system/dynamicfields/:DynamicFieldID/config                                   |   GET             | V1::DynamicField::DynamicFieldConfigGet

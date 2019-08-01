@@ -13,7 +13,7 @@ package Kernel::System::Console::Command::Internal::BashCompletion;
 use strict;
 use warnings;
 
-use Kernel::System::Console::InterfaceConsole;
+use Kernel::System::Console;
 
 use base qw(Kernel::System::Console::BaseCommand Kernel::System::Console::Command::List);
 

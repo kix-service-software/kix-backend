@@ -7,7 +7,7 @@
       "SysConfigOptionDefinition" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/SysConfigOptionDefinition"
+            "$ref" : "#/definitions/_SysConfigOptionDefinition_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "SysConfigOptionDefinition"
    ],
    "definitions" : {
-      "SysConfigOptionDefinition" : {
+      "_SysConfigOptionDefinition_json" : {
          "$id" : "#SysConfigOptionDefinition",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The SysConfig option definition object.",

@@ -26,7 +26,7 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
     },
 );
 
-exit $Kernel::OM->Get('Kernel::System::Console::InterfaceConsole')->Run(@ARGV);
+exit $Kernel::OM->Get('Kernel::System::Console')->Run(@ARGV);
 
 
 

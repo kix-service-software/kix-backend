@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Priority" : {
-         "$ref" : "#/definitions/Priority"
+         "$ref" : "#/definitions/_Priority_json"
       }
    },
    "required" : [
       "Priority"
    ],
    "definitions" : {
-      "Priority" : {
+      "_Priority_json" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The priority object.",

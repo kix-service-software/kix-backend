@@ -4,7 +4,7 @@
   /user:
     displayName: Current User
     description: !include ../descriptions/resources/session/user.md
-    type: [ item-readonly: { typeName: User } ]
+    type: [ item-nodelete: { typeName: User } ]
     /preferences:
       type: { collection: { typeName: UserPreference } }  
       /{preferenceId}:

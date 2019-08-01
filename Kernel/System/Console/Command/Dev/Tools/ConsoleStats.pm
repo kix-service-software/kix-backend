@@ -29,7 +29,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @Commands = $Self->ListAllCommands();
+    my @Commands = $Kernel::OM->Get('Kernel::System::Console')->CommandList();
     my %OptionsCount;
     my %ArgumentsCount;
     for my $Command (@Commands) {
