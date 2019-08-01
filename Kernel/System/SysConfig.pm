@@ -471,7 +471,7 @@ sub OptionUpdate {
 
     # determine if this option has been modified
     my $IsModified = 0;
-    if ( defined $Param{Value} && DataIsDifferent(Data1 => \($Param{Default} || $OptionData{Default} || ''), Data2 => \$Param{Value}) ) {
+    if ( defined $Param{Value} && $Param{Value} ne '' && DataIsDifferent(Data1 => \($Param{Default} || $OptionData{Default} || ''), Data2 => \$Param{Value}) ) {
         $IsModified = 1;
     }
     else {
@@ -688,7 +688,7 @@ sub ValueGetAll {
     }
 
     my %Result = map { 
-        my $Value = defined $_->{Value} ? $_->{Value} : $_->{Default};
+        my $Value = defined $_->{Value} && $_->{Value} ne '' ? $_->{Value} : $_->{Default};
         if ( $Value ) {
             $Value = $Self->{OptionTypeModules}->{$_->{Type}}->Decode(
                 Data => $Value
