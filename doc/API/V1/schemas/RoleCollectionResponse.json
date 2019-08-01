@@ -7,7 +7,7 @@
       "Role" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Role"
+            "$ref" : "#/definitions/_Role_json"
          }
       }
    },
@@ -15,72 +15,7 @@
       "Role"
    ],
    "definitions" : {
-      "Role" : {
-         "$id" : "#Role",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The role object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Permissions" : {
-               "description" : "added via include \"Permissions\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/Permission"
-               },
-               "readOnly" : true
-            },
-            "UserIDs" : {
-               "description" : "added via include \"UserIDs\"",
-               "type" : "array",
-               "items" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      },
-      "Permission" : {
+      "_Permission_json" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The permission object.",
@@ -136,6 +71,71 @@
             "ID",
             "Target",
             "Value"
+         ]
+      },
+      "_Role_json" : {
+         "$id" : "#Role",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The role object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Permissions" : {
+               "description" : "added via include \"Permissions\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_Permission_json"
+               },
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
          ]
       }
    }

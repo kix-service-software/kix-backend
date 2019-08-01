@@ -10390,4 +10390,12 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="Console::FilePath" Required="1" Valid="1">
+        <Description Translatable="1">The path to the uploaded console files.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Console</SubGroup>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp/console</String>
+        </Setting>
+    </ConfigItem>
 </kix_config>

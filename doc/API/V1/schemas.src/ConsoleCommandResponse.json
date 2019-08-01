@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConsoleCommand",
+  "type": "object",
+  "description": "A response for console command GET request.",
+  "properties": {
+    "ConsoleCommand": {
+      "$ref": "ConsoleCommand.json"
+    }
+  },
+  "required": [
+    "ConsoleCommand"
+  ]
+}

@@ -279,6 +279,48 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigOptionUpdate
+    V1::Console::ConsoleCommandSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleCommandSearch
+    V1::Console::ConsoleCommandExecute:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleCommandExecute
+    V1::Console::ConsoleCommandGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleCommandGet
+    V1::Console::ConsoleFileSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleFileSearch
+    V1::Console::ConsoleFileCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleFileCreate
+    V1::Console::ConsoleFileDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleFileDelete
     V1::DynamicField::DynamicFieldTypeSearch:
         Description: ''
         MappingInbound:
@@ -1996,6 +2038,30 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /system/config/:Option
+        V1::Console::ConsoleCommandSearch:
+          RequestMethod:
+          - GET
+          Route: /system/console
+        V1::Console::ConsoleCommandExecute:
+          RequestMethod:
+          - POST
+          Route: /system/console
+        V1::Console::ConsoleCommandGet:
+          RequestMethod:
+          - GET
+          Route: /system/console/:Command
+        V1::Console::ConsoleFileSearch:
+          RequestMethod:
+          - GET
+          Route: /system/console/files
+        V1::Console::ConsoleFileCreate:
+          RequestMethod:
+          - POST
+          Route: /system/console/files
+        V1::Console::ConsoleFileDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/console/files/:FileID
         V1::DynamicField::DynamicFieldTypeSearch:
           RequestMethod:
           - GET

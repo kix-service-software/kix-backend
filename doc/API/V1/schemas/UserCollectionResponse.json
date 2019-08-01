@@ -7,7 +7,7 @@
       "User" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/User"
+            "$ref" : "#/definitions/_User_json"
          }
       }
    },
@@ -15,7 +15,32 @@
       "User"
    ],
    "definitions" : {
-      "User" : {
+      "_UserPreference_json" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "UserID",
+            "Value"
+         ]
+      },
+      "_User_json" : {
          "$id" : "#User",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user object.",
@@ -41,7 +66,7 @@
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference"
+                  "$ref" : "#/definitions/_UserPreference_json"
                }
             },
             "RoleIDs" : {
@@ -126,31 +151,6 @@
             "UserFirstname",
             "UserLastname",
             "UserLogin"
-         ]
-      },
-      "UserPreference" : {
-         "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The user preference object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "UserID",
-            "Value"
          ]
       }
    }

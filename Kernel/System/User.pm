@@ -1362,12 +1362,14 @@ sub CheckPermission {
     # check the permission for each target level (from top to bottom) and role
     my $ResultingPermission;
     my $Target;
+    TARGETPART:
     foreach my $TargetPart ( split(/\//, $Param{Target}) ) {
         next if !$TargetPart;
 
         $Target .= "/$TargetPart";
 
         my $TargetPermission;
+        ROLEID:
         foreach my $RoleID ( sort @UserRoleList ) {
             my ($RoleGranted, $RolePermission) = $Self->_CheckPermissionForRole(
                 %Param,
@@ -1376,7 +1378,7 @@ sub CheckPermission {
             );
 
             # if no permissions have been found, go to the next role
-            next if !$RolePermission;
+            next ROLEID if !defined $RolePermission;
 
             # init the value
             if ( !defined $TargetPermission ) {
@@ -1388,7 +1390,7 @@ sub CheckPermission {
         }
 
         # if we don't have a target permission don't try use it
-        next if !defined $TargetPermission;
+        next TARGETPART if !defined $TargetPermission;
 
         # combine permissions
         if ( defined $ResultingPermission ) {

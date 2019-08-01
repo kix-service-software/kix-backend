@@ -7,7 +7,7 @@
       "TranslationPattern" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/TranslationPattern"
+            "$ref" : "#/definitions/_TranslationPattern_json"
          }
       }
    },
@@ -15,7 +15,32 @@
       "TranslationPattern"
    ],
    "definitions" : {
-      "TranslationPattern" : {
+      "_TranslationLanguage_json" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PatternID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "PatternID",
+            "Language",
+            "Value"
+         ]
+      },
+      "_TranslationPattern_json" : {
          "$id" : "#TranslationPattern",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The translation pattern object.",
@@ -52,7 +77,7 @@
                "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TranslationLanguage"
+                  "$ref" : "#/definitions/_TranslationLanguage_json"
                },
                "readOnly" : true
             },
@@ -67,31 +92,6 @@
             "CreateBy",
             "CreateTime",
             "ID",
-            "Value"
-         ]
-      },
-      "TranslationLanguage" : {
-         "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "PatternID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "PatternID",
-            "Language",
             "Value"
          ]
       }

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "MailFilter" : {
-         "$ref" : "#/definitions/MailFilter"
+         "$ref" : "#/definitions/_MailFilter_json"
       }
    },
    "required" : [
       "MailFilter"
    ],
    "definitions" : {
-      "MailFilter" : {
+      "_MailFilter_json" : {
          "$id" : "#MailFilter",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The mail filter object.",
