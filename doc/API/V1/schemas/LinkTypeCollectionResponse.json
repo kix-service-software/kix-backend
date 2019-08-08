@@ -1,0 +1,69 @@
+{
+   "$id" : "#LinkTypeCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of link types.",
+   "type" : "object",
+   "properties" : {
+      "LinkType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_LinkType_json"
+         }
+      }
+   },
+   "required" : [
+      "LinkType"
+   ],
+   "definitions" : {
+      "_LinkType_json" : {
+         "$id" : "#LinkType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The link type object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Pointed" : {
+               "description" : "If set to 1, what is source and what is target matters.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Source" : {
+               "description" : "The type of the source object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SourceName" : {
+               "description" : "The name of the link when viewed from the target object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Target" : {
+               "description" : "The type of the target object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TargetName" : {
+               "description" : "The name of the link when viewed from the source object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Name",
+            "Pointed",
+            "Source",
+            "SourceName",
+            "Target",
+            "TargetName",
+            "TypeID"
+         ]
+      }
+   }
+}

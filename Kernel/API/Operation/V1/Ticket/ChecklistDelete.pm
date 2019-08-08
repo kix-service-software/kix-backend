@@ -110,7 +110,6 @@ perform ChecklistDelete Operation. This will return the deleted ChecklistItemID.
         Code            => '',                      #
         ErrorMessage    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            ChecklistItemID   => 123,               # ID of deleted item
         },
     };
 
@@ -141,9 +140,7 @@ sub Run {
         );
     }
 
-    return $Self->_Success(
-        ChecklistItemID => $Param{Data}->{ChecklistItemID},
-    );
+    return $Self->_Success();
 }
 
 1;

@@ -23,7 +23,6 @@ use FileHandle;
 use Time::HiRes qw(time);
 
 use Kernel::System::ObjectManager;
-## nofilter(TidyAll::Plugin::OTRS::Perl::ObjectManagerCreation)
 
 # UnitTest helper must be loaded to override the builtin time functions!
 use Kernel::System::UnitTest::Helper;
@@ -432,8 +431,8 @@ sub _PrintSummary {
         print "<tr><td>OS:       </td><td>$ResultSummary{OS}</td></tr>\n";
         print "<tr><td>Vendor:   </td><td>$ResultSummary{Vendor}</td></tr>\n";
         print "<tr><td>Database: </td><td>$ResultSummary{Database}</td></tr>\n";
-        print "<tr><td>TestOk:   </td><td>$ResultSummary{TestOk}</td></tr>\n";
-        print "<tr><td>TestNotOk:</td><td>$ResultSummary{TestNotOk}</td></tr>\n";
+        print "<tr><td>Test OK:   </td><td>$ResultSummary{TestOk}</td></tr>\n";
+        print "<tr><td>Test FAILED:</td><td>$ResultSummary{TestNotOk}</td></tr>\n";
         print "</table><br>\n";
     }
     elsif ( $Self->{Output} eq 'ASCII' ) {
@@ -446,11 +445,11 @@ sub _PrintSummary {
         print " OS:          $ResultSummary{OS}\n";
         print " Vendor:      $ResultSummary{Vendor}\n";
         print " Database:    $ResultSummary{Database}\n";
-        print " TestOk:      $ResultSummary{TestOk}\n";
-        print " TestNotOk:   $ResultSummary{TestNotOk}\n";
+        print " Test OK:     $ResultSummary{TestOk}\n";
+        print " Test FAILED: $ResultSummary{TestNotOk}\n";
 
         if ( $ResultSummary{TestNotOk} ) {
-            print " FailedTests:\n";
+            print " Failed Tests:\n";
             FAILEDFILE:
             for my $FailedFile ( @{ $Self->{NotOkInfo} || [] } ) {
                 my ( $File, @Tests ) = @{ $FailedFile || [] };
@@ -473,6 +472,8 @@ sub _Print {
     if ( length $PrintName > 1000 ) {
         $PrintName = substr( $PrintName, 0, 1000 ) . "...";
     }
+    my $TestStep = $Name;
+    $TestStep =~ s/^(.*?)\s\(.+?\)$/$1/s;
 
     if ( $Self->{Output} eq 'ASCII' && $Self->{Verbose} ) {
         print { $Self->{OriginalSTDOUT} } $Self->{OutputBuffer};
@@ -490,7 +491,7 @@ sub _Print {
                 $Self->{Content} .= "<span style='color:green'>OK</span> $Self->{TestCount} - $PrintName<br/>";
             }
             else {
-                $Self->{Content} .= $Self->_Color('green', '&#x25FC');
+                $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $TestStep'>&#x25FC</span>";
             }
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {
@@ -514,7 +515,7 @@ sub _Print {
                 $Self->{Content} .= "<span style='color:red'>FAILED</span> $Self->{TestCount} - $PrintName<br/>";
             }
             else {
-                $Self->{Content} .= $Self->_Color('red', '&#x25FC');
+                $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $TestStep'>&#x25FC</span>";
             }
         }
         elsif ( $Self->{Output} eq 'ASCII' ) {

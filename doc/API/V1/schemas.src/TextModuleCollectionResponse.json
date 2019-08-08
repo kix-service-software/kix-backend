@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TextModuleCollectionResponse",
+  "type": "object",
+  "description": "A list of text modules.",
+  "properties": {
+    "TextModule": {
+      "type": "array",
+      "items": {
+        "$ref": "TextModule.json"
+      }
+    }
+  },
+  "required": [
+    "TextModule"
+  ]
+}

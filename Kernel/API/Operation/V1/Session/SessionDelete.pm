@@ -60,40 +60,12 @@ sub new {
     return $Self;
 }
 
-=item ParameterDefinition()
-
-define parameter preparation and check for this operation
-
-    my $Result = $OperationObject->ParameterDefinition(
-        Data => {
-            ...
-        },
-    );
-
-    $Result = {
-        ...
-    };
-
-=cut
-
-sub ParameterDefinition {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        'Token' => {
-            DataType => 'STRING',
-            Required => 1
-        }                
-    }
-}
-
 =item Run()
 
 remove token (invalidate)
 
     my $Result = $OperationObject->Run(
         Data => {
-            Token => '...'                                # required
         },
     );
 
@@ -108,7 +80,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
-        Token => $Param{Data}->{Token}
+        Token => $Self->{Authorization}->{Token}
     );
 
     # check result

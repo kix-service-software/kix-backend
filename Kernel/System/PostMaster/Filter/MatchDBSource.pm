@@ -13,10 +13,7 @@ package Kernel::System::PostMaster::Filter::MatchDBSource;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::PostMaster::Filter',
-);
+our @ObjectDependencies = ( 'Kernel::System::Log', 'Kernel::System::PostMaster::Filter', );
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -56,7 +53,7 @@ sub Run {
     for ( sort keys %JobList ) {
 
         # get config options
-        my %Config = $PostMasterFilter->FilterGet( Name => $_ );
+        my %Config = $PostMasterFilter->FilterGet( ID => $_ );
 
         my %Match;
         my %Set;
@@ -82,7 +79,7 @@ sub Run {
             if ( defined $Param{GetParam}->{$_} && $Match{$_} =~ /^EMAILADDRESS:(.*)$/ ) {
                 my $SearchEmail    = $1;
                 my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
-                    Line => $Param{GetParam}->{$_},
+                    Line => $Param{GetParam}->{$_}
                 );
                 my $LocalMatched;
                 RECIPIENT:
@@ -120,11 +117,10 @@ sub Run {
 
             # match string
             elsif (
-                defined $Param{GetParam}->{$_} &&
-                (
+                defined $Param{GetParam}->{$_}
+                && (
                     ( !$Config{Not}->{$_} && $Param{GetParam}->{$_} =~ m{$Match{$_}}i )
-                    ||
-                    ( $Config{Not}->{$_} && $Param{GetParam}->{$_} !~ m{$Match{$_}}i )
+                    || ( $Config{Not}->{$_} && $Param{GetParam}->{$_} !~ m{$Match{$_}}i )
                 )
                 )
             {
@@ -184,8 +180,6 @@ sub Run {
 }
 
 1;
-
-
 
 =back
 

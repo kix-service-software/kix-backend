@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#LogFileCollectionResponse",
+  "type": "object",
+  "description": "A list of log files.",
+  "properties": {
+    "LogFile": {
+      "type": "array",
+      "items": {
+        "$ref": "LogFile.json"
+      }
+    }
+  },
+  "required": [
+    "LogFile"
+  ]
+}

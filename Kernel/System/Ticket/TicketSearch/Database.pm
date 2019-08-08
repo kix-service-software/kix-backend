@@ -318,7 +318,6 @@ sub TicketSearch {
         $SQL .= ' '.($SQLPart->{BeginWith} || '').' '.$SQLDef{$SQLPart->{Name}};
     }
 
-print STDERR "SQL: $SQL\n";
     # check cache
     my $CacheObject;
     if ( $Param{CacheTTL} ) {

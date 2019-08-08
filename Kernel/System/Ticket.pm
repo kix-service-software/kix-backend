@@ -854,7 +854,7 @@ sub TicketSubjectBuild {
 
     # get config options
     my $TicketHook          = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider   = $ConfigObject->Get('Ticket::HookDivider');
+    my $TicketHookDivider   = $ConfigObject->Get('Ticket::HookDivider') || '';
     my $TicketSubjectRe     = $ConfigObject->Get('Ticket::SubjectRe');
     my $TicketSubjectFwd    = $ConfigObject->Get('Ticket::SubjectFwd');
     my $TicketSubjectFormat = $ConfigObject->Get('Ticket::SubjectFormat') || 'Left';
@@ -933,7 +933,7 @@ sub TicketSubjectClean {
 
     # get config options
     my $TicketHook        = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider');
+    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider') || '';
     my $TicketSubjectSize = $Param{Size};
     if ( !defined $TicketSubjectSize ) {
         $TicketSubjectSize = $ConfigObject->Get('Ticket::SubjectSize')
@@ -3040,19 +3040,19 @@ sub TicketEscalationIndexBuild {
             # do not use internal articles for calculation
             next ROW if !$Row->{CustomerVisible};
 
-            # only use 'agent' and 'customer' sender types for calculation
-            next ROW if $Row->{SenderType} !~ /^(agent|customer)$/;
+            # only use 'agent' and 'external' sender types for calculation
+            next ROW if $Row->{SenderType} !~ /^(agent|external)$/;
 
             # last ROW if latest was customer and the next was not customer
             # otherwise use also next, older customer article as latest
             # customer followup for starting escalation
-            if ( $Row->{SenderType} eq 'agent' && $LastSenderType eq 'customer' ) {
+            if ( $Row->{SenderType} eq 'agent' && $LastSenderType eq 'external' ) {
                 last ROW;
             }
 
-            # start escalation on latest customer article
-            if ( $Row->{SenderType} eq 'customer' ) {
-                $LastSenderType = 'customer';
+            # start escalation on latest external article
+            if ( $Row->{SenderType} eq 'external' ) {
+                $LastSenderType = 'external';
                 $LastSenderTime = $Row->{Created};
             }
 
@@ -3618,48 +3618,36 @@ sub GetSubscribedUserIDsByQueueID {
         return;
     }
 
-    # get queues
-    my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{QueueID} );
-
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     # fetch all queues
     my @UserIDs;
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT user_id FROM personal_queues WHERE queue_id = ?',
+        SQL => "SELECT distinct(user_id) FROM user_preferences WHERE preferences_key = 'MyQueues' AND preferences_value = ?",
         Bind => [ \$Param{QueueID} ],
     );
+    
     while ( my @Row = $DBObject->FetchrowArray() ) {
         push @UserIDs, $Row[0];
     }
 
-    # get needed objects
-    my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
+    # get user object
+    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
-    # check if user is valid and check permissions
+    # check if user is valid
     my @CleanUserIDs;
-
     USER:
     for my $UserID (@UserIDs) {
 
         my %User = $UserObject->GetUserData(
             UserID => $UserID,
-            Valid  => 1
+            Valid  => 1,
         );
 
         next USER if !%User;
 
-        # TODO!!! rbo-190327
-        # # just send emails to permitted agents
-        # my %GroupMember = $GroupObject->PermissionUserGet(
-        #     UserID => $UserID,
-        #     Type   => 'ro',
-        # );
-
-        # if ( $GroupMember{ $Queue{GroupID} } ) {
-        #     push @CleanUserIDs, $UserID;
-        # }
+        push @CleanUserIDs, $UserID;
     }
 
     return @CleanUserIDs;
@@ -3698,10 +3686,7 @@ sub GetSubscribedUserIDsByServiceID {
     # fetch all users
     my @UserIDs;
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT user_id
-            FROM personal_services
-            WHERE service_id = ?',
+        SQL => "SELECT distinct(user_id) FROM user_preferences WHERE preferences_key = 'MyServices' AND preferences_value = ?",
         Bind => [ \$Param{ServiceID} ],
     );
 
@@ -4607,10 +4592,10 @@ sub OwnerCheck {
 
     # search for owner_id and owner
     return if !$DBObject->Prepare(
-        SQL => "SELECT st.user_id, su.$ConfigObject->{DatabaseUserTableUser} "
-            . " FROM ticket st, $ConfigObject->{DatabaseUserTable} su "
+        SQL => "SELECT st.user_id, su.login"
+            . " FROM ticket st, users su "
             . " WHERE st.id = ? AND "
-            . " st.user_id = su.$ConfigObject->{DatabaseUserTableUserID}",
+            . " st.user_id = su.id",
         Bind => [ \$Param{TicketID}, ],
     );
 
@@ -5607,8 +5592,7 @@ sub HistoryTicketGet {
         }
         elsif (
             $Row[1] eq 'StateUpdate'
-            || $Row[1] eq 'Close successful'
-            || $Row[1] eq 'Close unsuccessful'
+            || $Row[1] eq 'Close'
             || $Row[1] eq 'Open'
             || $Row[1] eq 'Misc'
             )
@@ -6267,14 +6251,13 @@ sub TicketMerge {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-#rbo - T2016121190001552 - added KIX placeholders
     my $Body = $ConfigObject->Get('Ticket::Frontend::AutomaticMergeText');
-    $Body =~ s{<(KIX|OTRS)_TICKET>}{$MergeTicket{TicketNumber}}xms;
+    $Body =~ s{<KIX_TICKET>}{$MergeTicket{TicketNumber}}xms;
 
     # KIX4OTRS-capeIT
     # $Body =~ s{<KIX_MERGE_TO_TICKET>}{$MainTicket{TicketNumber}}xms;
     $Body =~
-        s{<(KIX|OTRS)_MERGE_TO_TICKET>}{<!-- KIX4OTRS MergeTargetLinkStart ::$Param{MainTicketID}:: -->$MainTicket{TicketNumber}<!-- KIX4OTRS MergeTargetLinkEnd -->}xms;
+        s{<KIX_MERGE_TO_TICKET>}{<!-- KIX MergeTargetLinkStart ::$Param{MainTicketID}:: -->$MainTicket{TicketNumber}<!-- KIX MergeTargetLinkEnd -->}xms;
 
     # EO KIX4OTRS-capeIT
 
@@ -7193,7 +7176,7 @@ sub TicketArticleStorageSwitch {
     for my $ArticleID (@ArticleIndex) {
 
         # create source object
-        # We have to create it for every article because of the way OTRS uses base classes here.
+        # We have to create it for every article because of the way KIX uses base classes here.
         # We cannot have two ticket objects with different base classes.
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',

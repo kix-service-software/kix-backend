@@ -105,7 +105,7 @@ for my $Test (@Tests) {
         $FixedTime,
     );
 
-    # Set OTRS time zone to arbitrary value to make sure it is ignored.
+    # Set KIX time zone to arbitrary value to make sure it is ignored.
     $ConfigObject->Set(
         Key   => 'TimeZone',
         Value => '',

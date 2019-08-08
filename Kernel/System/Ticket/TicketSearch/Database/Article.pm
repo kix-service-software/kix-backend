@@ -135,11 +135,6 @@ sub Search {
             String => $Param{Search}->{Value},
         );
 
-        if ( !$Value || $Value > $Kernel::OM->Get('Kernel::System::Time')->SystemTime() ) {
-            # return in case of some format error or if the date is in the future
-            return;
-        }
-
         my %OperatorMap = (
             'EQ'  => '=',
             'LT'  => '<',

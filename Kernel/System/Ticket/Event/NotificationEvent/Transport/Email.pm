@@ -9,8 +9,6 @@
 # --
 
 package Kernel::System::Ticket::Event::NotificationEvent::Transport::Email;
-## nofilter(TidyAll::Plugin::OTRS::Perl::LayoutObject)
-## nofilter(TidyAll::Plugin::OTRS::Perl::ParamObject)
 
 use strict;
 use warnings;
@@ -142,10 +140,10 @@ sub SendNotification {
                 $AddressLine = $UserData{UserEmail};
             } elsif ($Recipient{DynamicFieldType} eq 'Contact') {
                 my %Contact = $ContactObject->ContactGet(
-                    User => $FieldRecipient,
+                    ID => $FieldRecipient,
                 );
                 next FIELDRECIPIENT if !$Contact{UserEmail};
-                $AddressLine = $Contact{UserEmail};
+                $AddressLine = $Contact{Email};
             } else {
                 $AddressLine = $FieldRecipient;
             }
@@ -182,23 +180,28 @@ sub SendNotification {
     # EO NotificationEventX-capeIT
 
     # Verify a customer have an email
-    if ( $Recipient{Type} eq 'Customer' && $Recipient{UserID} && !$Recipient{UserEmail} ) {
-
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $Recipient{UserID},
-        );
-
-        if ( !$Contact{UserEmail} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'info',
-                Message  => "Send no customer notification because of missing "
-                    . "customer email (ContactID=$Contact{ContactID})!",
+    if ( $Recipient{Type} eq 'Customer' && $Recipient{ID} ) {
+        if ( !$Recipient{Email} ) {
+            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                ID => $Recipient{ID},
             );
-            return;
-        }
 
-        # Set calculated email.
-        $Recipient{UserEmail} = $Contact{UserEmail};
+            if ( !$Contact{Email} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'info',
+                    Message  => "Send no customer notification because of missing "
+                        . "customer email (ContactID=$Contact{ContactID})!",
+                );
+                return;
+            }
+
+            # Set calculated email.
+            $Recipient{UserEmail} = $Contact{Email};
+        }
+        else {
+            # prepare UserEmail to be compatible with agent users
+            $Recipient{UserEmail} = $Recipient{Email};
+        }
     }
 
     return if !$Recipient{UserEmail};
@@ -225,16 +228,15 @@ sub SendNotification {
         my $EmailTemplate = $Param{Notification}->{Data}->{TransportEmailTemplate}->[0] || 'Default';
 
         my $Home              = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-        my $TemplateDir       = "$Home/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
-        my $CustomTemplateDir = "$Home/Custom/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
+        my $TemplateDir       = "$Home/Kernel/Output/HTML/Templates/Notification/Email";
 
-        if ( !-r "$TemplateDir/$EmailTemplate.tt" && !-r "$CustomTemplateDir/$EmailTemplate.tt" ) {
+        if ( !-r "$TemplateDir/$EmailTemplate.tt" ) {
             $EmailTemplate = 'Default';
         }
 
         # generate HTML
         $Notification{Body} = $LayoutObject->Output(
-            TemplateFile => "NotificationEvent/Email/$EmailTemplate",
+            TemplateFile => "Notification/Email/$EmailTemplate",
             Data         => {
                 TicketID => $Param{TicketID},
                 Body     => $Notification{Body},
@@ -381,8 +383,6 @@ sub SendNotification {
         # get queue object
         my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
 
-        my $QueueID;
-
         # get article
         my %Article = $TicketObject->ArticleLastCustomerArticle(
             TicketID      => $Param{TicketID},
@@ -390,18 +390,11 @@ sub SendNotification {
         );
 
         # set "From" address from Article if exist, otherwise use ticket information, see bug# 9035
-        if (%Article) {
-            $QueueID = $Article{QueueID};
-        }
-        else {
-
-            # get ticket data
-            my %Ticket = $TicketObject->TicketGet(
-                TicketID => $Param{TicketID},
-            );
-            $QueueID = $Ticket{QueueID};
-        }
-
+        my %Ticket = $TicketObject->TicketGet(
+            TicketID => $Param{TicketID},
+        );
+        my $QueueID = $Ticket{QueueID};
+        
         my %Address = $QueueObject->GetSystemAddress( QueueID => $QueueID );
 
         # get queue
@@ -418,18 +411,18 @@ sub SendNotification {
         return if !$SecurityOptions;
 
         my $Channel = 'email';
+        if ( IsArrayRefWithData( $Param{Notification}->{Data}->{Channel} ) ) {
+            $Channel = $Param{Notification}->{Data}->{Channel}->[0],
+        }
 
-        if ( IsArrayRefWithData( $Param{Notification}->{Data}->{NotificationChannelID} ) ) {
-
-            # get notification channel
-            $Channel = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
-                ID => $Param{Notification}->{Data}->{NotificationChannelID}->[0],
-            );
+        my $VisibleForCustomer = 0;
+        if ( IsArrayRefWithData( $Param{Notification}->{Data}->{VisibleForCustomer} ) ) {
+            $VisibleForCustomer = $Param{Notification}->{Data}->{VisibleForCustomer}->[0],
         }
 
         my $ArticleID = $TicketObject->ArticleCreate(
             Channel        => $Channel,
-            CustomerVisible => $Param{Notification}->{Data}->{NotificationVisibleForCustomer} || 0,
+            CustomerVisible => $VisibleForCustomer,
             SenderType     => 'system',
             TicketID       => $Param{TicketID},
             HistoryType    => 'SendCustomerNotification',
@@ -511,13 +504,11 @@ sub GetTransportRecipients {
             $Recipient{Type}      = 'Customer';
             $Recipient{UserEmail} = $Param{Notification}->{Data}->{RecipientEmail}->[0];
 
-            # check if we have a specified article type
-            if ( $Param{Notification}->{Data}->{NotificationChannelID} ) {
+            # check if we have a specified channel
+            if ( $Param{Notification}->{Data}->{ChannelID} ) {
                 $Recipient{NotificationChannel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
-                    ID => $Param{Notification}->{Data}->{NotificationChannelID}->[0]
+                    ID => $Param{Notification}->{Data}->{ChannelID}->[0]
                 ) || 'email';
-                $Recipient{NotificationVisibleForCustomer} = $Param{Notification}->{Data}->{NotificationVisibleForCustomer} || 0;
-
             }
 
             # check recipients
@@ -848,7 +839,7 @@ sub GetTransportRecipients {
 
 #     PARAMETER:
 #     for my $Parameter (
-#         qw(RecipientEmail NotificationChannelID NotificationVisibleForCustomer TransportEmailTemplate
+#         qw(RecipientEmail ChannelID VisibleForCustomer TransportEmailTemplate
 #         EmailSigningCrypting EmailMissingSigningKeys EmailMissingCryptingKeys
 #         EmailSecuritySettings
 #         RecipientAgentDF RecipientCustomerDF

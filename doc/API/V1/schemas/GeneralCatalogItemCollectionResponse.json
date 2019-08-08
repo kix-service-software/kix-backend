@@ -7,7 +7,7 @@
       "GeneralCatalogItem" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/GeneralCatalogItem"
+            "$ref" : "#/definitions/_GeneralCatalogItem_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "GeneralCatalogItem"
    ],
    "definitions" : {
-      "GeneralCatalogItem" : {
+      "_GeneralCatalogItem_json" : {
          "$id" : "#GeneralCatalogItem",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The GeneralCatalog item object.",

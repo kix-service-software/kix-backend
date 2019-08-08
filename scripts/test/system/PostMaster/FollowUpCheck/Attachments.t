@@ -53,8 +53,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'open',
-    CustomerNo   => '123465',
-    Contact => 'external@example.com',
+    OrganisationID => '123465',
+    ContactID    => 'external@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -276,7 +276,11 @@ for my $Test (@Tests) {
         );
 
         @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
     }
+
+    @Return = @{ $Return[0] || [] };
+
     $Self->Is(
         $Return[0] || 0,
         $Test->{NewTicket},

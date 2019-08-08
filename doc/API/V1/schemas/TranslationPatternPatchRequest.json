@@ -1,0 +1,22 @@
+{
+   "$id" : "#TranslationPatternPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The translation pattern request object for update.",
+   "type" : "object",
+   "properties" : {
+      "TranslationPattern" : {
+         "type" : "object",
+         "properties" : {
+            "Pattern" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Value"
+         ]
+      }
+   },
+   "required" : [
+      "TranslationPattern"
+   ]
+}

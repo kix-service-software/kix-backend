@@ -19,14 +19,14 @@ my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
 my $DBObject      = $Kernel::OM->Get('Kernel::System::DB');
 my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
 
-# get OTRS Version
-my $OTRSVersion = $ConfigObject->Get('Version');
+# get KIX Version
+my $KIXVersion = $ConfigObject->Get('Version');
 
 # leave only major and minor level versions
-$OTRSVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
+$KIXVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
 
 # add x as patch level version
-$OTRSVersion .= '.x';
+$KIXVersion .= '.x';
 
 my $Home = $ConfigObject->Get('Home');
 
@@ -35,17 +35,17 @@ my $TmpDir = $ConfigObject->Get('TempDir');
 
 # install package normally
 my $MergeOne = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>MergeOne</Name>
   <Version>2.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <ChangeLog>2012-04-28 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
   <Description Lang="de">Ein Test Paket (some test &lt; &gt; &amp;).</Description>
   <ModuleRequired Version="1.112">Encode</ModuleRequired>
-  <Framework>' . $OTRSVersion . '</Framework>
+  <Framework>' . $KIXVersion . '</Framework>
   <BuildDate>2012-05-02 21:17:16</BuildDate>
   <BuildHost>yourhost.example.com</BuildHost>
   <Filelist>
@@ -53,7 +53,7 @@ my $MergeOne = '<?xml version="1.0" encoding="utf-8" ?>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="DeleteMe" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 # install package using package manager API
@@ -86,17 +86,17 @@ for my $File (qw( Test var/Test DeleteMe)) {
 }
 
 my $MainPackageOne = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
     <Name>TestMainPackage</Name>
     <Version>1.0.1</Version>
-    <Vendor>OTRS AG</Vendor>
-    <URL>http://otrs.org/</URL>
+    <Vendor>c.a.p.e. IT GmbH</Vendor>
+    <URL>http://www.cape-it.de/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
     <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
     <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
     <Description Lang="de">Ein Test Paket (some test &lt; &gt; &amp;).</Description>
     <ModuleRequired Version="1.112">Encode</ModuleRequired>
-    <Framework>' . $OTRSVersion . '</Framework>
+    <Framework>' . $KIXVersion . '</Framework>
     <BuildDate>2005-11-10 21:17:16</BuildDate>
     <BuildHost>yourhost.example.com</BuildHost>
     <Filelist>
@@ -112,7 +112,7 @@ my $MainPackageOne = '<?xml version="1.0" encoding="utf-8" ?>
           </TableCreate>
       </DatabaseUpgrade>
     </PackageMerge>
-</otrs_package>
+</kix_package>
 ';
 
 # install main package where the Test package was merged
@@ -139,17 +139,17 @@ $Self->True(
 );
 
 my $MainPackageTwo = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
     <Name>TestMainPackage</Name>
     <Version>1.0.1</Version>
-    <Vendor>OTRS AG</Vendor>
-    <URL>http://otrs.org/</URL>
+    <Vendor>c.a.p.e. IT GmbH</Vendor>
+    <URL>http://www.cape-it.de/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
     <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
     <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
     <Description Lang="de">Ein Test Paket (some test &lt; &gt; &amp;).</Description>
     <ModuleRequired Version="1.112">Encode</ModuleRequired>
-    <Framework>' . $OTRSVersion . '</Framework>
+    <Framework>' . $KIXVersion . '</Framework>
     <BuildDate>2005-11-10 21:17:16</BuildDate>
     <BuildHost>yourhost.example.com</BuildHost>
     <Filelist>
@@ -199,7 +199,7 @@ my $MainPackageTwo = '<?xml version="1.0" encoding="utf-8" ?>
     <DatabaseUninstall Type="post">
       <TableDrop Name="merge_package"/>
     </DatabaseUninstall>
-</otrs_package>
+</kix_package>
 ';
 
 # install main package where the Test package was merged
@@ -357,32 +357,32 @@ $PackageObject->PackageUninstall( String => $MainPackageThree );
 
 # define package for merging
 my $MergeThree = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>MergeThree</Name>
   <Version>3.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">The third test package.</Description>
-  <Framework>' . $OTRSVersion . '</Framework>
+  <Framework>' . $KIXVersion . '</Framework>
   <BuildDate>2014-05-02 17:59:59</BuildDate>
   <BuildHost>myhost.example.com</BuildHost>
   <Filelist>
     <File Location="DeleteMePlease" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 my $MainPackageFour = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
     <Name>TestMainPackageFour</Name>
     <Version>1.0.1</Version>
-    <Vendor>OTRS AG</Vendor>
-    <URL>http://otrs.org/</URL>
+    <Vendor>c.a.p.e. IT GmbH</Vendor>
+    <URL>http://www.cape-it.de/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
     <ChangeLog>2014-04-28 New package (some test &lt; &gt; &amp;).</ChangeLog>
     <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
-    <Framework>' . $OTRSVersion . '</Framework>
+    <Framework>' . $KIXVersion . '</Framework>
     <BuildDate>2014-04-28 16:16:16</BuildDate>
     <BuildHost>yourhost.example.com</BuildHost>
     <Filelist>
@@ -416,7 +416,7 @@ my $MainPackageFour = '<?xml version="1.0" encoding="utf-8" ?>
             Content  => \$Content,
         );
     ]]></CodeInstall>
-</otrs_package>
+</kix_package>
 ';
 
 my $PackageMergeSection = '<PackageMerge Name="MergeThree" TargetVersion="3.0.2"></PackageMerge>';
@@ -640,20 +640,20 @@ for my $Test (@Tests) {
 
 # define initial package
 my $PackageFour = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>PackageFour</Name>
   <Version>4.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">The third test package.</Description>
-  <Framework>' . $OTRSVersion . '</Framework>
+  <Framework>' . $KIXVersion . '</Framework>
   <BuildDate>2014-05-02 17:59:59</BuildDate>
   <BuildHost>myhost.example.com</BuildHost>
   <Filelist>
     <File Location="DeleteMePlease" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 # install predefined package
@@ -684,14 +684,14 @@ $Self->True(
 );
 
 $PackageFour = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>PackageFour</Name>
   <Version>4.0.2</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">The third test package.</Description>
-  <Framework>' . $OTRSVersion . '</Framework>
+  <Framework>' . $KIXVersion . '</Framework>
   <BuildDate>2014-09-02 17:59:59</BuildDate>
   <BuildHost>myhost.example.com</BuildHost>
   <Filelist>
@@ -719,7 +719,7 @@ $PackageFour = '<?xml version="1.0" encoding="utf-8" ?>
             Content  => \$Content,
         );
   ]]></CodeUpgrade>
-</otrs_package>
+</kix_package>
 ';
 
 my $PackageUpgrade = $PackageObject->PackageUpgrade( String => $PackageFour );

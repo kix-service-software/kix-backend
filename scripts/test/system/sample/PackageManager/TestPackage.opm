@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 199</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
@@ -39,4 +39,4 @@
     <File Location="var/tmp/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>

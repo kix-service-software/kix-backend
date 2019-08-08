@@ -145,6 +145,9 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
+
+        # force numeric IDs
+        $SLAData{TypeID} = 0 + $SLAData{TypeID};
         
         # add
         push(@SLAList, \%SLAData);

@@ -68,11 +68,11 @@ my $CacheClearedCheck = sub {
 };
 
 my $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
@@ -119,15 +119,15 @@ my $String = '<?xml version="1.0" encoding="utf-8" ?>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 my $StringSecond = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>TestSecond</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
@@ -150,7 +150,7 @@ my $StringSecond = '<?xml version="1.0" encoding="utf-8" ?>
     <File Location="TestSecond" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/TestSecond" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 # check if the package is already installed - check by name
@@ -331,11 +331,11 @@ $Self->True(
 
 # reinstall test
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <ChangeLog>2005-11-10 New package (some test &lt; &gt; &amp;).</ChangeLog>
   <Description Lang="en">A test package (some test &lt; &gt; &amp;).</Description>
@@ -372,7 +372,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 # reinstall
@@ -394,11 +394,11 @@ $Self->True(
 $CacheClearedCheck->();
 
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -419,7 +419,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -429,11 +429,11 @@ $Self->True(
 );
 
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>TestOSDetection1</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -454,7 +454,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -464,11 +464,11 @@ $Self->True(
 );
 
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>TestOSDetection2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -492,7 +492,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -509,11 +509,11 @@ $Self->True(
 );
 
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -534,7 +534,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -543,11 +543,11 @@ $Self->True(
     '#3 PackageInstall() - ModuleRequired not installed',
 );
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -568,7 +568,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -579,11 +579,11 @@ $Self->True(
 
 # #5 file exists tests
 my $String1 = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -603,7 +603,7 @@ my $String1 = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String1 );
 $Self->True(
@@ -611,11 +611,11 @@ $Self->True(
     '#5 PackageInstall() - 1/3 File already exists in package X.',
 );
 my $String2 = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test3</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -635,7 +635,7 @@ my $String2 = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String2 );
 
@@ -644,11 +644,11 @@ $Self->True(
     '#5 PackageInstall() - 2/3 File already exists in package X.',
 );
 my $String3 = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test3</Name>
   <Version>0.0.2</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -668,15 +668,15 @@ my $String3 = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test3" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String3 );
 my $String3a = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test3</Name>
   <Version>0.0.3</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -696,7 +696,7 @@ my $String3a = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 my $PackageUpgrade = $PackageObject->PackageUpgrade( String => $String3a );
@@ -708,11 +708,11 @@ $Self->True(
 
 my $TmpDir   = $ConfigObject->Get('TempDir');
 my $String3b = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test3</Name>
   <Version>0.0.3</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -767,7 +767,7 @@ my $String3b = '<?xml version="1.0" encoding="utf-8" ?>
   <Filelist>
     <File Location="Test3" Permission="644" Encode="Base64">aGVsbG8K</File>
   </Filelist>
-</otrs_package>
+</kix_package>
 ';
 
 $CachePopulate->();
@@ -819,18 +819,18 @@ $Self->True(
 
 # #6 os check
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
   <OS>_non_existing_</OS>
   <BuildDate>2005-11-10 21:17:16</BuildDate>
   <BuildHost>yourhost.example.com</BuildHost>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -841,18 +841,18 @@ $Self->True(
 
 # #7 fw check
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
   <Framework>99.0.x</Framework>
   <BuildDate>2005-11-10 21:17:16</BuildDate>
   <BuildHost>yourhost.example.com</BuildHost>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -863,11 +863,11 @@ $Self->True(
 
 # 9 pre tests
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -907,7 +907,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <DatabaseUninstall Type="pre">
     <TableDrop Name="test_package"/>
   </DatabaseUninstall>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -937,11 +937,11 @@ $Self->True(
 
 # 10 post tests
 $String = '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<kix_package version="1.0">
   <Name>Test2</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 110101</License>
   <Description Lang="en">A test package.</Description>
   <Description Lang="de">Ein Test Paket.</Description>
@@ -981,7 +981,7 @@ $String = '<?xml version="1.0" encoding="utf-8" ?>
   <DatabaseUninstall Type="post">
     <TableDrop Name="test_package"/>
   </DatabaseUninstall>
-</otrs_package>
+</kix_package>
 ';
 $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -1012,20 +1012,17 @@ $Self->True(
 # _FileInstall checks with not allowed files
 my $FilesNotAllowed = [
     'Kernel/Config.pm',
-    'Kernel/Config/Files/ZZZAuto.pm',
-    'Kernel/Config/Files/ZZZAAuto.pm',
-    'Kernel/Config/Files/ZZZProcessManagement.pm',
     'var/tmp/Cache/Tmp.cache',
     'var/log/some_log',
     '../../etc/passwd',
     '/etc/shadow',
 ];
 my $FileNotAllowedString = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>
-<otrs_package version=\"1.0\">
+<kix_package version=\"1.0\">
   <Name>FilesNotAllowed</Name>
   <Version>0.0.1</Version>
-  <Vendor>OTRS AG</Vendor>
-  <URL>http://otrs.org/</URL>
+  <Vendor>c.a.p.e. IT GmbH</Vendor>
+  <URL>http://www.cape-it.de/</URL>
   <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
   <Description Lang=\"en\">A test package.</Description>
   <Description Lang=\"de\">Ein Test Paket.</Description>
@@ -1042,7 +1039,7 @@ for my $FileNotAllowed ( @{$FilesNotAllowed} ) {
         "    <File Location=\"$FileNotAllowed\" Permission=\"644\" Encode=\"Base64\">aGVsbG8K</File>\n";
 }
 $FileNotAllowedString .= "  </Filelist>
-</otrs_package>\n";
+</kix_package>\n";
 
 $PackageInstall = $PackageObject->PackageInstall( String => $FileNotAllowedString );
 
@@ -1099,11 +1096,11 @@ if ( !$DeveloperSystem ) {
     my $RemoveFileFramework = $Home . '/' . 'bin/otrs.CheckSum.pl';
     copy( $RemoveFileFramework, $RemoveFileFramework . '.orig' );
     $String = '<?xml version="1.0" encoding="utf-8" ?>
-    <otrs_package version="1.0">
+    <kix_package version="1.0">
       <Name>TestFrameworkFileCheck</Name>
       <Version>0.0.1</Version>
-      <Vendor>OTRS AG</Vendor>
-      <URL>http://otrs.org/</URL>
+      <Vendor>c.a.p.e. IT GmbH</Vendor>
+      <URL>http://www.cape-it.de/</URL>
       <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
       <Description Lang="en">A test package.</Description>
       <Description Lang="de">Ein Test Paket.</Description>
@@ -1123,7 +1120,7 @@ if ( !$DeveloperSystem ) {
       <Filelist>
         <File Location="bin/otrs.CheckSum.pl" Permission="644" Encode="Base64">aGVsbG8K</File>
       </Filelist>
-    </otrs_package>
+    </kix_package>
     ';
     $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -1183,11 +1180,11 @@ if ( !$DeveloperSystem ) {
     my $SaveFileFramework = $Home . '/' . 'bin/otrs.CheckSum.pl';
     copy( $SaveFileFramework, $SaveFileFramework . '.orig' );
     $String = '<?xml version="1.0" encoding="utf-8" ?>
-    <otrs_package version="1.0">
+    <kix_package version="1.0">
       <Name>TestFrameworkFileCheck</Name>
       <Version>0.0.1</Version>
-      <Vendor>OTRS AG</Vendor>
-      <URL>http://otrs.org/</URL>
+      <Vendor>c.a.p.e. IT GmbH</Vendor>
+      <URL>http://www.cape-it.de/</URL>
       <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
       <Description Lang="en">A test package.</Description>
       <Description Lang="de">Ein Test Paket.</Description>
@@ -1207,7 +1204,7 @@ if ( !$DeveloperSystem ) {
       <Filelist>
         <File Location="bin/otrs.CheckSum.pl" Permission="644" Encode="Base64">aGVsbG8K</File>
       </Filelist>
-    </otrs_package>
+    </kix_package>
     ';
     $PackageInstall = $PackageObject->PackageInstall( String => $String );
 
@@ -1306,7 +1303,7 @@ if ( !$DeveloperSystem ) {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<http://www.cape-it.de/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
 COPYING for license information (AGPL). If you did not receive this file, see

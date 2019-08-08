@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::KIXSBRemoteDB;
-## nofilter(TidyAll::Plugin::OTRS::Perl::PODSpelling)
 
 use strict;
 use warnings;

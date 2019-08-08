@@ -85,9 +85,9 @@ for my $Test (@Tests) {
         Queue        => 'Raw',
         Lock         => 'unlock',
         Priority     => '3 normal',
-        State        => 'closed successful',
-        CustomerNo   => $Test->{CustomerID},
-        Contact => $Test->{ContactLogin},
+        State        => 'closed',
+        OrganisationID => $Test->{CustomerID},
+        ContactID    => $Test->{ContactLogin},
         OwnerID      => 1,
         UserID       => 1,
     );

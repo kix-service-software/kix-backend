@@ -4,7 +4,7 @@
   "type": "object",
   "description": "A list of service.",
   "properties": {
-    "Priority": {
+    "Service": {
       "type": "array",
       "items": {
         "$ref": "Service.json"

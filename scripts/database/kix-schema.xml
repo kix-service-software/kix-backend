@@ -176,9 +176,9 @@
 </Table>
 
 <Table Name="role_permission">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="role_id" Required="true" Type="INTEGER"/>
-    <Column Name="type_id" Required="true" Type="INTEGER"/>
+    <Column Name="type_id" Required="true" Type="SMALLINT"/>
     <Column Name="target" Required="true" Size="1000" Type="VARCHAR"/>
     <Column Name="value" Required="true" Type="INTEGER"/>
     <Column Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
@@ -199,42 +199,6 @@
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- personal_queues - stores all "my queues" -->
-<Table Name="personal_queues">
-    <Column Name="user_id" Required="true" Type="INTEGER"/>
-    <Column Name="queue_id" Required="true" Type="INTEGER"/>
-    <Index Name="personal_queues_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <Index Name="personal_queues_queue_id">
-        <IndexColumn Name="queue_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="user_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="queue">
-        <Reference Local="queue_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- personal_services - stores all "my services" -->
-<Table Name="personal_services">
-    <Column Name="user_id" Required="true" Type="INTEGER"/>
-    <Column Name="service_id" Required="true" Type="INTEGER"/>
-    <Index Name="personal_services_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <Index Name="personal_services_service_id">
-        <IndexColumn Name="service_id"/>
-    </Index>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="user_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="service">
-        <Reference Local="service_id" Foreign="id"/>
     </ForeignKey>
 </Table>
 
@@ -1448,17 +1412,37 @@
     </ForeignKey>
 </Table>
 
-<!-- postmaster_filter -->
-<Table Name="postmaster_filter">
-    <Column Name="f_name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="f_stop" Required="false" Type="SMALLINT"/>
-    <Column Name="f_type" Required="true" Size="20" Type="VARCHAR"/>
-    <Column Name="f_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="f_value" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="f_not" Required="false" Type="SMALLINT"/>
-    <Index Name="postmaster_filter_f_name">
-        <IndexColumn Name="f_name"/>
+<!-- mail_filter -->
+<Table Name="mail_filter">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="stop" Required="false" Type="SMALLINT"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Index Name="mail_filter_name">
+        <IndexColumn Name="name"/>
     </Index>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+<Table Name="mail_filter_properties">
+    <Column Name="id" Required="true" Type="INTEGER"/>
+    <Column Name="type" Required="true" Size="20" Type="VARCHAR"/>
+    <Column Name="filter_key" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="filter_value" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="negate" Required="false" Type="SMALLINT"/>
+    <ForeignKey ForeignTable="mail_filter">
+        <Reference Local="id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 
 <!-- generic_agent_jobs -->
@@ -2615,7 +2599,7 @@
         <IndexColumn Name="filesize"/>
     </Index>
 </Table>
-<Table Name="kix_text_module">
+<Table Name="text_module">
     <Column Name="id"          Required="true"  Type="INTEGER"  PrimaryKey="true" AutoIncrement="true"/>
     <Column Name="name"        Required="true"  Type="VARCHAR" Size="80"/>
     <Column Name="category"    Required="false" Type="VARCHAR" Size="255"/>
@@ -2632,16 +2616,16 @@
     <Column Name="create_by"   Required="true"  Type="INTEGER"/>
     <Column Name="change_time" Required="true"  Type="DATE"/>
     <Column Name="change_by"   Required="true"  Type="INTEGER"/>
-    <Index Name="kix_text_module_name">
+    <Index Name="text_module_name">
         <IndexColumn Name="name"/>
     </Index>
-    <Index Name="kix_text_module_category">
+    <Index Name="text_module_category">
         <IndexColumn Name="category"/>
     </Index>
-    <Index Name="kix_text_module_keywords">
+    <Index Name="text_module_keywords">
         <IndexColumn Name="keywords"/>
     </Index>
-    <Index Name="kix_text_module_language">
+    <Index Name="text_module_language">
         <IndexColumn Name="language"/>
     </Index>
 </Table>
@@ -2738,6 +2722,7 @@
 
 <!-- client_notification - core events to notify the registered clients about -->
 <Table Name="client_notification">
+    <Column Name="id" Required="true" Type="BIGINT" AutoIncrement="true" PrimaryKey="true" />
     <Column Name="timestamp" Required="true" Type="DECIMAL" Size="20,6"/>
     <Column Name="event" Required="true" Type="VARCHAR" Size="10"/>
     <Column Name="request_id" Required="true" Type="VARCHAR" Size="40"/>
@@ -2803,14 +2788,40 @@
     <Column Name="change_time" Required="true" Type="DATE" />
     <Column Name="change_by" Required="true" Type="INTEGER" />
     <Unique Name="kix_translation_pattern_uvalue">
-        <UniqueColumn Name="value"/>
+        <UniqueColumn Name="value" Size="255"/>
     </Unique>
     <Index Name="kix_translation_pattern_id">
         <IndexColumn Name="id"/>
     </Index>
     <Index Name="kix_translation_pattern_value">
-        <IndexColumn Name="value"/>
+        <IndexColumn Name="value" Size="100"/>
     </Index>
+</Table>
+
+<Table Name="sysconfig">
+    <Column Name="name" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true" />
+    <Column Name="description" Required="true" Type="VARCHAR" Size="10000" />
+    <Column Name="level" Required="false" Default="0" Type="INTEGER" />
+    <Column Name="type" Required="true" Type="VARCHAR" Size="50" />
+    <Column Name="group_name" Required="false" Type="VARCHAR" Size="255" />
+    <Column Name="setting" Required="false" Type="VARCHAR" Size="10000" />
+    <Column Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
+    <Column Name="is_modified" Required="true" Default="0" Type="SMALLINT"/>
+    <Column Name="default_value" Required="false" Type="VARCHAR" Size="100000" />
+    <Column Name="value" Required="false" Type="VARCHAR" Size="100000" />
+    <Column Name="comments" Required="false" Type="VARCHAR" Size="255" />
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE" />
+    <Column Name="create_by" Required="true" Type="INTEGER" />
+    <Column Name="change_time" Required="true" Type="DATE" />
+    <Column Name="change_by" Required="true" Type="INTEGER" />
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>    
 </Table>
 
 </database>

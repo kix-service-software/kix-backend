@@ -34,13 +34,13 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'untrusted',
-        Description => "This will cause X-OTRS email headers to be ignored.",
+        Description => "This will cause X-KIX email headers to be ignored.",
         Required    => 0,
         HasValue    => 0,
     );
     $Self->AddOption(
         Name        => 'debug',
-        Description => "Print debug info to the OTRS log.",
+        Description => "Print debug info to the KIX log.",
         Required    => 0,
         HasValue    => 0,
     );
@@ -56,7 +56,7 @@ sub PreRun {
     if ( $Self->GetOption('debug') ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'debug',
-            Message  => "OTRS email handle ($Name) started.",
+            Message  => "KIX email handle ($Name) started.",
         );
     }
 }
@@ -154,7 +154,7 @@ sub PostRun {
     if ( $Self->GetOption('debug') ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'debug',
-            Message  => "OTRS email handle ($Name) stopped.",
+            Message  => "KIX email handle ($Name) stopped.",
         );
     }
 }

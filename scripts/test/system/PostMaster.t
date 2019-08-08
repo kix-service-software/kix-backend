@@ -195,9 +195,11 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand1,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'test',
-                    To      => 'EMAILADDRESS:darthvader@otrs.org',
+                    To      => 'EMAILADDRESS:darthvader@test.org',
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -209,9 +211,11 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand2,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'test',
-                    To      => 'EMAILADDRESS:darthvader2@otrs.org',
+                    To      => 'EMAILADDRESS:darthvader2@test.org',
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -222,9 +226,11 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand3,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'test 1',
-                    To      => 'otrs.org',
+                    To      => 'test.org',
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
@@ -235,9 +241,11 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             $PostMasterFilter->FilterAdd(
                 Name           => $FilterRand4,
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 Match          => {
                     Subject => 'NOT REGEX',
-                    To      => 'darthvader@otrs.org',
+                    To      => 'darthvader@test.org',
                 },
                 Not => {
                     To => 1,
@@ -289,6 +297,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
 
                 if ( $File != 22 ) {
@@ -529,7 +538,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -580,7 +591,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -607,7 +620,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -634,7 +649,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -661,7 +678,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
+
                 $Self->Is(
                     $Return[0] || 0,
                     2,
@@ -686,13 +705,13 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpState check',
                 );
                 $StateSet = $TicketObject->StateSet(
-                    State    => 'closed successful',
+                    State    => 'closed',
                     TicketID => $Return[1],
                     UserID   => 1,
                 );
                 $Self->True(
                     $StateSet || 0,
-                    $NamePrefix . ' StateSet() - closed successful',
+                    $NamePrefix . ' StateSet() - closed',
                 );
 
                 # send follow up #3
@@ -716,6 +735,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
 
                     @Return = $PostMasterObject->Run();
+                    @Return = @{ $Return[0] || [] };
                 }
 
                 $Self->Is(
@@ -851,6 +871,8 @@ for my $Type (qw(Config DB)) {
             $PostMasterFilter->FilterAdd(
                 Name           => $Test->{Name},
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 %{$Test},
             );
         }
@@ -879,7 +901,9 @@ Some Content in Body
         );
 
         @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
     }
+
     $Self->Is(
         $Return[0] || 0,
         1,
@@ -997,6 +1021,8 @@ for my $Test (@Tests) {
             $PostMasterFilter->FilterAdd(
                 Name           => $Test->{Name},
                 StopAfterMatch => 0,
+                ValidID        => 1,
+                UserID         => 1,
                 %{$Test},
             );
         }
@@ -1017,7 +1043,9 @@ for my $Test (@Tests) {
             );
 
             @Return = $PostMasterObject->Run();
+            @Return = @{ $Return[0] || [] };
         }
+
         $Self->Is(
             $Return[0] || 0,
             1,
@@ -1154,6 +1182,7 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
     );
 
     my @Return = $PostMasterObject->Run();
+    @Return = @{ $Return[0] || [] };
 
     $Self->Is(
         $Return[0] || 0,

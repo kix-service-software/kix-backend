@@ -1777,12 +1777,7 @@ sub KeywordList {
 
         my $KeywordList = lc $Row[0];
 
-        for my $Keyword ( split /,/, $KeywordList ) {
-
-            # remove leading/tailing spaces
-            $Keyword =~ s{ \A \s+ }{}xmsg;
-            $Keyword =~ s{ \s+ \z }{}xmsg;
-
+        for my $Keyword ( split /\s/, $KeywordList ) {
             # increase keyword counter
             $Data{$Keyword}++;
         }
@@ -2436,7 +2431,7 @@ sub _FAQApprovalTicketCreate {
 #rbo - T2016121190001552 - added KIX placeholders
     # get subject
     my $Subject = $ConfigObject->Get('FAQ::ApprovalTicketSubject');
-    $Subject =~ s{ <(KIX|OTRS)_FAQ_NUMBER> }{$Param{FAQNumber}}xms;
+    $Subject =~ s{ <KIX_FAQ_NUMBER> }{$Param{FAQNumber}}xms;
 
     # check if we can find existing open approval tickets for this FAQ article
     my @TicketIDs = $TicketObject->TicketSearch(
@@ -2502,17 +2497,16 @@ sub _FAQApprovalTicketCreate {
         }
         my $Category = join( '::', reverse @CategoryNames );
 
-#rbo - T2016121190001552 - added KIX placeholders
         # get body from config
         my $Body = $ConfigObject->Get('FAQ::ApprovalTicketBody');
-        $Body =~ s{ <(KIX|OTRS)_FAQ_CATEGORYID> }{$Param{CategoryID}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_CATEGORY>   }{$Category}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_LANGUAGE>   }{$Param{Language}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_ITEMID>     }{$Param{ItemID}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_NUMBER>     }{$Param{FAQNumber}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_TITLE>      }{$Param{Title}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_AUTHOR>     }{$UserName}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_STATE>      }{$Param{Visibility}}xms;
+        $Body =~ s{ <KIX_FAQ_CATEGORYID> }{$Param{CategoryID}}xms;
+        $Body =~ s{ <KIX_FAQ_CATEGORY>   }{$Category}xms;
+        $Body =~ s{ <KIX_FAQ_LANGUAGE>   }{$Param{Language}}xms;
+        $Body =~ s{ <KIX_FAQ_ITEMID>     }{$Param{ItemID}}xms;
+        $Body =~ s{ <KIX_FAQ_NUMBER>     }{$Param{FAQNumber}}xms;
+        $Body =~ s{ <KIX_FAQ_TITLE>      }{$Param{Title}}xms;
+        $Body =~ s{ <KIX_FAQ_AUTHOR>     }{$UserName}xms;
+        $Body =~ s{ <KIX_FAQ_STATE>      }{$Param{Visibility}}xms;
 
         #  gather user data
         my %User = $UserObject->GetUserData(

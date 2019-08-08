@@ -158,8 +158,8 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryUpdate(
         CategoryID => $Param{Data}->{FAQCategoryID},
         Name       => $FAQCategory->{Name} || $FAQCategoryData{Name},
-        Comment    => $FAQCategory->{Comment} || $FAQCategoryData{Comment},
-        ParentID   => $FAQCategory->{ParentID} || $FAQCategoryData{ParentID},
+        Comment    => exists $FAQCategory->{Comment} ? $FAQCategory->{Comment} : $FAQCategoryData{Comment},
+        ParentID   => exists $FAQCategory->{ParentID} ? ($FAQCategory->{ParentID}||0) : $FAQCategoryData{ParentID},
         ValidID    => $FAQCategory->{ValidID} || $FAQCategoryData{ValidID},
         UserID     => $Self->{Authorization}->{UserID},
     );

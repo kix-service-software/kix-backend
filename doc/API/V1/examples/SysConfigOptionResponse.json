@@ -1,0 +1,9 @@
+{
+    "SysConfigOption": {
+        "Name": "DefaultUsedLanguages",
+        "Value": {
+            "de": "German",
+            "en": "English"
+        }
+    }
+}

@@ -180,14 +180,28 @@ sub Set {
                 Key  => 'TypeDependencies',
             );
         }
+        my $Changed = 0;
         foreach my $Type (@{$Param{Depends}}) {
             # ignore same type as dependency
             next if $Type eq $Param{Type};
 
             if ( !exists $Self->{TypeDependencies}->{$Type} || !exists $Self->{TypeDependencies}->{$Type}->{$Param{Type}} ) {
+                $Changed = 1;
                 $Self->_Debug('', "adding dependent cache type \"$Param{Type}\" to cache type \"$Type\".");
                 $Self->{TypeDependencies}->{$Type}->{$Param{Type}} = 1;
             }
+        }
+
+        if ( $Changed && $Self->{CacheInBackend} && $Param{CacheInBackend} // 1 && $Self->{TypeDependencies} ) {
+            # update cache dependencies in backend only if something has changed
+            use Data::Dumper;
+            $Self->_Debug('', "updating gobal cache dependency information: ".Dumper($Self->{TypeDependencies}));
+            $Self->{CacheObject}->Set(
+                Type => 'Cache',
+                Key  => 'TypeDependencies',
+                Value => $Self->{TypeDependencies},
+                TTL   => 60 * 60 * 24 * 20,         # 20 days
+            );
         }
     }
 
@@ -211,16 +225,6 @@ sub Set {
 
     # Set persistent cache.
     if ( $Self->{CacheInBackend} && ( $Param{CacheInBackend} // 1 ) ) {
-        if ($Self->{TypeDependencies}) {
-            use Data::Dumper;
-            $Self->_Debug('', "updating gobal cache dependency information: ".Dumper($Self->{TypeDependencies}));
-            $Self->{CacheObject}->Set(
-                Type => 'Cache',
-                Key  => 'TypeDependencies',
-                Value => $Self->{TypeDependencies},
-                TTL   => 60 * 60 * 24 * 20,         # 20 days
-            );
-        }
         return $Self->{CacheObject}->Set(%Param);
     }
 
@@ -593,18 +597,12 @@ sub _HandleDependingCacheTypes {
                 delete $Self->{TypeDependencies}->{$Param{Type}};
             }
 
+            if ( !IsHashRefWithData($Self->{TypeDependencies}) ) {
+                $Self->{TypeDependencies} = undef;
+            }
+
             $Self->CleanUp(
                 Type => $DependentType,
-            );
-        }
-
-        # Set persistent cache
-        if ( $Self->{CacheInBackend} ) {
-            $Self->{CacheObject}->Set(
-                Type => 'Cache',
-                Key  => 'TypeDependencies',
-                Value => $Self->{TypeDependencies},
-                TTL   => 60 * 60 * 24 * 20,         # 20 days
             );
         }
     }
@@ -625,8 +623,8 @@ update the cache statistics
 sub _UpdateCacheStats {
     my ( $Self, %Param ) = @_;
 
-    # if cache stats are not disabled, manage them
-    return if $Kernel::OM->Get('Kernel::Config')->Get('Cache::DisableStats');
+    # do nothing if cache stats are not enabled
+    return if !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Stats');
 
     # read stats from disk if empty
     my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats.'.$$;

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ConfigItemHistory" : {
-         "$ref" : "#/definitions/ConfigItemHistory"
+         "$ref" : "#/definitions/_ConfigItemHistory_json"
       }
    },
    "required" : [
       "ConfigItemHistory"
    ],
    "definitions" : {
-      "ConfigItemHistory" : {
+      "_ConfigItemHistory_json" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item history object.",

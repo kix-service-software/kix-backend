@@ -25,7 +25,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('List all installed OTRS packages.');
+    $Self->Description('List all installed KIX packages.');
 
     $Self->AddOption(
         Name        => 'package-name',
@@ -41,33 +41,6 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
-
-    $Self->AddOption(
-        Name        => 'show-verification-info',
-        Description => 'Shows package OTRS Verify™ status.',
-        Required    => 0,
-        HasValue    => 0,
-    );
-
-    $Self->AddOption(
-        Name        => 'delete-verification-cache',
-        Description => 'Deletes OTRS Verify™ cache, so verification info is fetch again from OTRS group servers.',
-        Required    => 0,
-        HasValue    => 0,
-    );
-
-    return;
-}
-
-sub PreRun {
-    my ( $Self, %Param ) = @_;
-
-    my $ShowVerificationInfoOption    = $Self->GetOption('show-verification-info');
-    my $DeleteVerificationCacheOption = $Self->GetOption('delete-verification-cache');
-
-    if ( $DeleteVerificationCacheOption && !$ShowVerificationInfoOption ) {
-        die "--delete-verification-cache requires --show-verification-info";
-    }
 
     return;
 }
@@ -86,10 +59,6 @@ sub Run {
 
     my $PackageNameOption             = $Self->GetOption('package-name');
     my $ShowDeploymentInfoOption      = $Self->GetOption('show-deployment-info');
-    my $ShowVerificationInfoOption    = $Self->GetOption('show-verification-info');
-    my $DeleteVerificationCacheOption = $Self->GetOption('delete-verification-cache');
-
-    #rbo - T2016121190001552 - removed CloudServices
 
     # Get package object
     my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
@@ -146,33 +115,6 @@ sub Run {
                 $Self->Print(
                     '| <yellow>Pck. Status:</yellow> ' . ( $PackageDeploymentOK ? 'OK' : 'Not OK' ) . "\n"
                 );
-            }
-        }
-
-        if ($ShowVerificationInfoOption) {
-
-            if ( !%VerificationInfo ) {
-
-                # Clear the package verification cache to get fresh results.
-                if ($DeleteVerificationCacheOption) {
-                    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-                        Type => 'PackageVerification',
-                    );
-                }
-
-                # Get verification info for all packages (this will create the cache again).
-                %VerificationInfo = $PackageObject->PackageVerifyAll();
-            }
-
-            if (
-                !defined $VerificationInfo{ $Package->{Name}->{Content} }
-                || $VerificationInfo{ $Package->{Name}->{Content} } ne 'verified'
-                )
-            {
-                $Self->Print("| <red>OTRS Verify:</red> Not Verified\n");
-            }
-            else {
-                $Self->Print("| <yellow>OTRS Verify:</yellow> Verified\n");
             }
         }
     }
@@ -306,7 +248,7 @@ sub _PackageContentGet {
                 }
             }
         }
-        if ( $PackageName !~ /^.+?.opm$/ ) {
+        if ( $PackageName !~ /^.+?.kpm$/ ) {
             my @Packages = $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineList(
                 URL  => $URL,
                 Lang => $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage'),

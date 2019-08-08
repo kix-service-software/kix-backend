@@ -1,0 +1,48 @@
+{
+   "$id" : "#SysConfigOptionCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of SysConfig option value.",
+   "type" : "object",
+   "properties" : {
+      "SysConfigOption" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_SysConfigOption_json"
+         }
+      }
+   },
+   "required" : [
+      "SysConfigOption"
+   ],
+   "definitions" : {
+      "_SysConfigOption_json" : {
+         "$id" : "#SysConfigOption",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The SysConfig option object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Name"
+         ]
+      }
+   }
+}

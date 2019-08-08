@@ -42,8 +42,8 @@ $Self->Is(
 $Self->Is(
     $Result,
     '<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package_list version="1.0">
-</otrs_package_list>
+<kix_package_list version="1.0">
+</kix_package_list>
 ',
     "Dev::Package::RepositoryIndex result for empty directory",
 );

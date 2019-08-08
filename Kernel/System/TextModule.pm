@@ -102,9 +102,6 @@ Adds a new TextModule
         Language   => 'de',               #optional
         Keywords   => 'key1, key2, key3', #optional
         Comment    => '',                 #optional
-        AgentFrontend    => 1,            #optional
-        CustomerFrontend => 1,            #optional
-        PublicFrontend   => 1,            #optional
         Subject    => '',                 #optional
         UserID     => 1,
         ValidID    => 1,
@@ -128,23 +125,12 @@ sub TextModuleAdd {
         $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
     }
 
-    # set frontend display flags...
-    for my $CurrKey (qw(AgentFrontend CustomerFrontend PublicFrontend)) {
-        if ( $Param{$CurrKey} ) {
-            $Param{$CurrKey} = 1;
-        }
-        else {
-            $Param{$CurrKey} = 0;
-        }
-    }
-
     # build sql...
-    my $SQL = "INSERT INTO kix_text_module "
+    my $SQL = "INSERT INTO text_module "
         . "(name, valid_id, keywords, category, comment, text, subject, language, "
-        . "f_agent, f_customer, f_public, "
         . "create_time, create_by, change_time, change_by ) "
         . "VALUES "
-        . "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+        . "(?, ?, ?, ?, ?, ?, ?, ?, "
         . "current_timestamp, ?, current_timestamp, ?) ";
 
     # do the db insert...
@@ -153,7 +139,6 @@ sub TextModuleAdd {
         Bind => [
             \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Category}, 
             \$Param{Comment}, \$Param{Text}, \$Param{Subject}, \$Param{Language},
-            \$Param{AgentFrontend}, \$Param{CustomerFrontend}, \$Param{PublicFrontend},
             \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -167,7 +152,7 @@ sub TextModuleAdd {
         );
 
         return 0 if !$Self->{DBObject}->Prepare(
-            SQL => 'SELECT max(id) FROM kix_text_module '
+            SQL => 'SELECT max(id) FROM text_module '
                 . " WHERE name = ? AND language = ? AND create_by = ? ",
             Bind => [ \$Param{Name}, \$Param{Language}, \$Param{UserID} ],
         );
@@ -231,8 +216,8 @@ sub TextModuleGet {
     # sql
     my $SQL
         = 'SELECT name, valid_id, keywords, category, comment, text, '
-        . 'language, subject, f_agent, f_customer, f_public '
-        . 'FROM kix_text_module '
+        . 'language, subject, create_time, create_by, change_time, change_by '
+        . 'FROM text_module '
         . 'WHERE id = ?';
 
     return if !$Self->{DBObject}->Prepare( 
@@ -242,18 +227,19 @@ sub TextModuleGet {
 
     if ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
         my %Data = (
-            ID         => $Param{ID},
-            Name       => $Data[0],
-            ValidID    => $Data[1],
-            Keywords   => $Data[2],
-            Category   => $Data[3],
-            Comment    => $Data[4],
-            Text       => $Data[5],
-            Language   => $Data[6],
-            Subject    => $Data[7],
-            AgentFrontend      => $Data[8],
-            CustomerFrontend   => $Data[9],
-            PublicFrontend     => $Data[10],
+            ID                  => $Param{ID},
+            Name                => $Data[0],
+            ValidID             => $Data[1],
+            Keywords            => $Data[2],
+            Category            => $Data[3],
+            Comment             => $Data[4],
+            Text                => $Data[5],
+            Language            => $Data[6],
+            Subject             => $Data[7],
+            CreateTime          => $Data[8],
+            CreateBy            => $Data[9],
+            ChangeTime          => $Data[10],
+            ChangeBy            => $Data[11],            
         );
 
         # set cache
@@ -279,13 +265,11 @@ Updates an existing TextModule
         ValidID    => 1,                  #required
         Text       => 'some blabla...',   #required
         UserID     => 1,                  #required
+        Subject    => '',                 #optional
         Category   => '',                 #optional
         Language   => 'de',               #optional
         Keywords   => 'key1, key2, key3', #optional
         Comment    => '',                 #optional
-        AgentFrontend      => 1,          #optional
-        CustomerFrontend   => 1,          #optional
-        PublicFrontend     => 1,          #optional
     );
 
 =cut
@@ -306,21 +290,10 @@ sub TextModuleUpdate {
         $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
     }
 
-    # set frontend display flags...
-    for my $CurrKey (qw(AgentFrontend CustomerFrontend PublicFrontend )) {
-        if ( $Param{$CurrKey} ) {
-            $Param{$CurrKey} = 1;
-        }
-        else {
-            $Param{$CurrKey} = 0;
-        }
-    }
-
     # build sql...
-    my $SQL = "UPDATE kix_text_module SET "
+    my $SQL = "UPDATE text_module SET "
         . " name = ?, text = ?, subject = ?, keywords = ?, language = ?, "
         . " category = ?, comment = ?, valid_id = ?, "
-        . " f_agent = ?, f_customer = ?, f_public = ?, "
         . " change_time = current_timestamp, change_by = ? "
         . "WHERE id = ?";
 
@@ -331,7 +304,6 @@ sub TextModuleUpdate {
             \$Param{Name}, \$Param{Text}, \$Param{Subject},
             \$Param{Keywords}, \$Param{Language},
             \$Param{Category}, \$Param{Comment}, \$Param{ValidID},
-            \$Param{AgentFrontend}, \$Param{CustomerFrontend}, \$Param{PublicFrontend},
             \$Param{UserID},   \$Param{ID}
         ],
     );
@@ -388,7 +360,7 @@ sub TextModuleDelete {
     );
 
     my $Result = $Self->{DBObject}->Do(
-        SQL  => 'DELETE FROM kix_text_module WHERE id = ?',
+        SQL  => 'DELETE FROM text_module WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
@@ -410,9 +382,6 @@ Returns all TextModuleIDs depending on given parameters.
         Name          => '...'   #optional
         Category      => '...',  #optional
         Language      => 'de',   #optional
-        AgentFrontend => 1,      #optional
-        CustomerFrontend => 1    #optional
-        PublicFrontend => 1,     #optional
         ValidID        => 1,     #optional: 1 is assumed as default
     );
 
@@ -429,7 +398,7 @@ sub TextModuleList {
     my $CacheKey = 'TextModuleList::';
     my @Params;
     foreach my $ParamKey (
-        qw{Category Name AgentFrontend CustomerFrontend PublicFrontend Language ValidID}
+        qw{Category Name Language ValidID}
         )
     {
         if ( $Param{$ParamKey} ) {
@@ -452,17 +421,6 @@ sub TextModuleList {
         push(@BindVars, \$Param{ValidID});
     }
 
-    # set frontend display flags...
-    if ( $Param{AgentFrontend} ) {
-        push(@SQLWhere, 'f_agent = 1');
-    }
-    elsif ( $Param{CustomerFrontend} ) {
-        push(@SQLWhere, 'f_customer = 1');
-    }
-    elsif ( $Param{PublicFrontend} ) {
-        push(@SQLWhere, 'f_public = 1');
-    }
-
     if ( $Param{Name} ) {
         push(@SQLWhere, 'name = ?');
         push(@BindVars, \$Param{Name});
@@ -474,7 +432,7 @@ sub TextModuleList {
     }
 
     # create SQL-String
-    my $SQL = "SELECT id FROM kix_text_module";
+    my $SQL = "SELECT id FROM text_module";
 
     if ( @SQLWhere ) {
         $SQL .= ' WHERE '.join(' AND ', @SQLWhere);
@@ -512,7 +470,7 @@ Returns all TextModuleCategories
 sub TextModuleCategoryList {
     my ( $Self, %Param ) = @_;
 
-    my $SQL = "SELECT DISTINCT(category) FROM kix_text_module WHERE category <> ''";
+    my $SQL = "SELECT DISTINCT(category) FROM text_module WHERE category <> ''";
 
     return if !$Self->{DBObject}->Prepare( 
         SQL => $SQL,
@@ -583,14 +541,14 @@ sub TextModuleObjectLinkGet {
     if ( $Param{TextModuleID} ) {
         return if !$Self->{DBObject}->Prepare(
             SQL =>
-                'SELECT object_id FROM kix_text_module_object_link WHERE object_type = ? AND text_module_id = ? ',
+                'SELECT object_id FROM text_module_object_link WHERE object_type = ? AND text_module_id = ? ',
             Bind => [ \$Param{ObjectType}, \$Param{TextModuleID} ],
         );
     }
     else {
         return if !$Self->{DBObject}->Prepare(
             SQL =>
-                'SELECT text_module_id FROM kix_text_module_object_link WHERE object_type = ? AND object_id = ? ',
+                'SELECT text_module_id FROM text_module_object_link WHERE object_type = ? AND object_id = ? ',
             Bind => [ \$Param{ObjectType}, \$Param{ObjectID} ],
         );
     }
@@ -647,13 +605,13 @@ sub TextModuleObjectLinkDelete {
         if ( $Param{ObjectType} ) {
             return $Self->{DBObject}->Do(
                 SQL =>
-                    'DELETE FROM kix_text_module_object_link WHERE object_type = ? AND text_module_id = ?',
+                    'DELETE FROM text_module_object_link WHERE object_type = ? AND text_module_id = ?',
                 Bind => [ \$Param{ObjectType}, \$Param{TextModuleID} ],
             );
         }
         else {
             return $Self->{DBObject}->Do(
-                SQL  => 'DELETE FROM kix_text_module_object_link WHERE text_module_id = ?',
+                SQL  => 'DELETE FROM text_module_object_link WHERE text_module_id = ?',
                 Bind => [ \$Param{TextModuleID} ],
             );
         }
@@ -661,7 +619,7 @@ sub TextModuleObjectLinkDelete {
     else {
         return $Self->{DBObject}->Do(
             SQL =>
-                'DELETE FROM kix_text_module_object_link WHERE object_type = ? AND object_id = ?',
+                'DELETE FROM text_module_object_link WHERE object_type = ? AND object_id = ?',
             Bind => [ \$Param{ObjectType}, \$Param{ObjectID} ],
         );
     }
@@ -692,7 +650,7 @@ sub TextModuleObjectLinkCreate {
         }
     }
 
-    my $SQL = "INSERT INTO kix_text_module_object_link "
+    my $SQL = "INSERT INTO text_module_object_link "
         . " (text_module_id, object_type, object_id, create_time, create_by, change_time, change_by)"
         . " VALUES  (?, ?, ?, current_timestamp, ?, current_timestamp, ?)";
 
@@ -719,11 +677,11 @@ sub TextModuleObjectLinkCreate {
 
 sub TextModuleCount {
     my ( $Self, %Param ) = @_;
-    my $SQL = "SELECT count(*) FROM kix_text_module t";
+    my $SQL = "SELECT count(*) FROM text_module t";
 
     if ( defined $Param{Type} && $Param{Type} =~ /^UNASSIGNED::(.*?)$/g ) {
         $SQL
-            .= " WHERE NOT EXISTS (SELECT object_id FROM kix_text_module_object_link ol WHERE object_type = '"
+            .= " WHERE NOT EXISTS (SELECT object_id FROM text_module_object_link ol WHERE object_type = '"
             . $1
             . "' AND ol.text_module_id = t.id)";
     }

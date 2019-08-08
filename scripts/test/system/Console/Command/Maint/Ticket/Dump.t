@@ -65,9 +65,6 @@ $Self->Is(
     "Exit code",
 );
 
-use Data::Dumper;
-print STDERR Dumper( \$Result );
-
 $Self->True(
     index( $Result, "Title: My ticket created by Agent A" ) > -1,
     "Title found",

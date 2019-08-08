@@ -37,7 +37,7 @@ sub new {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    my $TempDir = $ConfigObject->Get('TempDir');
+    my $TempDir = $ConfigObject->Get('TempDir') || $ConfigObject->Get('Home').'/var/tmp';
     $Self->{CacheDirectory} = $TempDir . '/CacheFileStorable';
 
     # check if cache directory exists and in case create one

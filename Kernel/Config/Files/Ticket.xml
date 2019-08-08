@@ -1,28 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketTemplates" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Create tickets from templates</Description>
-                <NavBarName>QuickTicket</NavBarName>
-                <Title>New Template Ticket</Title>
-                <NavBar>
-                    <Name Translatable="1">Ticket Templates</Name>
-                    <Link>Action=CustomerTicketTemplates</Link>
-                    <LinkOption></LinkOption>
-                    <NavBar></NavBar>
-                    <Description Translatable="1">Create new ticket from predefined template.</Description>
-                    <Type></Type>
-                    <Block></Block>
-                    <AccessKey></AccessKey>
-                    <Prio>50</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::CustomModule###002-TicketTemplateHandler" Required="0" Valid="1">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>
@@ -317,7 +294,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::StorageModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Saves the attachments of articles. "DB" stores all data in the database (not recommended for storing big attachments). "FS" stores the data on the filesystem; this is faster but the webserver should run under the OTRS user. You can switch between the modules even on a system that is already in production without any loss of data. Note: Searching for attachment names is not supported when "FS" is used.</Description>
+        <Description Translatable="1">Saves the attachments of articles. "DB" stores all data in the database (not recommended for storing big attachments). "FS" stores the data on the filesystem; this is faster but the KIX applications should not be running as root. You can switch between the modules even on a system that is already in production without any loss of data. Note: Searching for attachment names is not supported when "FS" is used.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
@@ -344,7 +321,7 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/article</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="OTRSEscalationEvents::DecayTime" Required="0" Valid="1">
+    <ConfigItem Name="EscalationEvents::DecayTime" Required="0" Valid="1">
         <Description Translatable="1">The duration in minutes after emitting an event, in which the new escalation notify and start events are suppressed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1706,7 +1683,7 @@
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Array>
-                <Item>'customer'</Item>
+                <Item>'external'</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -1772,9 +1749,7 @@
         <ValidateModule>Kernel::System::SysConfig::StateValidate</ValidateModule>
         <Setting>
             <Hash>
-                <Item Key="pending auto close+" Translatable="1">closed successful</Item>
-                <Item Key="pending auto close-" Translatable="1">closed unsuccessful</Item>
-                <Item Key="pending auto reopen" Translatable="1">open</Item>
+                <Item Key="pending auto close" Translatable="1">closed</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2303,8 +2278,6 @@
                 <Item>ArticleAutoResponse</Item>
                 <Item>ArticleFlagSet</Item>
                 <Item>ArticleFlagDelete</Item>
-                <Item>ArticleAgentNotification</Item>
-                <Item>ArticleCustomerNotification</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -2361,138 +2334,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketOverview" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Overview of customer tickets.</Description>
-                <NavBarName>Ticket</NavBarName>
-                <Title Translatable="1">Overview</Title>
-                <NavBar>
-                    <Description Translatable="1">Tickets.</Description>
-                    <Name Translatable="1">Tickets</Name>
-                    <Block></Block>
-                    <Type>Menu</Type>
-                    <NavBar>Ticket</NavBar>
-                    <Link>Action=CustomerTicketOverview;Subaction=MyTickets</Link>
-                    <LinkOption></LinkOption>
-                    <AccessKey>m</AccessKey>
-                    <Prio>100</Prio>
-                </NavBar>
-                <NavBar>
-                    <Description Translatable="1">My Tickets.</Description>
-                    <Name Translatable="1">My Tickets</Name>
-                    <Block></Block>
-                    <Type>Submenu</Type>
-                    <NavBar>Ticket</NavBar>
-                    <Link>Action=CustomerTicketOverview;Subaction=MyTickets</Link>
-                    <LinkOption></LinkOption>
-                    <AccessKey></AccessKey>
-                    <Prio>110</Prio>
-                </NavBar>
-                <NavBar>
-                    <Description Translatable="1">Company Tickets.</Description>
-                    <Name Translatable="1">Company Tickets</Name>
-                    <Block></Block>
-                    <Type>Submenu</Type>
-                    <NavBar>Ticket</NavBar>
-                    <Link>Action=CustomerTicketOverview;Subaction=CompanyTickets</Link>
-                    <LinkOption></LinkOption>
-                    <AccessKey>M</AccessKey>
-                    <Prio>120</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketMessage" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Create tickets.</Description>
-                <NavBarName>Ticket</NavBarName>
-                <Title Translatable="1">New Ticket</Title>
-                <NavBar>
-                    <Description Translatable="1">Create new Ticket.</Description>
-                    <Name Translatable="1">New Ticket</Name>
-                    <Block></Block>
-                    <Type>Submenu</Type>
-                    <NavBar>Ticket</NavBar>
-                    <Link>Action=CustomerTicketMessage</Link>
-                    <LinkOption></LinkOption>
-                    <AccessKey>n</AccessKey>
-                    <Prio>100</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketZoom" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Ticket zoom view.</Description>
-                <NavBarName>Ticket</NavBarName>
-                <Title Translatable="1">Zoom</Title>
-                <Loader>
-                    <JavaScript>Core.Customer.TicketZoom.js</JavaScript>
-                    <JavaScript>Core.UI.Popup.js</JavaScript>
-                    <JavaScript>Core.KIX4OTRS.Customer.TicketMergeLink.js</JavaScript>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketPrint" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Customer Ticket Print Module.</Description>
-                <NavBarName></NavBarName>
-                <Title Translatable="1">Print</Title>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketAttachment" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">To download attachments.</Description>
-                <NavBarName></NavBarName>
-                <Title Translatable="1"></Title>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketSearch" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Customer ticket search.</Description>
-                <NavBarName>Ticket</NavBarName>
-                <Title Translatable="1">Search</Title>
-                <NavBar>
-                    <Description Translatable="1">Search.</Description>
-                    <Name Translatable="1">Search</Name>
-                    <Block></Block>
-                    <Type>Submenu</Type>
-                    <NavBar>Ticket</NavBar>
-                    <Link>Action=CustomerTicketSearch</Link>
-                    <LinkOption></LinkOption>
-                    <AccessKey>s</AccessKey>
-                    <Prio>300</Prio>
-                </NavBar>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::Acl::Module###1-Ticket::Acl::Module" Required="0" Valid="0">
         <Description Translatable="1">ACL module that allows closing parent tickets only if all its children are already closed ("State" shows which states are not available for the parent ticket until all child tickets are closed).</Description>
         <Group>Ticket</Group>
@@ -2502,8 +2343,7 @@
                 <Item Key="Module">Kernel::System::Ticket::Acl::CloseParentAfterClosedChilds</Item>
                 <Item Key="State">
                     <Array>
-                        <Item Translatable="1">closed successful</Item>
-                        <Item Translatable="1">closed unsuccessful</Item>
+                        <Item Translatable="1">closed</Item>
                     </Array>
                 </Item>
             </Hash>
@@ -2735,7 +2575,7 @@
         <SubGroup>Core::PostMaster</SubGroup>
         <ValidateModule>Kernel::System::SysConfig::QueueValidate</ValidateModule>
         <Setting>
-            <String Regex="">Raw</String>
+            <String Regex="">Service Desk</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="PostmasterDefaultPriority" Required="1" Valid="1">
@@ -3012,13 +2852,13 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PostFilterModule###000-FollowUpArticleTypeCheck" Required="0" Valid="1">
+    <ConfigItem Name="PostMaster::PostFilterModule###000-FollowUpChannelCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to check if arrived emails should be marked as email-internal (because of original forwarded internal email). ArticleType and SenderType define the values for the arrived email/article.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::FollowUpArticleTypeCheck</Item>
+                <Item Key="Module">Kernel::System::PostMaster::Filter::FollowUpChannelCheck</Item>
                 <Item Key="ArticleType" Translatable="1">email-internal</Item>
                 <Item Key="SenderType" Translatable="1">customer</Item>
             </Hash>
@@ -3674,12 +3514,11 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::EscalationDelayed::FreeTimeField" Required="0" Valid="0">
-        <Description Translatable="1">Defines a dynamic field of type date/time which is used as start time for solution SLA-computation rather than ticket creation time, thus allowing to start SLA-countdown with begin of customer desired times. "Index" is only fallback for old configuration upgraded from OTRS 3.1 or previous to be workable. In this case dynamic field named TicketFreeTime"Index" is used.</Description>
+        <Description Translatable="1">Defines a dynamic field of type date/time which is used as start time for solution SLA-computation rather than ticket creation time, thus allowing to start SLA-countdown with begin of customer desired times.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Index">1</Item>
                 <Item Key="DynamicField"></Item>
             </Hash>
         </Setting>
@@ -3711,18 +3550,6 @@ Thanks for your help!
                 <Item Key="ShowData">UserFullname</Item>
                 <Item Key="ShowDataHead">Name</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarCustomerSearchAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarCustomer Search AJAX handler</Description>
-                <Title>KIXSidebarCustomer Search AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateDefault" Required="1" Valid="1">
@@ -3869,30 +3696,6 @@ Thanks for your help!
             <String Regex="">Kernel::System::Ticket::TicketExtensionsKIX4OTRSITSMIncidentProblem</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerTicketCustomerIDSelection" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Create tickets</Description>
-                <NavBarName>Ticket</NavBarName>
-                <Title>New Ticket</Title>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarDisableSidebarAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebar DisabledSidebar AJAX Handler</Description>
-                <Title>KIXSidebar DisabledSidebar AJAX Handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###200-CreateFAQEntry" Required="0" Valid="0">
         <Description Translatable="1">Enables creation of a FAQ entry from currently created article.</Description>
         <Group>Ticket</Group>
@@ -3903,18 +3706,6 @@ Thanks for your help!
                 <Item Key="Event">(ArticleCreate)</Item>
                 <Item Key="Transaction">1</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarCISearchAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebar CISearch AJAX Handler</Description>
-                <Title>KIXSidebar CISearch AJAX Handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###230-TicketCreateChecklistFromTicketTemplate" Required="0" Valid="1">
@@ -3940,8 +3731,7 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###500-TicketAutoLinkConfigItem" Required="0" Valid="0">
-        <Description Lang="en">Workflowmodule which links the ticket to related CIs - event handler supports only following events: ArticleCreate, TicketFreeTextUpdate. Requires OTRS::ITSM::ConfigurationManagement to be installed! DO NOT ENABLED IF THIS EXTENSION IS NOT INSTALLED ON YOUR SYSTEM!</Description>
-        <Description Lang="de">Workflow-Modul welches das Ticket mit CIs verknuepft - der event handler unterstuetzt derzeit nur folgende events: ArticleCreate, TicketFreeTextUpdate. Setzt ZWINGEND OTRS::ITSM::ConfigurationManagement voraus! NICHT AKTIVIEREN WENN DIESE ERWEITERUNG AUF IHREM SYSTEM NICHT INSTALLIERT IST!</Description>
+        <Description Translatable="1">Workflowmodule which links the ticket to related CIs - event handler supports only following events: ArticleCreate, TicketFreeTextUpdate.</Description>
         <Group>Ticket</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -3980,30 +3770,6 @@ Thanks for your help!
                 <Item Key="SearchSubject">1</Item>
                 <Item Key="TicketIDSearchMaskRegExp">CustomerTicketZoom</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarFAQSearchAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarFAQ Search AJAX handler</Description>
-                <Title>KIXSidebarFAQ Search AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarTicketLinkCISearchAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarTicketLinkCI Search AJAX handler</Description>
-                <Title>KIXSidebarTicketLinkCI Search AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::Acl::Module###950_TicketStateWorkflow" Required="0" Valid="0">
@@ -4125,18 +3891,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###DynamicFieldITSMConfigItemAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup ConfigItem with AJAX-request</Description>
-                <Title>ConfigItem search</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="0">
         <Description Translatable="1">Create link between ticket and config item on DynamicFieldUpdate (This event only create link, links can only be deleted manually).</Description>
         <Group>Ticket</Group>
@@ -4215,18 +3969,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarTicketSearchAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarTicket Search AJAX handler</Description>
-                <Title>KIXSidebarTicket Search AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###9-SystemMonitoringAcknowledgeX" Required="1" Valid="1">
         <Description Translatable="1">Ticket event module to send an acknowledge to registered system monitoring tools.</Description>
         <Group>Ticket</Group>
@@ -4277,80 +4019,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::KIXSidebarBackend###KIXSBRemoteDBList001" Required="0" Valid="0">
-        <Description Translatable="1">Sidebar module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::KIXSidebarRemoteDB</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Actions">CustomerTicket(Message|Zoom)</Item>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::RemoteDB</Item>
-                <Item Key="Title">Customer Tickets</Item>
-                <Item Key="Description">Shows customer ticket.</Item>
-                <Item Key="Prio">0540</Item>
-                <Item Key="InitialCollapsed"></Item>
-                <Item Key="Identifier">KIXSBRemoteDBList001</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Callback"></Item>
-                <Item Key="ArrayHandling">or</Item>
-                <Item Key="AutoSearch">CustomerTicket(Message|Zoom)</Item>
-                <Item Key="AutoSelectOne"></Item>
-                <Item Key="DatabaseCacheTTL"></Item>
-                <Item Key="DatabaseDSN">DBI:Pg:dbname=otrs;host=localhost</Item>
-                <Item Key="DatabasePw">otrs</Item>
-                <Item Key="DatabaseTable">ticket</Item>
-                <Item Key="DatabaseType"></Item>
-                <Item Key="DatabaseUser">otrs</Item>
-                <Item Key="DatabaseCaseSensitive"></Item>
-                <Item Key="MaxResultCount">30</Item>
-                <Item Key="MaxResultDisplay">10</Item>
-                <Item Key="MaxResultSize"></Item>
-                <Item Key="NoActionWithoutSelection"></Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="RestrictedOTRSObjects">Contact</Item>
-                <Item Key="RestrictedOTRSAttributes">UserLogin</Item>
-                <Item Key="RestrictedDBAttributes">customer_user_id</Item>
-                <Item Key="RestrictedMandatory">0</Item>
-                <Item Key="RestrictedArrayHandling">OR</Item>
-                <Item Key="SearchAttribute">tn</Item>
-                <Item Key="SearchInputDisabled">1</Item>
-                <Item Key="IdentifierAttribute"></Item>
-                <Item Key="ShowAttributes">tn,title</Item>
-                <Item Key="ShowAttributesHead">TN,Title</Item>
-                <Item Key="DynamicFields"></Item>
-                <Item Key="DynamicFieldsAttributes"></Item>
-                <Item Key="PopupAttributes">tn,title,create_time,change_time</Item>
-                <Item Key="PopupAttributesHead">TN,Title,Created, Changed</Item>
-                <Item Key="TicketIDSearchMaskRegExp">CustomerTicketZoom</Item>
-                <Item Key="TicketLink">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarRemoteDBSearchAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarRemoteDB Search AJAX handler</Description>
-                <Title>KIXSidebarRemoteDB Search AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###DynamicFieldRemoteDBAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Lookup RemoteDB with AJAX-request</Description>
-                <Title>RemoteDB search</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::Acl::Module###802-MatchTicketDataRestrictions" Required="0" Valid="0">
         <Description Translatable="1">Ticket-ACL to restrict some ticket data selections based on current ticket data.</Description>
         <Group>Ticket</Group>
@@ -4397,57 +4065,6 @@ Thanks for your help!
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::KIXSidebarBackend###KIXSBRemoteDBItem001" Required="0" Valid="0">
-        <Description Translatable="1">Sidebar module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::KIXSidebarRemoteDBView</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Actions">CustomerTicketZoom</Item>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::RemoteDBView</Item>
-                <Item Key="Title">Customer Data</Item>
-                <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-                <Item Key="Description">Shows data of contact.</Item>
-                <Item Key="Prio">0570</Item>
-                <Item Key="InitialCollapsed"></Item>
-                <Item Key="Identifier">KIXSBRemoteDBItem001</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Callback"></Item>
-                <Item Key="DatabaseCacheTTL">3600</Item>
-                <Item Key="DatabaseDSN">DBI:Pg:dbname=otrs;host=localhost</Item>
-                <Item Key="DatabaseField::00::first_name::Firstname"></Item>
-                <Item Key="DatabaseField::01::last_name::Lastname"></Item>
-                <Item Key="DatabaseField::02::street"></Item>
-                <Item Key="DatabaseField::03::zip"></Item>
-                <Item Key="DatabaseField::04::city"></Item>
-                <Item Key="DatabaseField::05::email"></Item>
-                <Item Key="DatabaseField::06::phone"></Item>
-                <Item Key="DatabaseField::07::fax"></Item>
-                <Item Key="DatabaseFieldKey">login</Item>
-                <Item Key="DatabasePw">otrs</Item>
-                <Item Key="DatabaseTable">customer_user</Item>
-                <Item Key="DatabaseType"></Item>
-                <Item Key="DatabaseUser">otrs</Item>
-                <Item Key="DatabaseCaseSensitive"></Item>
-                <Item Key="DynamicField">Contact</Item>
-                <Item Key="DynamicFieldArrayHandling">OR</Item>
-                <Item Key="MaxResultSize">25</Item>
-                <Item Key="TicketIDSearchMaskRegExp">CustomerTicketZoom</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###KIXSidebarRemoteDBViewAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>KIXSidebarRemoteDBView Search AJAX handler</Description>
-                <Title>KIXSidebarRemoteDBView Search AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Ticket::CustomModule###001-TicketExtensionsKIX4OTRS" Required="0" Valid="1">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>
@@ -4457,7 +4074,7 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::ACL-PossiblePropertiesSubsumption" Required="1" Valid="1">
-        <Description Translatable="1">Defines whether results of PossibleNot for tickets of multiple ACLs are subsumed, thus allowing a more modular approach to ACLS (OTRS-default behavior is disabled).</Description>
+        <Description Translatable="1">Defines whether results of PossibleNot for tickets of multiple ACLs are subsumed, thus allowing a more modular approach to ACLS (default behavior is disabled).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>

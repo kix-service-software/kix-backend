@@ -476,60 +476,6 @@ sub GetAllQueues {
     return %MoveQueues;
 }
 
-=item GetAllCustomQueues()
-
-get all custom queues of one user
-
-    my @Queues = $QueueObject->GetAllCustomQueues( UserID => 123 );
-
-=cut
-
-sub GetAllCustomQueues {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
-    }
-
-    # check cache
-    my $CacheKey = 'GetAllCustomQueues::' . $Param{UserID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return @{$Cache} if $Cache;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # search all custom queues
-    return if !$DBObject->Prepare(
-        SQL  => 'SELECT queue_id FROM personal_queues WHERE user_id = ?',
-        Bind => [ \$Param{UserID} ],
-    );
-
-    # fetch the result
-    my @QueueIDs;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        push @QueueIDs, $Row[0];
-    }
-
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \@QueueIDs,
-    );
-
-    return @QueueIDs;
-}
-
 =item GetAllSubQueues()
 
 get all sub queues of a queue
@@ -592,16 +538,18 @@ get id or name for queue
 
     my $QueueID = $QueueObject->QueueLookup( Queue => $Queue );
 
+    my $QueueID = $QueueObject->QueueLookup( SystemAddressID => $SystemAddressID );
+
 =cut
 
 sub QueueLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{Queue} && !$Param{QueueID} ) {
+    if ( !$Param{Queue} && !$Param{QueueID} && !$Param{SystemAddressID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Got no Queue or QueueID!'
+            Message  => 'Got no Queue or QueueID or SystemAddressID!'
         );
         return;
     }
@@ -619,11 +567,21 @@ sub QueueLookup {
         $Value      = $Param{QueueID};
         $ReturnData = $QueueList{ $Param{QueueID} };
     }
-    else {
+    elsif ( $Param{Queue} ) {
         $Key   = 'Queue';
         $Value = $Param{Queue};
         my %QueueListReverse = reverse %QueueList;
         $ReturnData = $QueueListReverse{ $Param{Queue} };
+    }
+    elsif ( $Param{SystemAddressID} ) {
+        foreach my $QueueID ( keys %QueueList ) {
+            my %QueueData = $Self->QueueGet(
+                QueueID => $QueueID
+            );
+            next if $QueueData{SystemAddressID} ne $Param{SystemAddressID};
+            $ReturnData = $QueueID;
+            last;
+        }
     }
 
     # check if data exists
@@ -670,7 +628,7 @@ sub QueueAdd {
 
             # I added default values in the Load Routine
             if ( !$Param{$_} ) {
-                $Param{$_} = $Self->{QueueDefaults}->{$_} || 0;
+                $Param{$_} = exists $Self->{QueueDefaults}->{$_} ? $Self->{QueueDefaults}->{$_} : 0;
             }
         }
     }
@@ -1101,10 +1059,10 @@ sub QueueUpdate {
     );
     
     # check all SysConfig options
-    return 1 if !$Param{CheckSysConfig};
+    #return 1 if !$Param{CheckSysConfig};
 
     # check all SysConfig options and correct them automatically if necessary
-    $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }

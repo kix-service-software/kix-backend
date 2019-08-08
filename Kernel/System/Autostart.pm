@@ -91,11 +91,24 @@ sub Run {
             # ignore empty lines and comments
             next if ( $Line =~ /^\s*$/ || $Line =~ /^\s*#/ );
 
+            # replace placeholders
+            $Line = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+                Text     => $Line,
+                Data     => {},
+                RichText => 0,
+                UserID   => 1,
+            );
+
+            # remove line break
             chomp($Line);
+
+            # replace leading and trailing spaces
+            $Line =~ s/(^\s+|\s+$)//g;
+
             my @Command = Text::ParseWords::quotewords('\s+', 0, $Line);
     
             if ( @Command ) {
-                my $Result = $Kernel::OM->Get('Kernel::System::Console::InterfaceConsole')->Run(@Command);
+                my $Result = $Kernel::OM->Get('Kernel::System::Console')->Run(@Command);
                 if ( $Result ) {
                     $Self->{LogObject}->Log( 
                         Priority => 'error', 

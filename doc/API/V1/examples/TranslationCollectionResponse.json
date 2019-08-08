@@ -1,20 +1,16 @@
 {
     "Translation": [
         { 
-            "ChangeBy": 1,
-            "ChangeTime": "2018-09-28 09:17:03",
-            "CreateBy": 1,
-            "CreateTime": "2018-08-28 11:34:55",
-            "ID": 1,
-            "Pattern": "Incident"
+            "Pattern": "Incident",
+            "Languages": {
+                "de": "Störung"
+            }
         },
         { 
-            "ChangeBy": 1,
-            "ChangeTime": "2018-10-28 08:12:17",
-            "CreateBy": 1,
-            "CreateTime": "2018-10-28 08:10:01",
-            "ID": 2,
-            "Pattern": "Problem"
+            "Pattern": "Delete this item ?",
+            "Languages": {
+                "de": "Diesen Eintrag löschen ?"
+            }
         }        
     ]
 }

@@ -79,7 +79,6 @@ sub new {
         Config => 'Contact::EventModulePost',
     );
 
-
     return $Self;
 }
 
@@ -217,6 +216,9 @@ sub ContactGet {
         );
         return;
     }
+
+    # ignore non-numeric IDs
+    return if $Param{ID} !~ /^\d+$/;
 
     # check cache
     my $CacheKey = "ContactGet::$Param{ID}";

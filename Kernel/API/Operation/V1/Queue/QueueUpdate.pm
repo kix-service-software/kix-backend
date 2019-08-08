@@ -197,8 +197,8 @@ sub Run {
         FollowUpLock        => $Queue->{FollowUpLock} || $QueueData{FollowUpLock},
         DefaultSignKey      => $Queue->{DefaultSignKey} || $QueueData{DefaultSignKey},
         SystemAddressID     => $Queue->{SystemAddressID} || $QueueData{SystemAddressID},
-        Signature           => $Queue->{Signature} || $QueueData{Signature},            
-        Comment             => $Queue->{Comment} || $QueueData{Comment},
+        Signature           => exists $Queue->{Signature} ? $Queue->{Signature} : $QueueData{Signature},            
+        Comment             => exists $Queue->{Comment} ? $Queue->{Comment} : $QueueData{Comment},
         ValidID             => $Queue->{ValidID}  || $QueueData{ValidID},
         UserID              => $Self->{Authorization}->{UserID},
     ); 

@@ -520,10 +520,10 @@ sub _ArticleDataGet {
         );
     }
 
-    # get id of article sender type 'customer'
+    # get id of article sender type 'external'
     if ( !$Self->{CustomerSenderTypeID} ) {
         $Self->{CustomerSenderTypeID} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
-            SenderType => 'customer',
+            SenderType => 'external',
         );
     }
 

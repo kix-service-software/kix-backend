@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
+    <ConfigItem Name="API::Cache" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable API level caching.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable API debugging.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###999-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
@@ -182,7 +202,6 @@
                 <Item Key="Object.UnableToDelete">400:Could not delete item, please contact the system administrator.</Item>
                 <Item Key="OK">200</Item>
                 <Item Key="Operation.InternalError">500</Item>
-                <Item Key="Operation.PrepareDataError">400</Item>
                 <Item Key="ParentObject.NotFound">404:The parent item(s) cannot be found.</Item>
                 <Item Key="PrepareData.InvalidFilter">400</Item>
                 <Item Key="PrepareData.InvalidSort">400</Item>

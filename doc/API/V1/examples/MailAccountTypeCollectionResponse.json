@@ -1,0 +1,10 @@
+{
+    "MailAccountType": [
+        "IMAP",
+        "IMAPS",
+        "IMAPTLS",
+        "POP3",
+        "POP3S",
+        "POP3TLS"
+    ]
+}

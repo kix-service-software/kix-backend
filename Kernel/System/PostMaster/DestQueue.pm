@@ -73,9 +73,14 @@ sub GetQueueID {
         next EMAIL if !$Address;
 
         # lookup queue id if recipiend address
-        $QueueID = $SystemAddressObject->SystemAddressQueueID(
-            Address => $Address,
+        my $SystemAddressID = $SystemAddressObject->SystemAddressLookup(
+            Name => $Address,
         );
+        if ( $SystemAddressID ) {
+            $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                SystemAddressID => $SystemAddressID
+            );
+        }
 
         # debug
         if ( $Self->{Debug} > 1 ) {
@@ -111,11 +116,6 @@ sub GetTrustedQueueID {
 
     # get email headers
     my %GetParam = %{ $Param{Params} };
-
-#rbo - T2016121190001552 - renamed X-OTRS headers
-    if( !$GetParam{'X-KIX-Queue'} ) {
-        $GetParam{'X-KIX-Queue'} = $GetParam{'X-OTRS-Queue'};       # fallback
-    }
 
     return if !$GetParam{'X-KIX-Queue'};
 

@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MailAccountPostRequest",
+  "type": "object",
+  "description": "The mail account request object for update.",
+  "properties": {
+    "MailAccount": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "DispatchingBy": {
+          "type": "string",
+          "description": "Can be either 'From' or 'Queue'."
+        },
+        "Host": {
+          "type": "string"
+        },
+        "IMAPFolder": {
+          "type": "string",
+          "description": "The IMAP folder to use if type is 'IMAP'."
+        },
+        "Login": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        },
+        "QueueID": {
+          "type": "integer",
+          "description": "The ID of the queue to dispatch to if DispatchingBy is 'Queue'."
+        },
+        "Trusted": {
+          "type": "integer",
+          "description": "If set to 1 the KIX-X-Headers will be interpreted."
+        },
+        "Type": {
+          "type": "string",
+          "description": "One of the available types from resource /system/communication/mailaccounts/types."
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "MailAccount"
+  ]
+}

@@ -252,7 +252,7 @@ $Self->True(
 my $ArticleID2 = $TicketObject->ArticleCreate(
     TicketID         => $TicketID,
     Channel          => 'email',
-    SenderType       => 'customer',
+    SenderType       => 'external',
     From             => 'Suplier<suplier@example.com>',
     To               => 'Some Agent <otrs@example.com>',
     Subject          => 'some short description',

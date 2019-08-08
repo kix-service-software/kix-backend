@@ -1,0 +1,9 @@
+  displayName: "[System] Ticket Locks"
+  description: !include ../../../descriptions/resources/system/ticket/locks.md
+  type: { collection-readonly: { typeName: Lock } }
+  /{lockId}:
+    type: { item-readonly: { typeName: Lock } }
+    uriParameters:
+      lockId:
+        displayName: LockID
+        type: integer

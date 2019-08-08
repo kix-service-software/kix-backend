@@ -1,0 +1,25 @@
+{
+    "MailFilter": {
+        "Comment": "...",
+        "Match": [
+            {
+                "Key": "From",
+                "Value": "email@example.com",
+                "Not": 1
+            },
+            {
+                "Key": "Subject",
+                "Value": "Test"
+            }
+        ],
+        "Name": "new filter",
+        "Set": [
+            {
+                "Key": "X-KIX-Queue",
+                "Value": "Some::Queue"
+            }
+        ],
+        "StopAfterMatch": 1,
+        "ValidID": 1
+    }
+}

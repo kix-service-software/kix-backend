@@ -1,0 +1,118 @@
+{
+   "$id" : "#SLACollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of SLAs.",
+   "type" : "object",
+   "properties" : {
+      "SLA" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_SLA_json"
+         }
+      }
+   },
+   "required" : [
+      "SLA"
+   ],
+   "definitions" : {
+      "_SLA_json" : {
+         "$id" : "#SLA",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The SLA object.",
+         "type" : "object",
+         "properties" : {
+            "Calendar" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FirstResponseNotify" : {
+               "description" : "Notify the respponsible agents when ... % of the FirstResponseTime are reached.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "FirstResponseTime" : {
+               "description" : "The first response time in minutes.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MinTimeBetweenIncidents" : {
+               "description" : "Just for reporting purposes. No automated functions.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SLAID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SolutionNotify" : {
+               "description" : "Notify the respponsible agents when ... % of the SolutionTime are reached.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SolutionTime" : {
+               "description" : "The solution time in minutes.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Type" : {
+               "description" : "The resolved name of TypeID.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "description" : "See GeneralCatalog class \"ITSM::SLA::Type\" for the list of possible types.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UpdateNotify" : {
+               "description" : "Notify the respponsible agents when ... % of the UpdateTime are reached.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UpdateTime" : {
+               "description" : "The update time in minutes.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "Name",
+            "SLAID",
+            "TypeID",
+            "ValidID"
+         ]
+      }
+   }
+}

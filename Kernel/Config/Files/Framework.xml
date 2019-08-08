@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
+    <ConfigItem Name="TempDir" Required="1" Valid="1">
+        <Description Translatable="1">The directory to use for temporary files.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Web</SubGroup>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="ImprintLink" Required="0" Valid="1">
         <Description Translatable="1">Defines the language dependent link to an online imprint.</Description>
         <Group>Framework</Group>
@@ -222,7 +230,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ExternalSupplierForwarding::ForwardFaxQueues" Required="1" Valid="1">
-        <Description Translatable="1">Defines mapping of OTRS queues to be fax-forwarded and corresponding fax-numbers.</Description>
+        <Description Translatable="1">Defines mapping of KIX queues to be fax-forwarded and corresponding fax-numbers.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
@@ -287,7 +295,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ExternalSupplierForwarding::ForwardQueues" Required="1" Valid="1">
-        <Description Translatable="1">Defines mapping of OTRS queues to be forwarded and corresponding email-addresses.</Description>
+        <Description Translatable="1">Defines mapping of KIX queues to be forwarded and corresponding email-addresses.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
@@ -631,8 +639,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ImportExport::ObjectBackendRegistration###User" Required="0" Valid="1">
-        <Description Lang="en">Object backend module registration for the import/export modul.</Description>
-        <Description Lang="de">Objekt-Backend Modul Registration des Import/Export Moduls.</Description>
+        <Description Translatable="1">Object backend module registration for the import/export modul.</Description>
         <Group>Framework</Group>
         <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
         <Setting>
@@ -643,8 +650,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="UserImport::DefaultEmailAddress" Required="1" Valid="1">
-        <Description Lang="en">Defines which email address to use if not defined - strongly depends on backend configuration!!!</Description>
-        <Description Lang="de">Definiert welche Mailadresse genutzt wird, wenn nicht gegeben - stark abhaengig von Backendkonfiguration!!!</Description>
+        <Description Translatable="1">Defines which email address to use if not defined - strongly depends on backend configuration!!!</Description>
         <Group>Framework</Group>
         <SubGroup>UserImportExport</SubGroup>
         <Setting>
@@ -652,8 +658,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="UserImport::DefaultPassword" Required="1" Valid="1">
-        <Description Lang="en">Defines which default password-suffix to use for import if not defined - strongly depends on backend configuration!!!</Description>
-        <Description Lang="de">Definiert welches Standard-Passwort-Suffix f�r Import genutzt wird, wenn nicht gegeben - stark abhaengig von Backendkonfiguration!!!</Description>
+        <Description Translatable="1">Defines which default password-suffix to use for import if not defined - strongly depends on backend configuration!!!</Description>
         <Group>Framework</Group>
         <SubGroup>UserImportExport</SubGroup>
         <Setting>
@@ -1322,8 +1327,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::FirstArticleOnly" Required="1" Valid="1">
-        <Description Lang="en">Defines whether EventHandler runs only for the first article in a ticket.</Description>
-        <Description Lang="de">Definiert, ob EventHandler nur fuer den ersten Artikel eines Tickets laeuft.</Description>
+        <Description Translatable="1">Defines whether EventHandler runs only for the first article in a ticket.</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1334,8 +1338,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchPattern" Required="1" Valid="1">
-        <Description Lang="en">Defines CI search pattern which is extracted from the ticket. Each regexp needs to return the search value in $1!. In ArticleCreate-Events only keys named like Article_* are considered (e.g. Article_Body), while TicketFreeText values are only considered in Ticketfreetext-Update events. However, you may define more than one Ticketfreetextfield for a regexp-match. In this case the different results are considered as different CI-searches, thus implementing some sort of OR (disjunction). If you want to use more than one regexp on a attribute just add a similar named key with the suffix _OR123 (see defaults).</Description>
-        <Description Lang="de">Definiert CI-Suchmuster, welches aus den Ticketdaten extrahiert wird. Jeder reg. Ausdruck muss den zu suchenden Wert in $1 zurueckgeben! Bei ArticleCreate-Events sind nur Schluesselnamen die mit Article_ beginnen relevant (z.B. Article_Body), waehrend TicketFreeText-werte nur in Ticketfreitext-Update-Events betrachtet werden. Es ist moeglich mehrere Ticketfreitextfelder mit einer reg. Ausdruck Suche zu versehen. In diesem Fall werden die einzelnen Suchergebnisse als getrennte CI-Suchen interpretiert und somit eine ODER-verknuepfte Suche abgebildet. Wenn Sie mehr als einen reg. Ausdruck auf ein Attribut anwenden wollen, legen Sie einfach einen zusaetzl. gleichnamigen Eintrag mit einem Suffix _OR123 an (siehe Standardkonfig).</Description>
+        <Description Translatable="1">Defines CI search pattern which is extracted from the ticket. Each regexp needs to return the search value in $1!. In ArticleCreate-Events only keys named like Article_* are considered (e.g. Article_Body), while TicketFreeText values are only considered in Ticketfreetext-Update events. However, you may define more than one Ticketfreetextfield for a regexp-match. In this case the different results are considered as different CI-searches, thus implementing some sort of OR (disjunction). If you want to use more than one regexp on a attribute just add a similar named key with the suffix _OR123 (see defaults).</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1362,8 +1365,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::LinkType" Required="1" Valid="1">
-        <Description Lang="en">Defines the link type which is used for the link creation.</Description>
-        <Description Lang="de">Definiert den Linktyp, der fuer die Verknuepfung genutzt wird.</Description>
+        <Description Translatable="1">Defines the link type which is used for the link creation.</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1371,8 +1373,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchInClassesPerRecipient" Required="0" Valid="1">
-        <Description Lang="en">Restricts CI-classes which are searched for certain article to-address (comma separated).</Description>
-        <Description Lang="de">Schraenkt zu durchsuchende CI-Klassen nach Artikelempfaenger ein (To-Adresse, komma-getrennt).</Description>
+        <Description Translatable="1">Restricts CI-classes which are searched for certain article to-address (comma separated).</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1383,8 +1384,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketAutoLinkConfigItem::CISearchInClasses" Required="1" Valid="1">
-        <Description Lang="en">Defines in which CI-classes which attributes need to match the search pattern (comma separated).</Description>
-        <Description Lang="de">Definiert in welcher CI-Klasse welche Attribute dem Suchmuster entsprechen sollen (Komma-getrennt).</Description>
+        <Description Translatable="1">Defines in which CI-classes which attributes need to match the search pattern (comma separated).</Description>
         <Group>Framework</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
         <Setting>
@@ -1593,17 +1593,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###SwitchButton" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the SwitchButton object in the Customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Session</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Switch to agent frontend and login automatically</Description>
-                <Title>Agent Frontend</Title>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="PreferencesGroups###PrintRichtext" Required="0" Valid="0">
         <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
         <Group>Framework</Group>
@@ -1638,8 +1627,7 @@
                 <Item Key="new">_ANY_</Item>
                 <Item Key="merged">_NONE_</Item>
                 <Item Key="removed">_NONE_</Item>
-                <Item Key="pending auto close+">_PREVIOUS_</Item>
-                <Item Key="pending auto close-">_PREVIOUS_</Item>
+                <Item Key="pending auto close">_PREVIOUS_,closed</Item>
                 <Item Key="pending reminder">_ANY_</Item>
             </Hash>
         </Setting>
@@ -1682,17 +1670,14 @@
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="closed successful">open</Item>
-                <Item Key="closed unsuccessful">open</Item>
-                <Item Key="pending auto close+">open</Item>
-                <Item Key="pending auto close-">open</Item>
-                <Item Key="pending auto reopen">open</Item>
+                <Item Key="closed">open</Item>
+                <Item Key="pending auto close">open</Item>
                 <Item Key="pending reminder">open</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom" Required="0" Valid="1">
-        <Description Translatable="1">Checks if the sender of a follow-up message is contained in customer database an has an identical customer-ID as the ticket. If so, the email is considered as email-external, otherwise it is considered as email-internal. Default OTRS-behavior if disabled.</Description>
+        <Description Translatable="1">Checks if the sender of a follow-up message is contained in customer database an has an identical customer-ID as the ticket. If so, the email is considered as email-external, otherwise it is considered as email-internal. Default KIX behavior if disabled.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
@@ -1992,7 +1977,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2036,7 +2021,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2080,7 +2065,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2124,7 +2109,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2168,7 +2153,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2212,7 +2197,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2256,7 +2241,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2300,7 +2285,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2344,7 +2329,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2388,7 +2373,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2432,7 +2417,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2476,7 +2461,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2520,7 +2505,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2564,7 +2549,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2608,7 +2593,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2637,8 +2622,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::Registration" Required="1" Valid="1">
-        <Description Lang="en">Registration for possible system monitoring tool acknowledge. Content is used as allocation in following config options. Key must be some of AcknowledgeName-value, used in PostMasterFilter.</Description>
-        <Description Lang="de">Registrierung der m\xF6glichen System Monitoring R\xFCckmeldungen. Der Inhalt wird als Zuordnung in den folgenden Konfigurationsoptionen genutzt. Der Schl\xFCssel muss einem AcknowledgeName-Wert aus den PostMasterFiltern entsprechen.</Description>
+        <Description Translatable="1">Registration for possible system monitoring tool acknowledge. Content is used as allocation in following config options. Key must be some of AcknowledgeName-value, used in PostMasterFilter.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2649,8 +2633,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::RegistrationAllocation" Required="1" Valid="1">
-        <Description Lang="en">Set Dynamic Field, which contains allocation for system monitoring acknowledge.</Description>
-        <Description Lang="de">Festlegung des Dynamischen Feldes, welches die Zuordnung f\xFCr die System Monitoring R\xFCckmeldung beinhaltet.</Description>
+        <Description Translatable="1">Set Dynamic Field, which contains allocation for system monitoring acknowledge.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2658,8 +2641,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::DynamicField::Host" Required="1" Valid="1">
-        <Description Lang="en">Name of Dynamic Field for Host.</Description>
-        <Description Lang="de">Name des Dynamischen Feldes f\xFCr Host.</Description>
+        <Description Translatable="1">Name of Dynamic Field for Host.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2669,8 +2651,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Tool::Acknowledge::DynamicField::Address" Required="1" Valid="1">
-        <Description Lang="en">Name of Dynamic Field for Address.</Description>
-        <Description Lang="de">Name des Dynamischen Feldes f\xFCr die Addresse.</Description>
+        <Description Translatable="1">Name of Dynamic Field for Address.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -2802,7 +2783,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="SystemID" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the system identifier. Every ticket number and http session string contains this ID. This ensures that only tickets which belong to your system will be processed as follow-ups (useful when communicating between two instances of OTRS).</Description>
+        <Description Translatable="1">Defines the system identifier. Every ticket number and http session string contains this ID. This ensures that only tickets which belong to your system will be processed as follow-ups (useful when communicating between two instances of KIX).</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
@@ -2818,7 +2799,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="SupportDataCollector::HTTPHostname" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the HTTP hostname for the support data collection with the public module 'PublicSupportDataCollector' (e.g. used from the OTRS Daemon).</Description>
+        <Description Translatable="1">Defines the HTTP hostname for the support data collection with the public module 'PublicSupportDataCollector' (e.g. used from the KIX Daemon).</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
@@ -2826,7 +2807,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="NodeID" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the cluster node identifier. This is only used in cluster configurations where there is more than one OTRS frontend system. Note: only values from 1 to 99 are allowed.</Description>
+        <Description Translatable="1">Defines the cluster node identifier. This is only used in cluster configurations where there is more than one KIX frontend system. Note: only values from 1 to 99 are allowed.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
@@ -2932,7 +2913,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="DisableIFrameOriginRestricted" Required="0" Valid="1">
-        <Description Translatable="1">Disable HTTP header "X-Frame-Options: SAMEORIGIN" to allow OTRS to be included as an IFrame in other websites. Disabling this HTTP header can be a security issue! Only disable it, if you know what you are doing!</Description>
+        <Description Translatable="1">Disable HTTP header "X-Frame-Options: SAMEORIGIN" to allow KIX to be included as an IFrame in other websites. Disabling this HTTP header can be a security issue! Only disable it, if you know what you are doing!</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Web</SubGroup>
         <Setting>
@@ -3099,7 +3080,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="LogModule::LogFile::Date" Required="1" Valid="1">
-        <Description Translatable="1">Adds a suffix with the actual year and month to the OTRS log file. A logfile for every month will be created.</Description>
+        <Description Translatable="1">Adds a suffix with the actual year and month to the KIX log file. A logfile for every month will be created.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Log</SubGroup>
         <Setting>
@@ -7990,7 +7971,7 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem Name="PGP" Required="1" Valid="1">
-        <Description Translatable="1">Enables PGP support. When PGP support is enabled for signing and encrypting mail, it is HIGHLY recommended that the web server runs as the OTRS user. Otherwise, there will be problems with the privileges when accessing .gnupg folder.</Description>
+        <Description Translatable="1">Enables PGP support. When PGP support is enabled for signing and encrypting mail, it is HIGHLY recommended that the web server runs as the KIX user. Otherwise, there will be problems with the privileges when accessing .gnupg folder.</Description>
         <Group>Framework</Group>
         <SubGroup>Crypt::PGP</SubGroup>
         <Setting>
@@ -8171,7 +8152,7 @@ If you did not request a new password, please ignore this email.
         <Group>Framework</Group>
         <SubGroup>Frontend::Agent</SubGroup>
         <Setting>
-            <String Regex="">New OTRS password</String>
+            <String Regex="">New KIX password</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="NotificationBodyLostPassword" Required="1" Valid="1">
@@ -8240,6 +8221,13 @@ You can log in via the following URL:
         <SubGroup>Core::PerformanceLog</SubGroup>
         <Setting>
             <String Regex="">25</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="AuthModule" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines default auth module.</Description>
+        <Group>Framework</Group>
+        <Setting>
+            <Option Location="Kernel/System/Auth/*.pm" SelectedID="Kernel::System::Auth::DB"></Option>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
@@ -8663,7 +8651,7 @@ New password: &lt;KIX_NEWPW&gt;
         <Group>Framework</Group>
         <SubGroup>Frontend::Customer</SubGroup>
         <Setting>
-            <String Regex="">New OTRS Account!</String>
+            <String Regex="">New KIX Account!</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="CustomerPanelBodyNewAccount" Required="1" Valid="1">
@@ -8816,7 +8804,7 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Contact::AuthModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use OTRS. Specify the group, who may access the system.</Description>
+        <Description Translatable="1">If "LDAP" was selected for Contact::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use KIX. Specify the group, who may access the system.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
@@ -8971,7 +8959,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Contact::Preferences::DB</Item>
-                <Item  Key="Params">
+                <Item Key="Params">
                     <Hash>
                         <Item Key="Table">contact_preferences</Item>
                         <Item Key="TableKey">preferences_key</Item>
@@ -9077,66 +9065,6 @@ via the Preferences button after logging in.
                 <Item Key="Prio">11000</Item>
                 <Item Key="Active">1</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###Logout" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Logout of customer panel.</Description>
-                <Title></Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerPreferences" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Customer preferences.</Description>
-                <Title Translatable="1">Preferences</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerAccept" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">To accept login information, such as an EULA or license.</Description>
-                <Title Translatable="1">Info</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###PictureUpload" Required="1" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Picture upload module.</Description>
-                <Title Translatable="1">Picture-Upload</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###SpellingInline" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Spell checker.</Description>
-                <Title Translatable="1">Spell Checker</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Stats::StatsHook" Required="1" Valid="1">
@@ -9272,7 +9200,7 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Core::MirrorDB::DSN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">OTRS can use one or more readonly mirror databases for expensive operations like fulltext search or statistics generation. Here you can specify the DSN for the first mirror database.</Description>
+        <Description Translatable="1">KIX can use one or more readonly mirror databases for expensive operations like fulltext search or statistics generation. Here you can specify the DSN for the first mirror database.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::MirrorDB</SubGroup>
         <Setting>
@@ -9367,7 +9295,7 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Secure::DisableBanner" Required="1" Valid="1">
-        <Description Translatable="1">If enabled, the OTRS version tag will be removed from the Webinterface, the HTTP headers and the X-Headers of outgoing mails.</Description>
+        <Description Translatable="1">If enabled, the KIX version tag will be removed from the Webinterface, the HTTP headers and the X-Headers of outgoing mails.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
@@ -9491,6 +9419,28 @@ via the Preferences button after logging in.
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="Cache::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable cache debugging.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Cache</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Cache::Stats" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable cache statistics.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Cache</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>    
     <ConfigItem Name="Cache::SubdirLevels" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Specify how many sub directory levels to use when creating cache files. This should prevent too many cache files being in one directory.</Description>
         <Group>Framework</Group>
@@ -9573,30 +9523,6 @@ via the Preferences button after logging in.
         <SubGroup>Core::Web</SubGroup>
         <Setting>
             <String Regex="">icons/kix.ico</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###DynamicFieldAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>DynamicField AJAX handler</Description>
-                <Title>DynamicField AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerLinkObject" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Link Object</Description>
-                <Title>Link Object</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="ContactPreferencesGroups###DefaultTicketType" Required="0" Valid="1">
@@ -9894,18 +9820,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###TextModuleAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the TextModuleAJAXHandler object.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Text Module AJAX handle</Description>
-                <Title>Text Module AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="TextModule::ImportExport###FileType" Required="0" Valid="1">
         <Description Translatable="1">Defines the import / export file type.</Description>
         <Group>Framework</Group>
@@ -10024,7 +9938,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::SysConfig::Event::LogSysConfigChanges</Item>
-                <Item Key="Event">SysConfigItemUpdate</Item>
+                <Item Key="Event">SysConfigOptionUpdate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10228,18 +10142,6 @@ via the Preferences button after logging in.
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###DynamicFieldObjectReferenceAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the DynamicFieldObjectReferenceAJAXHandler object.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>DynamicField ObjectReference AJAX Handler</Description>
-                <Title>DynamicField ObjectReference AJAX Handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="PostMaster::PreFilterModule###888-ExtendedFollowUp" Required="0" Valid="1">
         <Description Translatable="1">PostmasterFilter which sets destination queue in X-headers depending on email suffix.</Description>
         <Group>Framework</Group>
@@ -10317,8 +10219,19 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
 
+    <ConfigItem Name="Permission::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable permission debugging.</Description>
+        <Group>Permission</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="Permission::PropertyValue###Queue-to-Ticket" Required="0" Valid="1">
         <Description Translatable="1">Registration of a supported permission of type PropertyValue.</Description>
+        <Group>Permission</Group>
         <Setting>
             <Hash>
                 <Item Key="CREATE">/tickets{Ticket.QueueID EQ &lt;QueueID&gt;}</Item>
@@ -10326,9 +10239,9 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-
     <ConfigItem Name="Permission::PropertyValue###CIClass-to-ConfigItem" Required="0" Valid="1">
         <Description Translatable="1">Registration of a supported permission of type PropertyValue.</Description>
+        <Group>Permission</Group>
         <Setting>
             <Hash>
                 <Item Key="CREATE">/cmdb/configitems{ConfigItem.ClassID EQ &lt;ClassID&gt;}</Item>
@@ -10336,5 +10249,30 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
+    <!-- links for user manuals -->
+    <ConfigItem Name="KIX::UserManual" Required="0" Valid="1">
+        <Description Translatable="1">Link to the user manual.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Manuals</SubGroup>
+        <Setting>
+            <String Regex="">http://www.kixdesk.com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="KIX::AdminManual" Required="0" Valid="1">
+        <Description Translatable="1">Link to the admin manual.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Manuals</SubGroup>
+        <Setting>
+            <String Regex="">http://www.kixdesk.com</String>
+        </Setting>
+    </ConfigItem>
 
+    <ConfigItem Name="Console::FilePath" Required="1" Valid="1">
+        <Description Translatable="1">The path to the uploaded console files.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Console</SubGroup>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp/console</String>
+        </Setting>
+    </ConfigItem>
 </kix_config>

@@ -6,83 +6,6 @@ Description: KIX Core API
 FrameworkVersion: __VERSION__
 Provider:
   Operation:
-    V1::AddressBook::AddressDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::AddressBook::AddressDelete
-    V1::AddressBook::AddressGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::AddressBook::AddressGet
-    V1::AddressBook::AddressUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::AddressBook::AddressUpdate
-    V1::AddressBook::AddressSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::AddressBook::AddressSearch
-    V1::AddressBook::AddressCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::AddressBook::AddressCreate
-    V1::Channel::ChannelGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Channel::ChannelGet
-    V1::Channel::ChannelSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Channel::ChannelSearch
-    V1::ClientRegistration::ClientRegistrationDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ClientRegistration::ClientRegistrationDelete
-    V1::ClientRegistration::ClientRegistrationGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ClientRegistration::ClientRegistrationGet
-    V1::ClientRegistration::ClientRegistrationSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ClientRegistration::ClientRegistrationSearch
-    V1::ClientRegistration::ClientRegistrationCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ClientRegistration::ClientRegistrationCreate
     V1::CMDB::ClassDefinitionDelete:
         Description: ''
         MappingInbound:
@@ -146,6 +69,1148 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::CMDB::ClassCreate
+    V1::Channel::ChannelGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Channel::ChannelGet
+    V1::Channel::ChannelSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Channel::ChannelSearch
+    V1::MailAccount::MailAccountSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountSearch
+    V1::MailAccount::MailAccountDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountDelete
+    V1::MailAccount::MailAccountGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountGet
+    V1::MailAccount::MailAccountUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountUpdate
+    V1::MailAccount::MailAccountCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountCreate
+    V1::MailAccount::MailAccountTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailAccount::MailAccountTypeSearch
+    V1::MailFilter::MailFilterSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterSearch
+    V1::MailFilter::MailFilterDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterDelete
+    V1::MailFilter::MailFilterGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterGet
+    V1::MailFilter::MailFilterUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterUpdate
+    V1::MailFilter::MailFilterCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::MailFilter::MailFilterCreate
+    V1::Notification::NotificationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationSearch
+    V1::Notification::NotificationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationDelete
+    V1::Notification::NotificationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationGet
+    V1::Notification::NotificationUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationUpdate
+    V1::Notification::NotificationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Notification::NotificationCreate
+    V1::SenderType::SenderTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SenderType::SenderTypeSearch
+    V1::SenderType::SenderTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SenderType::SenderTypeGet
+    V1::SystemAddress::SystemAddressSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressSearch
+    V1::SystemAddress::SystemAddressCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressCreate
+    V1::SystemAddress::SystemAddressDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressDelete
+    V1::SystemAddress::SystemAddressGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressGet
+    V1::SystemAddress::SystemAddressUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SystemAddress::SystemAddressUpdate
+    V1::SysConfig::SysConfigOptionDefinitionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionSearch
+    V1::SysConfig::SysConfigOptionDefinitionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionGet
+    V1::SysConfig::SysConfigOptionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionSearch
+    V1::SysConfig::SysConfigOptionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionGet
+    V1::SysConfig::SysConfigOptionUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionUpdate
+    V1::Console::ConsoleCommandSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleCommandSearch
+    V1::Console::ConsoleCommandExecute:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleCommandExecute
+    V1::Console::ConsoleCommandGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleCommandGet
+    V1::Console::ConsoleFileSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleFileSearch
+    V1::Console::ConsoleFileCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleFileCreate
+    V1::Console::ConsoleFileDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Console::ConsoleFileDelete
+    V1::DynamicField::DynamicFieldTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldTypeSearch
+    V1::DynamicField::DynamicFieldObjectTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldObjectTypeSearch
+    V1::DynamicField::DynamicFieldConfigGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldConfigGet
+    V1::DynamicField::DynamicFieldConfigUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldConfigUpdate
+    V1::DynamicField::DynamicFieldDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldDelete
+    V1::DynamicField::DynamicFieldGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldGet
+    V1::DynamicField::DynamicFieldUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldUpdate
+    V1::DynamicField::DynamicFieldSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldSearch
+    V1::DynamicField::DynamicFieldCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::DynamicField::DynamicFieldCreate
+    V1::FAQ::FAQCategoryDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryDelete
+    V1::FAQ::FAQCategoryGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryGet
+    V1::FAQ::FAQCategoryUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryUpdate
+    V1::FAQ::FAQCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategorySearch
+    V1::FAQ::FAQCategoryCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::FAQ::FAQCategoryCreate
+    V1::GeneralCatalog::GeneralCatalogClassUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
+    V1::GeneralCatalog::GeneralCatalogClassSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogClassSearch
+    V1::GeneralCatalog::GeneralCatalogItemDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemDelete
+    V1::GeneralCatalog::GeneralCatalogItemGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemGet
+    V1::GeneralCatalog::GeneralCatalogItemUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemUpdate
+    V1::GeneralCatalog::GeneralCatalogItemSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemSearch
+    V1::GeneralCatalog::GeneralCatalogItemCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::GeneralCatalog::GeneralCatalogItemCreate
+    V1::I18n::TranslationPatternSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternSearch
+    V1::I18n::TranslationPatternCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternCreate
+    V1::I18n::TranslationPatternDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternDelete
+    V1::I18n::TranslationPatternGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternGet
+    V1::I18n::TranslationPatternUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationPatternUpdate
+    V1::I18n::TranslationLanguageSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageSearch
+    V1::I18n::TranslationLanguageDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageDelete
+    V1::I18n::TranslationLanguageGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageGet
+    V1::I18n::TranslationLanguageUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageUpdate
+    V1::I18n::TranslationLanguageCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::I18n::TranslationLanguageCreate
+    V1::Log::LogFileSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Log::LogFileSearch
+    V1::Log::LogFileGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Log::LogFileGet
+    V1::ObjectDefinition::ObjectDefinitionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectDefinition::ObjectDefinitionSearch
+    V1::ObjectDefinition::ObjectDefinitionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectDefinition::ObjectDefinitionGet
+    V1::ObjectIcon::ObjectIconSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconSearch
+    V1::ObjectIcon::ObjectIconDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconDelete
+    V1::ObjectIcon::ObjectIconGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconGet
+    V1::ObjectIcon::ObjectIconUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconUpdate
+    V1::ObjectIcon::ObjectIconCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ObjectIcon::ObjectIconCreate
+    V1::Role::PermissionTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionTypeSearch
+    V1::Role::RoleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleSearch
+    V1::Role::RoleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleCreate
+    V1::Role::RoleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleDelete
+    V1::Role::RoleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleGet
+    V1::Role::RoleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUpdate
+    V1::Role::PermissionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionSearch
+    V1::Role::PermissionDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionDelete
+    V1::Role::PermissionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionGet
+    V1::Role::PermissionUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionUpdate
+    V1::Role::PermissionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::PermissionCreate
+    V1::Role::RoleUserIDSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserIDSearch
+    V1::Role::RoleUserIDCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserIDCreate
+    V1::Role::RoleUserIDDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Role::RoleUserIDDelete
+    V1::Service::ServiceSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceSearch
+    V1::Service::ServiceCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceCreate
+    V1::Service::ServiceDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceDelete
+    V1::Service::ServiceGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceGet
+    V1::Service::ServiceUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Service::ServiceUpdate
+    V1::Sessions::SessionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Sessions::SessionSearch
+    V1::Sessions::SessionDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Sessions::SessionDelete
+    V1::Sessions::SessionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Sessions::SessionGet
+    V1::SLA::SLASearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLASearch
+    V1::SLA::SLACreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLACreate
+    V1::SLA::SLADelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLADelete
+    V1::SLA::SLAGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLAGet
+    V1::SLA::SLAUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SLA::SLAUpdate
+    V1::Template::TemplateSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Template::TemplateSearch
+    V1::Template::TemplateCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Template::TemplateCreate
+    V1::Template::TemplateDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Template::TemplateDelete
+    V1::Template::TemplateGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Template::TemplateGet
+    V1::Template::TemplateUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Template::TemplateUpdate
+    V1::TextModule::TextModuleCategorySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleCategorySearch
+    V1::TextModule::TextModuleSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleSearch
+    V1::TextModule::TextModuleCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleCreate
+    V1::TextModule::TextModuleDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleDelete
+    V1::TextModule::TextModuleGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleGet
+    V1::TextModule::TextModuleUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TextModule::TextModuleUpdate
+    V1::Lock::LockSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Lock::LockSearch
+    V1::Lock::LockGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Lock::LockGet
+    V1::Priority::PrioritySearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PrioritySearch
+    V1::Priority::PriorityCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityCreate
+    V1::Priority::PriorityDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityDelete
+    V1::Priority::PriorityGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityGet
+    V1::Priority::PriorityUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Priority::PriorityUpdate
+    V1::Queue::QueueSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueSearch
+    V1::Queue::QueueCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueCreate
+    V1::Queue::QueueDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueDelete
+    V1::Queue::QueueGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueGet
+    V1::Queue::QueueUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::QueueUpdate
+    V1::Queue::FollowUpTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Queue::FollowUpTypeSearch
+    V1::TicketState::TicketStateSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateSearch
+    V1::TicketState::TicketStateCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateCreate
+    V1::TicketState::TicketStateDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateDelete
+    V1::TicketState::TicketStateGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateGet
+    V1::TicketState::TicketStateUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketState::TicketStateUpdate
+    V1::StateType::StateTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StateType::StateTypeSearch
+    V1::StateType::StateTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::StateType::StateTypeGet
+    V1::TicketType::TicketTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeSearch
+    V1::TicketType::TicketTypeCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeCreate
+    V1::TicketType::TicketTypeDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeDelete
+    V1::TicketType::TicketTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeGet
+    V1::TicketType::TicketTypeUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketType::TicketTypeUpdate
+    V1::User::UserSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserSearch
+    V1::User::UserCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserCreate
+    V1::User::UserGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserGet
+    V1::User::UserUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserUpdate
+    V1::User::UserPreferenceSearch :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceSearch 
+    V1::User::UserPreferenceCreate :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceCreate 
+    V1::User::UserPreferenceDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceDelete
+    V1::User::UserPreferenceGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceGet
+    V1::User::UserPreferenceUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserPreferenceUpdate
+    V1::User::UserRoleIDSearch :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleIDSearch 
+    V1::User::UserRoleIDCreate :
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleIDCreate 
+    V1::User::UserRoleIDDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::User::UserRoleIDDelete
+    V1::Valid::ValidSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Valid::ValidSearch
+    V1::Valid::ValidGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Valid::ValidGet
+    V1::AddressBook::AddressDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressDelete
+    V1::AddressBook::AddressGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressGet
+    V1::AddressBook::AddressUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressUpdate
+    V1::AddressBook::AddressSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressSearch
+    V1::AddressBook::AddressCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::AddressBook::AddressCreate
+    V1::Sessions::SessionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Sessions::SessionCreate
+        NoAuthorizationNeeded: 1
+    V1::ClientRegistration::ClientRegistrationDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationDelete
+    V1::ClientRegistration::ClientRegistrationGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationGet
+    V1::ClientRegistration::ClientRegistrationSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationSearch
+    V1::ClientRegistration::ClientRegistrationCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ClientRegistration::ClientRegistrationCreate
     V1::CMDB::ConfigItemAttachmentGet:
         Description: ''
         MappingInbound:
@@ -293,118 +1358,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Contact::ContactCreate
-    V1::Organisation::OrganisationContactSearch:
+    V1::FAQ::FAQArticleSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Organisation::OrganisationContactSearch
-    V1::Organisation::OrganisationGet:
+        Type: V1::FAQ::FAQArticleSearch
+    V1::FAQ::FAQArticleCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Organisation::OrganisationGet
-    V1::Organisation::OrganisationUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Organisation::OrganisationUpdate
-    V1::Organisation::OrganisationDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Organisation::OrganisationDelete
-    V1::Organisation::OrganisationTicketSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Organisation::OrganisationTicketSearch
-    V1::Organisation::OrganisationSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Organisation::OrganisationSearch
-    V1::Organisation::OrganisationCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Organisation::OrganisationCreate
-    V1::DynamicField::DynamicFieldObjectTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldObjectTypeSearch
-    V1::DynamicField::DynamicFieldConfigGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldConfigGet
-    V1::DynamicField::DynamicFieldConfigUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldConfigUpdate
-    V1::DynamicField::DynamicFieldDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldDelete
-    V1::DynamicField::DynamicFieldGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldGet
-    V1::DynamicField::DynamicFieldUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldUpdate
-    V1::DynamicField::DynamicFieldSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldSearch
-    V1::DynamicField::DynamicFieldCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldCreate
-    V1::DynamicField::DynamicFieldTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::DynamicField::DynamicFieldTypeSearch
+        Type: V1::FAQ::FAQArticleCreate
     V1::FAQ::FAQArticleAttachmentDelete:
         Description: ''
         MappingInbound:
@@ -496,104 +1463,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::FAQ::FAQArticleVoteCreate
-    V1::FAQ::FAQArticleSearch:
+    V1::FAQ::FAQArticleKeywordSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::FAQ::FAQArticleSearch
-    V1::FAQ::FAQArticleCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQArticleCreate
-    V1::FAQ::FAQCategoryDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQCategoryDelete
-    V1::FAQ::FAQCategoryGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQCategoryGet
-    V1::FAQ::FAQCategoryUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQCategoryUpdate
-    V1::FAQ::FAQCategorySearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQCategorySearch
-    V1::FAQ::FAQCategoryCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::FAQ::FAQCategoryCreate
-    V1::GeneralCatalog::GeneralCatalogClassUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClassUpdate
-    V1::GeneralCatalog::GeneralCatalogClassSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogClassSearch
-    V1::GeneralCatalog::GeneralCatalogItemDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogItemDelete
-    V1::GeneralCatalog::GeneralCatalogItemGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogItemGet
-    V1::GeneralCatalog::GeneralCatalogItemUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogItemUpdate
-    V1::GeneralCatalog::GeneralCatalogItemSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogItemSearch
-    V1::GeneralCatalog::GeneralCatalogItemCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::GeneralCatalog::GeneralCatalogItemCreate
+        Type: V1::FAQ::FAQArticleKeywordSearch
     V1::I18n::TranslationSearch:
         Description: ''
         MappingInbound:
@@ -601,69 +1477,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::I18n::TranslationSearch
-    V1::I18n::TranslationCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationCreate
-    V1::I18n::TranslationDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationDelete
-    V1::I18n::TranslationGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationGet
-    V1::I18n::TranslationLanguageSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationLanguageSearch
-    V1::I18n::TranslationLanguageDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationLanguageDelete
-    V1::I18n::TranslationLanguageGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationLanguageGet
-    V1::I18n::TranslationLanguageUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationLanguageUpdate
-    V1::I18n::TranslationLanguageCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationLanguageCreate
-    V1::I18n::TranslationUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::I18n::TranslationUpdate
     V1::Link::LinkSearch:
         Description: ''
         MappingInbound:
@@ -699,272 +1512,55 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Link::LinkTypeSearch
-    V1::MailAccount::MailAccountSearch:
+    V1::Organisation::OrganisationContactSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::MailAccount::MailAccountSearch
-    V1::MailAccount::MailAccountDelete:
+        Type: V1::Organisation::OrganisationContactSearch
+    V1::Organisation::OrganisationGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::MailAccount::MailAccountDelete
-    V1::MailAccount::MailAccountGet:
+        Type: V1::Organisation::OrganisationGet
+    V1::Organisation::OrganisationUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::MailAccount::MailAccountGet
-    V1::MailAccount::MailAccountUpdate:
+        Type: V1::Organisation::OrganisationUpdate
+    V1::Organisation::OrganisationDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::MailAccount::MailAccountUpdate
-    V1::MailAccount::MailAccountCreate:
+        Type: V1::Organisation::OrganisationDelete
+    V1::Organisation::OrganisationTicketSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::MailAccount::MailAccountCreate
-    V1::MailAccount::MailAccountTypeSearch:
+        Type: V1::Organisation::OrganisationTicketSearch
+    V1::Organisation::OrganisationSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::MailAccount::MailAccountTypeSearch
-    V1::ObjectDefinition::ObjectDefinitionSearch:
+        Type: V1::Organisation::OrganisationSearch
+    V1::Organisation::OrganisationCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::ObjectDefinition::ObjectDefinitionSearch
-    V1::ObjectDefinition::ObjectDefinitionGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ObjectDefinition::ObjectDefinitionGet
-    V1::ObjectIcon::ObjectIconSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ObjectIcon::ObjectIconSearch
-    V1::ObjectIcon::ObjectIconDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ObjectIcon::ObjectIconDelete
-    V1::ObjectIcon::ObjectIconGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ObjectIcon::ObjectIconGet
-    V1::ObjectIcon::ObjectIconUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ObjectIcon::ObjectIconUpdate
-    V1::ObjectIcon::ObjectIconCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::ObjectIcon::ObjectIconCreate
-    V1::Priority::PrioritySearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Priority::PrioritySearch
-    V1::Priority::PriorityCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Priority::PriorityCreate
-    V1::Priority::PriorityDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Priority::PriorityDelete
-    V1::Priority::PriorityGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Priority::PriorityGet
-    V1::Priority::PriorityUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Priority::PriorityUpdate
-    V1::Queue::QueueSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Queue::QueueSearch
-    V1::Queue::QueueCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Queue::QueueCreate
-    V1::Queue::QueueDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Queue::QueueDelete
-    V1::Queue::QueueGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Queue::QueueGet
-    V1::Queue::QueueUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Queue::QueueUpdate
-    V1::Queue::FollowUpTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Queue::FollowUpTypeSearch
-    V1::Role::RoleSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleSearch
-    V1::Role::PermissionTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::PermissionTypeSearch
-    V1::Role::RoleCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleCreate
-    V1::Role::RoleDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleDelete
-    V1::Role::RoleGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleGet
-    V1::Role::RoleUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUpdate
-    V1::Role::PermissionSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::PermissionSearch
-    V1::Role::PermissionDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::PermissionDelete
-    V1::Role::PermissionGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::PermissionGet
-    V1::Role::PermissionUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::PermissionUpdate
-    V1::Role::PermissionCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::PermissionCreate
-    V1::Role::RoleUserIDSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUserIDSearch
-    V1::Role::RoleUserIDCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUserIDCreate
-    V1::Role::RoleUserIDDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Role::RoleUserIDDelete
+        Type: V1::Organisation::OrganisationCreate
     V1::SearchProfile::SearchProfileCategorySearch:
         Description: ''
         MappingInbound:
@@ -1007,84 +1603,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SearchProfile::SearchProfileUpdate
-    V1::SenderType::SenderTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SenderType::SenderTypeSearch
-    V1::SenderType::SenderTypeGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SenderType::SenderTypeGet
-    V1::Service::ServiceSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Service::ServiceSearch
-    V1::Service::ServiceCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Service::ServiceCreate
-    V1::Service::ServiceDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Service::ServiceDelete
-    V1::Service::ServiceGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Service::ServiceGet
-    V1::Service::ServiceUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Service::ServiceUpdate
-    V1::Own::SessionGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Own::SessionGet
-    V1::Session::SessionSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Session::SessionSearch
-    V1::Session::SessionCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Session::SessionCreate
-        NoAuthorizationNeeded: 1
-    V1::Session::SessionDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Session::SessionDelete
     V1::Session::SessionGet:
         Description: ''
         MappingInbound:
@@ -1092,251 +1610,69 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Session::SessionGet
-    V1::SLA::SLASearch:
+    V1::Session::SessionDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SLA::SLASearch
-    V1::SLA::SLACreate:
+        Type: V1::Session::SessionDelete
+    V1::Session::UserGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SLA::SLACreate
-    V1::SLA::SLADelete:
+        Type: V1::Session::UserGet
+    V1::Session::UserUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SLA::SLADelete
-    V1::SLA::SLAGet:
+        Type: V1::Session::UserUpdate
+    V1::Session::UserPreferenceSearch :
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SLA::SLAGet
-    V1::SLA::SLAUpdate:
+        Type: V1::Session::UserPreferenceSearch 
+    V1::Session::UserPreferenceCreate :
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::SLA::SLAUpdate
-    V1::StandardAttachment::StandardAttachmentDelete:
+        Type: V1::Session::UserPreferenceCreate 
+    V1::Session::UserPreferenceDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::StandardAttachment::StandardAttachmentDelete
-    V1::StandardAttachment::StandardAttachmentGet:
+        Type: V1::Session::UserPreferenceDelete
+    V1::Session::UserPreferenceGet:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::StandardAttachment::StandardAttachmentGet
-    V1::StandardAttachment::StandardAttachmentUpdate:
+        Type: V1::Session::UserPreferenceGet
+    V1::Session::UserPreferenceUpdate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::StandardAttachment::StandardAttachmentUpdate
-    V1::StandardAttachment::StandardAttachmentSearch:
+        Type: V1::Session::UserPreferenceUpdate
+    V1::Session::UserRoleIDSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::StandardAttachment::StandardAttachmentSearch
-    V1::StandardAttachment::StandardAttachmentCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StandardAttachment::StandardAttachmentCreate
-    V1::StandardTemplate::StandardTemplateSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StandardTemplate::StandardTemplateSearch
-    V1::StandardTemplate::StandardTemplateCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StandardTemplate::StandardTemplateCreate
-    V1::StandardTemplate::StandardTemplateDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StandardTemplate::StandardTemplateDelete
-    V1::StandardTemplate::StandardTemplateGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StandardTemplate::StandardTemplateGet
-    V1::StandardTemplate::StandardTemplateUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StandardTemplate::StandardTemplateUpdate
-    V1::StateType::StateTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StateType::StateTypeSearch
-    V1::StateType::StateTypeGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::StateType::StateTypeGet
-    V1::SysConfig::SysConfigItemDefinitionSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigItemDefinitionSearch
-    V1::SysConfig::SysConfigItemDefinitionGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigItemDefinitionGet
-    V1::SysConfig::SysConfigItemSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigItemSearch
-    V1::SysConfig::SysConfigItemGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigItemGet
-    V1::SysConfig::SysConfigItemUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SysConfig::SysConfigItemUpdate
-    V1::SystemAddress::SystemAddressSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SystemAddress::SystemAddressSearch
-    V1::SystemAddress::SystemAddressCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SystemAddress::SystemAddressCreate
-    V1::SystemAddress::SystemAddressDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SystemAddress::SystemAddressDelete
-    V1::SystemAddress::SystemAddressGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SystemAddress::SystemAddressGet
-    V1::SystemAddress::SystemAddressUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::SystemAddress::SystemAddressUpdate
-    V1::TextModule::TextModuleCategorySearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TextModule::TextModuleCategorySearch
-    V1::TextModule::TextModuleSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TextModule::TextModuleSearch
-    V1::TextModule::TextModuleCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TextModule::TextModuleCreate
-    V1::TextModule::TextModuleDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TextModule::TextModuleDelete
-    V1::TextModule::TextModuleGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TextModule::TextModuleGet
-    V1::TextModule::TextModuleUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TextModule::TextModuleUpdate
-    V1::Lock::LockSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Lock::LockSearch
-    V1::Lock::LockGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Lock::LockGet
+        Type: V1::Session::UserRoleIDSearch
     V1::Ticket::TicketSearch:
         Description: ''
         MappingInbound:
@@ -1351,41 +1687,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::TicketCreate
-    V1::TicketState::TicketStateSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketState::TicketStateSearch
-    V1::TicketState::TicketStateCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketState::TicketStateCreate
-    V1::TicketState::TicketStateDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketState::TicketStateDelete
-    V1::TicketState::TicketStateGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketState::TicketStateGet
-    V1::TicketState::TicketStateUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketState::TicketStateUpdate
     V1::Ticket::ArticleAttachmentGet:
         Description: ''
         MappingInbound:
@@ -1575,166 +1876,660 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::WatcherGet
-    V1::TicketType::TicketTypeSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketType::TicketTypeSearch
-    V1::TicketType::TicketTypeCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketType::TicketTypeCreate
-    V1::TicketType::TicketTypeDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketType::TicketTypeDelete
-    V1::TicketType::TicketTypeGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketType::TicketTypeGet
-    V1::TicketType::TicketTypeUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::TicketType::TicketTypeUpdate
-    V1::Own::UserGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Own::UserGet
-    V1::Own::UserPreferenceSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Own::UserPreferenceSearch
-    V1::Own::UserRoleIDSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Own::UserRoleIDSearch
-    V1::User::UserSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserSearch
-    V1::User::UserCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserCreate
-    V1::User::UserGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserGet
-    V1::User::UserUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserUpdate
-    V1::User::UserPreferenceSearch :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserPreferenceSearch 
-    V1::User::UserPreferenceCreate :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserPreferenceCreate 
-    V1::User::UserPreferenceDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserPreferenceDelete
-    V1::User::UserPreferenceGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserPreferenceGet
-    V1::User::UserPreferenceUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserPreferenceUpdate
-    V1::User::UserRoleIDSearch :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserRoleIDSearch 
-    V1::User::UserRoleIDCreate :
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserRoleIDCreate 
-    V1::User::UserRoleIDDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::User::UserRoleIDDelete
-    V1::Valid::ValidSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Valid::ValidSearch
-    V1::Valid::ValidGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Valid::ValidGet
 
   Transport:
     Config:
       KeepAlive: ''
       MaxLength: '10485760'
       RouteOperationMapping:
+        V1::CMDB::ClassDefinitionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/cmdb/classes/:ClassID/definitions/:DefinitionID
+        V1::CMDB::ClassDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /system/cmdb/classes/:ClassID/definitions/:DefinitionID
+        V1::CMDB::ClassDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/cmdb/classes/:ClassID/definitions
+        V1::CMDB::ClassDefinitionCreate:
+          RequestMethod:
+          - POST
+          Route: /system/cmdb/classes/:ClassID/definitions
+        V1::CMDB::ClassDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/cmdb/classes/:ClassID
+        V1::CMDB::ClassGet:
+          RequestMethod:
+          - GET
+          Route: /system/cmdb/classes/:ClassID
+        V1::CMDB::ClassUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/cmdb/classes/:ClassID
+        V1::CMDB::ClassSearch:
+          RequestMethod:
+          - GET
+          Route: /system/cmdb/classes
+        V1::CMDB::ClassCreate:
+          RequestMethod:
+          - POST
+          Route: /system/cmdb/classes
+        V1::Channel::ChannelGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/channels/:ChannelID
+        V1::Channel::ChannelSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/channels
+        V1::MailAccount::MailAccountSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailaccounts
+        V1::MailAccount::MailAccountDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/communication/mailaccounts/:MailAccountID
+        V1::MailAccount::MailAccountGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailaccounts/:MailAccountID
+        V1::MailAccount::MailAccountUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/communication/mailaccounts/:MailAccountID
+        V1::MailAccount::MailAccountCreate:
+          RequestMethod:
+          - POST
+          Route: /system/communication/mailaccounts
+        V1::MailAccount::MailAccountTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailaccounts/types
+        V1::MailFilter::MailFilterSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailfilters
+        V1::MailFilter::MailFilterDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/communication/mailfilters/:MailFilterID
+        V1::MailFilter::MailFilterGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/mailfilters/:MailFilterID
+        V1::MailFilter::MailFilterUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/communication/mailfilters/:MailFilterID
+        V1::MailFilter::MailFilterCreate:
+          RequestMethod:
+          - POST
+          Route: /system/communication/mailfilters
+        V1::Notification::NotificationSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/notifications
+        V1::Notification::NotificationDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/communication/notifications/:NotificationID
+        V1::Notification::NotificationGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/notifications/:NotificationID
+        V1::Notification::NotificationUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/communication/notifications/:NotificationID
+        V1::Notification::NotificationCreate:
+          RequestMethod:
+          - POST
+          Route: /system/communication/notifications
+        V1::SenderType::SenderTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/sendertypes
+        V1::SenderType::SenderTypeGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/sendertypes/:SenderTypeID
+        V1::SystemAddress::SystemAddressSearch:
+          RequestMethod:
+          - GET
+          Route: /system/communication/systemaddresses
+        V1::SystemAddress::SystemAddressCreate:
+          RequestMethod:
+          - POST
+          Route: /system/communication/systemaddresses
+        V1::SystemAddress::SystemAddressDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/communication/systemaddresses/:SystemAddressID
+        V1::SystemAddress::SystemAddressGet:
+          RequestMethod:
+          - GET
+          Route: /system/communication/systemaddresses/:SystemAddressID
+        V1::SystemAddress::SystemAddressUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/communication/systemaddresses/:SystemAddressID
+        V1::SysConfig::SysConfigOptionDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/config/definitions
+        V1::SysConfig::SysConfigOptionDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /system/config/definitions/:Option
+        V1::SysConfig::SysConfigOptionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/config
+        V1::SysConfig::SysConfigOptionGet:
+          RequestMethod:
+          - GET
+          Route: /system/config/:Option
+        V1::SysConfig::SysConfigOptionUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/config/:Option
+        V1::Console::ConsoleCommandSearch:
+          RequestMethod:
+          - GET
+          Route: /system/console
+        V1::Console::ConsoleCommandExecute:
+          RequestMethod:
+          - POST
+          Route: /system/console
+        V1::Console::ConsoleCommandGet:
+          RequestMethod:
+          - GET
+          Route: /system/console/:Command
+        V1::Console::ConsoleFileSearch:
+          RequestMethod:
+          - GET
+          Route: /system/console/files
+        V1::Console::ConsoleFileCreate:
+          RequestMethod:
+          - POST
+          Route: /system/console/files
+        V1::Console::ConsoleFileDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/console/files/:FileID
+        V1::DynamicField::DynamicFieldTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/dynamicfields/types
+        V1::DynamicField::DynamicFieldObjectTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/dynamicfields/objecttypes
+        V1::DynamicField::DynamicFieldConfigGet:
+          RequestMethod:
+          - GET
+          Route: /system/dynamicfields/:DynamicFieldID/config
+        V1::DynamicField::DynamicFieldConfigUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/dynamicfields/:DynamicFieldID/config
+        V1::DynamicField::DynamicFieldDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/dynamicfields/:DynamicFieldID
+        V1::DynamicField::DynamicFieldGet:
+          RequestMethod:
+          - GET
+          Route: /system/dynamicfields/:DynamicFieldID
+        V1::DynamicField::DynamicFieldUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/dynamicfields/:DynamicFieldID
+        V1::DynamicField::DynamicFieldSearch:
+          RequestMethod:
+          - GET
+          Route: /system/dynamicfields
+        V1::DynamicField::DynamicFieldCreate:
+          RequestMethod:
+          - POST
+          Route: /system/dynamicfields
+        V1::FAQ::FAQCategoryDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/faq/categories/:FAQCategoryID
+        V1::FAQ::FAQCategoryGet:
+          RequestMethod:
+          - GET
+          Route: /system/faq/categories/:FAQCategoryID
+        V1::FAQ::FAQCategoryUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/faq/categories/:FAQCategoryID
+        V1::FAQ::FAQCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /system/faq/categories
+        V1::FAQ::FAQCategoryCreate:
+          RequestMethod:
+          - POST
+          Route: /system/faq/categories
+        V1::GeneralCatalog::GeneralCatalogClassUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/generalcatalog/classes/:GeneralCatalogClass
+        V1::GeneralCatalog::GeneralCatalogClassSearch:
+          RequestMethod:
+          - GET
+          Route: /system/generalcatalog/classes
+        V1::GeneralCatalog::GeneralCatalogItemDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/generalcatalog/:GeneralCatalogItemID
+        V1::GeneralCatalog::GeneralCatalogItemGet:
+          RequestMethod:
+          - GET
+          Route: /system/generalcatalog/:GeneralCatalogItemID
+        V1::GeneralCatalog::GeneralCatalogItemUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/generalcatalog/:GeneralCatalogItemID
+        V1::GeneralCatalog::GeneralCatalogItemSearch:
+          RequestMethod:
+          - GET
+          Route: /system/generalcatalog
+        V1::GeneralCatalog::GeneralCatalogItemCreate:
+          RequestMethod:
+          - POST
+          Route: /system/generalcatalog
+        V1::I18n::TranslationPatternSearch:
+          RequestMethod:
+          - GET
+          Route: /system/i18n/translations
+        V1::I18n::TranslationPatternCreate:
+          RequestMethod:
+          - POST
+          Route: /system/i18n/translations
+        V1::I18n::TranslationPatternDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/i18n/translations/:PatternID
+        V1::I18n::TranslationPatternGet:
+          RequestMethod:
+          - GET
+          Route: /system/i18n/translations/:PatternID
+        V1::I18n::TranslationPatternUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/i18n/translations/:PatternID
+        V1::I18n::TranslationLanguageSearch:
+          RequestMethod:
+          - GET
+          Route: /system/i18n/translations/:PatternID/languages
+        V1::I18n::TranslationLanguageDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/i18n/translations/:PatternID/languages/:Language
+        V1::I18n::TranslationLanguageGet:
+          RequestMethod:
+          - GET
+          Route: /system/i18n/translations/:PatternID/languages/:Language
+        V1::I18n::TranslationLanguageUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/i18n/translations/:PatternID/languages/:Language
+        V1::I18n::TranslationLanguageCreate:
+          RequestMethod:
+          - POST
+          Route: /system/i18n/translations/:PatternID/languages
+        V1::Log::LogFileSearch:
+          RequestMethod:
+          - GET
+          Route: /system/logs
+        V1::Log::LogFileGet:
+          RequestMethod:
+          - GET
+          Route: /system/logs/:LogFileID
+        V1::ObjectDefinition::ObjectDefinitionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/objectdefinitions
+        V1::ObjectDefinition::ObjectDefinitionGet:
+          RequestMethod:
+          - GET
+          Route: /system/objectdefinitions/:ObjectType
+        V1::ObjectIcon::ObjectIconSearch:
+          RequestMethod:
+          - GET
+          Route: /system/objecticons
+        V1::ObjectIcon::ObjectIconDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/objecticons/:ObjectIconID
+        V1::ObjectIcon::ObjectIconGet:
+          RequestMethod:
+          - GET
+          Route: /system/objecticons/:ObjectIconID
+        V1::ObjectIcon::ObjectIconUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/objecticons/:ObjectIconID
+        V1::ObjectIcon::ObjectIconCreate:
+          RequestMethod:
+          - POST
+          Route: /system/objecticons
+        V1::Role::PermissionTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/roles/permissiontypes
+        V1::Role::RoleSearch:
+          RequestMethod:
+          - GET
+          Route: /system/roles
+        V1::Role::RoleCreate:
+          RequestMethod:
+          - POST
+          Route: /system/roles
+        V1::Role::RoleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/roles/:RoleID
+        V1::Role::RoleGet:
+          RequestMethod:
+          - GET
+          Route: /system/roles/:RoleID
+        V1::Role::RoleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/roles/:RoleID
+        V1::Role::PermissionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/roles/:RoleID/permissions
+        V1::Role::PermissionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/roles/:RoleID/permissions/:PermissionID
+        V1::Role::PermissionGet:
+          RequestMethod:
+          - GET
+          Route: /system/roles/:RoleID/permissions/:PermissionID
+        V1::Role::PermissionUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/roles/:RoleID/permissions/:PermissionID
+        V1::Role::PermissionCreate:
+          RequestMethod:
+          - POST
+          Route: /system/roles/:RoleID/permissions
+        V1::Role::RoleUserIDSearch:
+          RequestMethod:
+          - GET
+          Route: /system/roles/:RoleID/userids
+        V1::Role::RoleUserIDCreate:
+          RequestMethod:
+          - POST
+          Route: /system/roles/:RoleID/userids
+        V1::Role::RoleUserIDDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/roles/:RoleID/userids/:UserID
+        V1::Service::ServiceSearch:
+          RequestMethod:
+          - GET
+          Route: /system/services
+        V1::Service::ServiceCreate:
+          RequestMethod:
+          - POST
+          Route: /system/services
+        V1::Service::ServiceDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/services/:ServiceID
+        V1::Service::ServiceGet:
+          RequestMethod:
+          - GET
+          Route: /system/services/:ServiceID
+        V1::Service::ServiceUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/services/:ServiceID
+        V1::Sessions::SessionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/sessions
+        V1::Sessions::SessionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/sessions/:Token
+        V1::Sessions::SessionGet:
+          RequestMethod:
+          - GET
+          Route: /system/sessions/:Token
+        V1::SLA::SLASearch:
+          RequestMethod:
+          - GET
+          Route: /system/slas
+        V1::SLA::SLACreate:
+          RequestMethod:
+          - POST
+          Route: /system/slas
+        V1::SLA::SLADelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/slas/:SLAID
+        V1::SLA::SLAGet:
+          RequestMethod:
+          - GET
+          Route: /system/slas/:SLAID
+        V1::SLA::SLAUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/slas/:SLAID
+        V1::Template::TemplateSearch:
+          RequestMethod:
+          - GET
+          Route: /system/templates
+        V1::Template::TemplateCreate:
+          RequestMethod:
+          - POST
+          Route: /system/templates
+        V1::Template::TemplateDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/templates/:TemplateID
+        V1::Template::TemplateGet:
+          RequestMethod:
+          - GET
+          Route: /system/templates/:TemplateID
+        V1::Template::TemplateUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/templates/:TemplateID
+        V1::TextModule::TextModuleCategorySearch:
+          RequestMethod:
+          - GET
+          Route: /system/textmodules/categories
+        V1::TextModule::TextModuleSearch:
+          RequestMethod:
+          - GET
+          Route: /system/textmodules
+        V1::TextModule::TextModuleCreate:
+          RequestMethod:
+          - POST
+          Route: /system/textmodules
+        V1::TextModule::TextModuleDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/textmodules/:TextModuleID
+        V1::TextModule::TextModuleGet:
+          RequestMethod:
+          - GET
+          Route: /system/textmodules/:TextModuleID
+        V1::TextModule::TextModuleUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/textmodules/:TextModuleID
+        V1::Lock::LockSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/locks
+        V1::Lock::LockGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/locks/:LockID
+        V1::Priority::PrioritySearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/priorities
+        V1::Priority::PriorityCreate:
+          RequestMethod:
+          - POST
+          Route: /system/ticket/priorities
+        V1::Priority::PriorityDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/ticket/priorities/:PriorityID
+        V1::Priority::PriorityGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/priorities/:PriorityID
+        V1::Priority::PriorityUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/ticket/priorities/:PriorityID
+        V1::Queue::QueueSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/queues
+        V1::Queue::QueueCreate:
+          RequestMethod:
+          - POST
+          Route: /system/ticket/queues
+        V1::Queue::QueueDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/ticket/queues/:QueueID
+        V1::Queue::QueueGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/queues/:QueueID
+        V1::Queue::QueueUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/ticket/queues/:QueueID
+        V1::Queue::FollowUpTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/queues/followuptypes
+        V1::TicketState::TicketStateSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/states
+        V1::TicketState::TicketStateCreate:
+          RequestMethod:
+          - POST
+          Route: /system/ticket/states
+        V1::TicketState::TicketStateDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/ticket/states/:StateID
+        V1::TicketState::TicketStateGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/states/:StateID
+        V1::TicketState::TicketStateUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/ticket/states/:StateID
+        V1::StateType::StateTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/states/types
+        V1::StateType::StateTypeGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/states/types/:StateTypeID
+        V1::TicketType::TicketTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/types
+        V1::TicketType::TicketTypeCreate:
+          RequestMethod:
+          - POST
+          Route: /system/ticket/types
+        V1::TicketType::TicketTypeDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/ticket/types/:TypeID
+        V1::TicketType::TicketTypeGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/types/:TypeID
+        V1::TicketType::TicketTypeUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/ticket/types/:TypeID
+        V1::User::UserSearch:
+          RequestMethod:
+          - GET
+          Route: /system/users
+        V1::User::UserCreate:
+          RequestMethod:
+          - POST
+          Route: /system/users
+        V1::User::UserGet:
+          RequestMethod:
+          - GET
+          Route: /system/users/:UserID
+        V1::User::UserUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/users/:UserID
+        V1::User::UserPreferenceSearch :
+          RequestMethod:
+          - GET
+          Route: /system/users/:UserID/preferences
+        V1::User::UserPreferenceCreate :
+          RequestMethod:
+          - POST
+          Route: /system/users/:UserID/preferences
+        V1::User::UserPreferenceDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/users/:UserID/preferences/:UserPreferenceID
+        V1::User::UserPreferenceGet:
+          RequestMethod:
+          - GET
+          Route: /system/users/:UserID/preferences/:UserPreferenceID
+        V1::User::UserPreferenceUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/users/:UserID/preferences/:UserPreferenceID
+        V1::User::UserRoleIDSearch :
+          RequestMethod:
+          - GET
+          Route: /system/users/:UserID/roleids
+        V1::User::UserRoleIDCreate :
+          RequestMethod:
+          - POST
+          Route: /system/users/:UserID/roleids
+        V1::User::UserRoleIDDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/users/:UserID/roleids/:RoleID
+        V1::Valid::ValidSearch:
+          RequestMethod:
+          - GET
+          Route: /system/valid
+        V1::Valid::ValidGet:
+          RequestMethod:
+          - GET
+          Route: /system/valid/:ValidID
         V1::AddressBook::AddressDelete:
           RequestMethod:
           - DELETE
@@ -1755,14 +2550,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /addressbook
-        V1::Channel::ChannelGet:
+        V1::Sessions::SessionCreate:
           RequestMethod:
-          - GET
-          Route: /channels/:ChannelID
-        V1::Channel::ChannelSearch:
-          RequestMethod:
-          - GET
-          Route: /channels
+          - POST
+          Route: /auth
         V1::ClientRegistration::ClientRegistrationDelete:
           RequestMethod:
           - DELETE
@@ -1779,42 +2570,6 @@ Provider:
           RequestMethod:
           - POST
           Route: /clientregistration
-        V1::CMDB::ClassDefinitionDelete:
-          RequestMethod:
-          - DELETE
-          Route: /cmdb/classes/:ClassID/definitions/:DefinitionID
-        V1::CMDB::ClassDefinitionGet:
-          RequestMethod:
-          - GET
-          Route: /cmdb/classes/:ClassID/definitions/:DefinitionID
-        V1::CMDB::ClassDefinitionSearch:
-          RequestMethod:
-          - GET
-          Route: /cmdb/classes/:ClassID/definitions
-        V1::CMDB::ClassDefinitionCreate:
-          RequestMethod:
-          - POST
-          Route: /cmdb/classes/:ClassID/definitions
-        V1::CMDB::ClassDelete:
-          RequestMethod:
-          - DELETE
-          Route: /cmdb/classes/:ClassID
-        V1::CMDB::ClassGet:
-          RequestMethod:
-          - GET
-          Route: /cmdb/classes/:ClassID
-        V1::CMDB::ClassUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /cmdb/classes/:ClassID
-        V1::CMDB::ClassSearch:
-          RequestMethod:
-          - GET
-          Route: /cmdb/classes
-        V1::CMDB::ClassCreate:
-          RequestMethod:
-          - POST
-          Route: /cmdb/classes
         V1::CMDB::ConfigItemAttachmentGet:
           RequestMethod:
           - GET
@@ -1899,70 +2654,14 @@ Provider:
           RequestMethod:
           - POST
           Route: /contacts
-        V1::Organisation::OrganisationContactSearch:
+        V1::FAQ::FAQArticleSearch:
           RequestMethod:
           - GET
-          Route: /organisations/:OrganisationID/contacts
-        V1::Organisation::OrganisationGet:
-          RequestMethod:
-          - GET
-          Route: /organisations/:OrganisationID
-        V1::Organisation::OrganisationUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /organisations/:OrganisationID
-        V1::Organisation::OrganisationDelete:
-          RequestMethod:
-          - DELETE
-          Route: /organisations/:OrganisationID
-        V1::Organisation::OrganisationTicketSearch:
-          RequestMethod:
-          - GET
-          Route: /organisations/:OrganisationID/tickets
-        V1::Organisation::OrganisationSearch:
-          RequestMethod:
-          - GET
-          Route: /organisations
-        V1::Organisation::OrganisationCreate:
+          Route: /faq/articles
+        V1::FAQ::FAQArticleCreate:
           RequestMethod:
           - POST
-          Route: /organisations
-        V1::DynamicField::DynamicFieldObjectTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /dynamicfieldobjecttypes
-        V1::DynamicField::DynamicFieldConfigGet:
-          RequestMethod:
-          - GET
-          Route: /dynamicfields/:DynamicFieldID/config
-        V1::DynamicField::DynamicFieldConfigUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /dynamicfields/:DynamicFieldID/config
-        V1::DynamicField::DynamicFieldDelete:
-          RequestMethod:
-          - DELETE
-          Route: /dynamicfields/:DynamicFieldID
-        V1::DynamicField::DynamicFieldGet:
-          RequestMethod:
-          - GET
-          Route: /dynamicfields/:DynamicFieldID
-        V1::DynamicField::DynamicFieldUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /dynamicfields/:DynamicFieldID
-        V1::DynamicField::DynamicFieldSearch:
-          RequestMethod:
-          - GET
-          Route: /dynamicfields
-        V1::DynamicField::DynamicFieldCreate:
-          RequestMethod:
-          - POST
-          Route: /dynamicfields
-        V1::DynamicField::DynamicFieldTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /dynamicfieldtypes
+          Route: /faq/articles
         V1::FAQ::FAQArticleAttachmentDelete:
           RequestMethod:
           - DELETE
@@ -2015,102 +2714,14 @@ Provider:
           RequestMethod:
           - POST
           Route: /faq/articles/:FAQArticleID/votes
-        V1::FAQ::FAQArticleSearch:
+        V1::FAQ::FAQArticleKeywordSearch:
           RequestMethod:
           - GET
-          Route: /faq/articles
-        V1::FAQ::FAQArticleCreate:
-          RequestMethod:
-          - POST
-          Route: /faq/articles
-        V1::FAQ::FAQCategoryDelete:
-          RequestMethod:
-          - DELETE
-          Route: /faq/categories/:FAQCategoryID
-        V1::FAQ::FAQCategoryGet:
-          RequestMethod:
-          - GET
-          Route: /faq/categories/:FAQCategoryID
-        V1::FAQ::FAQCategoryUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /faq/categories/:FAQCategoryID
-        V1::FAQ::FAQCategorySearch:
-          RequestMethod:
-          - GET
-          Route: /faq/categories
-        V1::FAQ::FAQCategoryCreate:
-          RequestMethod:
-          - POST
-          Route: /faq/categories
-        V1::GeneralCatalog::GeneralCatalogClassUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /generalcatalog/classes/:GeneralCatalogClass
-        V1::GeneralCatalog::GeneralCatalogClassSearch:
-          RequestMethod:
-          - GET
-          Route: /generalcatalog/classes
-        V1::GeneralCatalog::GeneralCatalogItemDelete:
-          RequestMethod:
-          - DELETE
-          Route: /generalcatalog/:GeneralCatalogItemID
-        V1::GeneralCatalog::GeneralCatalogItemGet:
-          RequestMethod:
-          - GET
-          Route: /generalcatalog/:GeneralCatalogItemID
-        V1::GeneralCatalog::GeneralCatalogItemUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /generalcatalog/:GeneralCatalogItemID
-        V1::GeneralCatalog::GeneralCatalogItemSearch:
-          RequestMethod:
-          - GET
-          Route: /generalcatalog
-        V1::GeneralCatalog::GeneralCatalogItemCreate:
-          RequestMethod:
-          - POST
-          Route: /generalcatalog
+          Route: /faq/articles/keywords
         V1::I18n::TranslationSearch:
           RequestMethod:
           - GET
           Route: /i18n/translations
-        V1::I18n::TranslationCreate:
-          RequestMethod:
-          - POST
-          Route: /i18n/translations
-        V1::I18n::TranslationDelete:
-          RequestMethod:
-          - DELETE
-          Route: /i18n/translations/:TranslationID
-        V1::I18n::TranslationGet:
-          RequestMethod:
-          - GET
-          Route: /i18n/translations/:TranslationID
-        V1::I18n::TranslationLanguageSearch:
-          RequestMethod:
-          - GET
-          Route: /i18n/translations/:TranslationID/languages
-        V1::I18n::TranslationLanguageDelete:
-          RequestMethod:
-          - DELETE
-          Route: /i18n/translations/:TranslationID/languages/:Language
-        V1::I18n::TranslationLanguageGet:
-          RequestMethod:
-          - GET
-          Route: /i18n/translations/:TranslationID/languages/:Language
-        V1::I18n::TranslationLanguageUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /i18n/translations/:TranslationID/languages/:Language
-        V1::I18n::TranslationLanguageCreate:
-          RequestMethod:
-          - POST
-          Route: /i18n/translations/:TranslationID/languages
-        V1::I18n::TranslationUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /i18n/translations/:TranslationID
         V1::Link::LinkSearch:
           RequestMethod:
           - GET
@@ -2131,158 +2742,34 @@ Provider:
           RequestMethod:
           - GET
           Route: /links/types
-        V1::MailAccount::MailAccountSearch:
+        V1::Organisation::OrganisationContactSearch:
           RequestMethod:
           - GET
-          Route: /mailaccounts
-        V1::MailAccount::MailAccountDelete:
-          RequestMethod:
-          - DELETE
-          Route: /mailaccounts/:MailAccountID
-        V1::MailAccount::MailAccountGet:
+          Route: /organisations/:OrganisationID/contacts
+        V1::Organisation::OrganisationGet:
           RequestMethod:
           - GET
-          Route: /mailaccounts/:MailAccountID
-        V1::MailAccount::MailAccountUpdate:
+          Route: /organisations/:OrganisationID
+        V1::Organisation::OrganisationUpdate:
           RequestMethod:
           - PATCH
-          Route: /mailaccounts/:MailAccountID
-        V1::MailAccount::MailAccountCreate:
-          RequestMethod:
-          - POST
-          Route: /mailaccounts
-        V1::MailAccount::MailAccountTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /mailaccounts/types
-        V1::ObjectDefinition::ObjectDefinitionSearch:
-          RequestMethod:
-          - GET
-          Route: /objectdefinitions
-        V1::ObjectDefinition::ObjectDefinitionGet:
-          RequestMethod:
-          - GET
-          Route: /objectdefinitions/:ObjectType
-        V1::ObjectIcon::ObjectIconSearch:
-          RequestMethod:
-          - GET
-          Route: /objecticons
-        V1::ObjectIcon::ObjectIconDelete:
+          Route: /organisations/:OrganisationID
+        V1::Organisation::OrganisationDelete:
           RequestMethod:
           - DELETE
-          Route: /objecticons/:ObjectIconID
-        V1::ObjectIcon::ObjectIconGet:
+          Route: /organisations/:OrganisationID
+        V1::Organisation::OrganisationTicketSearch:
           RequestMethod:
           - GET
-          Route: /objecticons/:ObjectIconID
-        V1::ObjectIcon::ObjectIconUpdate:
+          Route: /organisations/:OrganisationID/tickets
+        V1::Organisation::OrganisationSearch:
           RequestMethod:
-          - PATCH
-          Route: /objecticons/:ObjectIconID
-        V1::ObjectIcon::ObjectIconCreate:
+          - GET
+          Route: /organisations
+        V1::Organisation::OrganisationCreate:
           RequestMethod:
           - POST
-          Route: /objecticons
-        V1::Priority::PrioritySearch:
-          RequestMethod:
-          - GET
-          Route: /priorities
-        V1::Priority::PriorityCreate:
-          RequestMethod:
-          - POST
-          Route: /priorities
-        V1::Priority::PriorityDelete:
-          RequestMethod:
-          - DELETE
-          Route: /priorities/:PriorityID
-        V1::Priority::PriorityGet:
-          RequestMethod:
-          - GET
-          Route: /priorities/:PriorityID
-        V1::Priority::PriorityUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /priorities/:PriorityID
-        V1::Queue::QueueSearch:
-          RequestMethod:
-          - GET
-          Route: /queues
-        V1::Queue::QueueCreate:
-          RequestMethod:
-          - POST
-          Route: /queues
-        V1::Queue::QueueDelete:
-          RequestMethod:
-          - DELETE
-          Route: /queues/:QueueID
-        V1::Queue::QueueGet:
-          RequestMethod:
-          - GET
-          Route: /queues/:QueueID
-        V1::Queue::QueueUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /queues/:QueueID
-        V1::Queue::FollowUpTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /queues/followuptypes
-        V1::Role::RoleSearch:
-          RequestMethod:
-          - GET
-          Route: /roles
-        V1::Role::PermissionTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /roles/permissiontypes
-        V1::Role::RoleCreate:
-          RequestMethod:
-          - POST
-          Route: /roles
-        V1::Role::RoleDelete:
-          RequestMethod:
-          - DELETE
-          Route: /roles/:RoleID
-        V1::Role::RoleGet:
-          RequestMethod:
-          - GET
-          Route: /roles/:RoleID
-        V1::Role::RoleUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /roles/:RoleID
-        V1::Role::PermissionSearch:
-          RequestMethod:
-          - GET
-          Route: /roles/:RoleID/permissions
-        V1::Role::PermissionDelete:
-          RequestMethod:
-          - DELETE
-          Route: /roles/:RoleID/permissions/:PermissionID
-        V1::Role::PermissionGet:
-          RequestMethod:
-          - GET
-          Route: /roles/:RoleID/permissions/:PermissionID
-        V1::Role::PermissionUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /roles/:RoleID/permissions/:PermissionID
-        V1::Role::PermissionCreate:
-          RequestMethod:
-          - POST
-          Route: /roles/:RoleID/permissions
-        V1::Role::RoleUserIDSearch:
-          RequestMethod:
-          - GET
-          Route: /roles/:RoleID/userids
-        V1::Role::RoleUserIDCreate:
-          RequestMethod:
-          - POST
-          Route: /roles/:RoleID/userids
-        V1::Role::RoleUserIDDelete:
-          RequestMethod:
-          - DELETE
-          Route: /roles/:RoleID/userids/:UserID
+          Route: /organisations
         V1::SearchProfile::SearchProfileCategorySearch:
           RequestMethod:
           - GET
@@ -2307,194 +2794,46 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /searchprofiles/:SearchProfileID
-        V1::SenderType::SenderTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /sendertypes
-        V1::SenderType::SenderTypeGet:
-          RequestMethod:
-          - GET
-          Route: /sendertypes/:SenderTypeID
-        V1::Service::ServiceSearch:
-          RequestMethod:
-          - GET
-          Route: /services
-        V1::Service::ServiceCreate:
-          RequestMethod:
-          - POST
-          Route: /services
-        V1::Service::ServiceDelete:
-          RequestMethod:
-          - DELETE
-          Route: /services/:ServiceID
-        V1::Service::ServiceGet:
-          RequestMethod:
-          - GET
-          Route: /services/:ServiceID
-        V1::Service::ServiceUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /services/:ServiceID
-        V1::Own::SessionGet:
-          RequestMethod:
-          - GET
-          Route: /session
-        V1::Session::SessionSearch:
-          RequestMethod:
-          - GET
-          Route: /sessions
-        V1::Session::SessionCreate:
-          RequestMethod:
-          - POST
-          Route: /sessions
-        V1::Session::SessionDelete:
-          RequestMethod:
-          - DELETE
-          Route: /sessions/:Token
         V1::Session::SessionGet:
           RequestMethod:
           - GET
-          Route: /sessions/:Token
-        V1::SLA::SLASearch:
-          RequestMethod:
-          - GET
-          Route: /slas
-        V1::SLA::SLACreate:
-          RequestMethod:
-          - POST
-          Route: /slas
-        V1::SLA::SLADelete:
+          Route: /session
+        V1::Session::SessionDelete:
           RequestMethod:
           - DELETE
-          Route: /slas/:SLAID
-        V1::SLA::SLAGet:
+          Route: /session
+        V1::Session::UserGet:
           RequestMethod:
           - GET
-          Route: /slas/:SLAID
-        V1::SLA::SLAUpdate:
+          Route: /session/user
+        V1::Session::UserUpdate:
           RequestMethod:
           - PATCH
-          Route: /slas/:SLAID
-        V1::StandardAttachment::StandardAttachmentDelete:
-          RequestMethod:
-          - DELETE
-          Route: /standardattachments/:AttachmentID
-        V1::StandardAttachment::StandardAttachmentGet:
+          Route: /session/user
+        V1::Session::UserPreferenceSearch :
           RequestMethod:
           - GET
-          Route: /standardattachments/:AttachmentID
-        V1::StandardAttachment::StandardAttachmentUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /standardattachments/:AttachmentID
-        V1::StandardAttachment::StandardAttachmentSearch:
-          RequestMethod:
-          - GET
-          Route: /standardattachments
-        V1::StandardAttachment::StandardAttachmentCreate:
+          Route: /session/user/preferences
+        V1::Session::UserPreferenceCreate :
           RequestMethod:
           - POST
-          Route: /standardattachments
-        V1::StandardTemplate::StandardTemplateSearch:
-          RequestMethod:
-          - GET
-          Route: /standardtemplates
-        V1::StandardTemplate::StandardTemplateCreate:
-          RequestMethod:
-          - POST
-          Route: /standardtemplates
-        V1::StandardTemplate::StandardTemplateDelete:
+          Route: /session/user/preferences
+        V1::Session::UserPreferenceDelete:
           RequestMethod:
           - DELETE
-          Route: /standardtemplates/:StandardTemplateID
-        V1::StandardTemplate::StandardTemplateGet:
+          Route: /session/user/preferences/:UserPreferenceID
+        V1::Session::UserPreferenceGet:
           RequestMethod:
           - GET
-          Route: /standardtemplates/:StandardTemplateID
-        V1::StandardTemplate::StandardTemplateUpdate:
+          Route: /session/user/preferences/:UserPreferenceID
+        V1::Session::UserPreferenceUpdate:
           RequestMethod:
           - PATCH
-          Route: /standardtemplates/:StandardTemplateID
-        V1::StateType::StateTypeSearch:
+          Route: /session/user/preferences/:UserPreferenceID
+        V1::Session::UserRoleIDSearch:
           RequestMethod:
           - GET
-          Route: /statetypes
-        V1::StateType::StateTypeGet:
-          RequestMethod:
-          - GET
-          Route: /statetypes/:StateTypeID
-        V1::SysConfig::SysConfigItemDefinitionSearch:
-          RequestMethod:
-          - GET
-          Route: /sysconfig/definitions
-        V1::SysConfig::SysConfigItemDefinitionGet:
-          RequestMethod:
-          - GET
-          Route: /sysconfig/definitions/:SysConfigItemDefinitionID
-        V1::SysConfig::SysConfigItemSearch:
-          RequestMethod:
-          - GET
-          Route: /sysconfig
-        V1::SysConfig::SysConfigItemGet:
-          RequestMethod:
-          - GET
-          Route: /sysconfig/:SysConfigItemID
-        V1::SysConfig::SysConfigItemUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /sysconfig/:SysConfigItemID
-        V1::SystemAddress::SystemAddressSearch:
-          RequestMethod:
-          - GET
-          Route: /systemaddresses
-        V1::SystemAddress::SystemAddressCreate:
-          RequestMethod:
-          - POST
-          Route: /systemaddresses
-        V1::SystemAddress::SystemAddressDelete:
-          RequestMethod:
-          - DELETE
-          Route: /systemaddresses/:SystemAddressID
-        V1::SystemAddress::SystemAddressGet:
-          RequestMethod:
-          - GET
-          Route: /systemaddresses/:SystemAddressID
-        V1::SystemAddress::SystemAddressUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /systemaddresses/:SystemAddressID
-        V1::TextModule::TextModuleCategorySearch:
-          RequestMethod:
-          - GET
-          Route: /textmodules/categories
-        V1::TextModule::TextModuleSearch:
-          RequestMethod:
-          - GET
-          Route: /textmodules
-        V1::TextModule::TextModuleCreate:
-          RequestMethod:
-          - POST
-          Route: /textmodules
-        V1::TextModule::TextModuleDelete:
-          RequestMethod:
-          - DELETE
-          Route: /textmodules/:TextModuleID
-        V1::TextModule::TextModuleGet:
-          RequestMethod:
-          - GET
-          Route: /textmodules/:TextModuleID
-        V1::TextModule::TextModuleUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /textmodules/:TextModuleID
-        V1::Lock::LockSearch:
-          RequestMethod:
-          - GET
-          Route: /ticketlocks
-        V1::Lock::LockGet:
-          RequestMethod:
-          - GET
-          Route: /ticketlocks/:LockID
+          Route: /session/user/roleids
         V1::Ticket::TicketSearch:
           RequestMethod:
           - GET
@@ -2503,26 +2842,6 @@ Provider:
           RequestMethod:
           - POST
           Route: /tickets
-        V1::TicketState::TicketStateSearch:
-          RequestMethod:
-          - GET
-          Route: /ticketstates
-        V1::TicketState::TicketStateCreate:
-          RequestMethod:
-          - POST
-          Route: /ticketstates
-        V1::TicketState::TicketStateDelete:
-          RequestMethod:
-          - DELETE
-          Route: /ticketstates/:StateID
-        V1::TicketState::TicketStateGet:
-          RequestMethod:
-          - GET
-          Route: /ticketstates/:StateID
-        V1::TicketState::TicketStateUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /ticketstates/:StateID
         V1::Ticket::ArticleAttachmentGet:
           RequestMethod:
           - GET
@@ -2631,94 +2950,6 @@ Provider:
           RequestMethod:
           - GET
           Route: /tickets/:TicketID/watchers/:WatcherID
-        V1::TicketType::TicketTypeSearch:
-          RequestMethod:
-          - GET
-          Route: /tickettypes
-        V1::TicketType::TicketTypeCreate:
-          RequestMethod:
-          - POST
-          Route: /tickettypes
-        V1::TicketType::TicketTypeDelete:
-          RequestMethod:
-          - DELETE
-          Route: /tickettypes/:TypeID
-        V1::TicketType::TicketTypeGet:
-          RequestMethod:
-          - GET
-          Route: /tickettypes/:TypeID
-        V1::TicketType::TicketTypeUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /tickettypes/:TypeID
-        V1::Own::UserGet:
-          RequestMethod:
-          - GET
-          Route: /user
-        V1::Own::UserPreferenceSearch:
-          RequestMethod:
-          - GET
-          Route: /user/preferences
-        V1::Own::UserRoleIDSearch:
-          RequestMethod:
-          - GET
-          Route: /user/roleids
-        V1::User::UserSearch:
-          RequestMethod:
-          - GET
-          Route: /users
-        V1::User::UserCreate:
-          RequestMethod:
-          - POST
-          Route: /users
-        V1::User::UserGet:
-          RequestMethod:
-          - GET
-          Route: /users/:UserID
-        V1::User::UserUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /users/:UserID
-        V1::User::UserPreferenceSearch :
-          RequestMethod:
-          - GET
-          Route: /users/:UserID/preferences
-        V1::User::UserPreferenceCreate :
-          RequestMethod:
-          - POST
-          Route: /users/:UserID/preferences
-        V1::User::UserPreferenceDelete:
-          RequestMethod:
-          - DELETE
-          Route: /users/:UserID/preferences/:UserPreferenceID
-        V1::User::UserPreferenceGet:
-          RequestMethod:
-          - GET
-          Route: /users/:UserID/preferences/:UserPreferenceID
-        V1::User::UserPreferenceUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /users/:UserID/preferences/:UserPreferenceID
-        V1::User::UserRoleIDSearch :
-          RequestMethod:
-          - GET
-          Route: /users/:UserID/roleids
-        V1::User::UserRoleIDCreate :
-          RequestMethod:
-          - POST
-          Route: /users/:UserID/roleids
-        V1::User::UserRoleIDDelete:
-          RequestMethod:
-          - DELETE
-          Route: /users/:UserID/roleids/:RoleID
-        V1::Valid::ValidSearch:
-          RequestMethod:
-          - GET
-          Route: /valid
-        V1::Valid::ValidGet:
-          RequestMethod:
-          - GET
-          Route: /valid/:ValidID
 
     Type: HTTP::REST
 RemoteSystem: ''

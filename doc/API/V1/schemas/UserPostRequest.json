@@ -10,7 +10,7 @@
             "Preferences" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreferencePostItem"
+                  "$ref" : "#/definitions/_UserPreferencePostItem_json"
                }
             },
             "RoleIDs" : {
@@ -62,7 +62,7 @@
       "User"
    ],
    "definitions" : {
-      "UserPreferencePostItem" : {
+      "_UserPreferencePostItem_json" : {
          "$id" : "#UserPreferencePostItem",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user preference request object for creation.",

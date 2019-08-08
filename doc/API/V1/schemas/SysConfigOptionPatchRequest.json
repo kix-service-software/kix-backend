@@ -1,0 +1,31 @@
+{
+   "$id" : "#SysConfigOptionPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The SysConfig option request object for update.",
+   "type" : "object",
+   "properties" : {
+      "SysConfigOption" : {
+         "properties" : {
+            "ValidID" : {
+               "type" : "integer"
+            },
+            "Value" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            }
+         }
+      }
+   },
+   "required" : [
+      "SysConfigOption"
+   ]
+}

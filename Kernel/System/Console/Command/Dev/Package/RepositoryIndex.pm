@@ -23,10 +23,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Generate an index file (otrs.xml) for an OTRS package repository.');
+    $Self->Description('Generate an index file (packages.xml) for a KIX package repository.');
     $Self->AddArgument(
         Name        => 'source-directory',
-        Description => "Specify the directory containing the OTRS packages.",
+        Description => "Specify the directory containing the KIX packages.",
         Required    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -49,11 +49,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $Result = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-    $Result .= "<otrs_package_list version=\"1.0\">\n";
+    $Result .= "<kix_package_list version=\"1.0\">\n";
     my $SourceDirectory = $Self->GetArgument('source-directory');
     my @List            = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
         Directory => $SourceDirectory,
-        Filter    => '*.opm',
+        Filter    => '*.kpm',
         Recursive => 1,
     );
     for my $File (@List) {
@@ -81,7 +81,7 @@ sub Run {
         $Result .= "  <File>$RelativeFile</File>\n";
         $Result .= "</Package>\n";
     }
-    $Result .= "</otrs_package_list>\n";
+    $Result .= "</kix_package_list>\n";
     $Self->Print($Result);
 
     return $Self->ExitCodeOk();

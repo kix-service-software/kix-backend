@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationGet" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">TranslationGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ObjectID">PatternID</Item>
-                <Item Key="ResponseObject">TranslationResponse</Item>
-                <Item Key="CacheType">API_i18n_translations</Item>
-                <Item Key="CacheTypeDependency">Translation</Item>
-                <Item Key="DisableUserBasedCaching">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
@@ -28,33 +14,61 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationCreate" Required="0" Valid="1">
+
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationPatternGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">TranslationCreate</Item>
+                <Item Key="Name">TranslationPatternGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TranslationPostRequest</Item>
-                <Item Key="ResponseObject">TranslationPostPatchResponse</Item>
+                <Item Key="ObjectID">PatternID</Item>
+                <Item Key="ResponseObject">TranslationPatternResponse</Item>
+                <Item Key="CacheType">API_i18n_translations</Item>
+                <Item Key="CacheTypeDependency">Translation</Item>
+                <Item Key="DisableUserBasedCaching">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationUpdate" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationPatternSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">TranslationUpdate</Item>
+                <Item Key="Name">TranslationPatternSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TranslationPatchRequest</Item>
-                <Item Key="ResponseObject">TranslationPostPatchResponse</Item>
+                <Item Key="ResponseObject">TranslationPatternCollectionResponse</Item>
+                <Item Key="CacheType">API_i18n_translations</Item>
+                <Item Key="CacheTypeDependency">Translation</Item>
+                <Item Key="DisableUserBasedCaching">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationDelete" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationPatternCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">TranslationDelete</Item>
+                <Item Key="Name">TranslationPatternCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">TranslationPatternPostRequest</Item>
+                <Item Key="ResponseObject">TranslationPatternPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationPatternUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationPatternUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">TranslationPatternPatchRequest</Item>
+                <Item Key="ResponseObject">TranslationPatternPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::I18n::TranslationPatternDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TranslationPatternDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MailFilterResponse",
+  "type": "object",
+  "description": "A response for mail filter GET request.",
+  "properties": {
+    "MailFilter": {
+      "$ref": "MailFilter.json"
+    }
+  },
+  "required": [
+    "MailFilter"
+  ]
+}

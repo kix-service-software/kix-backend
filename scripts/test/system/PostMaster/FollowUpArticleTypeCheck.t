@@ -61,7 +61,7 @@ my $ArticleID = $TicketObject->ArticleCreate(
     Channel        => 'email',
     CustomerVisible => 1,
     MessageID      => 'message-id-email-external',
-    SenderType     => 'customer',
+    SenderType     => 'external',
     From           => "Customer <$CustomerAddress>",
     To             => "Agent <$AgentAddress>",
     Subject        => 'subject',
@@ -144,12 +144,12 @@ Some Content in Body",
         Check => {
             Channel     => 'email',
             CustomerVisible => 1,            
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
         JobConfig => {
             Channel     => 'email',
             Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
     },
 
@@ -163,12 +163,12 @@ Subject: $Subject
 Some Content in Body",
         Check => {
             Channel     => 'email',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
         JobConfig => {
             Channel     => 'email',
             Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
     },
 
@@ -183,12 +183,12 @@ Subject: $Subject
 Some Content in Body",
         Check => {
             Channel     => 'email',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
         JobConfig => {
             Channel     => 'email',
             Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
     },
 
@@ -203,12 +203,12 @@ Some Content in Body",
         Check => {
             Channel     => 'email',
             CustomerVisible => 1,
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
         JobConfig => {
             Channel     => 'email',
             Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
     },
 
@@ -231,7 +231,7 @@ Some Content in Body",
         JobConfig => {
             Channel     => 'email',
             Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
     },
 
@@ -246,12 +246,12 @@ Subject: $Subject
 Some Content in Body",
         Check => {
             Channel     => 'email',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
         JobConfig => {
             Channel     => 'email',
             Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
-            SenderType  => 'customer',
+            SenderType  => 'external',
         },
     },
 );
@@ -286,6 +286,7 @@ my $RunTest = sub {
         );
 
         @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
     }
     $Self->Is(
         $Return[0] || 0,

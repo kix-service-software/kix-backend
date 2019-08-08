@@ -13,6 +13,8 @@ package Kernel::System::FAQ::Category;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::System::Cache',
     'Kernel::System::DB',
@@ -524,6 +526,65 @@ sub CategoryList {
     return \%Data;
 }
 
+=item CategoryLookup()
+
+get id or name of a category
+
+    my $Category = $FAQObject->CategoryLookup( CategoryID => $CategoryID );
+
+    my $CategoryID = $FAQObject->CategoryLookup( Name => $Category );
+
+=cut
+
+sub CategoryLookup {
+    my ( $Self, %Param ) = @_;
+    my $Key;
+    my $Value;
+    my $ReturnData;
+
+    # check needed stuff
+    if ( !$Param{Name} && !$Param{CategoryID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name or CategoryID!',
+        );
+        return;
+    }
+
+    if ( $Param{CategoryID} ) {
+        $Key   = 'CategoryID';
+        $Value = $Param{CategoryID};
+
+        my %Category = $Self->CategoryGet(
+            CategoryID => $Param{CategoryID} 
+        );
+        $ReturnData = $Category{Name};
+    }
+    else {
+        $Key   = 'Name';
+        $Value = $Param{Name};
+
+        my $CategoryList = $Self->CategorySearch(
+            Name   => $Param{Name}, 
+            UserID => 1,
+        );
+        if ( IsArrayRefWithData($CategoryList) ) {
+            $ReturnData = $CategoryList->[0];
+        }
+    }
+
+    # check if data exists
+    if ( !defined $ReturnData ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No $Key for $Value found!",
+        );
+        return;
+    }
+
+    return $ReturnData;
+}
+
 =item CategorySearch()
 
 get the category search as an array ref
@@ -533,8 +594,10 @@ get the category search as an array ref
         ParentID    => 3,
         ParentIDs   => [ 1, 3, 8 ],
         CategoryIDs => [ 2, 5, 7 ],
+        ValidIDs    => [ 1, 2 ],
         OrderBy     => 'Name',
         SortBy      => 'down',
+        Limit       => 500,
         UserID      => 1,
     );
 
@@ -563,10 +626,7 @@ sub CategorySearch {
     my $SQL = '
         SELECT id
         FROM faq_category
-        WHERE valid_id IN ('
-        . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
-        . ')';
-
+        WHERE 1 = 1';
     my $Ext = '';
 
     # get database object
@@ -582,7 +642,7 @@ sub CategorySearch {
     }
 
     # search for parent id
-    elsif ( defined $Param{ParentID} ) {
+    if ( defined $Param{ParentID} ) {
 
         # db integer quote
         $Param{ParentID} = $DBObject->Quote( $Param{ParentID}, 'Integer' );
@@ -591,7 +651,7 @@ sub CategorySearch {
     }
 
     # search for parent ids
-    elsif (
+    if (
         defined $Param{ParentIDs}
         && ref $Param{ParentIDs} eq 'ARRAY'
         && @{ $Param{ParentIDs} }
@@ -610,7 +670,7 @@ sub CategorySearch {
     }
 
     # search for category ids
-    elsif (
+    if (
         defined $Param{CategoryIDs}
         && ref $Param{CategoryIDs} eq 'ARRAY'
         && @{ $Param{CategoryIDs} }
@@ -626,6 +686,23 @@ sub CategorySearch {
         my $InString = join ', ', @{ $Param{CategoryIDs} };
 
         $Ext = ' AND id IN (' . $InString . ')';
+    }
+    
+    if (
+        defined $Param{ValidIDs}
+        && ref $Param{ValidIDs} eq 'ARRAY'
+        && @{ $Param{ValidIDs} }
+        ) 
+    {
+        # integer quote the valid ids
+        for my $ValidID ( @{ $Param{ValidIDs} } ) {
+            $ValidID = $DBObject->Quote( $ValidID, 'Integer' );
+        }
+
+        # create string
+        my $InString = join ', ', @{ $Param{ValidIDs} };
+
+        $Ext = ' AND valid_id IN (' . $InString . ')';
     }
 
     # ORDER BY
@@ -651,7 +728,7 @@ sub CategorySearch {
 
     return if !$DBObject->Prepare(
         SQL   => $SQL,
-        Limit => 500,
+        Limit => $Param{Limit},
     );
 
     my @List;

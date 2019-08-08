@@ -1,0 +1,12 @@
+{
+    "MailAccount": {
+        "DispatchingBy": "Queue",
+        "Host": "somehost",
+        "IMAPFolder": "INBOX",
+        "Login": "test",
+        "Password": "test123",
+        "QueueID": 1,
+        "Type": "IMAP",
+        "ValidID": 1
+    }
+}

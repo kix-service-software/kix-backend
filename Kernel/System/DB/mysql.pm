@@ -297,6 +297,9 @@ sub TableCreate {
                 $SQL .= ', ';
             }
             $SQL .= $Array[$_]->{Name};
+            if ( $Array[$_]->{Size} ) {
+                $SQL .= "($Array[$_]->{Size})";
+            }
         }
         $SQL .= ')';
     }

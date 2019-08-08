@@ -22,14 +22,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Rebuild the system configuration of OTRS.');
-
-    $Self->AddOption(
-        Name        => 'cleanup-user-config',
-        Description => "Cleanup the user configuration file ZZZAuto.pm, removing duplicate or obsolete values.",
-        Required    => 0,
-        HasValue    => 0,
-    );
+    $Self->Description('Rebuild the system configuration.');
 
     return;
 }
@@ -39,16 +32,13 @@ sub Run {
 
     $Self->Print("<yellow>Rebuilding the system configuration...</yellow>\n");
 
-    if ( !$Kernel::OM->Get('Kernel::System::SysConfig')->WriteDefault() ) {
-        $Self->PrintError("There was a problem writing ZZZAAuto.pm.");
+    my $Result = $Kernel::OM->Get('Kernel::System::SysConfig')->Rebuild();
+
+    if ( !$Result ) {
+        $Self->Print("<red>Error.</red>\n");
         return $Self->ExitCodeError();
     }
-    if ( $Self->GetOption('cleanup-user-config') ) {
-        if ( !$Kernel::OM->Get('Kernel::System::SysConfig')->CreateConfig() ) {
-            $Self->PrintError("There was a problem writing ZZZAuto.pm.");
-            return $Self->ExitCodeError();
-        }
-    }
+
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
 }

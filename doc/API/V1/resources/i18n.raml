@@ -2,19 +2,4 @@
   description: !include ../descriptions/resources/i18n.md
   /translations:
     description: !include ../descriptions/resources/i18n/translations.md
-    type: { collection: { typeName: Translation } }
-    /{translationId}:
-      type: { item: { typeName: Translation } }
-      uriParameters:
-        translationId:
-          displayName: TranslationID
-          type: integer        
-      /languages:
-        description: !include ../descriptions/resources/i18n/translations/languages.md
-        type: { collection: { typeName: TranslationLanguage } }
-        /{language}:
-          type: { item: { typeName: TranslationLanguage } }
-          uriParameters:
-            language:
-              displayName: Language
-              type: string
+    type: { collection-readonly: { typeName: Translation } }

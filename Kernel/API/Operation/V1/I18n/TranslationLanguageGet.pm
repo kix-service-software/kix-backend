@@ -91,7 +91,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TranslationID' => {
+        'PatternID' => {
             DataType => 'NUMERIC',
             Required => 1
         },
@@ -109,7 +109,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TranslationID => 123,
+            PatternID => 123,
             Language      => '...'     # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
@@ -137,7 +137,7 @@ sub Run {
 
     # check if pattern already exists
     my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
-        ID => $Param{Data}->{TranslationID},
+        ID => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
         return $Self->_Error(
@@ -152,7 +152,7 @@ sub Run {
 
         # get the Translation data
         my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageGet(
-            PatternID => $Param{Data}->{TranslationID},
+            PatternID => $Param{Data}->{PatternID},
             Language  => $Language,
             UserID    => $Self->{Authorization}->{UserID}
         );
@@ -162,10 +162,6 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
-
-        # replace PatternID with TranslationID
-        $TranslationData{TranslationID} = $TranslationData{PatternID};
-        delete $TranslationData{PatternID};
 
         # add
         push(@TranslationLanguageList, \%TranslationData);

@@ -7,7 +7,7 @@
       "TranslationLanguage" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/TranslationLanguage"
+            "$ref" : "#/definitions/_TranslationLanguage_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "TranslationLanguage"
    ],
    "definitions" : {
-      "TranslationLanguage" : {
+      "_TranslationLanguage_json" : {
          "$id" : "#TranslationLanguage",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The translation language object.",
@@ -25,7 +25,7 @@
                "type" : "string",
                "readOnly" : true
             },
-            "TranslationID" : {
+            "PatternID" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -35,7 +35,7 @@
             }
          },
          "required" : [
-            "TranslationID",
+            "PatternID",
             "Language",
             "Value"
          ]

@@ -220,8 +220,7 @@ sub TransitionCheck {
             next DEBUGFILTER if !$Self->{TransitionDebugFilters}->{$DebugFilter};
             next DEBUGFILTER if ref $Param{Data} ne 'HASH';
 
-#rbo - T2016121190001552 - added KIX placeholders
-            if ( $DebugFilter =~ m{<(KIX|OTRS)_TICKET_([^>]+)>}msx ) {
+            if ( $DebugFilter =~ m{<KIX_TICKET_([^>]+)>}msx ) {
                 my $TicketParam = $2;
 
                 if (
@@ -328,7 +327,6 @@ sub TransitionCheck {
 
         # If we don't have a ConditionLinking
         # set it to 'and' by default
-        # compatibility with OTRS 3.3.x
         if ( !$ConditionLinking ) {
             $ConditionLinking = $Transitions->{$TransitionEntityID}->{Condition}->{Type} || 'and';
         }

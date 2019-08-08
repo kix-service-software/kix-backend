@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConsoleCommandCollectionResponse",
+  "type": "object",
+  "description": "A list of console commands.",
+  "properties": {
+    "ConsoleCommand": {
+      "type": "array",
+      "items": {
+        "$ref": "ConsoleCommand.json"
+      }
+    }
+  },
+  "required": [
+    "ConsoleCommand"
+  ]
+}

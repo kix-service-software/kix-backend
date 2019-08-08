@@ -87,7 +87,7 @@ sub Run {
 
         my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
             Directory => $Options{Directory} || '.',
-            Filename  => "$PackageList{$Package->{Name}->{Content}}-$Package->{Name}->{Content}-$Package->{Version}->{Content}.opm",
+            Filename  => "$PackageList{$Package->{Name}->{Content}}-$Package->{Name}->{Content}-$Package->{Version}->{Content}.kpm",
             Content   => \$PackageContent,
         );
         if (!$Result) {

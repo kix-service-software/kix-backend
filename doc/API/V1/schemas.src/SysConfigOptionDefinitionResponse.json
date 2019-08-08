@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SysConfigOptionDefinitionResponse",
+  "type": "object",
+  "description": "A response for SysConfig option definition GET request.",
+  "properties": {
+    "SysConfigOptionDefinition": {
+      "$ref": "SysConfigOptionDefinition.json"
+    }
+  },
+  "required": [
+    "SysConfigOptionDefinition"
+  ]
+}

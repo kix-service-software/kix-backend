@@ -4,10 +4,10 @@
    "description" : "A list of service.",
    "type" : "object",
    "properties" : {
-      "Priority" : {
+      "Service" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Service"
+            "$ref" : "#/definitions/_Service_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Service"
    ],
    "definitions" : {
-      "Service" : {
+      "_Service_json" : {
          "$id" : "#Service",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The service object.",
@@ -58,7 +58,14 @@
                "readOnly" : true
             },
             "ParentID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "ServiceID" : {
@@ -66,6 +73,7 @@
                "readOnly" : true
             },
             "TypeID" : {
+               "description" : "See GeneralCatalog class \"ITSM::Service::Type\" for the list of possible types.",
                "type" : "integer",
                "readOnly" : true
             },

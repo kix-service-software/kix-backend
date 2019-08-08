@@ -16,7 +16,7 @@
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">TickeTypeSearch</Item>
+                <Item Key="Name">ChannelSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseObject">ChannelCollectionResponse</Item>
             </Hash>

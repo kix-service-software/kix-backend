@@ -88,35 +88,13 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform pattern search
-    my %PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternList(
-        UserID    => $Self->{Authorization}->{UserID}
+    my @TranslationList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationList(
+        UserID => $Self->{Authorization}->{UserID}
     );
-
-    if (IsHashRefWithData(\%PatternList)) {
-
-        # get already prepared Translation data from TranslationGet operation
-        my $TranslationGetResult = $Self->ExecOperation(
-            OperationType => 'V1::I18n::TranslationGet',
-            Data          => {
-                TranslationID => join(',', sort keys %PatternList),
-            }
-        );
-        if ( !IsHashRefWithData($TranslationGetResult) || !$TranslationGetResult->{Success} ) {
-            return $TranslationGetResult;
-        }
-
-        my @ResultList = IsArrayRefWithData($TranslationGetResult->{Data}->{Translation}) ? @{$TranslationGetResult->{Data}->{Translation}} : ( $TranslationGetResult->{Data}->{Translation} );
-        
-        if ( IsArrayRefWithData(\@ResultList) ) {
-            return $Self->_Success(
-                Translation => \@ResultList,
-            )
-        }
-    }
 
     # return result
     return $Self->_Success(
-        Translation => [],
+        Translation => \@TranslationList,
     );
 }
 

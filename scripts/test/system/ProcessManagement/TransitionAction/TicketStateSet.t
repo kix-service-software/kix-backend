@@ -168,12 +168,12 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Correct State closed successful',
+        Name   => 'Correct State closed',
         Config => {
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                State => 'closed successful',
+                State => 'closed',
             },
         },
         Success => 1,
@@ -190,7 +190,7 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Correct StateID closed successful',
+        Name   => 'Correct StateID closed',
         Config => {
             UserID => $UserID,
             Ticket => \%Ticket,
@@ -218,7 +218,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                State => '<OTRS_TICKET_Title>',
+                State => '<KIX_TICKET_Title>',
             },
         },
         Success => 1,
@@ -229,7 +229,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                State => '<OTRS_TICKET_NotExisting>',
+                State => '<KIX_TICKET_NotExisting>',
             },
         },
         Success => 0,
@@ -288,7 +288,7 @@ for my $Test (@Tests) {
             my $ExpectedValue = $Test->{Config}->{Config}->{$Attribute};
             if (
                 $OrigTest->{Config}->{Config}->{$Attribute}
-                =~ m{\A<OTRS_TICKET_([A-Za-z0-9_]+)>\z}msx
+                =~ m{\A<KIX_TICKET_([A-Za-z0-9_]+)>\z}msx
                 )
             {
                 $ExpectedValue = $Ticket{$1} // '';

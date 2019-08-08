@@ -1,0 +1,4 @@
+{
+  "ExitCode": 0,
+  "Output": "Maint::Cache::Delete   :$VAR1 = {\n  'Command' => 'Maint::Cache::Delete'\n};\nDeleting cache...\nDone.\n"
+}

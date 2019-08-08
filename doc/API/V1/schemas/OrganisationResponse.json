@@ -5,10 +5,219 @@
    "type" : "object",
    "properties" : {
       "Organisation" : {
-         "$ref" : "Organisation.json"
+         "$ref" : "#/definitions/_Organisation_json"
       }
    },
    "required" : [
       "Organisation"
-   ]
+   ],
+   "definitions" : {
+      "_Contact_json" : {
+         "$id" : "#Contact",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The contact object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "City" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Country" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Email" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fax" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Firstname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Lastname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Login" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Mobile" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "OrganisationIDs" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "Phone" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PrimaryOrganisationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Street" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Tickets" : {
+               "description" : "added via include \"Tickets\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "Ticket.json"
+               },
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Zip" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "PrimaryOrganisationID",
+            "OrganisationIDs",
+            "CreateBy",
+            "CreateTime",
+            "Firstname",
+            "Email",
+            "ID",
+            "Lastname",
+            "Login",
+            "ValidID"
+         ]
+      },
+      "_Organisation_json" : {
+         "$id" : "#Organisation",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The organisation object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "City" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Contacts" : {
+               "description" : "added via include \"Contacts\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_Contact_json"
+               },
+               "readOnly" : true
+            },
+            "Country" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Number" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Street" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Tickets" : {
+               "description" : "added via include \"Tickets\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "Ticket.json"
+               },
+               "readOnly" : true
+            },
+            "Url" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Zip" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "Number",
+            "ValidID"
+         ]
+      }
+   }
 }

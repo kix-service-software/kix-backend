@@ -1,0 +1,20 @@
+{
+    "TextModule": {
+        "Category": "Einstiege",
+        "ChangeBy": 1,
+        "ChangeTime": "2019-03-12 18:24:04",
+        "Comment": "",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-02 16:22:18",
+        "ID": 11,
+        "Keywords": [
+            "Danke",
+            "Anfrage"
+        ],
+        "Language": "de",
+        "Name": "Anfragedank",
+        "Subject": "",
+        "Text": "Vielen Dank für Ihre Anfrage.",
+        "ValidID": 1
+    }
+}

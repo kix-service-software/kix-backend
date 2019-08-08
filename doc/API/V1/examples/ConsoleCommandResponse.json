@@ -1,0 +1,34 @@
+{
+  "ConsoleCommand": {
+    "AdditionalHelp": "",
+    "Arguments": [],
+    "Command": "Maint::Cache::Delete",
+    "Description": "Deletes cache items created by KIX.",
+    "Parameters": [
+      {
+        "Description": "Delete only caches which are expired by TTL.",
+        "HasValue": 0,
+        "Name": "expired",
+        "Required": 0
+      },
+      {
+        "Description": "Define the type of cache which should be deleted (e.g. Ticket or StdAttachment).",
+        "HasValue": 1,
+        "Name": "type",
+        "Required": 0
+      },
+      {
+        "Description": "Display help for this command.",
+        "Name": "help"
+      },
+      {
+        "Description": "Do not perform ANSI terminal output coloring.",
+        "Name": "no-ansi"
+      },
+      {
+        "Description": "Suppress informative output, only retain error messages.",
+        "Name": "quiet"
+      }
+    ]
+  }
+}

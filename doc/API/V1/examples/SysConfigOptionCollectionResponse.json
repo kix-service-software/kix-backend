@@ -1,0 +1,22 @@
+{
+    "SysConfigOption": [
+        {
+            "Name": "Tool::Acknowledge::RegistrationAllocation",
+            "Value": "AcknowledgeName"
+        },
+        {
+            "Name": "Tool::Acknowledge::Type",
+            "Value": {
+                "Nagios1": "pipe"
+            }
+        },
+        {
+            "Name": "UniqueCIName::EnableUniquenessCheck",
+            "Value": "0"
+        },
+        {
+            "Name": "UniqueCIName::UniquenessCheckScope",
+            "Value": "global"
+        }
+    ]
+}

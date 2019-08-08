@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::EventHandler;
-## nofilter(TidyAll::Plugin::OTRS::Perl::PODSpelling)
 
 use strict;
 use warnings;
@@ -188,6 +187,7 @@ sub EventHandler {
         # If the module has an event configuration, determine if it should be executed for this event,
         #   and store the result in a small cache to avoid repetition on jobs involving many tickets.
         if ( !defined $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } ) {
+
             if ( !$Modules->{$Module}->{Event} ) {
                 $Self->{ExecuteModuleOnEvent}->{$Module}->{ $Param{Event} } = 1;
             }

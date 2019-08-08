@@ -1,0 +1,12 @@
+  displayName: Links
+  description: !include ../../../descriptions/resources/links.md
+  type: { collection-nopatch: { typeName: Link } }
+  /types:
+    description: !include ../../descriptions/resources/links/types.md
+    type: { collection-readonly: { typeName: LinkType } }
+  /{linkId}:
+    type: { item-nopatch: { typeName: Link } }
+    uriParameters:
+      linkId:
+        displayName: LinkID
+        type: integer

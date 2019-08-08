@@ -7,7 +7,7 @@
       "Queue" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Queue"
+            "$ref" : "#/definitions/_Queue_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Queue"
    ],
    "definitions" : {
-      "Queue" : {
+      "_Queue_json" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The priority object.",
@@ -124,7 +124,7 @@
                      "type" : "integer",
                      "readOnly" : true
                   },
-                  "OpenCount" : {
+                  "TotalCount" : {
                      "type" : "integer",
                      "readOnly" : true
                   }

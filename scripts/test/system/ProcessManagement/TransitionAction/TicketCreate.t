@@ -578,7 +578,7 @@ my @Tests = (
                 Title         => 'ProcessManagement::TransitionAction::TicketCreate::5::' . $RandomID,
                 CustomerID    => '123465',
                 Contact  => 'customer@example.com',
-                OwnerID       => '<OTRS_TICKET_OwnerID>',
+                OwnerID       => '<KIX_TICKET_OwnerID>',
                 TypeID        => 1,
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
@@ -620,7 +620,7 @@ my @Tests = (
                 Title         => 'ProcessManagement::TransitionAction::TicketCreate::5::' . $RandomID,
                 CustomerID    => '123465',
                 Contact  => 'customer@example.com',
-                Owner         => '<OTRS_TICKET_Owner>',
+                Owner         => '<KIX_TICKET_Owner>',
                 TypeID        => 1,
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
@@ -662,7 +662,7 @@ my @Tests = (
                 Title         => 'ProcessManagement::TransitionAction::TicketCreate::5::' . $RandomID,
                 CustomerID    => '123465',
                 Contact  => 'customer@example.com',
-                OwnerID       => '<OTRS_TICKET_OwnerID>',
+                OwnerID       => '<KIX_TICKET_OwnerID>',
                 TypeID        => 1,
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
@@ -684,7 +684,7 @@ my @Tests = (
                 Title         => 'ProcessManagement::TransitionAction::TicketCreate::5::' . $RandomID,
                 CustomerID    => '123465',
                 Contact  => 'customer@example.com',
-                Owner         => '<OTRS_TICKET_Owner>',
+                Owner         => '<KIX_TICKET_Owner>',
                 TypeID        => 1,
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
@@ -714,7 +714,7 @@ my @Tests = (
 
                 "DynamicField_Field1$RandomID" => 'Ticket',
                 "DynamicField_Field2$RandomID" => 'Article',
-                "DynamicField_Field3$RandomID" => "<OTRS_TICKET_DynamicField_Field3$RandomID>",
+                "DynamicField_Field3$RandomID" => "<KIX_TICKET_DynamicField_Field3$RandomID>",
             },
         },
         Success => 1,
@@ -734,7 +734,7 @@ my @Tests = (
                 ResponsibleID => 1,
                 PendingTime   => '2014-12-23 23:05:00',
 
-                "DynamicField_Field1$RandomID" => "<OTRS_TICKET_DynamicField_Field3$RandomID" . '_Value>',
+                "DynamicField_Field1$RandomID" => "<KIX_TICKET_DynamicField_Field3$RandomID" . '_Value>',
             },
         },
         Success => 1,
@@ -759,7 +759,7 @@ my @Tests = (
                 SenderType     => 'agent',
                 ContentType    => 'text/plain; charset=ISO-8859-15',
                 Subject        => 'some short description',
-                Body           => '<OTRS_Tiket_NotExisting>',
+                Body           => '<KIX_Tiket_NotExisting>',
                 HistoryType    => 'OwnerUpdate',
                 HistoryComment => 'Some free text!',
                 From           => 'Some Agent <email@example.com>',
@@ -916,7 +916,7 @@ for my $Test (@Tests) {
             if (
                 $OrigTest->{Config}->{Config}->{$Attribute}
                 && $OrigTest->{Config}->{Config}->{$Attribute}
-                =~ m{\A<OTRS_TICKET_([A-Za-z0-9_]+)>\z}msx
+                =~ m{\A<KIX_TICKET_([A-Za-z0-9_]+)>\z}msx
                 )
             {
                 $ExpectedValue = $Ticket{$1} // '';
@@ -933,7 +933,7 @@ for my $Test (@Tests) {
                     );
 
                 }
-                elsif ( $OrigTest->{Config}->{Config}->{$Attribute} =~ m{OTRS_TICKET_DynamicField_(\S+?)_Value} ) {
+                elsif ( $OrigTest->{Config}->{Config}->{$Attribute} =~ m{KIX_TICKET_DynamicField_(\S+?)_Value} ) {
                     $Self->IsNot(
                         $Test->{Config}->{Config}->{$Attribute},
                         $OrigTest->{Config}->{Config}->{$Attribute},
@@ -998,7 +998,7 @@ for my $Test (@Tests) {
                             . " $Article{ArticleID} match expected value",
                     );
                 }
-                elsif ( $OrigTest->{Config}->{Config}->{$Attribute} =~ m{OTRS_TICKET_DynamicField_(\S+?)_Value} ) {
+                elsif ( $OrigTest->{Config}->{Config}->{$Attribute} =~ m{KIX_TICKET_DynamicField_(\S+?)_Value} ) {
 
                     my $DynamicFieldName = $1;
 

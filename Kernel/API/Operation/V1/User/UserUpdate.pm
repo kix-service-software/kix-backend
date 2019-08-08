@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -106,7 +106,7 @@ sub ParameterDefinition {
         'User::UserEmail' => {
             RequiresValueIfUsed => 1
         },
-    }
+        }
 }
 
 =item Run()
@@ -149,6 +149,7 @@ sub Run {
     my $User = $Self->_Trim(
         Data => $Param{Data}->{User},
     );
+    delete $User->{UserID};
 
     # check UserLogin exists
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
@@ -161,11 +162,11 @@ sub Run {
     }
 
     # check if UserLogin already exists
-    if ( IsStringWithData($User->{UserLogin}) ) {
+    if ( IsStringWithData( $User->{UserLogin} ) ) {
         my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
             Search => $User->{UserLogin},
         );
-        if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+        if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Can not update user. Another user with same login already exists.',
@@ -173,34 +174,33 @@ sub Run {
         }
     }
 
-
     # check UserEmail exists
-    if ( IsStringWithData($User->{UserEmail}) ) {
+    if ( IsStringWithData( $User->{UserEmail} ) ) {
         my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
             PostMasterSearch => $User->{UserEmail},
         );
-        if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+        if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Can not update user. Another user with same email address already exists.',
             );
         }
     }
-    
+
     # update User
     my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
         %UserData,
         %{$User},
-        UserPw        => $User->{UserPw},
-        ChangeUserID  => $Self->{Authorization}->{UserID},
-    );    
+        UserPw       => $User->{UserPw},
+        ChangeUserID => $Self->{Authorization}->{UserID},
+    );
     if ( !$Success ) {
         return $Self->_Error(
             Code => 'Object.UnableToUpdate',
         );
     }
-    
+
     return $Self->_Success(
         UserID => $UserData{UserID},
-    );   
+    );
 }

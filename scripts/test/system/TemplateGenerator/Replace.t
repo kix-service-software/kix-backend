@@ -140,9 +140,9 @@ my $TicketID = $TicketObject->TicketCreate(
     Queue         => 'Raw',
     Lock          => 'unlock',
     Priority      => '3 normal',
-    State         => 'closed successful',
-    CustomerNo    => '123465',
-    Contact  => $TestCustomerLogin,
+    State         => 'closed',
+    OrganisationID => '123465',
+    ContactID     => $TestCustomerLogin,
     OwnerID       => $TestUser{UserID},
     ResponsibleID => $TestUser2{UserID},
     UserID        => $TestUser3{UserID},
@@ -202,7 +202,7 @@ my @Tests = (
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_From>',
+        Template => 'Test <KIX_CUSTOMER_From>',
         Result   => 'Test test@home.com',
     },
     {
@@ -211,7 +211,7 @@ my @Tests = (
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_FROM>',
+        Template => 'Test <KIX_CUSTOMER_FROM>',
         Result   => 'Test test@home.com',
     },
     {
@@ -220,157 +220,157 @@ my @Tests = (
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_INVALID_TAG>',
+        Template => 'Test <KIX_CUSTOMER_INVALID_TAG>',
         Result   => 'Test -',
     },
     {
-        Name => 'OTRS customer subject',    # <OTRS_CUSTOMER_SUBJECT>
+        Name => 'KIX customer subject',    # <KIX_CUSTOMER_SUBJECT>
         Data => {
             From    => 'test@home.com',
             Subject => 'otrs',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_SUBJECT>',
+        Template => 'Test <KIX_CUSTOMER_SUBJECT>',
         Result   => 'Test otrs',
     },
     {
-        Name => 'OTRS customer subject 3 letters',    # <OTRS_CUSTOMER_SUBJECT[20]>
+        Name => 'KIX customer subject 3 letters',    # <KIX_CUSTOMER_SUBJECT[20]>
         Data => {
             From    => 'test@home.com',
             Subject => 'otrs',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_SUBJECT[3]>',
+        Template => 'Test <KIX_CUSTOMER_SUBJECT[3]>',
         Result   => 'Test otr [...]',
     },
     {
-        Name => 'OTRS customer subject 20 letters + garbarge',    # <OTRS_CUSTOMER_SUBJECT[20]>
+        Name => 'KIX customer subject 20 letters + garbarge',    # <KIX_CUSTOMER_SUBJECT[20]>
         Data => {
             From    => 'test@home.com',
             Subject => 'RE: otrs',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_SUBJECT[20]>',
+        Template => 'Test <KIX_CUSTOMER_SUBJECT[20]>',
         Result   => 'Test otrs',
     },
     {
-        Name => 'OTRS responsible firstname',                     # <OTRS_RESPONSIBLE_UserFirstname>
+        Name => 'KIX responsible firstname',                     # <KIX_RESPONSIBLE_UserFirstname>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_RESPONSIBLE_UserFirstname> <OTRS_RESPONSIBLE_nonexisting>',
+        Template => 'Test <KIX_RESPONSIBLE_UserFirstname> <KIX_RESPONSIBLE_nonexisting>',
         Result   => "Test $TestUser2{UserFirstname} -",
     },
     {
-        Name => 'OTRS_TICKET_RESPONSIBLE firstname',              # <OTRS_RESPONSIBLE_UserFirstname>
+        Name => 'KIX_TICKET_RESPONSIBLE firstname',              # <KIX_RESPONSIBLE_UserFirstname>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_RESPONSIBLE_UserFirstname> <OTRS_TICKET_RESPONSIBLE_nonexisting>',
+        Template => 'Test <KIX_TICKET_RESPONSIBLE_UserFirstname> <KIX_TICKET_RESPONSIBLE_nonexisting>',
         Result   => "Test $TestUser2{UserFirstname} -",
     },
     {
-        Name => 'OTRS owner firstname',                           # <OTRS_OWNER_*>
+        Name => 'KIX owner firstname',                           # <KIX_OWNER_*>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_OWNER_UserFirstname> <OTRS_OWNER_nonexisting>',
+        Template => 'Test <KIX_OWNER_UserFirstname> <KIX_OWNER_nonexisting>',
         Result   => "Test $TestUser{UserFirstname} -",
     },
     {
-        Name => 'OTRS_TICKET_OWNER firstname',                    # <OTRS_OWNER_*>
+        Name => 'KIX_TICKET_OWNER firstname',                    # <KIX_OWNER_*>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_OWNER_UserFirstname> <OTRS_TICKET_OWNER_nonexisting>',
+        Template => 'Test <KIX_TICKET_OWNER_UserFirstname> <KIX_TICKET_OWNER_nonexisting>',
         Result   => "Test $TestUser{UserFirstname} -",
     },
     {
-        Name => 'OTRS current firstname',                         # <OTRS_CURRENT_*>
+        Name => 'KIX current firstname',                         # <KIX_CURRENT_*>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_CURRENT_UserFirstname> <OTRS_CURRENT_nonexisting>',
+        Template => 'Test <KIX_CURRENT_UserFirstname> <KIX_CURRENT_nonexisting>',
         Result   => "Test $TestUser3{UserFirstname} -",
     },
     {
-        Name => 'OTRS ticket ticketid',                           # <OTRS_TICKET_*>
+        Name => 'KIX ticket ticketid',                           # <KIX_TICKET_*>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_TicketID>',
+        Template => 'Test <KIX_TICKET_TicketID>',
         Result   => 'Test ' . $TicketID,
     },
     {
-        Name => 'OTRS dynamic field (text)',                      # <OTRS_TICKET_DynamicField_*>
+        Name => 'KIX dynamic field (text)',                      # <KIX_TICKET_DynamicField_*>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_DynamicField_Replace1' . $RandomID . '>',
+        Template => 'Test <KIX_TICKET_DynamicField_Replace1' . $RandomID . '>',
         Result   => 'Test otrs',
     },
     {
-        Name => 'OTRS dynamic field value (text)',                # <OTRS_TICKET_DynamicField_*_Value>
+        Name => 'KIX dynamic field value (text)',                # <KIX_TICKET_DynamicField_*_Value>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_DynamicField_Replace1' . $RandomID . '_Value>',
+        Template => 'Test <KIX_TICKET_DynamicField_Replace1' . $RandomID . '_Value>',
         Result   => 'Test otrs',
     },
     {
-        Name => 'OTRS dynamic field (Dropdown)',                  # <OTRS_TICKET_DynamicField_*>
+        Name => 'KIX dynamic field (Dropdown)',                  # <KIX_TICKET_DynamicField_*>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_DynamicField_Replace2' . $RandomID . '>',
+        Template => 'Test <KIX_TICKET_DynamicField_Replace2' . $RandomID . '>',
         Result   => 'Test 1',
     },
     {
-        Name => 'OTRS dynamic field value (Dropdown)',            # <OTRS_TICKET_DynamicField_*_Value>
+        Name => 'KIX dynamic field value (Dropdown)',            # <KIX_TICKET_DynamicField_*_Value>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_TICKET_DynamicField_Replace2' . $RandomID . '_Value>',
+        Template => 'Test <KIX_TICKET_DynamicField_Replace2' . $RandomID . '_Value>',
         Result   => 'Test A',
     },
     {
-        Name     => 'OTRS config value',                          # <OTRS_CONFIG_*>
+        Name     => 'KIX config value',                          # <KIX_CONFIG_*>
         Data     => {},
         RichText => 0,
-        Template => 'Test <OTRS_CONFIG_DefaultTheme>',
+        Template => 'Test <KIX_CONFIG_DefaultTheme>',
         Result   => 'Test Standard',
     },
     {
-        Name     => 'OTRS secret config values, must be masked (even unknown settings)',
+        Name     => 'KIX secret config values, must be masked (even unknown settings)',
         Data     => {},
         RichText => 0,
         Template =>
-            'Test <OTRS_CONFIG_DatabasePw> <OTRS_CONFIG_Core::MirrorDB::Password> <OTRS_CONFIG_SomeOtherValue::Password> <OTRS_CONFIG_SomeOtherValue::Pw>',
+            'Test <KIX_CONFIG_DatabasePw> <KIX_CONFIG_Core::MirrorDB::Password> <KIX_CONFIG_SomeOtherValue::Password> <KIX_CONFIG_SomeOtherValue::Pw>',
         Result => 'Test xxx xxx xxx xxx',
     },
     {
-        Name     => 'OTRS secret config value and normal config value',
+        Name     => 'KIX secret config value and normal config value',
         Data     => {},
         RichText => 0,
-        Template => 'Test <OTRS_CONFIG_DatabasePw> and <OTRS_CONFIG_DefaultTheme>',
+        Template => 'Test <KIX_CONFIG_DatabasePw> and <KIX_CONFIG_DefaultTheme>',
         Result   => 'Test xxx and Standard',
     },
     {
-        Name     => 'OTRS secret config values with numbers',
+        Name     => 'KIX secret config values with numbers',
         Data     => {},
         RichText => 0,
         Template =>
-            'Test <OTRS_CONFIG_AuthModule::LDAP::SearchUserPw1> and <OTRS_CONFIG_AuthModule::LDAP::SearchUserPassword1>',
+            'Test <KIX_CONFIG_AuthModule::LDAP::SearchUserPw1> and <KIX_CONFIG_AuthModule::LDAP::SearchUserPassword1>',
         Result => 'Test xxx and xxx',
     },
     {
@@ -380,13 +380,13 @@ my @Tests = (
         },
         RichText => 1,
         Template =>
-            'mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20%3COTRS_CUSTOMER_From%3E&amp;body=From%3A%20%3COTRS_CUSTOMER_From%3E">E-Mail mit Subject und Body</a><br />
+            'mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20%3CKIX_CUSTOMER_From%3E&amp;body=From%3A%20%3CKIX_CUSTOMER_From%3E">E-Mail mit Subject und Body</a><br />
 <br />
-mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20%3COTRS_CUSTOMER_From%3E">E-Mail mit Subject</a><br />
+mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20%3CKIX_CUSTOMER_From%3E">E-Mail mit Subject</a><br />
 <br />
-mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20%3COTRS_CUSTOMER_From%3E">E-Mail mit Body</a><br />',
+mailto-Link <a href="mailto:skywalker@test.org?body=From%3A%20%3CKIX_CUSTOMER_From%3E">E-Mail mit Body</a><br />',
         Result =>
-            'mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20test%40home.com&amp;body=From%3A%20test%40home.com">E-Mail mit Subject und Body</a><br /><br />mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20test%40home.com">E-Mail mit Subject</a><br /><br />mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20test%40home.com">E-Mail mit Body</a><br />',
+            'mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20test%40home.com&amp;body=From%3A%20test%40home.com">E-Mail mit Subject und Body</a><br /><br />mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20test%40home.com">E-Mail mit Subject</a><br /><br />mailto-Link <a href="mailto:skywalker@test.org?body=From%3A%20test%40home.com">E-Mail mit Body</a><br />',
     },
     {
         Name => 'mailto-Links',
@@ -395,20 +395,20 @@ mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20%3COTRS_CUSTOMER_F
         },
         RichText => 0,
         Template =>
-            'mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20%3COTRS_CUSTOMER_From%3E&amp;body=From%3A%20%3COTRS_CUSTOMER_From%3E">E-Mail mit Subject und Body</a><br />
+            'mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20%3CKIX_CUSTOMER_From%3E&amp;body=From%3A%20%3CKIX_CUSTOMER_From%3E">E-Mail mit Subject und Body</a><br />
 <br />
-mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20%3COTRS_CUSTOMER_From%3E">E-Mail mit Subject</a><br />
+mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20%3CKIX_CUSTOMER_From%3E">E-Mail mit Subject</a><br />
 <br />
-mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20%3COTRS_CUSTOMER_From%3E">E-Mail mit Body</a><br />',
+mailto-Link <a href="mailto:skywalker@test.org?body=From%3A%20%3CKIX_CUSTOMER_From%3E">E-Mail mit Body</a><br />',
         Result =>
-            'mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20test%40home.com&amp;body=From%3A%20test%40home.com">E-Mail mit Subject und Body</a><br />
+            'mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20test%40home.com&amp;body=From%3A%20test%40home.com">E-Mail mit Subject und Body</a><br />
 <br />
-mailto-Link <a href="mailto:skywalker@otrs.org?subject=From%3A%20test%40home.com">E-Mail mit Subject</a><br />
+mailto-Link <a href="mailto:skywalker@test.org?subject=From%3A%20test%40home.com">E-Mail mit Subject</a><br />
 <br />
-mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20test%40home.com">E-Mail mit Body</a><br />',
+mailto-Link <a href="mailto:skywalker@test.org?body=From%3A%20test%40home.com">E-Mail mit Body</a><br />',
     },
     {
-        Name => 'OTRS AGENT + CUSTOMER FROM',    # <OTRS_TICKET_DynamicField_*_Value>
+        Name => 'KIX AGENT + CUSTOMER FROM',    # <KIX_TICKET_DynamicField_*_Value>
         Data => {
             From => 'testcustomer@home.com',
         },
@@ -416,12 +416,12 @@ mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20test%40home.com">E
             From => 'testagent@home.com',
         },
         RichText => 0,
-        Template => 'Test <OTRS_AGENT_From> - <OTRS_CUSTOMER_From>',
+        Template => 'Test <KIX_AGENT_From> - <KIX_CUSTOMER_From>',
         Result   => 'Test testagent@home.com - testcustomer@home.com',
     },
     {
         Name =>
-            'OTRS AGENT + CUSTOMER BODY',   # this is an special case, it sets the Body as it is since is the Data param
+            'KIX AGENT + CUSTOMER BODY',   # this is an special case, it sets the Body as it is since is the Data param
         Data => {
             Body => "Line1\nLine2\nLine3",
         },
@@ -429,12 +429,12 @@ mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20test%40home.com">E
             Body => "Line1\nLine2\nLine3",
         },
         RichText => 0,
-        Template => 'Test <OTRS_AGENT_BODY> - <OTRS_CUSTOMER_BODY>',
+        Template => 'Test <KIX_AGENT_BODY> - <KIX_CUSTOMER_BODY>',
         Result   => "Test Line1\nLine2\nLine3 - Line1\nLine2\nLine3",
     },
     {
         Name =>
-            'OTRS AGENT + CUSTOMER BODY With RichText enabled'
+            'KIX AGENT + CUSTOMER BODY With RichText enabled'
         ,    # this is an special case, it sets the Body as it is since is the Data param
         Data => {
             Body => "Line1\nLine2\nLine3",
@@ -443,7 +443,7 @@ mailto-Link <a href="mailto:skywalker@otrs.org?body=From%3A%20test%40home.com">E
             Body => "Line1\nLine2\nLine3",
         },
         RichText => 1,
-        Template => 'Test &lt;OTRS_AGENT_BODY&gt; - &lt;OTRS_CUSTOMER_BODY&gt;',
+        Template => 'Test &lt;KIX_AGENT_BODY&gt; - &lt;KIX_CUSTOMER_BODY&gt;',
         Result   => "Test Line1<br/>
 Line2<br/>
 Line3 - Line1<br/>
@@ -451,7 +451,7 @@ Line2<br/>
 Line3",
     },
     {
-        Name => 'OTRS AGENT + CUSTOMER BODY[2]',
+        Name => 'KIX AGENT + CUSTOMER BODY[2]',
         Data => {
             Body => "Line1\nLine2\nLine3",
         },
@@ -459,11 +459,11 @@ Line3",
             Body => "Line1\nLine2\nLine3",
         },
         RichText => 0,
-        Template => 'Test <OTRS_AGENT_BODY[2]> - <OTRS_CUSTOMER_BODY[2]>',
+        Template => 'Test <KIX_AGENT_BODY[2]> - <KIX_CUSTOMER_BODY[2]>',
         Result   => "Test > Line1\n> Line2 - > Line1\n> Line2",
     },
     {
-        Name => 'OTRS AGENT + CUSTOMER BODY[7] with RichText enabled',
+        Name => 'KIX AGENT + CUSTOMER BODY[7] with RichText enabled',
         Data => {
             Body => "Line1\nLine2\nLine3\nLine4\nLine5\nLine6\nLine7\nLine8\nLine9",
         },
@@ -471,7 +471,7 @@ Line3",
             Body => "Line1\nLine2\nLine3\nLine4\nLine5\nLine6\nLine7\nLine8\nLine9",
         },
         RichText => 1,
-        Template => 'Test &lt;OTRS_AGENT_BODY[7]&gt; - &lt;OTRS_CUSTOMER_BODY[7]&gt;',
+        Template => 'Test &lt;KIX_AGENT_BODY[7]&gt; - &lt;KIX_CUSTOMER_BODY[7]&gt;',
         Result =>
             'Test <div  type="cite" style="border:none;border-left:solid blue 1.5pt;padding:0cm 0cm 0cm 4.0pt">Line1<br/>
 Line2<br/>
@@ -488,7 +488,7 @@ Line6<br/>
 Line7</div>',
     },
     {
-        Name => 'OTRS AGENT + CUSTOMER EMAIL',    # EMAIL without [ ] does not exists
+        Name => 'KIX AGENT + CUSTOMER EMAIL',    # EMAIL without [ ] does not exists
         Data => {
             Body => "Line1\nLine2\nLine3",
         },
@@ -496,11 +496,11 @@ Line7</div>',
             Body => "Line1\nLine2\nLine3",
         },
         RichText => 0,
-        Template => 'Test <OTRS_AGENT_EMAIL> - <OTRS_CUSTOMER_EMAIL>',
+        Template => 'Test <KIX_AGENT_EMAIL> - <KIX_CUSTOMER_EMAIL>',
         Result   => "Test - - -",
     },
     {
-        Name => 'OTRS AGENT + CUSTOMER EMAIL[2]',
+        Name => 'KIX AGENT + CUSTOMER EMAIL[2]',
         Data => {
             Body => "Line1\nLine2\nLine3",
         },
@@ -508,21 +508,21 @@ Line7</div>',
             Body => "Line1\nLine2\nLine3",
         },
         RichText => 0,
-        Template => 'Test <OTRS_AGENT_EMAIL[2]> - <OTRS_CUSTOMER_EMAIL[2]>',
+        Template => 'Test <KIX_AGENT_EMAIL[2]> - <KIX_CUSTOMER_EMAIL[2]>',
         Result   => "Test > Line1\n> Line2 - > Line1\n> Line2",
     },
     {
-        Name => 'OTRS COMMENT',    # EMAIL without [ ] does not exists
+        Name => 'KIX COMMENT',    # EMAIL without [ ] does not exists
         Data => {
             Body => "Line1\nLine2\nLine3",
         },
         RichText => 0,
-        Template => 'Test <OTRS_COMMENT>',
+        Template => 'Test <KIX_COMMENT>',
         Result   => "Test > Line1\n> Line2\n> Line3",
     },
 
     {
-        Name => 'OTRS AGENT + CUSTOMER SUBJECT[2]',
+        Name => 'KIX AGENT + CUSTOMER SUBJECT[2]',
         Data => {
             Subject => '0123456789'
         },
@@ -530,28 +530,28 @@ Line7</div>',
             Subject => '987654321'
         },
         RichText => 0,
-        Template => 'Test <OTRS_AGENT_SUBJECT[2]> - <OTRS_CUSTOMER_SUBJECT[2]>',
+        Template => 'Test <KIX_AGENT_SUBJECT[2]> - <KIX_CUSTOMER_SUBJECT[2]>',
         Result   => "Test 98 [...] - 01 [...]",
     },
     {
-        Name     => 'OTRS CUSTOMER REALNAME',
+        Name     => 'KIX CUSTOMER REALNAME',
         Data     => {},
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_REALNAME>',
+        Template => 'Test <KIX_CUSTOMER_REALNAME>',
         Result   => "Test $TestCustomerLogin $TestCustomerLogin",
     },
     {
-        Name     => 'OTRS CUSTOMER DATA UserFirstname',
+        Name     => 'KIX CUSTOMER DATA UserFirstname',
         Data     => {},
         RichText => 0,
-        Template => 'Test <OTRS_CUSTOMER_DATA_UserFirstname>',
+        Template => 'Test <KIX_CUSTOMER_DATA_UserFirstname>',
         Result   => "Test $TestCustomerLogin",
     },
     {
-        Name     => 'OTRS <OTRS_NOTIFICATION_RECIPIENT_UserFullname>',
+        Name     => 'KIX <KIX_NOTIFICATION_RECIPIENT_UserFullname>',
         Data     => {},
         RichText => 0,
-        Template => 'Test <OTRS_NOTIFICATION_RECIPIENT_UserFullname> <OTRS_NOTIFICATION_RECIPIENT_nonexisting>',
+        Template => 'Test <KIX_NOTIFICATION_RECIPIENT_UserFullname> <KIX_NOTIFICATION_RECIPIENT_nonexisting>',
         Result   => "Test $TestUser4{UserFullname} -",
     },
 );

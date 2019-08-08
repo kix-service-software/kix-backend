@@ -89,7 +89,6 @@ for my $Key (qw(Database Host Type User Version)) {
     );
 }
 
-#rbo - T2016121190001552 - renamed OTRS to KIX
 my %KIXInfo = $EnvironmentObject->KIXInfoGet();
 
 for my $Key (qw(Version Home Host Product SystemID DefaultLanguage)) {

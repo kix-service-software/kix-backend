@@ -1,0 +1,72 @@
+{
+   "$id" : "#MailFilterPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The mail filter request object for update.",
+   "type" : "object",
+   "properties" : {
+      "MailFilter" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Match" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Key" : {
+                        "description" : "relevant email or x-kix header",
+                        "type" : "string"
+                     },
+                     "Not" : {
+                        "description" : "to negate value",
+                        "type" : "integer"
+                     },
+                     "Value" : {
+                        "description" : "value of header, regular expression is possible",
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Key",
+                     "Value"
+                  ]
+               }
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Set" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Key" : {
+                        "description" : "relevant x-kix header",
+                        "type" : "string"
+                     },
+                     "Value" : {
+                        "description" : "value for header",
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Key",
+                     "Value"
+                  ]
+               }
+            },
+            "StopAfterMatch" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "MailFilter"
+   ]
+}

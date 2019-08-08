@@ -376,7 +376,7 @@ my @Tests = (
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
-                    '<OTRS_TICKET_Title>',
+                    '<KIX_TICKET_Title>',
                 Body =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 HistoryType    => 'OwnerUpdate',
@@ -407,7 +407,7 @@ my @Tests = (
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
-                    '<OTRS_TICKET_NotExisting> - tag not found',
+                    '<KIX_TICKET_NotExisting> - tag not found',
                 Body =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 HistoryType    => 'OwnerUpdate',
@@ -438,7 +438,7 @@ my @Tests = (
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
-                    '<OTRS_TICKET_NotExisting> - tag not found',
+                    '<KIX_TICKET_NotExisting> - tag not found',
                 Body =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 HistoryType    => 'OwnerUpdate',
@@ -469,7 +469,7 @@ my @Tests = (
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
-                    '<OTRS_TICKET_DynamicField_' . $TextFieldName . '_Value>',
+                    '<KIX_TICKET_DynamicField_' . $TextFieldName . '_Value>',
                 Body =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 HistoryType    => 'OwnerUpdate',
@@ -500,7 +500,7 @@ my @Tests = (
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
-                    '<OTRS_TICKET_DynamicField_' . $DropDownFieldName . '>',
+                    '<KIX_TICKET_DynamicField_' . $DropDownFieldName . '>',
                 Body =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 HistoryType    => 'OwnerUpdate',
@@ -531,7 +531,7 @@ my @Tests = (
                 SenderType  => 'agent',
                 ContentType => 'text/plain; charset=ISO-8859-15',
                 Subject =>
-                    '<OTRS_TICKET_DynamicField_' . $MultiSelectFieldName . '_Value>',
+                    '<KIX_TICKET_DynamicField_' . $MultiSelectFieldName . '_Value>',
                 Body =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 HistoryType    => 'OwnerUpdate',
@@ -600,7 +600,7 @@ for my $Test (@Tests) {
             next ATTRIBUTE if $ExcludedArtributes{$Attribute};
 
             if (
-                $OrigTest->{Config}->{Config}->{$Attribute} eq '<OTRS_TICKET_NotExisting>'
+                $OrigTest->{Config}->{Config}->{$Attribute} eq '<KIX_TICKET_NotExisting>'
                 && $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('Type') eq 'oracle'
                 )
             {
@@ -624,14 +624,14 @@ for my $Test (@Tests) {
 
             if (
                 $OrigTest->{Config}->{Config}->{$Attribute}
-                =~ m{\A<OTRS_TICKET_([A-Za-z0-9_]+)>\z}msx
+                =~ m{\A<KIX_TICKET_([A-Za-z0-9_]+)>\z}msx
                 )
             {
                 $ExpectedValue = $Ticket{$1} // '';
 
                 if (
                     $OrigTest->{Config}->{Config}->{$Attribute}
-                    =~ m{\A<OTRS_TICKET_DynamicField_([A-Za-z0-9_]+)_Value>\z}msx
+                    =~ m{\A<KIX_TICKET_DynamicField_([A-Za-z0-9_]+)_Value>\z}msx
                     )
                 {
                     my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(

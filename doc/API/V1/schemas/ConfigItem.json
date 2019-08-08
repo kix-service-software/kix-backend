@@ -55,20 +55,20 @@
          "readOnly" : true
       },
       "CurrentVersion" : {
-         "$ref" : "#/definitions/ConfigItemVersion"
+         "$ref" : "#/definitions/_ConfigItemVersion_json"
       },
       "History" : {
          "description" : "added via include \"History\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
+            "$ref" : "#/definitions/_ConfigItemHistory_json"
          }
       },
       "Images" : {
          "description" : "added via include \"Images\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemImage"
+            "$ref" : "#/definitions/_ConfigItemImage_json"
          }
       },
       "LastVersionID" : {
@@ -86,7 +86,7 @@
          "description" : "added via include \"Versions\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemVersion"
+            "$ref" : "#/definitions/_ConfigItemVersion_json"
          }
       }
    },
@@ -100,10 +100,10 @@
       "ConfigItemID"
    ],
    "definitions" : {
-      "ConfigItemVersion" : {
-         "$id" : "#ConfigItemVersion",
+      "_ConfigItemClassDefinition_json" : {
+         "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item version object.",
+         "description" : "The config item class definition object.",
          "type" : "object",
          "properties" : {
             "Class" : {
@@ -111,10 +111,6 @@
                "readOnly" : true
             },
             "ClassID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -126,70 +122,22 @@
                "type" : "string",
                "readOnly" : true
             },
-            "CurDeplState" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CurDeplStateID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CurDeplStateType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CurInciState" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CurInciStateID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CurInciStateType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Data" : {
-               "description" : "added via include \"Data\"",
-               "type" : "object"
-            },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition"
-            },
-            "DeplState" : {
-               "type" : "string",
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
                "readOnly" : true
             },
-            "DeplStateID" : {
+            "DefinitionID" : {
                "type" : "integer",
                "readOnly" : true
             },
-            "DeplStateType" : {
+            "DefinitionString" : {
                "type" : "string",
                "readOnly" : true
             },
-            "InciState" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "InciStateID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "InciStateType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "PreparedData" : {
-               "description" : "added via include \"PreparedData\"",
-               "type" : "object"
-            },
-            "VersionID" : {
+            "Version" : {
                "type" : "integer",
                "readOnly" : true
             }
@@ -197,26 +145,15 @@
          "required" : [
             "Class",
             "ClassID",
-            "ConfigItemID",
             "CreateBy",
             "CreateTime",
-            "CurDeplState",
-            "CurDeplStateID",
-            "CurDeplStateType",
-            "CurInciState",
-            "CurInciStateID",
-            "CurInciStateType",
-            "DeplState",
-            "DeplStateID",
-            "DeplStateType",
-            "InciState",
-            "InciStateID",
-            "InciStateType",
-            "Name",
-            "VersionID"
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       },
-      "ConfigItemHistory" : {
+      "_ConfigItemHistory_json" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item history object.",
@@ -279,7 +216,7 @@
             "UserLogin"
          ]
       },
-      "ConfigItemImage" : {
+      "_ConfigItemImage_json" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item image object.",
@@ -318,10 +255,10 @@
             "ID"
          ]
       },
-      "ConfigItemClassDefinition" : {
-         "$id" : "#ConfigItemClassDefinition",
+      "_ConfigItemVersion_json" : {
+         "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item class definition object.",
+         "description" : "The config item version object.",
          "type" : "object",
          "properties" : {
             "Class" : {
@@ -329,6 +266,10 @@
                "readOnly" : true
             },
             "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -340,22 +281,70 @@
                "type" : "string",
                "readOnly" : true
             },
-            "Definition" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object"
-               },
-               "readOnly" : true
-            },
-            "DefinitionID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "DefinitionString" : {
+            "CurDeplState" : {
                "type" : "string",
                "readOnly" : true
             },
-            "Version" : {
+            "CurDeplStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CurDeplStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurInciState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurInciStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CurInciStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+            },
+            "DeplState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DeplStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DeplStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "InciState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "InciStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "InciStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
+            "VersionID" : {
                "type" : "integer",
                "readOnly" : true
             }
@@ -363,12 +352,23 @@
          "required" : [
             "Class",
             "ClassID",
+            "ConfigItemID",
             "CreateBy",
             "CreateTime",
-            "Definition",
-            "DefinitionID",
-            "DefinitionString",
-            "Version"
+            "CurDeplState",
+            "CurDeplStateID",
+            "CurDeplStateType",
+            "CurInciState",
+            "CurInciStateID",
+            "CurInciStateType",
+            "DeplState",
+            "DeplStateID",
+            "DeplStateType",
+            "InciState",
+            "InciStateID",
+            "InciStateType",
+            "Name",
+            "VersionID"
          ]
       }
    }

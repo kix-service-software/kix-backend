@@ -91,6 +91,7 @@ sub ParameterDefinition {
 
     return {
         'TextModuleID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },
@@ -148,6 +149,9 @@ sub Run {
         # convert Keywords to array
         my @Keywords = split(/\s+/, $TextModuleData{Keywords});
         $TextModuleData{Keywords} = \@Keywords;
+
+        # force numeric ID
+        $TextModuleData{ID} += 0;
 
         # add
         push(@TextModuleList, \%TextModuleData);

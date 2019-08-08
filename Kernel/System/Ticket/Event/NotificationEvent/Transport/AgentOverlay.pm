@@ -7,8 +7,6 @@
 # --
 
 package Kernel::System::Ticket::Event::NotificationEvent::Transport::AgentOverlay;
-## nofilter(TidyAll::Plugin::OTRS::Perl::LayoutObject)
-## nofilter(TidyAll::Plugin::OTRS::Perl::ParamObject)
 
 use strict;
 use warnings;

@@ -33,7 +33,7 @@ sub new {
     bless( $Self, $Type );
 
     # Debug 0=off 1=on
-    $Self->{Debug} = 0;
+    $Self->{Debug} = 1;
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');

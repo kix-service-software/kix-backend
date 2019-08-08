@@ -17,6 +17,7 @@ use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 use Data::Dumper;
 
+use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -67,7 +68,7 @@ sub new {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # get user table
-    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'user';
+    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'users';
     $Self->{UserTableUserID} = $ConfigObject->Get('DatabaseUserTableUserID') || 'id';
     $Self->{UserTableUserPW} = $ConfigObject->Get('DatabaseUserTableUserPW') || 'pw';
     $Self->{UserTableUser}   = $ConfigObject->Get('DatabaseUserTableUser')   || 'login';
@@ -173,7 +174,7 @@ sub GetUserData {
     my @Bind;
     my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, "
         . " title, first_name, last_name, $Self->{UserTableUserPW}, email, phone, mobile, "
-        . " comments, valid_id, create_time, change_time FROM $Self->{UserTable} WHERE ";
+        . " comments, valid_id, create_time, change_time, create_by, change_by FROM $Self->{UserTable} WHERE ";
 
     if ( $Param{User} ) {
         my $User = lc $Param{User};
@@ -209,6 +210,8 @@ sub GetUserData {
         $Data{ValidID}       = $Row[10];
         $Data{CreateTime}    = $Row[11];
         $Data{ChangeTime}    = $Row[12];
+        $Data{CreateBy}      = $Row[13];
+        $Data{ChangeBy}      = $Row[14];
     }
 
     # check data
@@ -329,7 +332,6 @@ sub GetUserData {
             }
         }
 
-print STDERR "GetUserData($Data{UserID}): Preferences=".Dumper(\%Preferences);
         # add preferences to data hash
         $Data{Preferences} = \%Preferences;
     }
@@ -1056,16 +1058,16 @@ sub UserList {
 
     my $SelectStr;
     if ( $Type eq 'Short' ) {
-        $SelectStr = "$ConfigObject->{DatabaseUserTableUserID}, "
-            . " $ConfigObject->{DatabaseUserTableUser}";
+        $SelectStr = "$Self->{UserTableUserID}, "
+            . " $Self->{UserTableUser}";
     }
     else {
-        $SelectStr = "$ConfigObject->{DatabaseUserTableUserID}, "
+        $SelectStr = "$Self->{UserTableUserID}, "
             . " last_name, first_name, "
-            . " $ConfigObject->{DatabaseUserTableUser}";
+            . " $Self->{UserTableUser}";
     }
 
-    my $SQL = "SELECT $SelectStr FROM $ConfigObject->{DatabaseUserTable}";
+    my $SQL = "SELECT $SelectStr FROM $Self->{UserTable}";
 
     # sql query
     if ($Valid) {
@@ -1114,8 +1116,8 @@ sub UserList {
             my %User = $Self->GetUserData(
                 UserID => $UserID,
             );
-            if ( $User{OutOfOfficeMessage} ) {
-                $Users{$UserID} .= ' ' . $User{OutOfOfficeMessage};
+            if ( $User{Preferences}->{OutOfOfficeMessage} ) {
+                $Users{$UserID} .= ' ' . $User{Preferences}->{OutOfOfficeMessage};
             }
         }
     }
@@ -1173,6 +1175,7 @@ return a list of all permission of a given user
 
     my %List = $UserObject->PermissionList(
         UserID => 123
+        RoleID => 456,                           # optional, restrict result to this role
         Types  => [ 'Resource', 'Object' ]       # optional
     );
 
@@ -1191,16 +1194,21 @@ sub PermissionList {
     }
 
     # check cache
-    my $CacheKey = 'PermissionList::'.$Param{UserID}.'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
+    my $CacheKey = 'PermissionList::'.$Param{UserID}.'::'.$Param{RoleID}.'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
+    # get all permissions from every valid role the user is assigned to
     my @Bind;
-    my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ?';
+    my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ? AND role_id IN (SELECT id FROM roles WHERE valid_id = 1)';
     push(@Bind, \$Param{UserID});
+    if ( $Param{RoleID} ) {
+        $SQL .= ' AND role_id = ?';
+        push(@Bind, \$Param{RoleID});
+    }
 
     # filter specific permission types
     if ( IsArrayRefWithData($Param{Types}) ) {
@@ -1313,7 +1321,7 @@ sub RoleList {
 
 returns true if the requested permission is granted
 
-    my @List = $UserObject->CheckPermission(
+    my ($Granted, $ResultingPermission) = $UserObject->CheckPermission(
         UserID              => 123,
         Types               => [ 'Resource', 'Object' ]
         Target              => '/tickets',
@@ -1337,10 +1345,113 @@ sub CheckPermission {
     }
 
     # UserID 1 has God Mode ;)
-    return 1 if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD) if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+
+    $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for target $Param{Target}");
+
+    # get list of all roles to resolve names
+    my %RoleList = $Kernel::OM->Get('Kernel::System::Role')->RoleList();
+
+    # get all roles the user is assigned to
+    my @UserRoleList = $Self->RoleList(
+        UserID => $Param{UserID}
+    );
+    
+    $Self->_PermissionDebug("roles assigned to UserID $Param{UserID}: " . join(', ', map { "\"$RoleList{$_}\" (ID $_)" } sort @UserRoleList));
+
+    # check the permission for each target level (from top to bottom) and role
+    my $ResultingPermission;
+    my $Target;
+    TARGETPART:
+    foreach my $TargetPart ( split(/\//, $Param{Target}) ) {
+        next if !$TargetPart;
+
+        $Target .= "/$TargetPart";
+
+        my $TargetPermission;
+        ROLEID:
+        foreach my $RoleID ( sort @UserRoleList ) {
+            my ($RoleGranted, $RolePermission) = $Self->_CheckPermissionForRole(
+                %Param,
+                Target => $Target,
+                RoleID => $RoleID,
+            );
+
+            # if no permissions have been found, go to the next role
+            next ROLEID if !defined $RolePermission;
+
+            # init the value
+            if ( !defined $TargetPermission ) {
+                $TargetPermission = 0;
+            }
+
+            # combine permissions
+            $TargetPermission |= ($RolePermission || 0);
+        }
+
+        # if we don't have a target permission don't try use it
+        next TARGETPART if !defined $TargetPermission;
+
+        # combine permissions
+        if ( defined $ResultingPermission ) {
+            $ResultingPermission &= ($TargetPermission || 0);
+        }
+        else {
+            $ResultingPermission = ($TargetPermission || 0);
+        }
+
+        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $ResultingPermission,
+            Format => 'Short'
+        );
+
+        $Self->_PermissionDebug("resulting permission on target $Target: $ResultingPermissionShort");
+    }
+
+    # check if we have a DENY 
+    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    my $Granted = ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}}) == Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}};
+
+    return ( $Granted, $ResultingPermission);
+}
+
+=item CheckPermissionForRole()
+
+returns true if the requested permission is granted for a given role
+
+    my ($Granted, $ResultingPermission) = $UserObject->CheckPermissionForRole(
+        UserID              => 123,
+        RoleID              => 456,
+        Types               => [ 'Resource', 'Object' ]
+        Target              => '/tickets',
+        RequestedPermission => 'READ'
+    );
+
+=cut
+
+sub _CheckPermissionForRole {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(UserID RoleID Target RequestedPermission) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    # UserID 1 has God Mode ;)
+    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD)  if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+
+    $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}");
 
     my %PermissionList = $Self->PermissionList(
         UserID => $Param{UserID},
+        RoleID => $Param{RoleID},
         Types  => $Param{Types},
     );
 
@@ -1352,32 +1463,31 @@ sub CheckPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/.*?/g;
         $Target =~ s/\//\\\//g;
+        $Target =~ s/\*/(\\w|\\d)+?/g;
 
         # check if permission target matches the target to be checked (check whole resources)
-        if ( $Param{Target} !~ /^$Target$/ ) {
-            # the permission target doesn't match the target itself (i.e. permission target "/tickets" vs. target "/tickets/123/articles")
-            # check it with a / at the end but just the beginning part (needed for permission inheritance)
-            next if $Param{Target} !~ /^$Target\//;
-        }
+        next if $Param{Target} !~ /^$Target$/;
 
         my %PermissionType = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
             ID => $Permission->{TypeID}
         );
 
         $RelevantPermissions{$PermissionType{Name}}->{$ID} = $Permission;
-
-        # check for a specific match
-        next if $Param{Target} !~ /^$Target$/;
-
-        # we found a specific permission for this request 
-        $SpecificPermissions{$PermissionType{Name}}->{$ID} = $Permission;
     }
 
-    $Self->_PermissionDebug("relevant permissions: ".Dumper(\%RelevantPermissions));
+    $Self->_PermissionDebug("relevant permissions for role $Param{RoleID} on target $Param{Target}: ".Dumper(\%RelevantPermissions));
 
-    return if !IsHashRefWithData(\%RelevantPermissions);
+    # return if no relevant permissions exist
+    if ( !IsHashRefWithData(\%RelevantPermissions) ) {
+        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => 0,
+            Format => 'Short'
+        );
+        $Self->_PermissionDebug("no relevant permissions found, returning");
+
+        return 0;
+    }
     
     # sum up all the relevant permissions
     my $ResultingPermission = 0;
@@ -1388,44 +1498,22 @@ sub CheckPermission {
             my $Permission = $RelevantPermissions{$Type}->{$ID};
             $ResultingPermission |= $Permission->{Value};
             if ( ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} for role $Param{RoleID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
                 last TYPE_RELEVANT;
             }
         }
     }
 
     # check if we have a DENY already
-    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
-
-    # we have our sum of all relevant permissions, now look if we have specific permissions
-    if ( %SpecificPermissions ) {
-        $Self->_PermissionDebug("specific permissions found: ".Dumper(\%SpecificPermissions));
-        my $ResultingSpecificPermission = 0;
-        # sum up all the specific permissions
-        TYPE_SPECIFIC:
-        foreach my $Type ( qw(Resource Object) ) {
-            PERMISSION_SPECIFIC:
-            foreach my $ID ( sort { length($SpecificPermissions{$Type}->{$a}->{Target}) <=> length($SpecificPermissions{$Type}->{$b}->{Target}) } keys %{$SpecificPermissions{$Type}} ) {            
-                my $Permission = $RelevantPermissions{$Type}->{$ID};
-                $ResultingSpecificPermission |= $Permission->{Value};
-                if ( ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                    $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
-                    last TYPE_SPECIFIC;
-                }
-            }
-        }
-
-        # now calculate the result
-        $ResultingPermission &= $ResultingSpecificPermission;
-    }
+    return (0, Kernel::System::Role::Permission->PERMISSION->{NONE}) if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
 
     my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
         Value  => $ResultingPermission,
         Format => 'Short'
     );
 
-    $Self->_PermissionDebug("resulting permission: $ResultingPermissionShort");
-    
+    $Self->_PermissionDebug("resulting permissions for role $Param{RoleID} on target $Param{Target}: $ResultingPermissionShort");
+
     # check if we have a DENY 
     return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
 
@@ -1512,7 +1600,6 @@ sub SetPreferences {
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
-print STDERR "User::SetPreferences($Param{UserID}): $Param{Key} = $Param{Value}\n";
     # set preferences
     return $PreferencesObject->SetPreferences(%Param);
 }

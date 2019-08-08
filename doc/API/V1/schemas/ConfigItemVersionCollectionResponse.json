@@ -7,7 +7,7 @@
       "ConfigItemVersion" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemVersion"
+            "$ref" : "#/definitions/_ConfigItemVersion_json"
          }
       }
    },
@@ -15,7 +15,60 @@
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "ConfigItemVersion" : {
+      "_ConfigItemClassDefinition_json" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      },
+      "_ConfigItemVersion_json" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item version object.",
@@ -70,7 +123,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition"
+               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
             },
             "DeplState" : {
                "type" : "string",
@@ -129,59 +182,6 @@
             "InciStateType",
             "Name",
             "VersionID"
-         ]
-      },
-      "ConfigItemClassDefinition" : {
-         "$id" : "#ConfigItemClassDefinition",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item class definition object.",
-         "type" : "object",
-         "properties" : {
-            "Class" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ClassID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Definition" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object"
-               },
-               "readOnly" : true
-            },
-            "DefinitionID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "DefinitionString" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Version" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Class",
-            "ClassID",
-            "CreateBy",
-            "CreateTime",
-            "Definition",
-            "DefinitionID",
-            "DefinitionString",
-            "Version"
          ]
       }
    }

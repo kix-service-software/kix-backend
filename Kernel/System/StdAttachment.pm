@@ -427,53 +427,6 @@ sub StdAttachmentLookup {
     return $DBValue;
 }
 
-=item StdAttachmentsByResponseID()
-
-DEPRECATED: This function will be removed in further versions of OTRS
-
-return a hash (ID => Name) of std. attachment by response id
-
-    my %StdAttachment = $StdAttachmentObject->StdAttachmentsByResponseID(
-        ID => 4711,
-    );
-
-=cut
-
-sub StdAttachmentsByResponseID {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no ID!'
-        );
-        return;
-    }
-
-    # db quote
-    for (qw(ID)) {
-        $Param{$_} = $Self->{DBObject}->Quote( $Param{$_}, 'Integer' );
-    }
-
-    # return data
-    my %Relation = $Self->{DBObject}->GetTableData(
-        Table => 'standard_template_attachment',
-        What  => 'standard_attachment_id, standard_template_id',
-        Where => "standard_template_id = $Param{ID}",
-    );
-    my %AllStdAttachments = $Self->StdAttachmentList( Valid => 1 );
-    my %Data;
-    for ( sort keys %Relation ) {
-        if ( $AllStdAttachments{$_} ) {
-            $Data{$_} = $AllStdAttachments{$_};
-        }
-        else {
-            delete $Data{$_};
-        }
-    }
-    return %Data;
-}
 
 =item StdAttachmentList()
 
@@ -499,67 +452,6 @@ sub StdAttachmentList {
         Clamp => 1,
         Valid => $Param{Valid},
     );
-}
-
-=item StdAttachmentSetResponses()
-
-DEPRECATED: This function will be removed in further versions of OTRS
-
-set std responses of response id
-
-    $StdAttachmentObject->StdAttachmentSetResponses(
-        ID               => 123,
-        AttachmentIDsRef => [1, 2, 3],
-        UserID           => 1,
-    );
-
-=cut
-
-sub StdAttachmentSetResponses {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(ID AttachmentIDsRef UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # add attachments to response
-    return if !$Self->{DBObject}->Do(
-        SQL  => 'DELETE FROM standard_template_attachment WHERE standard_template_id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
-    ATTACHMENT:
-    for my $ID ( @{ $Param{AttachmentIDsRef} } ) {
-        next ATTACHMENT if !$ID;
-        $Self->{DBObject}->Do(
-            SQL => 'INSERT INTO standard_template_attachment (standard_attachment_id, '
-                . 'standard_template_id, create_time, create_by, change_time, change_by)'
-                . ' VALUES ( ?, ?, current_timestamp, ?, current_timestamp, ?)',
-            Bind => [
-                \$ID, \$Param{ID}, \$Param{UserID}, \$Param{UserID},
-            ],
-        );
-
-        # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event     => 'CREATE',
-            Namespace => 'StandardAttachment.Response',
-            ObjectID  => $ID.'::'.$Param{ID},
-        );
-    }
-
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-
-    return 1;
 }
 
 =item StdAttachmentStandardTemplateMemberAdd()

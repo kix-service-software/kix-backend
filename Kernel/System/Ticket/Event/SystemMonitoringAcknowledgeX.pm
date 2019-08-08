@@ -364,7 +364,7 @@ sub _HTTP {
 #rbo - T2016121190001552 - added KIX placeholders
     # replace config tags
     $URL =~ s{<CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($1)}egx;
-    $URL =~ s{<(KIX|OTRS)_CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($2)}egx;
+    $URL =~ s{<KIX_CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($2)}egx;
 
     my $UserAgent = LWP::UserAgent->new();
     $UserAgent->timeout(15);

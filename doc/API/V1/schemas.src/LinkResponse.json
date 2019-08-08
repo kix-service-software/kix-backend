@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#LinkResponse",
+  "type": "object",
+  "description": "A response for link GET request.",
+  "properties": {
+    "Link": {
+      "$ref": "Link.json"
+    }
+  },
+  "required": [
+    "Link"
+  ]
+}

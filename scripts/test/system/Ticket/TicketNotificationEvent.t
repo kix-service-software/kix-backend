@@ -75,7 +75,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => 'example.com',
-    Contact => $ContactData{UserEmail},
+    Contact      => $ContactData{UserEmail},
     OwnerID      => $UserID,
     UserID       => $UserID,
 );
@@ -101,8 +101,8 @@ my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
     Channel        => 'note',
     CustomerVisible => 1,
-    SenderType     => 'customer',
-    From           => $ContactData{UserEmail},
+    SenderType     => 'external',
+    From           => $ContactData{Email},
     To             => $UserData{UserEmail},
     Subject        => 'some short description',
     Body           => 'the message text',
@@ -135,7 +135,7 @@ my $NotificationID = $NotificationEventObject->NotificationAdd(
             Subject => 'Test external note',
 
             # include non-breaking space (bug#10970)
-            Body => 'Ticket:&nbsp;<OTRS_TICKET_TicketID>&nbsp;<OTRS_OWNER_UserFirstname>',
+            Body => 'Ticket:&nbsp;<KIX_TICKET_TicketID>&nbsp;<KIX_OWNER_UserFirstname>',
 
             ContentType => 'text/html',
         },

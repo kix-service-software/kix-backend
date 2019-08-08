@@ -1,0 +1,111 @@
+{
+   "$id" : "#NotificationResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for notification GET request.",
+   "type" : "object",
+   "properties" : {
+      "Notification" : {
+         "$ref" : "#/definitions/_Notification_json"
+      }
+   },
+   "required" : [
+      "Notification"
+   ],
+   "definitions" : {
+      "_Notification_json" : {
+         "$id" : "#Notification",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The notification object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Data" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               },
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Message" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "object",
+                     "properties" : {
+                        "Body" : {
+                           "type" : "string"
+                        },
+                        "ContentType" : {
+                           "type" : "string"
+                        },
+                        "Subject" : {
+                           "type" : "string"
+                        }
+                     },
+                     "required" : [
+                        "Body",
+                        "ContentType",
+                        "Subject"
+                     ]
+                  }
+               },
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "Data",
+            "ID",
+            "Name",
+            "Message",
+            "ValidID"
+         ]
+      }
+   }
+}

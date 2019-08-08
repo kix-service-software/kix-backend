@@ -1,0 +1,82 @@
+{
+   "$id" : "#TranslationPattern",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The translation pattern object.",
+   "type" : "object",
+   "properties" : {
+      "AvailableLanguages" : {
+         "type" : "array",
+         "item" : {
+            "type" : "string"
+         },
+         "readOnly" : true
+      },
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Languages" : {
+         "description" : "added via include \"Languages\"",
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/_TranslationLanguage_json"
+         },
+         "readOnly" : true
+      },
+      "Value" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Value"
+   ],
+   "definitions" : {
+      "_TranslationLanguage_json" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PatternID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "PatternID",
+            "Language",
+            "Value"
+         ]
+      }
+   }
+}

@@ -49,6 +49,12 @@
   ConfigItemVersionPostRequest: !include ../types/ConfigItemVersion/ConfigItemVersionPostRequest.raml
   ConfigItemVersionPostResponse: !include ../types/ConfigItemVersion/ConfigItemVersionPostResponse.raml
 
+# ConsoleCommand
+  ConsoleCommandResponse: !include ../types/ConsoleCommand/ConsoleCommandResponse.raml
+  ConsoleCommandCollectionResponse: !include ../types/ConsoleCommand/ConsoleCommandCollectionResponse.raml
+  ConsoleCommandPostRequest: !include ../types/ConsoleCommand/ConsoleCommandPostRequest.raml
+  ConsoleCommandPostResponse: !include ../types/ConsoleCommand/ConsoleCommandPostResponse.raml
+
 # Contact
   ContactResponse: !include ../types/Contact/ContactResponse.raml
   ContactCollectionResponse: !include ../types/Contact/ContactCollectionResponse.raml
@@ -58,6 +64,9 @@
 
 # Error 
   Error: !include ../types/Error/Error.raml
+
+# FAQKeyword
+  FAQKeywordCollectionResponse: !include ../types/FAQKeyword/FAQKeywordCollectionResponse.raml
 
 # FollowUpType
   FollowUpTypeCollectionResponse: !include ../types/Queue/FollowUpTypeCollectionResponse.raml
@@ -74,9 +83,46 @@
   GeneralCatalogItemPatchRequest: !include ../types/GeneralCatalogItem/GeneralCatalogItemPatchRequest.raml
   GeneralCatalogItemPostPatchResponse: !include ../types/GeneralCatalogItem/GeneralCatalogItemPostPatchResponse.raml
 
+# Link
+  LinkResponse: !include ../types/Link/LinkResponse.raml
+  LinkCollectionResponse: !include ../types/Link/LinkCollectionResponse.raml
+  LinkPostRequest: !include ../types/Link/LinkPostRequest.raml
+  LinkPostResponse: !include ../types/Link/LinkPostResponse.raml
+
+# LinkType
+  LinkTypeCollectionResponse: !include ../types/Link/LinkTypeCollectionResponse.raml
+
+# LogFile
+  LogFileResponse: !include ../types/LogFile/LogFileResponse.raml
+  LogFileCollectionResponse: !include ../types/LogFile/LogFileCollectionResponse.raml
+
 # Lock
   LockResponse: !include ../types/Lock/LockResponse.raml
   LockCollectionResponse: !include ../types/Lock/LockCollectionResponse.raml
+
+# MailAccount
+  MailAccountResponse: !include ../types/MailAccount/MailAccountResponse.raml
+  MailAccountCollectionResponse: !include ../types/MailAccount/MailAccountCollectionResponse.raml
+  MailAccountPostRequest: !include ../types/MailAccount/MailAccountPostRequest.raml
+  MailAccountPatchRequest: !include ../types/MailAccount/MailAccountPatchRequest.raml
+  MailAccountPostPatchResponse: !include ../types/MailAccount/MailAccountPostPatchResponse.raml
+
+# MailAccountType
+  MailAccountTypeCollectionResponse: !include ../types/MailAccount/MailAccountTypeCollectionResponse.raml
+
+# MailFilter
+  MailFilterResponse: !include ../types/MailFilter/MailFilterResponse.raml
+  MailFilterCollectionResponse: !include ../types/MailFilter/MailFilterCollectionResponse.raml
+  MailFilterPostRequest: !include ../types/MailFilter/MailFilterPostRequest.raml
+  MailFilterPatchRequest: !include ../types/MailFilter/MailFilterPatchRequest.raml
+  MailFilterPostPatchResponse: !include ../types/MailFilter/MailFilterPostPatchResponse.raml
+
+# Notification
+  NotificationResponse: !include ../types/Notification/NotificationResponse.raml
+  NotificationCollectionResponse: !include ../types/Notification/NotificationCollectionResponse.raml
+  NotificationPostRequest: !include ../types/Notification/NotificationPostRequest.raml
+  NotificationPatchRequest: !include ../types/Notification/NotificationPatchRequest.raml
+  NotificationPostPatchResponse: !include ../types/Notification/NotificationPostPatchResponse.raml
 
 # ObjectIcon
   ObjectIconResponse: !include ../types/ObjectIcon/ObjectIconResponse.raml
@@ -142,9 +188,29 @@
 # Session 
   SessionResponse: !include ../types/Session/SessionResponse.raml
 
+# SLA 
+  SLAResponse: !include ../types/SLA/SLAResponse.raml
+  SLACollectionResponse: !include ../types/SLA/SLACollectionResponse.raml
+  SLAPostRequest: !include ../types/SLA/SLAPostRequest.raml
+  SLAPatchRequest: !include ../types/SLA/SLAPatchRequest.raml
+  SLAPostPatchResponse: !include ../types/SLA/SLAPostPatchResponse.raml
+
 # StateType
   StateTypeResponse: !include ../types/StateType/StateTypeResponse.raml
   StateTypeCollectionResponse: !include ../types/StateType/StateTypeCollectionResponse.raml
+
+# SysConfigOption
+  SysConfigOptionResponse: !include ../types/SysConfigOption/SysConfigOptionResponse.raml
+  SysConfigOptionCollectionResponse: !include ../types/SysConfigOption/SysConfigOptionCollectionResponse.raml
+  SysConfigOptionPatchRequest: !include ../types/SysConfigOption/SysConfigOptionPatchRequest.raml
+  SysConfigOptionPatchResponse: !include ../types/SysConfigOption/SysConfigOptionPatchResponse.raml
+
+# SysConfigOptionDefinition
+  SysConfigOptionDefinitionResponse: !include ../types/SysConfigOptionDefinition/SysConfigOptionDefinitionResponse.raml
+  SysConfigOptionDefinitionCollectionResponse: !include ../types/SysConfigOptionDefinition/SysConfigOptionDefinitionCollectionResponse.raml
+
+# SysConfigOptionType
+  SysConfigOptionTypeCollectionResponse: !include ../types/SysConfigOptionType/SysConfigOptionTypeCollectionResponse.raml
 
 # SystemAddress
   SystemAddressResponse: !include ../types/SystemAddress/SystemAddressResponse.raml
@@ -152,6 +218,16 @@
   SystemAddressPostRequest: !include ../types/SystemAddress/SystemAddressPostRequest.raml
   SystemAddressPatchRequest: !include ../types/SystemAddress/SystemAddressPatchRequest.raml
   SystemAddressPostPatchResponse: !include ../types/SystemAddress/SystemAddressPostPatchResponse.raml
+
+# TextModule
+  TextModuleResponse: !include ../types/TextModule/TextModuleResponse.raml
+  TextModuleCollectionResponse: !include ../types/TextModule/TextModuleCollectionResponse.raml
+  TextModulePostRequest: !include ../types/TextModule/TextModulePostRequest.raml
+  TextModulePatchRequest: !include ../types/TextModule/TextModulePatchRequest.raml
+  TextModulePostPatchResponse: !include ../types/TextModule/TextModulePostPatchResponse.raml
+
+# TextModuleCategory
+  TextModuleCategoryCollectionResponse: !include ../types/TextModule/TextModuleCategoryCollectionResponse.raml
 
 # TicketState
   TicketStateResponse: !include ../types/TicketState/TicketStateResponse.raml
@@ -168,16 +244,21 @@
   TicketTypePostPatchResponse: !include ../types/TicketType/TicketTypePostPatchResponse.raml
 
 # Translation
-  TranslationResponse: !include ../types/Translation/TranslationResponse.raml
   TranslationCollectionResponse: !include ../types/Translation/TranslationCollectionResponse.raml
-  TranslationPostRequest: !include ../types/Translation/TranslationPostRequest.raml
-  TranslationPatchRequest: !include ../types/Translation/TranslationPatchRequest.raml
-  TranslationPostPatchResponse: !include ../types/Translation/TranslationPostPatchResponse.raml
-  TranslationLanguageResponse: !include ../types/Translation/TranslationLanguageResponse.raml
-  TranslationLanguageCollectionResponse: !include ../types/Translation/TranslationLanguageCollectionResponse.raml
-  TranslationLanguagePostRequest: !include ../types/Translation/TranslationLanguagePostRequest.raml
-  TranslationLanguagePatchRequest: !include ../types/Translation/TranslationLanguagePatchRequest.raml
-  TranslationLanguagePostPatchResponse: !include ../types/Translation/TranslationLanguagePostPatchResponse.raml
+
+# TranslationLanguage
+  TranslationLanguageResponse: !include ../types/TranslationLanguage/TranslationLanguageResponse.raml
+  TranslationLanguageCollectionResponse: !include ../types/TranslationLanguage/TranslationLanguageCollectionResponse.raml
+  TranslationLanguagePostRequest: !include ../types/TranslationLanguage/TranslationLanguagePostRequest.raml
+  TranslationLanguagePatchRequest: !include ../types/TranslationLanguage/TranslationLanguagePatchRequest.raml
+  TranslationLanguagePostPatchResponse: !include ../types/TranslationLanguage/TranslationLanguagePostPatchResponse.raml
+
+# TranslationPattern
+  TranslationPatternResponse: !include ../types/TranslationPattern/TranslationPatternResponse.raml
+  TranslationPatternCollectionResponse: !include ../types/TranslationPattern/TranslationPatternCollectionResponse.raml
+  TranslationPatternPostRequest: !include ../types/TranslationPattern/TranslationPatternPostRequest.raml
+  TranslationPatternPatchRequest: !include ../types/TranslationPattern/TranslationPatternPatchRequest.raml
+  TranslationPatternPostPatchResponse: !include ../types/TranslationPattern/TranslationPatternPostPatchResponse.raml
 
 # User
   UserResponse: !include ../types/User/UserResponse.raml
@@ -185,11 +266,13 @@
   UserPostRequest: !include ../types/User/UserPostRequest.raml
   UserPatchRequest: !include ../types/User/UserPatchRequest.raml
   UserPostPatchResponse: !include ../types/User/UserPostPatchResponse.raml
-  UserPreferenceResponse: !include ../types/User/UserPreferenceResponse.raml
-  UserPreferenceCollectionResponse: !include ../types/User/UserPreferenceCollectionResponse.raml
-  UserPreferencePostRequest: !include ../types/User/UserPreferencePostRequest.raml
-  UserPreferencePatchRequest: !include ../types/User/UserPreferencePatchRequest.raml
-  UserPreferencePostPatchResponse: !include ../types/User/UserPreferencePostPatchResponse.raml
+
+# UserPreference
+  UserPreferenceResponse: !include ../types/UserPreference/UserPreferenceResponse.raml
+  UserPreferenceCollectionResponse: !include ../types/UserPreference/UserPreferenceCollectionResponse.raml
+  UserPreferencePostRequest: !include ../types/UserPreference/UserPreferencePostRequest.raml
+  UserPreferencePatchRequest: !include ../types/UserPreference/UserPreferencePatchRequest.raml
+  UserPreferencePostPatchResponse: !include ../types/UserPreference/UserPreferencePostPatchResponse.raml
 
 # UserRoleID
   UserRoleIDCollectionResponse: !include ../types/UserRoleID/UserRoleIDCollectionResponse.raml

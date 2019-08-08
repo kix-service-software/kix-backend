@@ -350,7 +350,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     CustomerID   => 'example.com',
-    Contact => 'customerOne@example.com',
+    Contact      => 'customerOne@example.com',
     OwnerID      => $UserID,
     UserID       => $UserID,
 );
@@ -365,7 +365,7 @@ my $ArticleID = $TicketObject->ArticleCreate(
     TicketID       => $TicketID,
     Channel        => 'note',
     CustomerVisible => 1,
-    SenderType     => 'customer',
+    SenderType     => 'external',
     From           => 'customerOne@example.com',
     To             => 'Some Agent A <agent-a@example.com>',
     Subject        => 'some short description',
@@ -519,12 +519,12 @@ for my $Test (@Tests) {
         Message => {
             en => {
                 Subject     => 'JobName',
-                Body        => 'JobName <OTRS_TICKET_TicketID> <OTRS_CONFIG_SendmailModule> <OTRS_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
                 ContentType => 'text/plain',
             },
             de => {
                 Subject     => 'JobName',
-                Body        => 'JobName <OTRS_TICKET_TicketID> <OTRS_CONFIG_SendmailModule> <OTRS_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
                 ContentType => 'text/plain',
             },
         },

@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MailFilter",
+  "type": "object",
+  "description": "The mail filter object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Match": {
+      "type": "array",
+      "readOnly": true,
+      "item": {
+        "type": "object",
+        "properties": {
+          "Key": {
+            "type": "string",
+            "description": "relevant email or x-kix header"
+          },
+          "Value": {
+            "type": "string",
+            "description": "value of header, regular expression is possible"
+          },
+          "Not": {
+            "type": "integer",
+            "description": "to negate value"
+          }
+        }
+      }
+    },
+    "Set": {
+      "type": "array",
+      "readOnly": true,
+      "item": {
+        "type": "object",
+        "properties": {
+          "Key": {
+            "type": "string",
+            "description": "relevant x-kix header"
+          },
+          "Value": {
+            "type": "string",
+            "description": "value for header"
+          }
+        }
+      }
+    },
+    "StopAfterMatch": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Name",
+    "ValidID"
+  ]
+}

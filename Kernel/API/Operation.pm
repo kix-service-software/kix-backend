@@ -141,7 +141,7 @@ sub new {
 
     # if validator init failed, bail out
     if ( ref $Self->{ValidatorObject} ne 'Kernel::API::Validator' ) {
-        return $Self->_GenerateErrorResponse(
+        return $Self->_Error(
             %{$Self->{ValidatorObject}},
         );
     }
@@ -324,7 +324,12 @@ sub _CheckPermission {
             RequestedPermission => $RequestedPermission,
         );
 
-        $Self->_PermissionDebug(sprintf("RequestURI = %s, requested permission = $RequestedPermission --> Granted = $Granted, allowed permission = 0x%04x", $ResourceBase.$Resource, ($AllowedPermission||0)));
+        my $AllowedPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $AllowedPermission || 0,
+            Format => 'Short'
+        );
+
+        $Self->_PermissionDebug(sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
 
         if ( $Granted ) {
             # build new list of allowed (item) resources
@@ -336,7 +341,11 @@ sub _CheckPermission {
     if ( scalar(@Resources) > 1 && scalar(@GrantedResources) < scalar(@Resources) ) {
         $Granted = 1;
         $Self->{AlteredRequestURI} = $ResourceBase.join(',', @GrantedResources);
-        $Self->_PermissionDebug(sprintf("altered RequestURI = %s, requested permission = $RequestedPermission --> Granted = $Granted, allowed permission = 0x%04x", $Self->{AlteredRequestURI}, ($AllowedPermission||0)));
+        my $AllowedPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $AllowedPermission || 0,
+            Format => 'Short'
+        );
+        $Self->_PermissionDebug(sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
     }
 
     my @AllowedMethods;

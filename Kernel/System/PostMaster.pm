@@ -54,7 +54,7 @@ create an object. Do not use it directly, instead use:
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         'Kernel::System::PostMaster' => {
             Email        => \@ArrayOfEmailContent,
-            Trusted      => 1, # 1|0 ignore X-OTRS header if false
+            Trusted      => 1, # 1|0 ignore X-KIX header if false
         },
     );
     my $PostMasterObject = $Kernel::OM->Get('Kernel::System::PostMaster');
@@ -93,7 +93,7 @@ sub new {
             || die "Found no '$Option' option in configuration!";
     }
 
-    # should I use x-otrs headers?
+    # should I use x-kix headers?
     $Self->{Trusted} = defined $Param{Trusted} ? $Param{Trusted} : 1;
 
     if ( $Self->{Trusted} ) {
@@ -112,12 +112,9 @@ sub new {
         my %HeaderLookup = map { $_ => 1 } @{ $Self->{'PostmasterX-Header'} };
 
         for my $DynamicField ( values %$DynamicFields ) {
-#rbo - T2016121190001552 - renamed X-KIX headers
             for my $Header (
                 'X-KIX-DynamicField-' . $DynamicField,
                 'X-KIX-FollowUp-DynamicField-' . $DynamicField,
-                'X-OTRS-DynamicField-' . $DynamicField,
-                'X-OTRS-FollowUp-DynamicField-' . $DynamicField,
                 )
             {
 
@@ -242,8 +239,6 @@ sub Run {
     }
 
     # should I ignore the incoming mail?
-#rbo - T2016121190001552 - renamed X-KIX headers
-    $GetParam->{'X-KIX-Ignore'} = $GetParam->{'X-KIX-Ignore'} || $GetParam->{'X-OTRS-Ignore'};
     if ( $GetParam->{'X-KIX-Ignore'} && $GetParam->{'X-KIX-Ignore'} =~ /(yes|true)/i ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'info',
@@ -634,7 +629,6 @@ sub GetEmailParams {
         || $GetParam{'X-Loop'}
         || $GetParam{'X-No-Loop'}
         || $GetParam{'X-KIX-Loop'}
-        || $GetParam{'X-OTRS-Loop'}
         || (
             $GetParam{'Auto-Submitted'}
             && substr( $GetParam{'Auto-Submitted'}, 0, 5 ) eq 'auto-'
@@ -661,25 +655,25 @@ sub GetEmailParams {
 
 #rbo - T2016121190001552 - renamed X-KIX headers
     # set sender type if not given
-    for my $Key (qw(X-KIX-SenderType X-KIX-FollowUp-SenderType X-OTRS-SenderType X-OTRS-FollowUp-SenderType)) {
+    for my $Key (qw(X-KIX-SenderType X-KIX-FollowUp-SenderType)) {
 
         if ( !$GetParam{$Key} ) {
-            $GetParam{$Key} = 'customer';
+            $GetParam{$Key} = 'external';
         }
 
-        # check if X-KIX-SenderType exists, if not, set customer
+        # check if X-KIX-SenderType exists, if not, set external
         if ( !$TicketObject->ArticleSenderTypeLookup( SenderType => $GetParam{$Key} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Can't find sender type '$GetParam{$Key}' in db, take 'customer'",
+                Message  => "Can't find sender type '$GetParam{$Key}' in db, take 'external'",
             );
-            $GetParam{$Key} = 'customer';
+            $GetParam{$Key} = 'external';
         }
     }
 
 #rbo - T2016121190001552 - renamed X-KIX headers
     # set article type if not given
-    for my $Key (qw(X-KIX-Channel X-KIX-FollowUp-Channel X-OTRS-Channel X-OTRS-FollowUp-Channel)) {
+    for my $Key (qw(X-KIX-Channel X-KIX-FollowUp-Channel)) {
         if ( !$GetParam{$Key} ) {
             $GetParam{$Key} = 'email';
             $GetParam{CustomerVisible} = 1;

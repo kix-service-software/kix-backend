@@ -1,0 +1,13 @@
+  displayName: Authentication
+  description: !include ../descriptions/resources/auth.md
+  post:
+    description: Manage existing sessions.
+    securedBy: [ null ]
+    body:
+      application/json:
+        type: AuthRequest
+    responses:
+      201:
+        body:
+          application/json:
+            type: AuthResponse

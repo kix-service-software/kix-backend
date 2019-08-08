@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SLACollectionResponse",
+  "type": "object",
+  "description": "A list of SLAs.",
+  "properties": {
+    "SLA": {
+      "type": "array",
+      "items": {
+        "$ref": "SLA.json"
+      }
+    }
+  },
+  "required": [
+    "SLA"
+  ]
+}

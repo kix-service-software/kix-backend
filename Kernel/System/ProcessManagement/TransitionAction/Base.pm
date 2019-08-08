@@ -125,8 +125,7 @@ sub ReplaceExtended {
         %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{QueueID} );
     }
 
-#rbo - T2016121190001552 - added KIX placeholders
-    my $Tag = $Start . '(KIX|OTRS)_LAST_';
+    my $Tag = $Start . 'KIX_LAST_';
     if ( $Param{Text} =~ /$Tag.+$End/i ) {
 
         # get last article data and replace it with <KIX_LAST_...
@@ -134,9 +133,8 @@ sub ReplaceExtended {
             TicketID => $Param{TicketID},
         );
 
-#rbo - T2016121190001552 - added KIX placeholders
         # replace <KIX_LAST_BODY> and <KIX_LAST_COMMENT> tags
-        for my $Key (qw(KIX_LAST_BODY KIX_LAST_COMMENT OTRS_LAST_BODY OTRS_LAST_COMMENT)) {
+        for my $Key (qw(KIX_LAST_BODY KIX_LAST_COMMENT)) {
             my $Tag2 = $Start . $Key;
             if ( $Param{Text} =~ /$Tag2$End(\n|\r|)/g ) {
                 my $Line       = 2500;
@@ -188,9 +186,8 @@ sub ReplaceExtended {
             }
         }
 
-#rbo - T2016121190001552 - added KIX placeholders
         # replace <KIX_LAST_SUBJECT[]> tags
-        my $Tag2 = $Start . '(KIX|OTRS)_LAST_SUBJECT';
+        my $Tag2 = $Start . 'KIX_LAST_SUBJECT';
         if ( $Param{Text} =~ /$Tag2\[(.+?)\]$End/g ) {
             my $SubjectChar = $2;
 
@@ -226,7 +223,6 @@ sub ReplaceExtended {
     }
     else
     {
-        # using TemplateGenerator from KIX4OTRS
         $Param{Text} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
             RichText => $Param{RichText},
             Text     => $Param{Text},

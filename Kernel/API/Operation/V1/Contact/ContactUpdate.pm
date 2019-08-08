@@ -152,10 +152,10 @@ sub Run {
 
     # check if ContactLogin already exists
     if ( IsStringWithData($Contact->{Login}) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
             Login => $Contact->{Login},
         );
-        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{Login}})) {        
+        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{ID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update contact. Another contact with same login already exists.',
@@ -163,13 +163,12 @@ sub Run {
         }
     }
 
-
     # check ContactEmail exists
     if ( IsStringWithData($Contact->{Email}) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
             PostMasterSearch => $Contact->{Email},
-        );
-        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{UserLogin}})) {        
+        );        
+        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{ID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update contact. Another contact with same email address already exists.',
@@ -229,6 +228,6 @@ sub Run {
     }
     
     return $Self->_Success(
-        ContactID => $Param{Data}->{ContactID}
+        ContactID => 0 + $ContactData{ID}   # force numeric ID
     );   
 }

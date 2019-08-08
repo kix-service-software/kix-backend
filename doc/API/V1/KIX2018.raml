@@ -2,7 +2,7 @@
 title: KIX 2018 REST API
 version: v1
 protocols: [ HTTP, HTTPS ]
-baseUri: http://{fqdn}:{port}/api.pl/webservice/core:$version
+baseUri: http://{fqdn}:{port}/api/$version
 baseUriParameters:
   fqdn:
     description: |
@@ -17,6 +17,8 @@ description: !include descriptions/description.md
 documentation:
   - title: Getting started
     content: !include descriptions/gettingStarted.md
+  - title: Responses
+    content: !include descriptions/responses.md
   - title: Permissions
     content: !include descriptions/permissions.md
   - title: Populate queries
@@ -47,26 +49,37 @@ traits: !include lib/traits.raml
 resourceTypes: !include lib/resourceTypes.raml
 
 # resources
-/channels: !include resources/channels.raml
+/auth: !include resources/auth.raml
 /clientregistrations: !include resources/clientregistrations.raml
 /cmdb: !include resources/cmdb.raml
 /contacts: !include resources/contacts.raml
+/faq: !include resources/faq.raml
 /i18n: !include resources/i18n.raml
-/generalcatalog: !include resources/generalcatalog.raml
-/objecticons: !include resources/objecticons.raml
+/links: !include resources/links.raml
 /organisations: !include resources/organisations.raml
-/priorities: !include resources/priorities.raml
-/queues: !include resources/queues.raml
-/roles: !include resources/roles.raml
-/sendertypes: !include resources/sendertypes.raml
-/services: !include resources/services.raml
 /session: !include resources/session.raml
-/sessions: !include resources/sessions.raml
-/statetypes: !include resources/statetypes.raml
-/systemaddresses: !include resources/systemaddresses.raml
-/ticketlocks: !include resources/ticketlocks.raml
-/ticketstates: !include resources/ticketstates.raml
-/tickettypes: !include resources/tickettypes.raml
-/user: !include resources/user.raml
-/users: !include resources/users.raml
-/valid: !include resources/valid.raml
+/system/cmdb: !include resources/system/cmdb.raml
+/system/communication/channels: !include resources/system/communication/channels.raml
+/system/communication/mailaccounts: !include resources/system/communication/mailaccounts.raml
+/system/communication/mailfilters: !include resources/system/communication/mailfilters.raml
+/system/communication/notifications: !include resources/system/communication/notifications.raml
+/system/communication/sendertypes: !include resources/system/communication/sendertypes.raml
+/system/communication/systemaddresses: !include resources/system/communication/systemaddresses.raml
+/system/config: !include resources/system/config.raml
+/system/console: !include resources/system/console.raml
+/system/i18n: !include resources/system/i18n.raml
+/system/generalcatalog: !include resources/system/generalcatalog.raml
+/system/logs: !include resources/system/logs.raml
+/system/objecticons: !include resources/system/objecticons.raml
+/system/roles: !include resources/system/roles.raml
+/system/services: !include resources/system/services.raml
+/system/sessions: !include resources/system/sessions.raml
+/system/slas: !include resources/system/slas.raml
+/system/textmodules: !include resources/system/textmodules.raml
+/system/ticket/locks: !include resources/system/ticket/locks.raml
+/system/ticket/priorities: !include resources/system/ticket/priorities.raml
+/system/ticket/queues: !include resources/system/ticket/queues.raml
+/system/ticket/states: !include resources/system/ticket/states.raml
+/system/ticket/types: !include resources/system/ticket/types.raml
+/system/users: !include resources/system/users.raml
+/system/valid: !include resources/system/valid.raml

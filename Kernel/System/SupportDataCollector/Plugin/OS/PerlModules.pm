@@ -31,7 +31,6 @@ sub Run {
     my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
 
     my $Output;
-#rbo - T2016121190001552 - renamed OTRS to KIX
     open( my $FH, "-|", "perl $Home/bin/kix.CheckModules.pl nocolors --all" );
 
     while (<$FH>) {

@@ -658,8 +658,8 @@ $Self->Is(
 );
 
 # modify calendar 1
-my $TimeVacationDays1        = $ConfigObject->Get('TimeVacationDays::Calendar1');
-my $TimeVacationDaysOneTime1 = $ConfigObject->Get('TimeVacationDaysOneTime::Calendar1');
+my $TimeVacationDays1        = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDays::Calendar1');
+my $TimeVacationDaysOneTime1 = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDaysOneTime::Calendar1');
 
 # 2005-01-01
 $Vacation = $TimeObject->VacationCheck(

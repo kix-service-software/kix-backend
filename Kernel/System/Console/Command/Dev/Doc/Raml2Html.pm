@@ -78,6 +78,7 @@ sub Configure {
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my @ErrorFiles;
 
     my $SourceDirectory = $Self->GetOption('source-directory');
     my $SchemaDirectory = $Self->GetOption('schema-directory');
@@ -176,6 +177,12 @@ sub Run {
 
             if ( !$ValidationResult ) {
                 $Self->Print("<red>Unable to validate bundled schema $File against OpenAPI specification ($DraftURI).</red>\n");
+
+                # save for summary
+                push(@ErrorFiles, {
+                    Name => $File,
+                    Type => 'Schema'
+                });
             }
             else {
                 $Self->Print("<green>valid</green>\n");
@@ -242,11 +249,27 @@ sub Run {
                 foreach my $Line (@ValidationResult) {
                     $Self->Print("        <red>$Line</red>\n");
                 }
+
+                # save for summary
+                push(@ErrorFiles, {
+                    Name => $File,
+                    Type => 'Example'
+                });
             }
             else {
                 $Self->Print("<green>valid</green>\n");
             }
         }
+    }
+
+    # print summary in case of error
+    if ( @ErrorFiles ) {
+        $Self->Print("\nthe following files contained errors:\n");
+
+        foreach my $File ( @ErrorFiles ) {
+            $Self->Print("    <red>$File->{Name} ($File->{Type})</red>\n");
+        }
+        $Self->Print("\n");
     }
 
     # execute raml2html 

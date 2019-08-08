@@ -441,6 +441,7 @@ sub _TicketCreate {
     if ( IsArrayRefWithData($Ticket->{Articles}) ) {
 
         foreach my $Article ( @{$Ticket->{Articles}} ) {
+
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Ticket::ArticleCreate',
                 Data          => {

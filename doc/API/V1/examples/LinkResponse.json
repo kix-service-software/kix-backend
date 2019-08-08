@@ -1,0 +1,12 @@
+{
+    "Link": {
+        "CreateBy": 1,
+        "CreateTime": "2009-01-20 09:27:53",
+        "ID": 1781974,
+        "SourceKey": "180",
+        "SourceObject": "Ticket",
+        "TargetKey": "22",
+        "TargetObject": "Ticket",
+        "Type": "Normal"
+    }
+}

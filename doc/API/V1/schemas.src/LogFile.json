@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#LogFile",
+  "type": "object",
+  "description": "The log file object.",
+  "properties": {
+    "AccessTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "AccessTimeUnix": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Content": {
+      "type": "string",
+      "readOnly": true,
+      "description": "if included"
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateTimeUnix": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "DisplayName": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Filename": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Filesize": {
+      "type": "string",
+      "readOnly": true
+    },
+    "FilesizeRaw": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ModifyTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ModifyTimeUnix": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "AccessTime",
+    "AccessTimeUnix",
+    "CreateTime",
+    "CreateTimeUnix",
+    "DisplayName",
+    "Filename",
+    "Filesize",
+    "FilesizeRaw",
+    "ID",
+    "ModifyTime",
+    "ModifyTimeUnix"
+  ]
+}
