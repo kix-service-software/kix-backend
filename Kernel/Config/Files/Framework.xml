@@ -1593,17 +1593,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###SwitchButton" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the SwitchButton object in the Customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Session</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Switch to agent frontend and login automatically</Description>
-                <Title>Agent Frontend</Title>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="PreferencesGroups###PrintRichtext" Required="0" Valid="0">
         <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
         <Group>Framework</Group>
@@ -1638,8 +1627,7 @@
                 <Item Key="new">_ANY_</Item>
                 <Item Key="merged">_NONE_</Item>
                 <Item Key="removed">_NONE_</Item>
-                <Item Key="pending auto close+">_PREVIOUS_</Item>
-                <Item Key="pending auto close-">_PREVIOUS_</Item>
+                <Item Key="pending auto close">_PREVIOUS_,closed</Item>
                 <Item Key="pending reminder">_ANY_</Item>
             </Hash>
         </Setting>
@@ -1682,11 +1670,8 @@
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="closed successful">open</Item>
-                <Item Key="closed unsuccessful">open</Item>
-                <Item Key="pending auto close+">open</Item>
-                <Item Key="pending auto close-">open</Item>
-                <Item Key="pending auto reopen">open</Item>
+                <Item Key="closed">open</Item>
+                <Item Key="pending auto close">open</Item>
                 <Item Key="pending reminder">open</Item>
             </Hash>
         </Setting>
@@ -1992,7 +1977,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2036,7 +2021,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2080,7 +2065,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2124,7 +2109,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2168,7 +2153,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2212,7 +2197,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2256,7 +2241,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2300,7 +2285,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2344,7 +2329,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2388,7 +2373,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2432,7 +2417,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2476,7 +2461,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2520,7 +2505,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2564,7 +2549,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -2608,7 +2593,7 @@
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
-                <Item Key="CloseActionState">closed successful</Item>
+                <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
                 <Item Key="DefaultService">Host</Item>
             </Hash>
@@ -9082,66 +9067,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###Logout" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Logout of customer panel.</Description>
-                <Title></Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerPreferences" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Customer preferences.</Description>
-                <Title Translatable="1">Preferences</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerAccept" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">To accept login information, such as an EULA or license.</Description>
-                <Title Translatable="1">Info</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###PictureUpload" Required="1" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Picture upload module.</Description>
-                <Title Translatable="1">Picture-Upload</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###SpellingInline" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Spell checker.</Description>
-                <Title Translatable="1">Spell Checker</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="Stats::StatsHook" Required="1" Valid="1">
         <Description Translatable="1">Sets the stats hook.</Description>
         <Group>Framework</Group>
@@ -9600,30 +9525,6 @@ via the Preferences button after logging in.
             <String Regex="">icons/kix.ico</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###DynamicFieldAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>DynamicField AJAX handler</Description>
-                <Title>DynamicField AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerLinkObject" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Link Object</Description>
-                <Title>Link Object</Title>
-                <NavBarName></NavBarName>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="ContactPreferencesGroups###DefaultTicketType" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
         <Group>Framework</Group>
@@ -9917,18 +9818,6 @@ via the Preferences button after logging in.
                 <Item Key="Prio">3100</Item>
                 <Item Key="Active">1</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###TextModuleAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the TextModuleAJAXHandler object.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>Text Module AJAX handle</Description>
-                <Title>Text Module AJAX handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="TextModule::ImportExport###FileType" Required="0" Valid="1">
@@ -10251,18 +10140,6 @@ via the Preferences button after logging in.
                 <Item>Multiselect</Item>
                 <Item>Dropdown</Item>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###DynamicFieldObjectReferenceAJAXHandler" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the DynamicFieldObjectReferenceAJAXHandler object.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description>DynamicField ObjectReference AJAX Handler</Description>
-                <Title>DynamicField ObjectReference AJAX Handler</Title>
-                <NavBarName>Ticket</NavBarName>
-            </FrontendModuleReg>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="PostMaster::PreFilterModule###888-ExtendedFollowUp" Required="0" Valid="1">

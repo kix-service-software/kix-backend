@@ -32,9 +32,9 @@ my $TicketID = $TicketObject->TicketCreate(
     Queue        => 'Raw',
     Lock         => 'unlock',
     Priority     => '3 normal',
-    State        => 'pending auto close+',
-    CustomerNo   => '123465',
-    Contact => 'customer@example.com',
+    State        => 'pending auto close',
+    OrganisationID => '123465',
+    ContactID    => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -77,7 +77,7 @@ my %Ticket = $TicketObject->TicketGet(
 
 $Self->Is(
     $Ticket{State},
-    'pending auto close+',
+    'pending auto close',
     "Ticket pending auto close time not reached",
 );
 
@@ -103,7 +103,7 @@ $Self->Is(
 
 $Self->Is(
     $Ticket{State},
-    'closed successful',
+    'closed',
     "Ticket pending auto closed time reached",
 );
 

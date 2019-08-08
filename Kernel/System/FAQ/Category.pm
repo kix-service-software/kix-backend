@@ -13,6 +13,8 @@ package Kernel::System::FAQ::Category;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::System::Cache',
     'Kernel::System::DB',
@@ -522,6 +524,65 @@ sub CategoryList {
     }
 
     return \%Data;
+}
+
+=item CategoryLookup()
+
+get id or name of a category
+
+    my $Category = $FAQObject->CategoryLookup( CategoryID => $CategoryID );
+
+    my $CategoryID = $FAQObject->CategoryLookup( Name => $Category );
+
+=cut
+
+sub CategoryLookup {
+    my ( $Self, %Param ) = @_;
+    my $Key;
+    my $Value;
+    my $ReturnData;
+
+    # check needed stuff
+    if ( !$Param{Name} && !$Param{CategoryID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name or CategoryID!',
+        );
+        return;
+    }
+
+    if ( $Param{CategoryID} ) {
+        $Key   = 'CategoryID';
+        $Value = $Param{CategoryID};
+
+        my %Category = $Self->CategoryGet(
+            CategoryID => $Param{CategoryID} 
+        );
+        $ReturnData = $Category{Name};
+    }
+    else {
+        $Key   = 'Name';
+        $Value = $Param{Name};
+
+        my $CategoryList = $Self->CategorySearch(
+            Name   => $Param{Name}, 
+            UserID => 1,
+        );
+        if ( IsArrayRefWithData($CategoryList) ) {
+            $ReturnData = $CategoryList->[0];
+        }
+    }
+
+    # check if data exists
+    if ( !defined $ReturnData ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No $Key for $Value found!",
+        );
+        return;
+    }
+
+    return $ReturnData;
 }
 
 =item CategorySearch()

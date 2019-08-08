@@ -49,13 +49,13 @@ sub Run {
         }
     }
 
-    # Only run if we have a follow-up article with SenderType 'customer'.
+    # Only run if we have a follow-up article with SenderType 'external'.
     #   It could be that follow-ups have a different SenderType like 'system' for
     #   automatic notifications. In these cases there is no need to hide them.
     #   See also bug#10182 for details.
     if (
         !$Param{GetParam}->{'X-KIX-FollowUp-SenderType'}
-        || $Param{GetParam}->{'X-KIX-FollowUp-SenderType'} ne 'customer'
+        || $Param{GetParam}->{'X-KIX-FollowUp-SenderType'} ne 'external'
         )
     {
         return 1;
@@ -154,7 +154,7 @@ sub Run {
     $Param{GetParam}->{'X-KIX-FollowUp-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer} || 'email';
 
     # set article type to email-internal
-    $Param{GetParam}->{'X-KIX-FollowUp-SenderType'} = $Param{JobConfig}->{SenderType} || 'customer';
+    $Param{GetParam}->{'X-KIX-FollowUp-SenderType'} = $Param{JobConfig}->{SenderType} || 'external';
 
     return 1;
 }

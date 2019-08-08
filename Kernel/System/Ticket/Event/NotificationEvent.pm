@@ -797,7 +797,7 @@ sub _RecipientsGet {
 
                 # Check if we actually do have an article
                 if ( defined $Article{SenderType} ) {
-                    if ( $Article{SenderType} eq 'customer' ) {
+                    if ( $Article{SenderType} eq 'external' ) {
                         $Recipient{Email} = $Article{From};
                     }
                     else {

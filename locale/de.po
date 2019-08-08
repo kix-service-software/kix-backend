@@ -109,32 +109,20 @@ msgstr "neu"
 msgid "open"
 msgstr "offen"
 
-msgid "merged"
-msgstr "zusammengefasst"
-
-msgid "closed successful"
-msgstr "erfolgreich geschlossen"
-
-msgid "closed unsuccessful"
-msgstr "erfolglos geschlossen"
-
-msgid "closed with workaround"
-msgstr "mit Workaround geschlossen"
-
-msgid "pending auto close+"
-msgstr "warten auf erfolgreich schließen"
-
-msgid "pending auto close-"
-msgstr "warten auf erfolglos schließen"
-
-msgid "pending auto reopen"
-msgstr "warten zur Wiedervorlage"
-
 msgid "pending reminder"
 msgstr "warten zur Erinnerung"
 
+msgid "closed"
+msgstr "geschlossen"
+
+msgid "pending auto close"
+msgstr "warten auf erfolgreich schließen"
+
 msgid "removed"
 msgstr "entfernt"
+
+msgid "merged"
+msgstr "zusammengefasst"
 
 # valid
 msgid "valid"

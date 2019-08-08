@@ -3040,19 +3040,19 @@ sub TicketEscalationIndexBuild {
             # do not use internal articles for calculation
             next ROW if !$Row->{CustomerVisible};
 
-            # only use 'agent' and 'customer' sender types for calculation
-            next ROW if $Row->{SenderType} !~ /^(agent|customer)$/;
+            # only use 'agent' and 'external' sender types for calculation
+            next ROW if $Row->{SenderType} !~ /^(agent|external)$/;
 
             # last ROW if latest was customer and the next was not customer
             # otherwise use also next, older customer article as latest
             # customer followup for starting escalation
-            if ( $Row->{SenderType} eq 'agent' && $LastSenderType eq 'customer' ) {
+            if ( $Row->{SenderType} eq 'agent' && $LastSenderType eq 'external' ) {
                 last ROW;
             }
 
-            # start escalation on latest customer article
-            if ( $Row->{SenderType} eq 'customer' ) {
-                $LastSenderType = 'customer';
+            # start escalation on latest external article
+            if ( $Row->{SenderType} eq 'external' ) {
+                $LastSenderType = 'external';
                 $LastSenderTime = $Row->{Created};
             }
 
@@ -5592,8 +5592,7 @@ sub HistoryTicketGet {
         }
         elsif (
             $Row[1] eq 'StateUpdate'
-            || $Row[1] eq 'Close successful'
-            || $Row[1] eq 'Close unsuccessful'
+            || $Row[1] eq 'Close'
             || $Row[1] eq 'Open'
             || $Row[1] eq 'Misc'
             )

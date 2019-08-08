@@ -271,43 +271,6 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::Module###CustomerFAQExplorer" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the customer interface.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Frontend::Customer::ModuleRegistration</SubGroup>
-        <Setting>
-            <FrontendModuleReg>
-                <Description Translatable="1">Customer FAQ.</Description>
-                <NavBarName>FAQ</NavBarName>
-                <Title></Title>
-                <NavBar>
-                    <Description Translatable="1">FAQ</Description>
-                    <Name Translatable="1">FAQ</Name>
-                    <Link>Action=CustomerFAQExplorer</Link>
-                    <Type>Menu</Type>
-                    <Block></Block>
-                    <NavBar>FAQ</NavBar>
-                    <AccessKey></AccessKey>
-                    <Prio>700</Prio>
-                </NavBar>
-                <NavBar>
-                    <Description Translatable="1">FAQ Explorer</Description>
-                    <Name Translatable="1">FAQ Explorer</Name>
-                    <Link>Action=CustomerFAQExplorer</Link>
-                    <Type>Submenu</Type>
-                    <Block></Block>
-                    <NavBar>FAQ</NavBar>
-                    <AccessKey>X</AccessKey>
-                    <Prio>710</Prio>
-                </NavBar>
-                <Loader>
-                    <CSS>FAQ.Customer.Detail.css</CSS>
-                    <CSS>FAQ.Customer.Default.css</CSS>
-                    <CSS>FAQ.Widget.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="FAQ::Item::HTML" Required="1" Valid="1">
         <Description Translatable="1">Show FAQ Article with HTML.</Description>
         <Group>FAQ</Group>

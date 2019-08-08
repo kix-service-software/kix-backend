@@ -323,9 +323,9 @@ for my $Test (@Tests) {
             Queue        => 'Raw',
             Lock         => 'unlock',
             Priority     => '3 normal',
-            State        => 'closed successful',
-            CustomerID   => '123465',
-            Contact => 'unittest@otrs.com',
+            State        => 'closed',
+            OrganisationID   => '123465',
+            ContactID    => 'unittest@otrs.com',
             OwnerID      => 1,
             UserID       => 1,
         );

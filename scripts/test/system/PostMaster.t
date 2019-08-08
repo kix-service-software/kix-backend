@@ -705,13 +705,13 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpState check',
                 );
                 $StateSet = $TicketObject->StateSet(
-                    State    => 'closed successful',
+                    State    => 'closed',
                     TicketID => $Return[1],
                     UserID   => 1,
                 );
                 $Self->True(
                     $StateSet || 0,
-                    $NamePrefix . ' StateSet() - closed successful',
+                    $NamePrefix . ' StateSet() - closed',
                 );
 
                 # send follow up #3

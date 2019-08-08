@@ -201,7 +201,7 @@ sub Run {
                     TicketID       => $TicketID,
                     Channel        => 'note',
                     CustomerVisible => 1,
-                    SenderType     => 'customer',
+                    SenderType     => 'external',
                     From           => RandomAddress(),
                     To             => RandomAddress(),
                     Cc             => RandomAddress(),

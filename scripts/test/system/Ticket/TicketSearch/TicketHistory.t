@@ -62,7 +62,7 @@ $Self->True(
 
 # close ticket 2
 $Success = $TicketObject->TicketStateSet(
-    State    => 'closed successful',
+    State    => 'closed',
     TicketID => $TicketIDs[1],
     UserID   => 1,
 );

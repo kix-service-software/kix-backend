@@ -189,7 +189,7 @@ $Self->Is(
 
 $Self->Is(
     $Ticket{State},
-    'closed successful',
+    'closed',
     "Run() - Ticket State",
 );
 

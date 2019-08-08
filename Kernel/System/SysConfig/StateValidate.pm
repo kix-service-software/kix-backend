@@ -151,8 +151,7 @@ hash will be checked, and corrected if neccessary.
 
     my $Value = $StateValidateObject->GetAutoCorrectValue(
         Data => {                                            # (optional)
-            'pending auto close+' => 'closed successful',
-            'pending auto close-' => 'closed unsuccessful',
+            'pending auto close' => 'closed',
         },
     );
 

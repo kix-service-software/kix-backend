@@ -70,12 +70,7 @@ my @Tests = (
         ExpectedResult  => 2,
     },
     {
-        TicketState     => 'closed successful',
-        QueueFollowUpID => 1,
-        ExpectedResult  => 2,
-    },
-    {
-        TicketState     => 'closed unsuccessful',
+        TicketState     => 'closed',
         QueueFollowUpID => 1,
         ExpectedResult  => 2,
     },
@@ -105,12 +100,7 @@ my @Tests = (
         ExpectedResult  => 2,
     },
     {
-        TicketState     => 'closed successful',
-        QueueFollowUpID => 2,
-        ExpectedResult  => 4,
-    },
-    {
-        TicketState     => 'closed unsuccessful',
+        TicketState     => 'closed',
         QueueFollowUpID => 2,
         ExpectedResult  => 4,
     },
@@ -140,12 +130,7 @@ my @Tests = (
         ExpectedResult  => 2,
     },
     {
-        TicketState     => 'closed successful',
-        QueueFollowUpID => 3,
-        ExpectedResult  => 3,
-    },
-    {
-        TicketState     => 'closed unsuccessful',
+        TicketState     => 'closed',
         QueueFollowUpID => 3,
         ExpectedResult  => 3,
     },
@@ -173,7 +158,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'removed',
-    Contact => 'external@example.com',
+    OrganisationID => 'external@example.com',
+    ContactID    => 'external@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

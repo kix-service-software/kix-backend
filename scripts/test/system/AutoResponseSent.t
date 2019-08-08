@@ -61,7 +61,7 @@ my @Tests = (
         FollowUpID         => 2,                          # Queue follow up option 'rejected'
         AutoResponseTypeID => 2,
         AutoResponseType   => 'auto reject',
-        TicketState        => 'closed successful',
+        TicketState        => 'closed',
         Channel            => 'email',
     },
     {
@@ -69,7 +69,7 @@ my @Tests = (
         FollowUpID         => 3,                                 # Queue follow up option 'new ticket'
         AutoResponseTypeID => 4,
         AutoResponseType   => 'auto reply/new ticket',
-        TicketState        => 'closed successful',
+        TicketState        => 'closed',
         Channel            => 'email',
     },
     {
@@ -170,7 +170,7 @@ for my $Test (@Tests) {
         TicketID         => $TicketIDOne,
         Channel          => $Test->{Channel},
         CustomerVisible  => 1,
-        SenderType       => 'customer',
+        SenderType       => 'external',
         Subject          => 'UnitTest article one',
         From             => '"test" <test@localunittest.com>',
         To               => $QueueName,
@@ -258,7 +258,7 @@ for my $Test (@Tests) {
         TicketID         => $TicketIDTwo,
         Channel          => $Test->{Channel},
         CustomerVisible  => 1,
-        SenderType       => 'customer',
+        SenderType       => 'external',
         Subject          => 'UnitTest article two',
         From             => '"test" <test@localunittest.com>',
         To               => $QueueName,

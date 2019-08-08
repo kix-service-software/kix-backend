@@ -2599,7 +2599,7 @@
         <IndexColumn Name="filesize"/>
     </Index>
 </Table>
-<Table Name="kix_text_module">
+<Table Name="text_module">
     <Column Name="id"          Required="true"  Type="INTEGER"  PrimaryKey="true" AutoIncrement="true"/>
     <Column Name="name"        Required="true"  Type="VARCHAR" Size="80"/>
     <Column Name="category"    Required="false" Type="VARCHAR" Size="255"/>
@@ -2616,16 +2616,16 @@
     <Column Name="create_by"   Required="true"  Type="INTEGER"/>
     <Column Name="change_time" Required="true"  Type="DATE"/>
     <Column Name="change_by"   Required="true"  Type="INTEGER"/>
-    <Index Name="kix_text_module_name">
+    <Index Name="text_module_name">
         <IndexColumn Name="name"/>
     </Index>
-    <Index Name="kix_text_module_category">
+    <Index Name="text_module_category">
         <IndexColumn Name="category"/>
     </Index>
-    <Index Name="kix_text_module_keywords">
+    <Index Name="text_module_keywords">
         <IndexColumn Name="keywords"/>
     </Index>
-    <Index Name="kix_text_module_language">
+    <Index Name="text_module_language">
         <IndexColumn Name="language"/>
     </Index>
 </Table>

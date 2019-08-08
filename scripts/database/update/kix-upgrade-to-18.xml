@@ -39,7 +39,7 @@
         <ColumnDrop Name="f_language_id"/>
         <ColumnDrop Name="f_state_id"/>
     </TableAlter>
-    <TableAlter Name="kix_text_module">
+    <TableAlter NameOld="kix_text_module" NameNew="text_module">
         <ColumnAdd Name="category"    Required="false" Type="VARCHAR" Size="255"/>
         <ColumnChange Name="subject"  Required="false" Type="VARCHAR" Size="255"/>
         <ColumnChange NameOld="comment1" NameNew="comment"/>  
