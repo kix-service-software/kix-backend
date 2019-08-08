@@ -27,7 +27,7 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-my @BlackListedStates = ( 'closed successful', 'closed unsuccessful' );
+my @BlackListedStates = ( 'closed' );
 
 # enable feature
 $ConfigObject->Set(
@@ -219,7 +219,7 @@ $CheckACLs->(
 
 # close child ticket
 my $Success = $TicketObject->TicketStateSet(
-    State    => 'closed successful',
+    State    => 'closed',
     TicketID => $TicketIDs[1],
     UserID   => 1,
 );

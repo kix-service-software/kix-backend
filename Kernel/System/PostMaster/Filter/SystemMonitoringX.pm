@@ -92,7 +92,7 @@ sub new {
         NewTicketRegExp   => 'CRITICAL|DOWN|WARNING',
         CloseNotIfLocked  => '0',
         CloseTicketRegExp => 'OK|UP',
-        CloseActionState  => 'closed successful',
+        CloseActionState  => 'closed',
         ClosePendingTime  => 60 * 60 * 24 * 2,                          # equals 2 days
         DefaultService    => 'Host',
     };

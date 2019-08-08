@@ -1,5 +1,2 @@
-# refresh translations of PO file
+# refresh translations from PO file
 Admin::Translation::Import --allow-root
-
-# warmup core cache
-Admin::Translation::List --allow-root --quiet

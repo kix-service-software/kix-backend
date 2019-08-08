@@ -168,12 +168,12 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Correct State closed successful',
+        Name   => 'Correct State closed',
         Config => {
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                State => 'closed successful',
+                State => 'closed',
             },
         },
         Success => 1,
@@ -190,7 +190,7 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Correct StateID closed successful',
+        Name   => 'Correct StateID closed',
         Config => {
             UserID => $UserID,
             Ticket => \%Ticket,

@@ -49,9 +49,9 @@ my $TicketID = $TicketObject->TicketCreate(
     Queue        => 'Raw',
     Lock         => 'unlock',
     Priority     => '3 normal',
-    State        => 'closed successful',
-    CustomerNo   => '123465',
-    Contact => 'customer@example.com',
+    State        => 'closed',
+    OrganisationID => '123465',
+    ContactID    => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

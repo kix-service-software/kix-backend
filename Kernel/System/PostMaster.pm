@@ -658,16 +658,16 @@ sub GetEmailParams {
     for my $Key (qw(X-KIX-SenderType X-KIX-FollowUp-SenderType)) {
 
         if ( !$GetParam{$Key} ) {
-            $GetParam{$Key} = 'customer';
+            $GetParam{$Key} = 'external';
         }
 
-        # check if X-KIX-SenderType exists, if not, set customer
+        # check if X-KIX-SenderType exists, if not, set external
         if ( !$TicketObject->ArticleSenderTypeLookup( SenderType => $GetParam{$Key} ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Can't find sender type '$GetParam{$Key}' in db, take 'customer'",
+                Message  => "Can't find sender type '$GetParam{$Key}' in db, take 'external'",
             );
-            $GetParam{$Key} = 'customer';
+            $GetParam{$Key} = 'external';
         }
     }
 

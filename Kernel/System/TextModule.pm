@@ -126,7 +126,7 @@ sub TextModuleAdd {
     }
 
     # build sql...
-    my $SQL = "INSERT INTO kix_text_module "
+    my $SQL = "INSERT INTO text_module "
         . "(name, valid_id, keywords, category, comment, text, subject, language, "
         . "create_time, create_by, change_time, change_by ) "
         . "VALUES "
@@ -152,7 +152,7 @@ sub TextModuleAdd {
         );
 
         return 0 if !$Self->{DBObject}->Prepare(
-            SQL => 'SELECT max(id) FROM kix_text_module '
+            SQL => 'SELECT max(id) FROM text_module '
                 . " WHERE name = ? AND language = ? AND create_by = ? ",
             Bind => [ \$Param{Name}, \$Param{Language}, \$Param{UserID} ],
         );
@@ -217,7 +217,7 @@ sub TextModuleGet {
     my $SQL
         = 'SELECT name, valid_id, keywords, category, comment, text, '
         . 'language, subject, create_time, create_by, change_time, change_by '
-        . 'FROM kix_text_module '
+        . 'FROM text_module '
         . 'WHERE id = ?';
 
     return if !$Self->{DBObject}->Prepare( 
@@ -291,7 +291,7 @@ sub TextModuleUpdate {
     }
 
     # build sql...
-    my $SQL = "UPDATE kix_text_module SET "
+    my $SQL = "UPDATE text_module SET "
         . " name = ?, text = ?, subject = ?, keywords = ?, language = ?, "
         . " category = ?, comment = ?, valid_id = ?, "
         . " change_time = current_timestamp, change_by = ? "
@@ -360,7 +360,7 @@ sub TextModuleDelete {
     );
 
     my $Result = $Self->{DBObject}->Do(
-        SQL  => 'DELETE FROM kix_text_module WHERE id = ?',
+        SQL  => 'DELETE FROM text_module WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
@@ -432,7 +432,7 @@ sub TextModuleList {
     }
 
     # create SQL-String
-    my $SQL = "SELECT id FROM kix_text_module";
+    my $SQL = "SELECT id FROM text_module";
 
     if ( @SQLWhere ) {
         $SQL .= ' WHERE '.join(' AND ', @SQLWhere);
@@ -470,7 +470,7 @@ Returns all TextModuleCategories
 sub TextModuleCategoryList {
     my ( $Self, %Param ) = @_;
 
-    my $SQL = "SELECT DISTINCT(category) FROM kix_text_module WHERE category <> ''";
+    my $SQL = "SELECT DISTINCT(category) FROM text_module WHERE category <> ''";
 
     return if !$Self->{DBObject}->Prepare( 
         SQL => $SQL,
@@ -541,14 +541,14 @@ sub TextModuleObjectLinkGet {
     if ( $Param{TextModuleID} ) {
         return if !$Self->{DBObject}->Prepare(
             SQL =>
-                'SELECT object_id FROM kix_text_module_object_link WHERE object_type = ? AND text_module_id = ? ',
+                'SELECT object_id FROM text_module_object_link WHERE object_type = ? AND text_module_id = ? ',
             Bind => [ \$Param{ObjectType}, \$Param{TextModuleID} ],
         );
     }
     else {
         return if !$Self->{DBObject}->Prepare(
             SQL =>
-                'SELECT text_module_id FROM kix_text_module_object_link WHERE object_type = ? AND object_id = ? ',
+                'SELECT text_module_id FROM text_module_object_link WHERE object_type = ? AND object_id = ? ',
             Bind => [ \$Param{ObjectType}, \$Param{ObjectID} ],
         );
     }
@@ -605,13 +605,13 @@ sub TextModuleObjectLinkDelete {
         if ( $Param{ObjectType} ) {
             return $Self->{DBObject}->Do(
                 SQL =>
-                    'DELETE FROM kix_text_module_object_link WHERE object_type = ? AND text_module_id = ?',
+                    'DELETE FROM text_module_object_link WHERE object_type = ? AND text_module_id = ?',
                 Bind => [ \$Param{ObjectType}, \$Param{TextModuleID} ],
             );
         }
         else {
             return $Self->{DBObject}->Do(
-                SQL  => 'DELETE FROM kix_text_module_object_link WHERE text_module_id = ?',
+                SQL  => 'DELETE FROM text_module_object_link WHERE text_module_id = ?',
                 Bind => [ \$Param{TextModuleID} ],
             );
         }
@@ -619,7 +619,7 @@ sub TextModuleObjectLinkDelete {
     else {
         return $Self->{DBObject}->Do(
             SQL =>
-                'DELETE FROM kix_text_module_object_link WHERE object_type = ? AND object_id = ?',
+                'DELETE FROM text_module_object_link WHERE object_type = ? AND object_id = ?',
             Bind => [ \$Param{ObjectType}, \$Param{ObjectID} ],
         );
     }
@@ -650,7 +650,7 @@ sub TextModuleObjectLinkCreate {
         }
     }
 
-    my $SQL = "INSERT INTO kix_text_module_object_link "
+    my $SQL = "INSERT INTO text_module_object_link "
         . " (text_module_id, object_type, object_id, create_time, create_by, change_time, change_by)"
         . " VALUES  (?, ?, ?, current_timestamp, ?, current_timestamp, ?)";
 
@@ -677,11 +677,11 @@ sub TextModuleObjectLinkCreate {
 
 sub TextModuleCount {
     my ( $Self, %Param ) = @_;
-    my $SQL = "SELECT count(*) FROM kix_text_module t";
+    my $SQL = "SELECT count(*) FROM text_module t";
 
     if ( defined $Param{Type} && $Param{Type} =~ /^UNASSIGNED::(.*?)$/g ) {
         $SQL
-            .= " WHERE NOT EXISTS (SELECT object_id FROM kix_text_module_object_link ol WHERE object_type = '"
+            .= " WHERE NOT EXISTS (SELECT object_id FROM text_module_object_link ol WHERE object_type = '"
             . $1
             . "' AND ol.text_module_id = t.id)";
     }

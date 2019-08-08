@@ -408,9 +408,9 @@ for my $Backend (qw(DB FS)) {
         Queue        => 'Raw',
         Lock         => 'unlock',
         Priority     => '3 normal',
-        State        => 'closed successful',
-        CustomerNo   => 'unittest',
-        Contact => 'customer@example.com',
+        State        => 'closed',
+        OrganisationID => 'unittest',
+        ContactID    => 'customer@example.com',
         OwnerID      => 1,
         UserID       => 1,
     );

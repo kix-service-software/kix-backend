@@ -538,7 +538,7 @@ sub ArticleCreate {
     }
 
     # reset unlock time if customer sent an update
-    if ( $Param{SenderType} eq 'customer' ) {
+    if ( $Param{SenderType} eq 'external' ) {
 
         # check if latest article comes from customer
         my $LastSender = '';
@@ -929,7 +929,7 @@ sub ArticleSenderTypeList {
 article sender lookup
 
     my $SenderTypeID = $TicketObject->ArticleSenderTypeLookup(
-        SenderType => 'customer', # customer|system|agent
+        SenderType => 'external', # external|system|agent
     );
 
     my $SenderType = $TicketObject->ArticleSenderTypeLookup(
@@ -1039,7 +1039,7 @@ sub ArticleLastCustomerArticle {
     # get article index
     my @Index = $Self->ArticleIndex(
         TicketID   => $Param{TicketID},
-        SenderType => 'customer',
+        SenderType => 'external',
         CustomerVisible => 1,
     );
 
@@ -1121,7 +1121,7 @@ returns an array with article IDs
     );
 
     my @ArticleIDs = $TicketObject->ArticleIndex(
-        SenderType => 'customer',                   # optional, to limit to a certain sender type
+        SenderType => 'external',                   # optional, to limit to a certain sender type
         TicketID   => 123,
     );
 
@@ -1143,7 +1143,7 @@ sub ArticleIndex {
     #   unknown ones cannot be invalidated in _TicketCacheClear().
     my %CacheableSenderTypes = (
         'agent'    => 1,
-        'customer' => 1,
+        'external' => 1,
         'system'   => 1,
         'ALL'      => 1,
     );

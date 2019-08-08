@@ -1,347 +1,3100 @@
-# api
-msgid "No \"Authorization\" header found."
+msgid ""
+msgstr "Project-Id-Version: KIX
+POT-Creation-Date: 2019-07-19 11:16+0000
+PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE
+Last-Translator: 
+Language-Team: 
+Language: 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+"
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "h"
 msgstr ""
 
-msgid "No token in \"Authorization\" header found."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "m"
 msgstr ""
 
-msgid "No permission to execute this operation."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "hour(s)"
 msgstr ""
 
-msgid "The resource doesn't support the requested method. Please have a look into the \"Allow\" header which methods are supported by this resource."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "minute(s)"
 msgstr ""
 
-msgid "Cannot create or update item, because it already exists."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "d"
 msgstr ""
 
-msgid "Depending objects prevent this operation."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "h"
 msgstr ""
 
-msgid "The requested item cannot be found."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "m"
 msgstr ""
 
-msgid "The requested item cannot be found or is invalid."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "day(s)"
 msgstr ""
 
-msgid "Could not create item, please contact the system administrator."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "hour(s)"
 msgstr ""
 
-msgid "Could not update item, please contact the system administrator."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "minute(s)"
 msgstr ""
 
-msgid "Could not delete item, please contact the system administrator."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "We are sorry, you do not have permissions anymore to access this ticket in its current state. You can take one of the following actions:"
 msgstr ""
 
-msgid "The parent item(s) cannot be found."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "This is a"
 msgstr ""
 
-msgid "Authorization not possible, please contact the system administrator."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "email"
 msgstr ""
 
-msgid "User is not authorized. The requested operation cannot be executed."
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "click here"
 msgstr ""
 
-# ticket types
-msgid "Unclassified"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "to open it in a new window."
 msgstr ""
 
-msgid "Incident"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "This is a"
 msgstr ""
 
-msgid "Incident::Major"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "email"
 msgstr ""
 
-msgid "ServiceRequest"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "click here"
 msgstr ""
 
-msgid "Problem"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "to open it in a new window."
 msgstr ""
 
-
-# ticket priority
-msgid "1 very low"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Page"
 msgstr ""
 
-msgid "2 low"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "of"
 msgstr ""
 
-msgid "3 normal"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Year"
 msgstr ""
 
-msgid "4 high"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Year"
 msgstr ""
 
-msgid "5 very high"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Month"
 msgstr ""
 
-
-# ticket states
-msgid "new"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Month"
 msgstr ""
 
-msgid "open"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Day"
 msgstr ""
 
-msgid "merged"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Day"
 msgstr ""
 
-msgid "closed successful"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Hours"
 msgstr ""
 
-msgid "closed unsuccessful"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Hours"
 msgstr ""
 
-msgid "closed with workaround"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Minutes"
 msgstr ""
 
-msgid "pending auto close+"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Minutes"
 msgstr ""
 
-msgid "pending auto close-"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Check to activate this date"
 msgstr ""
 
-msgid "pending auto reopen"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Login"
 msgstr ""
 
-msgid "pending reminder"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "No Permission!"
 msgstr ""
 
-msgid "removed"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "No Permission"
 msgstr ""
 
-
-# valid
-msgid "valid"
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "Show Tree Selection"
 msgstr ""
 
-msgid "invalid"
+#. Perl Module: Kernel/Output/PDF/Statistics.pm
+msgid "Page"
 msgstr ""
 
-msgid "invalid-temporarily"
+#. Perl Module: Kernel/Output/PDF/Statistics.pm
+msgid "No matches found."
 msgstr ""
 
-
-# follow up possible
-msgid "possible"
+#. Perl Module: Kernel/Output/PDF/Statistics.pm
+msgid "Time Zone"
 msgstr ""
 
-msgid "reject"
+#. Perl Module: Kernel/System/Auth.pm
+msgid "It is currently not possible to login due to a scheduled system maintenance."
 msgstr ""
 
-msgid "new ticket"
+#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
+msgid "Configuration Options Reference"
 msgstr ""
 
-
-# auto response type
-msgid "auto reply"
+#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
+msgid "This setting can not be changed."
 msgstr ""
 
-msgid "auto reject"
+#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
+msgid "This setting is not active by default."
 msgstr ""
 
-msgid "auto follow up"
+#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
+msgid "This setting can not be deactivated."
 msgstr ""
 
-msgid "auto reply/new ticket"
+#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
+msgid "Default value"
 msgstr ""
 
-msgid "auto remove"
+#. Perl Module: Kernel/System/ContactAuth.pm
+msgid "It is currently not possible to login due to a scheduled system maintenance."
 msgstr ""
 
-
-# auto response
-msgid "default reply (after new ticket has been created)"
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "This field is required."
 msgstr ""
 
-msgid "default reject (after follow-up and rejected of a closed ticket)"
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "more than ... ago"
 msgstr ""
 
-msgid "default follow-up (after a ticket follow-up has been added)"
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "within the last ..."
 msgstr ""
 
-msgid "default reject/new ticket created (after closed follow-up with new ticket creation)"
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "within the next ..."
 msgstr ""
 
-# CI classes
-msgid "General Information"
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "in more than ..."
 msgstr ""
 
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "minute(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "hour(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "day(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "week(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "month(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "year(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "before/after"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "and"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseDateTime.pm
+msgid "between"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseSelect.pm
+msgid "Show Tree Selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseSelect.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseSelect.pm
+msgid "Show Tree Selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/BaseText.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Checkbox.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "more than ... ago"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "within the last ..."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "within the next ..."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "in more than ..."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "minute(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "hour(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "day(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "week(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "month(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "year(s)"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "day"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "before/after"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "and"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
+msgid "between"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/DropdownGeneralCatalog.pm
+msgid "Show Tree Selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/DropdownGeneralCatalog.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/DropdownGeneralCatalog.pm
+msgid "Show Tree Selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/ITSMConfigItemReference.pm
+msgid "Remove selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/ITSMConfigItemReference.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/ITSMConfigItemReference.pm
+msgid "Remove selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Multiselect.pm
+msgid "Show Tree Selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Multiselect.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/MultiselectGeneralCatalog.pm
+msgid "Show Tree Selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/MultiselectGeneralCatalog.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
+msgid "Remove selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
+msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
+msgid "Remove selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
+msgid "This field is required or"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
+msgid "The field content is too long!"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
+msgid "Maximum size is %s characters."
+msgstr ""
+
+#. Perl Module: Kernel/System/FwdLinkedObjectData.pm
+msgid "Location Information"
+msgstr ""
+
+#. Perl Module: Kernel/System/ITSMConfigItem/History.pm
+msgid "CIHistory::"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "not installed"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "installed"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "installed"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "Unable to parse repository index document."
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "No packages for your framework version found in this repository, it only contains packages for other framework versions."
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "File is not installed!"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "File is different!"
+msgstr ""
+
+#. Perl Module: Kernel/System/Package.pm
+msgid "Can't read file!"
+msgstr ""
+
+#. Perl Module: Kernel/System/ProcessManagement/DB/Process/State.pm
+msgid "Active"
+msgstr ""
+
+#. Perl Module: Kernel/System/ProcessManagement/DB/Process/State.pm
+msgid "Inactive"
+msgstr ""
+
+#. Perl Module: Kernel/System/ProcessManagement/DB/Process/State.pm
+msgid "FadeAway"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats.pm
+msgid "week"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats.pm
+msgid "quarter"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats.pm
+msgid "half-year"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats.pm
+msgid "quarter"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats.pm
+msgid "half-year"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Queue"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "State Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Created in Queue"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Created Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Created State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Lock"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Title"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Contact login (complex search)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Contact login (exact match)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "From"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "To"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Cc"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Subject"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Text"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Create Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Last changed times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Change times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Close Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Escalation"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Escalation - First Response Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Escalation - Update Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Escalation - Solution Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Service"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "SLA"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
 msgid "Type"
 msgstr ""
 
-msgid "Vendor"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Agent/Owner"
 msgstr ""
 
-msgid "Model"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Created by Agent/Owner"
 msgstr ""
 
-msgid "Location"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Responsible"
 msgstr ""
 
-msgid "Building"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "CustomerID"
 msgstr ""
 
-msgid "Room"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "CustomerID (complex search)"
 msgstr ""
 
-msgid "Description"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "CustomerID (exact match)"
 msgstr ""
 
-msgid "Note"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Archive Search"
 msgstr ""
 
-msgid "Notes"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Archived tickets"
 msgstr ""
 
-msgid "Attachment"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "Unarchived tickets"
 msgstr ""
 
-msgid "Attachments"
+#. Perl Module: Kernel/System/Stats/Dynamic/Ticket.pm
+msgid "All tickets"
 msgstr ""
 
-msgid "Owner Information"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Evaluation by"
 msgstr ""
 
-msgid "Assigned Organisation"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Queue"
 msgstr ""
 
-msgid "Assigned Contact"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "State"
 msgstr ""
 
-msgid "Network Information"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "State Type"
 msgstr ""
 
-msgid "Network Interface"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Priority"
 msgstr ""
 
-msgid "IP over DHCP"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Created in Queue"
 msgstr ""
 
-msgid "Yes"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Created Priority"
 msgstr ""
 
-msgid "No"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Created State"
 msgstr ""
 
-msgid "yes"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Lock"
 msgstr ""
 
-msgid "no"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Title"
 msgstr ""
 
-msgid "IP Address"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "ContactLogin (complex search)"
 msgstr ""
 
-msgid "Please enter a valid IPv4 address in form 123.123.123.123."
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "ContactLogin (exact match)"
 msgstr ""
 
-msgid "Network"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "From"
 msgstr ""
 
-msgid "Hardware Information"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "To"
 msgstr ""
 
-msgid "Serial Number"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Cc"
 msgstr ""
 
-msgid "Hard Disk"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Subject"
 msgstr ""
 
-msgid "Capacity"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Text"
 msgstr ""
 
-msgid "Graphic Adapter"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Ticket/Article Accounted Time"
 msgstr ""
 
-msgid "Other Equipment"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Ticket Create Time"
 msgstr ""
 
-msgid "Software Information"
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Last changed times"
 msgstr ""
 
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Change times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Ticket Close Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Escalation"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Escalation - First Response Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Escalation - Update Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Escalation - Solution Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Service"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "SLA"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Archive Search"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Archived tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Unarchived tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "All tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Accounted time by Agent"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Agent/Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Created by Agent/Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Responsible"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "CustomerID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "CustomerID (complex search)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "CustomerID (exact match)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Evaluation by"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Total Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Ticket Average"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Ticket Min Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Ticket Max Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Number of Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Article Average"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Article Min Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Article Max Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketAccountedTime.pm
+msgid "Number of Articles"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "unlimited"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "ascending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "descending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Attributes to be printed"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Order by"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Sort sequence"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Limit"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Queue"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "State Historic"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "State Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "State Type Historic"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Created in Queue"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Created Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Created State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Lock"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Title"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "ContactLogin (complex search)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "ContactLogin (exact match)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "From"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "To"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Cc"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Subject"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Text"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Create Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Last changed times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Change times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Close Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Historic Time Range"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Escalation"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Escalation - First Response Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Escalation - Update Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Escalation - Solution Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Service"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "SLA"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Agent/Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Created by Agent/Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Responsible"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "CustomerID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "CustomerID (complex search)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "CustomerID (exact match)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Archive Search"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Archived tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "Unarchived tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketList.pm
+msgid "All tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Evaluation by"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Queue"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "State Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Created in Queue"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Created Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Created State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Lock"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Title"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "ContactLogin (complex search)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "ContactLogin (exact match)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "From"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "To"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Cc"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Subject"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Text"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Create Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Last changed times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Change times"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Close Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Escalation"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Escalation - First Response Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Escalation - Update Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Escalation - Solution Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Service"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "SLA"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Archive Search"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Archived tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Unarchived tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "All tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Agent/Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Created by Agent/Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Responsible"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "CustomerID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "CustomerID (complex search)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "CustomerID (exact match)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Evaluation by"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Average"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Min Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Max Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Number of Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Average (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Min Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Max Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Working Time Average (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Min Working Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Solution Max Working Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Response Average (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Response Min Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Response Max Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Response Working Time Average (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Response Min Working Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Response Max Working Time (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Number of Tickets (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Static/StateAction.pm
+msgid "Days"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Table Presence"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Internal Error: Could not open file."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Table Check"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Internal Error: Could not read file."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Table Presence"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Table Presence"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/TablePresence.pm
+msgid "Tables found which are not present in the database."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Size.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Size.pm
+msgid "Database Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Size.pm
+msgid "Database Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Size.pm
+msgid "Could not determine database size."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Version.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mssql/Version.pm
+msgid "Could not determine database version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Client Connection Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Client Connection Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Setting character_set_client needs to be utf8."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Server Database Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Server Database Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Setting character_set_database needs to be UNICODE or UTF8."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Table Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "There were tables found which do not have utf8 as charset."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Charset.pm
+msgid "Table Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/InnoDBLogFileSize.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/InnoDBLogFileSize.pm
+msgid "InnoDB Log File Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/InnoDBLogFileSize.pm
+msgid "The setting innodb_log_file_size must be at least 256 MB."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/InnoDBLogFileSize.pm
+msgid "InnoDB Log File Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/MaxAllowedPacket.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/MaxAllowedPacket.pm
+msgid "Maximum Query Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/MaxAllowedPacket.pm
+msgid "The setting 'max_allowed_packet' must be higher than 20 MB."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/MaxAllowedPacket.pm
+msgid "Maximum Query Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Performance.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Performance.pm
+msgid "Query Cache Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Performance.pm
+msgid "The setting 'query_cache_size' should be used (higher than 10 MB but not more than 512 MB)."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Performance.pm
+msgid "Query Cache Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Size.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Size.pm
+msgid "Database Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Size.pm
+msgid "Database Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Size.pm
+msgid "Could not determine database size."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/StorageEngine.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/StorageEngine.pm
+msgid "Default Storage Engine"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/StorageEngine.pm
+msgid "Table Storage Engine"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/StorageEngine.pm
+msgid "Tables with a different storage engine than the default engine were found."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/StorageEngine.pm
+msgid "Table Storage Engine"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
+msgid "MySQL 5.x or higher is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/mysql/Version.pm
+msgid "Could not determine database version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_LANG Setting"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_LANG Setting"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_LANG must be set to al32utf8 (e.g. GERMAN_GERMANY.AL32UTF8)."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_DATE_FORMAT Setting"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_DATE_FORMAT Setting"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_DATE_FORMAT must be set to 'YYYY-MM-DD HH24:MI:SS'."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_DATE_FORMAT Setting SQL Check"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_DATE_FORMAT Setting SQL Check"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/NLS.pm
+msgid "NLS_DATE_FORMAT must be set to 'YYYY-MM-DD HH24:MI:SS'."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/Version.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/oracle/Version.pm
+msgid "Could not determine database version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Client Connection Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Client Connection Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Setting client_encoding needs to be UNICODE or UTF8."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Server Database Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Server Database Charset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Charset.pm
+msgid "Setting server_encoding needs to be UNICODE or UTF8."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/DateStyle.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/DateStyle.pm
+msgid "Date Format"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/DateStyle.pm
+msgid "Date Format"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/DateStyle.pm
+msgid "Setting DateStyle needs to be ISO."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Size.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Size.pm
+msgid "Database Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Size.pm
+msgid "Database Size"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Size.pm
+msgid "Could not determine database size."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Version.pm
+msgid "Database"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Version.pm
+msgid "PostgreSQL 8.x or higher is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Version.pm
+msgid "Database Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Database/postgresql/Version.pm
+msgid "Could not determine database version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ConfigSettings.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ConfigSettings.pm
+msgid "Config Settings"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ConfigSettings.pm
+msgid "Could not determine value."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DaemonRunning.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DaemonRunning.pm
+msgid "Daemon"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DaemonRunning.pm
+msgid "Daemon is running."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DaemonRunning.pm
+msgid "Daemon"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DaemonRunning.pm
+msgid "Daemon is not running."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Database Records"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Ticket History Entries"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Articles"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Attachments (DB, Without HTML)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Customers With At Least One Ticket"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Queues"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Agents"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Roles"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Groups"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Dynamic Fields"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Dynamic Field Values"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Invalid Dynamic Fields"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Invalid Dynamic Field Values"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "GenericInterface Webservices"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Processes"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Process Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Could not determine value."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Months Between First And Last Ticket"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DatabaseRecords.pm
+msgid "Tickets Per Month (avg)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultSOAPUser.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultSOAPUser.pm
+msgid "Default SOAP Username And Password"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultSOAPUser.pm
+msgid "Security risk: you use the default setting for SOAP::User and SOAP::Password. Please change it."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultSOAPUser.pm
+msgid "Default SOAP Username And Password"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultUser.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultUser.pm
+msgid "Default Admin Password"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultUser.pm
+msgid "Security risk: the agent account root@localhost still has the default password. Please change it or invalidate the account."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/DefaultUser.pm
+msgid "Default Admin Password"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ErrorLog.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ErrorLog.pm
+msgid "Error Log"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ErrorLog.pm
+msgid "There are error reports in your system log."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/ErrorLog.pm
+msgid "Error Log"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FQDN.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FQDN.pm
+msgid "FQDN (domain name)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FQDN.pm
+msgid "Please configure your FQDN setting."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FQDN.pm
+msgid "Domain Name"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FQDN.pm
+msgid "Your FQDN setting is invalid."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FQDN.pm
+msgid "Domain Name"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FileSystemWritable.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FileSystemWritable.pm
+msgid "File System Writable"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FileSystemWritable.pm
+msgid "The file system on your KIX partition is not writable."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/FileSystemWritable.pm
+msgid "File System Writable"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Installation Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Some packages have locally modified files."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Installation Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Some packages are not correctly installed."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Installation Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Verification Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Some packages are not verified by the KIX Group! It is recommended not to use this packages."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Verification Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Some packages are not verified by the KIX Group! It is recommended not to use this packages."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Verification Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Framework Version Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Some packages are not allowed for the current framework version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Framework Version Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Some packages are not allowed for the current framework version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageDeployment.pm
+msgid "Package Framework Version Status"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageList.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/PackageList.pm
+msgid "Package List"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SpoolMails.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SpoolMails.pm
+msgid "Spooled Emails"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SpoolMails.pm
+msgid "There are emails in var/spool that KIX could not process."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SpoolMails.pm
+msgid "Spooled Emails"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SystemID.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SystemID.pm
+msgid "SystemID"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SystemID.pm
+msgid "Your SystemID setting is invalid, it should only contain digits."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/SystemID.pm
+msgid "SystemID"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/DefaultType.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/DefaultType.pm
+msgid "Default Ticket Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/DefaultType.pm
+msgid "Default Ticket Type"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/DefaultType.pm
+msgid "The configured default ticket type is invalid or missing. Please change the setting Ticket::Type::Default and select a valid ticket type."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/IndexModule.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/IndexModule.pm
+msgid "Ticket Index Module"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/IndexModule.pm
+msgid "You have more than 60,000 tickets and should use the StaticDB backend. See admin manual (Performance Tuning) for more information."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/IndexModule.pm
+msgid "Ticket Index Module"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/InvalidUsersWithLockedTickets.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/InvalidUsersWithLockedTickets.pm
+msgid "Invalid Users with Locked Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/InvalidUsersWithLockedTickets.pm
+msgid "There are invalid users with locked tickets."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/InvalidUsersWithLockedTickets.pm
+msgid "Invalid Users with Locked Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/OpenTickets.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/OpenTickets.pm
+msgid "Open Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/OpenTickets.pm
+msgid "You should not have more than 8,000 open tickets in your system."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/OpenTickets.pm
+msgid "Open Tickets"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/SearchIndexModule.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/SearchIndexModule.pm
+msgid "Ticket Search Index Module"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/SearchIndexModule.pm
+msgid "You have more than 50,000 articles and should use the StaticDB backend. See admin manual (Performance Tuning) for more information."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/SearchIndexModule.pm
+msgid "Ticket Search Index Module"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "Orphaned Records In ticket_lock_index Table"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "Table ticket_lock_index contains orphaned records. Please run bin/kix.Console.pl \"Maint::Ticket::QueueIndexCleanup\" to clean the StaticDB index."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "Orphaned Records In ticket_lock_index Table"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "Orphaned Records In ticket_index Table"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "Table ticket_index contains orphaned records. Please run bin/kix.Console.pl \"Maint::Ticket::QueueIndexCleanup\" to clean the StaticDB index."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Ticket/StaticDBOrphanedRecords.pm
+msgid "Orphaned Records In ticket_index Table"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "Time Settings"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "Server time zone"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "Computed server time offset"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX TimeZone setting (global time offset)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "TimeZone may only be activated for systems running in UTC."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX TimeZone setting (global time offset)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX TimeZoneUser setting (per-user time zone support)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "TimeZoneUser may only be activated for systems running in UTC that don't have an KIX TimeZone set."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX TimeZoneUser setting (per-user time zone support)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX TimeZone setting for calendar "
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "TimeZone may only be activated for systems running in UTC."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/TimeSettings.pm
+msgid "KIX TimeZone setting for calendar "
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Version.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/KIX/Version.pm
+msgid "KIX Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskPartitionKIX.pm
 msgid "Operating System"
 msgstr ""
 
-msgid "Installed Software"
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskPartitionKIX.pm
+msgid "KIX Disk Partition"
 msgstr ""
 
-msgid "Warranty Information"
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "Operating System"
 msgstr ""
 
-msgid "Warranty Expiration Date"
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "Disk Usage"
 msgstr ""
 
-msgid "First Usage Date"
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "The partition where KIX is located is almost full."
 msgstr ""
 
-msgid "Global Location Number"
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "Disk Usage"
 msgstr ""
 
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "The partition where KIX is located is almost full."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "Disk Usage"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpace.pm
+msgid "The partition where KIX is located has no disk space problems."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpacePartitions.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/DiskSpacePartitions.pm
+msgid "Disk Partitions Usage"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Distribution.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Distribution.pm
+msgid "Distribution"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Distribution.pm
+msgid "Could not determine distribution."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Distribution.pm
+msgid "Distribution"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/KernelVersion.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/KernelVersion.pm
+msgid "Kernel Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/KernelVersion.pm
+msgid "Kernel Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Load.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Load.pm
+msgid "System Load"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Load.pm
+msgid "The system load should be at maximum the number of CPUs the system has (e.g. a load of 8 or less on a system with 8 CPUs is OK)."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/PerlModules.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/PerlModules.pm
+msgid "Perl Modules"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/PerlModules.pm
+msgid "Not all required Perl modules are correctly installed."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/PerlModules.pm
+msgid "Perl Modules"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/PerlVersion.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/PerlVersion.pm
+msgid "Perl Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Operating System"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Free Swap Space (%)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "No swap enabled."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Used Swap Space (MB)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "No swap enabled."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Free Swap Space (%)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "There should be more than 60% free swap space."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Free Swap Space (%)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Used Swap Space (MB)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "There should be no more than 200 MB swap space used."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/OS/Swap.pm
+msgid "Used Swap Space (MB)"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/EnvironmentVariables.pm
+msgid "Webserver"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/EnvironmentVariables.pm
+msgid "Environment Variables"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/InternalWebRequest.pm
+msgid "Webserver"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/InternalWebRequest.pm
+msgid "Support Data Collection"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/InternalWebRequest.pm
+msgid "Support data could not be collected from the web server."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/Version.pm
+msgid "Webserver"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/Version.pm
+msgid "Webserver Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/Version.pm
+msgid "Webserver Version"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/Plugin/Webserver/Version.pm
+msgid "Could not determine webserver version."
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginAsynchronous/KIX/ConcurrentUsers.pm
+msgid "Concurrent Users Details"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginAsynchronous/KIX/ConcurrentUsers.pm
+msgid "KIX"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginAsynchronous/KIX/ConcurrentUsers.pm
+msgid "Concurrent Users"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginBase.pm
+msgid "Unknown"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginBase.pm
+msgid "OK"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginBase.pm
+msgid "Warning"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginBase.pm
+msgid "Problem"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginBase.pm
+msgid "Information"
+msgstr ""
+
+#. Perl Module: Kernel/System/SupportDataCollector/PluginBase.pm
+msgid "General"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket.pm
+msgid "Reset of unlock time."
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
+msgid "FAQ Item suggested in source ticket:"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
+msgid "FAQ Item suggested in source ticket:"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "PGP sign only"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "PGP encrypt only"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "PGP sign and encrypt"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "SMIME sign only"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "SMIME encrypt only"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "SMIME sign and encrypt"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "PGP and SMIME not enabled."
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "Skip notification delivery"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "Send unsigned notification"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "Skip notification delivery"
+msgstr ""
+
+#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
+msgid "Send unencrypted notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "valid"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "invalid"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "invalid-temporarily"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Superuser"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "full permissions on everything (CRUD on resource /*)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "System Admin"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to change/edit any system configuration found in the Admin-Module, requires Agent-User role though in order to log in the system"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Agent User"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to login in both frontend- and backend application but does not grant any further permissions"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Reader"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to read any ticket in any queue and allows to READ links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Agent"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "same as Ticket Reader, but additionally allows to create new or edit any existing ticket and allows to CREATE, UPDATE, DELETE links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Creator"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to read any information required to create a ticket (queues, types, priorities, etc.), allows to create new tickets and allows to CREATE links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "FAQ Reader"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to read any FAQ article in any FAQ category and allows to READ links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "FAQ Editor"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "same as FAQ Reader, but additionally allows to create new or edit any existing FAQ article and allows to CREATE, UPDATE, DELETE links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "CMDB Reader"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to read any config items information in any CI class and allows to READ links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "CMDB Maintainer"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "same as CMDB-Reader, but additionally  allows to create new or update any existing config item entry and allows to CREATE, UPDATE, DELETE links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer Reader"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to read information of any organization or contact and allows to READ links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer Manager"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "same as Customer Reader, but additionally allows to create new or update any existing contact or organization entry and allows to CREATE, UPDATE, DELETE links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Resource"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type that corresponds with a collection resource."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Object"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type that corresponds with a item resource."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "PropertyValue"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "new"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All new state types (default: viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "open"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All open state types (default: viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "closed"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All closed state types (default: not viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "pending reminder"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All 'pending reminder' state types (default: viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "pending auto"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All 'pending auto *' state types (default: viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "removed"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All 'removed' state types (default: not viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "merged"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "State type for merged tickets (default: not viewable)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "new"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "New ticket created by customer."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "open"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Open tickets."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "pending reminder"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket is pending for agent reminder."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "closed"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket is closed."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "pending auto close"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket is pending for automatic close."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "removed"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer removed ticket."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "merged"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "State for merged tickets."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Standard Address."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "possible"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Follow-ups for closed tickets are possible. Ticket will be reopened."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "reject"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Follow-ups for closed tickets are not possible. No new ticket will be created."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "new ticket"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Follow-ups for closed tickets are not possible. A new ticket will be created.."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Team Service Desk."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Incoming monitoring messages."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "All junk tickets."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Unclassified"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "1 very low"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "2 low"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "3 normal"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "4 high"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "5 very high"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "unlock"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "lock"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "tmp_lock"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "note"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "email"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "phone-inbound"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "phone-outbound"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "agent"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "system"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "external"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket create notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "You will receive a notification each time a new ticket is created in one of your \"My Queues\" or \"My Services\"."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket follow-up notification (unlocked)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "You will receive a notification if a customer sends a follow-up to an unlocked ticket which is in your \"My Queues\" or \"My Services\"."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket follow-up notification (locked)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "You will receive a notification if a customer sends a follow-up to a locked ticket of which you are the ticket owner or responsible."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket lock timeout notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "You will receive a notification as soon as a ticket owned by you is automatically unlocked."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket owner update notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket responsible update notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket new note notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket queue update notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "You will receive a notification if a ticket is moved into one of your \"My Queues\"."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket pending reminder notification (locked)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket pending reminder notification (unlocked)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket escalation notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket escalation warning notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket service update notification"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "You will receive a notification if a ticket's service is changed to one of your \"My Services\"."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Linked Person Notification (Agent)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Linked Person Notification (Customer)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Linked Person Notification (3rd Person)"
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-807_pre.xml
+msgid "Resource"
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-807_pre.xml
+msgid "Permission type that corresponds with a collection resource."
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-807_pre.xml
+msgid "Object"
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-807_pre.xml
+msgid "Permission type that corresponds with a item resource."
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-807_pre.xml
+msgid "Queue->Ticket"
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-807_pre.xml
+msgid "Permission type for the relationship of queues and tickets."
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Address Information"
 msgstr ""
 
-msgid "Street"
+#. manual entry from templates.pot.manual
+msgid "Assigned Contact"
 msgstr ""
 
-msgid "Street 2"
+#. manual entry from templates.pot.manual
+msgid "Assigned Organisation"
 msgstr ""
 
+#. manual entry from templates.pot.manual
+msgid "Attachment"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Attachments"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Authorization not possible, please contact the system administrator."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Building"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Cannot create or update item, because it already exists."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Capacity"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "City"
 msgstr ""
 
-msgid "ZIP"
-msgstr ""
-
-msgid "Region"
-msgstr ""
-
-msgid "Country"
-msgstr ""
-
+#. manual entry from templates.pot.manual
 msgid "Contact Information"
 msgstr ""
 
+#. manual entry from templates.pot.manual
 msgid "Contact Role"
 msgstr ""
 
+#. manual entry from templates.pot.manual
 msgid "Contact"
 msgstr ""
 
-msgid "Parent Location"
+#. manual entry from templates.pot.manual
+msgid "Could not create item, please contact the system administrator."
 msgstr ""
 
-msgid "Room Type"
+#. manual entry from templates.pot.manual
+msgid "Could not delete item, please contact the system administrator."
 msgstr ""
 
+#. manual entry from templates.pot.manual
+msgid "Could not update item, please contact the system administrator."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Country"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Depending objects prevent this operation."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Description"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Expiration Date"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "First Usage Date"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Floor"
 msgstr ""
 
-msgid "Please enter decimal numbers only."
+#. manual entry from templates.pot.manual
+msgid "General Information"
 msgstr ""
 
-msgid "Room Label"
+#. manual entry from templates.pot.manual
+msgid "Global Location Number"
 msgstr ""
 
-msgid "Network Address"
+#. manual entry from templates.pot.manual
+msgid "Graphic Adapter"
 msgstr ""
 
-msgid "Subnet Mask"
+#. manual entry from templates.pot.manual
+msgid "Hard Disk"
 msgstr ""
 
-msgid "Product"
+#. manual entry from templates.pot.manual
+msgid "Hardware Information"
 msgstr ""
 
-msgid "License Information"
+#. manual entry from templates.pot.manual
+msgid "IP Address"
 msgstr ""
 
+#. manual entry from templates.pot.manual
+msgid "IP over DHCP"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Installed Software"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Licence Type"
 msgstr ""
 
+#. manual entry from templates.pot.manual
+msgid "License Information"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "License Key"
 msgstr ""
 
+#. manual entry from templates.pot.manual
+msgid "Location"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Model"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Network Address"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Network Information"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Network Interface"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Network"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "No \"Authorization\" header found."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "No permission to execute this operation."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "No token in \"Authorization\" header found."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "No"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Note"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Notes"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Operating System"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Other Equipment"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Owner Information"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Parent Location"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Please enter a valid IPv4 address in form 123.123.123.123."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Please enter decimal numbers only."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Product"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Quantity"
 msgstr ""
 
-msgid "Expiration Date"
+#. manual entry from templates.pot.manual
+msgid "Region"
 msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Room Label"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Room Type"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Room"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Serial Number"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Software Information"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Street 2"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Street"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Subnet Mask"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The parent item(s) cannot be found."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The requested item cannot be found or is invalid."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The requested item cannot be found."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The resource doesn't support the requested method. Please have a look into the \"Allow\" header which methods are supported by this resource."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Type"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "User is not authorized. The requested operation cannot be executed."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Vendor"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Warranty Expiration Date"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Warranty Information"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Yes"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "ZIP"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "no"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "yes"
+msgstr ""
+

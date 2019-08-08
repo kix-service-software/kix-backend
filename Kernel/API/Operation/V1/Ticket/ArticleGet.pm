@@ -205,7 +205,7 @@ sub Run {
 	    }
     
         # restrict article sender types
-        if ( $Self->{Authorization}->{UserType} eq 'Customer' && $ArticleRaw{ArticleSenderType} ne 'customer') {
+        if ( $Self->{Authorization}->{UserType} eq 'Customer' && $ArticleRaw{ArticleSenderType} ne 'external') {
             return $Self->_Error(
                 Code => 'Object.NoPermission',
             );
