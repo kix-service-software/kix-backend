@@ -138,6 +138,10 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique Name="role_user_pkey">
+        <UniqueColumn Name="user_id"/>
+        <UniqueColumn Name="role_id"/>
+    </Unique>
     <Index Name="role_user_user_id">
         <IndexColumn Name="user_id"/>
     </Index>
