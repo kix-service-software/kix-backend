@@ -2253,6 +2253,7 @@
     </ForeignKey>
 </Table>
 <Table Name="general_catalog_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
     <Column Name="general_catalog_id" Required="true" Type="INTEGER" />
     <Column Name="pref_key" Required="true" Size="255" Type="VARCHAR" />
     <Column Name="pref_value" Required="false" Size="255" Type="VARCHAR" />
