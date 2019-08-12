@@ -1555,6 +1555,7 @@
 
 <!-- notification_event_item -->
 <Table Name="notification_event_item">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="notification_id" Required="true" Type="INTEGER"/>
     <Column Name="event_key" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="event_value" Required="true" Size="200" Type="VARCHAR"/>
