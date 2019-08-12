@@ -64,7 +64,6 @@ sub Configure {
         Description => "Comma separated list of roles to which the new user should be added.",
         Required    => 0,
         HasValue    => 1,
-        Multiple    => 1,
         ValueRegex  => qr/.*/smx,
     );
 
