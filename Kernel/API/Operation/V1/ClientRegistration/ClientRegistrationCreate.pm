@@ -167,6 +167,9 @@ sub Run {
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
             my $Content = MIME::Base64::decode_base64($Item->{Content});
+            
+            $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput(\$Content);
+            
             # fire & forget, not result handling at the moment
             my $Result = $Kernel::OM->Get('Kernel::System::Translation')->ImportPO(
                 Language => $Item->{Language},
