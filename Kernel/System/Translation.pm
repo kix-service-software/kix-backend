@@ -1022,26 +1022,27 @@ sub ImportPO {
 
     if ( $Param{Content} ) {
         # store content in temp file
-        my $TempDir = $Kernel::OM->Get('Kernel::System::FileTemp')->TempDir();
+        my ($FH, $Filename) = $Kernel::OM->Get('Kernel::System::FileTemp')->TempFile(
+            Suffix => '.po'
+        );
 
-        if ( !$TempDir ) {
+        if ( !$Filename ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to create temporary directory!"
+                Message  => "Unable to create temporary file!"
             );
             return;
         }
 
-        my $Filename = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
-            Length     => 10,
-            Dictionary => [ 0..9, 'a'..'f' ],
+        # set UTF8 flag
+        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput(
+            \$Param{Content}
         );
 
         my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-            Directory => $TempDir,
             Filename  => $Filename,
             Content   => \$Param{Content},
-            Mode      => 'utf8'
+            Mode      => 'binmode'
         );
 
         if ( !$Result ) {
@@ -1052,7 +1053,7 @@ sub ImportPO {
             return;
         }
 
-        $Param{File} = $TempDir . '/' . $Filename;
+        $Param{File} = $Filename;
     }
 
     my $Items;
