@@ -45,17 +45,17 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my %RoleList = (
-        'Superuser' => 1,
-        'System Admin' => 2,
-        'Agent User' => 3,
-        'Ticket Reader' => 4,
-        'Ticket Agent' => 5,
-        'Ticket Creator' => 6,
-        'FAQ Reader' => 7,
-        'FAQ Editor' => 8,
-        'CMDB Reader' => 9,
-        'CMDB Maintainer' => 10,
-        'Customer Reader' => 11,
+        'Superuser'        => 1,
+        'System Admin'     => 2,
+        'Agent User'       => 3,
+        'Ticket Reader'    => 4,
+        'Ticket Agent'     => 5,
+        'Ticket Creator'   => 6,
+        'FAQ Reader'       => 7,
+        'FAQ Editor'       => 8,
+        'CMDB Reader'      => 9,
+        'CMDB Maintainer'  => 10,
+        'Customer Reader'  => 11,
         'Customer Manager' => 12
     );
 
@@ -80,18 +80,18 @@ sub Run {
     );
 
     # remove header line
-    @Lines = @{$LinesRef};
+    my @Lines = @{$LinesRef};
     shift @Lines;
 
-    foreach my $Line ( @Lines ) {
+    foreach my $Line (@Lines) {
         my $Role   = $Line->[0];
         my $Target = $Line->[2];
         my $Value  = 0
-                   + ($Line->[3] ? Kernel::System::Role::Permission->PERMISSION->{CREATE} : 0)
-                   + ($Line->[4] ? Kernel::System::Role::Permission->PERMISSION->{READ} : 0)
-                   + ($Line->[5] ? Kernel::System::Role::Permission->PERMISSION->{UPDATE} : 0)
-                   + ($Line->[6] ? Kernel::System::Role::Permission->PERMISSION->{DELETE} : 0)
-                   + ($Line->[7] ? Kernel::System::Role::Permission->PERMISSION->{DENY} : 0);
+            + ( $Line->[3] ? Kernel::System::Role::Permission->PERMISSION->{CREATE} : 0 )
+            + ( $Line->[4] ? Kernel::System::Role::Permission->PERMISSION->{READ}   : 0 )
+            + ( $Line->[5] ? Kernel::System::Role::Permission->PERMISSION->{UPDATE} : 0 )
+            + ( $Line->[6] ? Kernel::System::Role::Permission->PERMISSION->{DELETE} : 0 )
+            + ( $Line->[7] ? Kernel::System::Role::Permission->PERMISSION->{DENY}   : 0 );
 
         my $PermissionStr = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
             Value  => $Value,
@@ -99,8 +99,8 @@ sub Run {
         );
         $PermissionStr =~ s/-/_/g;
 
-        my $XML = 
-"    <!-- role \"$Role\": permission $PermissionStr on $Target -->
+        my $XML =
+            "    <!-- role \"$Role\": permission $PermissionStr on $Target -->
     <Insert Table=\"role_permission\">
         <Data Key=\"role_id\">$RoleList{$Role}</Data>
         <Data Key=\"type_id\">1</Data>
