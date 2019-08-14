@@ -824,8 +824,11 @@ sub FetchAllArrayRef {
         $Self->{LimitCounter}++;
     }
 
-    # return
+    # fetch
     my $Rows = $Self->{Cursor}->fetchall_arrayref();
+
+    # get encode object
+    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
 
     # map columns
     my @Result;
@@ -834,33 +837,12 @@ sub FetchAllArrayRef {
         my $Counter = 0;
         foreach my $Column ( @{$Param{Columns}} ) {
             $RowData{$Column} = $Row->[$Counter++];
-        }
-        push(@Result, \%RowData);
-    }
-
-    if ( !$Self->{Backend}->{'DB::Encode'} ) {
-        return \@Result;
-    }
-
-    # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
-
-    # e. g. set utf-8 flag
-    ROW:
-    foreach my $Row (@{$Rows}) {
-        my $Counter = 0;
-        ELEMENT:
-        for my $Element (@{$Row}) {
-
-            next ELEMENT if !defined $Element;
-
-            if ( !defined $Self->{Encode} || ( $Self->{Encode} && $Self->{Encode}->[$Counter] ) ) {
-                $EncodeObject->EncodeInput( \$Element );
+            if ( $Self->{Backend}->{'DB::Encode'} ) {
+                # e. g. set utf-8 flag
+                $EncodeObject->EncodeInput( \$RowData{$Column} );
             }
         }
-        continue {
-            $Counter++;
-        }
+        push(@Result, \%RowData);
     }
 
     return \@Result;
