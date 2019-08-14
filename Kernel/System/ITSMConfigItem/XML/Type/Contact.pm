@@ -67,11 +67,14 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %ContactSearchList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
-        Search => $Param{Value},
+    my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Param{Value}
     );
 
-    return $ContactSearchList{ $Param{Value} } || $Param{Value};
+    if ( IsHashRefWithData( \%Contact ) ) {
+        return $Contact{Login}
+    }
+    return $Param{Value};
 }
 
 =item StatsAttributeCreate()
@@ -130,7 +133,7 @@ sub ExportSearchValuePrepare {
 
     return if !defined $Param{Value};
     return $Param{Value};
-    
+
 }
 
 =item ExportValuePrepare()
@@ -206,7 +209,7 @@ sub ValidateValue {
     );
 
     # if customer is not registered in the database
-     if (!IsHashRefWithData( \%ContactData )) {
+    if ( !IsHashRefWithData( \%ContactData ) ) {
         return 'contact not found';
     }
 
@@ -214,7 +217,7 @@ sub ValidateValue {
     if ( defined $ContactData{ValidID} ) {
 
         # return false if customer is not valid
-        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $ContactData{ValidID} ) ne 'valid') {
+        if ( $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $ContactData{ValidID} ) ne 'valid' ) {
             return 'invalid contact';
         }
     }
@@ -223,9 +226,6 @@ sub ValidateValue {
 }
 
 1;
-
-
-
 
 =back
 
