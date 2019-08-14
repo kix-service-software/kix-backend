@@ -1032,6 +1032,11 @@ sub ImportPO {
             return;
         }
 
+        my $Filename = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
+            Length     => 10,
+            Dictionary => [ 0..9, 'a'..'f' ],
+        );
+
         my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
             Directory => $TempDir,
             Filename  => $Filename,
