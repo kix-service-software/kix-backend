@@ -1040,7 +1040,7 @@ sub ImportPO {
         );
 
         my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-            Filename  => $Filename,
+            Location  => $Filename,
             Content   => \$Param{Content},
             Mode      => 'binmode'
         );
