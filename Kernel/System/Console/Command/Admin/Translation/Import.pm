@@ -51,13 +51,18 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddOption(
+        Name        => 'file',
+        Description => "Only import the given file. The option locale-directory will be ignored in this case.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 
     my $Name = $Self->Name();
 
     return;
 }
-
-my $BreakLineAfterChars = 60;
 
 sub Run {
     my ( $Self, %Param ) = @_;
@@ -66,13 +71,22 @@ sub Run {
 
     my $Language  = $Self->GetOption('language') || '';
     my $LocaleDir = $Self->GetOption('locale-directory') || $Home.'/locale';
+    my $File      = $Self->GetOption('language') || '';
 
     $Self->Print("<yellow>Updating translations...</yellow>\n\n");
 
-    my @POFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $LocaleDir,
-        Filter    => $Language ? "$Language.po" : '*.po'
-    );
+    my @POFiles;
+    if ( $File ) {
+        # only import the given file
+        push @POFiles, $File;
+    }
+    else {
+        # get all relevant PO files in given directory
+        @POFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+            Directory => $LocaleDir,
+            Filter    => $Language ? "$Language.po" : '*.po'
+        );
+    }
 
     foreach my $File ( sort @POFiles ) {
         my $Filename = basename $File;

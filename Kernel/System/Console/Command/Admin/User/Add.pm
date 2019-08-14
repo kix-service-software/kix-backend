@@ -74,7 +74,7 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     # check if all groups exist
-    my @Roles = split(/\s*,\s*/, ($Self->GetOption('roles') || ''));
+    my @Roles = split( /\s*,\s*/, ( $Self->GetOption('roles') || '' ) );
     my %RoleList = reverse $Kernel::OM->Get('Kernel::System::Role')->RoleList( Valid => 1 );
 
     ROLE:
@@ -130,8 +130,6 @@ sub Run {
 }
 
 1;
-
-
 
 =back
 

@@ -988,7 +988,8 @@ sub ImportPO {
 
         my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
             Location => $Filename,
-            Content  => \$Param{Content}
+            Content  => \$Param{Content},
+            Mode     => 'utf8'
         );
 
         if ( !$Result ) {

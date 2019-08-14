@@ -97,6 +97,7 @@
 
 <!-- user preferences -->
 <Table Name="user_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="preferences_value" Required="false" Type="varchar" Size="1000" />
@@ -138,6 +139,10 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique Name="role_user_pkey">
+        <UniqueColumn Name="user_id"/>
+        <UniqueColumn Name="role_id"/>
+    </Unique>
     <Index Name="role_user_user_id">
         <IndexColumn Name="user_id"/>
     </Index>
@@ -1551,6 +1556,7 @@
 
 <!-- notification_event_item -->
 <Table Name="notification_event_item">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="notification_id" Required="true" Type="INTEGER"/>
     <Column Name="event_key" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="event_value" Required="true" Size="200" Type="VARCHAR"/>
@@ -2248,6 +2254,7 @@
     </ForeignKey>
 </Table>
 <Table Name="general_catalog_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
     <Column Name="general_catalog_id" Required="true" Type="INTEGER" />
     <Column Name="pref_key" Required="true" Size="255" Type="VARCHAR" />
     <Column Name="pref_value" Required="false" Size="255" Type="VARCHAR" />
