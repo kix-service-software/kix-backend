@@ -830,6 +830,8 @@ sub FetchAllArrayRef {
     # get encode object
     my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
 
+    my $DoEncode = $Self->{Backend}->{'DB::Encode'};
+
     # map columns
     my @Result;
     foreach my $Row ( @{$Rows} ) {
@@ -837,8 +839,8 @@ sub FetchAllArrayRef {
         my $Counter = 0;
         foreach my $Column ( @{$Param{Columns}} ) {
             $RowData{$Column} = $Row->[$Counter++];
-            if ( $Self->{Backend}->{'DB::Encode'} ) {
-                # e. g. set utf-8 flag
+            if ( $DoEncode ) {
+                # set utf-8 flag
                 $EncodeObject->EncodeInput( \$RowData{$Column} );
             }
         }
