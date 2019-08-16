@@ -195,9 +195,28 @@ sub SearchPreferences {
     return %Data;
 }
 
+sub DeleteAllPreferencesForContact {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Param{ContactID};
+
+    # delete data
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => "
+            DELETE FROM $Self->{PreferencesTable}
+            WHERE $Self->{PreferencesTableContactID} = ?",
+        Bind => [ \$Param{ContactID} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return 1;
+}
+
 1;
-
-
 
 =back
 
