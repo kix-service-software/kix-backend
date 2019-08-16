@@ -446,15 +446,15 @@ sub PatternDelete {
         }
     }
 
-    # delete pattern
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'DELETE FROM kix_translation_pattern WHERE id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
     # delete assigned languages
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'DELETE FROM kix_translation_language WHERE pattern_id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    # delete pattern
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'DELETE FROM kix_translation_pattern WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
@@ -927,6 +927,54 @@ sub TranslationList {
     return @TranslationList;
 }
 
+=item CleanUp()
+
+    Deletes all entries
+
+    my $Success = $TranslationObject->CleanUp(
+        UserID => '...',       # required
+    );
+
+=cut
+
+sub CleanUp {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # delete languages
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'DELETE FROM kix_translation_language',
+    );
+
+    # delete patterns
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'DELETE FROM kix_translation_pattern',
+    );
+
+    # reset cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Translation.Pattern',
+    );
+
+    return 1;
+}
+
 =item ImportPO()
 
 Import a PO content
@@ -986,10 +1034,15 @@ sub ImportPO {
             return;
         }
 
+        # set UTF8 flag
+        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput(
+            \$Param{Content}
+        );
+
         my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-            Location => $Filename,
-            Content  => \$Param{Content},
-            Mode     => 'utf8'
+            Location  => $Filename,
+            Content   => \$Param{Content},
+            Mode      => 'binmode'
         );
 
         if ( !$Result ) {

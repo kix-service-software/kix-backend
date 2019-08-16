@@ -71,7 +71,7 @@ sub Run {
 
     my $Language  = $Self->GetOption('language') || '';
     my $LocaleDir = $Self->GetOption('locale-directory') || $Home.'/locale';
-    my $File      = $Self->GetOption('language') || '';
+    my $File      = $Self->GetOption('file') || '';
 
     $Self->Print("<yellow>Updating translations...</yellow>\n\n");
 

@@ -9048,7 +9048,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 Input      => {
                     Type => 'Text',
                     MaxLength => 50,
-                    RegEx             => '\D',
+                    RegEx             => '\d',
                     RegExErrorMessage => 'Please enter decimal numbers only.',
                 },
             },
