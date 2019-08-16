@@ -17,6 +17,7 @@ use base qw(Kernel::System::EventHandler);
 
 use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
+use Kernel::System::VariableCheck qw( IsArrayRefWithData );
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -339,8 +340,8 @@ sub ContactUpdate {
             Password => $Param{Password} || $Self->GenerateRandomPassword()
         );
     }
-    if ( $Param{OrganisationIDs} ) {
-        $Param{OrganisationIDs} = ','.join(',', $Param{OrganisationIDs}).',';
+    if ( IsArrayRefWithData($Param{OrganisationIDs}) ) {
+        $Param{OrganisationIDs} = ','.join(',', @{$Param{OrganisationIDs}}).',';
     }
 
     # check if contact exists
@@ -376,11 +377,13 @@ sub ContactUpdate {
     # update role in database
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE Contact SET login = ?, password = ?, firstname = ?, lastname = ?, '
+            . 'primary_org_id = ?, org_ids = ?, '
             . 'email = ?, title = ?, phone = ?, fax = ?, mobile = ?, street = ?, '
             . 'zip = ?, city = ?, country = ?, comments = ?, valid_id = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Login}, \$Param{Password}, \$Param{Firstname}, \$Param{Lastname}, 
+            \$Param{Login}, \$Param{Password}, \$Param{Firstname}, \$Param{Lastname},
+            \$Param{PrimaryOrganisationID}, \$Param{OrganisationIDs},
             \$Param{Email}, \$Param{Title}, \$Param{Phone}, \$Param{Fax}, \$Param{Mobile},
             \$Param{Street}, \$Param{Zip}, \$Param{City}, \$Param{Country},
             \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
@@ -601,7 +604,12 @@ sub ContactDelete {
         }
     }
 
-    # get database object
+    # delete preferences (foreign key)
+    $Self->{PreferencesObject}->DeleteAllPreferencesForContact(
+        ContactID => $Param{ID}
+    );
+
+    # delete contact
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'DELETE FROM contact WHERE id = ?',
         Bind => [ \$Param{ID} ],

@@ -4,7 +4,7 @@
 #
 # written/edited by:
 # * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+#
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -94,7 +94,7 @@ sub ParameterDefinition {
             Type     => 'HASH',
             Required => 1
         },
-    }
+        }
 }
 
 =item Run()
@@ -140,7 +140,7 @@ sub Run {
         Data => $Param{Data}->{Contact}
     );
 
-    # check ContactLogin exists
+    # check if Contact exists
     my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         ID => $Param{Data}->{ContactID},
     );
@@ -151,11 +151,11 @@ sub Run {
     }
 
     # check if ContactLogin already exists
-    if ( IsStringWithData($Contact->{Login}) ) {
+    if ( IsStringWithData( $Contact->{Login} ) ) {
         my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
             Login => $Contact->{Login},
         );
-        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{ID}})) {        
+        if ( %ContactList && ( scalar( keys %ContactList ) > 1 || !$ContactList{ $ContactData{ID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update contact. Another contact with same login already exists.',
@@ -164,18 +164,18 @@ sub Run {
     }
 
     # check ContactEmail exists
-    if ( IsStringWithData($Contact->{Email}) ) {
+    if ( IsStringWithData( $Contact->{Email} ) ) {
         my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
             PostMasterSearch => $Contact->{Email},
-        );        
-        if ( %ContactList && (scalar(keys %ContactList) > 1 || !$ContactList{$ContactData{ID}})) {        
+        );
+        if ( %ContactList && ( scalar( keys %ContactList ) > 1 || !$ContactList{ $ContactData{ID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update contact. Another contact with same email address already exists.',
             );
         }
     }
-    
+
     # check if primary OrganisationID exists
     if ( $Contact->{PrimaryOrganisationID} ) {
         my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
@@ -185,29 +185,31 @@ sub Run {
         if ( !%OrgData || $OrgData{ValidID} != 1 ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => 'Validation failed. No valid organisation found for primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'".',
+                Message => 'Validation failed. No valid organisation found for primary organisation ID "' . $Contact->{PrimaryOrganisationID} . '".',
             );
         }
     }
-    
-    if ( $Contact->{PrimaryOrganisationID} && (IsArrayRefWithData($Contact->{OrganisationIDs}) || IsArrayRefWithData($ContactData{OrganisationIDs})) ) {
+
+    if ( $Contact->{PrimaryOrganisationID} && ( IsArrayRefWithData( $Contact->{OrganisationIDs} ) || IsArrayRefWithData( $ContactData{OrganisationIDs} ) ) ) {
+
         # check if primary OrganisationID is contained in assigned OrganisationIDs
-        my @OrgIDs = @{IsArrayRefWithData($Contact->{OrganisationIDs}) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs}};
+        my @OrgIDs = @{ IsArrayRefWithData( $Contact->{OrganisationIDs} ) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs} };
         if ( !grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => 'Validation failed. Primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'" is not available in assigned organisation IDs "'.(join(", ", @OrgIDs)).'".',
+                Message => 'Validation failed. Primary organisation ID "' . $Contact->{PrimaryOrganisationID} . '" is not available in assigned organisation IDs "' . ( join( ", ", @OrgIDs ) ) . '".',
             );
         }
-        # check each assigned customer 
-        foreach my $OrgID ( @OrgIDs ) {
+
+        # check each assigned customer
+        foreach my $OrgID (@OrgIDs) {
             my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
             if ( !%OrgData || $OrgData{ValidID} != 1 ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => 'Validation failed. No valid organisation found for assigned organisation ID "'.$OrgID.'".',
+                    Message => 'Validation failed. No valid organisation found for assigned organisation ID "' . $OrgID . '".',
                 );
             }
         }
@@ -219,15 +221,15 @@ sub Run {
         %{$Contact},
         ID     => $Param{Data}->{ContactID},
         UserID => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
             Message => 'Could not update contact, please contact the system administrator',
         );
     }
-    
+
     return $Self->_Success(
-        ContactID => 0 + $ContactData{ID}   # force numeric ID
-    );   
+        ContactID => 0 + $ContactData{ID}    # force numeric ID
+    );
 }
