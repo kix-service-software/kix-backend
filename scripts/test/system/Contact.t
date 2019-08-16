@@ -17,11 +17,11 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-my $CacheObject   = $Kernel::OM->Get('Kernel::System::Cache');
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
+my $CacheObject        = $Kernel::OM->Get('Kernel::System::Cache');
+my $ContactObject      = $Kernel::OM->Get('Kernel::System::Contact');
 my $OrganisationObject = $Kernel::OM->Get('Kernel::System::Organisation');
-my $DBObject      = $Kernel::OM->Get('Kernel::System::DB');
+my $DBObject           = $Kernel::OM->Get('Kernel::System::DB');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
@@ -41,10 +41,22 @@ my $DatabaseCaseSensitive      = $DBObject->{Backend}->{'DB::CaseSensitive'};
 my $SearchCaseSensitiveDefault = $ConfigObject->{Contact}->{Params}->{SearchCaseSensitive};
 
 # create organisation for tests
-my $OrgRand = 'Example-Organisation-Company' . $Helper->GetRandomID();
+my $OrgRand        = 'Example-Organisation-Company' . $Helper->GetRandomID();
 my $OrganisationID = $OrganisationObject->OrganisationAdd(
     Number  => $OrgRand,
     Name    => $OrgRand . ' Inc',
+    Street  => 'Some Street',
+    Zip     => '12345',
+    City    => 'Some city',
+    Country => 'USA',
+    Url     => 'http://example.com',
+    Comment => 'some comment',
+    ValidID => 1,
+    UserID  => 1,
+);
+my $OrganisationIDForUpdate = $OrganisationObject->OrganisationAdd(
+    Number  => $OrgRand . '_ForUpdate',
+    Name    => $OrgRand . ' Inc_ForUpdate',
     Street  => 'Some Street',
     Zip     => '12345',
     City    => 'Some city',
@@ -62,17 +74,17 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     my $ContactRandom = 'unittest-' . $Key . $Helper->GetRandomID();
 
     my $ContactID = $ContactObject->ContactAdd(
-        Firstname  => 'Firstname Test' . $Key,
-        Lastname   => 'Lastname Test' . $Key,
+        Firstname             => 'Firstname Test' . $Key,
+        Lastname              => 'Lastname Test' . $Key,
         PrimaryOrganisationID => $OrganisationID,
-        OrganisationIDs => [
+        OrganisationIDs       => [
             $OrganisationID
         ],
-        Login      => $ContactRandom,
-        Email      => $ContactRandom . '-Email@example.com',
-        Password   => 'some_pass',
-        ValidID    => 1,
-        UserID     => 1,
+        Login    => $ContactRandom,
+        Email    => $ContactRandom . '-Email@example.com',
+        Password => 'some_pass',
+        ValidID  => 1,
+        UserID   => 1,
     );
 
     $Self->True(
@@ -111,7 +123,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     $Self->Is(
-        scalar(@{$Contact{OrganisationIDs}}),
+        scalar( @{ $Contact{OrganisationIDs} } ),
         1,
         "ContactGet() - length OrganisationIDs",
     );
@@ -122,14 +134,17 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     my $Update = $ContactObject->ContactUpdate(
-        ID         => $ContactID,
-        Firstname  => 'Firstname Test Update' . $Key,
-        Lastname   => 'Lastname Test Update' . $Key,
-        OrganisationID => $OrganisationID,
-        Login      => $ContactRandom,
-        Email      => $ContactRandom . '-Update@example.com',
-        ValidID    => 1,
-        UserID     => 1,
+        ID                    => $ContactID,
+        Firstname             => 'Firstname Test Update' . $Key,
+        Lastname              => 'Lastname Test Update' . $Key,
+        PrimaryOrganisationID => $OrganisationIDForUpdate,
+        OrganisationIDs       => [
+            $OrganisationIDForUpdate
+        ],
+        Login   => $ContactRandom,
+        Email   => $ContactRandom . '-Update@example.com',
+        ValidID => 1,
+        UserID  => 1,
     );
     $Self->True(
         $Update,
@@ -162,7 +177,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
     $Self->Is(
         $Contact{PrimaryOrganisationID},
-        $OrganisationID,
+        $OrganisationIDForUpdate,
         "ContactGet() - OrganisationID",
     );
     $Self->Is(
@@ -173,12 +188,12 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
 
     # search by OrganisationID
     my %List = $ContactObject->ContactSearch(
-        OrganisationID => $OrganisationID,
-        ValidID    => 1,
+        OrganisationID => $OrganisationIDForUpdate,
+        ValidID        => 1,
     );
     $Self->True(
         $List{$ContactID},
-        "ContactSearch() - OrganisationID=\'$OrganisationID\' - $ContactID is found",
+        "ContactSearch() - PrimaryOrganisationID=\'$OrganisationIDForUpdate\' - $ContactID is found",
     );
 
     # START CaseSensitive
@@ -199,7 +214,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
 
         $Self->False(
             $List{$ContactID},
-            "ContactSearch() - OrganisationID - $ContactID (SearchCaseSensitive = 1)",
+            "ContactSearch() - ContactID - $ContactID (SearchCaseSensitive = 1)",
         );
     }
     else {
@@ -235,24 +250,24 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     %List = $ContactObject->ContactSearch(
-        Login => $ContactRandom,
-        ValidID   => 1,
+        Login   => $ContactRandom,
+        ValidID => 1,
     );
     $Self->True(
         $List{$ContactID},
         "ContactSearch() - Login - $ContactID",
     );
     %List = $ContactObject->ContactSearch(
-        Login => lc($ContactRandom),
-        ValidID   => 1,
+        Login   => lc($ContactRandom),
+        ValidID => 1,
     );
     $Self->True(
         $List{$ContactID},
         "ContactSearch() - Login - lc - $ContactID",
     );
     %List = $ContactObject->ContactSearch(
-        Login => uc($ContactRandom),
-        ValidID   => 1,
+        Login   => uc($ContactRandom),
+        ValidID => 1,
     );
     $Self->True(
         $List{$ContactID},
@@ -441,7 +456,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     my $TokenValid = $ContactObject->TokenCheck(
-        Token  => $Token,
+        Token     => $Token,
         ContactID => $ContactID,
     );
 
@@ -451,7 +466,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     $TokenValid = $ContactObject->TokenCheck(
-        Token  => $Token,
+        Token     => $Token,
         ContactID => $ContactID,
     );
 
@@ -461,7 +476,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     $TokenValid = $ContactObject->TokenCheck(
-        Token  => $Token . '123',
+        Token     => $Token . '123',
         ContactID => $ContactID,
     );
 
@@ -473,8 +488,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     # testing preferences
 
     my $SetPreferences = $ContactObject->SetPreferences(
-        Key    => 'UserLanguage',
-        Value  => 'fr',
+        Key       => 'UserLanguage',
+        Value     => 'fr',
         ContactID => $ContactID,
     );
 
@@ -542,8 +557,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
 
     #update existing prefs
     my $UpdatePreferences = $ContactObject->SetPreferences(
-        Key    => 'UserLanguage',
-        Value  => 'da',
+        Key       => 'UserLanguage',
+        Value     => 'da',
         ContactID => $ContactID,
     );
 
@@ -578,8 +593,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         OrganisationIDs       => [
             $OrganisationID
         ],
-        ValidID               => 1,
-        UserID                => 1,
+        ValidID => 1,
+        UserID  => 1,
     );
     $Self->True(
         $Update,
@@ -602,6 +617,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     if ( $Key eq '1' ) {
+
         # delete the first contact
         my $Success = $ContactObject->ContactDelete(
             ID => $ContactID,
@@ -613,10 +629,10 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         );
     }
 }
+
 # cleanup is done by RestoreDatabase
 
 1;
-
 
 =back
 
