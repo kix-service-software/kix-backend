@@ -1,4 +1,4 @@
-"Role";"Type";"Target";"C";"R";"U";"D";"DN"
+"Rolle";"Typ";"Pfad";"C";"R";"U";"D";"DN"
 "Agent User";"resource";"/auth";"x";;;;
 "Agent User";"resource";"/session";"x";"x";"x";"x";
 "Agent User";"resource";"/system";;"x";;;
@@ -110,4 +110,12 @@
 "System Admin";"resource";"/system/roles";"x";"x";"x";"x";
 "System Admin";"resource";"/system/services";"x";"x";"x";"x";
 "System Admin";"resource";"/system/logs";;"x";;;
+"System Admin";"resource";"/system/ticket";"x";"x";"x";"x";
+"System Admin";"resource";"/system/ticket/*";;;;;
+"System Admin";"resource";"/system/ticket/locks";"x";"x";"x";"x";
+"System Admin";"resource";"/system/ticket/priorities";"x";"x";"x";"x";
+"System Admin";"resource";"/system/ticket/queues";"x";"x";"x";"x";
+"System Admin";"resource";"/system/ticket/states";"x";"x";"x";"x";
+"System Admin";"resource";"/system/ticket/types";"x";"x";"x";"x";
+"System Admin";"resource";"/system/ticket/slas";"x";"x";"x";"x";
 "Superuser";"resource";"/*";"x";"x";"x";"x";
