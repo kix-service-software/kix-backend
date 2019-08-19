@@ -1,16 +1,9 @@
 # --
-# Kernel/System/PerfLog.pm - support functions for performance logging
-# Copyright (C) 2006-2015 c.a.p.e. IT GmbH, http://www.cape-it.de/
-#
-# written by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# * Mario(dot)Illinger(at)cape(dash)it(dot)de
-# --
-# $Id: PerfLog.pm,v 1.12 2015/09/25 09:00:48 millinger Exp $
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::PerfLog;
@@ -334,3 +327,17 @@ sub SQLLogDeactivate {
 }
 1;
 
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

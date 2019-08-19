@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -34,14 +32,26 @@ $ConfigObject->Set(
     Value => 0,
 );
 
+my $OrgRand  = 'example-organisation' . $Helper->GetRandomID();
+
+my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+    Number => $OrgRand,
+    Name   => $OrgRand,
+    ValidID => 1,
+    UserID  => 1,
+);
+
 my $ContactID = $ContactObject->ContactAdd(
     Source         => 'Contact',
-    UserFirstname  => 'Firstname Test',
-    UserLastname   => 'Lastname Test',
-    UserCustomerID => $Contact . '-Customer-Id',
-    UserLogin      => $Contact,
-    UserEmail      => "john.doe.$Contact\@example.com",
-    UserPassword   => 'some_pass',
+    Firstname  => 'Firstname Test',
+    Lastname   => 'Lastname Test',
+    PrimaryOrganisationID => $OrgID,
+    OrganisationIDs => [
+        $OrgID
+    ],
+    Login      => $Contact,
+    Email      => "john.doe.$Contact\@example.com",
+    Password   => 'some_pass',
     ValidID        => 1,
     UserID         => 1,
 );
@@ -75,7 +85,7 @@ my @Tests = (
 );
 
 for my $Test (@Tests) {
-    my %Result = $ContactObject->CustomerSearch(
+    my %Result = $ContactObject->ContactSearch(
         PostMasterSearch => $Test->{PostMasterSearch},
     );
 
@@ -91,16 +101,17 @@ for my $Test (@Tests) {
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
