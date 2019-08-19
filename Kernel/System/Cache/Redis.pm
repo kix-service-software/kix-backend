@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Cache::Redis;
@@ -61,7 +61,7 @@ sub Set {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Self->_prepareMemCacheKey(%Param);
+    my $PreparedKey = $Self->_prepareRedisKey(%Param);
     my $TTL = $Param{TTL};
     if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
         foreach my $TypePattern (keys %{$Self->{Config}->{OverrideTTL}}) {
@@ -104,7 +104,7 @@ sub Get {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Self->_prepareMemCacheKey(%Param);
+    my $PreparedKey = $Self->_prepareRedisKey(%Param);
 
     my $Value = $Self->{RedisObject}->get(
         $PreparedKey,
@@ -135,7 +135,7 @@ sub Delete {
     return if ( !$Self->{RedisObject} );
 
     return $Self->{RedisObject}->del(
-        $Self->_prepareMemCacheKey(%Param)
+        $Self->_prepareRedisKey(%Param)
     );
 }
 
@@ -210,19 +210,19 @@ sub _initRedis {
     return 1;
 }
 
-=item _prepareMemCacheKey()
+=item _prepareRedisKey()
 
-Use MD5 digest of Key for memcached key (memcached key max length is 250);
+Use MD5 digest of Key (to prevent special and possibly unsupported characters in key);
 we use here algo similar to original one from FileStorable.pm.
 (thanks to Informatyka Boguslawski sp. z o.o. sp.k., http://www.ib.pl/ for testing and contributing the MD5 change)
 
-    my $PreparedKey = $CacheInternalObject->_prepareMemCacheKey(
+    my $PreparedKey = $CacheInternalObject->_prepareRedisKey(
         'SomeKey',
     );
 
 =cut
 
-sub _prepareMemCacheKey {
+sub _prepareRedisKey {
     my ( $Self, %Param ) = @_;
 
     if ($Param{Raw}) {
@@ -240,16 +240,17 @@ sub _prepareMemCacheKey {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

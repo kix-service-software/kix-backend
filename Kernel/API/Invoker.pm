@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Invoker;
@@ -37,181 +35,17 @@ For every Request, two methods are called:
 
 =item L</HandleResponse()>
 
-=back
-
-The first method prepares the response and can prevent it by returning
-an error state. The second method must always be called if the request
-was initiated to allow the Invoker to handle possible errors.
-
-=head1 PUBLIC INTERFACE
-
-=over 4
-
-=cut
-
-=item new()
-
-create an object.
-
-    use Kernel::API::Debugger;
-    use Kernel::API::Invoker;
-
-    my $DebuggerObject = Kernel::API::Debugger->new(
-        DebuggerConfig   => {
-            DebugThreshold => 'debug',
-            TestMode       => 0,           # optional, in testing mode the data will not be written to the DB
-            # ...
-        },
-        WebserviceID      => 12,
-        CommunicationType => Requester, # Requester or Provider
-        RemoteIP          => 192.168.1.1, # optional
-    );
-    my $InvokerObject = Kernel::API::Invoker->new(
-        DebuggerObject     => $DebuggerObject,
-        Invoker            => 'TicketLock',            # the name of the invoker in the web service
-        InvokerType        => 'Nagios::TicketLock',    # the Invoker backend to use
-        WebserviceID       => 1                        # the WebserviceID where the Invoker belongs
-                                                       # normally this is passed by the requester
-    );
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed params
-    for my $Needed (qw( DebuggerObject Invoker InvokerType WebserviceID )) {
-        if ( !$Param{$Needed} ) {
-
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!"
-            };
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    if ( !IsStringWithData( $Param{InvokerType} ) ) {
-
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got no Invoker Type as string with value!',
-        );
-    }
-
-    # load backend module
-    my $GenericModule = 'Kernel::API::Invoker::' . $Param{InvokerType};
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
-
-        return $Self->{DebuggerObject}->Error( Summary => "Can't load invoker backend module!" );
-    }
-    $Self->{BackendObject} = $GenericModule->new( %{$Self} );
-
-    # pass back error message from backend if backend module could not be executed
-    return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
-
-    return $Self;
-}
-
-=item PrepareRequest()
-
-prepare the invocation of the configured remote webservice.
-
-    my $Result = $InvokerObject->PrepareRequest(
-        Data => {                               # data payload
-            ...
-        },
-    );
-
-    $Result = {
-        Success         => 1,                   # 0 or 1
-        ErrorMessage    => '',                  # in case of error
-        Data            => {                    # data payload after Invoker
-            ...
-        },
-    };
-
-    $Result = {
-        Success           => 1,                 # 0 or 1
-        StopCommunication => 1,                 # in case of is not needed to continue with the
-                                                # request (do nothing just exist gracefully)
-    };
-
-=cut
-
-sub PrepareRequest {
-    my ( $Self, %Param ) = @_;
-
-    # check data - only accept undef or hash ref
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
-
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Invoker handler (PrepareRequest)!'
-        );
-    }
-
-    # start map on backend
-    return $Self->{BackendObject}->PrepareRequest(%Param);
-
-}
-
-=item HandleResponse()
-
-handle response data of the configured remote webservice.
-
-    my $Result = $InvokerObject->HandleResponse(
-        ResponseSuccess      => 1,              # success status of the remote webservice
-        ResponseErrorMessage => '',             # in case of webservice error
-        Data => {                               # data payload
-            ...
-        },
-    );
-
-    $Result = {
-        Success         => 1,                   # 0 or 1
-        ErrorMessage    => '',                  # in case of error
-        Data            => {                    # data payload after Invoker
-            ...
-        },
-    };
-
-=cut
-
-sub HandleResponse {
-    my ( $Self, %Param ) = @_;
-
-    # check data - only accept undef or hash ref
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
-
-        return $Self->{DebuggerObject}->Error(
-            Summary => 'Got Data but it is not a hash ref in Invoker handler (HandleResponse)!'
-        );
-    }
-
-    # start map on backend
-    return $Self->{BackendObject}->HandleResponse(%Param);
-
-}
-
-1;
-
-
-
 
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -536,37 +536,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Cache::Module::Memcached###Servers" Required="0" Valid="1">
-        <Description Translatable="1">Defines the memcached servers.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Cache</SubGroup>
-        <Setting>
-            <Array>
-                <Item>localhost:11211</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Cache::Module::Memcached###Parameters" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the (additional) memcached parameters.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Cache</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="nowait">1</Item>
-                <Item Key="utf8">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Cache::Module::Memcached###OverrideTTL" Required="0" Valid="1">
-        <Description Translatable="1">Allows overriding of object/cache type related TTLs.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Cache</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Cache::Module::Redis###Server" Required="0" Valid="1">
+,    <ConfigItem Name="Cache::Module::Redis###Server" Required="0" Valid="1">
         <Description Translatable="1">Defines the redis server to connect.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Cache</SubGroup>
