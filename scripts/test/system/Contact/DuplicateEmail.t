@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 use strict;
@@ -33,6 +31,15 @@ $Kernel::OM->Get('Kernel::Config')->Set(
 
 my $RandomID = $Helper->GetRandomID();
 
+my $OrgRand  = 'example-organisation' . $Helper->GetRandomID();
+
+my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+    Number => $OrgRand,
+    Name   => $OrgRand,
+    ValidID => 1,
+    UserID  => 1,
+);
+
 my @CustomerLogins;
 for my $Key ( 1 .. 2 ) {
 
@@ -41,7 +48,10 @@ for my $Key ( 1 .. 2 ) {
     my $ContactID = $ContactObject->ContactAdd(
         Firstname  => 'Firstname Test' . $Key,
         Lastname   => 'Lastname Test' . $Key,
-        PrimaryOrganisationID => $ContactRand . '-Customer-Id',     # TODO!!!
+        PrimaryOrganisationID => $OrgID,
+        OrganisationIDs => [
+            $OrgID
+        ],
         Login      => $ContactRand,
         Email      => $ContactRand . '-Email@example.com',
         Password   => 'some_pass',
@@ -49,10 +59,10 @@ for my $Key ( 1 .. 2 ) {
         UserID     => 1,
     );
 
-    push @CustomerLogins, $UserID;
+    push @CustomerLogins, $ContactID;
 
     $Self->True(
-        $UserID,
+        $ContactID,
         "ContactAdd() - $ContactID",
     );
 
@@ -60,7 +70,7 @@ for my $Key ( 1 .. 2 ) {
         ID         => $ContactID,
         Firstname  => 'Firstname Test Update' . $Key,
         Lastname   => 'Lastname Test Update' . $Key,
-        PrimaryOrganisationID => $ContactRand . '-Customer-Update-Id',          # TODO!!!
+        PrimaryOrganisationID => $OrgID,
         Login      => $ContactRand,
         Email      => $ContactRand . '-Update@example.com',
         ValidID    => 1,
@@ -74,40 +84,41 @@ for my $Key ( 1 .. 2 ) {
 }
 
 my %CustomerData = $ContactObject->ContactGet(
-    User => $CustomerLogins[0],
+    ID => $CustomerLogins[0],
 );
 
-my $Customer1Email = $CustomerData{UserEmail};
+my $Customer1Email = $CustomerData{Email};
 
 # create a new customer with email address of customer 1
-my $UserID = $ContactObject->ContactAdd(
-    Source         => 'Contact',
-    UserFirstname  => "Firstname Add $RandomID",
-    UserLastname   => "Lastname Add $RandomID",
-    UserCustomerID => "CustomerID Add $RandomID",
-    UserLogin      => "UserLogin Add $RandomID",
-    UserEmail      => $Customer1Email,
-    UserPassword   => 'some_pass',
+my $ContactID = $ContactObject->ContactAdd(
+    Firstname  => "Firstname Add $RandomID",
+    Lastname   => "Lastname Add $RandomID",
+    Login      => "UserLogin Add $RandomID",
+    Email      => $Customer1Email,
+    PrimaryOrganisationID => $OrgID,
+    OrganisationIDs => [
+        $OrgID
+    ],    
+    Password   => 'some_pass',
     ValidID        => 1,
     UserID         => 1,
 );
 
 $Self->False(
-    $UserID,
+    $ContactID,
     "ContactAdd() - not possible for duplicate email address",
 );
 
 %CustomerData = $ContactObject->ContactGet(
-    User => $CustomerLogins[1],
+    ID => $CustomerLogins[1],
 );
 
 # update user 1 with email address of customer 2
 my $Update = $ContactObject->ContactUpdate(
     %CustomerData,
-    Source    => 'Contact',
-    ID        => $CustomerData{UserLogin},
-    UserEmail => $Customer1Email,
-    UserID    => 1,
+    ID     => $CustomerData{ID},
+    Email  => $Customer1Email,
+    UserID => 1,
 );
 
 $Self->False(
@@ -120,16 +131,17 @@ $Self->False(
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
