@@ -255,12 +255,44 @@
             <String Regex="">Fax: [Fax number]</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="OrganizationLong" Required="1" Valid="1">
-        <Description Translatable="1">Extended organization description.</Description>
+    <ConfigItem Name="OrganizationLong" Required="0" Valid="1">
+        <Description Translatable="1">Your organizations name for use in placeholder.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
-            <String Regex="">[Organization], [Address], [Zip code] [City], [Country]</String>
+            <String Regex="">Your Organization Name</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="OrganizationAddress" Required="0" Valid="1">
+        <Description Translatable="1">Your organizations street for use in placeholder.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">Your Org Street 123</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="OrganizationRegistrationLocation" Required="0" Valid="1">
+        <Description Translatable="1">Your organizations registration location according to legal requirements (if applicable) for use in placeholder.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">Your Org Registration Location</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="OrganizationRegistrationNumber" Required="0" Valid="1">
+        <Description Translatable="1">Your organizations registration number according to legal requirements (if applicable) for use in placeholder.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">Your Org. Registration Number</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="OrganizationDirectors" Required="0" Valid="1">
+        <Description Translatable="1">The director/s mentioned in your organizations legal registration for use in placeholder.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">Your Org. Director/s according to Registration</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="Ticket::Acl::Module###500-ExternalSupplierForwarding" Required="0" Valid="0">

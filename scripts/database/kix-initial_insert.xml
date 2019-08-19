@@ -1429,6 +1429,94 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/ticket -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission _____ on /system/ticket/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>    
+    <!-- role "System Admin": permission CRUD_ on /system/ticket/locks -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/locks</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/ticket/priorities -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/priorities</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/ticket/queues -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/queues</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/ticket/states -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/states</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/ticket/types -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/types</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/ticket/slas -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket/slas</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Superuser": permission CRUD_ on /* -->
     <Insert Table="role_permission">
         <Data Key="role_id">1</Data>
@@ -9048,7 +9136,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 Input      => {
                     Type => 'Text',
                     MaxLength => 50,
-                    RegEx             => '\D',
+                    RegEx             => '\d',
                     RegExErrorMessage => 'Please enter decimal numbers only.',
                 },
             },

@@ -1063,7 +1063,7 @@ sub ImportPO {
         $DisableWarnings = 0;
     }
 
-    if ( IsHashRefWithData($Items) ) {        
+    if ( IsHashRefWithData($Items) ) {
         my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
 
         foreach my $MsgId ( sort keys %{$Items} ) {
@@ -1071,9 +1071,11 @@ sub ImportPO {
 
             my $MsgStr = $EncodeObject->EncodeInput($Items->{$MsgId}->msgstr);
             $MsgId =~ s/(?<!\\)"//g;
-            $MsgStr =~ s/(?<!\\)"//g;
             $MsgId =~ s/\\"/"/g;
-            $MsgStr =~ s/\\"/"/g;
+            if ($MsgStr) {
+                $MsgStr =~ s/(?<!\\)"//g;
+                $MsgStr =~ s/\\"/"/g;
+            }
 
             # the pattern is empty, go to the next one
             next if !$MsgId;
@@ -1091,7 +1093,7 @@ sub ImportPO {
                 if ( !$PatternID ) {
                     $Kernel::OM->Get('Kernel::System::Log')->Log(
                         Priority => 'error',
-                        Message  => "Unable to add translation pattern !"
+                        Message  => "Unable to add translation pattern for $MsgId!"
                     );
                     next;
                 }
