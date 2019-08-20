@@ -26,19 +26,6 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-# disable debugging
-foreach my $Type ( qw(Permission Cache) ) {
-    my $Success = $ConfigObject->Set(
-        Key   => $Type."::Debug",
-        Value => 0,
-    );
-
-    $Self->True(
-        $Success,
-        "Disabled $Type debugging",
-    );
-}
-
 # disable rich text editor
 my $Success = $ConfigObject->Set(
     Key   => 'Frontend::RichText',
@@ -106,60 +93,56 @@ $ConfigObject->Set(
 # get a random id
 my $RandomID = $Helper->GetRandomID();
 
-# get role object
-my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
-
-# add simple role
-my $RoleID = $RoleObject->RoleAdd(
-    Name    => "example-role$RandomID",
-    Comment => 'comment describing the role',
-    ValidID => 1,
-    UserID  => 1,
+# create role without permissions
+my $RoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+    Name        => "example-role$RandomID",
+    Permissions => {
+        Resource => [
+            {
+                Target => '/tickets',
+                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+            }
+        ]
+    }
 );
 
-# add ticket_deny role
-my $TicketDenyRoleID = $RoleObject->RoleAdd(
-    Name    => "ticket_deny_$RandomID",
-    ValidID => 1,
-    UserID  => 1,
+# create role with DENY on tickets
+my $TicketDenyRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+    Name        => "ticket_deny_$RandomID",
+    Permissions => {
+        Resource => [
+            {
+                Target => '/tickets',
+                Value  => Kernel::System::Role::Permission->PERMISSION->{DENY},
+            }
+        ]
+    }
 );
 
-$RoleObject->PermissionAdd(
-    RoleID => $TicketDenyRoleID,
-    TypeID => 1,
-    Target => '/tickets',
-    Value  => Kernel::System::Role::Permission->PERMISSION->{DENY},
-    UserID => 1,
+# create role with READ on tickets
+my $TicketReadRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+    Name        => "ticket_read_$RandomID",
+    Permissions => {
+        Resource => [
+            {
+                Target => '/tickets',
+                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+            }
+        ]
+    }
 );
 
-# add ticket_read role
-my $TicketReadRoleID = $RoleObject->RoleAdd(
-    Name    => "ticket_read_$RandomID",
-    ValidID => 1,
-    UserID  => 1,
-);
-
-$RoleObject->PermissionAdd(
-    RoleID => $TicketReadRoleID,
-    TypeID => 1,
-    Target => '/tickets',
-    Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
-    UserID => 1,
-);
-
-# add ticket_read role
-my $TicketWriteRoleID = $RoleObject->RoleAdd(
-    Name    => "ticket_write_$RandomID",
-    ValidID => 1,
-    UserID  => 1,
-);
-
-$RoleObject->PermissionAdd(
-    RoleID => $TicketWriteRoleID,
-    TypeID => 1,
-    Target => '/tickets',
-    Value  => Kernel::System::Role::Permission->PERMISSION->{UPDATE},
-    UserID => 1,
+# create role with WRITE on tickets
+my $TicketWriteRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+    Name        => "ticket_write_$RandomID",
+    Permissions => {
+        Resource => [
+            {
+                Target => '/tickets',
+                Value  => Kernel::System::Role::Permission->PERMISSION->{UPDATE},
+            }
+        ]
+    }
 );
 
 # get objects
@@ -881,6 +864,28 @@ my @Tests = (
         ],
         Success => 1,
     },
+    {
+        Name => 'HTML email',
+        ContentType => 'text/html',
+        Data => {
+            Events          => [ 'TicketCreate' ],
+            RecipientAgents => [$UserID],
+        },
+        Config => {
+            Event => 'TicketCreate',
+            Data  => {
+                TicketID => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                ToArray => [ $UserData{UserEmail} ],
+            },
+        ],
+        Success => 1,
+    },
 );
 
 my $SetPostMasterUserID = sub {
@@ -1023,11 +1028,28 @@ for my $Test (@Tests) {
     # add transport setting
     $Test->{Data}->{Transports} = ['Email'];
 
+    if ( $Test->{ContentType} && $Test->{ContentType} eq 'text/html' ) {
+        # enable RichText
+        $Kernel::OM->Get('Kernel::System::TemplateGenerator')->{RichText} = 1;
+        my $Success = $ConfigObject->Set(
+            Key   => 'Frontend::RichText',
+            Value => 1,
+        );
+    }
+    elsif ( $ConfigObject->Get('Frontend::RichText' )) {
+        # disable RichText
+        $Kernel::OM->Get('Kernel::System::TemplateGenerator')->{RichText} = 0;
+        my $Success = $ConfigObject->Set(
+            Key   => 'Frontend::RichText',
+            Value => 0,
+        );
+    }
+
     $NotificationID = $NotificationEventObject->NotificationAdd(
         Name    => "JobName$Count-$RandomID",
         Comment => 'An optional comment',
         Data    => $Test->{Data},
-        Message => {
+        Message => (!$Test->{ContentType} || $Test->{ContentType} ne 'text/html') ? {
             en => {
                 Subject     => 'JobName',
                 Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
@@ -1037,6 +1059,17 @@ for my $Test (@Tests) {
                 Subject     => 'JobName',
                 Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
                 ContentType => 'text/plain',
+            },
+        } : {
+            en => {
+                Subject     => 'JobName',
+                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_UserFirstname&gt;',
+                ContentType => 'text/html',
+            },
+            de => {
+                Subject     => 'JobName',
+                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_UserFirstname&gt;',
+                ContentType => 'text/html',
             },
         },
         ValidID => 1,
@@ -1111,6 +1144,11 @@ for my $Test (@Tests) {
 
         # de-reference body
         $Email->{Body} = ${ $Email->{Body} };
+
+        if ( $Test->{ContentType} && $Test->{ContentType} eq 'text/html' ) {
+            # at the moment we are not able to check the HTML body
+            delete $Email->{Body};
+        }
     }
 
     my @EmailSorted           = sort { $a->{ToArray}->[0] cmp $b->{ToArray}->[0] } @{$Emails};
