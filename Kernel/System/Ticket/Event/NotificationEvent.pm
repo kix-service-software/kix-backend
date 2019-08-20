@@ -300,8 +300,7 @@ sub Run {
                 {
                     next BUNDLE;
                 }
-
-                # Check if notification should not send to the customer.
+                # Check if notification should not be send to the customer.
                 if (
                     $Bundle->{Recipient}->{Type} eq 'Customer'
                     && $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
@@ -995,7 +994,11 @@ sub _SendRecipientNotification {
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # check if the notification needs to be sent just one time per day
-    if ( $Param{Notification}->{Data}->{OncePerDay} && $Param{Recipient}->{UserLogin} ) {
+    if ( 
+        IsArrayRefWithData($Param{Notification}->{Data}->{OncePerDay}) 
+        && $Param{Notification}->{Data}->{OncePerDay}->[0]
+        && $Param{Recipient}->{UserLogin} 
+    ) {
 
         # get ticket history
         my @HistoryLines = $TicketObject->HistoryGet(

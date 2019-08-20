@@ -180,8 +180,8 @@ sub SendNotification {
     # EO NotificationEventX-capeIT
 
     # Verify a customer have an email
-    if ( $Recipient{Type} eq 'Customer' && $Recipient{ID} ) {
-        if ( !$Recipient{Email} ) {
+    if ( $Recipient{Type} eq 'Customer' ) {
+        if ( !$Recipient{Email} && $Recipient{ID} ) {
             my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
                 ID => $Recipient{ID},
             );
@@ -227,8 +227,8 @@ sub SendNotification {
         # Get configured template with fallback to Default.
         my $EmailTemplate = $Param{Notification}->{Data}->{TransportEmailTemplate}->[0] || 'Default';
 
-        my $Home              = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-        my $TemplateDir       = "$Home/Kernel/Output/HTML/Templates/Notification/Email";
+        my $Home        = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+        my $TemplateDir = "$Home/Kernel/Output/HTML/Templates/Notification/Email";
 
         if ( !-r "$TemplateDir/$EmailTemplate.tt" ) {
             $EmailTemplate = 'Default';
@@ -502,7 +502,7 @@ sub GetTransportRecipients {
             my %Recipient;
             $Recipient{Realname}  = '';
             $Recipient{Type}      = 'Customer';
-            $Recipient{UserEmail} = $Param{Notification}->{Data}->{RecipientEmail}->[0];
+            $Recipient{Email} = $Param{Notification}->{Data}->{RecipientEmail}->[0];
 
             # check if we have a specified channel
             if ( $Param{Notification}->{Data}->{ChannelID} ) {
@@ -512,7 +512,7 @@ sub GetTransportRecipients {
             }
 
             # check recipients
-            if ( $Recipient{UserEmail} && $Recipient{UserEmail} =~ /@/ ) {
+            if ( $Recipient{Email} && $Recipient{Email} =~ /@/ ) {
                 push @Recipients, \%Recipient;
             }
         }

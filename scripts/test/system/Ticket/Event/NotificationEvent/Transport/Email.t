@@ -73,9 +73,24 @@ $Self->IsDeeply(
     'Test backend empty after initial cleanup',
 );
 
+# get a random id
+my $RandomID = $Helper->GetRandomID();
+
+my $RoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+    Name        => "ticket_read_$RandomID",
+    Permissions => {
+        Resource => [
+            {
+                Target => '/tickets',
+                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+            }
+        ]
+    }
+);
+
 # create a new user for current test
 my $UserLogin = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestUserCreate(
-    Groups => ['users'],
+    Roles => ["ticket_read_$RandomID"],
 );
 
 my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
@@ -94,8 +109,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
-    CustomerID   => 'example.com',
-    Contact => $UserData{UserLogin},
+    OrganisationID => 'example.com',
+    ContactID    => $UserData{UserLogin},
     OwnerID      => $UserID,
     UserID       => $UserID,
 );
@@ -127,9 +142,6 @@ $Self->True(
     $ArticleID,
     "ArticleCreate() successful for Article ID $ArticleID",
 );
-
-# get a random id
-my $RandomID = $Helper->GetRandomNumber();
 
 # get dynamic field object
 my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
@@ -168,7 +180,7 @@ my @Tests = (
         Data => {
             Events          => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientAgents => [$UserID],
-            RecipientEmail  => ['test@otrsexample.com'],
+            RecipientEmail  => ['test@kixexample.com'],
         },
         ExpectedResults => [
             {
@@ -176,7 +188,7 @@ my @Tests = (
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
             },
             {
-                ToArray => ['test@otrsexample.com'],
+                ToArray => ['test@kixexample.com'],
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
             },
         ],

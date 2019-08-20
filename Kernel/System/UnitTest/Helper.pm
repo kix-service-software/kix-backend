@@ -96,6 +96,19 @@ sub new {
 
     }
 
+    # disable debugging
+    foreach my $Type ( qw(Permission Cache) ) {
+        my $Success = $Kernel::OM->Get('Kernel::Config')->Set(
+            Key   => $Type."::Debug",
+            Value => 0,
+        );
+
+        $Self->{UnitTestObject}->True(
+            $Success,
+            "Disabled $Type debugging",
+        );
+    }
+
     return $Self;
 }
 
@@ -190,7 +203,7 @@ sub TestUserCreate {
     $Self->{TestUsers} ||= [];
     push( @{ $Self->{TestUsers} }, $TestUserID );
 
-    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserID" );
+    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserLogin ($TestUserID)" );
 
     # Add user to roles
     ROLE_NAME:
@@ -244,10 +257,11 @@ sub TestContactCreate {
 
     # create test user
     my $TestUser;
+    my $TestUserLogin;
     COUNT:
     for my $Count ( 1 .. 10 ) {
 
-        my $TestUserLogin = $Self->GetRandomID();
+        $TestUserLogin = $Self->GetRandomID();
 
         my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
             Number  => $TestUserLogin,
@@ -273,13 +287,13 @@ sub TestContactCreate {
 
     die 'Could not create test user' if !$TestUser;
 
-    # Remember UserID of the test user to later set it to invalid
+    # Remember IDs of the test user and organisation to later set it to invalid
     #   in the destructor.
     $Self->{TestContacts} ||= [];
     push( @{ $Self->{TestContacts} }, $TestUser );
 
     # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True( 1, "Created test contact $TestUser" );
+    $Self->{UnitTestObject}->True( 1, "Created test contact $TestUserLogin ($TestUser)" );
 
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
@@ -292,6 +306,68 @@ sub TestContactCreate {
     $Self->{UnitTestObject}->True( 1, "Set contact UserLanguage to $UserLanguage" );
 
     return $TestUser;
+}
+
+=item TestRoleCreate()
+
+creates a test role with given permissions that can be used in tests.
+Returns the ID and Name of the new role
+
+    my $RoleID = $Helper->TestRoleCreate(
+        Name => '...',
+        Permissions => {
+            Resource => [
+                { 
+                    Target => '/tickets', 
+                    Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                }
+            ]
+        }
+    );
+
+=cut
+
+sub TestRoleCreate {
+    my ( $Self, %Param ) = @_;
+
+    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+
+    # add ticket_read role
+    my $RoleID = $RoleObject->RoleAdd(
+        Name    => $Param{Name},
+        Comment => $Param{Comment},
+        ValidID => $Param{ValidID} || 1,
+        UserID  => 1,
+    );
+
+    die 'Could not create test role' if !$RoleID;
+
+    # Remember RoleID of the role to later set it to invalid
+    #   in the destructor.
+    $Self->{TestRoles} ||= [];
+    push( @{ $Self->{TestRoles} }, $RoleID );
+
+    $Self->{UnitTestObject}->True( 1, "Created test role $Param{Name} ($RoleID)" );
+
+    if ( ref $Param{Permissions} eq 'HASH' ) {
+        my %PermissionTypes = reverse $RoleObject->PermissionTypeList();
+
+        foreach my $Type ( %{$Param{Permissions}} ) {
+            foreach my $Permission ( @{$Param{Permissions}->{$Type}} ) {
+                my $Success = $RoleObject->PermissionAdd(
+                    RoleID => $RoleID,
+                    TypeID => $PermissionTypes{$Type},
+                    Target => $Permission->{Target},
+                    Value  => $Permission->{Value},
+                    UserID => 1,
+                );
+
+                die 'Could not create test role' if !$Success;
+            }
+        }
+    }
+
+    return $RoleID
 }
 
 =item BeginWork()
@@ -548,8 +624,51 @@ sub DESTROY {
                 # rkaiser - T#2017020290001194 - changed customer user to contact
                 $Success, "Set test contact $TestContact to invalid"
             );
+
+            # disable assigned organisation
+            my %Organisation = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                ID => $Contact{PrimaryOrganisationID}
+            );
+            $Success = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationUpdate(
+                %Organisation,
+                ID      => $Contact{PrimaryOrganisationID},
+                ValidID => 2,
+                UserID  => 1,
+            );
+
+            $Self->{UnitTestObject}->True(
+                $Success, "Set test organisation $Contact{PrimaryOrganisationID} to invalid"
+            );
         }
     }
+
+    # invalidate test roles
+    if ( ref $Self->{TestRoles} eq 'ARRAY' && @{ $Self->{TestRoles} } ) {
+        TESTROLES:
+        for my $TestRole ( @{ $Self->{TestRoles} } ) {
+
+            my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+                ID => $TestRole,
+            );
+
+            if ( !$Role{ID} ) {
+
+                # if no such role exists, there is no need to set it to invalid;
+                # happens when the test role is created inside a transaction
+                # that is later rolled back.
+                next TESTROLES;
+            }
+
+            # make test role invalid
+            my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
+                %Role,
+                ValidID      => 2,
+                ChangeUserID => 1,
+            );
+
+            $Self->{UnitTestObject}->True( $Success, "Set test role $TestRole to invalid" );
+        }
+    }    
 }
 
 =item ConfigSettingChange()
@@ -577,13 +696,6 @@ sub ConfigSettingChange {
     my $Value = $Param{Value};
 
     die "Need 'Key'" if !defined $Key;
-
-    my $RandomNumber = $Self->GetRandomNumber();
-
-    my $KeyDump = $Key;
-    $KeyDump =~ s|'|\\'|smxg;
-    $KeyDump = "\$Self->{'$KeyDump'}";
-    $KeyDump =~ s|\#{3}|'}->{'|smxg;
 
     # Also set at runtime in the ConfigObject. This will be destroyed at the end of the unit test.
     $Kernel::OM->Get('Kernel::Config')->Set(
