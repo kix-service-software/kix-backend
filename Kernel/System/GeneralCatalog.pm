@@ -249,7 +249,7 @@ sub ItemList {
     }
 
     # create sql string
-    my $SQL = "SELECT id, name FROM general_catalog $PreferencesTable "
+    my $SQL = "SELECT general_catalog.id, name FROM general_catalog $PreferencesTable "
         . "WHERE general_catalog_class = ? $PreferencesWhere ";
     my @BIND = ( \$Param{Class}, @PreferencesBind );
 
