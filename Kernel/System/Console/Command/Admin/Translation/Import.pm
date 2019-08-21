@@ -14,9 +14,6 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 use File::Basename;
-use File::Copy;
-use Pod::Strip;
-use Storable ();
 
 use Kernel::Language;
 use Kernel::System::VariableCheck qw(:all);
