@@ -31,7 +31,7 @@ my @Names = sort $LockObject->LockViewableLock(
 
 $Self->IsDeeply(
     \@Names,
-    [ 'tmp_lock', 'unlock' ],
+    [ 'unlock' ],
     'LockViewableLock()',
 );
 
@@ -39,11 +39,6 @@ my @Tests = (
     {
         Name   => 'Lookup - lock',
         Input  => 'lock',
-        Result => 1,
-    },
-    {
-        Name   => 'Lookup - tmp_lock',
-        Input  => 'tmp_lock',
         Result => 1,
     },
     {

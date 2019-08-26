@@ -2655,10 +2655,6 @@ msgid "lock"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "tmp_lock"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "note"
 msgstr ""
 
