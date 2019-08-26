@@ -1001,7 +1001,7 @@ sub AttachmentGet {
         if ( $Row[3] =~ /^base64;/ ) {
             # if the content starts with this pattern we need to replace it
             # this attachment has been created by the initial data import
-            $Row[3] =~ /^base64;//g;
+            $Row[3] =~ s/^base64;//g;
             $DecodeBase64 = 1;
         }
 
