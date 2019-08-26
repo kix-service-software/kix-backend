@@ -3460,7 +3460,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="content_type" Type="Quote">img/png</Data>
         <Data Key="content_id" Type="Quote"><![CDATA[<pasted.1563537680.585160@yourhost.example.com>]]></Data>
         <Data Key="disposition" Type="Quote">inline</Data>
-        <Data Key="content" Type="Quote"><![CDATA[iVBORw0KGgoAAAANSUhEUgAAA5kAAAJECAYAAACcgeBjAAGq4ElEQVR4nOydB3wcxfXHf9ebTr33
+        <Data Key="content" Type="Quote" DecodeBase64="true"><![CDATA[iVBORw0KGgoAAAANSUhEUgAAA5kAAAJECAYAAACcgeBjAAGq4ElEQVR4nOydB3wcxfXHf9ebTr33
 Zrn33m0w1bTQW+glkFCTQICEDgkkgT+BEAgkQOgEAoFQTMc2NrZx77LVe+/Xy3/eSCvLsmxL9kkn
 We/rz1l3u7Ozs7uzu/Ob9+aN1i8AwzAMwzAMwzAMwwQAbbALwDAMwzAMwzAMwxw7sMhkGIZhGIZh
 GIZhAgaLTIZhGIZhGIZhGCZgsMhkGIZhGIZhGIZhAgaLTIZhGIZhGIZhGCZgsMhkGIZhGIZhGIZh
@@ -5392,7 +5392,7 @@ AAAASUVORK5CYII=
         <Data Key="content_type" Type="Quote">img/png</Data>
         <Data Key="content_id" Type="Quote"><![CDATA[<pasted.1563537693.378547@yourhost.example.com>]]></Data>
         <Data Key="disposition" Type="Quote">inline</Data>
-        <Data Key="content" Type="Quote"><![CDATA[iVBORw0KGgoAAAANSUhEUgAAA5kAAAJECAYAAACcgeBjAAAACXBIWXMAAAsTAAALEwEAmpwYAAGG
+        <Data Key="content" Type="Quote" DecodeBase64="true"><![CDATA[iVBORw0KGgoAAAANSUhEUgAAA5kAAAJECAYAAACcgeBjAAAACXBIWXMAAAsTAAALEwEAmpwYAAGG
 w0lEQVR4nOy9BXhkx5X+/TaLmWE0M9Iwo2HG9owhpsR2HDsbchzcbDacJ/CFYZPd0IY2//CGnMQO
 OOvEdszMNMyg0WjEzK3mr96SSu7pEaulbknnN0+Pum9fqHu7bt3z1jl1yh5SQBAEQRAEQRAEQRCi
 gD3WBRAEQRAEQRAEQRDmDiIyBUEQBEEQBEEQhKghIlMQBEEQBEEQBEGIGiIyBUEQBEEQBEEQhKgh
