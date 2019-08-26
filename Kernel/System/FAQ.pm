@@ -997,8 +997,16 @@ sub AttachmentGet {
     my %File;
     while ( my @Row = $DBObject->FetchrowArray() ) {
 
-        # decode attachment if it's a postgresql backend and not BLOB
-        if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
+        my $DecodeBase64 = 0;
+        if ( $Row[3] =~ /^base64;(.*?)/ ) {
+            # if the content starts with this pattern we need to replace it
+            # this attachment has been created by the initial data import
+            $Row[3] = $1;
+            $DecodeBase64 = 1;
+        }
+
+        # decode attachment if it's a postgresql backend and not BLOB or if it is a base64 encoded attachment from the initial data import
+        if ( $DecodeBase64 || !$DBObject->GetDatabaseFunction('DirectBlob') ) {
             $Row[3] = MIME::Base64::decode_base64( $Row[3] );
         }
 
