@@ -418,8 +418,6 @@ sub _TicketCreate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Ticket->{DynamicFields}} ) {
-            next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
-
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
                 TicketID => $TicketID,

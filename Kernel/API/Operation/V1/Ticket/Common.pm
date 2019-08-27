@@ -34,48 +34,6 @@ Kernel::API::Operation::V1::Ticket::Common - Base class for all Ticket Operation
 
 =cut
 
-=item Init()
-
-initialize the operation by checking the webservice configuration and gather of the dynamic fields
-
-    my $Return = $CommonObject->Init(
-        WebserviceID => 1,
-    );
-
-    $Return = {
-        Success => 1,                       # or 0 in case of failure,
-        ErrorMessage => 'Error Message',
-    }
-
-=cut
-
-sub Init {
-    my ( $Self, %Param ) = @_;
-
-    my $InitResult = $Self->SUPER::Init(%Param);
-
-    if ( !$InitResult->{Success} ) {
-        return $InitResult;
-    }
-
-    # get the dynamic fields
-    my $DynamicField = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
-        Valid      => 1,
-        ObjectType => [ 'Ticket', 'Article' ],
-    );
-
-    # create a Dynamic Fields lookup table (by name)
-    DYNAMICFIELD:
-    for my $DynamicField ( @{$DynamicField} ) {
-        next DYNAMICFIELD if !$DynamicField;
-        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
-        next DYNAMICFIELD if !$DynamicField->{Name};
-        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
-    }
-
-    return $Self->_Success();
-}
-
 =item ValidateCustomerService()
 
 checks if the given service or service ID is valid for this customer / customer contact.
@@ -396,8 +354,8 @@ sub ValidateDynamicFieldValue {
 checks if the given dynamic field name is valid.
 
     my $Success = $CommonObject->ValidateDynamicFieldObjectType(
-        Name    => 'some name',
-        Article => 1,               # if article exists
+        Name       => 'some name',
+        ObjectType => 'Ticket'
     );
 
     returns
@@ -416,7 +374,7 @@ sub ValidateDynamicFieldObjectType {
     return if !IsHashRefWithData( $Self->{DynamicFieldLookup}->{ $Param{Name} } );
 
     my $DynamicFieldConfg = $Self->{DynamicFieldLookup}->{ $Param{Name} };
-    return if $DynamicFieldConfg->{ObjectType} eq 'Article' && !$Param{Article};
+    return if $DynamicFieldConfg->{ObjectType} eq $Param{ObjectType};
 
     return 1;
 }
@@ -465,6 +423,21 @@ sub SetDynamicFieldValue {
                 Message => "SetDynamicFieldValue() Invalid value for $Needed, just string is allowed!"
             );
         }
+    }
+
+    # get the dynamic fields
+    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => [ 'Ticket', 'Article' ],
+    );
+
+    # create a Dynamic Fields lookup table (by name)
+    DYNAMICFIELD:
+    for my $DynamicField ( @{$DynamicFieldList} ) {
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
+        next DYNAMICFIELD if !$DynamicField->{Name};
+        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
     }
 
     # check value structure
@@ -599,7 +572,10 @@ sub _CheckTicket {
             }
 
             # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
+            my $DynamicFieldCheck = $Self->_CheckDynamicField( 
+                DynamicField => $DynamicFieldItem,
+                ObjectType   => 'Ticket'
+            );
 
             if ( !$DynamicFieldCheck->{Success} ) {
                 return $Self->_Error( 
@@ -760,7 +736,10 @@ sub _CheckArticle {
             }
 
             # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
+            my $DynamicFieldCheck = $Self->_CheckDynamicField( 
+                DynamicField => $DynamicFieldItem,
+                ObjectType   => 'Article'
+            );
 
             if ( !$DynamicFieldCheck->{Success} ) {
                 return $Self->_Error( 
@@ -780,6 +759,7 @@ checks if the given dynamic field parameter is valid.
 
     my $DynamicFieldCheck = $OperationObject->_CheckDynamicField(
         DynamicField => $DynamicField,              # all dynamic field parameters
+        ObjectType   => 'Ticket'
     );
 
     returns:
@@ -797,6 +777,21 @@ checks if the given dynamic field parameter is valid.
 
 sub _CheckDynamicField {
     my ( $Self, %Param ) = @_;
+
+    # get the dynamic fields
+    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => [ 'Ticket', 'Article' ],
+    );
+
+    # create a Dynamic Fields lookup table (by name)
+    DYNAMICFIELD:
+    for my $DynamicField ( @{$DynamicFieldList} ) {
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
+        next DYNAMICFIELD if !$DynamicField->{Name};
+        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
+    }
 
     my $DynamicField = $Param{DynamicField};
 
@@ -819,6 +814,14 @@ sub _CheckDynamicField {
         return $Self->_Error(
             Code    => 'BadRequest',
             Message => "Parameter DynamicField::Name is invalid!",
+        );
+    }
+
+    # check DynamicField->Value
+    if ( !$Self->ValidateDynamicFieldObjectType( %{$DynamicField}, ObjectType => $Param{ObjectType} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField is invalid for object type \"$Param{ObjectType}\"!",
         );
     }
 

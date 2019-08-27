@@ -302,8 +302,6 @@ sub _ArticleUpdate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
-            next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
-
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
                 ArticleID => $Param{ArticleID},
