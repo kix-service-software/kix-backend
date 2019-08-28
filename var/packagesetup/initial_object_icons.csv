@@ -40,7 +40,6 @@
 "GeneralCatalogItem";"ITSM::ConfigItem::Class";"Hardware";"hardware.svg";"image/svg+xml"
 "TicketLockType";;"unlock";"lock-open.svg";"image/svg+xml"
 "TicketLockType";;"lock";"lock-close.svg";"image/svg+xml"
-"TicketLockType";;"tmp_lock";"lock-close.svg";"image/svg+xml"
 "ArticleSenderType";;"system";"internal.svg";"image/svg+xml"
 "ArticleSenderType";;"agent";"arrow-outward.svg";"image/svg+xml"
 "ArticleSenderType";;"external";"arrow-receive.svg";"image/svg+xml"
