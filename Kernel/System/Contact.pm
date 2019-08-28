@@ -261,6 +261,7 @@ sub ContactGet {
         shift @OrganisationIDs;
 
         $Contact{ID}                    = $Row[0];
+        $Contact{UserID}                = $Row[0]; # for backward compatibility (e.g. NotifcationEvent)
         $Contact{Login}                 = $Row[1];
         $Contact{Firstname}             = $Row[2];
         $Contact{Lastname}              = $Row[3];

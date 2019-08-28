@@ -1357,7 +1357,7 @@ sub CheckPermission {
         UserID => $Param{UserID}
     );
     
-    $Self->_PermissionDebug("roles assigned to UserID $Param{UserID}: " . join(', ', map { "\"$RoleList{$_}\" (ID $_)" } sort @UserRoleList));
+    $Self->_PermissionDebug("roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($RoleList{$_} || '')."\" (ID $_)" } sort @UserRoleList));
 
     # check the permission for each target level (from top to bottom) and role
     my $ResultingPermission;
@@ -1409,7 +1409,7 @@ sub CheckPermission {
     }
 
     # check if we have a DENY 
-    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+    return 0 if !defined $ResultingPermission || ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
 
     my $Granted = ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}}) == Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}};
 

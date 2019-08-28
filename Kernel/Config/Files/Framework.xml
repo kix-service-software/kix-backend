@@ -2993,7 +2993,7 @@
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
-            <String Regex="">^(root@localhost|admin@localhost)$</String>
+            <String Regex="">^(kix@localhost|admin@localhost)$</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="CheckEmailInvalidAddress" Required="1" Valid="1">

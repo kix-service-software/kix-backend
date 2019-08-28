@@ -714,6 +714,9 @@ sub Insert {
             else {
                 $Value = '';
             }
+            if ( $Tag->{DecodeBase64} && $Tag->{DecodeBase64} eq 'true' ) {
+                $Value = MIME::Base64::decode_base64($Value);
+            }
             if ( $Tag->{Type} && $Tag->{Type} eq 'Quote' ) {
                 $Value = "'" . ${ $Self->Quote( \$Value ) } . "'";
             }

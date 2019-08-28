@@ -62,7 +62,7 @@ sub ArticleStorageInit {
     # get activated cache backend configuration
     my $CacheModule = $ConfigObject->Get('Cache::Module') || '';
 
-,    return 1 if !$ConfigObject->Get('Cache::ArticleStorageCache');
+    return 1 if !$ConfigObject->Get('Cache::ArticleStorageCache');
 
     $Self->{ArticleStorageCache} = 1;
     $Self->{ArticleStorageCacheTTL} = $ConfigObject->Get('Cache::ArticleStorageCache::TTL') || 60 * 60 * 24;

@@ -400,13 +400,6 @@ sub _ArticleCreate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
-
-            my $IsArticleDynamicField = $Self->ValidateDynamicFieldObjectType(
-                %{$DynamicField},
-                Article => 1,
-            );
-            next DYNAMICFIELD if !$IsArticleDynamicField;
-
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
                 TicketID  => $Ticket->{TicketID},

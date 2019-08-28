@@ -85,18 +85,18 @@ Return all users whose UserID isn't 1, 2 oder 3 and whose first name doesn't beg
         "AND": [
             {
                 "Field": "UserEmail",
-                "Operation": "ENDSWITH",
+                "Operator": "ENDSWITH",
                 "Value": "cape-it.de"
             },
             {
                 "Field": "UserID",
-                "Operation": "IN",
+                "Operator": "IN",
                 "Value": [ 1, 2, 3 ],
                 "Type": "numeric"
             },
             {
                 "Field": "UserFirstname",
-                "Operation": "STARTSWITH",
+                "Operator": "STARTSWITH",
                 "Value": "$UserComment",
                 "Not": true
             }
