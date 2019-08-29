@@ -81,7 +81,7 @@ sub Run {
     my @Lines = @{$LinesRef};
     shift @Lines;
 
-    foreach my $Line (@Lines) {
+    foreach my $Line (@Lines) {        
         my $Role   = $Line->[0];
         my $Target = $Line->[2];
         my $Value  = 0
@@ -96,6 +96,9 @@ sub Run {
             Format => 'Short'
         );
         $PermissionStr =~ s/-/_/g;
+
+        $Role   =~ s/ *$//g;
+        $Target =~ s/ *$//g;
 
         my $XML =
             "    <!-- role \"$Role\": permission $PermissionStr on $Target -->
