@@ -4,11 +4,11 @@
 "Agent User";"resource";"/system";;"x";;;
 "Agent User";"resource";"/system/*";;;;;
 "Agent User";"resource";"/system/users";;"x";;;
-"Agent User";"resource";"/system/config ";;"x";;;
+"Agent User";"resource";"/system/config";;"x";;;
 "Agent User";"resource";"/system/objectdefinitions";;"x";;;
 "Agent User";"resource";"/system/valid";;"x";;;
-"Agent User";"resource";"/system/objecticons ";;"x";;;
-"Agent User";"resource";"/system/generalcatalog ";;"x";;;
+"Agent User";"resource";"/system/objecticons";;"x";;;
+"Agent User";"resource";"/system/generalcatalog";;"x";;;
 "Agent User";"resource";"/i18n";;"x";;;
 "Ticket Reader";"resource";"/tickets";;"x";;;
 "Ticket Reader";"resource";"/system/services";;"x";;;
@@ -20,7 +20,7 @@
 "Ticket Reader";"resource";"/system/ticket/states";;"x";;;
 "Ticket Reader";"resource";"/system/ticket/types";;"x";;;
 "Ticket Reader";"resource";"/system/ticket/slas";;"x";;;
-"Ticket Reader";"resource";"/system/communication ";;"x";;;
+"Ticket Reader";"resource";"/system/communication";;"x";;;
 "Ticket Reader";"resource";"/system/communication/*";;;;;
 "Ticket Reader";"resource";"/system/communication/channels";;"x";;;
 "Ticket Reader";"resource";"/system/communication/sendertypes";;"x";;;
@@ -35,7 +35,7 @@
 "Ticket Agent";"resource";"/system/ticket/states";;"x";;;
 "Ticket Agent";"resource";"/system/ticket/types";;"x";;;
 "Ticket Agent";"resource";"/system/ticket/slas";;"x";;;
-"Ticket Agent";"resource";"/system/communication ";;"x";;;
+"Ticket Agent";"resource";"/system/communication";;"x";;;
 "Ticket Agent";"resource";"/system/communication/*";;;;;
 "Ticket Agent";"resource";"/system/communication/channels";;"x";;;
 "Ticket Agent";"resource";"/system/communication/sendertypes";;"x";;;
@@ -46,11 +46,11 @@
 "Ticket Agent";"resource";"/links";"x";"x";"x";"x";
 "Ticket Creator";"resource";"/tickets";"x";;;;
 "Ticket Creator";"resource";"/system/ticket";;"x";;;
-"Ticket Creator";"resource";"/system/communication ";;"x";;;
+"Ticket Creator";"resource";"/system/communication";;"x";;;
 "Ticket Creator";"resource";"/system/communication/*";;;;;
-"Ticket Creator";"resource";"/system/communication/channels ";;"x";;;
-"Ticket Creator";"resource";"/system/communication/sendertypes ";;"x";;;
-"Ticket Creator";"resource";"/system/communication/systemaddresses ";;"x";;;
+"Ticket Creator";"resource";"/system/communication/channels";;"x";;;
+"Ticket Creator";"resource";"/system/communication/sendertypes";;"x";;;
+"Ticket Creator";"resource";"/system/communication/systemaddresses";;"x";;;
 "FAQ Reader";"resource";"/system/faq";;"x";;;
 "FAQ Reader";"resource";"/system/faq/*";;;;;
 "FAQ Reader";"resource";"/system/faq/categories";;"x";;;
@@ -83,7 +83,7 @@
 "Customer Reader";"resource";"/contacts";;"x";;;
 "Customer Manager";"resource";"/organisations";"x";"x";"x";"x";
 "Customer Manager";"resource";"/contacts";"x";"x";"x";"x";
-"System Admin";"resource";"/system ";"x";"x";"x";"x";
+"System Admin";"resource";"/system";"x";"x";"x";"x";
 "System Admin";"resource";"/system/*";;;;;
 "System Admin";"resource";"/system/cmdb";"x";"x";"x";"x";
 "System Admin";"resource";"/system/cmdb/*";;;;;

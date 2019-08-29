@@ -267,7 +267,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/config </Data>
+        <Data Key="target" Type="Quote">/system/config</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -300,7 +300,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/objecticons </Data>
+        <Data Key="target" Type="Quote">/system/objecticons</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -311,7 +311,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/generalcatalog </Data>
+        <Data Key="target" Type="Quote">/system/generalcatalog</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -443,7 +443,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">4</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/communication </Data>
+        <Data Key="target" Type="Quote">/system/communication</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -608,7 +608,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">5</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/communication </Data>
+        <Data Key="target" Type="Quote">/system/communication</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -729,7 +729,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/communication </Data>
+        <Data Key="target" Type="Quote">/system/communication</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -751,7 +751,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/communication/channels </Data>
+        <Data Key="target" Type="Quote">/system/communication/channels</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -762,7 +762,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/communication/sendertypes </Data>
+        <Data Key="target" Type="Quote">/system/communication/sendertypes</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -773,7 +773,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/communication/systemaddresses </Data>
+        <Data Key="target" Type="Quote">/system/communication/systemaddresses</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -1136,7 +1136,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">2</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system </Data>
+        <Data Key="target" Type="Quote">/system</Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
