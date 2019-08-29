@@ -1514,7 +1514,7 @@ sub _ApplyFilter {
 
                                     # the string matches the pattern
                                     elsif ( $FilterItem->{Operator} eq 'LIKE' ) {
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/i ) {
+                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/im ) {
                                             $FilterMatch = 0;
                                         }
                                     }
