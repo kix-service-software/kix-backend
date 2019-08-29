@@ -1,0 +1,81 @@
+"Class";"Name";"Functionality"
+"ITSM::Core::IncidentState";"Operational";"operational"
+"ITSM::Core::IncidentState";"Warning";"warning"
+"ITSM::Core::IncidentState";"Incident";"incident"
+"ITSM::ConfigItem::Class";"Computer";
+"ITSM::ConfigItem::Class";"Hardware";
+"ITSM::ConfigItem::Class";"Location";
+"ITSM::ConfigItem::Class";"Building";
+"ITSM::ConfigItem::Class";"Room";
+"ITSM::ConfigItem::Class";"Network";
+"ITSM::ConfigItem::Class";"Software";
+"ITSM::ConfigItem::DeploymentState";"Expired";"productive"
+"ITSM::ConfigItem::DeploymentState";"Inactive";"postproductive"
+"ITSM::ConfigItem::DeploymentState";"Maintenance";"productive"
+"ITSM::ConfigItem::DeploymentState";"Pilot";"productive"
+"ITSM::ConfigItem::DeploymentState";"Planned";"preproductive"
+"ITSM::ConfigItem::DeploymentState";"Production";"productive"
+"ITSM::ConfigItem::DeploymentState";"Repair";"productive"
+"ITSM::ConfigItem::DeploymentState";"Retired";"postproductive"
+"ITSM::ConfigItem::DeploymentState";"Review";"productive"
+"ITSM::ConfigItem::DeploymentState";"Test/QA";"preproductive"
+"ITSM::ConfigItem::YesNo";"Yes";
+"ITSM::ConfigItem::YesNo";"No";
+"ITSM::ConfigItem::Computer::Type";"Desktop";
+"ITSM::ConfigItem::Computer::Type";"Phone";
+"ITSM::ConfigItem::Computer::Type";"Server";
+"ITSM::ConfigItem::Computer::Type";"Other";
+"ITSM::ConfigItem::Computer::Type";"Laptop";
+"ITSM::ConfigItem::Hardware::Type";"Monitor";
+"ITSM::ConfigItem::Hardware::Type";"Printer";
+"ITSM::ConfigItem::Hardware::Type";"Switch";
+"ITSM::ConfigItem::Hardware::Type";"Router";
+"ITSM::ConfigItem::Hardware::Type";"WLAN Access Point";
+"ITSM::ConfigItem::Hardware::Type";"Security Device";
+"ITSM::ConfigItem::Hardware::Type";"Backup Device";
+"ITSM::ConfigItem::Hardware::Type";"Mouse";
+"ITSM::ConfigItem::Hardware::Type";"Keyboard";
+"ITSM::ConfigItem::Hardware::Type";"Camera";
+"ITSM::ConfigItem::Hardware::Type";"Beamer";
+"ITSM::ConfigItem::Hardware::Type";"Modem";
+"ITSM::ConfigItem::Hardware::Type";"USB Device";
+"ITSM::ConfigItem::Hardware::Type";"Docking Station";
+"ITSM::ConfigItem::Hardware::Type";"Scanner";
+"ITSM::ConfigItem::Hardware::Type";"Other";
+"ITSM::ConfigItem::Location::Type";"Building";
+"ITSM::ConfigItem::Location::Type";"Office";
+"ITSM::ConfigItem::Location::Type";"Floor";
+"ITSM::ConfigItem::Location::Type";"Room";
+"ITSM::ConfigItem::Location::Type";"Rack";
+"ITSM::ConfigItem::Location::Type";"Workplace";
+"ITSM::ConfigItem::Location::Type";"Outlet";
+"ITSM::ConfigItem::Location::Type";"IT Facility";
+"ITSM::ConfigItem::Location::Type";"Other";
+"ITSM::ConfigItem::Network::Type";"LAN";
+"ITSM::ConfigItem::Network::Type";"WLAN";
+"ITSM::ConfigItem::Network::Type";"Telco";
+"ITSM::ConfigItem::Network::Type";"GSM";
+"ITSM::ConfigItem::Network::Type";"Other";
+"ITSM::ConfigItem::Software::Type";"Client Application";
+"ITSM::ConfigItem::Software::Type";"Middleware";
+"ITSM::ConfigItem::Software::Type";"Server Application";
+"ITSM::ConfigItem::Software::Type";"Client OS";
+"ITSM::ConfigItem::Software::Type";"Server OS";
+"ITSM::ConfigItem::Software::Type";"Admin Tool";
+"ITSM::ConfigItem::Software::Type";"User Tool";
+"ITSM::ConfigItem::Software::Type";"Embedded";
+"ITSM::ConfigItem::Software::Type";"Other";
+"ITSM::ConfigItem::Software::LicenceType";"Single Licence";
+"ITSM::ConfigItem::Software::LicenceType";"Per User";
+"ITSM::ConfigItem::Software::LicenceType";"Concurrent Users";
+"ITSM::ConfigItem::Software::LicenceType";"Per Processor";
+"ITSM::ConfigItem::Software::LicenceType";"Per Server";
+"ITSM::ConfigItem::Software::LicenceType";"Per Node";
+"ITSM::ConfigItem::Software::LicenceType";"Volume Licence";
+"ITSM::ConfigItem::Software::LicenceType";"Enterprise Licence";
+"ITSM::ConfigItem::Software::LicenceType";"Developer Licence";
+"ITSM::ConfigItem::Software::LicenceType";"Demo";
+"ITSM::ConfigItem::Software::LicenceType";"Time Restricted";
+"ITSM::ConfigItem::Software::LicenceType";"Freeware";
+"ITSM::ConfigItem::Software::LicenceType";"Unlimited";
+"ITSM::ConfigItem::Software::LicenceType";"Open Source";
