@@ -7139,869 +7139,869 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 <!-- general_catalog -->
     <Insert Table="general_catalog">
-        <Data Key="id">1</Data>
+        <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::Core::IncidentState</Data>
         <Data Key="name" Type="Quote">Operational</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">2</Data>
+        <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::Core::IncidentState</Data>
         <Data Key="name" Type="Quote">Warning</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">3</Data>
+        <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::Core::IncidentState</Data>
         <Data Key="name" Type="Quote">Incident</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">50</Data>
+        <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Computer</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">51</Data>
+        <Data Key="id" Type="AutoIncrement">5</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Hardware</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">52</Data>
+        <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Location</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">53</Data>
+        <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Building</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">54</Data>
+        <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Room</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">55</Data>
+        <Data Key="id" Type="AutoIncrement">9</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Network</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">56</Data>
+        <Data Key="id" Type="AutoIncrement">10</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Class</Data>
         <Data Key="name" Type="Quote">Software</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">100</Data>
+        <Data Key="id" Type="AutoIncrement">11</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Expired</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">101</Data>
+        <Data Key="id" Type="AutoIncrement">12</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Inactive</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">102</Data>
+        <Data Key="id" Type="AutoIncrement">13</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Maintenance</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">103</Data>
+        <Data Key="id" Type="AutoIncrement">14</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Pilot</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">104</Data>
+        <Data Key="id" Type="AutoIncrement">15</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Planned</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">105</Data>
+        <Data Key="id" Type="AutoIncrement">16</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Production</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">106</Data>
+        <Data Key="id" Type="AutoIncrement">17</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Repair</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">107</Data>
+        <Data Key="id" Type="AutoIncrement">18</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Retired</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">108</Data>
+        <Data Key="id" Type="AutoIncrement">19</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Review</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">109</Data>
+        <Data Key="id" Type="AutoIncrement">20</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::DeploymentState</Data>
         <Data Key="name" Type="Quote">Test/QA</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">150</Data>
+        <Data Key="id" Type="AutoIncrement">21</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::YesNo</Data>
         <Data Key="name" Type="Quote">Yes</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">151</Data>
+        <Data Key="id" Type="AutoIncrement">22</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::YesNo</Data>
         <Data Key="name" Type="Quote">No</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">41</Data>
-        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
-        <Data Key="name" Type="Quote">Laptop</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-    </Insert>
-    <Insert Table="general_catalog">
-        <Data Key="id">200</Data>
+        <Data Key="id" Type="AutoIncrement">23</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Desktop</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">201</Data>
+        <Data Key="id" Type="AutoIncrement">24</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Phone</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">202</Data>
+        <Data Key="id" Type="AutoIncrement">25</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Server</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">203</Data>
+        <Data Key="id" Type="AutoIncrement">26</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
         <Data Key="name" Type="Quote">Other</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">250</Data>
+        <Data Key="id" Type="AutoIncrement">27</Data>
+        <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Computer::Type</Data>
+        <Data Key="name" Type="Quote">Laptop</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="general_catalog">
+        <Data Key="id" Type="AutoIncrement">28</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Monitor</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">251</Data>
+        <Data Key="id" Type="AutoIncrement">29</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Printer</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">252</Data>
+        <Data Key="id" Type="AutoIncrement">30</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Switch</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">253</Data>
+        <Data Key="id" Type="AutoIncrement">31</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Router</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">254</Data>
+        <Data Key="id" Type="AutoIncrement">32</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">WLAN Access Point</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">255</Data>
+        <Data Key="id" Type="AutoIncrement">33</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Security Device</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">256</Data>
+        <Data Key="id" Type="AutoIncrement">34</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Backup Device</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">257</Data>
+        <Data Key="id" Type="AutoIncrement">35</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Mouse</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">258</Data>
+        <Data Key="id" Type="AutoIncrement">36</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Keyboard</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">259</Data>
+        <Data Key="id" Type="AutoIncrement">37</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Camera</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">260</Data>
+        <Data Key="id" Type="AutoIncrement">38</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Beamer</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">261</Data>
+        <Data Key="id" Type="AutoIncrement">39</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Modem</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">262</Data>
+        <Data Key="id" Type="AutoIncrement">40</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">USB Device</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">263</Data>
+        <Data Key="id" Type="AutoIncrement">41</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Docking Station</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">264</Data>
+        <Data Key="id" Type="AutoIncrement">42</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Scanner</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">265</Data>
+        <Data Key="id" Type="AutoIncrement">43</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Hardware::Type</Data>
         <Data Key="name" Type="Quote">Other</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">300</Data>
+        <Data Key="id" Type="AutoIncrement">44</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Building</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">301</Data>
+        <Data Key="id" Type="AutoIncrement">45</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Office</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">302</Data>
+        <Data Key="id" Type="AutoIncrement">46</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Floor</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">303</Data>
+        <Data Key="id" Type="AutoIncrement">47</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Room</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">304</Data>
+        <Data Key="id" Type="AutoIncrement">48</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Rack</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">305</Data>
+        <Data Key="id" Type="AutoIncrement">49</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Workplace</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">306</Data>
+        <Data Key="id" Type="AutoIncrement">50</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Outlet</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">307</Data>
+        <Data Key="id" Type="AutoIncrement">51</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">IT Facility</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">308</Data>
+        <Data Key="id" Type="AutoIncrement">52</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Location::Type</Data>
         <Data Key="name" Type="Quote">Other</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">350</Data>
+        <Data Key="id" Type="AutoIncrement">53</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Network::Type</Data>
         <Data Key="name" Type="Quote">LAN</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">351</Data>
+        <Data Key="id" Type="AutoIncrement">54</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Network::Type</Data>
         <Data Key="name" Type="Quote">WLAN</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">352</Data>
+        <Data Key="id" Type="AutoIncrement">55</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Network::Type</Data>
         <Data Key="name" Type="Quote">Telco</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">353</Data>
+        <Data Key="id" Type="AutoIncrement">56</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Network::Type</Data>
         <Data Key="name" Type="Quote">GSM</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">354</Data>
+        <Data Key="id" Type="AutoIncrement">57</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Network::Type</Data>
         <Data Key="name" Type="Quote">Other</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">400</Data>
+        <Data Key="id" Type="AutoIncrement">58</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Client Application</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">401</Data>
+        <Data Key="id" Type="AutoIncrement">59</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Middleware</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">402</Data>
+        <Data Key="id" Type="AutoIncrement">60</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Server Application</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">403</Data>
+        <Data Key="id" Type="AutoIncrement">61</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Client OS</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">404</Data>
+        <Data Key="id" Type="AutoIncrement">62</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Server OS</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">405</Data>
+        <Data Key="id" Type="AutoIncrement">63</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Admin Tool</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">406</Data>
+        <Data Key="id" Type="AutoIncrement">64</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">User Tool</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">407</Data>
+        <Data Key="id" Type="AutoIncrement">65</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Embedded</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">408</Data>
+        <Data Key="id" Type="AutoIncrement">66</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::Type</Data>
         <Data Key="name" Type="Quote">Other</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">450</Data>
+        <Data Key="id" Type="AutoIncrement">67</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Single Licence</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">451</Data>
+        <Data Key="id" Type="AutoIncrement">68</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Per User</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">452</Data>
+        <Data Key="id" Type="AutoIncrement">69</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Concurrent Users</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">453</Data>
+        <Data Key="id" Type="AutoIncrement">70</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Per Processor</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">454</Data>
+        <Data Key="id" Type="AutoIncrement">71</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Per Server</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">455</Data>
+        <Data Key="id" Type="AutoIncrement">72</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Per Node</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">456</Data>
+        <Data Key="id" Type="AutoIncrement">73</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Volume Licence</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">457</Data>
+        <Data Key="id" Type="AutoIncrement">74</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Enterprise Licence</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">458</Data>
+        <Data Key="id" Type="AutoIncrement">75</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Developer Licence</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">459</Data>
+        <Data Key="id" Type="AutoIncrement">76</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Demo</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">460</Data>
+        <Data Key="id" Type="AutoIncrement">77</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Time Restricted</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">461</Data>
+        <Data Key="id" Type="AutoIncrement">78</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Freeware</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">462</Data>
+        <Data Key="id" Type="AutoIncrement">79</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Unlimited</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="general_catalog">
-        <Data Key="id">463</Data>
+        <Data Key="id" Type="AutoIncrement">80</Data>
         <Data Key="general_catalog_class" Type="Quote">ITSM::ConfigItem::Software::LicenceType</Data>
         <Data Key="name" Type="Quote">Open Source</Data>
         <Data Key="valid_id">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
         <Data Key="create_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
 <!-- general catalog preferences -->
-    <Insert Table="general_catalog_preferences">
+   <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">1</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">operational</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
+   <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">2</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">warning</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
+   <Insert Table="general_catalog_preferences">
         <Data Key="general_catalog_id">3</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">incident</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">100</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">11</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">101</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">12</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">postproductive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">102</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">13</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">103</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">14</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">104</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">15</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">preproductive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">105</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">16</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">106</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">17</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">107</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">18</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">postproductive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">108</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">19</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">productive</Data>
     </Insert>
-    <Insert Table="general_catalog_preferences">
-        <Data Key="general_catalog_id">109</Data>
+   <Insert Table="general_catalog_preferences">
+        <Data Key="general_catalog_id">20</Data>
         <Data Key="pref_key" Type="Quote">Functionality</Data>
         <Data Key="pref_value" Type="Quote">preproductive</Data>
     </Insert>
@@ -8114,7 +8114,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 <!-- CI class Computer -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">50</Data>
+        <Data Key="class_id">4</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
@@ -8470,7 +8470,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     </Insert>
 <!-- CI class Hardware -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">51</Data>
+        <Data Key="class_id">5</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
@@ -8737,7 +8737,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     </Insert>
 <!-- CI class Location -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">52</Data>
+        <Data Key="class_id">6</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key => 'SectionGeneral',
@@ -8887,7 +8887,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     </Insert>
 <!-- CI class Building -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">53</Data>
+        <Data Key="class_id">7</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key => 'SectionGeneral',
@@ -9057,7 +9057,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     </Insert>
 <!-- CI class Room -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">54</Data>
+        <Data Key="class_id">8</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
@@ -9178,7 +9178,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     </Insert>
 <!-- CI class Network -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">55</Data>
+        <Data Key="class_id">9</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key        => 'Type',
@@ -9261,7 +9261,7 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     </Insert>
 <!-- CI class Software -->
     <Insert Table="configitem_definition">
-        <Data Key="class_id">56</Data>
+        <Data Key="class_id">10</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
         Key   => 'SectionGeneral',
