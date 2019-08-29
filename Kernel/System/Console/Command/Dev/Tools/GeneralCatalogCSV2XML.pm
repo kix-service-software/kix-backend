@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Console::Command::Dev::Tools::PermissionCSV2XML;
+package Kernel::System::Console::Command::Dev::Tools::GeneralCatalogCSV2XML;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('create permission XML from CSV.');
+    $Self->Description('create GeneralCatalog XML from CSV.');
 
     $Self->AddOption(
         Name        => 'file',
@@ -41,21 +41,6 @@ sub Configure {
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    my %RoleList = (
-        'Superuser'        => 1,
-        'System Admin'     => 2,
-        'Agent User'       => 3,
-        'Ticket Reader'    => 4,
-        'Ticket Agent'     => 5,
-        'Ticket Creator'   => 6,
-        'FAQ Reader'       => 7,
-        'FAQ Editor'       => 8,
-        'CMDB Reader'      => 9,
-        'CMDB Maintainer'  => 10,
-        'Customer Reader'  => 11,
-        'Customer Manager' => 12
-    );
 
     my $CSVFile = $Self->GetOption('file');
     if ( !-f $CSVFile ) {
@@ -81,32 +66,19 @@ sub Run {
     my @Lines = @{$LinesRef};
     shift @Lines;
 
-    foreach my $Line (@Lines) {        
-        my $Role   = $Line->[0];
-        my $Target = $Line->[2];
-        my $Value  = 0
-            + ( $Line->[3] ? Kernel::System::Role::Permission->PERMISSION->{CREATE} : 0 )
-            + ( $Line->[4] ? Kernel::System::Role::Permission->PERMISSION->{READ}   : 0 )
-            + ( $Line->[5] ? Kernel::System::Role::Permission->PERMISSION->{UPDATE} : 0 )
-            + ( $Line->[6] ? Kernel::System::Role::Permission->PERMISSION->{DELETE} : 0 )
-            + ( $Line->[7] ? Kernel::System::Role::Permission->PERMISSION->{DENY}   : 0 );
-
-        my $PermissionStr = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
-            Value  => $Value,
-            Format => 'Short'
-        );
-        $PermissionStr =~ s/-/_/g;
-
-        $Role   =~ s/ *$//g;
-        $Target =~ s/ *$//g;
+    my $ID = 1;
+    my @PrefList;
+    foreach my $Line (@Lines) {
+        my $Class = $Line->[0];
+        my $Name  = $Line->[1];
+        my $Functionality = $Line->[2];
 
         my $XML =
-            "    <!-- role \"$Role\": permission $PermissionStr on $Target -->
-    <Insert Table=\"role_permission\">
-        <Data Key=\"role_id\">$RoleList{$Role}</Data>
-        <Data Key=\"type_id\">1</Data>
-        <Data Key=\"target\" Type=\"Quote\">$Target</Data>
-        <Data Key=\"value\">$Value</Data>
+"    <Insert Table=\"general_catalog\">
+        <Data Key=\"id\" Type=\"AutoIncrement\">$ID</Data>
+        <Data Key=\"general_catalog_class\" Type=\"Quote\">$Class</Data>
+        <Data Key=\"name\" Type=\"Quote\">$Name</Data>
+        <Data Key=\"valid_id\">1</Data>
         <Data Key=\"create_by\">1</Data>
         <Data Key=\"create_time\">current_timestamp</Data>
         <Data Key=\"change_by\">1</Data>
@@ -114,8 +86,27 @@ sub Run {
     </Insert>";
 
         $Self->Print("$XML\n");
+
+        if ( $Functionality ) {
+            my $PrefXML =
+"   <Insert Table=\"general_catalog_preferences\">
+        <Data Key=\"general_catalog_id\">$ID</Data>
+        <Data Key=\"pref_key\" Type=\"Quote\">Functionality</Data>
+        <Data Key=\"pref_value\" Type=\"Quote\">$Functionality</Data>
+    </Insert>";
+
+            push(@PrefList, $PrefXML);
+        }
+
+        $ID++;
     }
 
+    if ( @PrefList ) {
+        $Self->Print("\n<!-- general catalog preferences -->\n");
+        foreach my $PrefXML ( @PrefList ) {
+            $Self->Print("$PrefXML\n");
+        }
+    }
     $Self->Print("\n<green>Done.</green>\n");
 
     return $Self->ExitCodeOk();
