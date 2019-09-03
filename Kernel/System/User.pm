@@ -1362,9 +1362,13 @@ sub CheckPermission {
     # check the permission for each target level (from top to bottom) and role
     my $ResultingPermission;
     my $Target;
+    my %RolePermissionHistory;    
     TARGETPART:
     foreach my $TargetPart ( split(/\//, $Param{Target}) ) {
         next if !$TargetPart;
+
+        # save parent for history
+        my $ParentTarget = $Target;
 
         $Target .= "/$TargetPart";
 
@@ -1377,8 +1381,11 @@ sub CheckPermission {
                 RoleID => $RoleID,
             );
 
-            # if no permissions have been found, go to the next role
-            next ROLEID if !defined $RolePermission;
+            # use parent permission if no permissions have been found
+            if ( !defined $RolePermission && $ParentTarget ) {
+                $RolePermission = $RolePermissionHistory{$ParentTarget}->{$RoleID};
+                $Self->_PermissionDebug("no permissions found for role $RoleID on target $Target, using parent permission");
+            }
 
             # init the value
             if ( !defined $TargetPermission ) {
@@ -1387,9 +1394,12 @@ sub CheckPermission {
 
             # combine permissions
             $TargetPermission |= ($RolePermission || 0);
+
+            # store permission in history
+            $RolePermissionHistory{$Target}->{$RoleID} = $RolePermission;
         }
 
-        # if we don't have a target permission don't try use it
+        # if we don't have a target permission don't try to use it
         next TARGETPART if !defined $TargetPermission;
 
         # combine permissions
