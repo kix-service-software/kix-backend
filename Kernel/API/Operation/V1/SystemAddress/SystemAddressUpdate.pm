@@ -144,7 +144,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressUpdate(
         ID       => $Param{Data}->{SystemAddressID},    
         Name     => $SystemAddress->{Name} || $SystemAddressData{Name},
-        Comment  => $SystemAddress->{Comment} || $SystemAddressData{Comment},
+        Comment  => exists $SystemAddress->{Comment} ? $SystemAddress->{Comment} : $SystemAddressData{Comment},
         ValidID  => $SystemAddress->{ValidID} || $SystemAddressData{ValidID},
         Realname => $SystemAddress->{Realname} || $SystemAddressData{Realname},        
         UserID   => $Self->{Authorization}->{UserID},               

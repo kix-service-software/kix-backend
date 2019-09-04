@@ -175,7 +175,7 @@ sub Run {
         Target     => $Permission->{Target} || $PermissionData{Target},
         Value      => defined $Permission->{Value} ? $Permission->{Value} : $PermissionData{Value},
         IsRequired => $Permission->{IsRequired} || $PermissionData{IsRequired},
-        Comment    => $Permission->{Comment} || $PermissionData{Comment},
+        Comment    => exists $Permission->{Comment} ? $Permission->{Comment} : $PermissionData{Comment},
         UserID     => $Self->{Authorization}->{UserID},
     );
 

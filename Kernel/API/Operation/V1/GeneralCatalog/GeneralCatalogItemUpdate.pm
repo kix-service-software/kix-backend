@@ -144,7 +144,7 @@ sub Run {
         ItemID   => $Param{Data}->{GeneralCatalogItemID},    
         Class    => $GeneralCatalogItem->{Class} || $GeneralCatalogData->{Class},
         Name     => $GeneralCatalogItem->{Name} || $GeneralCatalogData->{Name},
-        Comment  => $GeneralCatalogItem->{Comment} || $GeneralCatalogData->{Comment},
+        Comment  => exists $GeneralCatalogItem->{Comment} ? $GeneralCatalogItem->{Comment} : $GeneralCatalogData->{Comment},
         ValidID  => $GeneralCatalogItem->{ValidID} || $GeneralCatalogData->{ValidID},
         UserID   => $Self->{Authorization}->{UserID},                        
     );
