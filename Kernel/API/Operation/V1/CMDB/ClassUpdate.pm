@@ -156,7 +156,7 @@ sub Run {
         ItemID   => $Param{Data}->{ClassID},    
         Class    => 'ITSM::ConfigItem::Class',
         Name     => $ConfigItemClass->{Name} || $GeneralCatalogData->{Name},
-        Comment  => $ConfigItemClass->{Comment} || $GeneralCatalogData->{Comment},
+        Comment  => exists $ConfigItemClass->{Comment} ? $ConfigItemClass->{Comment} : $GeneralCatalogData->{Comment},
         ValidID  => $ConfigItemClass->{ValidID} || $GeneralCatalogData->{ValidID},
         UserID   => $Self->{Authorization}->{UserID},                        
     );

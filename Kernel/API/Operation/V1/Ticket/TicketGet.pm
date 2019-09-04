@@ -352,6 +352,8 @@ sub Run {
                         
                         push @DynamicFields, {
                             ID           => $DynamicFieldConfig->{ID},
+                            Name         => $DynamicFieldConfig->{Name},
+                            Label        => $DynamicFieldConfig->{Label},
                             Value        => $TicketRaw{$Attribute},
                             DisplayValue => $DFDisplayValue,
                         };
