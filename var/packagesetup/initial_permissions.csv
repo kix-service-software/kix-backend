@@ -9,6 +9,9 @@
 "Agent User";"resource";"/system/valid";;"x";;;
 "Agent User";"resource";"/system/objecticons";;"x";;;
 "Agent User";"resource";"/system/generalcatalog";;"x";;;
+"Agent User";"resource";"/system/communication";;"x";;;
+"Agent User";"resource";"/system/communication/*";;;;;
+"Agent User";"resource";"/system/communication/notifications";;"x";;;
 "Agent User";"resource";"/i18n";;"x";;;
 "Ticket Reader";"resource";"/tickets";;"x";;;
 "Ticket Reader";"resource";"/system/services";;"x";;;
