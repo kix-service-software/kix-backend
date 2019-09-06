@@ -318,6 +318,39 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "Agent User": permission _R___ on /system/communication -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission _____ on /system/communication/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission _R___ on /system/communication/notifications -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/notifications</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Agent User": permission _R___ on /i18n -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
@@ -2599,7 +2632,7 @@
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="visibility" Type="Quote">external</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
-        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-size:small">Es wird ein erster &Uuml;berblick ben&ouml;tigt, wie mit KIX Cloud gearbeitet werden kann.</span></p>
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-size:small">Es wird ein erster &Uuml;berblick ben&ouml;tigt, wie mit KIX 18 gearbeitet werden kann.</span></p>
 ]]></Data>
         <Data Key="f_field3" Type="Quote"><![CDATA[<p><span style="font-size:small"><b>Hinweise zum Aufbau</b></span></p>
 
@@ -2673,9 +2706,6 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
 	<li>
 	<p><span style="font-size:small">Button mit 3 Punkten &quot;...&quot; zeigen an, dass sich dort weitere Aktionen befinden.</span></p>
 	</li>
-	<li>
-	<p><span style="font-size:small">Eingabe von 3 Sternen &quot;***&quot; in einigen Formularfeldern zeigt die ersten 10 gefundenen Datens&auml;tze an.</span></p>
-	</li>
 </ul>
 
 <p><strong><span style="font-size:small">Um die Suche zu nutzen</span></strong><span style="font-size:small">, klicken Sie im Modulmen&uuml; </span><span style="font-size:small">(linke Seite)</span><span style="font-size:small"> auf die Lupe. Es &ouml;ffnet sich ein Dialogfenster. Eine n&auml;here n&auml;here Erl&auml;uterung zu den Suchoperatoren finden Sie in der FAQ &quot;Wie suche ich mit KIX </span><span style="font-size:small">Cloud</span><span style="font-size:small">&quot;.</span></p>
@@ -2694,7 +2724,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="visibility" Type="Quote">external</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
-        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-size:small">It is necessary to get a first overview on how to work with KIX Cloud.</span></p>
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-size:small">It is necessary to get a first overview on how to work with KIX 18.</span></p>
 ]]></Data>
         <Data Key="f_field3" Type="Quote"><![CDATA[<p><span style="font-size:small"><b>Structure</b></span></p>
 
@@ -2796,9 +2826,6 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
 	<li>
 	<p><span style="font-style:normal"><span style="font-weight:normal"><span style="font-size:small">Buttons with 3 dots &ldquo;...&ldquo; indicate further actions in a context menu.</span></span></span></p>
 	</li>
-	<li>
-	<p><span style="font-style:normal"><span style="font-weight:normal"><span style="font-size:small">Enter 3 asterix&lsquo; in a form field to find the first 10 records available.</span></span></span></p>
-	</li>
 </ul>
 
 <p>&nbsp;</p>
@@ -2814,12 +2841,12 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
     <Insert Table="faq_item">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="f_number" Type="Quote">17003</Data>
-        <Data Key="f_subject" Type="Quote">Wie suche ich in KIX Cloud?</Data>
+        <Data Key="f_subject" Type="Quote">Wie suche ich in KIX 18?</Data>
         <Data Key="f_name" Type="Quote">1563537275-21.3419126942618</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="visibility" Type="Quote">external</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
-        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Objekte sollen in KIX Cloud gefunden werden.</span></p>        
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Objekte sollen in KIX 18 gefunden werden.</span></p>        
 ]]></Data>
         <Data Key="f_field3" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Die Komplexsuche ist &uuml;ber das <b>Lupen-Symbol im Modulmen&uuml; </b><span style="font-weight:normal">und</span> &uuml;ber die Header Action auf den Dashboards erreichbar. Es &ouml;ffnet sich ein Dialogfenster. &Uuml;ber die Tabs k&ouml;nnen Sie ausw&auml;hlen, nach welchen Objekten Sie suchen wollen.</span></p>
 
@@ -3051,6 +3078,44 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 <p><b>Watch/Lock Tickets</b></p>
 
 <p>You can find the action to watch and/or lock a ticket in the ticket detail view. Therefore, click the eye-icon (watch) or the lock-icon (lock) in the widget header. Klick the icon again to undo the action. At the right side of the header menu at the very top of the page you can always find the notification icons so see all your watched and locked tickets.</p>
+]]></Data>
+        <Data Key="category_id">2</Data>        
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+    </Insert>
+    <Insert Table="faq_item">
+        <Data Key="f_number" Type="Quote">17007</Data>
+        <Data Key="f_subject" Type="Quote">Neues Ticket</Data>
+        <Data Key="f_name" Type="Quote">1563537998-85.9252951241907</Data>
+        <Data Key="language" Type="Quote">de</Data>
+        <Data Key="visibility" Type="Quote">external</Data>
+        <Data Key="content_type" Type="Quote">text/html</Data>
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p>In KIX 18 soll ein neues Ticket anlegt werden.</p>]]></Data>
+        <Data Key="f_field3" Type="Quote"><![CDATA[
+<p>Im Kopfmenü können Sie über den Plus Button das Dialogfenster zum Anlegen neuer Objekte öffnen. Standardmäßig ist als erstes der Tab "Neues Ticket" geöffnet. Die Funktion "Neues Ticket" finden Sie auch als Header Action auf verschiedenen Detailseiten.</p>
+
+<p>Die mit Sternchen markierten Formularfelder sind Pflichtfelder. Über das Fragezeichen vor dem Eingabefeld können Sie kurze Hilfetexte zu diesem Feld aufrufen. Für die Ticketbeschreibung stehen Ihnen Textbausteine zur Verfügung. Nähere Infos dazu finden Sie in der Sidebar Textbausteine. Sie können ein neues Ticket als Notiz anlegen oder eine E-Mail versenden. Nachdem Sie das Formular ausgefüllt und auf Speichern geklickt haben, wird Ihnen Ihr eben erstelltes Ticket in der Ticket Detailansicht angezeigt.</p>
+]]></Data>
+        <Data Key="category_id">2</Data>        
+        <Data Key="created">current_timestamp</Data>
+        <Data Key="created_by">1</Data>
+        <Data Key="changed">current_timestamp</Data>
+        <Data Key="changed_by">1</Data>
+    </Insert>
+    <Insert Table="faq_item">
+        <Data Key="f_number" Type="Quote">17008</Data>
+        <Data Key="f_subject" Type="Quote">New Ticket</Data>
+        <Data Key="f_name" Type="Quote">1563537998-85.9252951241908</Data>
+        <Data Key="language" Type="Quote">en</Data>
+        <Data Key="visibility" Type="Quote">external</Data>
+        <Data Key="content_type" Type="Quote">text/html</Data>
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p>I want to create a new ticket in KIX 18.</p>]]></Data>
+        <Data Key="f_field3" Type="Quote"><![CDATA[
+<p>In the header menu, you can find the „New“-Button. Clicking the Button will open a dialog to create new objects. Initially, the tap „New Ticket“ is opened first. The action „New Ticket“ can also be found as a header action in several object detail views.</p>
+
+<p>Forms marked by an asterisk are obligational. Click the question mark in front of form fields to see a short help text about this field. You can use text modules in the ticket description. Further information about how to insert text modules can be found in the text modules sidebar. You can create a new ticket as a note, but also send an email. After filling in the form and saving the ticket, the dialog closes automatically and you can see your ticket in the ticket detailed view.</p>
 ]]></Data>
         <Data Key="category_id">2</Data>        
         <Data Key="created">current_timestamp</Data>

@@ -152,7 +152,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::SLA')->SLAUpdate(
         SLAID                   => $Param{Data}->{SLAID},    
         Name                    => $SLA->{Name} || $SLAData{Name},
-        Comment                 => $SLA->{Comment} || $SLAData{Comment},
+        Comment                 => exists $SLA->{Comment} ? $SLA->{Comment} : $SLAData{Comment},
         ValidID                 => $SLA->{ValidID} || $SLAData{ValidID},
         TypeID                  => $SLA->{TypeID} || $SLAData{TypeID},        
         Calendar                => $SLA->{Calendar} || $SLAData{Calendar},
