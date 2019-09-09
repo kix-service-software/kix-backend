@@ -2544,6 +2544,10 @@
     <Column Name="subject"     Required="true" Type="VARCHAR" Size="250"/>
     <Column Name="note"        Required="true" Type="VARCHAR" Size="2000"/>
     <Column Name="create_by"   Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="article_id"/>
+        <UniqueColumn Name="article_key"/>
+    </Unique>
 </Table>
 <Table Name="organisation_prefs">
     <Column Name="org_id" Required="true" Type="INTEGER"/>
