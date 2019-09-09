@@ -1661,6 +1661,7 @@
 
 <!-- xml - xml_storage-->
 <Table Name="xml_storage">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="xml_type" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="xml_key" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="xml_content_key" Required="true" Size="250" Type="VARCHAR"/>
