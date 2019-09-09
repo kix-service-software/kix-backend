@@ -1490,6 +1490,7 @@
 
 <!-- process_id -->
 <Table Name="process_id">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="process_name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="process_id" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="process_host" Required="true" Size="200" Type="VARCHAR"/>
