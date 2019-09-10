@@ -92,15 +92,15 @@ sub ParameterDefinition {
             Required => 1
         },
         'Ticket::State' => {
-            RequiredIfNot => [ 'Ticket::StateID' ],
+            RequiredIfNot => ['Ticket::StateID'],
         },
         'Ticket::Priority' => {
-            RequiredIfNot => [ 'Ticket::PriorityID' ],
+            RequiredIfNot => ['Ticket::PriorityID'],
         },
         'Ticket::Queue' => {
-            RequiredIfNot => [ 'Ticket::QueueID' ],
+            RequiredIfNot => ['Ticket::QueueID'],
         },
-    }
+        }
 }
 
 =item Run()
@@ -201,8 +201,8 @@ sub Run {
     );
 
     # check Ticket attribute values
-    my $TicketCheck = $Self->_CheckTicket( 
-        Ticket => $Ticket 
+    my $TicketCheck = $Self->_CheckTicket(
+        Ticket => $Ticket
     );
 
     if ( !$TicketCheck->{Success} ) {
@@ -249,7 +249,21 @@ creates a ticket with its articles and dynamic fields and attachments if specifi
 sub _TicketCreate {
     my ( $Self, %Param ) = @_;
 
-    my $Ticket           = $Param{Ticket};
+    my $Ticket = $Param{Ticket};
+
+    # use not number value as email for contact search
+    if ( $Ticket->{ContactID} !~ /^\d+$/ ) {
+        my $ContactEmail = $Ticket->{ContactID};
+        $ContactEmail =~ s/.+ <(.+)>/$1/;
+        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+            PostMasterSearch => $ContactEmail,
+            Valid            => 0,
+        );
+        if ( IsHashRefWithData( \%ContactList ) ) {
+            ( $Ticket->{ContactID} ) = keys %ContactList;
+            delete $Ticket->{OrganisationID};
+        }
+    }
 
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
@@ -295,30 +309,30 @@ sub _TicketCreate {
 
     # create new ticket
     my $TicketID = $TicketObject->TicketCreate(
-        Title        => $Ticket->{Title},
-        QueueID      => $Ticket->{QueueID} || '',
-        Queue        => $Ticket->{Queue} || '',
-        Lock         => 'unlock',
-        TypeID       => $Ticket->{TypeID} || '',
-        Type         => $Ticket->{Type} || '',
-        ServiceID    => $Ticket->{ServiceID} || '',
-        Service      => $Ticket->{Service} || '',
-        SLAID        => $Ticket->{SLAID} || '',
-        SLA          => $Ticket->{SLA} || '',
-        StateID      => $Ticket->{StateID} || '',
-        State        => $Ticket->{State} || '',
-        PriorityID   => $Ticket->{PriorityID} || '',
-        Priority     => $Ticket->{Priority} || '',
-        OwnerID      => 1,
+        Title          => $Ticket->{Title},
+        QueueID        => $Ticket->{QueueID} || '',
+        Queue          => $Ticket->{Queue} || '',
+        Lock           => 'unlock',
+        TypeID         => $Ticket->{TypeID} || '',
+        Type           => $Ticket->{Type} || '',
+        ServiceID      => $Ticket->{ServiceID} || '',
+        Service        => $Ticket->{Service} || '',
+        SLAID          => $Ticket->{SLAID} || '',
+        SLA            => $Ticket->{SLA} || '',
+        StateID        => $Ticket->{StateID} || '',
+        State          => $Ticket->{State} || '',
+        PriorityID     => $Ticket->{PriorityID} || '',
+        Priority       => $Ticket->{Priority} || '',
+        OwnerID        => 1,
         OrganisationID => $OrgID,
-        ContactID    => $Ticket->{ContactID},
-        UserID       => $Param{UserID},
+        ContactID      => $Ticket->{ContactID},
+        UserID         => $Param{UserID},
     );
 
     if ( !$TicketID ) {
         return $Self->_Error(
-            Code         => 'Object.UnableToCreate',
-            Message      => 'Ticket could not be created, please contact the system administrator',
+            Code    => 'Object.UnableToCreate',
+            Message => 'Ticket could not be created, please contact the system administrator',
         );
     }
 
@@ -414,10 +428,10 @@ sub _TicketCreate {
     }
 
     # set dynamic fields
-    if ( IsArrayRefWithData($Ticket->{DynamicFields}) ) {
+    if ( IsArrayRefWithData( $Ticket->{DynamicFields} ) ) {
 
         DYNAMICFIELD:
-        foreach my $DynamicField ( @{$Ticket->{DynamicFields}} ) {
+        foreach my $DynamicField ( @{ $Ticket->{DynamicFields} } ) {
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
                 TicketID => $TicketID,
@@ -426,50 +440,50 @@ sub _TicketCreate {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    Code         => 'Operation.InternalError',
-                    Message      => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                    Code    => 'Operation.InternalError',
+                    Message => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
                 );
             }
         }
     }
 
     # create articles
-    if ( IsArrayRefWithData($Ticket->{Articles}) ) {
+    if ( IsArrayRefWithData( $Ticket->{Articles} ) ) {
 
-        foreach my $Article ( @{$Ticket->{Articles}} ) {
+        foreach my $Article ( @{ $Ticket->{Articles} } ) {
 
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Ticket::ArticleCreate',
                 Data          => {
                     TicketID => $TicketID,
                     Article  => $Article,
-                }
+                    }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     ${$Result},
-                )
+                    )
             }
         }
     }
 
     # create checklist
-    if ( IsHashRefWithData($Ticket->{Checklist}) ) {
+    if ( IsHashRefWithData( $Ticket->{Checklist} ) ) {
 
-        foreach my $ChecklistItem ( @{$Ticket->{Checklist}} ) {
+        foreach my $ChecklistItem ( @{ $Ticket->{Checklist} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Ticket::TicketChecklistCreate',
                 Data          => {
                     TicketID      => $TicketID,
                     ChecklistItem => $ChecklistItem,
-                }
+                    }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     ${$Result},
-                )
+                    )
             }
         }
     }
