@@ -732,6 +732,10 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="ticket_id"/>
+        <UniqueColumn Name="user_id"/>
+    </Unique>
     <Index Name="ticket_watcher_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
@@ -844,6 +848,10 @@
     <Column Name="article_value" Required="false" Size="1000" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="article_id"/>
+        <UniqueColumn Name="article_key"/>
+    </Unique>
     <!-- index for a user's article flags -->
     <Index Name="article_flag_article_id_create_by">
         <IndexColumn Name="article_id"/>
@@ -1490,6 +1498,7 @@
 
 <!-- process_id -->
 <Table Name="process_id">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="process_name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="process_id" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="process_host" Required="true" Size="200" Type="VARCHAR"/>
@@ -1660,6 +1669,7 @@
 
 <!-- xml - xml_storage-->
 <Table Name="xml_storage">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="xml_type" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="xml_key" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="xml_content_key" Required="true" Size="250" Type="VARCHAR"/>
@@ -2542,6 +2552,10 @@
     <Column Name="subject"     Required="true" Type="VARCHAR" Size="250"/>
     <Column Name="note"        Required="true" Type="VARCHAR" Size="2000"/>
     <Column Name="create_by"   Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="article_id"/>
+        <UniqueColumn Name="article_key"/>
+    </Unique>
 </Table>
 <Table Name="organisation_prefs">
     <Column Name="org_id" Required="true" Type="INTEGER"/>
