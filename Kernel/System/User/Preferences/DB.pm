@@ -104,6 +104,13 @@ sub SetPreferences {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
+    );
+
     return 1;
 }
 
@@ -196,6 +203,13 @@ sub DeletePreferences {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
     );
 
     return 1;

@@ -473,6 +473,13 @@ sub UserAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'User',
+        ObjectID  => $UserID,
+    );
+
     return $UserID;
 }
 
@@ -576,6 +583,13 @@ sub UserUpdate {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
     );
 
     return 1;
@@ -867,6 +881,13 @@ sub SetPassword {
     $Kernel::OM->Get('Kernel::System::Log')->Log(
         Priority => 'notice',
         Message  => "User: '$Param{UserLogin}' changed password successfully!",
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $User{UserID},
     );
 
     return 1;
