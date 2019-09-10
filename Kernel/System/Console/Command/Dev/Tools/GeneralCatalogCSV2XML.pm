@@ -77,7 +77,7 @@ sub Run {
 "    <Insert Table=\"general_catalog\">
         <Data Key=\"id\" Type=\"AutoIncrement\">$ID</Data>
         <Data Key=\"general_catalog_class\" Type=\"Quote\">$Class</Data>
-        <Data Key=\"name\" Type=\"Quote\">$Name</Data>
+        <Data Key=\"name\" Type=\"Quote\" Translatable=\"1\">$Name</Data>
         <Data Key=\"valid_id\">1</Data>
         <Data Key=\"create_by\">1</Data>
         <Data Key=\"create_time\">current_timestamp</Data>
