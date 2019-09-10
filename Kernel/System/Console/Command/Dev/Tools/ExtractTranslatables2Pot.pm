@@ -49,20 +49,20 @@ sub Run {
 
     $Self->Print("<yellow>gathering Translatables and updating templates.pot file...</yellow>\n\n");
 
-    my @Translatables;
+    my %Translatables;
 
-    push(@Translatables, $Self->_ExtractFromTemplateFiles);
-    push(@Translatables, $Self->_ExtractFromPerlFiles);
-    push(@Translatables, $Self->_ExtractFromXMLFiles(
+    %Translatables = ( %Translatables, $Self->_ExtractFromTemplateFiles );
+    %Translatables = ( %Translatables, $Self->_ExtractFromPerlFiles );
+    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
         Directory => "$Self->{Home}/scripts/database",
         Source    => "Database",
     ));
-    push(@Translatables, $Self->_ExtractFromXMLFiles(
+    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
         Directory => "$Self->{Home}/Kernel/Config/Files",
         Source    => "SysConfig",
     ));
 
-    $Self->Print(sprintf "\nextracted %i Translatables\n", (scalar @Translatables));
+    $Self->Print(sprintf "\nextracted %i Translatables\n", (scalar keys %Translatables));
 
     my $Items;
     {
@@ -74,19 +74,15 @@ sub Run {
         my $Count = 0;
 
         # merge manual items into Translatables
-        my %TranslatableHash = map { $_->{String} => 1 } @Translatables;
         foreach my $MsgId ( sort keys %{$ManualItems} ) {
-            next if $TranslatableHash{$MsgId};
+            next if $Translatables{$MsgId};
 
             my $String = $MsgId;
             $String =~ s/(?<!\\)"//g;
             $String =~ s/\\"/"/g;
 
             # it doesn't exist, add to list
-            push @Translatables, {
-                Location => 'manual entry from templates.pot.manual',
-                String   => $String
-            };
+            $Translatables{$String} = 'manual entry from templates.pot.manual';
 
             $Count++;
         }
@@ -95,7 +91,7 @@ sub Run {
     }
 
     $Self->WritePOTFile(
-        TranslationStrings => \@Translatables,
+        TranslationStrings => \%Translatables,
         TargetPOTFile      => "$Self->{Home}/locale/templates.pot",
     );
 
@@ -133,15 +129,15 @@ sub WritePOTFile {
             "Content-Transfer-Encoding: 8bit\n",
     );
 
-    for my $Translatable ( @{ $Param{TranslationStrings} } ) {
-        my $String = $Translatable->{String};
+    for my $Translatable ( sort { "$Param{TranslationStrings}->{$a}$a" cmp "$Param{TranslationStrings}->{$b}$b" } keys %{ $Param{TranslationStrings} } ) {
+        my $String = $Translatable;
         $String =~ s/\\/\\\\/g;
         $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$String );
 
         push @POTEntries, Locale::PO->new(
             -msgid     => $String,
             -msgstr    => '',
-            -automatic => $Translatable->{Location},
+            -automatic => $Param{TranslationStrings}->{$Translatable},
         );
     }
 
@@ -154,7 +150,7 @@ sub WritePOTFile {
 # extract translatable strings from .tt files
 sub _ExtractFromTemplateFiles {
     my ($Self, %Param) = @_;
-    my @Translatables;
+    my %Translatables;
 
     my %UsedWords;
     my $Directory = "$Self->{Home}/Kernel/Output/HTML/Templates";
@@ -197,14 +193,8 @@ sub _ExtractFromTemplateFiles {
             $Word =~ s{\\'}{'}smxg;
 
             if ($Word) {
-
-                push @Translatables, {
-                    Location => "Template: $File",
-                    String => $Word,
-                };
-
+                $Translatables{$Word} = "Template: $File";
                 $Count++;
-
             }
 
             '';
@@ -213,13 +203,13 @@ sub _ExtractFromTemplateFiles {
         $Self->Print(sprintf "%4i in %s\n", $Count, $File);
     }
 
-    return @Translatables;
+    return %Translatables;
 }
 
 # extract translatable strings from Perl code
 sub _ExtractFromPerlFiles {
     my ($Self, %Param) = @_;
-    my @Translatables;
+    my %Translatables;
 
     $Self->Print("\n<yellow>extracting perl files...</yellow>\n");
 
@@ -279,14 +269,8 @@ sub _ExtractFromPerlFiles {
             $SkipWord = 1 if $Word =~ m{\$}xms;
 
             if ($Word && !$SkipWord) {
-
-                push @Translatables, {
-                    Location => "Perl Module: $File",
-                    String => $Word,
-                };
-
+                $Translatables{$Word} = "Perl Module: $File";
                 $Count++;
-
             }
             '';
         }egx;
@@ -294,13 +278,13 @@ sub _ExtractFromPerlFiles {
         $Self->Print(sprintf "%4i in %s\n", $Count, $File);
     }
 
-    return @Translatables;
+    return %Translatables;
 }
 
 # extract translatable strings from XML files
 sub _ExtractFromXMLFiles {
     my ($Self, %Param) = @_;
-    my @Translatables;
+    my %Translatables;
 
     $Self->Print("\n<yellow>extracting $Param{Source} XML files...</yellow>\n");
 
@@ -323,26 +307,20 @@ sub _ExtractFromXMLFiles {
             die "Can't open $File: $!";
         }
 
-        $File =~ s{^.*/(scripts/)}{$1}smx;
+        $File =~ s{^.*/(scripts/|Kernel/)}{$1}smx;
 
         my $Content = ${$ContentRef};
 
         # do translation
         $Content =~ s{
-            <Data[^>]+Translatable="1"[^>]*>(.*?)</Data>
+            <(Data|Description|Item)[^>]+Translatable="1"[^>]*>(.*?)</(Data|Description|Item)>
         }
         {
-            my $Word = $1 // '';
+            my $Word = $2 // '';
 
             if ($Word) {
-
-                push @Translatables, {
-                    Location => "$Param{Source}: $File",
-                    String => $Word,
-                };
-
+                $Translatables{$Word} = "$Param{Source}: $File";
                 $Count++;
-
             }
             '';
         }egx;
@@ -350,7 +328,7 @@ sub _ExtractFromXMLFiles {
         $Self->Print(sprintf "%4i in %s\n", $Count, $File);
     }
 
-    return @Translatables;
+    return %Translatables;
 }
 
 1;
