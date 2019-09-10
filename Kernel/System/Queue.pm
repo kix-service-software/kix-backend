@@ -509,7 +509,7 @@ sub GetAllSubQueues {
 
     # search all custom queues
     return if !$DBObject->Prepare(
-        SQL  => "SELECT q2.id, q2.name FROM queue q1, queue q2 WHERE q1.id = ? AND q2.id <> ? AND q2.name like q1.name||'::%'",
+        SQL  => "SELECT q2.id, q2.name FROM queue q1, queue q2 WHERE q1.id = ? AND q2.id <> ? AND q2.name like CONCAT(q1.name, '::%')",
         Bind => [ \$Param{QueueID}, \$Param{QueueID} ],
     );
 
