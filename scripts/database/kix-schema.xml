@@ -732,6 +732,10 @@
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="ticket_id"/>
+        <UniqueColumn Name="user_id"/>
+    </Unique>
     <Index Name="ticket_watcher_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
@@ -844,6 +848,10 @@
     <Column Name="article_value" Required="false" Size="1000" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="article_id"/>
+        <UniqueColumn Name="article_key"/>
+    </Unique>
     <!-- index for a user's article flags -->
     <Index Name="article_flag_article_id_create_by">
         <IndexColumn Name="article_id"/>
