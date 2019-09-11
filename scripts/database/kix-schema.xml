@@ -851,6 +851,7 @@
     <Unique>
         <UniqueColumn Name="article_id"/>
         <UniqueColumn Name="article_key"/>
+        <UniqueColumn Name="create_by"/>
     </Unique>
     <!-- index for a user's article flags -->
     <Index Name="article_flag_article_id_create_by">
@@ -2555,6 +2556,7 @@
     <Unique>
         <UniqueColumn Name="article_id"/>
         <UniqueColumn Name="article_key"/>
+        <UniqueColumn Name="create_by"/>
     </Unique>
 </Table>
 <Table Name="organisation_prefs">
