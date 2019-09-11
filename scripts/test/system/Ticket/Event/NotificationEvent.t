@@ -232,6 +232,28 @@ $Self->True(
     "TicketCreate() successful for Ticket ID $TicketID",
 );
 
+# create article
+my $ArticleID = $TicketObject->ArticleCreate(
+    TicketID      => $TicketID,
+    Channel       => 'note',
+    SenderType    => 'external',
+    Charset       => 'utf-8',
+    ContentType   => 'text/plain',
+    From          => 'test@example.com',
+    To            => 'test123@example.com',
+    Subject       => 'article subject test',
+    Body          => 'article body test',
+    HistoryType   => 'NewTicket',
+    HistoryComment => '%%',
+    UserID        => $UserID,
+);
+
+# sanity check
+$Self->True(
+    $ArticleID,
+    "ArticleCreate() successful for Article ID $ArticleID",
+);
+
 my $DynamicFieldObject      = $Kernel::OM->Get('Kernel::System::DynamicField');
 my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
 
@@ -844,9 +866,9 @@ my @Tests = (
             Events         => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientEmail => ['test@kixexample.com'],
 
-            # Filter by unchecked checbox dynamic field value. Note that the search value (-1) is
+            # Filter by unchecked checkbox dynamic field value. Note that the search value (-1) is
             #   different than the match value (0). See bug#12257 for more information.
-            'Search_DynamicField_DFT1' . $RandomID => [-1],
+            'Ticket::DynamicField_DFT1' . $RandomID => [0],
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -865,14 +887,62 @@ my @Tests = (
         Success => 1,
     },
     {
+        Name => 'article subject match',
+        Data => {
+            Events             => [ 'ArticleCreate' ],
+            RecipientEmail     => ['test@kixexample.com'],
+            'Article::Subject' => ['subject te'],
+        },
+        Config => {
+            Event => 'ArticleCreate',
+            Data  => {
+                ArticleID => $ArticleID,
+                TicketID  => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                ToArray => [ 'test@kixexample.com' ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'article ChannelID match',
+        Data => {
+            Events             => [ 'ArticleCreate' ],
+            RecipientEmail     => ['test@kixexample.com'],
+            'Article::ChannelID' => [1],
+        },
+        Config => {
+            Event => 'ArticleCreate',
+            Data  => {
+                ArticleID => $ArticleID,
+                TicketID  => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                ToArray => [ 'test@kixexample.com' ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+            },
+        ],
+        Success => 1,
+    },
+    {
         Name => 'HTML email',
         ContentType => 'text/html',
         Data => {
-            Events          => [ 'TicketCreate' ],
+            Events          => [ 'TicketPriorityUpdate' ],
             RecipientAgents => [$UserID],
         },
         Config => {
-            Event => 'TicketCreate',
+            Event => 'TicketPriorityUpdate',
             Data  => {
                 TicketID => $TicketID,
             },
