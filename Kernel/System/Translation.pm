@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Locale::PO;
+use Digest::MD5 qw(md5_hex);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -126,7 +127,7 @@ sub _PatternGet {
     my @BindRefList = map { \$_ } @{$Param{IDs}};
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL  => 'SELECT id, value, create_time, create_by, change_time, change_by FROM kix_translation_pattern WHERE id IN ('.(join( ',', map { '?' } @{$Param{IDs}})).')',
+        SQL  => 'SELECT id, value, create_time, create_by, change_time, change_by FROM translation_pattern WHERE id IN ('.(join( ',', map { '?' } @{$Param{IDs}})).')',
         Bind => \@BindRefList
     );
 
@@ -143,7 +144,7 @@ sub _PatternGet {
     if ( $Param{IncludeAvailableLanguages} ) {
         my @BindRefList = map { \$_->{ID} } @{$Result};
         return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-            SQL  => 'SELECT pattern_id, language FROM kix_translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Result})).') ORDER by language',
+            SQL  => 'SELECT pattern_id, language FROM translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Result})).') ORDER by language',
             Bind => \@BindRefList
         );
         # fetch the result
@@ -201,7 +202,7 @@ sub PatternList {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => 'SELECT id, value FROM kix_translation_pattern'
+        SQL => 'SELECT id, value FROM translation_pattern'
     );
 
     # fetch the result
@@ -262,8 +263,8 @@ sub PatternExistsCheck {
     return $Cache if $Cache;
 
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL  => 'SELECT id FROM kix_translation_pattern WHERE value = ?',
-        Bind => [ \$Param{Value} ] 
+        SQL  => 'SELECT id FROM translation_pattern WHERE value_md5= ?',
+        Bind => [ \$Param{MD5} ] 
     );
 
     # fetch the result
@@ -322,20 +323,23 @@ sub PatternAdd {
         return;
     }
 
+    # generate MD5 sum of value
+    my $MD5 = Digest::MD5::md5_hex($Param{Value});
+
     # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'INSERT INTO kix_translation_pattern '
-            . '(value, create_time, create_by, change_time, change_by) '
-            . 'VALUES (?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO translation_pattern '
+            . '(value, value_md5, create_time, create_by, change_time, change_by) '
+            . 'VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Value}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Value}, \$MD5, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
     # get new Pattern id
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL   => 'SELECT id FROM kix_translation_pattern WHERE value = ?',
-        Bind  => [ \$Param{Value} ],
+        SQL   => 'SELECT id FROM translation_pattern WHERE value_md5= ?',
+        Bind  => [ \$MD5 ],
         Limit => 1,
     );
 
@@ -398,11 +402,14 @@ sub PatternUpdate {
         return;
     }
 
+    # generate MD5 sum of value
+    my $MD5 = Digest::MD5::md5_hex($Param{Value});
+
     # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE kix_translation_pattern SET value = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE translation_pattern SET value = ?, value_md5= ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Value}, \$Param{UserID}, \$Param{ID}
+            \$Param{Value}, \$MD5, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -448,13 +455,13 @@ sub PatternDelete {
 
     # delete assigned languages
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'DELETE FROM kix_translation_language WHERE pattern_id = ?',
+        SQL => 'DELETE FROM translation_language WHERE pattern_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete pattern
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'DELETE FROM kix_translation_pattern WHERE id = ?',
+        SQL => 'DELETE FROM translation_pattern WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
@@ -529,7 +536,7 @@ sub TranslationLanguageAdd {
     }
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'INSERT INTO kix_translation_language '
+        SQL => 'INSERT INTO translation_language '
             . '(value, language, is_default, pattern_id, create_time, create_by, change_time, change_by) '
             . 'VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
@@ -627,7 +634,7 @@ sub _TranslationLanguageGet {
     my @BindRefList = map { \$_ } ( $Param{Language}, @{$Param{PatternIDs}} );
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL  => 'SELECT pattern_id, language, value, is_default, create_time, create_by, change_time, change_by FROM kix_translation_language WHERE language = ? AND pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
+        SQL  => 'SELECT pattern_id, language, value, is_default, create_time, create_by, change_time, change_by FROM translation_language WHERE language = ? AND pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
         Bind => \@BindRefList
     );
 
@@ -717,7 +724,7 @@ sub _TranslationLanguageList {
     my @BindRefList = map { \$_ } ( @{$Param{PatternIDs}} );
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => 'SELECT pattern_id, language, value FROM kix_translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
+        SQL => 'SELECT pattern_id, language, value FROM translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
         Bind  => \@BindRefList,
     );
 
@@ -793,7 +800,7 @@ sub TranslationLanguageUpdate {
 
     # sql
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE kix_translation_language SET value = ?, is_default = ?, change_time = current_timestamp, change_by = ? WHERE pattern_id = ? AND language = ?',
+        SQL => 'UPDATE translation_language SET value = ?, is_default = ?, change_time = current_timestamp, change_by = ? WHERE pattern_id = ? AND language = ?',
         Bind => [
             \$Param{Value}, \$Param{IsDefault}, \$Param{UserID}, 
             \$Param{PatternID}, \$Param{Language}
@@ -841,7 +848,7 @@ sub TranslationLanguageDelete {
     }
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'DELETE FROM kix_translation_language WHERE pattern_id = ? AND language = ?',
+        SQL => 'DELETE FROM translation_language WHERE pattern_id = ? AND language = ?',
         Bind => [ \$Param{PatternID}, \$Param{Language} ],
     );
 
@@ -896,7 +903,7 @@ sub TranslationList {
     return @{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => 'SELECT tp.value, tl.language, tl.value FROM kix_translation_pattern tp, kix_translation_language tl WHERE tl.pattern_id = tp.id ORDER BY tp.value'
+        SQL => 'SELECT tp.value, tl.language, tl.value FROM translation_pattern tp, translation_language tl WHERE tl.pattern_id = tp.id ORDER BY tp.value'
     );
 
     # fetch the result
@@ -953,12 +960,12 @@ sub CleanUp {
 
     # delete languages
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'DELETE FROM kix_translation_language',
+        SQL => 'DELETE FROM translation_language',
     );
 
     # delete patterns
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'DELETE FROM kix_translation_pattern',
+        SQL => 'DELETE FROM translation_pattern',
     );
 
     # reset cache
