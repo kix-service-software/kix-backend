@@ -13,6 +13,7 @@
 "GeneralCatalogItem";"ITSM::Core::IncidentState";"Incident";"service-red_02.svg";"image/svg+xml"
 "GeneralCatalogItem";"ITSM::Core::IncidentState";"Operational";"service-green_02.svg";"image/svg+xml"
 "FAQCategory";;"Misc";"faq-misc.svg";"image/svg+xml"
+"FAQCategory";;"KIX";"KIXprof_64px.svg";"image/svg+xml"
 "Queue";;"Junk";"trash.svg";"image/svg+xml"
 "Queue";;"Service Desk";"folder.svg";"image/svg+xml"
 "Queue";;"Service Desk::Monitoring";"folder.svg";"image/svg+xml"
