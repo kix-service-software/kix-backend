@@ -14,6 +14,10 @@
                "description" : "Can be either 'From' or 'Queue'.",
                "type" : "string"
             },
+            "ExecFetch" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 all emails will be fetched.",
+               "type" : "integer"
+            },
             "Host" : {
                "type" : "string"
             },

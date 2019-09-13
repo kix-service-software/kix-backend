@@ -7,7 +7,7 @@
       "SenderType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_SenderType_json"
+            "$ref" : "#/definitions/SenderType"
          }
       }
    },
@@ -15,7 +15,7 @@
       "SenderType"
    ],
    "definitions" : {
-      "_SenderType_json" : {
+      "SenderType" : {
          "$id" : "#SenderType",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The sender type object.",

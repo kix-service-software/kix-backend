@@ -35,7 +35,7 @@
          "description" : "added via include \"Languages\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/_TranslationLanguage_json"
+            "$ref" : "#/definitions/TranslationLanguage"
          },
          "readOnly" : true
       },
@@ -53,7 +53,7 @@
       "Value"
    ],
    "definitions" : {
-      "_TranslationLanguage_json" : {
+      "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The translation language object.",

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ConsoleCommand" : {
-         "$ref" : "#/definitions/_ConsoleCommand_json"
+         "$ref" : "#/definitions/ConsoleCommand"
       }
    },
    "required" : [
       "ConsoleCommand"
    ],
    "definitions" : {
-      "_ConsoleCommand_json" : {
+      "ConsoleCommand" : {
          "$id" : "#ConsoleCommand",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The console command object.",
