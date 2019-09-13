@@ -2792,7 +2792,7 @@
         <UniqueColumn Name="value" Size="255"/>
     </Unique>
     <Unique Name="translation_pattern_umd5">
-        <UniqueColumn Name="md5"/>
+        <UniqueColumn Name="value_md5"/>
     </Unique>
     <Index Name="translation_pattern_id">
         <IndexColumn Name="id"/>

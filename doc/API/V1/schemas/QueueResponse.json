@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Queue" : {
-         "$ref" : "#/definitions/_Queue_json"
+         "$ref" : "#/definitions/Queue"
       }
    },
    "required" : [
       "Queue"
    ],
    "definitions" : {
-      "_Queue_json" : {
+      "Queue" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The priority object.",

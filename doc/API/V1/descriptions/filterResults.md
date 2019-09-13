@@ -1,6 +1,6 @@
 You can use an optional ```filter``` function to filter the items in the response of collections. The ```filter``` function will be executed at API level and therefore is a lot more powerful in terms of complexity than the [```search```](#search_objects) function. Also the ```filter``` function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of [```search```](#search_objects) and ```filter``` to achieve the best performance.
 
-** Usage in URL **
+**Usage in URL**
 ``` bash
     .../<resource>?filter={...}
 ```
@@ -34,7 +34,7 @@ The filter definition is a JSON object in the following form:
 ```
 
 
-** Explanation **
+**Explanation**
 
 |Parameter|Required?|Description|
 |-|:-:|-|
@@ -48,7 +48,7 @@ The filter definition is a JSON object in the following form:
 If both lists are given (AND and OR) they will be combines using a logical AND operation.
 
 
-** Supported types **
+**Supported types**
 
 |Type|Description|
 |-|-|
@@ -58,7 +58,7 @@ If both lists are given (AND and OR) they will be combines using a logical AND o
 |```DATETIME```|The value will be treated as a date + time combination of the form ```YYYY-MM-DD HH24:MI:SS```|
 
 
-** Supported operators **
+**Supported operators**
 
 |Operator|Meaning|Valid for datatypes|Description|
 |-|-|-|-|
@@ -75,11 +75,11 @@ If both lists are given (AND and OR) they will be combines using a logical AND o
 |```LIKE```|matches pattern|STRING|The data value matches the filter value which represents a pattern. The wildcard ```*``` can be used multiple times. Without a wildcard the LIKE operator works like the EQ operator.|
 
 
-** Example **
+**Example**
 
 Return all users whose UserID isn't 1, 2 oder 3 and whose first name doesn't begin with their last name and whose email address doesn't end with "cape-it.de".
 
-```
+``` js
 {
     "User": {
         "AND": [

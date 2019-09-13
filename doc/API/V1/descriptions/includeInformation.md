@@ -1,12 +1,12 @@
 When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter ```include```. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource. 
 
-** Usage in URL **
+**Usage in URL**
 ``` bash
-    .../<resource>?include=<What>
+.../<resource>?include=<What>
 ```
 
 
-** Explanation **
+**Explanation**
 
 |Parameter|Required?|Description|
 |-|:-:|-|
@@ -24,7 +24,7 @@ Please note that the include extends each item in the response with an additiona
 
 The ```ConfiguredPermissions``` include will include an object with two arrays that each contain the relevant configured permissions ```Assigned``` and ```DependingObjects```. The ```Assigned``` list contains the permissions that are configured exactly for this specific object. The second list ```DependingObjects``` contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz). 
 
-** Example **
+**Example**
 
 Query all organisations and include a list of tickets and contacts of each organisation.
 

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Link" : {
-         "$ref" : "#/definitions/_Link_json"
+         "$ref" : "#/definitions/Link"
       }
    },
    "required" : [
       "Link"
    ],
    "definitions" : {
-      "_Link_json" : {
+      "Link" : {
          "$id" : "#Link",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The link object.",

@@ -1,12 +1,12 @@
 Every collection resource supports the sorting of items in the response. This can be done with the optional query parameter ```sort```.
 
-** Usage in URL **
+**Usage in URL**
 ``` bash
     .../<resource>?sort=<Object>.[-]<Fieldname>[:<Type>]
 ```
 
 
-** Explanation **
+**Explanation**
 
 |Parameter|Required?|Description|
 |-|:-:|-|
@@ -15,7 +15,7 @@ Every collection resource supports the sorting of items in the response. This ca
 |```<Type>```||The type of data that should be used to compare the value. If not given, the the value will be sorted as ASCII text and case-insensitive.|
 
 
-** Supported types **
+**Supported types**
 
 |Type|Description|
 |-|-|
@@ -28,7 +28,7 @@ Every collection resource supports the sorting of items in the response. This ca
 Multiple attributes can be sorted by separating the sort definition with comma. 
 
 
-** Example **
+**Example**
 
 Query all users and sort the result for the creation time ascending + UserID descending + first name ascending.
 

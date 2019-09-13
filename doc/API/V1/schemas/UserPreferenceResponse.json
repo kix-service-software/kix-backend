@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "UserPreference" : {
-         "$ref" : "#/definitions/_UserPreference_json"
+         "$ref" : "#/definitions/UserPreference"
       }
    },
    "required" : [
       "UserPreference"
    ],
    "definitions" : {
-      "_UserPreference_json" : {
+      "UserPreference" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The user preference object.",

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "TextModule" : {
-         "$ref" : "#/definitions/_TextModule_json"
+         "$ref" : "#/definitions/TextModule"
       }
    },
    "required" : [
       "TextModule"
    ],
    "definitions" : {
-      "_TextModule_json" : {
+      "TextModule" : {
          "$id" : "#TicketState",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The ticket state object.",

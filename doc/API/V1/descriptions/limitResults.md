@@ -4,13 +4,13 @@ There are two optional functions ```offset``` and ```limit``` to limit the numbe
 
 By using the optional query parameter ```offset``` a collection resource can be forced to return its response starting at a specific array index. This function will be executed before the [limit](#limit_results) function.
 
-** Usage in URL **
+**Usage in URL**
 ``` bash
-    .../<resource>?offset=[<Object>:]<Offset>
+.../<resource>?offset=[<Object>:]<Offset>
 ```
 
 
-** Explanation **
+**Explanation**
 
 |Parameter|Required?|Description|
 |-|:-:|-|
@@ -20,7 +20,7 @@ By using the optional query parameter ```offset``` a collection resource can be 
 If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma. 
 
 
-** Example **
+**Example**
 
 ``` bash
 .../users?offset=100,User:10
@@ -31,13 +31,13 @@ If a response contains different objects in different lists, separate offsets ca
 
 The optional query parameter ```limit``` allows to limit the number objects contained in the response of a collection.
 
-** Usage in URL **
+**Usage in URL**
 ``` bash
-    .../<resource>?limit=[<Object>:]<Limit>
+.../<resource>?limit=[<Object>:]<Limit>
 ```
 
 
-** Explanation **
+**Explanation**
 
 |Parameter|Required?|Description|
 |-|:-:|-|
@@ -47,7 +47,7 @@ The optional query parameter ```limit``` allows to limit the number objects cont
 If a response contains different objects in different lists, separate limits can be applied by separating them the with comma. 
 
 
-** Example **
+**Example**
 
 ``` bash
 .../users?limit=100,User:10

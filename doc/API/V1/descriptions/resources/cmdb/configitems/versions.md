@@ -10,7 +10,7 @@ In addition to its sub-resources (as far as they exist), this resource supports 
 |```Data```|Adds the version data to the response.|
 |```PreparedData```|Adds the prepared data to the response. The structure of this object is based on the structure of the definition. For every value in the ```Data``` object an array item will be created. Please see the description below.|
 
-** Structure of the Data attribute ** 
+**Structure of the Data attribute**
 
 The structure of the ```Data``` attribute is based on the structure and configuration of the corresponding Config Item class definition. The following rules apply:
 
@@ -57,7 +57,7 @@ The structure of the ```Data``` attribute is based on the structure and configur
     ```
 
 
-** Format of the PreparedData array items ** 
+**Format of the PreparedData array items**
 
 ``` bash
 { 

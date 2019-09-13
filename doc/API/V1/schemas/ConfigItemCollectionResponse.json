@@ -7,7 +7,7 @@
       "ConfigItem" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_ConfigItem_json"
+            "$ref" : "#/definitions/ConfigItem"
          }
       }
    },
@@ -15,60 +15,46 @@
       "ConfigItem"
    ],
    "definitions" : {
-      "_ConfigItemClassDefinition_json" : {
-         "$id" : "#ConfigItemClassDefinition",
+      "ConfigItemImage" : {
+         "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item class definition object.",
+         "description" : "The config item image object.",
          "type" : "object",
          "properties" : {
-            "Class" : {
+            "Comment" : {
                "type" : "string",
                "readOnly" : true
             },
-            "ClassID" : {
+            "ConfigItemID" : {
                "type" : "integer",
                "readOnly" : true
             },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
+            "Content" : {
                "type" : "string",
                "readOnly" : true
             },
-            "Definition" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object"
-               },
-               "readOnly" : true
-            },
-            "DefinitionID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "DefinitionString" : {
+            "ContentType" : {
                "type" : "string",
                "readOnly" : true
             },
-            "Version" : {
-               "type" : "integer",
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "string",
                "readOnly" : true
             }
          },
          "required" : [
-            "Class",
-            "ClassID",
-            "CreateBy",
-            "CreateTime",
-            "Definition",
-            "DefinitionID",
-            "DefinitionString",
-            "Version"
+            "Comment",
+            "ConfigItemID",
+            "ContentType",
+            "Filename",
+            "ID"
          ]
       },
-      "_ConfigItemHistory_json" : {
+      "ConfigItemHistory" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item history object.",
@@ -131,46 +117,109 @@
             "UserLogin"
          ]
       },
-      "_ConfigItemImage_json" : {
-         "$id" : "#ConfigItemImage",
+      "ConfigItem" : {
+         "$id" : "#ConfigItem",
          "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item image object.",
+         "description" : "The config item object.",
          "type" : "object",
          "properties" : {
-            "Comment" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
                "readOnly" : true
             },
             "ConfigItemID" : {
                "type" : "integer",
                "readOnly" : true
             },
-            "Content" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
                "type" : "string",
                "readOnly" : true
             },
-            "ContentType" : {
-               "type" : "string",
+            "CurDeplStateID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
-            "Filename" : {
-               "type" : "string",
+            "CurInciStateID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
-            "ID" : {
-               "type" : "string",
+            "CurrentVersion" : {
+               "$ref" : "#/definitions/ConfigItemVersion"
+            },
+            "History" : {
+               "description" : "added via include \"History\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemHistory"
+               }
+            },
+            "Images" : {
+               "description" : "added via include \"Images\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemImage"
+               }
+            },
+            "LastVersionID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
+            },
+            "Versions" : {
+               "description" : "added via include \"Versions\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemVersion"
+               }
             }
          },
          "required" : [
-            "Comment",
-            "ConfigItemID",
-            "ContentType",
-            "Filename",
-            "ID"
+            "ChangeBy",
+            "ChangeTime",
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "ConfigItemID"
          ]
       },
-      "_ConfigItemVersion_json" : {
+      "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item version object.",
@@ -225,7 +274,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
             },
             "DeplState" : {
                "type" : "string",
@@ -286,29 +335,17 @@
             "VersionID"
          ]
       },
-      "_ConfigItem_json" : {
-         "$id" : "#ConfigItem",
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/schema",
-         "description" : "The config item object.",
+         "description" : "The config item class definition object.",
          "type" : "object",
          "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
             "Class" : {
                "type" : "string",
                "readOnly" : true
             },
             "ClassID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -320,72 +357,35 @@
                "type" : "string",
                "readOnly" : true
             },
-            "CurDeplStateID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
                "readOnly" : true
             },
-            "CurInciStateID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+            "DefinitionID" : {
+               "type" : "integer",
                "readOnly" : true
             },
-            "CurrentVersion" : {
-               "$ref" : "#/definitions/_ConfigItemVersion_json"
-            },
-            "History" : {
-               "description" : "added via include \"History\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/_ConfigItemHistory_json"
-               }
-            },
-            "Images" : {
-               "description" : "added via include \"Images\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/_ConfigItemImage_json"
-               }
-            },
-            "LastVersionID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+            "DefinitionString" : {
+               "type" : "string",
                "readOnly" : true
             },
-            "Versions" : {
-               "description" : "added via include \"Versions\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/_ConfigItemVersion_json"
-               }
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
-            "ChangeBy",
-            "ChangeTime",
             "Class",
             "ClassID",
             "CreateBy",
             "CreateTime",
-            "ConfigItemID"
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       }
    }

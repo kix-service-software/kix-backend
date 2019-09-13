@@ -36,7 +36,7 @@
          "description" : "added via include \"Permissions\"",
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Permission_json"
+            "$ref" : "#/definitions/Permission"
          },
          "readOnly" : true
       },
@@ -63,7 +63,7 @@
       "ValidID"
    ],
    "definitions" : {
-      "_Permission_json" : {
+      "Permission" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The permission object.",

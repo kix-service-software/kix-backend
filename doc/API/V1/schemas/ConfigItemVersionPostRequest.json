@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ConfigItemVersion" : {
-         "$ref" : "#/definitions/_ConfigItemVersionPostItem_json"
+         "$ref" : "#/definitions/ConfigItemVersionPostItem"
       }
    },
    "required" : [
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "_ConfigItemVersionPostItem_json" : {
+      "ConfigItemVersionPostItem" : {
          "$id" : "#ConfigItemVersionPostItem",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item version request object for creation.",

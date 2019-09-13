@@ -21,7 +21,9 @@ h5 {
   margin-bottom: 10px;
 }
 code {
-  color: #000;
+  color: #8d1d2c;
+  font-weight: bold;
+  font-size: 100%;
   background-color: #f0f0f0;
 }
 pre {
