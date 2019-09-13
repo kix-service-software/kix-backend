@@ -681,8 +681,8 @@ sub ArticleCreate {
         }
     }
 
-    # send article through email channel
-    if ( $Param{Channel} eq 'email' ) {
+    # send article through email channel if it was created by an agent
+    if ( $Param{Channel} eq 'email' && $Param{SenderType} eq 'agent' ) {
 
         # send mail
         my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
