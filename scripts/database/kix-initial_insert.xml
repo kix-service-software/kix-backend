@@ -1960,11 +1960,6 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketCreate</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">1</Data>
         <Data Key="event_key" Type="Quote">RecipientSubject</Data>
         <Data Key="event_value" Type="Quote">0</Data>
     </Insert>
@@ -2129,11 +2124,6 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">5</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketOwnerUpdate</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">5</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentOwner</Data>
     </Insert>
@@ -2162,11 +2152,6 @@
         <Data Key="notification_id">6</Data>
         <Data Key="event_key" Type="Quote">Events</Data>
         <Data Key="event_value" Type="Quote">NotificationResponsibleUpdate</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">6</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketResponsibleUpdate</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">6</Data>
@@ -2239,11 +2224,6 @@
         <Data Key="notification_id">8</Data>
         <Data Key="event_key" Type="Quote">Events</Data>
         <Data Key="event_value" Type="Quote">NotificationMove</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">8</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketQueueUpdate</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">8</Data>
