@@ -7,7 +7,7 @@
       "LinkType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_LinkType_json"
+            "$ref" : "#/definitions/LinkType"
          }
       }
    },
@@ -15,7 +15,7 @@
       "LinkType"
    ],
    "definitions" : {
-      "_LinkType_json" : {
+      "LinkType" : {
          "$id" : "#LinkType",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The link type object.",

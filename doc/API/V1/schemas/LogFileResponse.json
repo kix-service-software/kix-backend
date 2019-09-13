@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "LogFile" : {
-         "$ref" : "#/definitions/_LogFile_json"
+         "$ref" : "#/definitions/LogFile"
       }
    },
    "required" : [
       "LogFile"
    ],
    "definitions" : {
-      "_LogFile_json" : {
+      "LogFile" : {
          "$id" : "#LogFile",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The log file object.",

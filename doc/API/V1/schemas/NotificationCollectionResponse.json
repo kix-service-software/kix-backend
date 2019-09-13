@@ -7,7 +7,7 @@
       "Notification" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Notification_json"
+            "$ref" : "#/definitions/Notification"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Notification"
    ],
    "definitions" : {
-      "_Notification_json" : {
+      "Notification" : {
          "$id" : "#Notification",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The notification object.",

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ConfigItemClassDefinition" : {
-         "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+         "$ref" : "#/definitions/ConfigItemClassDefinition"
       }
    },
    "required" : [
       "ConfigItemClassDefinition"
    ],
    "definitions" : {
-      "_ConfigItemClassDefinition_json" : {
+      "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The config item class definition object.",

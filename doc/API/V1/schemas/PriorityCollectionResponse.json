@@ -7,7 +7,7 @@
       "Priority" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Priority_json"
+            "$ref" : "#/definitions/Priority"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Priority"
    ],
    "definitions" : {
-      "_Priority_json" : {
+      "Priority" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The priority object.",

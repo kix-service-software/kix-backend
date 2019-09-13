@@ -7,7 +7,7 @@
       "ClientRegistration" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_ClientRegistration_json"
+            "$ref" : "#/definitions/ClientRegistration"
          }
       }
    },
@@ -15,7 +15,7 @@
       "ClientRegistration"
    ],
    "definitions" : {
-      "_ClientRegistration_json" : {
+      "ClientRegistration" : {
          "$id" : "#ClientRegistration",
          "$schema" : "http://json-schema.org/schema",
          "description" : "The client registration object.",
