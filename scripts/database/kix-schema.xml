@@ -2788,9 +2788,6 @@
     <Column Name="create_by" Required="true" Type="INTEGER" />
     <Column Name="change_time" Required="true" Type="DATE" />
     <Column Name="change_by" Required="true" Type="INTEGER" />
-    <Unique Name="translation_pattern_uvalue">
-        <UniqueColumn Name="value" Size="255"/>
-    </Unique>
     <Unique Name="translation_pattern_umd5">
         <UniqueColumn Name="value_md5"/>
     </Unique>
