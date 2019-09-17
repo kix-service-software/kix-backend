@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-05 15:52+0000\n"
-"PO-Revision-Date: 2019-03-19 08:13+0000\n"
-"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
+"PO-Revision-Date: 2019-09-17 09:33+0000\n"
+"Last-Translator: fuhlig <Frank.Uhlig@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.5\n"
+"X-Generator: Weblate 3.7\n"
 
 # ticket priority
 #. Database: scripts/database/kix-initial_insert.xml
@@ -3318,7 +3318,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "English"
-msgstr ""
+msgstr "Englisch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enter your shared secret to enable two factor authentication."
@@ -3394,7 +3394,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "German"
-msgstr ""
+msgstr "Deutsch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -5897,6 +5897,8 @@ msgid ""
 "English stop words for fulltext index. These words will be removed from the "
 "search index."
 msgstr ""
+"Englische Stopp-Wörter für Volltextindex. Diese Wörter werden aus dem "
+"Suchindex entfernt."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Error"
@@ -6033,6 +6035,8 @@ msgid ""
 "German stop words for fulltext index. These words will be removed from the "
 "search index."
 msgstr ""
+"Deutsche Stopp-Wörter für Volltextindex. Diese Wörter werden aus dem "
+"Suchindex entfernt."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
