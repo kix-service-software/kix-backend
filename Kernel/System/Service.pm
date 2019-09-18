@@ -1530,7 +1530,7 @@ sub GetAllSubServices {
 
     # search all custom Services
     return if !$DBObject->Prepare(
-        SQL  => "SELECT s2.id, s2.name FROM service s1, service s2 WHERE s1.id = ? AND s2.id <> ? AND s2.name like s1.name||'::%'",
+        SQL  => "SELECT s2.id, s2.name FROM service s1, service s2 WHERE s1.id = ? AND s2.id <> ? AND s2.name like CONCAT(s1.name, '::%')",
         Bind => [ \$Param{ServiceID}, \$Param{ServiceID} ],
     );
 

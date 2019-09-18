@@ -1215,7 +1215,7 @@ sub PermissionList {
     }
 
     # check cache
-    my $CacheKey = 'PermissionList::'.$Param{UserID}.'::'.$Param{RoleID}.'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
+    my $CacheKey = 'PermissionList::'.($Param{UserID}||'').'::'.($Param{RoleID}||'').'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,

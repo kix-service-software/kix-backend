@@ -1,26 +1,26 @@
 With the use of the optional query parameter ```fields``` it is possible to select which properties of an object should be included in the response. There are three ways to do this: a general style, a compact style and the use of pre-defined fieldsets.
 
-** Usage in URL **
+**Usage in URL**
 
 General:
 
 ``` bash
-    .../<resource>?fields=<Object>.<Property>
+.../<resource>?fields=<Object>.<Property>
 ```
 Compact:
 
 ``` bash
-    .../<resource>?fields=<Object>.[<Property>;<Property>;<Property>]
+.../<resource>?fields=<Object>.[<Property>;<Property>;<Property>]
 ```
 Please note that the "[]" characters do not declare optional content but define an actual array list in this case.
 
 Fieldset:
 
 ``` bash
-    .../<resource>?fields=:<Fieldset>
+.../<resource>?fields=:<Fieldset>
 ```
 
-** Explanation **
+**Explanation**
 
 |Parameter|Required?|Description|
 |-|:-:|-|
@@ -32,7 +32,7 @@ When using the general style, multiple properties can be selected by multiplying
 A fieldset is a pre-defined property selection with a name. Please see the documentation of a specific resource whether fieldsets are available.
 
 
-** Example **
+**Example**
 
 Only select the attributes "UserLogin" and "UserID" from the users collection. In our example a fieldset named "Short" exists which selects those two properties.
 

@@ -351,8 +351,8 @@ sub Run {
         Service         => $Service || $GetParam{'X-KIX-Service'} || '',
         SLA             => $SLA     || $GetParam{'X-KIX-SLA'}     || '',
         TicketTemplate  => (%TicketTemplate && $TicketTemplate{ID}) ? $TicketTemplate{ID} : '',
-        OrganisationID      => $GetParam{'X-KIX-CustomerNo'},
-        Contact         => $GetParam{'X-KIX-Contact'},
+        OrganisationID  => $GetParam{'X-KIX-CustomerNo'},
+        ContactID       => $GetParam{'X-KIX-Contact'},
         OwnerID         => $OwnerID,
         UserID          => $Param{InmailUserID},
         %Opts,
@@ -370,7 +370,7 @@ sub Run {
         print "Priority: $Priority\n";
         print "State: $State\n";
         print "OrganisationID: ".$GetParam{'X-KIX-CustomerNo'}."\n";
-        print "Contact: ".$GetParam{'X-KIX-Contact'}."\n";
+        print "ContactID: ".$GetParam{'X-KIX-Contact'}."\n";
         for my $Value (qw(Type Service SLA Lock)) {
 
             if ( $GetParam{ 'X-KIX-' . $Value } ) {

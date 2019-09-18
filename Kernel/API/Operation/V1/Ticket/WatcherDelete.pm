@@ -138,9 +138,7 @@ sub Run {
     }
 
     # return result
-    return $Self->_Success(
-        WatcherID => $Param{Data}->{WatcherID},
-    );
+    return $Self->_Success();
 }
 
 1;
