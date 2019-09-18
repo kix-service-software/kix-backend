@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE HTML><html><head><title>KIX 2018 REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.2.1"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
       // --
 // Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
@@ -7,9 +6,6 @@
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
 // did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 // --
-=======
-<!DOCTYPE HTML><html><head><title>KIX 2018 REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.3.0"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
->>>>>>> origin/rel-18_FEATURE
 $(document).ready(function() {
   // add chapters to sidebar
   $($('.chapter > h2').get().reverse()).each(function(i, chapter) {
@@ -91,7 +87,6 @@ $(document).ready(function() {
     } catch(e) {}
   });
 });
-<<<<<<< HEAD
       // --
 // Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 // --
@@ -276,171 +271,6 @@ $(document).ready(function() {
  *
  */
 
-=======
-/**
- * jQuery json-viewer
- * @author: Kevin Olson <acidjazz@gmail.com>
- */
-(function($){
-
-    /**
-     * Check if arg is either an array with at least 1 element, or a dict with at least 1 key
-     * @return boolean
-     */
-    function isCollapsable(arg) {
-      return arg instanceof Object && Object.keys(arg).length > 0;
-    }
-  
-    /**
-     * Check if a string represents a valid url
-     * @return boolean
-     */
-    function isUrl(string) {
-       var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-       return regexp.test(string);
-    }
-  
-    /**
-     * Transform a json object into html representation
-     * @return string
-     */
-    function json2html(json, options) {
-      html = '';
-      if (typeof json === 'string') {
-        // Escape tags
-        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        if (isUrl(json))
-          html += '<a href="' + json + '" class="json-string">' + json + '</a>';
-        else
-          html += '<span class="json-string">"' + json + '"</span>';
-      }
-      else if (typeof json === 'number') {
-        html += '<span class="json-number">' + json + '</span>';
-      }
-      else if (typeof json === 'boolean') {
-        html += '<span class="json-boolean">' + json + '</span>';
-      }
-      else if (json === null) {
-        html += '<span class="json-null">null</span>';
-      }
-      else if (json instanceof Array) {
-        if (json.length > 0) {
-          html += '[<ol class="json-array">';
-          for (var i = 0; i < json.length; ++i) {
-            html += '<li>'
-            // Add toggle button if item is collapsable
-            if (!options.noToggle && isCollapsable(json[i])) {
-                html += '<a href class="json-toggle"></a>';
-            }
-            html += json2html(json[i], options);
-            // Add comma if item is not last
-            if (i < json.length - 1) {
-              html += ',';
-            }
-            html += '</li>';
-          }
-          html += '</ol>]';
-        }
-        else {
-          html += '[]';
-        }
-      }
-      else if (typeof json === 'object') {
-        var key_count = Object.keys(json).length;
-        if (key_count > 0) {
-          html += '{<ul class="json-dict">';
-          for (var key in json) {
-            if (json.hasOwnProperty(key)) {
-              html += '<li>';
-              var keyRepr = options.withQuotes ?
-                '<span class="json-attribute">"' + key + '"</span>' : key;
-              // Add toggle button if item is collapsable
-              if (!options.noToggle && isCollapsable(json[key])) {
-                html += '<a href class="json-toggle">' + keyRepr + '</a>';
-              }
-              else {
-                html += keyRepr;
-              }
-              html += ': ' + json2html(json[key], options);
-              // Add comma if item is not last
-              if (--key_count > 0)
-                html += ',';
-              html += '</li>';
-            }
-          }
-          html += '</ul>}';
-        }
-        else {
-          html += '{}';
-        }
-      }
-      return html;
-    }
-  
-    $.fn.jsonHighlight = function(json) {
-
-        // jQuery chaining
-        return this.each(function() {
-
-            // Transform to HTML
-            var html = json2html(json, { withQuotes: true, noToggle: true })
-
-            // Insert HTML in target DOM element
-            $(this).html(html);    
-        });
-    }
-
-    /**
-     * jQuery plugin method
-     * @param json: a javascript object
-     * @param options: an optional options hash
-     */
-    $.fn.jsonBrowse = function(json, options) {
-      options = options || {};
-  
-      // jQuery chaining
-      return this.each(function() {
-  
-        // Transform to HTML
-        var html = json2html(json, options)
-        if (isCollapsable(json))
-          html = '<a href></a>' + html;
-  
-        // Insert HTML in target DOM element
-        $(this).html(html);
-  
-        // Bind click on toggle buttons
-        $(this).off('click');
-        $(this).on('click', 'a.json-toggle', function() {
-          var target = $(this).toggleClass('collapsed').siblings('ul.json-dict, ol.json-array');
-          target.toggle();
-          if (target.is(':visible')) {
-            target.siblings('.json-placeholder').remove();
-          }
-          else {
-            var count = target.children('li').length;
-            var placeholder = count + (count > 1 ? ' items' : ' item');
-            target.after('<a href class="json-placeholder">' + placeholder + '</a>');
-          }
-          return false;
-        });
-  
-        // Simulate click on toggle button when placeholder is clicked
-        $(this).on('click', 'a.json-placeholder', function() {
-          $(this).siblings('a.json-toggle').click();
-          return false;
-        });
-  
-        if (options.collapsed == true) {
-          // Trigger click to collapse all nodes
-          $(this).find('a.json-toggle').click();
-        }
-      });
-    };
-  })(jQuery);
-  
-    </script><style>
->>>>>>> origin/rel-18_FEATURE
 h1 {
   font-weight: bold;
 }
@@ -676,7 +506,6 @@ pre code {
   font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
   font-size: 95%;
 }
-<<<<<<< HEAD
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
  * Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
@@ -787,102 +616,6 @@ pre code {
 }
 }
 </code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td style="text-align:center">yes</td><td>The object in the JSON response to be filtered.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td style="text-align:center">yes</td><td>The attribute in each item of the response to be filtered.</td></tr><tr><td><code>&lt;Operator&gt;</code></td><td style="text-align:center">yes</td><td>The compare operator to be used.</td></tr><tr><td><code>&lt;Value&gt;</code></td><td style="text-align:center">yes</td><td>The value to compare to. Filters are working case-insensitive. If the value starts with a <code>$</code> character it will be interpreted as a reference to another attribute and the actual value will be taken from the referenced attribute.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td style="text-align:center"></td><td>The type of data that should be used to compare the value. If not given, the value will be interpreted as a string.</td></tr><tr><td><code>&lt;Not&gt;</code></td><td style="text-align:center"></td><td>To negate the comparison set this to <code>true</code>.</td></tr></tbody></table><p>If both lists are given (AND and OR) they will be combines using a logical AND operation.</p><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>STRING</code></td><td>The value will be treated as a text of ASCII characters.</td></tr><tr><td><code>NUMERIC</code></td><td>The value will be treated as a number (integer or float).</td></tr><tr><td><code>DATE</code></td><td>The value will be treated as a date of the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>DATETIME</code></td><td>The value will be treated as a date + time combination of the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p><strong>Supported operators</strong></p><table class="table"><thead><tr><th>Operator</th><th>Meaning</th><th>Valid for datatypes</th><th>Description</th></tr></thead><tbody><tr><td><code>EQ</code></td><td>equal to</td><td>all</td><td>The data value must be exactly identical to the filter value.</td></tr><tr><td><code>NE</code></td><td>not equal to</td><td>all</td><td>The data value must not be identical to the filter value.</td></tr><tr><td><code>LT</code></td><td>less than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than the filter value.</td></tr><tr><td><code>LTE</code></td><td>less than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than or equal to the filter value.</td></tr><tr><td><code>GT</code></td><td>greater than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than the filter value.</td></tr><tr><td><code>GTE</code></td><td>greater than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than or equal to the filter value.</td></tr><tr><td><code>IN</code></td><td>exists in list</td><td>all</td><td>The data value must be one of the given list of filter values. This is identical to separate OR filters with EQ operators for each filter value</td></tr><tr><td><code>CONTAINS</code></td><td>contains a pattern</td><td>STRING</td><td>The filter value is contained in the data value at any position.</td></tr><tr><td><code>STARTSWITH</code></td><td>starts with a pattern</td><td>STRING</td><td>The data value starts with the filter value.</td></tr><tr><td><code>ENDSWITH</code></td><td>ends with a pattern</td><td>STRING</td><td>The data value end with the filter value.</td></tr><tr><td><code>LIKE</code></td><td>matches pattern</td><td>STRING</td><td>The data value matches the filter value which represents a pattern. The wildcard <code>*</code> can be used multiple times. Without a wildcard the LIKE operator works like the EQ operator.</td></tr></tbody></table><p><strong>Example</strong></p><p>Return all users whose UserID isn&#39;t 1, 2 oder 3 and whose first name doesn&#39;t begin with their last name and whose email address doesn&#39;t end with "cape-it.de".</p><pre><code>{
-=======
-/* Syntax highlighting for JSON objects */
-.json-body {
-    margin: 10px 20px;
-  }
-  
-  ul.json-dict, ol.json-array {
-    list-style-type: none;
-    margin: 0 0 0 1px;
-    border-left: 1px dotted #ccc;
-    padding-left: 2em;
-    font: 13px/18px monospace;
-    -webkit-font-smoothing: antialiased;
-  }
-  .json-string {
-    color: #811f3f;
-  }
-  .json-number {
-    color: #267f99;
-  }
-  .json-boolean {
-    color: #0000ff;
-  }
-  .json-literal {
-    color: #0000ff;
-  }
-  .json-null {
-    color: #000;
-  }
-  .json-attribute {
-    color: #0451a5;
-  }
-  /* Toggle button */
-  a.json-toggle {
-    position: relative;
-    color: inherit;
-    text-decoration: none;
-  }
-  a.json-toggle:focus {
-    outline: none;
-  }
-  a.json-toggle:before {
-    content: "\25B6"; /* left arrow */
-    transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    color: #d9d9d9;
-    position: absolute;
-    display: inline-block;
-    width: 1em;
-    font-size: 10px;
-    left: -1.5em;
-  }
-  a.json-toggle.collapsed:before {
-    content: "\25B6"; /* left arrow */
-    transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    font-size: 10px;
-  }
-  
-  /* Collapsable placeholder links */
-  a.json-placeholder {
-    color: #aaa;
-    padding: 0 1em;
-    text-decoration: none;
-  }
-  a.json-placeholder:hover {
-    text-decoration: underline;
-  }
-  
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX 2018 REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api/v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#auth"><code>/auth</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="responses"><a href="#responses">Responses</a></h2><p>In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If there occurs an error the API returns a simple error object. You can find the structure of these objects in the response description for every API resource.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In contrast to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function depends on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p>** Usage in URL **</p><pre><code class="language-bash">.../&lt;resource&gt;?search={...}</code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be executed at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p>** Usage in URL **</p><pre><code class="language-bash">.../&lt;resource&gt;?filter={...}</code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="language-bash">{
-    "&lt;Object&gt;": {
-        "AND": [
-            {
-                "Field":     "&lt;Fieldname&gt;",
-                "Operator":  "&lt;Operator&gt;",
-                "Value":     "&lt;Value&gt;"[,]
-                ["Type":     "&lt;Type&gt;",]
-                ["Not":      &lt;Not&gt;,]
-            },
-            ...next field...
-        ],
-        "OR": [
-            {
-                "Field":     "&lt;Fieldname&gt;",
-                "Operator":  "&lt;Operator&gt;",
-                "Value":     "&lt;Value&gt;"[,]
-                ["Type":     "&lt;Type&gt;",]
-                ["Not":      &lt;Not&gt;,]
-            },
-            ...next field...
-        ]
-    }
-}</code></pre><p>** Explanation **</p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response to be filtered.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td align="center">yes</td><td>The attribute in each item of the response to be filtered.</td></tr><tr><td><code>&lt;Operator&gt;</code></td><td align="center">yes</td><td>The compare operator to be used.</td></tr><tr><td><code>&lt;Value&gt;</code></td><td align="center">yes</td><td>The value to compare to. Filters are working case-insensitive. If the value starts with a <code>$</code> character it will be interpreted as a reference to another attribute and the actual value will be taken from the referenced attribute.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td align="center"></td><td>The type of data that should be used to compare the value. If not given, the value will be interpreted as a string.</td></tr><tr><td><code>&lt;Not&gt;</code></td><td align="center"></td><td>To negate the comparison set this to <code>true</code>.</td></tr></tbody></table><p>If both lists are given (AND and OR) they will be combines using a logical AND operation.</p><p>** Supported types **</p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>STRING</code></td><td>The value will be treated as a text of ASCII characters.</td></tr><tr><td><code>NUMERIC</code></td><td>The value will be treated as a number (integer or float).</td></tr><tr><td><code>DATE</code></td><td>The value will be treated as a date of the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>DATETIME</code></td><td>The value will be treated as a date + time combination of the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p>** Supported operators **</p><table class="table"><thead><tr><th>Operator</th><th>Meaning</th><th>Valid for datatypes</th><th>Description</th></tr></thead><tbody><tr><td><code>EQ</code></td><td>equal to</td><td>all</td><td>The data value must be exactly identical to the filter value.</td></tr><tr><td><code>NE</code></td><td>not equal to</td><td>all</td><td>The data value must not be identical to the filter value.</td></tr><tr><td><code>LT</code></td><td>less than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than the filter value.</td></tr><tr><td><code>LTE</code></td><td>less than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than or equal to the filter value.</td></tr><tr><td><code>GT</code></td><td>greater than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than the filter value.</td></tr><tr><td><code>GTE</code></td><td>greater than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than or equal to the filter value.</td></tr><tr><td><code>IN</code></td><td>exists in list</td><td>all</td><td>The data value must be one of the given list of filter values. This is identical to separate OR filters with EQ operators for each filter value</td></tr><tr><td><code>CONTAINS</code></td><td>contains a pattern</td><td>STRING</td><td>The filter value is contained in the data value at any position.</td></tr><tr><td><code>STARTSWITH</code></td><td>starts with a pattern</td><td>STRING</td><td>The data value starts with the filter value.</td></tr><tr><td><code>ENDSWITH</code></td><td>ends with a pattern</td><td>STRING</td><td>The data value end with the filter value.</td></tr><tr><td><code>LIKE</code></td><td>matches pattern</td><td>STRING</td><td>The data value matches the filter value which represents a pattern. The wildcard <code>*</code> can be used multiple times. Without a wildcard the LIKE operator works like the EQ operator.</td></tr></tbody></table><p>** Example **</p><p>Return all users whose UserID isn&#39;t 1, 2 oder 3 and whose first name doesn&#39;t begin with their last name and whose email address doesn&#39;t end with "cape-it.de".</p><pre><code>{
->>>>>>> origin/rel-18_FEATURE
 "User": {
 "AND": [
 {
@@ -3848,7 +3581,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table><p>This resource supports a special <code>search</code> property</p><table class="table"><thead><tr><th>Search</th><th>Description</th></tr></thead><tbody><tr><td><code>Fulltext</code></td><td>Searches with the given value in the following contact attributes: login, firstname, lastname, email, title, phone, fax, mobile, street, zip, city, country. Some logical operators are possible: "+" or "&amp;" as AND, "|" as OR and "*" as any string, e.g. "john&amp;doe" or "j*+doe|james"</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems_attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems_attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr></tbody></table><p>This resource supports a special <code>search</code> property</p><table class="table"><thead><tr><th>Search</th><th>Description</th></tr></thead><tbody><tr><td><code>Fulltext</code></td><td>Searches with the given value in the following contact attributes: login, firstname, lastname, email, title, phone, fax, mobile, street, zip, city, country. Some logical operators are possible: "+" or "&amp;" as AND, "\</td><td>" as OR and "*" as any string, e.g. "john&amp;doe" or "j*+doe\</td><td>james"</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ContactCollectionResponse",
    "$schema" : "http://json-schema.org/schema",
    "description" : "A list of contacts.",
