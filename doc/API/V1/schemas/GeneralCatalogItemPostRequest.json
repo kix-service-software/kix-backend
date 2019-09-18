@@ -1,0 +1,32 @@
+{
+   "$id" : "#GeneralCatalogItemPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The GeneralCatalog item request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "GeneralCatalogItem" : {
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Class",
+            "Name"
+         ]
+      }
+   },
+   "required" : [
+      "GeneralCatalogItem"
+   ]
+}

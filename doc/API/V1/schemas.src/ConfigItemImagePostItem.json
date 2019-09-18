@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemImagePostItem",
+  "type": "object",
+  "description": "The config item image request object for creation.",
+  "properties": {
+    "Comment": {
+      "type": "string"
+    },
+    "Content": {
+      "type": "string"
+    },
+    "ContentType": {
+      "type": "string"
+    },
+    "Filename": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "Content",
+    "ContentType",
+    "Filename"
+  ]
+}

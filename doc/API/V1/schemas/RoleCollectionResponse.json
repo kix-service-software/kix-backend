@@ -1,0 +1,142 @@
+{
+   "$id" : "#RoleCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of roles.",
+   "type" : "object",
+   "properties" : {
+      "Role" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Role"
+         }
+      }
+   },
+   "required" : [
+      "Role"
+   ],
+   "definitions" : {
+      "Role" : {
+         "$id" : "#Role",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The role object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Permissions" : {
+               "description" : "added via include \"Permissions\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/Permission"
+               },
+               "readOnly" : true
+            },
+            "UserIDs" : {
+               "description" : "added via include \"UserIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      },
+      "Permission" : {
+         "$id" : "#Permission",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The permission object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IsRequired" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Target" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "description" : "bitmask, please see documentation for bit descriptions",
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Target",
+            "Value"
+         ]
+      }
+   }
+}

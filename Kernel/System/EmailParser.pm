@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::EmailParser;
@@ -771,7 +771,7 @@ sub PartsAttachments {
 
     # For multipart/mixed emails, we check for all text/plain or text/html MIME parts which are
     #   body elements, and concatenate them into the first relevant attachment, to stay in line
-    #   with OTRS file-1 and file-2 attachment handling.
+    #   with file-1 and file-2 attachment handling.
     # HTML parts will just be concatenated, so that the attachment has two complete HTML documents
     #   inside. Browsers tolerate this.
     if (
@@ -1048,16 +1048,17 @@ sub _MailAddressParse {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,0 +1,22 @@
+{
+   "$id" : "#ConfigItemClassDefinitionPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item class definition request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "type" : "object",
+         "properties" : {
+            "DefinitionString" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "DefinitionString"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ]
+}

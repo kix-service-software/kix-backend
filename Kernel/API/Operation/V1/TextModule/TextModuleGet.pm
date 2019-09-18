@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/V1/TextModule/TextModuleGet.pm - API TextModule Get operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::TextModule::TextModuleGet;
@@ -91,6 +86,7 @@ sub ParameterDefinition {
 
     return {
         'TextModuleID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },
@@ -141,14 +137,16 @@ sub Run {
 
         if ( !IsHashRefWithData( \%TextModuleData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for TextModuleID $TextModuleID.",
+                Code => 'Object.NotFound',
             );
         }
         
         # convert Keywords to array
         my @Keywords = split(/\s+/, $TextModuleData{Keywords});
         $TextModuleData{Keywords} = \@Keywords;
+
+        # force numeric ID
+        $TextModuleData{ID} += 0;
 
         # add
         push(@TextModuleList, \%TextModuleData);
@@ -167,3 +165,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

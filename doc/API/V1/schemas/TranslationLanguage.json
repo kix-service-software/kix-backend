@@ -1,0 +1,25 @@
+{
+   "$id" : "#TranslationLanguage",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The translation language object.",
+   "type" : "object",
+   "properties" : {
+      "Language" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "PatternID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Value" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "PatternID",
+      "Language",
+      "Value"
+   ]
+}

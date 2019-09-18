@@ -1,0 +1,93 @@
+{
+   "$id" : "#TextModuleCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of text modules.",
+   "type" : "object",
+   "properties" : {
+      "TextModule" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TextModule"
+         }
+      }
+   },
+   "required" : [
+      "TextModule"
+   ],
+   "definitions" : {
+      "TextModule" : {
+         "$id" : "#TicketState",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The ticket state object.",
+         "type" : "object",
+         "properties" : {
+            "Category" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Keywords" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Subject" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Text" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Language",
+            "Name",
+            "Text",
+            "ValidID"
+         ]
+      }
+   }
+}

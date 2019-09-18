@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Cache::FileStorable;
@@ -18,6 +18,7 @@ use Storable qw();
 use Digest::MD5 qw();
 use File::Path qw();
 use File::Find qw();
+use File::Basename;
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -36,7 +37,7 @@ sub new {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    my $TempDir = $ConfigObject->Get('TempDir');
+    my $TempDir = $ConfigObject->Get('TempDir') || $ConfigObject->Get('Home').'/var/tmp';
     $Self->{CacheDirectory} = $TempDir . '/CacheFileStorable';
 
     # check if cache directory exists and in case create one
@@ -181,9 +182,15 @@ sub CleanUp {
         Filter    => $Param{Type} || '*',
     );
 
-    if ( $Param{KeepTypes} ) {
-        my $KeepTypesRegex = join( '|', map {"\Q$_\E"} @{ $Param{KeepTypes} } );
-        @TypeList = grep { $_ !~ m{/$KeepTypesRegex/?$}smx } @TypeList;
+    if ( $Param{KeepTypes} ) {                
+        my %KeepTypes = map { $_ => 1 } @{$Param{KeepTypes}};
+        my @RealTypeList;        
+        foreach my $Directory (sort @TypeList) {
+            my $Type = basename($Directory);
+            next if $KeepTypes{$Type};
+            push(@RealTypeList, $Directory);
+        }
+        @TypeList = @RealTypeList;
     }
 
     return 1 if !@TypeList;
@@ -266,16 +273,17 @@ sub _GetFilenameAndCacheDirectory {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

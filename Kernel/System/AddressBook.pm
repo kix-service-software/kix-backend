@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::AddressBook;
@@ -178,9 +178,19 @@ sub AddressAdd {
             ],
         );
 
+        my $ID;
         while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-            return $Row[0];
+            $ID = $Row[0];
         }
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event      => 'CREATE',
+            Namespace  => 'AddressBook',
+            ObjectID   => $ID,
+        );
+
+        return $ID;
     }
     else {
         $Self->{LogObject}->Log(
@@ -224,6 +234,13 @@ sub AddressUpdate {
         Type => $Self->{CacheType}
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'AddressBook',
+        ObjectID  => $Param{AddressID},
+    );
+
     return 1;
 }
 
@@ -243,9 +260,17 @@ sub Empty {
         Type => $Self->{CacheType}
     );
 
-    return $Self->{DBObject}->Do(
+    return if !$Self->{DBObject}->Do(
         SQL  => 'DELETE FROM addressbook',
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'AddressBook',
+    );
+
+    return 1
 }
 
 =item AddressList()
@@ -344,10 +369,18 @@ sub AddressDelete {
         Type => $Self->{CacheType}
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'AddressBook',
+        ObjectID  => $Param{AddressID},
+    );
+
     return 1;
 }
 
 1;
+
 
 
 
@@ -356,11 +389,11 @@ sub AddressDelete {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

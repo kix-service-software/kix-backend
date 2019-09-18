@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Admin::Package::FileSearch;
@@ -22,7 +22,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Find a file in an installed OTRS package.');
+    $Self->Description('Find a file in an installed KIX package.');
     $Self->AddArgument(
         Name        => 'search-path',
         Description => "Filename or path to search for.",
@@ -36,7 +36,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Searching in installed OTRS packages...</yellow>\n");
+    $Self->Print("<yellow>Searching in installed KIX packages...</yellow>\n");
 
     my $Hit      = 0;
     my $Filepath = $Self->GetArgument('search-path');
@@ -73,11 +73,12 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->PrintError("File $Filepath was not found in an installed OTRS package.\n");
+    $Self->PrintError("File $Filepath was not found in an installed KIX package.\n");
     return $Self->ExitCodeError();
 }
 
 1;
+
 
 
 
@@ -86,11 +87,11 @@ sub Run {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

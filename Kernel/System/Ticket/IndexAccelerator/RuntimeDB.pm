@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::IndexAccelerator::RuntimeDB;
@@ -16,7 +16,6 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::DB',
-    'Kernel::System::Group',
     'Kernel::System::Lock',
     'Kernel::System::Log',
     'Kernel::System::State',
@@ -62,25 +61,6 @@ sub TicketAcceleratorIndex {
     for (qw(UserID)) {
         $Param{$_} = $DBObject->Quote( $Param{$_}, 'Integer' );
     }
-
-    # get user groups
-    my $Type             = 'rw';
-    my $AgentTicketQueue = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::AgentTicketQueue');
-    if (
-        $AgentTicketQueue
-        && ref $AgentTicketQueue eq 'HASH'
-        && $AgentTicketQueue->{ViewAllPossibleTickets}
-        )
-    {
-        $Type = 'ro';
-    }
-
-    my %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-        UserID => $Param{UserID},
-        Type   => $Type,
-    );
-
-    my @GroupIDs = sort keys %GroupList;
 
     my @QueueIDs = @{ $Param{ShownQueueIDs} };
     my %Queues;
@@ -136,33 +116,19 @@ sub TicketAcceleratorIndex {
         }
     }
 
-    # check if user is in min. one group! if not, return here
-    if ( !@GroupIDs ) {
-
-        my %Hashes;
-        $Hashes{QueueID} = 0;
-        $Hashes{Queue}   = 'CustomQueue';
-        $Hashes{MaxAge}  = 0;
-        $Hashes{Count}   = 0;
-
-        push @{ $Queues{Queues} }, \%Hashes;
-
-        return %Queues;
-    }
-
     # CustomQueue add on
     return if !$DBObject->Prepare(
 
         # Differentiate between total and unlocked tickets
         SQL => "
             SELECT count(*), st.ticket_lock_id
-            FROM ticket st, queue sq, personal_queues suq
+            FROM ticket st, queue sq, user_preferences up
             WHERE st.ticket_state_id IN ( ${\(join ', ', @ViewableStateIDs)} )
                 AND st.queue_id = sq.id
                 AND st.archive_flag = 0
-                AND suq.queue_id = st.queue_id
-                AND sq.group_id IN ( ${\(join ', ', @GroupIDs)} )
-                AND suq.user_id = $Param{UserID}
+                AND up.preferences_key = 'MyQueues'
+                AND up.preferences_value = st.queue_id
+                AND up.user_id = $Param{UserID}
                 GROUP BY st.ticket_lock_id",
     );
 
@@ -204,7 +170,6 @@ sub TicketAcceleratorIndex {
             WHERE st.ticket_state_id IN ( ${\(join ', ', @ViewableStateIDs)} )
                 AND st.queue_id = sq.id
                 AND st.archive_flag = 0
-                AND sq.group_id IN ( ${\(join ', ', @GroupIDs)} )
             GROUP BY st.queue_id, sq.name, st.ticket_lock_id
             ORDER BY sq.name"
     );
@@ -268,16 +233,17 @@ sub TicketAcceleratorRebuild {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::LinkObject;
@@ -597,6 +597,13 @@ sub LinkAdd {
         UserID       => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Link',
+        ObjectID  => $LinkID,
+    );
+
     return $LinkID;
 }
 
@@ -645,6 +652,12 @@ sub LinkCleanup {
         Bind => [
             \$DeleteTime,
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Link',
     );
 
     return 1;
@@ -742,7 +755,7 @@ sub LinkDelete {
     # get the existing link
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT source_object_id, source_key, target_object_id, target_key
+            SELECT id, source_object_id, source_key, target_object_id, target_key
             FROM link_relation
             WHERE (
                     (source_object_id = ? AND source_key = ?
@@ -765,11 +778,11 @@ sub LinkDelete {
     # fetch results
     my %Existing;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-
-        $Existing{SourceObjectID} = $Row[0];
-        $Existing{SourceKey}      = $Row[1];
-        $Existing{TargetObjectID} = $Row[2];
-        $Existing{TargetKey}      = $Row[3];
+        $Existing{ID}             = $Row[0];
+        $Existing{SourceObjectID} = $Row[1];
+        $Existing{SourceKey}      = $Row[2];
+        $Existing{TargetObjectID} = $Row[3];
+        $Existing{TargetKey}      = $Row[4];
     }
 
     return 1 if !%Existing;
@@ -863,6 +876,13 @@ sub LinkDelete {
     # invalidate cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Link',
+        ObjectID  => $Param{LinkID} || $Existing{ID},
     );
 
     return 1;
@@ -2395,7 +2415,7 @@ Return
     };
 
     $ObjectList = $LinkObject->ObjectSearch(
-        Object       => 'ITSMConfigItem',
+        Object       => 'ConfigItem',
         SubObject    => 'Computer'         # (optional)
         SearchParams => $HashRef,          # (optional)
         UserID       => 1,
@@ -2438,16 +2458,17 @@ sub ObjectSearch {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,0 +1,15 @@
+  displayName: Organisations
+  description: !include ../descriptions/resources/organisations.md
+  type: { collection: { typeName: Organisation } }
+  /{organisationId}:
+    type: { item: { typeName: Organisation } }
+    uriParameters:
+      organisationId:
+        displayName: OrganisationID
+        type: integer
+    /contacts:
+      description: !include ../descriptions/resources/organisations/contacts.md
+      type: { collection-readonly: { typeName: Contact } }
+    /tickets:
+      description: !include ../descriptions/resources/organisations/tickets.md
+      type: { collection-readonly: { typeName: Ticket } }

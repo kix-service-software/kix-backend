@@ -1,0 +1,14 @@
+{
+   "$id" : "#PriorityPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated priority.",
+   "type" : "object",
+   "properties" : {
+      "PriorityID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "PriorityID"
+   ]
+}

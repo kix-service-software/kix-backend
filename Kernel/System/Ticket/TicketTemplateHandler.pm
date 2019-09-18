@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::TicketTemplateHandler;
@@ -90,42 +90,6 @@ sub TicketTemplateList {
 
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         $Templates{ $Row[0] } = $Row[1];
-    }
-
-    my $Config = $Self->{ConfigObject}->Get('Ticket::QuickTicketByDefaultSet::UserGroups');
-    if ( $Param{UserID} ) {
-        my $Permission = $Config->{Permission};
-
-        if ( !$Param{Frontend} || $Param{Frontend} eq 'Agent' ) {
-            $Self->{GroupObject} = $Kernel::OM->Get('Kernel::System::Group');
-        }
-        elsif ( $Param{Frontend} eq 'Customer' ) {
-            $Self->{GroupObject} = $Kernel::OM->Get('Kernel::System::CustomerGroup');
-        }
-        my %UserGroups = $Self->{GroupObject}->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => $Permission,
-            Result => 'HASH',
-        );
-
-        for my $Template ( keys %Templates ) {
-            my $Found              = 0;
-            my %TicketTemplateHash = $Self->TicketTemplateGet(
-                ID => $Template
-            );
-
-            # no user groups defined for this ticket template
-            next if !defined $TicketTemplateHash{UserGroupIDs};
-
-            # get array of user groups with permission
-            my @Array = split( /,/, $TicketTemplateHash{UserGroupIDs} );
-
-            # check if user is part of one of these groups
-            next if grep { defined $UserGroups{$_} } @Array;
-
-            # delete if no permission
-            delete( $Templates{$Template} );
-        }
     }
 
     # set ticket template cache
@@ -1023,16 +987,17 @@ sub _CreateTicketTemplateExportXML {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

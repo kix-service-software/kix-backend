@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::LinkObject::Person;
@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::LinkObject',
     'Kernel::System::Log',
     'Kernel::System::User',
@@ -50,7 +50,7 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{CustomerUserObject} = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
     $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{UserObject}         = $Kernel::OM->Get('Kernel::System::User');
@@ -110,14 +110,14 @@ sub LinkListWithData {
                 }
                 else {
                     %PersonData =
-                        $Self->{CustomerUserObject}
-                        ->CustomerUserDataGet( User => $PersonID, );
+                        $Self->{ContactObject}
+                        ->ContactGet( User => $PersonID, );
                     $PersonData{Type} = 'Customer';
                 }
 
                 #                else {
 ##                    $Person = $1;
-                #                    %PersonData = $Self->{CustomerUserObject}->CustomerUserDataGet(
+                #                    %PersonData = $Self->{ContactObject}->ContactGet(
                 #                        User   => $PersonID,
                 #                    );
                 #                }
@@ -231,16 +231,16 @@ sub ObjectSearch {
     if ( $PersonType eq 'Customer' ) {
 
         # search customer
-        my %CustomerUsers = $Self->{CustomerUserObject}->CustomerSearch(
+        my %Contacts = $Self->{ContactObject}->CustomerSearch(
             Search => $Param{SearchParams}->{PersonAttributes},
             Valid  => 1,
             Limit  => $Limit,
         );
-        for my $ID ( keys %CustomerUsers ) {
-            my %CustomerUserData =
-                $Self->{CustomerUserObject}->CustomerUserDataGet( User => $ID, );
-            $CustomerUserData{Type} = 'Customer';
-            $FoundPersons{NOTLINKED}->{Source}->{$ID} = \%CustomerUserData;
+        for my $ID ( keys %Contacts ) {
+            my %ContactData =
+                $Self->{ContactObject}->ContactGet( User => $ID, );
+            $ContactData{Type} = 'Customer';
+            $FoundPersons{NOTLINKED}->{Source}->{$ID} = \%ContactData;
         }
     }
     else {
@@ -476,16 +476,17 @@ sub LinkDeletePost {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

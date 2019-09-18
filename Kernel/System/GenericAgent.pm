@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::GenericAgent;
@@ -88,7 +88,7 @@ sub new {
         Body                    => 'SCALAR',
         TimeUnit                => 'SCALAR',
         CustomerID              => 'SCALAR',
-        CustomerUserLogin       => 'SCALAR',
+        ContactLogin       => 'SCALAR',
         Agent                   => 'SCALAR',
         StateIDs                => 'ARRAY',
         StateTypeIDs            => 'ARRAY',
@@ -102,7 +102,7 @@ sub new {
         SLAIDs                  => 'ARRAY',
         NewTitle                => 'SCALAR',
         NewCustomerID           => 'SCALAR',
-        NewCustomerUserLogin    => 'SCALAR',
+        NewContactLogin    => 'SCALAR',
         NewStateID              => 'SCALAR',
         NewQueueID              => 'SCALAR',
         NewPriorityID           => 'SCALAR',
@@ -163,6 +163,8 @@ sub new {
 
     $Self->{Map} = \%Map;
 
+    $Self->{CacheType} = 'GenericAgent';
+    
     return $Self;
 }
 
@@ -814,7 +816,14 @@ sub JobAdd {
     );
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'GenericAgent',
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'GenericAgent',
+        ObjectID  => $Param{Name},
     );
 
     return 1;
@@ -861,7 +870,14 @@ sub JobDelete {
     );
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'GenericAgent',
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'GenericAgent',
+        ObjectID  => $Param{Name},
     );
 
     return 1;
@@ -981,7 +997,7 @@ sub _JobRunTicket {
         }
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID    => $Param{TicketID},
-            ArticleType => $Param{Config}->{New}->{Note}->{ArticleType} || 'note-internal',
+            Channel     => $Param{Config}->{New}->{Note}->{Channel} || 'note',
             SenderType  => 'agent',
             From        => $Param{Config}->{New}->{Note}->{From}
                 || $Param{Config}->{New}->{NoteFrom}
@@ -1092,24 +1108,24 @@ sub _JobRunTicket {
     }
 
     # set customer id and customer user
-    if ( $Param{Config}->{New}->{CustomerID} || $Param{Config}->{New}->{CustomerUserLogin} ) {
+    if ( $Param{Config}->{New}->{CustomerID} || $Param{Config}->{New}->{ContactLogin} ) {
         if ( $Param{Config}->{New}->{CustomerID} ) {
             if ( $Self->{NoticeSTDOUT} ) {
                 print
                     "  - set customer id of Ticket $Ticket to '$Param{Config}->{New}->{CustomerID}'\n";
             }
         }
-        if ( $Param{Config}->{New}->{CustomerUserLogin} ) {
+        if ( $Param{Config}->{New}->{ContactLogin} ) {
             if ( $Self->{NoticeSTDOUT} ) {
                 print
                     # rkaiser - T#2017020290001194 - changed customer user to contact
-                    "  - set contact id of Ticket $Ticket to '$Param{Config}->{New}->{CustomerUserLogin}'\n";
+                    "  - set contact id of Ticket $Ticket to '$Param{Config}->{New}->{ContactLogin}'\n";
             }
         }
         $TicketObject->TicketCustomerSet(
             TicketID => $Param{TicketID},
             No       => $Param{Config}->{New}->{CustomerID} || '',
-            User     => $Param{Config}->{New}->{CustomerUserLogin} || '',
+            User     => $Param{Config}->{New}->{ContactLogin} || '',
             UserID   => $Param{UserID},
         );
     }
@@ -1507,16 +1523,17 @@ sub _JobUpdateRunTime {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::PostMaster::Filter::SystemMonitoringX;
@@ -70,13 +68,13 @@ sub new {
         DynamicFieldState   => 'SysMonXState',
 
         AcknowledgeName         => 'Nagios1',
-        OTRSCreateTicketType    => 'Incident',
-        OTRSCreateTicketQueue   => '',
-        OTRSCreateTicketState   => '',
-        OTRSCreateTicketService => '',
-        OTRSCreateTicketSLA     => '',
-        OTRSCreateSenderType    => 'system',
-        OTRSCreateArticleType   => 'note-report',
+        CreateTicketType    => 'Incident',
+        CreateTicketQueue   => '',
+        CreateTicketState   => '',
+        CreateTicketService => '',
+        CreateTicketSLA     => '',
+        CreateSenderType    => 'system',
+        CreateChannel       => 'note',
 
         CloseNotIfLocked => 0,
         StopAfterMatch   => 1,
@@ -92,7 +90,7 @@ sub new {
         NewTicketRegExp   => 'CRITICAL|DOWN|WARNING',
         CloseNotIfLocked  => '0',
         CloseTicketRegExp => 'OK|UP',
-        CloseActionState  => 'closed successful',
+        CloseActionState  => 'closed',
         ClosePendingTime  => 60 * 60 * 24 * 2,                          # equals 2 days
         DefaultService    => 'Host',
     };
@@ -112,10 +110,9 @@ sub Run {
         }
     }
 
-#rbo - T2016121190001552 - added KIX placeholders
     # replace KIX_CONFIG tags
     for my $Key ( keys %{ $Self->{Config} } ) {
-        $Self->{Config}->{$Key} =~ s{<(KIX|OTRS)_CONFIG_(.+?)>}{$Self->{Config}->Get($2)}egx;
+        $Self->{Config}->{$Key} =~ s{<KIX_CONFIG_(.+?)>}{$Self->{Config}->Get($2)}egx;
     }
 
     # see, whether to-address is of interest regarding system-monitoring
@@ -528,10 +525,9 @@ sub _TicketUpdate {
         Subject      => $Param->{GetParam}->{Subject},
     );
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
     # set sender type and article type
-    $Param->{GetParam}->{'X-KIX-FollowUp-SenderType'}  = $Self->{Config}->{OTRSCreateSenderType};
-    $Param->{GetParam}->{'X-KIX-FollowUp-ArticleType'} = $Self->{Config}->{OTRSCreateArticleType};
+    $Param->{GetParam}->{'X-KIX-FollowUp-SenderType'} = $Self->{Config}->{CreateSenderType};
+    $Param->{GetParam}->{'X-KIX-FollowUp-Channel'}    = $Self->{Config}->{CreateChannel};
 
     # Set Article Free Field for State
     my $ArticleDFNumber = $Self->{Config}->{'DynamicFieldState'};
@@ -539,7 +535,6 @@ sub _TicketUpdate {
     # ArticleDFNumber is a number
     if ( $ArticleDFNumber =~ /^\d+$/ ) {
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
         $Param->{GetParam}->{ 'X-KIX-FollowUp-ArticleKey' . $ArticleDFNumber } = 'State';
         $Param->{GetParam}->{ 'X-KIX-FollowUp-ArticleValue' . $ArticleDFNumber }
             = $Self->{State};
@@ -560,7 +555,6 @@ sub _TicketUpdate {
             )
         {
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
             $Param->{GetParam}->{'X-KIX-FollowUp-State'} = $Self->{Config}->{CloseActionState};
 
             # get time object
@@ -570,7 +564,6 @@ sub _TicketUpdate {
                 SystemTime => $TimeObject->SystemTime()
                     + $Self->{Config}->{ClosePendingTime},
             );
-#rbo - T2016121190001552 - renamed X-OTRS headers
             $Param->{GetParam}->{'X-KIX-State-PendingTime'} = $TimeStamp;
         }
 
@@ -638,7 +631,6 @@ sub _TicketCreate {
                     . " does not exists or missnamed.",
             );
         }
-#rbo - T2016121190001552 - renamed X-OTRS headers
         $Param->{GetParam}->{ 'X-KIX-DynamicField-' . $TicketDFNumber }
             = $Self->{$ConfiguredDynamicField};
     }
@@ -649,7 +641,6 @@ sub _TicketCreate {
     # ArticleDFNumber is a number
     if ( $ArticleDFNumber =~ /^\d+$/ ) {
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
         $Param->{GetParam}->{ 'X-KIX-ArticleKey' . $ArticleDFNumber }   = 'State';
         $Param->{GetParam}->{ 'X-KIX-ArticleValue' . $ArticleDFNumber } = $Self->{State};
     }
@@ -658,22 +649,21 @@ sub _TicketCreate {
             = $Self->{State};
     }
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
     # set sender type and article type
-    $Param->{GetParam}->{'X-KIX-SenderType'} = $Self->{Config}->{OTRSCreateSenderType}
+    $Param->{GetParam}->{'X-KIX-SenderType'} = $Self->{Config}->{CreateSenderType}
         || $Param->{GetParam}->{'X-KIX-SenderType'};
-    $Param->{GetParam}->{'X-KIX-ArticleType'} = $Self->{Config}->{OTRSCreateArticleType}
-        || $Param->{GetParam}->{'X-KIX-ArticleType'};
+    $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
+        || $Param->{GetParam}->{'X-KIX-Channel'};
 
-    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{OTRSCreateTicketQueue}
+    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
         || $Param->{GetParam}->{'X-KIX-Queue'};
-    $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{OTRSCreateTicketState}
+    $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
         || $Param->{GetParam}->{'X-KIX-State'};
-    $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{OTRSCreateTicketType}
+    $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
         || $Param->{GetParam}->{'X-KIX-Type'};
-    $Param->{GetParam}->{'X-KIX-Service'} = $Self->{Config}->{OTRSCreateTicketService}
+    $Param->{GetParam}->{'X-KIX-Service'} = $Self->{Config}->{CreateTicketService}
         || $Param->{GetParam}->{'X-KIX-Service'};
-    $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{OTRSCreateTicketSLA}
+    $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{CreateTicketSLA}
         || $Param->{GetParam}->{'X-KIX-SLA'};
 
     # AcknowledgeNameField
@@ -697,7 +687,6 @@ sub _TicketCreate {
                 );
             }
             else {
-#rbo - T2016121190001552 - renamed X-OTRS headers
                 $Param->{GetParam}->{ 'X-KIX-DynamicField-' . $AcknowledgeNameField }
                     = $Self->{Config}->{AcknowledgeName} || 'Nagios';
             }
@@ -721,7 +710,6 @@ sub _TicketDrop {
     my ( $Self, $Param ) = @_;
 
     # No existing ticket and no open condition -> drop silently
-#rbo - T2016121190001552 - renamed X-OTRS headers
     $Param->{GetParam}->{'X-KIX-Ignore'} = 'yes';
     $Self->_LogMessage(
         MessageText => 'Mail Dropped, no matching ticket found, no open on this state ',
@@ -879,7 +867,7 @@ sub _LinkTicketWithCI {
     my $LinkResult = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
         SourceObject => 'Ticket',
         SourceKey    => $Param{TicketID},
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => $ConfigItemID,
         Type         => 'RelevantTo',
         UserID       => 1,
@@ -892,16 +880,17 @@ sub _LinkTicketWithCI {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

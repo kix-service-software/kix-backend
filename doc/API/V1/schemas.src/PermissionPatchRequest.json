@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PermissionPatchRequest",
+  "type": "object",
+  "description": "The permission request object for update.",
+  "properties": {
+    "Permission": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "IsRequired": {
+          "type": "integer"
+        },
+        "TypeID": {
+          "type": "integer" 
+        },
+        "Target": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "integer",
+          "description": "bitmask, please see documentation for bit descriptions"
+        }
+      }
+    }
+  },
+  "required": [
+    "Permission"
+  ]
+}

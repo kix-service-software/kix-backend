@@ -1,20 +1,16 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ImportExport::ObjectBackend::User;
 
 use strict;
 use warnings;
-use Kernel::System::User;
-use Kernel::System::Valid;
-use Kernel::System::Time;
-use Kernel::System::Queue;
-use Kernel::System::Group;
+
 use Time::Local;
 
 use vars qw($VERSION);
@@ -24,7 +20,7 @@ our @ObjectDependencies = (
     'Kernel::System::ImportExport',
     'Kernel::System::User',
     'Kernel::System::Queue',
-    'Kernel::System::Group',
+    'Kernel::System::Role',
     'Kernel::System::Log',
     'Kernel::Config'
 );
@@ -453,35 +449,16 @@ sub ExportDataGet {
             else                          { $UserData{$Argument} = 'no' }
         }
 
-        # get CustomQueues
-        my @QueueIDs = $Kernel::OM->Get('Kernel::System::Queue')->GetAllCustomQueues(
-            UserID => $CurrUser,
-        );
-        if (@QueueIDs) {
-            my $CurrIndex = 0;
-            my $NumberOfCustomQueues = $ObjectData->{NumberOfCustomQueues} || 10;
-            for my $QueueID (@QueueIDs) {
-                if ( $CurrIndex < $NumberOfCustomQueues ) {
-                    my $Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-                        QueueID => $QueueID,
-                    );
-                    $UserData{ 'CustomQueue' . sprintf( "%03d", $CurrIndex ) } = $Queue;
-                }
-                $CurrIndex++;
-            }
-        }
-
         # get roles
-        my @RoleIDs = $Kernel::OM->Get('Kernel::System::Group')->GroupUserRoleMemberList(
+        my %Roles = $Kernel::OM->Get('Kernel::System::User')->RolesList(
             UserID => $CurrUser,
-            Result => 'ID',
         );
-        if (@RoleIDs) {
+        if (%Roles) {
             my $CurrIndex = 0;
             my $NumberOfRoles = $ObjectData->{NumberOfRoles} || 10;
-            for my $RoleID (@RoleIDs) {
+            for my $RoleID (sort keys %{$Roles}) {
                 if ( $CurrIndex < $NumberOfRoles ) {
-                    my $Role = $Kernel::OM->Get('Kernel::System::Group')
+                    my $Role = $Kernel::OM->Get('Kernel::System::Role')
                         ->RoleLookup( RoleID => $RoleID );
                     $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) } = $Role;
                 }
@@ -751,13 +728,6 @@ sub ImportDataSave {
             $UserID = $UserData{UserID};
         }
 
-        # set CustomQueues
-        # delete existing entries
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
-            SQL  => 'DELETE FROM personal_queues WHERE user_id = ?',
-            Bind => [ \$UserID ],
-        );
-
         my $CurrIndex = 0;
         my $NumberOfCustomQueues = $ObjectData->{NumberOfCustomQueues} || 10;
         while ( $CurrIndex < $NumberOfCustomQueues ) {
@@ -770,16 +740,7 @@ sub ImportDataSave {
 
                 # create new entry
                 if ($QueueID) {
-                    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
-                        SQL => 'INSERT INTO personal_queues (user_id, queue_id) VALUES ('
-                            . $UserID . ','
-                            . $QueueID
-                            . ')',
-                    );
-                    $ReturnCode = "Partially changed - see log for details" if ( !$Success );
-                }
-                else {
-                    $ReturnCode = "Partially changed - see log for details";
+                    # TODO
                 }
             }
             $CurrIndex++;
@@ -869,17 +830,17 @@ UserConfigItemOverviewSmallPageShown UserChangeOverviewSmallPageShown UserRefres
             if ( $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) } ) {
 
                 # get RoleID
-                my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+                my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
                     Role => $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) },
                 );
 
                 #create new entry
                 if ($RoleID) {
-                    my $Success = $Kernel::OM->Get('Kernel::System::Group')->GroupUserRoleMemberAdd(
-                        UID    => $UserID,
-                        RID    => $RoleID,
-                        Active => 1,
-                        UserID => $Param{UserID},
+                    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                        AssignUserID => $UserID,
+                        RoleID       => $RoleID,
+                        Active       => 1,
+                        UserID       => $Param{UserID},
                     );
                     $ReturnCode = "Partially changed - see log for details" if ( !$Success );
 
@@ -901,16 +862,17 @@ UserConfigItemOverviewSmallPageShown UserChangeOverviewSmallPageShown UserRefres
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

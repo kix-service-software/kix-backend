@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">TextModuleGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TextModule</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">TextModuleID</Item>
+                <Item Key="ResponseObject">TextModuleResponse</Item>
                 <Item Key="CacheType">API_textmodules</Item>
                 <Item Key="CacheTypeDependency">TextModule</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">TextModuleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TextModule</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TextModuleCollectionResponse</Item>
                 <Item Key="CacheType">API_textmodules</Item>                
                 <Item Key="CacheTypeDependency">TextModule</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">TextModuleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TextModule</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TextModulePostRequest</Item>
+                <Item Key="ResponseObject">TextModulePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">TextModuleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TextModule</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">TextModulePatchRequest</Item>
+                <Item Key="ResponseObject">TextModulePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +54,6 @@
             <Hash>
                 <Item Key="Name">TextModuleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">TextModule</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
             </Hash>
         </Setting>
     </ConfigItem>

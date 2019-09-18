@@ -1,0 +1,96 @@
+# --
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+package Kernel::System::Console::Command::Admin::Translation::List;
+
+use strict;
+use warnings;
+
+use base qw(Kernel::System::Console::BaseCommand);
+
+use Kernel::Language;
+use Kernel::System::VariableCheck qw(:all);
+
+our @ObjectDependencies = (
+    'Kernel::Config',
+    'Kernel::System::Encode',
+    'Kernel::System::Main',
+    'Kernel::System::SysConfig',
+    'Kernel::System::Time',
+);
+
+sub Configure {
+    my ( $Self, %Param ) = @_;
+
+    $Self->Description('List the existing translations in the database.');
+
+    $Self->AddOption(
+        Name        => 'language',
+        Description => "Which language to list, omit to list all languages.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    
+    return;
+}
+
+sub Run {
+    my ( $Self, %Param ) = @_;
+
+    my $Home      = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+
+    my $Language  = $Self->GetOption('language') || '';
+
+    $Self->Print("<yellow>Listing existing translations...</yellow>\n\n");
+
+    my %PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternList();
+
+    foreach my $ID ( sort { $PatternList{$a} cmp $PatternList{$b} } keys %PatternList ) {
+        # get pattern 
+        my %Pattern = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+            ID => $ID,
+        );
+
+        # get languages
+        my %LanguageList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageList(
+            PatternID => $ID,
+        );
+
+        $Self->Print("Pattern: \"$PatternList{$ID}\":\n");
+        foreach my $Lang ( sort keys %LanguageList ) {
+            $Self->Print("    Language $Lang:\n");
+            $Self->Print("        \"$LanguageList{$Lang}\"\n");
+        }
+        $Self->Print("\n");
+    }
+
+    $Self->Print("<green>".(scalar(keys %PatternList))." patterns</green>\n");
+    $Self->Print("\n<green>Done.</green>\n");
+
+    return $Self->ExitCodeOk();
+}
+
+1;
+
+
+
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

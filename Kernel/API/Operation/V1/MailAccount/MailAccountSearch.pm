@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/MailAccount/MailAccountSearch.pm - API MailAccount Search operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::MailAccount::MailAccountSearch;
@@ -65,7 +60,7 @@ sub new {
 
 =item Run()
 
-perform MailAccountSearch Operation. This will return a MailAccount ID list.
+perform MailAccountSearch Operation. This will return a MailAccount list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -92,25 +87,27 @@ sub Run {
     # perform MailAccount search
     my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList();
 
-	# get already prepared MailAccount data from MailAccountGet operation
-    if ( IsHashRefWithData(\%MailAccountList) ) {  	
+    # get already prepared MailAccount data from MailAccountGet operation
+    if ( IsHashRefWithData( \%MailAccountList ) ) {
         my $MailAccountGetResult = $Self->ExecOperation(
             OperationType => 'V1::MailAccount::MailAccountGet',
-            Data      => {
-                MailAccountID => join(',', sort keys %MailAccountList),
-            }
-        );    
+            Data          => {
+                MailAccountID => join( ',', sort keys %MailAccountList ),
+                }
+        );
 
         if ( !IsHashRefWithData($MailAccountGetResult) || !$MailAccountGetResult->{Success} ) {
             return $MailAccountGetResult;
         }
 
-        my @MailAccountDataList = IsArrayRefWithData($MailAccountGetResult->{Data}->{MailAccount}) ? @{$MailAccountGetResult->{Data}->{MailAccount}} : ( $MailAccountGetResult->{Data}->{MailAccount} );
+        my @MailAccountDataList = IsArrayRefWithData( $MailAccountGetResult->{Data}->{MailAccount} )
+            ? @{ $MailAccountGetResult->{Data}->{MailAccount} }
+            : ( $MailAccountGetResult->{Data}->{MailAccount} );
 
-        if ( IsArrayRefWithData(\@MailAccountDataList) ) {
+        if ( IsArrayRefWithData( \@MailAccountDataList ) ) {
             return $Self->_Success(
                 MailAccount => \@MailAccountDataList,
-            )
+            );
         }
     }
 
@@ -121,3 +118,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

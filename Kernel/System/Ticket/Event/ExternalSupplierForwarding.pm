@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Event::ExternalSupplierForwarding;
@@ -54,9 +54,9 @@ sub Run {
     my $FwdQueueRef =
         $Kernel::OM->Get('Kernel::Config')->Get('ExternalSupplierForwarding::ForwardQueues');
     my $FwdQueueNames = keys( %{$FwdQueueRef} );
-    my $RelevantFwdArticleTypesRef =
+    my $RelevantFwdChannelsRef =
         $Kernel::OM->Get('Kernel::Config')
-        ->Get('ExternalSupplierForwarding::RelevantFwdArticleTypes');
+        ->Get('ExternalSupplierForwarding::RelevantFwdChannels');
 
     #get ticket data...
     my %Ticket = $TicketObject->TicketGet(
@@ -71,9 +71,9 @@ sub Run {
         my %ArticleOfInterest = ();
         my @ArticleIDs        = qw{};
         my @Articles          = $TicketObject->ArticleContentIndex(
-            TicketID    => $Param{Data}->{TicketID},
-            ArticleType => $RelevantFwdArticleTypesRef,
-            UserID      => $Self->{UserID} || 1,
+            TicketID => $Param{Data}->{TicketID},
+            Channel  => $RelevantFwdChannelsRef,
+            UserID   => $Self->{UserID} || 1,
         );
         return if ( !@Articles );
         for my $CurrArticle (@Articles) {
@@ -154,16 +154,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

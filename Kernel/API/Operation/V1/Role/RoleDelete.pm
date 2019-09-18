@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/Role/RoleDelete.pm - API Role Delete operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Role::RoleDelete;
@@ -85,6 +80,7 @@ sub ParameterDefinition {
 
     return {
         'RoleID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         },
@@ -110,43 +106,24 @@ perform RoleDelete Operation. This will return the deleted RoleID.
 sub Run {
     my ( $Self, %Param ) = @_;
     
-    # get permission type list
-    my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Group')->_PermissionTypeList();
-
     # start loop
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
-        # search Role user       
-        my %ResultUserList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleUserGet(
+        # get all users assigned to this role
+        my @UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
             RoleID => $RoleID,
         );
    
-        if ( IsHashRefWithData(\%ResultUserList) ) {
+        if ( IsArrayRefWithData(\@UserList) ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete Role. At least one user is assigned to this Role.',
             );
         }
 
-        foreach my $Type ( keys %PermissionTypeList ) {
-	        # search Role role       
-	        my %ResultRoleList = $Kernel::OM->Get('Kernel::System::Group')->PermissionRoleGroupGet(
-	            Type    => $Type,
-	            RoleID => $RoleID,
-	        );
-	  
-	        if ( IsHashRefWithData(\%ResultRoleList) ) {
-	            return $Self->_Error(
-	                Code    => 'Object.DependingObjectExists',
-	                Message => 'Cannot delete Role. This Role is assgined to at least one group.',
-	            );
-	        }
-        }
-        
         # delete Role	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Group')->RoleDelete(
-            RoleID  => $RoleID,
-            UserID  => $Self->{Authorization}->{UserID},
+        my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleDelete(
+            ID  => $RoleID,
         );
 
         if ( !$Success ) {
@@ -162,3 +139,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

@@ -1,17 +1,19 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::User::Preferences::DB;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw( :all );
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -66,7 +68,14 @@ sub SetPreferences {
         }
     }
 
-    my $Value = $Param{Value} // '';
+    # prepare multiple values (i.e. MyQueues, MyServices, ...)
+    my @Values;
+    if ( IsArrayRefWithData($Param{Value}) ) {
+        @Values = @{$Param{Value}};
+    }
+    else {
+        push @Values, ($Param{Value} // '');
+    }
 
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -79,19 +88,27 @@ sub SetPreferences {
         Bind => [ \$Param{UserID}, \$Param{Key} ],
     );
 
-    # insert new data
-    return if !$DBObject->Do(
-        SQL => "
-            INSERT INTO $Self->{PreferencesTable}
-            ($Self->{PreferencesTableUserID}, $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue})
-            VALUES (?, ?, ?)",
-        Bind => [ \$Param{UserID}, \$Param{Key}, \$Value ],
-    );
+    foreach my $Value ( @Values ) {
+        # insert new data
+        return if !$DBObject->Do(
+            SQL => "
+                INSERT INTO $Self->{PreferencesTable}
+                ($Self->{PreferencesTableUserID}, $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue})
+                VALUES (?, ?, ?)",
+            Bind => [ \$Param{UserID}, \$Param{Key}, \$Value ],
+        );
+    }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $Self->{CachePrefix} . $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
     );
 
     return 1;
@@ -132,7 +149,19 @@ sub GetPreferences {
     # fetch the result
     my %Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Data{ $Row[0] } = $Row[1];
+        if ( exists $Data{ $Row[0] } && !IsArrayRefWithData($Data{ $Row[0] }) ) {
+            # create array if there are multiple attributes
+            my $Value = $Data{ $Row[0] };
+            $Data{ $Row[0] } = [
+                $Value
+            ];
+        }
+        if ( IsArrayRefWithData($Data{ $Row[0] }) ) {
+            push @{$Data{ $Row[0] }}, $Row[1];
+        }
+        else {
+            $Data{ $Row[0] } = $Row[1];
+        }
     }
 
     # set cache
@@ -144,6 +173,46 @@ sub GetPreferences {
     );
 
     return %Data;
+}
+
+sub DeletePreferences {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(UserID Key)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # delete old data
+    return if !$DBObject->Do(
+        SQL => "
+            DELETE FROM $Self->{PreferencesTable}
+            WHERE $Self->{PreferencesTableUserID} = ?
+                AND $Self->{PreferencesTableKey} = ?",
+        Bind => [ \$Param{UserID}, \$Param{Key} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
+    );
+
+    return 1;
 }
 
 sub SearchPreferences {
@@ -189,16 +258,17 @@ sub SearchPreferences {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

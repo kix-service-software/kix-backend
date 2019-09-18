@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::CMDB::ConfigItemGet;
@@ -126,8 +124,7 @@ sub Run {
 
         if (!IsHashRefWithData($ConfigItem)) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ConfigItemID $ConfigItemID",
+                Code => 'Object.NotFound',
             );
         }     
 
@@ -141,50 +138,9 @@ sub Run {
                     VersionID     => $ConfigItem->{LastVersionID},
                 }
             );
+            
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
                 $ConfigItem->{CurrentVersion} = $Result->{Data}->{ConfigItemVersion};
-            }
-        }
-
-        # include Versions if requested
-        if ( $Param{Data}->{include}->{Versions} ) {
-            # get already prepared Versions data from VersionSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ConfigItemVersionSearch',
-                Data          => {
-                    ConfigItemID  => $ConfigItemID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{Versions} = $Result->{Data}->{ConfigItemVersion};
-            }
-        }
-
-        # include History if requested
-        if ( $Param{Data}->{include}->{History} ) {
-            # get already prepared History data from HistorySearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ConfigItemHistorySearch',
-                Data          => {
-                    ConfigItemID  => $ConfigItemID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{History} = $Result->{Data}->{ConfigItemHistoryItem};
-            }
-        }
-
-        # include Images if requested
-        if ( $Param{Data}->{include}->{Images} ) {
-            # get already prepared Images data from ImageSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ConfigItemImageSearch',
-                Data          => {
-                    ConfigItemID  => $ConfigItemID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $ConfigItem->{Images} = $Result->{Data}->{Image};
             }
         }
 
@@ -193,8 +149,7 @@ sub Run {
 
     if ( scalar(@ConfigItemList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ConfigItemID ".join(',', $Param{Data}->{ConfigItemID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@ConfigItemList) == 1 ) {
@@ -213,16 +168,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

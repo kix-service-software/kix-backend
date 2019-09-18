@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::Common;
@@ -36,60 +34,18 @@ Kernel::API::Operation::V1::Ticket::Common - Base class for all Ticket Operation
 
 =cut
 
-=item Init()
-
-initialize the operation by checking the webservice configuration and gather of the dynamic fields
-
-    my $Return = $CommonObject->Init(
-        WebserviceID => 1,
-    );
-
-    $Return = {
-        Success => 1,                       # or 0 in case of failure,
-        ErrorMessage => 'Error Message',
-    }
-
-=cut
-
-sub Init {
-    my ( $Self, %Param ) = @_;
-
-    my $InitResult = $Self->SUPER::Init(%Param);
-
-    if ( !$InitResult->{Success} ) {
-        return $InitResult;
-    }
-
-    # get the dynamic fields
-    my $DynamicField = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
-        Valid      => 1,
-        ObjectType => [ 'Ticket', 'Article' ],
-    );
-
-    # create a Dynamic Fields lookup table (by name)
-    DYNAMICFIELD:
-    for my $DynamicField ( @{$DynamicField} ) {
-        next DYNAMICFIELD if !$DynamicField;
-        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
-        next DYNAMICFIELD if !$DynamicField->{Name};
-        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
-    }
-
-    return $Self->_Success();
-}
-
 =item ValidateCustomerService()
 
 checks if the given service or service ID is valid for this customer / customer contact.
 
     my $Success = $CommonObject->ValidateService(
         ServiceID    => 123,
-        CustomerUser => 'Test',
+        Contact => 'Test',
     );
 
     my $Success = $CommonObject->ValidateService(
         Service      => 'some service',
-        CustomerUser => 'Test',
+        Contact => 'Test',
     );
 
     returns
@@ -102,7 +58,7 @@ sub ValidateCustomerService {
 
     # check needed stuff
     return if !$Param{ServiceID} && !$Param{Service};
-    return if !$Param{CustomerUser};
+    return if !$Param{Contact};
 
     my %ServiceData;
 
@@ -146,8 +102,8 @@ sub ValidateCustomerService {
     }
 
     # get customer services
-    my %CustomerServices = $ServiceObject->CustomerUserServiceMemberList(
-        CustomerUserLogin => $Param{CustomerUser},
+    my %CustomerServices = $ServiceObject->ContactServiceMemberList(
+        ContactLogin => $Param{Contact},
         Result            => 'HASH',
         DefaultServices   => 1,
     );
@@ -398,8 +354,8 @@ sub ValidateDynamicFieldValue {
 checks if the given dynamic field name is valid.
 
     my $Success = $CommonObject->ValidateDynamicFieldObjectType(
-        Name    => 'some name',
-        Article => 1,               # if article exists
+        Name       => 'some name',
+        ObjectType => 'Ticket'
     );
 
     returns
@@ -418,7 +374,7 @@ sub ValidateDynamicFieldObjectType {
     return if !IsHashRefWithData( $Self->{DynamicFieldLookup}->{ $Param{Name} } );
 
     my $DynamicFieldConfg = $Self->{DynamicFieldLookup}->{ $Param{Name} };
-    return if $DynamicFieldConfg->{ObjectType} eq 'Article' && !$Param{Article};
+    return if $DynamicFieldConfg->{ObjectType} eq $Param{ObjectType};
 
     return 1;
 }
@@ -469,6 +425,21 @@ sub SetDynamicFieldValue {
         }
     }
 
+    # get the dynamic fields
+    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => [ 'Ticket', 'Article' ],
+    );
+
+    # create a Dynamic Fields lookup table (by name)
+    DYNAMICFIELD:
+    for my $DynamicField ( @{$DynamicFieldList} ) {
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
+        next DYNAMICFIELD if !$DynamicField->{Name};
+        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
+    }
+
     # check value structure
     if ( !IsString( $Param{Value} ) && ref $Param{Value} ne 'ARRAY' && defined($Param{Value}) ) {
         return $Self->_Error(
@@ -511,291 +482,6 @@ sub SetDynamicFieldValue {
 
     return $Self->_Success();
 }
-
-=item CheckCreatePermission ()
-
-Tests if the user have the permission to create a ticket on a determined queue
-
-    my $Result = $CommonObject->CheckCreatePermission(
-        Ticket     => $TicketHashReference,
-        UserID     => 123,                      # or 'CustomerLogin'
-        UserType   => 'Agent',                  # or 'Customer'
-    );
-
-returns:
-    $Result = 1                                 # if everything is OK
-
-=cut
-
-sub CheckCreatePermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Ticket UserID UserType)) {
-        if ( !$Param{$Needed} ) {
-            return;
-        }
-    }
-
-    # get create permission groups
-    my %UserGroups;
-
-    if ( $Param{UserType} ne 'Customer' ) {
-        %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $Param{UserID},
-            Type   => 'create',
-        );
-    }
-    else {
-        %UserGroups = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'create',
-            Result => 'HASH',
-        );
-    }
-
-    my %QueueData;
-    if ( defined $Param{Ticket}->{Queue} && $Param{Ticket}->{Queue} ne '' ) {
-        %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( Name => $Param{Ticket}->{Queue} );
-    }
-    else {
-        %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{Ticket}->{QueueID} );
-    }
-
-    # permission check, can we create new tickets in queue
-    return if !$UserGroups{ $QueueData{GroupID} };
-
-    return 1;
-}
-
-=item CheckWritePermission()
-
-Tests if the user have write permission for a ticket
-
-    my $Result = $CommonObject->CheckWritePermission(
-        TicketID   => 123,
-        UserID     => 123,                      # or 'CustomerLogin'
-        UserType   => 'Agent',                  # or 'Customer'
-    );
-
-returns:
-    $Result = 1                                # if everything is OK
-
-=cut
-
-sub CheckWritePermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID UserID UserType)) {
-        if ( !$Param{$Needed} ) {
-            return;
-        }
-    }
-
-    my $TicketPermissionFunction = 'TicketPermission';
-    if ( $Param{UserType} eq 'Customer' ) {
-        $TicketPermissionFunction = 'TicketCustomerPermission';
-    }
-
-    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
-        Type     => 'rw',
-        TicketID => $Param{TicketID},
-        UserID   => $Param{UserID},
-    );
-
-    return $Access;
-}
-
-=item CheckAccessPermission()
-
-Tests if the user have access permission for a ticket
-
-    my $Result = $CommonObject->CheckAccessPermission(
-        TicketID   => 123,
-        UserID     => 123,                      # or 'CustomerLogin'
-        UserType   => 'Agent',                  # or 'Customer'
-    );
-
-returns:
-    $Result = 1                                 # if everything is OK
-
-=cut
-
-sub CheckAccessPermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID UserID UserType)) {
-        if ( !$Param{$Needed} ) {
-            return;
-        }
-    }
-
-    my $TicketPermissionFunction = 'TicketPermission';
-    if ( $Param{UserType} eq 'Customer' ) {
-        $TicketPermissionFunction = 'TicketCustomerPermission';
-    }
-
-    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
-        Type     => 'ro',
-        TicketID => $Param{TicketID},
-        UserID   => $Param{UserID},
-    );
-
-    return $Access;
-}
-
-=item CheckUpdatePermission()
-
-check if user has permissions to update ticket attributes.
-
-    my $Response = $OperationObject->CheckUpdatePermission(
-        TicketID     => 123,
-        Ticket       => $Ticket,                    # all ticket parameters
-        UserID       => 123,
-    );
-
-    returns:
-
-    $Response = {
-        Success => 1,                               # if everything is OK
-    }
-
-    $Response = {
-        Success => 0,
-        Code    => "function.error",                # if error
-        Message => "Error description"
-    }
-
-=cut
-
-sub CheckUpdatePermission {
-    my ( $Self, %Param ) = @_;
-
-    my %NeededPermissions = (
-        'Queue'             => 'move',
-        'QueueID'           => 'move',
-        'Owner'             => 'owner',
-        'OwnerID'           => 'owner',
-        'Responsible'       => 'responsible',
-        'ResponsibleID'     => 'responsible',
-        'Priority'          => 'priority',
-        'PriorityID'        => 'priority',
-    );
-
-    my $Ticket = $Param{Ticket};
-
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    # check permissions for each attribute
-    foreach my $Attribute ( sort keys %{$Ticket} ) {    
-        if ( $Ticket->{$Attribute} ) {
-            my $Permission = $TicketObject->TicketPermission(
-                Type     => $NeededPermissions{$Attribute} || 'rw',
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-            if ( !$Permission ) {
-                return $Self->_Error(
-                    Code    => 'Object.NoPermission',
-                    Message => "No permission to update $Attribute!",
-                );
-            }
-        }
-    }
-
-    # check state permissions separately since they are something special to handle
-    if ( $Ticket->{State} || $Ticket->{StateID} ) {
-
-        # get State Data
-        my %StateData;
-        my $StateID;
-
-        # get state object
-        my $StateObject = $Kernel::OM->Get('Kernel::System::State');
-
-        if ( $Ticket->{StateID} ) {
-            $StateID = $Ticket->{StateID};
-        }
-        else {
-            $StateID = $StateObject->StateLookup(
-                State => $Ticket->{State},
-            );
-        }
-
-        %StateData = $StateObject->StateGet(
-            ID => $StateID,
-        );
-
-        my $Permission = 1;
-
-        if ( $StateData{TypeName} =~ /^close/i ) {
-            $Permission = $TicketObject->TicketPermission(
-                Type     => 'close',
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-        else {
-            $Permission = $TicketObject->TicketPermission(
-                Type     => 'rw',
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-
-        if ( !$Permission ) {
-            return $Self->_Error(
-                Code    => 'Object.NoPermission',
-                Message => "No permission to update state!",
-            );
-        }
-    }
-
-    return $Self->_Success();
-}
-
-=item CheckDeletePermission()
-
-Tests if the user have delete permission for a ticket
-
-    my $Result = $CommonObject->CheckDeletePermission(
-        TicketID   => 123,
-        UserID     => 123,                      # or 'CustomerLogin'
-        UserType   => 'Agent',                  # or 'Customer'
-    );
-
-returns:
-    $Result = 1                                 # if everything is OK
-
-=cut
-
-sub CheckDeletePermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID UserID UserType)) {
-        if ( !$Param{$Needed} ) {
-            return;
-        }
-    }
-
-    my $TicketPermissionFunction = 'TicketPermission';
-    if ( $Param{UserType} eq 'Customer' ) {
-        $TicketPermissionFunction = 'TicketCustomerPermission';
-    }
-
-    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->$TicketPermissionFunction(
-        Type     => 'delete',
-        TicketID => $Param{TicketID},
-        UserID   => $Param{UserID},
-    );
-
-    return $Access;
-}
-
 
 =begin Internal:
 
@@ -886,7 +572,10 @@ sub _CheckTicket {
             }
 
             # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
+            my $DynamicFieldCheck = $Self->_CheckDynamicField( 
+                DynamicField => $DynamicFieldItem,
+                ObjectType   => 'Ticket'
+            );
 
             if ( !$DynamicFieldCheck->{Success} ) {
                 return $Self->_Error( 
@@ -1047,7 +736,10 @@ sub _CheckArticle {
             }
 
             # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( DynamicField => $DynamicFieldItem );
+            my $DynamicFieldCheck = $Self->_CheckDynamicField( 
+                DynamicField => $DynamicFieldItem,
+                ObjectType   => 'Article'
+            );
 
             if ( !$DynamicFieldCheck->{Success} ) {
                 return $Self->_Error( 
@@ -1067,6 +759,7 @@ checks if the given dynamic field parameter is valid.
 
     my $DynamicFieldCheck = $OperationObject->_CheckDynamicField(
         DynamicField => $DynamicField,              # all dynamic field parameters
+        ObjectType   => 'Ticket'
     );
 
     returns:
@@ -1084,6 +777,21 @@ checks if the given dynamic field parameter is valid.
 
 sub _CheckDynamicField {
     my ( $Self, %Param ) = @_;
+
+    # get the dynamic fields
+    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => [ 'Ticket', 'Article' ],
+    );
+
+    # create a Dynamic Fields lookup table (by name)
+    DYNAMICFIELD:
+    for my $DynamicField ( @{$DynamicFieldList} ) {
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
+        next DYNAMICFIELD if !$DynamicField->{Name};
+        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
+    }
 
     my $DynamicField = $Param{DynamicField};
 
@@ -1106,6 +814,14 @@ sub _CheckDynamicField {
         return $Self->_Error(
             Code    => 'BadRequest',
             Message => "Parameter DynamicField::Name is invalid!",
+        );
+    }
+
+    # check DynamicField->Value
+    if ( !$Self->ValidateDynamicFieldObjectType( %{$DynamicField}, ObjectType => $Param{ObjectType} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField is invalid for object type \"$Param{ObjectType}\"!",
         );
     }
 
@@ -1168,16 +884,17 @@ sub _CheckAttachment {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

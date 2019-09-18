@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2018 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::Cache::ShowStats;
@@ -41,10 +41,12 @@ sub Run {
     }
 
     my $Line = '-------------------------------------------------------------------------------------------';
-    printf("%-50s %10s %10s %10s %10s\n", 'Cache Type', '#Items', '#Access', '#Hits', 'Hitrate');
-    printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );
+    printf("%-50s %10s %10s %10s %10s %10s %10s\n", 'Cache Type', '#Cleanups', '#Deletes', '#Items', '#Access', '#Hits', 'Hitrate');
+    printf("%.50s %.10s %.10s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line, $Line, $Line );
 
     my %Totals = (
+        Cleanups => 0,
+        Deletes => 0,
         Items => 0,
         Access => 0,
         Hits => 0,
@@ -53,14 +55,16 @@ sub Run {
         my $StatsItem = $CacheStats->{$Type};
 
         my $Hitrate = ($StatsItem->{AccessCount} && $StatsItem->{HitCount}) ? $StatsItem->{HitCount} / $StatsItem->{AccessCount} * 100 : 0;
-        $Totals{Items}  += $StatsItem->{KeyCount};
-        $Totals{Access} += $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0;
-        $Totals{Hits}   += $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0;
+        $Totals{Items}    += $StatsItem->{KeyCount};
+        $Totals{Access}   += $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0;
+        $Totals{Hits}     += $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0;
+        $Totals{Cleanups} += $StatsItem->{CleanupCount} ? $StatsItem->{CleanupCount} : 0;
+        $Totals{Deletes}  += $StatsItem->{DeleteCount} ? $StatsItem->{DeleteCount} : 0;
 
-        printf("%-50s %10i %10i %10i %10i\n", $Type, $StatsItem->{KeyCount}, $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0, $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0, $Hitrate );
+        printf("%-50s %10i %10i %10i %10i %10i %10i\n", $Type, $StatsItem->{CleanupCount}, $StatsItem->{DeleteCount}, $StatsItem->{KeyCount}, $StatsItem->{AccessCount} ? $StatsItem->{AccessCount} : 0, $StatsItem->{HitCount} ? $StatsItem->{HitCount} : 0, $Hitrate );
     }
-    printf("%.50s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line );
-    printf("%-50s %10i %10i %10i %10i\n\n", 'TOTAL', $Totals{Items}, $Totals{Access}, $Totals{Hits}, $Totals{Access} ? $Totals{Hits} / $Totals{Access} * 100 : 0 );
+    printf("%.50s %.10s %.10s %.10s %.10s %.10s %.10s\n", $Line, $Line, $Line, $Line, $Line, $Line, $Line );
+    printf("%-50s %10i %10i %10i %10i %10i %10i\n\n", 'TOTAL', $Totals{Cleanups}, $Totals{Deletes}, $Totals{Items}, $Totals{Access}, $Totals{Hits}, $Totals{Access} ? $Totals{Hits} / $Totals{Access} * 100 : 0 );
 
     $Self->Print("<green>Done.</green>\n");
 
@@ -71,16 +75,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

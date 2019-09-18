@@ -1,0 +1,41 @@
+{
+   "$id" : "#TranslationLanguageResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for translation language GET request.",
+   "type" : "object",
+   "properties" : {
+      "TranslationLanguage" : {
+         "$ref" : "#/definitions/TranslationLanguage"
+      }
+   },
+   "required" : [
+      "TranslationLanguage"
+   ],
+   "definitions" : {
+      "TranslationLanguage" : {
+         "$id" : "#TranslationLanguage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The translation language object.",
+         "type" : "object",
+         "properties" : {
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PatternID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "PatternID",
+            "Language",
+            "Value"
+         ]
+      }
+   }
+}

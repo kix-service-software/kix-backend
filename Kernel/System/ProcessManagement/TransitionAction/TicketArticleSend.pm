@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::TicketArticleSend;
@@ -79,11 +77,8 @@ sub new {
         TransitionActionEntityID => 'TA123',
         Config                   => {
             # required:
-# BPMX-capeIT
-#            ArticleType      => 'note-internal',                        # note-external|phone|fax|sms|...
-#                                                                        #   excluding any email type
-            ArticleType      => 'email-internal',                       # email-external | email-internal
-# EO BPMX-capeIT
+            Channel          => 'email',                                # ...
+            CustomerVisible  => 0|1,                                    # optional
             SenderType       => 'agent',                                # agent|system|customer
             ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
             Subject          => 'some short description',               # required
@@ -161,17 +156,17 @@ sub Run {
         }
     }
 
-    # check ArticleType
+    # check Channel
     # BPMX-capeIT
-    #    TODO Test => consultation tto => ReleaseTicket => sopm
-    #    if ( $Param{Config}->{ArticleType} =~ m{\A email }msxi ) {
-    if ( !( $Param{Config}->{ArticleType} =~ m{\A email }msxi ) ) {
+    #    TODO Test => consultation tto => ReleaseTicket => skpm
+    #    if ( $Param{Config}->{Channel} =~ m{\A email }msxi ) {
+    if ( !( $Param{Config}->{Channel} =~ m{\A email }msxi ) ) {
 
         # EO BPMX-capeIT
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
-                . "ArticleType $Param{Config}->{ArticleType} is not supported",
+                . "Channel $Param{Config}->{Channel} is not supported",
         );
         return;
     }
@@ -191,11 +186,7 @@ sub Run {
         $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
     }
 
-    # BPMX-capeIT
-    #    my $ArticleID = $TicketObject->ArticleCreate(
-    my $ArticleID = $TicketObject->ArticleSend(
-
-        # EO BPMX-capeIT
+    my $ArticleID = $TicketObject->ArticleCreate(
         %{ $Param{Config} },
         TicketID => $Param{Ticket}->{TicketID},
         UserID   => $Param{UserID},
@@ -229,16 +220,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,20 +1,17 @@
 # --
-# Kernel/API/Operation/ClientRegistration/ClientRegistrationCreate.pm - API ClientRegistration Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::ClientRegistration::ClientRegistrationCreate;
 
 use strict;
 use warnings;
+
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
 
@@ -91,9 +88,6 @@ sub ParameterDefinition {
         'ClientRegistration::ClientID' => {
             Required => 1
         },
-        'ClientRegistration::CallbackURL' => {
-            Required => 1
-        },
     }
 }
 
@@ -104,9 +98,16 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
     my $Result = $OperationObject->Run(
         Data => {
         	ClientRegistration => {
-                ClientID       => '...',
-                CallbackURL    => '...',
-                Authentication => '...'     # optional
+                ClientID         => '...',
+                CallbackURL      => '...',        # optional
+                CallbackInterval => '...',        # optional
+                Authorization   => '...',         # optional
+                Translations     => [             # optional
+                    {
+                        Language => 'de',
+                        POFile   => '...'       # base64 encoded content of the PO file
+                    }
+                ]
             }
 	    },
     );
@@ -144,9 +145,10 @@ sub Run {
 
     # create ClientRegistration
     my $ClientID = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationAdd(
-        ClientID       => $ClientRegistration->{ClientID},
-        CallbackURL    => $ClientRegistration->{CallbackURL},
-        Authentication => $ClientRegistration->{Authentication},
+        ClientID             => $ClientRegistration->{ClientID},
+        NotificationURL      => $ClientRegistration->{NotificationURL},
+        NotificationInterval => $ClientRegistration->{NotificationInterval},
+        Authorization        => $ClientRegistration->{Authorization},
     );
 
     if ( !$ClientID ) {
@@ -156,6 +158,20 @@ sub Run {
         );
     }
     
+    # import translations if given
+    if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
+        foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
+            my $Content = MIME::Base64::decode_base64($Item->{Content});
+                        
+            # fire & forget, not result handling at the moment
+            my $Result = $Kernel::OM->Get('Kernel::System::Translation')->ImportPO(
+                Language => $Item->{Language},
+                Content  => $Content,
+                UserID   => $Self->{Authorization}->{UserID},
+            );
+        }
+    }
+
     my %SystemInfo;
     foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
         $SystemInfo{$Key} = $Kernel::OM->Get('Kernel::Config')->Get($Key);
@@ -170,3 +186,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

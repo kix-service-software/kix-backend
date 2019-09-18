@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::AutoResponse;
@@ -129,6 +129,13 @@ sub AutoResponseAdd {
         $ID = $Row[0];
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'AutoResponse',
+        ObjectID  => $ID,
+    );
+
     return $ID;
 }
 
@@ -246,6 +253,13 @@ sub AutoResponseUpdate {
         ],
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'AutoResponse',
+        ObjectID  => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -262,16 +276,16 @@ Return example:
 
     %QueueAddressData(
         #Auto Response Data
-        'Text'            => 'Your OTRS TeamOTRS! answered by a human asap.',
+        'Text'            => 'Your KIX Team! answered by a human asap.',
         'Subject'         => 'New ticket has been created! (RE: <KIX_CUSTOMER_SUBJECT[24]>)',
         'ContentType'     => 'text/plain',
         'SystemAddressID' => '1',
 
         #System Address Data
         'ID'              => '1',
-        'Name'            => 'otrs@localhost',
-        'Address'         => 'otrs@localhost',  #Compatibility with OTRS 2.1
-        'Realname'        => 'OTRS System',
+        'Name'            => 'kix@localhost',
+        'Address'         => 'kix@localhost',
+        'Realname'        => 'KIX System',
         'Comment'         => 'Standard Address.',
         'ValidID'         => '1',
         'QueueID'         => '1',
@@ -548,16 +562,17 @@ sub _NameExistsCheck {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

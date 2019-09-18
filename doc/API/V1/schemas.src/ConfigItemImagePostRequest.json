@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemImagePostRequest",
+  "type": "object",
+  "description": "The config item image request object for creation.",
+  "properties": {
+    "Image": {
+      "$ref": "ConfigItemImagePostItem.json"
+    }
+  },
+  "required": [
+    "Image"
+  ]
+}

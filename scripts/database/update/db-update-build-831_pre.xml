@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="role_permission">
+        <ColumnAdd Name="is_required" Required="true" Default="0" Type="SMALLINT"/>
+    </TableAlter>
+
+</database>

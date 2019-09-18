@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Package;
@@ -392,6 +392,13 @@ sub RepositoryAdd {
         Type => 'RepositoryList',
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'PackageManagement.Repository',
+        ObjectID  => $Structure{Name}->{Content},
+    );
+
     return 1;
 }
 
@@ -440,6 +447,13 @@ sub RepositoryRemove {
     );
     $CacheObject->CleanUp(
         Type => 'RepositoryGet',
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'PackageManagement.Repository',
+        ObjectID  => $Param{Name},
     );
 
     return 1;
@@ -629,6 +643,13 @@ sub PackageInstall {
         UserID => 1,
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
+    );
+
     return 1;
 }
 
@@ -716,6 +737,13 @@ sub PackageReinstall {
             Version => $Structure{Version}->{Content},
         },
         UserID => 1,
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -1126,6 +1154,13 @@ sub PackageUpgrade {
         UserID => 1,
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
+    );
+
     return 1;
 }
 
@@ -1222,6 +1257,13 @@ sub PackageUninstall {
             Version => $Structure{Version}->{Content},
         },
         UserID => 1,
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'PackageManagement.Package',
+        ObjectID  => $Structure{Name}->{Content},
     );
 
     return 1;
@@ -1553,7 +1595,7 @@ download of an online package and put it into the local repository
 
     $PackageObject->PackageOnlineGet(
         Source => 'http://host.example.com/',
-        File   => 'SomePackage-1.0.opm',
+        File   => 'SomePackage-1.0.kpm',
     );
 
 =cut
@@ -1689,8 +1731,6 @@ sub DeployCheckInfo {
     return ();
 }
 
-#rbo - T2016121190001552 - removed CloudServices and PackageVerify
-
 =item PackageBuild()
 
 build an opm package
@@ -1703,10 +1743,10 @@ build an opm package
             Content => '1.0',
         },
         Vendor => {
-            Content => 'OTRS AG',
+            Content => 'c.a.p.e. IT GmbH',
         },
         URL => {
-            Content => 'L<http://otrs.org/>',
+            Content => 'L<http://www.cape-it.de/>',
         },
         License => {
             Content => 'GNU GENERAL PUBLIC LICENSE Version 2, June 1991',
@@ -1773,7 +1813,7 @@ sub PackageBuild {
     if ( !$Param{Type} ) {
         $XML .= '<?xml version="1.0" encoding="utf-8" ?>';
         $XML .= "\n";
-        $XML .= '<otrs_package version="1.1">';
+        $XML .= '<kix_package version="1.1">';
         $XML .= "\n";
     }
 
@@ -2002,7 +2042,7 @@ sub PackageBuild {
         }
     }
 
-    $XML .= '</otrs_package>';
+    $XML .= '</kix_package>';
 
     return $XML;
 }
@@ -2314,7 +2354,7 @@ sub PackageInstallDefaultFiles {
     my $Directory    = $Self->{ConfigObject}->Get('Home') . '/var/packages';
     my @PackageFiles = $Self->{MainObject}->DirectoryRead(
         Directory => $Directory,
-        Filter    => '*.opm',
+        Filter    => '*.kpm',
     );
 
     # read packages and install
@@ -3416,7 +3456,7 @@ CodeUninstall are not called.
 
     $Success = $PackageObject->_PackageUninstallMerged(
         Name        => 'some package name',
-        Home        => 'OTRS Home path',      # Optional
+        Home        => 'KIX Home path',       # Optional
         DeleteSaved => 1,                     # or 0, 1 Default, Optional: if set to 1 it also
                                               # delete .save files
     );
@@ -3832,16 +3872,17 @@ sub DESTROY {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

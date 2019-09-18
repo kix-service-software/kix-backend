@@ -1,15 +1,14 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Email;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
 
 use strict;
 use warnings;
@@ -165,7 +164,7 @@ sub Send {
 
     # check from
     if ( !$Param{From} ) {
-        $Param{From} = $ConfigObject->Get('AdminEmail') || 'otrs@localhost';
+        $Param{From} = $ConfigObject->Get('AdminEmail') || 'kix@localhost';
     }
 
     # replace all br tags with br tags with a space to show newlines in Lotus Notes
@@ -290,7 +289,6 @@ sub Send {
     }
     else {
         $Header{'X-Mailer'}     = "$Product Mail Service ($Version)";
-#rbo - T2016121190001552 - renamed OTRS to KIX
         $Header{'X-Powered-By'} = 'KIX (https://www.kixdesk.com/)';
     }
     $Header{Type} = $Param{MimeType} || 'text/plain';
@@ -315,6 +313,9 @@ sub Send {
     else {
         $Header{'Message-ID'} = $Self->_MessageIDCreate();
     }
+
+    # save MessageID for later use
+    my $MessageID = $Header{'Message-ID'};
 
     # add date header
     $Header{Date} = 'Date: ' . $Kernel::OM->Get('Kernel::System::Time')->MailTimeStamp();
@@ -779,6 +780,14 @@ sub Send {
         return;
     }
 
+    # don't push notification for email at the moment
+    # # push client callback event
+    # $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    #     Event     => 'CREATE',
+    #     Namespace => 'Email',
+    #     ObjectID  => $MessageID,
+    # );
+
     return ( \$Param{Header}, \$Param{Body} );
 }
 
@@ -873,8 +882,6 @@ sub Bounce {
         Body    => \$BodyAsString,
     );
 
-    return if !$Sent;
-
     return ( \$HeaderAsString, \$BodyAsString );
 }
 
@@ -916,16 +923,17 @@ sub _MessageIDCreate {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Transport::Common;
@@ -62,9 +62,7 @@ Map the internal return code to transport specific response
         Code      => 'Code'        # texttual return code
     );
 
-    $Result = {
-        Code    => ...
-    };
+    $Result = ...
 
 =cut
 
@@ -74,14 +72,14 @@ sub _MapReturnCode {
     # check needed params
     if ( !IsString( $Param{Code} ) ) {
         return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'Need Code!',
+            Code    => 'Transport.InternalError',
+            Message => 'Need Code!',
         );
     }
     if ( !IsString( $Param{Transport} ) ) {
         return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'Need Transport!',
+            Code    => 'Transport.InternalError',
+            Message => 'Need Transport!',
         );
     }
 
@@ -89,8 +87,8 @@ sub _MapReturnCode {
     my $Mapping = $Kernel::OM->Get('Kernel::Config')->Get('API::Transport::ReturnCodeMapping');
     if ( !IsHashRefWithData($Mapping) ) {
         return $Self->_Error(
-            Code      => 'Transport.InternalError',
-            Message   => 'No ReturnCodeMapping config!',
+            Code    => 'Transport.InternalError',
+            Message => 'No ReturnCodeMapping config!',
         );        
     }
 
@@ -100,30 +98,36 @@ sub _MapReturnCode {
     }
     my $TransportMapping = $Mapping->{$Param{Transport}};
 
-    # map code
-    my $MappedCode = $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'};
+    # get map entry
+    my ($MappedCode, $MappedMessage) = split(/:/, $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'});
+    
+    # override defualt message from mapping if we have some special message
+    if ( !$MappedMessage || $Param{Message} ) {
+        $MappedMessage = $Param{Message} || ''; 
+    }
 
     # log to debugger
-    $Self->{DebuggerObject}->Error(
-        Summary => $MappedCode.': '.($Param{Message} || ''),
+    $Self->{DebuggerObject}->Debug(
+        Summary => $MappedCode.': '.($MappedMessage || ''),
     );
 
     # return
-    return $MappedCode;
+    return "$MappedCode:$MappedMessage";
 }
 
 1;
+
 
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

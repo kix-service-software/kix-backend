@@ -7,11 +7,12 @@
             <Hash>
                 <Item Key="Name">QueueGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">QueueID</Item>
+                <Item Key="ResponseObject">QueueResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
+                <Item Key="AdditionalUriParameters">TicketStats.StateType, TicketStats.StateID</Item>
+                <Item Key="RelevantPropertyValuePermissions">Queue-to-Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -21,8 +22,7 @@
             <Hash>
                 <Item Key="Name">QueueSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">QueueCollectionResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
             </Hash>
@@ -34,8 +34,8 @@
             <Hash>
                 <Item Key="Name">QueueCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">QueuePostRequest</Item>
+                <Item Key="ResponseObject">QueuePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +45,8 @@
             <Hash>
                 <Item Key="Name">QueueUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">QueuePatchRequest</Item>
+                <Item Key="ResponseObject">QueuePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,9 +56,19 @@
             <Hash>
                 <Item Key="Name">QueueDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Queue</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="Permission">Group=admin:rw</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Queue::FollowUpTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">FollowUpTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">FollowUpTypeCollectionResponse</Item>
+                <Item Key="CacheType">API_queues</Item>
+                <Item Key="CacheTypeDependency">Queue</Item>
             </Hash>
         </Setting>
     </ConfigItem>

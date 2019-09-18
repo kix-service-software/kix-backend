@@ -1,0 +1,85 @@
+{
+   "$id" : "#ConsoleCommand",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for console command GET request.",
+   "type" : "object",
+   "properties" : {
+      "ConsoleCommand" : {
+         "$ref" : "#/definitions/ConsoleCommand"
+      }
+   },
+   "required" : [
+      "ConsoleCommand"
+   ],
+   "definitions" : {
+      "ConsoleCommand" : {
+         "$id" : "#ConsoleCommand",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The console command object.",
+         "type" : "object",
+         "properties" : {
+            "AdditionalHelp" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Arguments" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "Name" : {
+                        "type" : "string"
+                     },
+                     "Required" : {
+                        "description" : "is required = 1",
+                        "type" : "integer"
+                     }
+                  }
+               },
+               "readOnly" : true
+            },
+            "Command" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Parameters" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "HasValue" : {
+                        "description" : "needs value = 1",
+                        "type" : "integer"
+                     },
+                     "Name" : {
+                        "type" : "string"
+                     },
+                     "Required" : {
+                        "description" : "is required = 1",
+                        "type" : "integer"
+                     }
+                  }
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "AdditionalHelp",
+            "Arguments",
+            "Command",
+            "Description",
+            "Parameters"
+         ]
+      }
+   }
+}

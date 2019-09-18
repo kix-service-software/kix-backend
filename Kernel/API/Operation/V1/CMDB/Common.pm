@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::CMDB::Common;
@@ -35,42 +33,6 @@ Kernel::API::Operation::V1::CMDB::Common - Base class for all CMDB operations
 =over 4
 
 =cut
-
-=item CheckCreatePermission ()
-
-Tests if the user has the permission to create a CI for a specific class
-
-    my $Result = $CommonObject->CheckCreatePermission(
-        ConfigItem => $ConfigItemHashReference,
-        UserID     => 123,
-        UserType   => 'Agent',
-    );
-
-returns:
-    $Result = 1                                 # if everything is OK
-
-=cut
-
-sub CheckCreatePermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(ConfigItem UserID UserType)) {
-        if ( !$Param{$Needed} ) {
-            return;
-        }
-    }
-
-    # check create permissions
-    my $Permission = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->Permission(
-        Scope   => 'Class',
-        ClassID => $Param{ConfigItem}->{ClassID},
-        UserID  => $Param{UserID},
-        Type    => 'rw',
-    );
-
-    return 1;
-}
 
 =begin Internal:
 
@@ -971,16 +933,17 @@ sub _CheckDefinition {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-
+    <ConfigItem Name="API::Cache" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable API level caching.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable API debugging.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem Name="Ticket::EventModulePost###999-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
@@ -21,7 +40,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerCompany::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem Name="Organisation::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -31,7 +50,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerUser::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem Name="Contact::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -65,18 +84,6 @@
         <Description Translatable="1">Cache time in seconds for the web service config backend.</Description>
         <Setting>
             <String Regex="">86400</String><!-- default 1 day -->
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Common::CachedAuth::AgentCacheTTL" Required="1" Valid="1">
-        <Description Translatable="1">Cache time in seconds for agent authentication in the API.</Description>
-        <Setting>
-            <String Regex="">300</String><!-- default 5 min -->
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Common::CachedAuth::CustomerCacheTTL" Required="1" Valid="1">
-        <Description Translatable="1">Cache time in seconds for customer authentication in the API.</Description>
-        <Setting>
-            <String Regex="">300</String><!-- default 5 min -->
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Transport::Module###HTTP::SOAP" Required="0" Valid="1">
@@ -155,19 +162,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Module###AdminAPIMappingXSLT" Required="0" Valid="1">
-        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
-        <Setting>
-            <FrontendModuleReg>
-                <Group>admin</Group>
-                <Description>Admin</Description>
-                <Title Translatable="1">API Webservice Mapping GUI</Title>
-                <Loader>
-                    <CSS>Core.Agent.Admin.API.css</CSS>
-                </Loader>
-            </FrontendModuleReg>
-        </Setting>
-    </ConfigItem>
     <ConfigItem Name="API::Mapping::Module###XSLT" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the mapping layer.</Description>
         <Setting>
@@ -184,40 +178,36 @@
     </ConfigItem>
 
     <ConfigItem Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
-        <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code</Description>
+        <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code[:DefaultMessage]</Description>
         <Setting>
             <Hash>
                 <Item Key="DEFAULT">200</Item>
-                <Item Key="Authorization.NoHeader">403</Item>
-                <Item Key="Authorization.NoToken">403</Item>
+                <Item Key="Authorization.NoHeader">403:No "Authorization" header found.</Item>
+                <Item Key="Authorization.NoToken">403:No token in "Authorization" header found. </Item>
                 <Item Key="BadRequest">400</Item>
                 <Item Key="Conflict">409</Item>                
-                <Item Key="ContactCreate.EmailExists">409</Item>
-                <Item Key="ContactCreate.LoginExists">409</Item>
                 <Item Key="ExecOperation.MissingParameter">500</Item>
-                <Item Key="ExecOperation.OperationNotFound">500</Item>
-                <Item Key="Forbidden">403</Item>
+                <Item Key="Forbidden">403:No permission to execute this operation.</Item>
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
-                <Item Key="NotAllowed">405</Item>
-                <Item Key="Object.AlreadyExists">409</Item>
+                <Item Key="NotAllowed">405:The resource does not support the requested method. Please have a look into the "Allow" header which methods are supported by this resource.</Item>
+                <Item Key="Object.AlreadyExists">409:Cannot create or update item, because it already exists.</Item>
                 <Item Key="Object.Created">201</Item>
-                <Item Key="Object.DependingObjectExists">409</Item>
-                <Item Key="Object.NoPermission">403</Item>
-                <Item Key="Object.NotFound">404</Item>
-                <Item Key="Object.UnableToCreate">400</Item>
-                <Item Key="Object.UnableToUpdate">400</Item>
-                <Item Key="Object.UnableToDelete">400</Item>
+                <Item Key="Object.DependingObjectExists">409:Depending objects prevent this operation.</Item>
+                <Item Key="Object.NoPermission">403:No permission to execute this operation.</Item>
+                <Item Key="Object.NotFound">404:The requested item cannot be found.</Item>
+                <Item Key="Object.Invalid">404:The requested item cannot be found or is invalid.</Item>
+                <Item Key="Object.UnableToCreate">400:Could not create item, please contact the system administrator.</Item>
+                <Item Key="Object.UnableToUpdate">400:Could not update item, please contact the system administrator.</Item>
+                <Item Key="Object.UnableToDelete">400:Could not delete item, please contact the system administrator.</Item>
                 <Item Key="OK">200</Item>
                 <Item Key="Operation.InternalError">500</Item>
-                <Item Key="Operation.PrepareDataError">400</Item>
+                <Item Key="ParentObject.NotFound">404:The parent item(s) cannot be found.</Item>
                 <Item Key="PrepareData.InvalidFilter">400</Item>
                 <Item Key="PrepareData.InvalidSort">400</Item>
                 <Item Key="PrepareData.InvalidExpand">400</Item>
                 <Item Key="Provider.InternalError">500</Item>
-                <Item Key="SessionCreate.AuthFail">401</Item>
-                <Item Key="SessionDelete.DeleteError">404</Item>
-                <Item Key="SessionGet.TokenError">404</Item>
+                <Item Key="SessionCreate.AuthFail">401:Authorization not possible, please contact the system administrator.</Item>
                 <Item Key="Transport.InternalError">500</Item>
                 <Item Key="Transport.OperationNotFound">501</Item>
                 <Item Key="Transport.REST.DataMissing">400</Item>
@@ -232,11 +222,7 @@
                 <Item Key="Transport.REST.OperationNotFound">501</Item>
                 <Item Key="Transport.REST.RequestTooBig">413</Item>
                 <Item Key="Transport.REST.TransportConfigInvalid">500</Item>
-                <Item Key="Unauthorized">401</Item>
-                <Item Key="UserGet.NoUserData">400</Item>
-                <Item Key="UserGet.InvalidUserID">400</Item>
-                <Item Key="UserGet.InalidUserType">400</Item>
-                <Item Key="UserUpdate.LoginExists">409</Item>                
+                <Item Key="Unauthorized">401:User is not authorized. The requested operation cannot be executed.</Item>
                 <Item Key="Validator.InternalError">500</Item>
                 <Item Key="Validator.UnknownAttribute">500</Item>
                 <Item Key="Validator.Failed">400</Item>
@@ -244,6 +230,19 @@
             </Hash>
         </Setting>
     </ConfigItem>
-   
+
+    <ConfigItem Name="API::JSONSchema::Location" Required="1" Valid="1">
+        <Description Translatable="1">Defines the location where the JSON schema files are located.</Description>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/doc/API/V1/schemas</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Example::Location" Required="1" Valid="1">
+        <Description Translatable="1">Defines the location where the example files are located.</Description>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/doc/API/V1/examples</String>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>
-    

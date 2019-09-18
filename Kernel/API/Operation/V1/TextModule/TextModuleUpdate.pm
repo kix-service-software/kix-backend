@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/TextModule/TextModuleUpdate.pm - API TextModule Update operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::TextModule::TextModuleUpdate;
@@ -102,27 +97,6 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => \@LanguageIDs
         },
-        'TextModule::AgentFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::CustomerFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::PublicFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
     }
 }
 
@@ -143,9 +117,6 @@ perform TextModuleUpdate Operation. This will return the updated TypeID.
                     'some', 'keywords'
                 ],                                  # optional
                 Subject             => '...',       # optional
-                AgentFrontend       => 0|1,         # optional
-                CustomerFrontend    => 0|1,         # optional
-                PublicFrontend      => 0|1,         # optional
                 ValidID             => 1            # optional
             },
         },
@@ -179,8 +150,7 @@ sub Run {
  
     if ( !%TextModuleData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update TextModule. No TextModule with ID '$Param{Data}->{TextModuleID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -192,8 +162,7 @@ sub Run {
         
         if ( IsArrayRefWithData($ExistingProfileIDs) && $ExistingProfileIDs->[0] != $TextModuleData{ID}) {
             return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Cannot update TextModule. Another TextModule with the same name already exists.",
+                Code => 'Object.AlreadyExists',
             );
         }
     }
@@ -203,22 +172,18 @@ sub Run {
         ID                 => $Param{Data}->{TextModuleID},
         Name               => $TextModule->{Name} || $TextModuleData{Name},
         Text               => $TextModule->{Text} || $TextModuleData{Text},
-        Category           => $TextModule->{Category} || $TextModuleData{Category},
+        Category           => exists $TextModule->{Category} ? $TextModule->{Category} : $TextModuleData{Category},
         Language           => $TextModule->{Language} || $TextModuleData{Language},
-        Subject            => $TextModule->{Subject} || $TextModuleData{Subject},
-        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
-        Comment            => $TextModule->{Comment} || $TextModuleData{Comment},
-        AgentFrontend      => $TextModule->{AgentFrontend} || $TextModuleData{AgentFrontend},
-        CustomerFrontend   => $TextModule->{CustomerFrontend} || $TextModuleData{CustomerFrontend},
-        PublicFrontend     => $TextModule->{PublicFrontend} || $TextModuleData{PublicFrontend},        
+        Subject            => exists $TextModule->{Subject} ? $TextModule->{Subject} : $TextModuleData{Subject},
+        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : $TextModuleData{Keywords},
+        Comment            => exists $TextModule->{Comment} ? $TextModule->{Comment} : $TextModuleData{Comment},
         ValidID            => $TextModule->{ValidID} || $TextModuleData{ValidID},        
         UserID             => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update TextModule, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 
@@ -229,3 +194,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

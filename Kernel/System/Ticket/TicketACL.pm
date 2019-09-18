@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::TicketACL;
@@ -97,7 +97,7 @@ Example to restrict ticket actions:
                                                       #   PossibleNot sub-key in ACL
 
         UserID         => 123,                        # UserID => 1 is not affected by this function
-        CustomerUserID => 'customer login',           # UserID or CustomerUserID are mandatory
+        ContactID => 'customer login',           # UserID or ContactID are mandatory
 
         # Process Management Parameters
         ProcessEntityID        => 123,                # Optional
@@ -137,7 +137,7 @@ is called on it, and then the C<Run> method is called.
 
 The C<Checks> array reference in the configuration controls what arguments are passed. to the
 C<Run> method.
-Valid keys are C<CustomerUser>, C<DynamicField>, C<Frontend>, C<Owner>, C<Priority>, C<Process>,
+Valid keys are C<Contact>, C<DynamicField>, C<Frontend>, C<Owner>, C<Priority>, C<Process>,
 C<Queue>, C<Responsible>, C<Service>, C<SLA>, C<State>, C<Ticket> and C<Type>. If any of those are
 present, the C<Checks> argument passed to C<Run> contains an entry with the same name, and as a
 value the associated data.
@@ -154,10 +154,10 @@ sub TicketAcl {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{UserID} && !$Param{CustomerUserID} ) {
+    if ( !$Param{UserID} && !$Param{ContactID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need UserID or CustomerUserID!',
+            Message  => 'Need UserID or ContactID!',
         );
         return;
     }
@@ -172,6 +172,10 @@ sub TicketAcl {
             return;
         }
     }
+
+    # TODO
+    # at the moment always return since we do not support ACLs 
+    return;
 
     # do not execute ACLs if UserID 1 is used
     return if $Param{UserID} && $Param{UserID} == 1;
@@ -353,7 +357,7 @@ sub TicketAcl {
             next DEBUGFILTER if !$Self->{ACLDebugFilters}->{$DebugFilter};
 
 #rbo - T2016121190001552 - added KIX placeholders
-            if ( $DebugFilter =~ m{<(KIX|OTRS)_TICKET_([^>]+)>}msx ) {
+            if ( $DebugFilter =~ m{<KIX_TICKET_([^>]+)>}msx ) {
                 my $TicketParam = $2;
 
                 if (
@@ -1084,7 +1088,7 @@ static ticket data stored in the DB) with the required data to use as a basis to
         Responsible      => 'some user login'         # Optional
 
         UserID         => 123,                        # UserID => 1 is not affected by this function
-        CustomerUserID => 'customer login',           # UserID or CustomerUserID are mandatory
+        ContactID => 'customer login',           # UserID or ContactID are mandatory
 
         # Process Management Parameters
         ProcessEntityID        => 123,                # Optional
@@ -1287,22 +1291,7 @@ sub _GetChecks {
             UserID => $Param{UserID},
         );
 
-        # get group object
-        my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-        for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
-
-            my %Groups = $GroupObject->PermissionUserGet(
-                UserID => $Param{UserID},
-                Type   => $Type,
-            );
-
-            my @GroupNames = sort values %Groups;
-
-            $User{"Group_$Type"} = \@GroupNames;
-        }
-
-        my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+        my %RoleIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
             UserID => $Param{UserID},
         );
 
@@ -1315,90 +1304,90 @@ sub _GetChecks {
 
     # get customer user objects
     my $CustomerGroupObject = $Kernel::OM->Get('Kernel::System::CustomerGroup');
-    my $CustomerUserObject  = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    my $ContactObject  = $Kernel::OM->Get('Kernel::System::Contact');
 
     # use customer user data
-    if ( ( $CheckAll || $RequiredChecks{CustomerUser} ) && $Param{CustomerUserID} ) {
+    if ( ( $CheckAll || $RequiredChecks{Contact} ) && $Param{ContactID} ) {
 
-        my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
-            User => $Param{CustomerUserID},
+        my %Contact = $ContactObject->ContactGet(
+            User => $Param{ContactID},
         );
 
         for my $Type ( @{ $ConfigObject->Get('System::Customer::Permission') } ) {
 
             my @Groups = $CustomerGroupObject->GroupMemberList(
-                UserID => $Param{CustomerUserID},
+                UserID => $Param{ContactID},
                 Result => 'Name',
                 Type   => $Type,
             );
 
-            $CustomerUser{"Group_$Type"} = \@Groups;
+            $Contact{"Group_$Type"} = \@Groups;
         }
 
-        $Checks{CustomerUser} = \%CustomerUser;
+        $Checks{Contact} = \%Contact;
 
         # update or add customer information to the ticket check
-        $Checks{Ticket}->{CustomerUserID} = $Checks{CustomerUser}->{UserLogin};
-        $Checks{Ticket}->{CustomerID}     = $Checks{CustomerUser}->{UserCustomerID};
+        $Checks{Ticket}->{ContactID} = $Checks{Contact}->{UserLogin};
+        $Checks{Ticket}->{CustomerID}     = $Checks{Contact}->{UserCustomerID};
     }
     else {
-        if ( IsStringWithData( $Checks{Ticket}->{CustomerUserID} ) ) {
+        if ( IsStringWithData( $Checks{Ticket}->{ContactID} ) ) {
 
             # get customer data from the ticket
-            my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
-                User => $Checks{Ticket}->{CustomerUserID},
+            my %Contact = $ContactObject->ContactGet(
+                User => $Checks{Ticket}->{ContactID},
             );
 
             for my $Type ( @{ $ConfigObject->Get('System::Customer::Permission') } ) {
 
                 my @Groups = $CustomerGroupObject->GroupMemberList(
-                    UserID => $Checks{Ticket}->{CustomerUserID},
+                    UserID => $Checks{Ticket}->{ContactID},
                     Result => 'Name',
                     Type   => $Type,
                 );
 
-                $CustomerUser{"Group_$Type"} = \@Groups;
+                $Contact{"Group_$Type"} = \@Groups;
             }
 
-            $Checks{CustomerUser} = \%CustomerUser;
+            $Checks{Contact} = \%Contact;
         }
     }
 
     # create hash with the ticket information stored in the database
     if (
-        ( $CheckAll || $RequiredChecks{CustomerUser} )
-        && IsStringWithData( $ChecksDatabase{Ticket}->{CustomerUserID} )
+        ( $CheckAll || $RequiredChecks{Contact} )
+        && IsStringWithData( $ChecksDatabase{Ticket}->{ContactID} )
         )
     {
 
         # check if database data matches current data (performance)
         if (
-            defined $Checks{CustomerUser}->{UserLogin}
-            && $ChecksDatabase{Ticket}->{CustomerUserID} eq $Checks{CustomerUser}->{UserLogin}
+            defined $Checks{Contact}->{UserLogin}
+            && $ChecksDatabase{Ticket}->{ContactID} eq $Checks{Contact}->{UserLogin}
             )
         {
-            $ChecksDatabase{CustomerUser} = $Checks{CustomerUser};
+            $ChecksDatabase{Contact} = $Checks{Contact};
         }
 
         # otherwise complete the data querying the database again
         else {
 
-            my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
-                User => $ChecksDatabase{Ticket}->{CustomerUserID},
+            my %Contact = $ContactObject->ContactGet(
+                User => $ChecksDatabase{Ticket}->{ContactID},
             );
 
             for my $Type ( @{ $ConfigObject->Get('System::Customer::Permission') } ) {
 
                 my @Groups = $CustomerGroupObject->GroupMemberList(
-                    UserID => $ChecksDatabase{Ticket}->{CustomerUserID},
+                    UserID => $ChecksDatabase{Ticket}->{ContactID},
                     Result => 'Name',
                     Type   => $Type,
                 );
 
-                $CustomerUser{"Group_$Type"} = \@Groups;
+                $Contact{"Group_$Type"} = \@Groups;
             }
 
-            $ChecksDatabase{CustomerUser} = \%CustomerUser;
+            $ChecksDatabase{Contact} = \%Contact;
         }
     }
 
@@ -1819,8 +1808,8 @@ sub _GetChecks {
     }
 
     # get needed objects
-    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-    my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
+    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
     # use owner data (if given)
     if ( $CheckAll || $RequiredChecks{Owner} ) {
@@ -1848,19 +1837,8 @@ sub _GetChecks {
             my %Owner = $UserObject->GetUserData(
                 UserID => $Param{OwnerID},
             );
-            for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                my %Groups = $GroupObject->PermissionUserGet(
-                    UserID => $Param{OwnerID},
-                    Type   => $Type,
-                );
-
-                my @GroupNames = sort values %Groups;
-
-                $Owner{"Group_$Type"} = \@GroupNames;
-            }
-
-            my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+            my %RoleIDs = $UserObject->UserRoleList(
                 UserID => $Param{OwnerID},
             );
 
@@ -1880,23 +1858,14 @@ sub _GetChecks {
             my %Owner = $UserObject->GetUserData(
                 UserID => $OwnerID,
             );
-            for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                my %Groups = $GroupObject->PermissionUserGet(
-                    UserID => $OwnerID,
-                    Type   => $Type,
-                );
+            my %RoleList = $RoleObject->RoleList();
 
-                my @GroupNames = sort values %Groups;
-
-                $Owner{"Group_$Type"} = \@GroupNames;
-            }
-
-            my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+            my @RoleIDs = $UserObject->RoleList(
                 UserID => $OwnerID,
             );
 
-            my @RoleNames = sort values %RoleIDs;
+            my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
 
             $Owner{Role}   = \@RoleNames;
             $Checks{Owner} = \%Owner;
@@ -1912,23 +1881,14 @@ sub _GetChecks {
                 my %Owner = $UserObject->GetUserData(
                     UserID => $Checks{Ticket}->{OwnerID},
                 );
-                for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                    my %Groups = $GroupObject->PermissionUserGet(
-                        UserID => $Checks{Ticket}->{OwnerID},
-                        Type   => $Type,
-                    );
+                my %RoleList = $RoleObject->RoleList();
 
-                    my @GroupNames = sort values %Groups;
-
-                    $Owner{"Group_$Type"} = \@GroupNames;
-                }
-
-                my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+                my @RoleIDs = $UserObject->RoleList(
                     UserID => $Checks{Ticket}->{OwnerID},
                 );
 
-                my @RoleNames = sort values %RoleIDs;
+                my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
 
                 $Owner{Role}   = \@RoleNames;
                 $Checks{Owner} = \%Owner;
@@ -1953,23 +1913,14 @@ sub _GetChecks {
             my %Owner = $UserObject->GetUserData(
                 UserID => $ChecksDatabase{Ticket}->{OwnerID},
             );
-            for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                my %Groups = $GroupObject->PermissionUserGet(
-                    UserID => $ChecksDatabase{Ticket}->{OwnerID},
-                    Type   => $Type,
-                );
+            my %RoleList = $RoleObject->RoleList();
 
-                my @GroupNames = sort values %Groups;
-
-                $Owner{"Group_$Type"} = \@GroupNames;
-            }
-
-            my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+            my @RoleIDs = $UserObject->RoleList(
                 UserID => $ChecksDatabase{Ticket}->{OwnerID},
             );
 
-            my @RoleNames = sort values %RoleIDs;
+            my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
 
             $Owner{Role}           = \@RoleNames;
             $ChecksDatabase{Owner} = \%Owner;
@@ -1984,23 +1935,14 @@ sub _GetChecks {
             my %Responsible = $UserObject->GetUserData(
                 UserID => $Param{ResponsibleID},
             );
-            for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                my %Groups = $GroupObject->PermissionUserGet(
-                    UserID => $Param{ResponsibleID},
-                    Type   => $Type,
-                );
+            my %RoleList = $RoleObject->RoleList();
 
-                my @GroupNames = sort values %Groups;
-
-                $Responsible{"Group_$Type"} = \@GroupNames;
-            }
-
-            my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+            my @RoleIDs = $UserObject->RoleList(
                 UserID => $Param{ResponsibleID},
             );
 
-            my @RoleNames = sort values %RoleIDs;
+            my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
 
             $Responsible{Role}   = \@RoleNames;
             $Checks{Responsible} = \%Responsible;
@@ -2016,23 +1958,14 @@ sub _GetChecks {
             my %Responsible = $UserObject->GetUserData(
                 UserID => $ResponsibleID,
             );
-            for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                my %Groups = $GroupObject->PermissionUserGet(
-                    UserID => $ResponsibleID,
-                    Type   => $Type,
-                );
+            my %RoleList = $RoleObject->RoleList();
 
-                my @GroupNames = sort values %Groups;
-
-                $Responsible{"Group_$Type"} = \@GroupNames;
-            }
-
-            my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+            my @RoleIDs = $UserObject->RoleList(
                 UserID => $ResponsibleID,
             );
 
-            my @RoleNames = sort values %RoleIDs;
+            my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
 
             $Responsible{Role}   = \@RoleNames;
             $Checks{Responsible} = \%Responsible;
@@ -2048,24 +1981,15 @@ sub _GetChecks {
                 my %Responsible = $UserObject->GetUserData(
                     UserID => $Checks{Ticket}->{ResponsibleID},
                 );
-                for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
 
-                    my %Groups = $GroupObject->PermissionUserGet(
-                        UserID => $Checks{Ticket}->{ResponsibleID},
-                        Type   => $Type,
-                    );
+                my %RoleList = $RoleObject->RoleList();
 
-                    my @GroupNames = sort values %Groups;
-
-                    $Responsible{"Group_$Type"} = \@GroupNames;
-                }
-
-                my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+                my @RoleIDs = $UserObject->RoleList(
                     UserID => $Checks{Ticket}->{ResponsibleID},
                 );
 
-                my @RoleNames = sort values %RoleIDs;
-
+                my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
+            
                 $Responsible{Role}   = \@RoleNames;
                 $Checks{Responsible} = \%Responsible;
             }
@@ -2092,23 +2016,13 @@ sub _GetChecks {
                 UserID => $ChecksDatabase{Ticket}->{ResponsibleID},
             );
 
-            for my $Type ( @{ $ConfigObject->Get('System::Permission') } ) {
+            my %RoleList = $RoleObject->RoleList();
 
-                my %Groups = $GroupObject->PermissionUserGet(
-                    UserID => $ChecksDatabase{Ticket}->{ResponsibleID},
-                    Type   => $Type,
-                );
-
-                my @GroupNames = sort values %Groups;
-
-                $Responsible{"Group_$Type"} = \@GroupNames;
-            }
-
-            my %RoleIDs = $GroupObject->PermissionUserRoleGet(
+            my @RoleIDs = $UserObject->RoleList(
                 UserID => $ChecksDatabase{Ticket}->{ResponsibleID},
             );
 
-            my @RoleNames = sort values %RoleIDs;
+            my @RoleNames = sort map { $RoleList{$_} } @RoleIDs;
 
             $Responsible{Role}           = \@RoleNames;
             $ChecksDatabase{Responsible} = \%Responsible;
@@ -2275,16 +2189,17 @@ sub _CompareMatchWithData {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

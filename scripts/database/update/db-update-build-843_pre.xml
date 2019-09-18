@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter NameOld="customer_company" NameNew="organisation">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <ColumnChange NameOld="customer_id" NameNew="number" Required="true" Size="150" Type="VARCHAR"/>
+        <UniqueDrop Name="customer_company_pkey"/>
+        <UniqueCreate Name="organisation_number">
+            <UniqueColumn Name="number"/>
+        </UniqueCreate>
+        <UniqueDrop Name="customer_company_name"/>
+        <UniqueCreate Name="organisation_name">
+            <UniqueColumn Name="name"/>
+        </UniqueCreate>
+    </TableAlter>
+    <TableAlter NameOld="kix_customer_company_prefs" NameNew="organisation_prefs">
+        <ColumnChange NameOld="user_id" NameNew="org_id" Required="true" Type="INTEGER"/>
+        <ForeignKeyCreate ForeignTable="organisation">
+            <Reference Local="org_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+    <TableAlter NameOld="customer_user" NameNew="contact">
+        <ColumnChange NameOld="customer_id" NameNew="primary_org_id" Required="true" Type="INTEGER"/>
+        <ColumnChange NameOld="customer_ids" NameNew="org_ids" Required="false" Size="10000" Type="VARCHAR"/>
+        <ColumnChange NameOld="pw" NameNew="password" Required="false" Size="64" Type="VARCHAR"/>
+        <ColumnChange NameOld="first_name" NameNew="firstname" Required="true" Size="100" Type="VARCHAR"/>
+        <ColumnChange NameOld="last_name" NameNew="lastname" Required="true" Size="100" Type="VARCHAR"/>
+        <UniqueDrop Name="customer_user_login"/>
+        <UniqueCreate Name="contact_login">
+            <UniqueColumn Name="login"/>
+        </UniqueCreate>
+    </TableAlter>
+    <TableAlter NameOld="customer_preferences" NameNew="contact_preferences">
+        <ColumnChange NameOld="user_id" NameNew="contact_id" Required="true" Type="INTEGER"/>
+        <IndexDrop Name="customer_preferences_user_id"/>
+        <IndexCreate Name="contact_preferences_contact_id">
+            <IndexColumn Name="contact_id"/>
+        </IndexCreate>
+        <ForeignKeyCreate ForeignTable="contact">
+            <Reference Local="contact_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+    <TableAlter Name="ticket">
+        <ColumnChange NameOld="customer_id" NameNew="organisation_id" Required="false" Size="150" Type="VARCHAR"/>
+        <ColumnChange NameOld="customer_user_id" NameNew="contact_id" Required="false" Size="250" Type="VARCHAR"/>
+        <IndexDrop Name="ticket_customer_user_id"/>
+        <IndexDrop Name="ticket_customer_id"/>
+        <IndexDrop Name="ticket_custid_aflag_id"/>
+        <IndexCreate Name="ticket_contact_id">
+            <IndexColumn Name="contact_id"/>
+        </IndexCreate>
+        <IndexCreate Name="ticket_organisation_id">
+            <IndexColumn Name="organisation_id"/>
+        </IndexCreate>
+        <IndexCreate Name="ticket_orgid_aflag_id">
+            <IndexColumn Name="organisation_id"/>
+            <IndexColumn Name="archive_flag"/>
+            <IndexColumn Name="id"/>
+        </IndexCreate>
+    </TableAlter>
+
+</database>

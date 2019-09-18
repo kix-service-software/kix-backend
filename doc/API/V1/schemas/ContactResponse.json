@@ -1,0 +1,14 @@
+{
+   "$id" : "#ContactResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for contact GET request.",
+   "type" : "object",
+   "properties" : {
+      "Contact" : {
+         "$ref" : "Contact.json"
+      }
+   },
+   "required" : [
+      "Contact"
+   ]
+}

@@ -1,0 +1,26 @@
+{
+    "SystemAddress": [
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2019-05-09 15:27:10",
+			"Comment": "Standard Address.",
+			"CreateBy": 1,
+			"CreateTime": "2019-05-09 15:27:10",
+			"ID": 1,
+			"Name": "kix@localhost",
+			"Realname": "KIX System",
+			"ValidID": 1
+		},
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2019-05-09 15:36:06",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2019-05-09 15:36:06",
+			"ID": 2,
+			"Name": "temp.invalid@testtest.org",
+			"Realname": "[TD-Email-002] Temporarily Invalid E-Mail address",
+			"ValidID": 3
+		}     
+    ]
+}

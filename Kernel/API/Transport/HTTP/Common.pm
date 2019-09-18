@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Transport::HTTP::Common;
@@ -56,20 +56,18 @@ sub ProviderCheckAuthorization {
     # check authentication header
     my $cgi = CGI->new;
     my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-    
-    if (!$Headers{HTTP_AUTHORIZATION}) {
+        
+    if ( !$Headers{HTTP_AUTHORIZATION} ) {
         return $Self->_Error(
-            Code    => 'Authorization.NoHeader',
-            Message => 'No authorization header given!',
+            Code => 'Authorization.NoHeader'
         );
     }
 
     my %Authorization = split(/\s+/, $Headers{HTTP_AUTHORIZATION});
 
-    if (!$Authorization{Token}) {
+    if ( !$Authorization{Token} ) {
         return $Self->_Error(
-            Code    => 'Authorization.NoToken',
-            Message => 'No token in authorization header found!',
+            Code => 'Authorization.NoToken'
         );
     }
 
@@ -79,8 +77,7 @@ sub ProviderCheckAuthorization {
 
     if ( !IsHashRefWithData($ValidatedToken) ) {
         return $Self->_Error(
-            Code    => 'Unauthorized',
-            Message => "Not authorized!"
+            Code => 'Unauthorized'
         );
     }
 
@@ -96,16 +93,17 @@ sub ProviderCheckAuthorization {
 
 1;
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

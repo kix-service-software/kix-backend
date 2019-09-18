@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ITSMConfigItem::History;
@@ -69,9 +69,12 @@ sub HistoryGet {
         }
     }
 
-    # if cached result exists, return that result
-    return $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} }
-        if $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} };
+    my $CacheKey = 'HistoryGet::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # fetch some data from history for given config item
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -105,8 +108,13 @@ sub HistoryGet {
         Entries      => \@Entries,
     );
 
-    # save result in cache
-    $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} } = $Result;
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result,
+    );
 
     return $Result;
 }
@@ -148,11 +156,12 @@ sub HistoryEntryGet {
         }
     }
 
-    # if cached result exists, return that result
-    if ( $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} } ) {
-        my ($ConfigItemID) = keys %{ $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} } };
-        return $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} }->{$ConfigItemID};
-    }
+    my $CacheKey = 'HistoryEntryGet::'.$Param{HistoryEntryID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # fetch a single entry from history
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -184,7 +193,13 @@ sub HistoryEntryGet {
         Entries      => [ \%Entry ],
     );
 
-    $Self->{Cache}->{Versions}->{ $Param{HistoryEntryID} }->{ $Entry{ConfigItemID} } = $Result->[0];
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result->[0],
+    );
 
     return $Result->[0];
 }
@@ -269,9 +284,6 @@ sub HistoryAdd {
         }
     }
 
-    # delete cached results
-    delete $Self->{Cache}->{CIVersions}->{ $Param{ConfigItemID} };
-
     # shorten the comment if it is bigger than max length
     if ( length( $Param{Comment} ) > 255 ) {
 
@@ -292,8 +304,13 @@ sub HistoryAdd {
         $Param{Comment} = $NewComment;
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # insert history entry
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'INSERT INTO configitem_history ( configitem_id, content, create_by, '
             . 'create_time, type_id ) VALUES ( ?, ?, ?, current_timestamp, ? )',
         Bind => [
@@ -303,6 +320,15 @@ sub HistoryAdd {
             \$Param{HistoryTypeID},
         ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'CMDB.ConfigItem.History',
+        ObjectID  => $Param{ConfigItemID}.'::'.$Param{HistoryTypeID},
+    );
+
+    return 1;
 }
 
 =item HistoryDelete()
@@ -336,11 +362,25 @@ sub HistoryDelete {
         delete $Self->{Cache}->{Versions}->{$VersionNr} if $CacheConfigItem eq $Param{ConfigItemID};
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # delete history for given config item
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE configitem_id = ?',
         Bind => [ \$Param{ConfigItemID} ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'CMDB.ConfigItem.History',
+        ObjectID  => $Param{ConfigItemID},
+    );
+
+    return 1;
 }
 
 =item HistoryEntryDelete()
@@ -367,11 +407,29 @@ sub HistoryEntryDelete {
         }
     }
 
+    my $HistoryEntry = $Self->HistoryEntryGet(
+        HistoryEntryID => $Param{HistoryEntryID}
+    );
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # delete single entry
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE id = ?',
         Bind => [ \$Param{HistoryEntryID} ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'CMDB.ConfigItem.History',
+        ObjectID  => $HistoryEntry->{ConfigItemID}.'::'.$Param{HistoryEntryID},
+    );
+
+    return 1;
 }
 
 =item HistoryTypeLookup()
@@ -404,9 +462,12 @@ sub HistoryTypeLookup {
         return;
     }
 
-    # if result is cached return that result
-    return $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} }
-        if $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} };
+    my $CacheKey = 'HistoryTypeLookup::'.($Param{HistoryTypeID}||'').'::'.($Param{HistoryType}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # set the appropriate SQL statement
     my $SQL = 'SELECT name FROM configitem_history_type WHERE id = ?';
@@ -427,8 +488,13 @@ sub HistoryTypeLookup {
         $Value = $Row[0];
     }
 
-    # save value in cache
-    $Self->{Cache}->{HistoryTypeLookup}->{ $Param{$Key} } = $Value;
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Value,
+    );
 
     return $Value;
 }
@@ -588,16 +654,17 @@ sub _GetAttributeInfo {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

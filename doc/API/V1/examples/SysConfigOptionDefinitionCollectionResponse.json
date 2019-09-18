@@ -1,0 +1,48 @@
+{
+    "SysConfigOptionDefinition": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-05-14 20:43:11",
+            "Comment": null,
+            "CreateBy": 1,
+            "CreateTime": "2019-05-14 20:06:07",
+            "Default": {
+                "AgentEnabledByDefault": "0",
+                "Icon": "fa fa-th-list",
+                "Module": "Kernel::System::Ticket::Event::NotificationEvent::Transport::AgentOverlay",
+                "Name": "Agent Notification (Popup/Dashboard)",
+                "Prio": "110"
+            },
+            "Description": "Defines all the parameters for this notification transport.",
+            "Group": "Ticket",
+            "IsModified": 1,
+            "IsRequired": 0,
+            "Level": null,
+            "Name": "Notification::Transport###AgentOverlay",
+            "Setting": null,
+            "Type": "Hash",
+            "ValidID": 1,
+            "Value": null
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-05-14 20:43:17",
+            "Comment": null,
+            "CreateBy": 1,
+            "CreateTime": "2019-05-14 20:06:44",
+            "Default": "15",
+            "Description": "Sets the timeout (in seconds) for http/ftp downloads.",
+            "Group": "Framework",
+            "IsModified": 1,
+            "IsRequired": 1,
+            "Level": 200,
+            "Name": "WebUserAgent::Timeout",
+            "Setting": {
+              "Regex": ""
+            },
+            "Type": "String",
+            "ValidID": 1,
+            "Value": null
+          }
+    ]
+}

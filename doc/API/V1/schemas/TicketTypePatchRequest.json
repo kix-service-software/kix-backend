@@ -1,0 +1,25 @@
+{
+   "$id" : "#TicketTypePatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ticket type request object for update.",
+   "type" : "object",
+   "properties" : {
+      "TicketType" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "TicketType"
+   ]
+}

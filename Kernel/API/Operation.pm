@@ -1,17 +1,17 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation;
 
 use strict;
 use warnings;
+
+use File::Basename;
 
 use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
@@ -24,6 +24,14 @@ use base qw(
 );
 
 our $ObjectManagerDisabled = 1;
+
+# mapping for permissions
+use constant REQUEST_METHOD_PERMISSION_MAPPING => {
+    'GET'    => 'READ',
+    'POST'   => 'CREATE',
+    'PATCH'  => 'UPDATE',
+    'DELETE' => 'DELETE',
+};
 
 =head1 NAME
 
@@ -63,6 +71,7 @@ create an object.
         Operation       => 'TicketCreate',                # the name of the operation in the web service
         OperationType   => 'V1::Ticket::TicketCreate',    # the local operation backend to use
         WebserviceID    => $WebserviceID,                 # ID of the currently used web service
+        OperationRouteMapping => {},                      # required
         NoAuthorizationNeeded => 1                        # optional
     );
 
@@ -75,7 +84,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject Operation OperationType WebserviceID)) {
+    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
             return $Self->_Error(
@@ -106,17 +115,21 @@ sub new {
 
     # check permission
     if ( IsHashRefWithData($Param{Authorization}) ) {
-        my $Permission = $Self->_CheckOperationPermission(
-            OperationType   => $Param{OperationType},
-            OperationConfig => $Self->{OperationConfig},
-            Authorization   => $Param{Authorization},
+        my ($Granted, @AllowedMethods) = $Self->_CheckPermission(
+            Authorization => $Param{Authorization},
         );
-        if ( !$Permission ) {
+        if ( !$Granted ) {
             return $Self->_Error(
-                Code    => 'Forbidden',
-                Message => 'No permission to execute this operation!',
+                Code => 'Forbidden',
+                Additional => {
+                    AddHeader => {
+                        Allow => join(', ', @AllowedMethods),
+                    }
+                }
             );
         }
+
+        $Self->{Authorization} = $Param{Authorization};        
     }
 
     # create validator
@@ -126,7 +139,7 @@ sub new {
 
     # if validator init failed, bail out
     if ( ref $Self->{ValidatorObject} ne 'Kernel::API::Validator' ) {
-        return $Self->_GenerateErrorResponse(
+        return $Self->_Error(
             %{$Self->{ValidatorObject}},
         );
     }
@@ -147,13 +160,10 @@ sub new {
     # pass back error message from backend if backend module could not be executed
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
-    # pass authorization information to backend
-    $Self->{BackendObject}->{Authorization}   = $Param{Authorization};
-
-    # pass operation information to backend
-    $Self->{BackendObject}->{Operation}       = $Param{Operation};
-    $Self->{BackendObject}->{OperationType}   = $Param{OperationType};
-    $Self->{BackendObject}->{OperationConfig} = $Self->{OperationConfig};
+    # pass information to backend
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods) ) {
+        $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
+    }
 
     # add call level
     $Self->{Level} = $Param{Level};
@@ -197,8 +207,37 @@ sub Run {
         );
     }
 
-    # start map on backend
+    if ( $Self->{AlteredRequestURI} && $Self->{CurrentRoute} =~ /:(.+?)$/ ) {
+        # the RequestURI has been altered by the permission check
+        # this can happen in case of multiple IDs with different permissions (the user has no permission to some of the items)
+        $Param{Data}->{$1} = (split(/\//, $Self->{AlteredRequestURI}))[-1];
+    }
+
+    # start the backend
     return $Self->{BackendObject}->RunOperation(%Param);
+}
+
+=item Options()
+
+gather information about the Operation.
+
+    my $Result = $OperationObject->Options();
+
+    $Result = {
+        Success         => 1,                   # 0 or 1
+        ErrorMessage    => '',                  # in case of error
+        Data            => {                    # result data payload after Operation
+            ...
+        },
+    };
+
+=cut
+
+sub Options {
+    my ( $Self, %Param ) = @_;    
+
+    # start the backend
+    return $Self->{BackendObject}->Options(%Param);
 }
 
 =item GetCacheDependencies()
@@ -223,25 +262,25 @@ sub GetCacheDependencies {
 
 =begin Internal:
 
-=item _CheckOperationPermission()
+=item _CheckPermission()
 
-checks whether the user is allowed to execute this operation
+checks whether the user is allowed to execute this operation (Resource and Object types)
 
-    my $Permission = $OperationObject->_CheckOperationPermission(
-        OperationType    => 'V1::Own::UserGet',
-        OperationConfig  => { },
+    my $Permission = $OperationObject->_CheckPermission(
         Authorization    => { },
     );
 
 =cut
 
-sub _CheckOperationPermission {
+sub _CheckPermission {
     my ( $Self, %Param ) = @_;    
+
+    my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
 
     # check if token allows access, first check denials
     my $Access = 1;
     foreach my $DeniedOp ( @{$Param{Authorization}->{DeniedOperations}} ) {
-        if ( $Param{OperationType} =~ /^$DeniedOp$/g ) {
+        if ( $Self->{OperationType} =~ /^$DeniedOp$/g ) {
             $Access = 0;
             last;
         }
@@ -254,71 +293,80 @@ sub _CheckOperationPermission {
         }
         # we don't have access, so check if the operation is explicitly allowed
         foreach my $AllowedOp ( @{$Param{Authorization}->{AllowedOperations}} ) {
-            if ( $Param{OperationType} =~ /^$AllowedOp$/g ) {
+            if ( $Self->{OperationType} =~ /^$AllowedOp$/g ) {
                 $Access = 1;
                 last;
             }
         }        
     }
 
-    return 0 if !$Access;
+    # return false if access is explicitly denied by token
+    if ( !$Access ) {
+        $Self->_PermissionDebug("RequestURI = $Self->{RequestURI}, requested permission = $RequestedPermission --> permission denied by token");
+        return;
+    }
 
-    return 1 if !$Param{OperationConfig}->{Permission};
+    # split multiple (item) resources in the URI
+    my ($Resource, $ResourceBase) = fileparse $Self->{RequestURI};
+    my @Resources = split(/,/, $Resource);
 
-    # parse permissions
-    my $Result = 0;
-    PERMISSION:
-    foreach my $PermissionDef ( split(/\s*,\s*/, $Param{OperationConfig}->{Permission}) ) {
+    # check if user has permission for this request
+    my $Granted = 0;
+    my $AllowedPermission;
+    my @GrantedResources;
+    foreach my $Resource ( @Resources ) {
+        ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+            UserID              => $Param{Authorization}->{UserID},
+            Target              => $ResourceBase.$Resource,
+            Types               => [ 'Resource', 'Object' ],
+            RequestedPermission => $RequestedPermission,
+        );
 
-        my ($ObjectType, $Rest)   = split(/=/, $PermissionDef);
-        my ($Object, $Permission) = split(/:/, $Rest);
-        my @UserIDs;
+        my $AllowedPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $AllowedPermission || 0,
+            Format => 'Short'
+        );
 
-        # check roles, groups and users
-        if ( uc($ObjectType) eq 'ROLE' ) {
-            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-            my $RoleID = $GroupObject->RoleLookup( 
-                Role => $Object
-            );
-            if ( $RoleID ) {
-                @UserIDs = $GroupObject->GroupUserRoleMemberList(
-                    RoleID => $RoleID,
-                    Result => 'ID',
-                );
-            }
-        }
-        elsif ( uc($ObjectType) eq 'GROUP' ) {
-            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-            my $GroupID = $GroupObject->GroupLookup( 
-                Group => $Object
-            );
-            if ( $GroupID ) {
-                @UserIDs = $GroupObject->GroupGroupMemberList(
-                    GroupID => $GroupID,
-                    Type    => $Permission,
-                    Result  => 'ID',
-                );
-            }
-        }
-        elsif ( uc($ObjectType) eq 'USER' ) {
-            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-            my $UserID = $UserObject->UserLookup( 
-                UserLogin => $Object 
-            );
-            if ( $UserID ) {
-                push(@UserIDs, $UserID);
-            }
-        }
+        $Self->_PermissionDebug(sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
 
-        my %UserHash = map { $_ => 1 } @UserIDs;
-        if ( $UserHash{$Param{Authorization}->{UserID}} ) {
-            # user has permission, abort loop
-            $Result = 1;
-            last PERMISSION;
+        if ( $Granted ) {
+            # build new list of allowed (item) resources
+            push(@GrantedResources, $Resource);
         }
     }
 
-    return $Result;
+    # create a new RequestURI with granted resources if some of the item resources are denied
+    if ( scalar(@Resources) > 1 && scalar(@GrantedResources) < scalar(@Resources) ) {
+        $Granted = 1;
+        $Self->{AlteredRequestURI} = $ResourceBase.join(',', @GrantedResources);
+        my $AllowedPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $AllowedPermission || 0,
+            Format => 'Short'
+        );
+        $Self->_PermissionDebug(sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
+    }
+
+    my @AllowedMethods;
+    if ( $AllowedPermission ) {
+        my %ReversePermissionMapping = reverse %{Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING};
+        foreach my $Perm ( sort keys %{Kernel::System::Role::Permission->PERMISSION} ) {
+            next if (($AllowedPermission & Kernel::System::Role::Permission->PERMISSION->{$Perm}) != Kernel::System::Role::Permission->PERMISSION->{$Perm});
+            push(@AllowedMethods, $ReversePermissionMapping{$Perm});
+        }
+    }
+
+    # OPTIONS requests are always possible
+    $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
+
+    return ($Granted, @AllowedMethods);
+}
+
+sub _PermissionDebug {
+    my ( $Self, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
+
+    printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
 }
 
 1;
@@ -326,16 +374,17 @@ sub _CheckOperationPermission {
 =end Internal:
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

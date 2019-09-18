@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::Output::HTML::Layout;
@@ -38,7 +38,6 @@ our @ObjectDependencies = (
     'Kernel::System::User',
     'Kernel::System::VideoChat',
     'Kernel::System::Web::Request',
-    'Kernel::System::Group',
 );
 
 =head1 NAME
@@ -97,11 +96,6 @@ sub new {
     $Self->{Action} = '' if !defined $Self->{Action};
 
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-
-    # get/set some common params
-    if ( !$Self->{UserTheme} ) {
-        $Self->{UserTheme} = $ConfigObject->Get('DefaultTheme');
-    }
 
     # We'll keep one default TimeObject and one for the user's time zone (if needed)
     $Self->{TimeObject} = $Kernel::OM->Get('Kernel::System::Time');
@@ -395,77 +389,51 @@ EOF
         }
     }
 
-    # load theme
-    my $Theme = $Self->{UserTheme} || $ConfigObject->Get('DefaultTheme') || Translatable('Standard');
-
-    # force a theme based on host name
-    my $DefaultThemeHostBased = $ConfigObject->Get('DefaultTheme::HostBased');
-    if ( $DefaultThemeHostBased && $ENV{HTTP_HOST} ) {
-
-        THEME:
-        for my $RegExp ( sort keys %{$DefaultThemeHostBased} ) {
-
-            # do not use empty regexp or theme directories
-            next THEME if !$RegExp;
-            next THEME if $RegExp eq '';
-            next THEME if !$DefaultThemeHostBased->{$RegExp};
-
-            # check if regexp is matching
-            if ( $ENV{HTTP_HOST} =~ /$RegExp/i ) {
-                $Theme = $DefaultThemeHostBased->{$RegExp};
-            }
-        }
-    }
-
     # locate template files
-    $Self->{TemplateDir}         = $ConfigObject->Get('TemplateDir') . '/HTML/Templates/' . $Theme;
-    $Self->{StandardTemplateDir} = $ConfigObject->Get('TemplateDir') . '/HTML/Templates/' . 'Standard';
+    $Self->{TemplateDir} = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/Output/HTML/Templates';
 
-    # Check if 'Standard' fallback exists
-    if ( !-e $Self->{StandardTemplateDir} ) {
+    # Check if TemplateDir exists
+    if ( !-e $Self->{TemplateDir} ) {
         $Self->FatalDie(
             Message =>
-                "No existing template directory found ('$Self->{TemplateDir}')! Check your Home in Kernel/Config.pm."
+                "No existing template directory found ('$Self->{TemplateDir}')! Check your Home configuration."
         );
     }
 
+    # TODO new solution needed for extensions
     # KIXCore-capeIT
-    my $ThemePath   = $Self->{TemplateDir};
-    my $HomeDir     = $ConfigObject->Get('Home');
-    my $ThemeKIXDir = '';
-    $ThemePath =~ s/$HomeDir//g;
+    # my $ThemePath   = $Self->{TemplateDir};
+    # my $HomeDir     = $ConfigObject->Get('Home');
+    # my $ThemeKIXDir = '';
+    # $ThemePath =~ s/$HomeDir//g;
 
-    for my $ThemeDir (@INC) {
-        $ThemeKIXDir = $ThemeDir . $ThemePath;
-        last if ( -e $ThemeKIXDir )
-    }
+    # for my $ThemeDir (@INC) {
+    #     $ThemeKIXDir = $ThemeDir . $ThemePath;
+    #     last if ( -e $ThemeKIXDir )
+    # }
 
-    # if ( !-e $Self->{TemplateDir} ) {
-    if ( !-e ( $ThemeKIXDir || $Self->{TemplateDir} ) ) {
+    # # if ( !-e $Self->{TemplateDir} ) {
+    # if ( !-e ( $ThemeKIXDir || $Self->{TemplateDir} ) ) {
 
-        # EO KIXCore-capeIT
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message =>
-                "No existing template directory found ('$Self->{TemplateDir}')!.
-                Default theme used instead.",
-        );
+    #     # EO KIXCore-capeIT
+    #     $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #         Priority => 'error',
+    #         Message =>
+    #             "No existing template directory found ('$Self->{TemplateDir}')!.
+    #             Default theme used instead.",
+    #     );
 
-        # Set TemplateDir to 'Standard' as a fallback.
-        $Theme = 'Standard';
-        $Self->{TemplateDir} = $Self->{StandardTemplateDir};
-    }
-
-    $Self->{CustomTemplateDir}         = $ConfigObject->Get('CustomTemplateDir') . '/HTML/Templates/' . $Theme;
-    $Self->{CustomStandardTemplateDir} = $ConfigObject->Get('CustomTemplateDir') . '/HTML/Templates/' . 'Standard';
+    #     # Set TemplateDir to 'Standard' as a fallback.
+    #     $Self->{TemplateDir} = $Self->{StandardTemplateDir};
+    # }
 
     # get main object
     my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
     # load sub layout files
     # KIXCore-capeIT
-    my $LayoutPath    = $ConfigObject->Get('TemplateDir') . '/HTML/Layout';
     my $Home          = $ConfigObject->Get('Home');
+    my $LayoutPath    = $Home . '/Kernel/Output/HTML/Layout';
     my $LayoutPathKIX = $LayoutPath;
     $LayoutPathKIX =~ s/$Home//g;
     my %LayoutFiles = ();
@@ -497,37 +465,6 @@ EOF
     }
 
     # EO KIXCore-capeIT
-
-    my $NewDir = $ConfigObject->Get('TemplateDir') . '/HTML/Layout';
-    if ( -e $NewDir ) {
-        my @NewFiles = $MainObject->DirectoryRead(
-            Directory => $NewDir,
-            Filter    => '*.pm',
-        );
-        for my $NewFile (@NewFiles) {
-
-            # KIXCore-capeIT
-            # if ( $NewFile !~ /Layout.pm$/ ) {
-            if ( ( $NewFile !~ /Layout.pm$/ ) && !exists( $LayoutFiles{$NewFile} ) ) {
-
-                # EO KIXCore-capeIT
-
-                $NewFile =~ s{\A.*\/(.+?).pm\z}{$1}xms;
-                my $NewClassName = "Kernel::Output::HTML::Layout::$NewFile";
-                if ( !$MainObject->RequireBaseClass($NewClassName) ) {
-                    $Self->FatalDie(
-                        Message => "Could not load class Kernel::Output::HTML::Layout::$NewFile.",
-                    );
-                }
-
-                # KIXCore-capeIT
-                $LayoutFiles{$NewFile} = $NewFile;
-                push @ISA, "Kernel::Output::HTML::Layout::$NewFile";
-
-                # EO KIXCore-capeIT
-            }
-        }
-    }
 
     if ( $Self->{SessionID} && $Self->{UserChallengeToken} ) {
         $Self->{ChallengeTokenParam} = "ChallengeToken=$Self->{UserChallengeToken};";
@@ -1357,142 +1294,6 @@ sub Header {
             );
             next MODULE if !$Object;
             $Object->Run( %Param, Config => $Jobs{$Job} );
-        }
-    }
-
-    # run tool bar item modules
-    if ( $Self->{UserID} && $Self->{UserType} eq 'User' ) {
-        my $ToolBarModule = $ConfigObject->Get('Frontend::ToolBarModule');
-        if ( $Param{ShowToolbarItems} && ref $ToolBarModule eq 'HASH' ) {
-
-            $Self->Block(
-                Name => 'ToolBar',
-                Data => \%Param,
-            );
-
-            my %Modules;
-            my %Jobs = %{$ToolBarModule};
-
-            # get group object
-            my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
-
-            MODULE:
-            for my $Job ( sort keys %Jobs ) {
-
-                # load and run module
-                next MODULE if !$MainObject->Require( $Jobs{$Job}->{Module} );
-                my $Object = $Jobs{$Job}->{Module}->new(
-                    %{$Self},    # UserID etc.
-                );
-                next MODULE if !$Object;
-
-                my $ToolBarAccessOk;
-
-                # if group restriction for tool-bar is set, check user permission
-                if ( $Jobs{$Job}->{Group} ) {
-
-                    # remove white-spaces
-                    $Jobs{$Job}->{Group} =~ s{\s}{}xmsg;
-
-                    # get group configurations
-                    my @Items = split( ';', $Jobs{$Job}->{Group} );
-
-                    ITEM:
-                    for my $Item (@Items) {
-
-                        # split values into permission and group
-                        my ( $Permission, $GroupName ) = split( ':', $Item );
-
-                        # log an error if not valid setting
-                        if ( !$Permission || !$GroupName ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                                Priority => 'error',
-                                Message  => "Invalid config for ToolBarModule $Job - Key Group: '$Item'! "
-                                    . "Need something like 'Permission:Group;'",
-                            );
-                        }
-
-                        # get groups for current user
-                        my %Groups = $GroupObject->PermissionUserGet(
-                            UserID => $Self->{UserID},
-                            Type   => $Permission,
-                        );
-
-                        # next job if user have not groups
-                        next ITEM if !%Groups;
-
-                        # check user belongs to the correct group
-                        my %GroupsReverse = reverse %Groups;
-                        next ITEM if !$GroupsReverse{$GroupName};
-
-                        $ToolBarAccessOk = 1;
-
-                        last ITEM;
-                    }
-
-                    # go to the next module if not permissions
-                    # for the current one
-                    next MODULE if !$ToolBarAccessOk;
-                }
-
-                %Modules = ( $Object->Run( %Param, Config => $Jobs{$Job} ), %Modules );
-            }
-
-            # show tool bar items
-            MODULE:
-            for my $Key ( sort keys %Modules ) {
-                next MODULE if !%{ $Modules{$Key} };
-                $Self->Block(
-                    Name => $Modules{$Key}->{Block},
-                    Data => {
-                        %{ $Modules{$Key} },
-                        AccessKeyReference => $Modules{$Key}->{AccessKey}
-                        ? " ($Modules{$Key}->{AccessKey})"
-                        : '',
-                    },
-                );
-            }
-            
-            # set toolbar position from UserPreferences
-            my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->GetPreferences(
-                UserID => $Self->{UserID},
-            );
-            # enforce default if empty
-            if (!$UserPreferences{UserToolbarPosition}) {
-                $UserPreferences{UserToolbarPosition} = 'ToolbarRight';
-                my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->SetPreferences(
-                    Key    => 'UserToolbarPosition',
-                    Value  => $UserPreferences{UserToolbarPosition},
-                    UserID => $Self->{UserID},
-                );
-            }
-            $Param{UserToolbarPosition} = $UserPreferences{UserToolbarPosition};
-        }
-
-        # show logged in notice
-        if ( $Param{ShowPrefLink} ) {
-            $Self->Block(
-                Name => 'Login',
-                Data => \%Param,
-            );
-        }
-        else {
-            $Self->Block(
-                Name => 'LoginWithoutLink',
-                Data => \%Param,
-            );
-        }
-
-        # show logout button (if registered)
-        if (
-            $Param{ShowLogoutButton}
-            && $ConfigObject->Get('Frontend::Module')->{Logout}
-            )
-        {
-            $Self->Block(
-                Name => 'Logout',
-                Data => \%Param,
-            );
         }
     }
 
@@ -2341,7 +2142,7 @@ sub NoPermission {
 check if access to a frontend module exists
 
     my $Access = $LayoutObject->Permission(
-        Action => 'AdminCustomerUser',
+        Action => 'AdminContact',
         Type   => 'rw', # ro|rw possible
     );
 
@@ -3541,7 +3342,7 @@ sub CustomerLogin {
         # show 2 factor password input if we have at least one backend enabled
         COUNT:
         for my $Count ( '', 1 .. 10 ) {
-            next COUNT if !$ConfigObject->Get("Customer::AuthTwoFactorModule$Count");
+            next COUNT if !$ConfigObject->Get("Contact::AuthTwoFactorModule$Count");
 
             $Self->Block(
                 Name => 'AuthTwoFactor',
@@ -3553,8 +3354,8 @@ sub CustomerLogin {
         # get lost password output
         if (
             $ConfigObject->Get('CustomerPanelLostPassword')
-            && $ConfigObject->Get('Customer::AuthModule') eq
-            'Kernel::System::CustomerAuth::DB'
+            && $ConfigObject->Get('Contact::AuthModule') eq
+            'Kernel::System::ContactAuth::DB'
             )
         {
             $Self->Block(
@@ -3570,8 +3371,8 @@ sub CustomerLogin {
         # get create account output
         if (
             $ConfigObject->Get('CustomerPanelCreateAccount')
-            && $ConfigObject->Get('Customer::AuthModule') eq
-            'Kernel::System::CustomerAuth::DB'
+            && $ConfigObject->Get('Contact::AuthModule') eq
+            'Kernel::System::ContactAuth::DB'
             )
 
         {
@@ -3879,289 +3680,6 @@ sub CustomerFatalError {
     $Output .= $Self->CustomerFooter();
     $Self->Print( Output => \$Output );
     exit;
-}
-
-sub CustomerNavigationBar {
-    my ( $Self, %Param ) = @_;
-
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-
-    # create menu items
-    my %NavBarModule;
-    my $FrontendModuleConfig = $ConfigObject->Get('CustomerFrontend::Module');
-
-    MODULE:
-    for my $Module ( sort keys %{$FrontendModuleConfig} ) {
-        my %Hash = %{ $FrontendModuleConfig->{$Module} };
-        next MODULE if !$Hash{NavBar};
-        next MODULE if ref $Hash{NavBar} ne 'ARRAY';
-
-        my @Items = @{ $Hash{NavBar} };
-
-        ITEM:
-        for my $Item (@Items) {
-            next ITEM if !$Item;
-
-            # check permissions
-            my $Shown = 0;
-
-            # get permissions from module if no permissions are defined for the icon
-            if ( !$Item->{GroupRo} && !$Item->{Group} ) {
-                if ( $Hash{GroupRo} ) {
-                    $Item->{GroupRo} = $Hash{GroupRo};
-                }
-                if ( $Hash{Group} ) {
-                    $Item->{Group} = $Hash{Group};
-                }
-            }
-
-            # check shown permission
-            PERMISSION:
-            for my $Permission (qw(GroupRo Group)) {
-
-                # array access restriction
-                if ( $Item->{$Permission} && ref $Item->{$Permission} eq 'ARRAY' ) {
-                    for my $Type ( @{ $Item->{$Permission} } ) {
-                        my $Key = 'UserIs' . $Permission . '[' . $Type . ']';
-                        if ( $Self->{$Key} && $Self->{$Key} eq 'Yes' ) {
-                            $Shown = 1;
-                            last PERMISSION;
-                        }
-                    }
-                }
-
-                # scalar access restriction
-                elsif ( $Item->{$Permission} ) {
-                    my $Key = 'UserIs' . $Permission . '[' . $Item->{$Permission} . ']';
-                    if ( $Self->{$Key} && $Self->{$Key} eq 'Yes' ) {
-                        $Shown = 1;
-                        last PERMISSION;
-                    }
-                }
-
-                # no access restriction
-                elsif ( !$Item->{GroupRo} && !$Item->{Group} ) {
-                    $Shown = 1;
-                    last PERMISSION;
-                }
-            }
-            next ITEM if !$Shown;
-
-            # set prio of item
-            my $Key = sprintf( "%07d", $Item->{Prio} );
-            COUNT:
-            for ( 1 .. 51 ) {
-                last COUNT if !$NavBarModule{$Key};
-
-                $Item->{Prio}++;
-            }
-
-            if ( $Item->{Type} eq 'Menu' ) {
-                $NavBarModule{ sprintf( "%07d", $Item->{Prio} ) } = $Item;
-            }
-
-            # show as sub of main menu
-            elsif ( $Item->{Type} eq 'Submenu' ) {
-                $NavBarModule{Sub}->{ $Item->{NavBar} }->{ sprintf( "%07d", $Item->{Prio} ) } = $Item;
-            }
-            else {
-                $NavBarModule{ sprintf( "%07d", $Item->{Prio} ) } = $Item;
-            }
-        }
-    }
-
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
-
-    # run menu item modules
-    if ( ref $ConfigObject->Get('CustomerFrontend::NavBarModule') eq 'HASH' ) {
-        my %Jobs = %{ $ConfigObject->Get('CustomerFrontend::NavBarModule') };
-        for my $Job ( sort keys %Jobs ) {
-
-            # load module
-            if ( !$MainObject->Require( $Jobs{$Job}->{Module} ) ) {
-                $Self->FatalError();
-            }
-            my $Object = $Jobs{$Job}->{Module}->new(
-                %{$Self},
-                LayoutObject => $Self,
-                UserID       => $Self->{UserID},
-                Debug        => $Self->{Debug},
-            );
-
-            # run module
-            %NavBarModule = (
-                %NavBarModule,
-                $Object->Run(
-                    %Param,
-                    Config       => $Jobs{$Job},
-                    NavBarModule => \%NavBarModule || {},
-                ),
-            );
-        }
-    }
-
-    my $Total   = keys %NavBarModule;
-    my $Counter = 0;
-
-    if ( $NavBarModule{Sub} ) {
-        $Total = int($Total) - 1;
-    }
-
-    # Only highlight the first matched navigation entry. If there are several entries
-    #   with the same Action and Subaction, it cannot be determined which one was used.
-    #   Therefore we just highlight the first one.
-    my $SelectedFlag;
-
-    ITEM:
-    for my $Item ( sort keys %NavBarModule ) {
-        next ITEM if !%{ $NavBarModule{$Item} };
-        next ITEM if $Item eq 'Sub';
-        $Counter++;
-        my $Sub;
-        if ( $NavBarModule{$Item}->{NavBar} ) {
-            $Sub = $NavBarModule{Sub}->{ $NavBarModule{$Item}->{NavBar} };
-        }
-
-        # highlight active link
-        $NavBarModule{$Item}->{Class} = '';
-        if ( $NavBarModule{$Item}->{Link} ) {
-            if (
-                !$SelectedFlag
-                && $NavBarModule{$Item}->{Link} =~ /Action=$Self->{Action}/
-                && $NavBarModule{$Item}->{Link} =~ /$Self->{Subaction}/    # Subaction can be empty
-                )
-            {
-                $NavBarModule{$Item}->{Class} .= ' Selected';
-                $SelectedFlag = 1;
-            }
-        }
-        if ( $Counter == $Total ) {
-            $NavBarModule{$Item}->{Class} .= ' Last';
-        }
-        $Self->Block(
-            Name => $NavBarModule{$Item}->{Block} || 'Item',
-            Data => $NavBarModule{$Item},
-        );
-
-        # show sub menu
-        next ITEM if !$Sub;
-        $Self->Block(
-            Name => 'ItemAreaSub',
-            Data => $Item,
-        );
-        for my $Key ( sort keys %{$Sub} ) {
-            my $ItemSub = $Sub->{$Key};
-            $ItemSub->{NameForID} = $ItemSub->{Name};
-            $ItemSub->{NameForID} =~ s/[ &;]//ig;
-            $ItemSub->{NameTop} = $NavBarModule{$Item}->{NameForID};
-
-            # check if we must mark the parent element as selected
-            if ( $ItemSub->{Link} ) {
-                if (
-                    $ItemSub->{Link} =~ /Action=$Self->{Action}/
-                    && $ItemSub->{Link} =~ /$Self->{Subaction}/    # Subaction can be empty
-                    )
-                {
-                    $NavBarModule{$Item}->{Class} .= ' Selected';
-                    $ItemSub->{Class} .= ' SubSelected';
-                    $SelectedFlag = 1;
-                }
-            }
-
-            $Self->Block(
-                Name => 'ItemAreaSubItem',
-                Data => {
-                    %$ItemSub,
-                    AccessKeyReference => $ItemSub->{AccessKey} ? " ($ItemSub->{AccessKey})" : '',
-                },
-            );
-        }
-    }
-
-    # run notification modules
-    my $FrontendNotifyModuleConfig = $ConfigObject->Get('CustomerFrontend::NotifyModule');
-    if ( ref $FrontendNotifyModuleConfig eq 'HASH' ) {
-        my %Jobs = %{$FrontendNotifyModuleConfig};
-
-        NOTIFICATIONMODULE:
-        for my $Job ( sort keys %Jobs ) {
-
-            # load module
-            next NOTIFICATIONMODULE if !$MainObject->Require( $Jobs{$Job}->{Module} );
-            my $Object = $Jobs{$Job}->{Module}->new(
-                %{$Self},
-                LayoutObject => $Self,
-            );
-            next NOTIFICATIONMODULE if !$Object;
-
-            # run module
-            $Param{Notification} .= $Object->Run( %Param, Config => $Jobs{$Job} );
-        }
-    }
-
-    # create the customer user login info (usually at the right side of the navigation bar)
-    if ( !$Self->{UserLoginIdentifier} ) {
-        $Param{UserLoginIdentifier} = $Self->{UserEmail} ne $Self->{UserCustomerID}
-            ?
-            "( $Self->{UserEmail} / $Self->{UserCustomerID} )"
-            : $Self->{UserEmail};
-    }
-    else {
-        $Param{UserLoginIdentifier} = $Self->{UserLoginIdentifier};
-    }
-
-    # only on valid session
-    if ( $Self->{UserID} ) {
-
-        # show logout button (if registered)
-        if ( $FrontendModuleConfig->{Logout} ) {
-            $Self->Block(
-                Name => 'Logout',
-                Data => \%Param,
-            );
-        }
-
-        # show preferences button (if registered)
-        if ( $FrontendModuleConfig->{CustomerPreferences} ) {
-            if ( $Self->{Action} eq 'CustomerPreferences' ) {
-                $Param{Class} = 'Selected';
-            }
-            $Self->Block(
-                Name => 'Preferences',
-                Data => \%Param,
-            );
-        }
-
-        # Show open chat requests (if chat engine is active).
-        if ( $Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::Chat', Silent => 1 ) ) {
-            if ( $ConfigObject->Get('ChatEngine::Active') ) {
-                my $ChatObject = $Kernel::OM->Get('Kernel::System::Chat');
-                my $Chats      = $ChatObject->ChatList(
-                    Status        => 'request',
-                    TargetType    => 'Customer',
-                    ChatterID     => $Self->{UserID},
-                    ChatterType   => 'Customer',
-                    ChatterActive => 0,
-                );
-
-                my $Count = scalar $Chats;
-
-                $Self->Block(
-                    Name => 'ChatRequests',
-                    Data => {
-                        Count => $Count,
-                        Class => ($Count) ? '' : 'Hidden',
-                    },
-                );
-            }
-        }
-    }
-
-    # create & return output
-    return $Self->Output(
-        TemplateFile => 'CustomerNavigationBar',
-        Data         => \%Param
-    );
 }
 
 sub CustomerError {
@@ -5492,16 +5010,17 @@ sub TransfromDateSelection {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

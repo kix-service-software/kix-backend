@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#SystemAddressPatchRequest",
+  "type": "object",
+  "description": "The system address request object for update.",
+  "properties": {
+    "SystemAddress": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Realname": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "SystemAddress"
+  ]
+}

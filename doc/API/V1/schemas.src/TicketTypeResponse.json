@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TicketTypeResponse",
+  "type": "object",
+  "description": "A response for ticket type GET request.",
+  "properties": {
+    "TicketType": {
+      "$ref": "TicketType.json"
+    }
+  },
+  "required": [
+    "TicketType"
+  ]
+}

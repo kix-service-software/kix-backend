@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::TicketExtensionsKIX4OTRS;
@@ -490,6 +490,11 @@ sub ArticleMove {
         }
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # update article data
     return 'MoveFailed' if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => "UPDATE article SET ticket_id = ?, "
@@ -515,6 +520,20 @@ sub ArticleMove {
             ArticleID => $Param{ArticleID},
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -602,7 +621,7 @@ sub ArticleCopy {
     delete $Self->{ 'Cache::GetTicket' . $Param{TicketID} };
 
     # copy plain article if exists
-    if ( $Article{ArticleType} =~ /email/i ) {
+    if ( $Article{Channel} =~ /email/i ) {
         my $Data = $Self->ArticlePlain(
             ArticleID => $Param{ArticleID}
         );
@@ -735,6 +754,14 @@ sub ArticleCreateDateUpdate {
         },
         UserID => $Param{UserID},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+    );
+
     return 1;
 }
 
@@ -762,6 +789,11 @@ sub ArticleFlagDataSet {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # db quote
     for my $Quote (qw(Notes Subject Keywords Key)) {
@@ -795,6 +827,13 @@ sub ArticleFlagDataSet {
                 \$Param{ArticleID}, \$Param{Key},     \$Param{UserID}
             ],
         );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        );
     }
 
     # insert action
@@ -807,6 +846,13 @@ sub ArticleFlagDataSet {
                 \$Param{ArticleID}, \$Param{Key},  \$Param{Keywords},
                 \$Param{Subject},   \$Param{Note}, \$Param{UserID}
             ],
+        );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event     => 'CREATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -850,6 +896,11 @@ sub ArticleFlagDataDelete {
         return;
     }
 
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
     # check if UserID or AllUsers set
     if ( $Param{UserID} ) {
 
@@ -871,6 +922,13 @@ sub ArticleFlagDataDelete {
             Bind => [ \$Param{ArticleID}, \$Param{Key} ],
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Flag',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
 
     return 1;
 }
@@ -968,7 +1026,7 @@ sub SendLinkedPersonNotification {
             );
         }
         else {
-            %User = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+            %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
                 User => $RecipientID,
             );
         }
@@ -1106,16 +1164,16 @@ sub _GetUserInfoString {
     return '' if !$Param{UserType};
     my %User = %{ $Param{User} };
 
-    my %CustomerUserData
-        = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+    my %ContactData
+        = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         User => $User{UserLogin},
         );
 
     # if no customer data found use agent data
-    if ( !%CustomerUserData ) {
+    if ( !%ContactData ) {
         my @EmptyArray = ();
-        %CustomerUserData = %User;
-        $CustomerUserData{Config}->{Map} = \@EmptyArray;
+        %ContactData = %User;
+        $ContactData{Config}->{Map} = \@EmptyArray;
 
         my $AgentConfig
             = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarTicketInfo');
@@ -1129,13 +1187,13 @@ sub _GetUserInfoString {
             push @TempArray, '';
             push @TempArray, 1;
             push @TempArray, 0;
-            push @{ $CustomerUserData{Config}->{Map} }, \@TempArray;
+            push @{ $ContactData{Config}->{Map} }, \@TempArray;
         }
     }
 
     $Self->{LayoutObject} = $Param{LayoutObject};
     my $DetailsTable = $Self->{LayoutObject}->AgentCustomerDetailsViewTable(
-        Data   => \%CustomerUserData,
+        Data   => \%ContactData,
         Ticket => $Param{Ticket},
         Max =>
             $Kernel::OM->Get('Kernel::Config')
@@ -1280,16 +1338,17 @@ sub _CalcStringDistance {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

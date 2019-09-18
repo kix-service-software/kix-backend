@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::DB;
@@ -782,6 +782,72 @@ sub FetchrowArray {
     }
 
     return @Row;
+}
+
+=item FetchAllArrayRef()
+
+to process the results of a SELECT statement
+
+    $DBObject->Prepare(
+        SQL   => "SELECT id, name FROM table",
+        Limit => 10
+    );
+
+    my $Rows = $DBObject->FetchAllArrayRef(
+        Columns => [ 'ID', 'Name' ]
+    );
+
+=cut
+
+sub FetchAllArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !IsArrayRefWithData($Param{Columns}) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need Columns!',
+        );
+        return;
+    }
+
+    if ( $Self->{_PreparedOnSlaveDB} ) {
+        return $Self->{SlaveDBObject}->FetchAllArrayRef();
+    }
+
+    # work with cursors if database don't support limit
+    if ( !$Self->{Backend}->{'DB::Limit'} && $Self->{Limit} ) {
+        if ( $Self->{Limit} <= $Self->{LimitCounter} ) {
+            $Self->{Cursor}->finish();
+            return;
+        }
+        $Self->{LimitCounter}++;
+    }
+
+    # fetch
+    my $Rows = $Self->{Cursor}->fetchall_arrayref();
+
+    # get encode object
+    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+
+    my $DoEncode = $Self->{Backend}->{'DB::Encode'};
+
+    # map columns
+    my @Result;
+    foreach my $Row ( @{$Rows} ) {
+        my %RowData;
+        my $Counter = 0;
+        foreach my $Column ( @{$Param{Columns}} ) {
+            $RowData{$Column} = $Row->[$Counter++];
+            if ( $DoEncode ) {
+                # set utf-8 flag
+                $EncodeObject->EncodeInput( \$RowData{$Column} );
+            }
+        }
+        push(@Result, \%RowData);
+    }
+
+    return \@Result;
 }
 
 =item GetColumnNames()
@@ -1804,16 +1870,17 @@ sub DESTROY {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

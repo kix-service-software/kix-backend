@@ -1,0 +1,27 @@
+{
+    "Notification": {
+        "ChangeBy": 1,
+        "ChangeTime": "2019-06-28 16:04:57",
+        "Comment": "",
+        "CreateBy": 1,
+        "CreateTime": "2019-06-28 16:04:57",
+        "Data": {
+            "Events": [
+                "TicketQueueUpdate"
+            ],
+            "Queues": [
+                "Postmaster"
+            ]
+        },
+        "ID": 131,
+        "Message": {
+            "de": {
+                "Body": "something to tell...",
+                "ContentType": "text/plain",
+                "Subject": "test"
+            }
+        },
+        "Name": "test",
+        "ValidID": 1
+    }
+}

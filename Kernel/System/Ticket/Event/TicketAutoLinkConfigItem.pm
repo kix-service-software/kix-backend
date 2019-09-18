@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Event::TicketAutoLinkConfigItem;
@@ -64,9 +64,6 @@ sub Run {
     my $CISearchPatternRef =
         $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::CISearchPattern');
 
-    my @ArticleTypes =
-        @{ $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::ArticleTypesCISearchPattern') };
-
     my $OnlyFirstArticle =
         $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::FirstArticleOnly');
 
@@ -103,9 +100,6 @@ sub Run {
             ArticleID => $Param{Data}->{ArticleID},
             UserID    => 1,
         );
-
-        # check article type...
-        return 0 if ( join( ',', @ArticleTypes ) !~ /(^|.*,)$ArticleData{ArticleType}(,.*|$)/ );
 
         # check if it's the first article...
         if ($OnlyFirstArticle) {
@@ -310,7 +304,7 @@ sub Run {
                                 $Self->{LinkObject}->LinkAdd(
                                     SourceObject => 'Ticket',
                                     SourceKey    => $Param{Data}->{TicketID},
-                                    TargetObject => 'ITSMConfigItem',
+                                    TargetObject => 'ConfigItem',
                                     TargetKey    => $ConfigItemID,
                                     Type         => $LinkType,
                                     UserID       => 1,
@@ -395,16 +389,17 @@ sub _ExportXMLSearchDataPrepare {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#OrganisationResponse",
+  "type": "object",
+  "description": "A response for organisation GET request.",
+  "properties": {
+    "Organisation": {
+      "$ref": "Organisation.json"
+    }
+  },
+  "required": [
+    "Organisation"
+  ]
+}

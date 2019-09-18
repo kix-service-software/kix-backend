@@ -1,0 +1,18 @@
+{
+  "Organisation": {
+    "ChangeBy": 1,
+    "ChangeTime": "2019-03-12 18:24:18",
+    "City": "Rostock",
+    "Comment": "",
+    "Country": "Germany",
+    "CreateBy": 1,
+    "CreateTime": "2018-11-01 14:21:35",
+    "ID": 10,
+    "Name": "Albatros Reederei",
+    "Number": "ALB",
+    "Street": "Kurfürstendamm 89",
+    "Url": "http://www.albatros-shipping.eu",
+    "ValidID": 1,
+    "Zip": "18010"
+  }
+}

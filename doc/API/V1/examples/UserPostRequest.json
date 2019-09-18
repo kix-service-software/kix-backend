@@ -1,0 +1,11 @@
+{
+    "User": {
+        "UserEmail": "john.doe@example.com",
+        "UserFirstname": "John",
+        "UserLastname": "Doe",
+        "UserLogin": "jdoe",
+        "UserPw": "secret",
+        "UserTitle": "Dr.",
+        "ValidID": 1
+    }
+}

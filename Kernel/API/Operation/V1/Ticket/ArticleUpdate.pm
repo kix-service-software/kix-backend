@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleUpdate;
@@ -113,8 +111,9 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
                 TicketID                        => 123,                        # optional, used to move the article to another ticket
-                ArticleTypeID                   => 123,                        # optional
-                ArticleType                     => 'some article type name',   # optional
+                ChannelID                       => 123,                        # optional
+                Channel                         => 'some channel name',        # optional
+                CustomerVisible                 => 0|1,                        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 From                            => 'some from string',         # optional
@@ -144,27 +143,10 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        # customers are not allowed to update articles
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'No permission to update article!',
-        );        
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
+    # isolate and trim Article parameter
+    my $Article = $Self->_Trim(
+        Data => $Param{Data}->{Article}
     );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to update article!",
-        );
-    }
 
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
@@ -177,16 +159,14 @@ sub Run {
     # check if article exists
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            Code => 'Object.NotFound',
         );
     }
 
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -194,7 +174,7 @@ sub Run {
     return $Self->_ArticleUpdate(
         TicketID  => $Param{Data}->{TicketID},
         ArticleID => $Param{Data}->{ArticleID},
-        Article   => $Param{Data}->{Article},
+        Article   => $Article,
         UserID    => $Self->{Authorization}->{UserID},
     );
 }
@@ -237,8 +217,8 @@ sub _ArticleUpdate {
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # update normal attributes
-    foreach my $Attribute ( qw(Subject Body From ArticleType ArticleTypeID SenderType SenderTypeID) ) {
-        next if !$Article->{$Attribute};
+    foreach my $Attribute ( qw(Subject Body From ChannelID Channel CustomerVisible SenderType SenderTypeID) ) {
+        next if !defined $Article->{$Attribute};
 
         my $Success = $TicketObject->ArticleUpdate(
             ArticleID => $Param{ArticleID},
@@ -322,8 +302,6 @@ sub _ArticleUpdate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
-            next DYNAMICFIELD if !$Self->ValidateDynamicFieldObjectType( %{$DynamicField} );
-
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
                 ArticleID => $Param{ArticleID},
@@ -351,16 +329,17 @@ sub _ArticleUpdate {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

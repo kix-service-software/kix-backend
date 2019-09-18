@@ -1,17 +1,14 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ObjectManager;
-## nofilter(TidyAll::Plugin::OTRS::Perl::PodSpelling)
-## nofilter(TidyAll::Plugin::OTRS::Perl::Require)
-## nofilter(TidyAll::Plugin::OTRS::Perl::SyntaxCheck)
 
 use strict;
 use warnings;
@@ -28,7 +25,6 @@ use Kernel::System::Auth;
 use Kernel::System::Cache;
 use Kernel::System::DB;
 use Kernel::System::Encode;
-use Kernel::System::Group;
 use Kernel::System::Log;
 use Kernel::System::Main;
 use Kernel::System::Time;
@@ -51,7 +47,7 @@ Kernel::System::ObjectManager - object and dependency manager
 
 =head1 SYNOPSIS
 
-The ObjectManager is the central place to create and access singleton OTRS objects.
+The ObjectManager is the central place to create and access singleton KIX objects.
 
 =head2 How does it work?
 
@@ -60,13 +56,13 @@ are destroyed in the correct order, based on their dependencies (see below).
 
 =head2 How to use it?
 
-The ObjectManager must always be provided to OTRS by the toplevel script like this:
+The ObjectManager must always be provided to KIX by the toplevel script like this:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         # options for module constructors here
         LogObject {
-            LogPrefix => 'OTRS-MyTestScript',
+            LogPrefix => 'KIX-MyTestScript',
         },
     );
 
@@ -121,7 +117,7 @@ The hash reference will be flattened and passed to the constructor of the object
 
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         Kernel::System::Log => {
-            LogPrefix => 'OTRS-MyTestScript',
+            LogPrefix => 'KIX-MyTestScript',
         },
     );
 
@@ -148,14 +144,7 @@ sub new {
     #   already create an instance here to make sure it is always done and done
     #   at the beginning of things.
     $Self->Get('Kernel::System::Encode');
-
-    $Self->{PerfLogConfig} = $Self->Get('Kernel::Config')->Get('PerfLogConfig');
-
-    # init PerfLog
-    if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{OutputTo}) {
-        $Self->{PerfLogFile} = $Self->{PerfLogConfig}->{OutputTo};
-    }
-
+    
     return $Self;
 }
 
@@ -307,32 +296,41 @@ sub _ObjectBuild {
 
     $Self->{Objects}->{$Package} = $NewObject;
 
-    # check if we have to wrap a method for performance logging
-    if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{Methods} && $Self->{PerfLogConfig}->{Methods}->{$Package} && ref $Self->{PerfLogConfig}->{Methods}->{$Package} eq 'HASH') {
-        my $PreparedCount = 0;
-        foreach my $Method ( sort keys %{$Self->{PerfLogConfig}->{Methods}->{$Package}} ) {
-            my $PackageMethod = "$Package::$Method";
-            next if $PerfLogWrappedMethods{"$PackageMethod"};
+    # TODO
+    # # check if we have to wrap a method for performance logging
+    # if ( !$Self->{StartUp} && !$Self->{PerfLogConfig} ) {
+    #     $Self->{PerfLogConfig} = $Self->Get('Kernel::Config')->Get('PerfLogConfig') || {};
 
-            if (!$PreparedCount++) {
-                print STDERR "preparing package $Package for performance logging\n";
-            }
+    #     # init PerfLog
+    #     if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{OutputTo}) {
+    #         $Self->{PerfLogFile} = $Self->{PerfLogConfig}->{OutputTo};
+    #     }
+    # }
+    # if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{Methods} && $Self->{PerfLogConfig}->{Methods}->{$Package} && ref $Self->{PerfLogConfig}->{Methods}->{$Package} eq 'HASH') {
+    #     my $PreparedCount = 0;
+    #     foreach my $Method ( sort keys %{$Self->{PerfLogConfig}->{Methods}->{$Package}} ) {
+    #         my $PackageMethod = "$Package::$Method";
+    #         next if $PerfLogWrappedMethods{"$PackageMethod"};
 
-            print STDERR "    hooking method $Method...";
+    #         if (!$PreparedCount++) {
+    #             print STDERR "preparing package $Package for performance logging\n";
+    #         }
 
-            my $ReturnType = $Self->{PerfLogConfig}->{Methods}->{$Package}->{$Method};
+    #         print STDERR "    hooking method $Method...";
 
-            $PerfLogWrappedMethods{"$PackageMethod"} = \&$PackageMethod;
-            no strict 'refs';
-            no warnings 'redefine';
-            *{$PackageMethod} = sub {
-                my ($ObjRef, %Param) = @_;
-                Kernel::System::ObjectManager::_PerfLogMethodWrapper($Self, "$PackageMethod", $ReturnType, $ObjRef, %Param);
-            };
+    #         my $ReturnType = $Self->{PerfLogConfig}->{Methods}->{$Package}->{$Method};
 
-            print STDERR "OK\n";
-        }
-    }
+    #         $PerfLogWrappedMethods{"$PackageMethod"} = \&$PackageMethod;
+    #         no strict 'refs';
+    #         no warnings 'redefine';
+    #         *{$PackageMethod} = sub {
+    #             my ($ObjRef, %Param) = @_;
+    #             Kernel::System::ObjectManager::_PerfLogMethodWrapper($Self, "$PackageMethod", $ReturnType, $ObjRef, %Param);
+    #         };
+
+    #         print STDERR "OK\n";
+    #     }
+    # }
 
     return $NewObject;
 }
@@ -487,7 +485,7 @@ sub ObjectsDiscard {
         push @AllObjects, $Object;
     }
 
-    # During an OTRS package upgrade the packagesetup code module has just
+    # During a KIX package upgrade the packagesetup code module has just
     # recently been copied to it's location in the file system.
     # In a persistent Perl environment an old version of the module might still be loaded,
     # as watchdogs like Apache2::Reload haven't had a chance to reload it.
@@ -685,16 +683,17 @@ sub DESTROY {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::PostMaster::Filter::MatchDBSource;
@@ -13,10 +13,7 @@ package Kernel::System::PostMaster::Filter::MatchDBSource;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::PostMaster::Filter',
-);
+our @ObjectDependencies = ( 'Kernel::System::Log', 'Kernel::System::PostMaster::Filter', );
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -56,7 +53,7 @@ sub Run {
     for ( sort keys %JobList ) {
 
         # get config options
-        my %Config = $PostMasterFilter->FilterGet( Name => $_ );
+        my %Config = $PostMasterFilter->FilterGet( ID => $_ );
 
         my %Match;
         my %Set;
@@ -82,7 +79,7 @@ sub Run {
             if ( defined $Param{GetParam}->{$_} && $Match{$_} =~ /^EMAILADDRESS:(.*)$/ ) {
                 my $SearchEmail    = $1;
                 my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
-                    Line => $Param{GetParam}->{$_},
+                    Line => $Param{GetParam}->{$_}
                 );
                 my $LocalMatched;
                 RECIPIENT:
@@ -120,11 +117,10 @@ sub Run {
 
             # match string
             elsif (
-                defined $Param{GetParam}->{$_} &&
-                (
+                defined $Param{GetParam}->{$_}
+                && (
                     ( !$Config{Not}->{$_} && $Param{GetParam}->{$_} =~ m{$Match{$_}}i )
-                    ||
-                    ( $Config{Not}->{$_} && $Param{GetParam}->{$_} !~ m{$Match{$_}}i )
+                    || ( $Config{Not}->{$_} && $Param{GetParam}->{$_} !~ m{$Match{$_}}i )
                 )
                 )
             {
@@ -186,17 +182,16 @@ sub Run {
 1;
 
 
-
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

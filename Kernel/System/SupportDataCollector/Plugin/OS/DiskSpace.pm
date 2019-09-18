@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::SupportDataCollector::Plugin::OS::DiskSpace;
@@ -37,11 +37,11 @@ sub Run {
         return $Self->GetResults();
     }
 
-    # find OTRS partition
+    # find KIX partition
     my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
 
-    my $OTRSPartition = `df -P $Home | tail -1 | cut -d' ' -f 1`;
-    chomp $OTRSPartition;
+    my $Partition = `df -P $Home | tail -1 | cut -d' ' -f 1`;
+    chomp $Partition;
 
     my $Commandline = "df -lx tmpfs -x iso9660 -x udf -x squashfs";
 
@@ -57,7 +57,7 @@ sub Run {
 
         # TODO change from percent to megabytes used.
         while (<$In>) {
-            if ( $_ =~ /^$OTRSPartition\s.*/ && $_ =~ /^(.+?)\s.*\s(\d+)%.+?$/ ) {
+            if ( $_ =~ /^$Partition\s.*/ && $_ =~ /^(.+?)\s.*\s(\d+)%.+?$/ ) {
                 my ( $Partition, $UsedPercent ) = $_ =~ /^(.+?)\s.*?\s(\d+)%.+?$/;
                 if ( $UsedPercent > 90 ) {
                     push @ProblemPartitions, "$Partition \[$UsedPercent%\]";
@@ -74,14 +74,14 @@ sub Run {
                 $Self->AddResultProblem(
                     Label   => Translatable('Disk Usage'),
                     Value   => join( ', ', @ProblemPartitions ),
-                    Message => Translatable('The partition where OTRS is located is almost full.'),
+                    Message => Translatable('The partition where KIX is located is almost full.'),
                 );
             }
             else {
                 $Self->AddResultWarning(
                     Label   => Translatable('Disk Usage'),
                     Value   => join( ', ', @ProblemPartitions ),
-                    Message => Translatable('The partition where OTRS is located is almost full.'),
+                    Message => Translatable('The partition where KIX is located is almost full.'),
                 );
             }
         }
@@ -89,7 +89,7 @@ sub Run {
             $Self->AddResultOk(
                 Label   => Translatable('Disk Usage'),
                 Value   => '',
-                Message => Translatable('The partition where OTRS is located has no disk space problems.'),
+                Message => Translatable('The partition where KIX is located has no disk space problems.'),
             );
         }
     }
@@ -101,16 +101,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

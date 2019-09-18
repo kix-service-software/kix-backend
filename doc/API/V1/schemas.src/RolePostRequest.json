@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#RolePostRequest",
+  "type": "object",
+  "description": "The role request object for creation.",
+  "properties": {
+    "Role": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },         
+        "Permissions": {
+          "type": "array",
+          "item": {
+            "$ref": "PermissionPostItem.json"
+          }
+        },    
+        "UserIDs": {
+          "type": "array",
+          "item": {
+            "type": "integer"
+          }
+        },    
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Name",
+        "ValidID"
+      ]
+    }
+  },
+  "required": [
+    "Role"
+  ]
+}

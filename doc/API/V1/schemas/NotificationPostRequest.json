@@ -1,0 +1,72 @@
+{
+   "$id" : "#NotificationPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The notification request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Notification" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Data" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            "Message" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "object",
+                     "properties" : {
+                        "Body" : {
+                           "type" : "string"
+                        },
+                        "ContentType" : {
+                           "type" : "string"
+                        },
+                        "Subject" : {
+                           "type" : "string"
+                        }
+                     },
+                     "required" : [
+                        "Body",
+                        "ContentType",
+                        "Subject"
+                     ]
+                  }
+               }
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Data",
+            "Message",
+            "Name"
+         ]
+      }
+   },
+   "required" : [
+      "Notification"
+   ]
+}

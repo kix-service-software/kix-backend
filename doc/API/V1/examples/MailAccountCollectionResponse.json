@@ -1,0 +1,20 @@
+{
+    "MailAccount": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-05-29 13:13:09",
+            "Comment": "",
+            "CreateBy": 1,
+            "CreateTime": "2018-01-03 14:47:10",
+            "DispatchingBy": "From",
+            "Host": "somehost",
+            "ID": 2,
+            "IMAPFolder": "INBOX",
+            "Login": "test",
+            "QueueID": 0,
+            "Trusted": 0,
+            "Type": "IMAP",
+            "ValidID": 1
+        }
+    ]
+}

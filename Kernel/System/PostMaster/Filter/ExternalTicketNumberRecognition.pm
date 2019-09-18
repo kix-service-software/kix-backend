@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition;
@@ -36,7 +36,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # checking mandatory configuration options
-    for my $Option (qw(NumberRegExp DynamicFieldName SenderType ArticleType)) {
+    for my $Option (qw(NumberRegExp DynamicFieldName SenderType Channel)) {
         if ( !defined $Param{JobConfig}->{$Option} && !$Param{JobConfig}->{$Option} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -208,16 +208,16 @@ sub Run {
         my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider');
         $Param{GetParam}->{Subject} .= " [$TicketHook$TicketHookDivider$TicketNumber]";
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
         # set sender type and article type.
         $Param{GetParam}->{'X-KIX-FollowUp-SenderType'}  = $Param{JobConfig}->{SenderType};
-        $Param{GetParam}->{'X-KIX-FollowUp-ArticleType'} = $Param{JobConfig}->{ArticleType};
+        $Param{GetParam}->{'X-KIX-FollowUp-Channel'} = $Param{JobConfig}->{Channel};
+        $Param{GetParam}->{'X-KIX-FollowUp-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer};
 
         # also set these parameters. It could be that the follow up is rejected by Reject.pm
         #   (follow-ups not allowed), but the original article will still be attached to the ticket.
         $Param{GetParam}->{'X-KIX-SenderType'}  = $Param{JobConfig}->{SenderType};
-        $Param{GetParam}->{'X-KIX-ArticleType'} = $Param{JobConfig}->{ArticleType};
-
+        $Param{GetParam}->{'X-KIX-Channel'} = $Param{JobConfig}->{Channel};
+        $Param{GetParam}->{'X-KIX-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer};
     }
     else {
         if ( $Self->{Debug} >= 1 ) {
@@ -227,14 +227,14 @@ sub Run {
             );
         }
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
         # get the dynamic field name and description from JobConfig, set as headers
         my $TicketDynamicFieldName = $Param{JobConfig}->{'DynamicFieldName'};
         $Param{GetParam}->{ 'X-KIX-DynamicField-' . $TicketDynamicFieldName } = $Self->{Number};
 
         # set sender type and article type
         $Param{GetParam}->{'X-KIX-SenderType'}  = $Param{JobConfig}->{SenderType};
-        $Param{GetParam}->{'X-KIX-ArticleType'} = $Param{JobConfig}->{ArticleType};
+        $Param{GetParam}->{'X-KIX-Channel'} = $Param{JobConfig}->{Channel};
+        $Param{GetParam}->{'X-KIX-CustomerVisible'} = $Param{JobConfig}->{VisibleForCustomer};
     }
 
     return 1;
@@ -244,16 +244,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

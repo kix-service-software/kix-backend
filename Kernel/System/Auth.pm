@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Auth;
@@ -17,7 +17,6 @@ use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::Main',
     'Kernel::System::SystemMaintenance',
@@ -324,26 +323,27 @@ sub Auth {
     # check if system maintenance is active
     if ($ActiveMaintenance) {
 
-        # check if user is allow to login
-        # get current user groups
-        my %Groups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $UserID,
-            Type   => 'move_into',
-        );
+        # TODO!!! rbo-190327
+        # # check if user is allow to login
+        # # get current user groups
+        # my %Groups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+        #     UserID => $UserID,
+        #     Type   => 'move_into',
+        # );
 
-        # reverse groups hash for easy look up
-        %Groups = reverse %Groups;
+        # # reverse groups hash for easy look up
+        # %Groups = reverse %Groups;
 
-        # check if the user is in the Admin group
-        # if that is not the case return
-        if ( !$Groups{admin} ) {
+        # # check if the user is in the Admin group
+        # # if that is not the case return
+        # if ( !$Groups{admin} ) {
 
-            $Self->{LastErrorMessage} =
-                $ConfigObject->Get('SystemMaintenance::IsActiveDefaultLoginErrorMessage')
-                || Translatable("It is currently not possible to login due to a scheduled system maintenance.");
+        #     $Self->{LastErrorMessage} =
+        #         $ConfigObject->Get('SystemMaintenance::IsActiveDefaultLoginErrorMessage')
+        #         || Translatable("It is currently not possible to login due to a scheduled system maintenance.");
 
-            return;
-        }
+        #     return;
+        # }
     }
 
     # last login preferences update
@@ -379,16 +379,17 @@ sub GetLastErrorMessage {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

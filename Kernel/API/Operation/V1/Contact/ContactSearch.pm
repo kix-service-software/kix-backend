@@ -1,12 +1,9 @@
 # --
-# Kernel/API/Operation/Contact/ContactSearch.pm - API Contact Search operation backend
-# based upon Kernel/API/Operation/Ticket/TicketSearch.pm
-# original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Contact::ContactSearch;
@@ -90,26 +87,26 @@ sub Run {
 
     # prepare search if given
     my %SearchParam;
-    if ( IsHashRefWithData($Self->{Search}->{Contact}) ) {
-        foreach my $SearchType ( keys %{$Self->{Search}->{Contact}} ) {
+    if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
+        foreach my $SearchType ( keys %{ $Self->{Search}->{Contact} } ) {
             my %SearchTypeResult;
-            foreach my $SearchItem ( @{$Self->{Search}->{Contact}->{$SearchType}} ) {
+            foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
                 my $Value = $SearchItem->{Value};
 
                 if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
-                   $Value = '*' . $Value . '*';
+                    $Value = '*' . $Value . '*';
                 }
                 elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
-                   $Value = $Value . '*';
+                    $Value = $Value . '*';
                 }
                 if ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
-                   $Value = '*' . $Value;
+                    $Value = '*' . $Value;
                 }
 
-                if ($SearchItem->{Field} =~ /^(CustomerID|UserLogin)$/g) {
-                    $SearchParam{$SearchItem->{Field}} = $Value;
+                if ( $SearchItem->{Field} =~ /^(PrimaryOrganisationID|Login)$/g ) {
+                    $SearchParam{ $SearchItem->{Field} } = $Value;
                 }
-                elsif ($SearchItem->{Field} =~ /^(ValidID)$/g) {
+                elsif ( $SearchItem->{Field} =~ /^(ValidID)$/g ) {
                     $SearchParam{Valid} = $Value;
                 }
                 else {
@@ -117,8 +114,9 @@ sub Run {
                 }
 
                 # perform Contact search
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-                   %SearchParam,
+                my %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                    %SearchParam,
+                    Valid => 0
                 );
 
                 if ( $SearchType eq 'AND' ) {
@@ -133,6 +131,7 @@ sub Run {
                     }
                 }
                 elsif ( $SearchType eq 'OR' ) {
+
                     # merge results
                     %SearchTypeResult = (
                         %SearchTypeResult,
@@ -155,28 +154,30 @@ sub Run {
     }
     else {
         # perform Contact search without any search params
-        %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch();
+        %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+            Valid => 0
+        );
     }
 
-    if (IsHashRefWithData(\%ContactList)) {
+    if ( IsHashRefWithData( \%ContactList ) ) {
 
         # get already prepared Contact data from ContactGet operation
         my $ContactGetResult = $Self->ExecOperation(
             OperationType => 'V1::Contact::ContactGet',
             Data          => {
-                ContactID => join(',', sort keys %ContactList),
-            }
+                ContactID => join( ',', sort keys %ContactList ),
+                }
         );
         if ( !IsHashRefWithData($ContactGetResult) || !$ContactGetResult->{Success} ) {
             return $ContactGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($ContactGetResult->{Data}->{Contact}) ? @{$ContactGetResult->{Data}->{Contact}} : ( $ContactGetResult->{Data}->{Contact} );
-        
-        if ( IsArrayRefWithData(\@ResultList) ) {
+        my @ResultList = IsArrayRefWithData( $ContactGetResult->{Data}->{Contact} ) ? @{ $ContactGetResult->{Data}->{Contact} } : ( $ContactGetResult->{Data}->{Contact} );
+
+        if ( IsArrayRefWithData( \@ResultList ) ) {
             return $Self->_Success(
                 Contact => \@ResultList,
-            )
+                )
         }
     }
 
@@ -187,3 +188,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

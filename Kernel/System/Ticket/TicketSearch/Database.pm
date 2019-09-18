@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::TicketSearch::Database;
@@ -432,71 +430,72 @@ sub _CreatePermissionSQL {
         return;
     }
 
-    # permission check and restrictions
-    my %GroupList;
-    if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
+    # TODO!!! rbo-190327
+    # # permission check and restrictions
+    # my %GroupList;
+    # if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
 
-        # get users groups
-        %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-            UserID => $Param{UserID},
-            Type   => $Param{Permission} || 'ro',
-        );
+    #     # get users groups
+    #     %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+    #         UserID => $Param{UserID},
+    #         Type   => $Param{Permission} || 'ro',
+    #     );
 
-        # return if we have no permissions
-        return if !%GroupList;
-    }
-    if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
+    #     # return if we have no permissions
+    #     return if !%GroupList;
+    # }
+    # if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
 
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    #     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-        # get customer groups
-        %GroupList = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => $Param{Permission} || 'ro',
-            Result => 'HASH',
-        );
+    #     # get customer groups
+    #     %GroupList = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
+    #         UserID => $Param{UserID},
+    #         Type   => $Param{Permission} || 'ro',
+    #         Result => 'HASH',
+    #     );
 
-        # return if we have no permissions
-        return if !%GroupList;
+    #     # return if we have no permissions
+    #     return if !%GroupList;
 
-        # get all customer ids
-        $SQLWhere = '(';
-        my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
-            User => $Param{UserID},
-        );
+    #     # get all customer ids
+    #     $SQLWhere = '(';
+    #     my @CustomerIDs = $Kernel::OM->Get('Kernel::System::Contact')->CustomerIDs(
+    #         User => $Param{UserID},
+    #     );
 
-        if (@CustomerIDs) {
+    #     if (@CustomerIDs) {
 
-            my $Lower = '';
-            if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
-                $Lower = 'LOWER';
-            }
+    #         my $Lower = '';
+    #         if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
+    #             $Lower = 'LOWER';
+    #         }
 
-            $SQLWhere .= "$Lower(st.customer_id) IN (";
-            my $Exists = 0;
+    #         $SQLWhere .= "$Lower(st.customer_id) IN (";
+    #         my $Exists = 0;
 
-            for (@CustomerIDs) {
+    #         for (@CustomerIDs) {
 
-                if ($Exists) {
-                    $SQLWhere  .= ', ';
-                }
-                else {
-                    $Exists = 1;
-                }
-                $SQLWhere  .= "$Lower('" . $DBObject->Quote($_) . "')";
-            }
-            $SQLWhere  .= ') OR ';
-        }
+    #             if ($Exists) {
+    #                 $SQLWhere  .= ', ';
+    #             }
+    #             else {
+    #                 $Exists = 1;
+    #             }
+    #             $SQLWhere  .= "$Lower('" . $DBObject->Quote($_) . "')";
+    #         }
+    #         $SQLWhere  .= ') OR ';
+    #     }
 
-        # get all own tickets
-        my $UserIDQuoted = $DBObject->Quote( $Param{UserID} );
-        $SQLWhere  .= "st.customer_user_id = '$UserIDQuoted') ";
-    }
+    #     # get all own tickets
+    #     my $UserIDQuoted = $DBObject->Quote( $Param{UserID} );
+    #     $SQLWhere  .= "st.customer_user_id = '$UserIDQuoted') ";
+    # }
 
-    # add group ids to sql string
-    if (%GroupList) {
-        $SQLWhere = 'sq.group_id IN ('.(join(',', sort keys %GroupList)).')';
-    }
+    # # add group ids to sql string
+    # if (%GroupList) {
+    #     $SQLWhere = 'sq.group_id IN ('.(join(',', sort keys %GroupList)).')';
+    # }
 
     return $SQLWhere;
 }
@@ -722,16 +721,17 @@ sub _CreateOrderBySQL {
 =end Internal:
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

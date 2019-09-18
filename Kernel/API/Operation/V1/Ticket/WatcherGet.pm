@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::WatcherGet;
@@ -121,20 +119,6 @@ one or more ticket entries in one call.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
-    # check ticket permission
-    my $Permission = $Self->CheckAccessPermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
-        );
-    }
     
     my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
         TicketID => $Param{Data}->{TicketID},
@@ -153,8 +137,7 @@ sub Run {
 
     if ( scalar(@WatcherList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for watcher ".join(',', $Param{Data}->{WatcherID})." in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@WatcherList) == 1 ) {
@@ -173,16 +156,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

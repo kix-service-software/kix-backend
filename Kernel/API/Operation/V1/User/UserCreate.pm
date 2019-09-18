@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/User/UserCreate.pm - API User Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::User::UserCreate;
@@ -117,8 +112,15 @@ perform UserCreate Operation. This will return the created UserLogin.
                 UserPassword    => '...'                                        # optional                
                 UserPhone       => '...'                                        # optional                
                 UserTitle       => '...'                                        # optional
+                ValidID         => 1,
                 RoleIDs         => [                                            # optional          
                     123
+                ],
+                Preferences     => [                                            # optional
+                    {
+                        ID    => '...',
+                        Value => '...'
+                    }
                 ]
             },
         },
@@ -167,9 +169,9 @@ sub Run {
     
     # create User
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        ValidID      => 1,
         %{$User},
-        ChangeUserID     => $Self->{Authorization}->{UserID},
-        ValidID          => 1,
+        ChangeUserID => $Self->{Authorization}->{UserID},
     );    
     if ( !$UserID ) {
         return $Self->_Error(
@@ -178,12 +180,32 @@ sub Run {
         );
     }
 
-    # create checklist
-    if ( IsHashRefWithData($User->{RoleIDs}) ) {
+    # add preferences
+    if ( IsArrayRefWithData($User->{Preferences}) ) {
+
+        foreach my $Pref ( @{$User->{Preferences}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserPreferenceCreate',
+                Data          => {
+                    UserID         => $UserID,
+                    UserPreference => $Pref
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    ${$Result},
+                )
+            }
+        }
+    }
+
+    # assign roles
+    if ( IsArrayRefWithData($User->{RoleIDs}) ) {
 
         foreach my $RoleID ( @{$User->{RoleIDs}} ) {
             my $Result = $Self->ExecOperation(
-                OperationType => 'V1::User::UserRoleCreate',
+                OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {
                     UserID => $UserID,
                     RoleID => $RoleID,
@@ -203,3 +225,17 @@ sub Run {
         UserID => $UserID,
     );    
 }
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

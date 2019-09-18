@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Valid",
+  "type": "object",
+  "description": "The valid object.",
+  "properties": {
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    }
+  }
+}

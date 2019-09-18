@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::DynamicFieldValue;
@@ -179,6 +179,13 @@ sub ValueSet {
     # delete cache
     $Self->_DeleteFromCache(%Param);
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'DynamicField.Value',
+        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
+    );
+
     return 1;
 }
 
@@ -334,6 +341,13 @@ sub ValueDelete {
     # delete cache
     $Self->_DeleteFromCache(%Param);
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'DynamicField.Value',
+        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
+    );
+
     return 1;
 }
 
@@ -373,6 +387,13 @@ sub AllValuesDelete {
     # Cleanup entire cache!
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => 'DynamicFieldValue',
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'DynamicField.Value',
+        ObjectID  => $Param{FieldID},
     );
 
     return 1;
@@ -589,16 +610,17 @@ sub _DeleteFromCache {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

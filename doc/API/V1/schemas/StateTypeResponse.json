@@ -1,0 +1,36 @@
+{
+   "$id" : "#StateTypeResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for state type GET request.",
+   "type" : "object",
+   "properties" : {
+      "StateType" : {
+         "$ref" : "#/definitions/StateType"
+      }
+   },
+   "required" : [
+      "StateType"
+   ],
+   "definitions" : {
+      "StateType" : {
+         "$id" : "#StateType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The state type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   }
+}

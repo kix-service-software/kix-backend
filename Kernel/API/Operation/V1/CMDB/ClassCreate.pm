@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogItemCreate.pm - API GeneralCatalogItem Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::CMDB::ClassCreate;
@@ -140,6 +135,24 @@ sub Run {
     	}
     }
 
+    # validate definition if given
+    if ( $ConfigItemClass->{DefinitionString} ) {
+        my $Check = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionCheck(
+            Definition => $ConfigItemClass->{DefinitionString},
+        );
+
+        if ( !$Check ) {
+            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+                Type => 'error', 
+                What => 'Message',
+            );
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => $LogMessage || 'Cannot create class. The given definition string is invalid.',
+            );
+        }
+    }
+
     # create class
     my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
         Class    => 'ITSM::ConfigItem::Class',
@@ -156,6 +169,24 @@ sub Run {
         );
     }
     
+    if ( $ConfigItemClass->{DefinitionString} ) {
+        my $Result = $Self->ExecOperation(
+            OperationType => 'V1::CMDB::ClassDefinitionCreate',
+            Data          => {
+                ClassID                   => $GeneralCatalogItemID,
+                ConfigItemClassDefinition => {
+                    DefinitionString => $ConfigItemClass->{DefinitionString}
+                }
+            }
+        );
+        
+        if ( !$Result->{Success} ) {
+            return $Self->_Error(
+                ${$Result},
+            )
+        }
+    }
+
     # return result    
     return $Self->_Success(
         Code              => 'Object.Created',
@@ -165,3 +196,17 @@ sub Run {
 
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

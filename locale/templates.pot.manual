@@ -1,0 +1,227 @@
+# API error messages
+msgid "No \"Authorization\" header found."
+msgstr ""
+
+msgid "No token in \"Authorization\" header found."
+msgstr ""
+
+msgid "No permission to execute this operation."
+msgstr ""
+
+msgid "The resource doesn't support the requested method. Please have a look into the \"Allow\" header which methods are supported by this resource."
+msgstr ""
+
+msgid "Cannot create or update item, because it already exists."
+msgstr ""
+
+msgid "Depending objects prevent this operation."
+msgstr ""
+
+msgid "The requested item cannot be found."
+msgstr ""
+
+msgid "The requested item cannot be found or is invalid."
+msgstr ""
+
+msgid "Could not create item, please contact the system administrator."
+msgstr ""
+
+msgid "Could not update item, please contact the system administrator."
+msgstr ""
+
+msgid "Could not delete item, please contact the system administrator."
+msgstr ""
+
+msgid "The parent item(s) cannot be found."
+msgstr ""
+
+msgid "Authorization not possible, please contact the system administrator."
+msgstr ""
+
+msgid "User is not authorized. The requested operation cannot be executed."
+msgstr ""
+
+
+# CI classes
+msgid "General Information"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Vendor"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Location"
+msgstr ""
+
+msgid "Building"
+msgstr ""
+
+msgid "Room"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Note"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+msgid "Attachment"
+msgstr ""
+
+msgid "Attachments"
+msgstr ""
+
+msgid "Owner Information"
+msgstr ""
+
+msgid "Assigned Organisation"
+msgstr ""
+
+msgid "Assigned Contact"
+msgstr ""
+
+msgid "Network Information"
+msgstr ""
+
+msgid "Network Interface"
+msgstr ""
+
+msgid "IP over DHCP"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "yes"
+msgstr ""
+
+msgid "no"
+msgstr ""
+
+msgid "IP Address"
+msgstr ""
+
+msgid "Please enter a valid IPv4 address in form 123.123.123.123."
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "Hardware Information"
+msgstr ""
+
+msgid "Serial Number"
+msgstr ""
+
+msgid "Hard Disk"
+msgstr ""
+
+msgid "Capacity"
+msgstr ""
+
+msgid "Graphic Adapter"
+msgstr ""
+
+msgid "Other Equipment"
+msgstr ""
+
+msgid "Software Information"
+msgstr ""
+
+msgid "Operating System"
+msgstr ""
+
+msgid "Installed Software"
+msgstr ""
+
+msgid "Warranty Information"
+msgstr ""
+
+msgid "Warranty Expiration Date"
+msgstr ""
+
+msgid "First Usage Date"
+msgstr ""
+
+msgid "Global Location Number"
+msgstr ""
+
+msgid "Address Information"
+msgstr ""
+
+msgid "Street"
+msgstr ""
+
+msgid "Street 2"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "ZIP"
+msgstr ""
+
+msgid "Region"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Contact Information"
+msgstr ""
+
+msgid "Contact Role"
+msgstr ""
+
+msgid "Contact"
+msgstr ""
+
+msgid "Parent Location"
+msgstr ""
+
+msgid "Room Type"
+msgstr ""
+
+msgid "Floor"
+msgstr ""
+
+msgid "Please enter decimal numbers only."
+msgstr ""
+
+msgid "Room Label"
+msgstr ""
+
+msgid "Network Address"
+msgstr ""
+
+msgid "Subnet Mask"
+msgstr ""
+
+msgid "Product"
+msgstr ""
+
+msgid "License Information"
+msgstr ""
+
+msgid "Licence Type"
+msgstr ""
+
+msgid "License Key"
+msgstr ""
+
+msgid "Quantity"
+msgstr ""
+
+msgid "Expiration Date"
+msgstr ""

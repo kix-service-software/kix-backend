@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#GeneralCatalogItem",
+  "type": "object",
+  "description": "The GeneralCatalog item object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Class": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ItemID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "Class",
+    "CreateBy",
+    "CreateTime",
+    "ItemID",
+    "Name",
+    "ValidID"
+  ]
+}

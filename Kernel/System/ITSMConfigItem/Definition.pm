@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ITSMConfigItem::Definition;
@@ -93,6 +93,13 @@ sub DefinitionList {
         return;
     }
 
+    my $CacheKey = 'DefinitionList::'.$Param{ClassID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # ask database
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'SELECT id, configitem_definition, version, create_time, create_by '
@@ -111,6 +118,14 @@ sub DefinitionList {
 
         push @DefinitionList, \%Definition;
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@DefinitionList,
+    );
 
     return \@DefinitionList;
 }
@@ -153,11 +168,14 @@ sub DefinitionGet {
         return;
     }
 
-    if ( $Param{DefinitionID} ) {
+    my $CacheKey = 'DefinitionGet::'.($Param{DefinitionID}||'').'::'.($Param{ClassID}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
-        # check if result is already cached
-        return $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} }
-            if $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} };
+    if ( $Param{DefinitionID} ) {
 
         # ask database
         $Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -213,7 +231,12 @@ sub DefinitionGet {
     $Definition{Class} = $ClassList->{ $Definition{ClassID} };
 
     # cache the result
-    $Self->{Cache}->{DefinitionGet}->{ $Definition{DefinitionID} } = \%Definition;
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Definition,
+    );
 
     return \%Definition;
 }
@@ -326,6 +349,11 @@ sub DefinitionAdd {
         $DefinitionID = $Row[0];
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # trigger DefinitionCreate event
     $Self->EventHandler(
         Event => 'DefinitionCreate',
@@ -333,6 +361,13 @@ sub DefinitionAdd {
             Comment => $DefinitionID,
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'CMDB.Class.Definition',
+        ObjectID  => $Param{ClassID}.'::'.$DefinitionID,
     );
 
     return $DefinitionID;
@@ -369,6 +404,14 @@ sub DefinitionCheck {
     }
     else {
         $Definition = eval $Param{Definition};    ## no critic
+        my $EvalFault = $@ || '';
+        if ( $EvalFault ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid Definition! You have an syntax error in the definition (' . $EvalFault. ').',
+            );
+            return;
+        }
     }
 
     # check if definition exists at all
@@ -514,7 +557,7 @@ sub _DefinitionPrepare {
 
 return a $DefinitionID are be deleted
 
-    my $DefinitionID = $ConfigItemObject->DefinitionGet(
+    my $DefinitionID = $ConfigItemObject->DefinitionDelete(
         DefinitionID => 123,
     );
 
@@ -532,6 +575,10 @@ sub DefinitionDelete {
         return;
     }
 
+    my $Definition = $Self->DefinitionGet(
+        DefinitionID => $Param{DefinitionID}
+    );
+
     # delete in database
     my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'DELETE FROM configitem_definition WHERE id = ?',
@@ -539,7 +586,17 @@ sub DefinitionDelete {
     );
     return if !$Success;
 
-    delete $Self->{Cache}->{DefinitionGet}->{ $Param{DefinitionID} };
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'CMDB.Class.Definition',
+        ObjectID  => $Definition->{ClassID}.'::'.$Param{DefinitionID},
+    );
 
     return $Param{DefinitionID};
 }
@@ -549,16 +606,17 @@ sub DefinitionDelete {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

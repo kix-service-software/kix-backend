@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Permission",
+  "type": "object",
+  "description": "The permission object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "IsRequired": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Target": {
+      "type": "string",
+      "readOnly": true
+    },
+    "TypeID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Value": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "bitmask, please see documentation for bit descriptions"
+    }    
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Target",
+    "Value"
+  ]
+}

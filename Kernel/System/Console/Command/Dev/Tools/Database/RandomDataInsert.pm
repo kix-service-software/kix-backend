@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Dev::Tools::Database::RandomDataInsert;
@@ -19,12 +19,12 @@ use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
-    'Kernel::System::CustomerCompany',
+    'Kernel::System::Contact',
+    'Kernel::System::Organisation',
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Group',
+    'Kernel::System::Role',
     'Kernel::System::Queue',
     'Kernel::System::Ticket',
     'Kernel::System::User',
@@ -33,7 +33,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Insert random data into the OTRS database for testing purposes.');
+    $Self->Description('Insert random data into the KIX database for testing purposes.');
     $Self->AddOption(
         Name        => 'generate-tickets',
         Description => "Specify how many tickets should be generated.",
@@ -64,15 +64,15 @@ sub Configure {
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-customer-companies',
-        Description => "Specify how many customer companies should be generated.",
+        Name        => 'generate-organisations',
+        Description => "Specify how many organisations should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-groups',
-        Description => "Specify how many groups should be generated.",
+        Name        => 'generate-roless',
+        Description => "Specify how many roles should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
@@ -123,13 +123,13 @@ sub Run {
         ObjectType => ['Article'],
     );
 
-    # groups
-    my @GroupIDs;
-    if ( !$Self->GetOption('generate-groups') ) {
-        @GroupIDs = GroupGet();
+    # roles
+    my @RoleIDs;
+    if ( !$Self->GetOption('generate-roles') ) {
+        @RoleIDs = RoleGet();
     }
     else {
-        @GroupIDs = GroupCreate( $Self->GetOption('generate-groups') );
+        @RoleIDs = RoleCreate( $Self->GetOption('generate-roles') );
     }
 
     # users
@@ -138,7 +138,7 @@ sub Run {
         @UserIDs = UserGet();
     }
     else {
-        @UserIDs = UserCreate( $Self->GetOption('generate-users'), \@GroupIDs );
+        @UserIDs = UserCreate( $Self->GetOption('generate-users'), \@RoleIDs );
     }
 
     # queues
@@ -147,7 +147,7 @@ sub Run {
         @QueueIDs = QueueGet();
     }
     else {
-        @QueueIDs = QueueCreate( $Self->GetOption('generate-queues'), \@GroupIDs );
+        @QueueIDs = QueueCreate( $Self->GetOption('generate-queues'));
     }
 
     # customer users
@@ -156,8 +156,8 @@ sub Run {
     }
 
     # customer companies
-    if ( $Self->GetOption('generate-customer-companies') ) {
-        CompanyCreate( $Self->GetOption('generate-customer-companies') );
+    if ( $Self->GetOption('generate-organisations') ) {
+        OrganisationCreate( $Self->GetOption('generate-organisations') );
     }
 
     my $Counter = 1;
@@ -174,7 +174,7 @@ sub Run {
             Priority     => '3 normal',
             State        => 'new',
             CustomerNo   => int( rand(1000) ),
-            CustomerUser => RandomAddress(),
+            Contact => RandomAddress(),
             OwnerID      => $UserIDs[ int( rand($#UserIDs) ) ],
             UserID       => $UserIDs[ int( rand($#UserIDs) ) ],
             );
@@ -199,8 +199,9 @@ sub Run {
             for ( 1 .. $Self->GetOption('articles-per-ticket') // 10 ) {
                 my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
                     TicketID       => $TicketID,
-                    ArticleType    => 'note-external',
-                    SenderType     => 'customer',
+                    Channel        => 'note',
+                    CustomerVisible => 1,
+                    SenderType     => 'external',
                     From           => RandomAddress(),
                     To             => RandomAddress(),
                     Cc             => RandomAddress(),
@@ -392,7 +393,6 @@ sub QueueGet {
 
 sub QueueCreate {
     my $Count = shift || return;
-    my @GroupIDs = @{ shift() };
 
     my @QueueIDs;
     for ( 1 .. $Count ) {
@@ -400,13 +400,7 @@ sub QueueCreate {
         my $ID   = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
             Name              => $Name,
             ValidID           => 1,
-            GroupID           => $GroupIDs[ int( rand( scalar @GroupIDs ) ) ],
-            FirstResponseTime => 0,
-            UpdateTime        => 0,
-            SolutionTime      => 0,
             SystemAddressID   => 1,
-            SalutationID      => 1,
-            SignatureID       => 1,
             UserID            => 1,
             MoveNotify        => 0,
             StateNotify       => 0,
@@ -422,47 +416,39 @@ sub QueueCreate {
     return @QueueIDs;
 }
 
-sub GroupGet {
-    my @GroupIDs;
-    my %Groups = $Kernel::OM->Get('Kernel::System::Group')->GroupList( Valid => 1 );
-    for ( sort keys %Groups ) {
-        push @GroupIDs, $_;
+sub RoleGet {
+    my @RoleIDs;
+    my %Roles = $Kernel::OM->Get('Kernel::System::Role')->RoleList( Valid => 1 );
+    for ( sort keys %Roles ) {
+        push @RoleIDs, $_;
     }
-    return @GroupIDs;
+    return @RoleIDs;
 }
 
-sub GroupCreate {
+sub RoleCreate {
     my $Count = shift || return;
 
-    my @GroupIDs;
+    my @RoleIDs;
     for ( 1 .. $Count ) {
-        my $Name = 'fill-up-group' . int( rand(100_000_000) );
-        my $ID   = $Kernel::OM->Get('Kernel::System::Group')->GroupAdd(
+        my $Name = 'fill-up-role' . int( rand(100_000_000) );
+        my $ID   = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
             Name    => $Name,
             ValidID => 1,
             UserID  => 1,
         );
         if ($ID) {
-            print "Group '$Name' with ID '$ID' created.\n";
-            push( @GroupIDs, $ID );
+            print "Role '$Name' with ID '$ID' created.\n";
+            push( @RoleIDs, $ID );
 
-            # add root to every group
-            $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-                GID        => $ID,
-                UID        => 1,
-                Permission => {
-                    ro        => 1,
-                    move_into => 1,
-                    create    => 1,
-                    owner     => 1,
-                    priority  => 0,
-                    rw        => 1,
-                },
-                UserID => 1,
+            # add root to every role
+            $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                AssignUserID => 1,
+                RoleID       => $ID,
+                UserID       => 1,
             );
         }
     }
-    return @GroupIDs;
+    return @RoleIDs;
 }
 
 sub UserGet {
@@ -479,7 +465,7 @@ sub UserGet {
 
 sub UserCreate {
     my $Count = shift || return;
-    my @GroupIDs = @{ shift() };
+    my @RoleIDs = @{ shift() };
 
     my @UserIDs;
     for ( 1 .. $Count ) {
@@ -495,38 +481,13 @@ sub UserCreate {
         if ($ID) {
             print "User '$Name' with ID '$ID' created.\n";
             push( @UserIDs, $ID );
-            for my $GroupID (@GroupIDs) {
-                my $GroupAdd = int( rand(3) );
-                if ( $GroupAdd == 2 ) {
-                    $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-                        GID        => $GroupID,
-                        UID        => $ID,
-                        Permission => {
-                            ro        => 1,
-                            move_into => 1,
-                            create    => 1,
-                            owner     => 1,
-                            priority  => 0,
-                            rw        => 1,
-                        },
-                        UserID => 1,
-                    );
-                }
-                elsif ( $GroupAdd == 1 ) {
-                    $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-                        GID        => $GroupID,
-                        UID        => $ID,
-                        Permission => {
-                            ro        => 1,
-                            move_into => 1,
-                            create    => 1,
-                            owner     => 0,
-                            priority  => 0,
-                            rw        => 0,
-                        },
-                        UserID => 1,
-                    );
-                }
+            for my $RoleID (@RoleIDs) {
+                my $RoleAdd = int( rand(3) );
+                $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                    AssignUserID => $ID,
+                    RoleID       => $RoleID,
+                    UserID       => 1,
+                );
             }
         }
     }
@@ -538,8 +499,8 @@ sub CustomerCreate {
 
     for ( 1 .. $Count ) {
         my $Name      = 'fill-up-user' . int( rand(100_000_000) );
-        my $UserLogin = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-            Source         => 'CustomerUser',            # CustomerUser source config
+        my $UserLogin = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            Source         => 'Contact',            # Contact source config
             UserFirstname  => $Name,
             UserLastname   => $Name,
             UserCustomerID => $Name,
@@ -548,35 +509,35 @@ sub CustomerCreate {
             ValidID        => 1,
             UserID         => 1,
         );
-        print "CustomerUser '$Name' created.\n";
+        print "Contact '$Name' created.\n";
     }
 }
 
-sub CompanyCreate {
+sub OrganisationCreate {
     my $Count = shift || return;
 
     for ( 1 .. $Count ) {
 
         my $Name       = 'fill-up-company' . int( rand(100_000_000) );
-        my $CustomerID = $Kernel::OM->Get('Kernel::System::CustomerCompany')->CustomerCompanyAdd(
-            Source                 => 'CustomerCompany',          # CustomerCompany source config
-            CustomerID             => $Name . '_CustomerID',
-            CustomerCompanyName    => $Name,
-            CustomerCompanyStreet  => '5201 Blue Lagoon Drive',
-            CustomerCompanyZIP     => '33126',
-            CustomerCompanyCity    => 'Miami',
-            CustomerCompanyCountry => 'USA',
-            CustomerCompanyURL     => 'http://www.example.org',
-            CustomerCompanyComment => 'some comment',
-            ValidID                => 1,
-            UserID                 => 1,
+        my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+            Number   => $Name . '_CustomerID',
+            Name     => $Name,
+            Street   => '5201 Blue Lagoon Drive',
+            Zip      => '33126',
+            City     => 'Miami',
+            Country  => 'USA',
+            Url      => 'http://www.example.org',
+            Comment  => 'some comment',
+            ValidID  => 1,
+            UserID   => 1,
         );
 
-        print "CustomerCompany '$Name' created.\n";
+        print "Organisation '$Name' created.\n";
     }
 }
 
 1;
+
 
 
 
@@ -585,11 +546,11 @@ sub CompanyCreate {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

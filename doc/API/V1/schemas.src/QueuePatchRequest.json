@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueuePatchRequest",
+  "type": "object",
+  "description": "The queue request object for creation.",
+  "properties": {
+    "Queue": {
+      "type": "object",
+      "properties": {
+        "Calendar": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "DefaultSignKey": {
+          "type": "integer"
+        },
+        "FollowUpID": {
+          "type": "integer"
+        },
+        "FollowUpLock": {
+          "type": "integer"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "Signature": {
+          "type": "string"
+        },
+        "SystemAddressID": {
+          "type": "integer"
+        },
+        "UnlockTimeout": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "Queue"
+  ]
+}

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::GeneralCatalog;
@@ -166,11 +166,22 @@ sub ClassRename {
     );
 
     # rename general catalog class
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE general_catalog SET general_catalog_class = ? '
             . 'WHERE general_catalog_class = ?',
         Bind => [ \$Param{ClassNew}, \$Param{ClassOld} ],
     );
+
+    return if !$Result;
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'GeneralCatalog.Class',
+        ObjectID  => $Param{ClassOld}.'::'.$Param{ClassNew},
+    );
+
+    return 1;
 }
 
 =item ItemList()
@@ -238,7 +249,7 @@ sub ItemList {
     }
 
     # create sql string
-    my $SQL = "SELECT id, name FROM general_catalog $PreferencesTable "
+    my $SQL = "SELECT general_catalog.id, name FROM general_catalog $PreferencesTable "
         . "WHERE general_catalog_class = ? $PreferencesWhere ";
     my @BIND = ( \$Param{Class}, @PreferencesBind );
 
@@ -532,6 +543,13 @@ sub ItemAdd {
         $ItemID = $Row[0];
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'GeneralCatalog',
+        ObjectID  => $ItemID,
+    );
+
     return $ItemID;
 }
 
@@ -644,7 +662,7 @@ sub ItemUpdate {
         Type => $Self->{CacheType},
     );
 
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE general_catalog SET '
             . 'name = ?, valid_id = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? '
@@ -655,6 +673,17 @@ sub ItemUpdate {
             \$Param{UserID},  \$Param{ItemID},
         ],
     );
+
+    return if !$Result;
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'GeneralCatalog',
+        ObjectID  => $Param{ItemID},
+    );
+
+    return 1;
 }
 
 =item GeneralCatalogPreferencesSet()
@@ -723,6 +752,13 @@ sub GeneralCatalogItemDelete {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'GeneralCatalog',
+        ObjectID  => $Param{ItemID},
+    );
+
     return 1;
 
 }
@@ -733,16 +769,17 @@ sub GeneralCatalogItemDelete {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

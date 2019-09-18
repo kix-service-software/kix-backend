@@ -1,0 +1,8 @@
+{
+    "ClientRegistration": { 
+        "ClientID": "KIX-Frontend",
+        "Authorization": "test123",
+        "NotificationURL": "http://kix-frontend.example.org/notifications",
+        "NotificationInterval": 30
+    }
+}

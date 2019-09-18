@@ -1,0 +1,17 @@
+{
+    "Service": {
+        "ChangeBy": 1,
+        "ChangeTime": "2018-11-08 09:37:33",
+        "Comment": "",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-08 09:37:33",
+        "Criticality": "3 normal",
+        "CurInciStateTypeFromCIs": "operational",
+        "Fullname": "Software-/Application Services",
+        "Name": "Software-/Application Services",
+        "ParentID": null,
+        "ServiceID": 18,
+        "TypeID": 4,
+        "ValidID": 1
+    }
+}

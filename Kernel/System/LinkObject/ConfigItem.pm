@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::LinkObject::ConfigItem;
@@ -128,7 +126,7 @@ sub LinkListWithData {
 checks read permission for a given object and UserID.
 
     $Permission = $LinkObject->ObjectPermission(
-        Object  => 'ITSMConfigItem',
+        Object  => 'ConfigItem',
         Key     => 123,
         UserID  => 1,
     );
@@ -370,7 +368,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPre(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -380,7 +378,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPre(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -411,7 +409,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPost(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -421,7 +419,7 @@ link add pre event module
 
     $True = $LinkObject->LinkAddPost(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -471,7 +469,7 @@ link delete pre event module
 
     $True = $LinkObject->LinkDeletePre(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -481,7 +479,7 @@ link delete pre event module
 
     $True = $LinkObject->LinkDeletePre(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -512,7 +510,7 @@ link delete post event module
 
     $True = $LinkObject->LinkDeletePost(
         Key          => 123,
-        SourceObject => 'ITSMConfigItem',
+        SourceObject => 'ConfigItem',
         SourceKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -522,7 +520,7 @@ link delete post event module
 
     $True = $LinkObject->LinkDeletePost(
         Key          => 123,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => 321,
         Type         => 'Normal',
         UserID       => 1,
@@ -642,16 +640,17 @@ sub _XMLSearchFormGet {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

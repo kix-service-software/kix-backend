@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Organisation",
+  "type": "object",
+  "description": "The organisation object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "City": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Contacts": {
+      "type": "array",
+      "description": "added via include \"Contacts\"",
+      "readOnly": true,
+      "items": {
+        "$ref": "Contact.json"
+      }
+    },
+    "Country": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Number": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Street": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Tickets": {
+      "type": "array",
+      "description": "added via include \"Tickets\"",
+      "readOnly": true,
+      "items": {
+        "$ref": "Ticket.json"
+      }
+    },
+    "Url": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Zip": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Name",
+    "Number",
+    "ValidID"
+  ]
+}

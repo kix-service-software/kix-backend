@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Admin::Queue::Add;
@@ -16,7 +16,6 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Group',
     'Kernel::System::Queue',
     'Kernel::System::SystemAddress',
 );
@@ -28,13 +27,6 @@ sub Configure {
     $Self->AddOption(
         Name        => 'name',
         Description => 'Queue name for the new queue.',
-        Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'group',
-        Description => 'Group which should be assigned to the new queue.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -68,27 +60,6 @@ sub Configure {
         ValueRegex  => qr/\d/smx,
     );
     $Self->AddOption(
-        Name        => 'first-response-time',
-        Description => 'Ticket first respone time in minutes for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/\d/smx,
-    );
-    $Self->AddOption(
-        Name        => 'update-time',
-        Description => 'Ticket update in minutes for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/\d/smx,
-    );
-    $Self->AddOption(
-        Name        => 'solution-time',
-        Description => 'Ticket solution time in minutes for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/\d/smx,
-    );
-    $Self->AddOption(
         Name        => 'calendar',
         Description => 'Name of the calendar for the new queue.',
         Required    => 0,
@@ -103,14 +74,6 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     $Self->Print("<yellow>Adding a new queue...</yellow>\n");
-
-    # check group
-    my $Group = $Self->GetOption('group');
-    my $GroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup( Group => $Group );
-    if ( !$GroupID ) {
-        $Self->PrintError("Found no GroupID for $Group\n");
-        return $Self->ExitCodeError();
-    }
 
     my $SystemAddressID   = $Self->GetOption('system-address-id');
     my $SystemAddressName = $Self->GetOption('system-address-name');
@@ -139,13 +102,9 @@ sub Run {
     # add queue
     my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
         Name              => $Self->GetOption('name'),
-        GroupID           => $GroupID,
         SystemAddressID   => $SystemAddressID || $Self->GetOption('system-address-id') || undef,
         Comment           => $Self->GetOption('comment'),
         UnlockTimeout     => $Self->GetOption('unlock-timeout'),
-        FirstResponseTime => $Self->GetOption('first-response-time'),
-        UpdateTime        => $Self->GetOption('update-time'),
-        SolutionTime      => $Self->GetOption('solution-time'),
         Calendar          => $Self->GetOption('calendar'),
         ValidID           => 1,
         UserID            => 1,
@@ -166,16 +125,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

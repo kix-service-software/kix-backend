@@ -1,0 +1,16 @@
+{
+    "Translation": [
+        { 
+            "Pattern": "Incident",
+            "Languages": {
+                "de": "Störung"
+            }
+        },
+        { 
+            "Pattern": "Delete this item ?",
+            "Languages": {
+                "de": "Diesen Eintrag löschen ?"
+            }
+        }        
+    ]
+}

@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleDelete;
@@ -84,9 +82,11 @@ sub ParameterDefinition {
 
     return {
         'TicketID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
         'ArticleID' => {
+            DataType => 'NUMERIC',
             Required => 1
         },
     }
@@ -116,25 +116,6 @@ perform ArticleDelete Operation. This will return the deleted TicketID. The tick
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $PermissionUserID,
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to delete article.",
-        );
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -146,16 +127,14 @@ sub Run {
     # check if article exists
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            Code => 'Object.NotFound',
         );
     }
 
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -166,8 +145,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToDelete',
-            Message => 'Unable to delete article, please contact system administrator!',
+            Code => 'Object.UnableToDelete',
         );
     }
 
@@ -177,16 +155,17 @@ sub Run {
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

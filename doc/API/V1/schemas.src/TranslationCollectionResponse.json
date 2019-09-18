@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#TranslationCollectionResponse",
+  "type": "object",
+  "description": "A list of translations.",
+  "properties": {
+    "Translation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Languages": {
+            "type": "object",
+            "patternProperties": {
+              "^[a-zA-Z]+$": {
+                "type": "string",
+                "readOnly": true
+              }
+            }
+          },
+          "Pattern": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "Languages",
+          "Pattern"
+        ]
+      }
+    }
+  },
+  "required": [
+    "Translation"
+  ]
+}

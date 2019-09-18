@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/ObjectIcon/ObjectIconUpdate.pm - API ObjectIcon Update operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::ObjectIcon::ObjectIconUpdate;
@@ -140,8 +135,7 @@ sub Run {
   
     if ( !%ObjectIconData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update ObjectIcon. No ObjectIcon with ObjectIconID $Param{Data}->{ObjectIconID} found",
+            Code => 'Object.NotFound',
         );
     }
     
@@ -153,8 +147,7 @@ sub Run {
 
     if ( IsArrayRefWithData($ObjectIconList) && $ObjectIconList->[0] != $Param{Data}->{ObjectIconID} ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Can not create ObjectIcon. Another ObjectIcon with the same Object and ObjectID already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
     
@@ -170,8 +163,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update ObjectIcon, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 
@@ -182,3 +174,17 @@ sub Run {
 }
 
 
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

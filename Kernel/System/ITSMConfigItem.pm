@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ITSMConfigItem;
@@ -157,6 +157,13 @@ sub ConfigItemCount {
         return;
     }
 
+    my $CacheKey = 'ConfigItemCount::'.$Param{ClassID}.'::'.$Param{IncludePostproductive};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # get state list
     my @Functionality = ( 'preproductive', 'productive' );
     push( @Functionality, 'postproductive' ) if ( $Param{IncludePostproductive} );
@@ -186,6 +193,14 @@ sub ConfigItemCount {
         $Count = $Row[0];
     }
 
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Count,
+    );
+
     return $Count;
 }
 
@@ -212,6 +227,13 @@ sub ConfigItemResultList {
         );
         return;
     }
+
+    my $CacheKey = 'ConfigItemResultList::'.$Param{ClassID}.'::'.$Param{Start}.'::'.$Param{Limit};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # get state list
     my $StateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
@@ -252,6 +274,14 @@ sub ConfigItemResultList {
 
         push @ConfigItemList, $LastVersion;
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@ConfigItemList,
+    );
 
     return \@ConfigItemList;
 }
@@ -499,6 +529,11 @@ sub ConfigItemAdd {
         $ConfigItemID = $Row[0];
     }
 
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # trigger ConfigItemCreate
     $Self->EventHandler(
         Event => 'ConfigItemCreate',
@@ -634,7 +669,7 @@ sub ConfigItemDelete {
 
     # delete all links to this config item first, before deleting the versions
     return if !$Kernel::OM->Get('Kernel::System::LinkObject')->LinkDeleteAll(
-        Object => 'ITSMConfigItem',
+        Object => 'ConfigItem',
         Key    => $Param{ConfigItemID},
         UserID => $Param{UserID},
     );
@@ -691,11 +726,9 @@ sub ConfigItemDelete {
         Bind => [ \$Param{ConfigItemID} ],
     );
 
-    # delete the cache
-    my $CacheKey = 'ConfigItemGet::ConfigItemID::' . $Param{ConfigItemID};
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $CacheKey,
     );
 
     return $Success;
@@ -745,6 +778,11 @@ sub ConfigItemAttachmentAdd {
 
     # check for error
     if ($Success) {
+
+        # clear cache
+        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+            Type => $Self->{CacheType},
+        );
 
         # trigger AttachmentAdd-Event
         $Self->EventHandler(
@@ -807,6 +845,11 @@ sub ConfigItemAttachmentDelete {
 
     # check for error
     if ($Success) {
+
+        # clear cache
+        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+            Type => $Self->{CacheType},
+        );
 
         # trigger AttachmentDeletePost-Event
         $Self->EventHandler(
@@ -938,6 +981,13 @@ sub ConfigItemAttachmentList {
         return;
     }
 
+    my $CacheKey = 'ConfigItemAttachmentList::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
     # find all attachments of this config item
     my @Attachments = $Kernel::OM->Get('Kernel::System::VirtualFS')->Find(
         Preferences => {
@@ -950,6 +1000,14 @@ sub ConfigItemAttachmentList {
         # remove extra information from filename
         $Filename =~ s{ \A ConfigItem / \d+ / }{}xms;
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Attachments,
+    );
 
     return @Attachments;
 }
@@ -1516,9 +1574,12 @@ sub ConfigItemLookup {
         return;
     }
 
-    # if result is cached return that result
-    return $Self->{Cache}->{ConfigItemLookup}->{$Key}->{ $Param{$Key} }
-        if $Self->{Cache}->{ConfigItemLookup}->{$Key}->{ $Param{$Key} };
+    my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # set the appropriate SQL statement
     my $SQL = 'SELECT configitem_number FROM configitem WHERE id = ?';
@@ -1539,7 +1600,13 @@ sub ConfigItemLookup {
         $Value = $Row[0];
     }
 
-    $Self->{Cache}->{ConfigItemLookup}->{$Key}->{ $Param{$Key} } = $Value;
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Value,
+    );
 
     return $Value;
 }
@@ -1772,7 +1839,7 @@ sub CurInciStateRecalc {
 
             # find all linked services of this CI
             my %LinkedServiceIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-                Object1   => 'ITSMConfigItem',
+                Object1   => 'ConfigItem',
                 Key1      => $ConfigItemID,
                 Object2   => 'Service',
                 State     => 'Valid',
@@ -1928,6 +1995,11 @@ sub CurInciStateRecalc {
             UserID    => 1,
         );
     }
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     return 1;
 }
@@ -2448,12 +2520,12 @@ sub CountLinkedObjects {
     return '' if !$LinkObject;
 
     my %PossibleObjectsList = $LinkObject->PossibleObjectsList(
-        Object => 'ITSMConfigItem',
+        Object => 'ConfigItem',
         UserID => $Param{UserID} || 1,
     );
     for my $CurrObject ( keys(%PossibleObjectsList) ) {
         my %LinkList = $LinkObject->LinkKeyList(
-            Object1 => 'ITSMConfigItem',
+            Object1 => 'ConfigItem',
             Key1    => $Param{ConfigItemID},
             Object2 => $CurrObject,
             State   => 'Valid',
@@ -2503,9 +2575,9 @@ sub _FindInciConfigItems {
 
         # find all linked config items (childs)
         my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-            Object1 => 'ITSMConfigItem',
+            Object1 => 'ConfigItem',
             Key1    => $Param{ConfigItemID},
-            Object2 => 'ITSMConfigItem',
+            Object2 => 'ConfigItem',
             State   => 'Valid',
             Type    => $LinkType,
 
@@ -2599,9 +2671,9 @@ sub _FindWarnConfigItems {
 
     # find all linked config items
     my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
-        Object1   => 'ITSMConfigItem',
+        Object1   => 'ConfigItem',
         Key1      => $Param{ConfigItemID},
-        Object2   => 'ITSMConfigItem',
+        Object2   => 'ConfigItem',
         State     => 'Valid',
         Type      => $Param{LinkType},
         Direction => $Param{Direction},
@@ -2661,16 +2733,17 @@ sub _PrepareLikeString {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

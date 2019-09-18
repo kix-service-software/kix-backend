@@ -1,21 +1,21 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::Event::DynamicFieldFromCustomerUser;
+package Kernel::System::Ticket::Event::DynamicFieldFromContact;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Log',
@@ -59,7 +59,7 @@ sub Run {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # get mapping config,
-    my %Mapping = %{ $ConfigObject->Get('DynamicFieldFromCustomerUser::Mapping') || {} };
+    my %Mapping = %{ $ConfigObject->Get('DynamicFieldFromContact::Mapping') || {} };
 
     # no mapping is OK
     return 1 if !%Mapping;
@@ -84,34 +84,34 @@ sub Run {
 
     my $DynamicFieldsReverse = { reverse %{$DynamicFields} };
 
-    my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket{CustomerUserID},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        User => $Ticket{ContactID},
     );
 
-    # also continue if there was no CustomerUser data found - erase values
+    # also continue if there was no Contact data found - erase values
     # loop over the configured mapping of customer data variables to dynamic fields
     CUSTOMERUSERVARIABLENAME:
-    for my $CustomerUserVariableName ( sort keys %Mapping ) {
+    for my $ContactVariableName ( sort keys %Mapping ) {
 
         # check config for the particular mapping
-        if ( !defined $DynamicFieldsReverse->{ $Mapping{$CustomerUserVariableName} } ) {
+        if ( !defined $DynamicFieldsReverse->{ $Mapping{$ContactVariableName} } ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message =>
-                    "DynamicField $Mapping{$CustomerUserVariableName} in DynamicFieldFromCustomerUser::Mapping must be set in system and valid.",
+                    "DynamicField $Mapping{$ContactVariableName} in DynamicFieldFromContact::Mapping must be set in system and valid.",
             );
             next CUSTOMERUSERVARIABLENAME;
         }
 
         my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
-            Name => $Mapping{$CustomerUserVariableName},
+            Name => $Mapping{$ContactVariableName},
         );
 
         # update dynamic field value for ticket
         $DynamicFieldBackendObject->ValueSet(
             DynamicFieldConfig => $DynamicFieldConfig,
             ObjectID           => $Param{Data}->{TicketID},
-            Value              => $CustomerUserData{$CustomerUserVariableName} || '',
+            Value              => $ContactData{$ContactVariableName} || '',
             UserID             => $Param{UserID},
         );
     }
@@ -123,16 +123,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

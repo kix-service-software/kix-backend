@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">PriorityGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Priority</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">PriorityID</Item>
+                <Item Key="ResponseObject">PriorityResponse</Item>
                 <Item Key="CacheType">API_priorities</Item>
                 <Item Key="CacheTypeDependency">Priority</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">PrioritySearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Priority</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">PriorityCollectionResponse</Item>
                 <Item Key="CacheType">API_priorities</Item>                
                 <Item Key="CacheTypeDependency">Priority</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">PriorityCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Priority</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">PriorityPostRequest</Item>
+                <Item Key="ResponseObject">PriorityPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">PriorityUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Priority</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">PriorityPatchRequest</Item>
+                <Item Key="ResponseObject">PriorityPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,8 +54,6 @@
             <Hash>
                 <Item Key="Name">PriorityDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Priority</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

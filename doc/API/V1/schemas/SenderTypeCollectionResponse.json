@@ -1,0 +1,39 @@
+{
+   "$id" : "#SenderTypeCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of sender types.",
+   "type" : "object",
+   "properties" : {
+      "SenderType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/SenderType"
+         }
+      }
+   },
+   "required" : [
+      "SenderType"
+   ],
+   "definitions" : {
+      "SenderType" : {
+         "$id" : "#SenderType",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The sender type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   }
+}

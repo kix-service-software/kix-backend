@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ChecklistCreate;
@@ -137,69 +135,6 @@ perform ChecklistCreate Operation. This will return the created ChecklistItemID
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # init webservice
-    my $Result = $Self->Init(
-        WebserviceID => $Self->{WebserviceID},
-    );
-
-    if ( !$Result->{Success} ) {
-        $Self->_Error(
-            Code    => 'Webservice.InvalidConfiguration',
-            Message => $Result->{Message},
-        );
-    }
-
-    # get possible item states
-    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
-    my @PossibleItemStates = sort keys %{$PossibleItemStates};
-
-    # prepare data
-    $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => {
-            'TicketID' => {
-                Required => 1
-            },
-            'ChecklistItem' => {
-                Type     => 'HASH',
-                Required => 1
-            },
-            'ChecklistItem::Text' => {
-                Required => 1
-            },
-            'ChecklistItem::State' => {
-                OneOf    => \@PossibleItemStates,
-                Required => 1
-            },
-            'ChecklistItem::Position' => {
-                Required => 1,
-                Format   => '^(\d+)$',
-            },            
-        }
-    );
-
-    # check result
-    if ( !$Result->{Success} ) {
-        return $Self->_Error(
-            Code    => 'Operation.PrepareDataError',
-            Message => $Result->{Message},
-        );
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create checklist item!",
-        );
-    }
-
     # isolate and trim ChecklistItem parameter
     my $ChecklistItem = $Self->_Trim(
         Data => $Param{Data}->{ChecklistItem},
@@ -229,16 +164,17 @@ sub Run {
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

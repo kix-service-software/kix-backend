@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::SystemData;
@@ -130,6 +130,13 @@ sub SystemDataAdd {
         Key => $Param{Key},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'SystemData',
+        ObjectID  => $Param{Key},
+    );    
+
     return 1;
 }
 
@@ -138,7 +145,7 @@ sub SystemDataAdd {
 get system data for key
 
     my $SystemData = $SystemDataObject->SystemDataGet(
-        Key => 'OTRS Version',
+        Key => 'KIX Version',
     );
 
 returns value as a simple scalar, or undef if the key does not exist.
@@ -275,7 +282,7 @@ Returns true if update was succesful or false if otherwise - for instance
 if key did not exist.
 
     my $Result = $SystemDataObject->SystemDataUpdate(
-        Key     => 'OTRS Version',
+        Key     => 'KIX Version',
         Value   => 'Some New Value',
         UserID  => 123,
     );
@@ -331,6 +338,13 @@ sub SystemDataUpdate {
         Key  => $Param{Key},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'SystemData',
+        ObjectID  => $Param{Key},
+    );    
+
     return 1;
 }
 
@@ -342,7 +356,7 @@ Returns true if delete was succesful or false if otherwise - for instance
 if key did not exist.
 
     $SystemDataObject->SystemDataDelete(
-        Key    => 'OTRS Version',
+        Key    => 'KIX Version',
         UserID => 123,
     );
 
@@ -385,6 +399,13 @@ sub SystemDataDelete {
     $Self->_SystemDataCacheKeyDelete(
         Key => $Param{Key},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'SystemData',
+        ObjectID  => $Param{Key},
+    );    
 
     return 1;
 }
@@ -454,16 +475,17 @@ sub _SystemDataCacheKeyDelete {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

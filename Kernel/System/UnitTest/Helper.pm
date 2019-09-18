@@ -1,15 +1,14 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::UnitTest::Helper;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
 use warnings;
@@ -22,8 +21,8 @@ our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::DB',
     'Kernel::System::Cache',
-    'Kernel::System::CustomerUser',
-    'Kernel::System::Group',
+    'Kernel::System::Contact',
+    'Kernel::System::Role',
     'Kernel::System::Main',
     'Kernel::System::UnitTest',
     'Kernel::System::User',
@@ -44,8 +43,6 @@ construct a helper object.
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
         'Kernel::System::UnitTest::Helper' => {
-            RestoreSystemConfiguration => 1,        # optional, save ZZZAuto.pm
-                                                    # and restore it in the destructor
             RestoreDatabase            => 1,        # runs the test in a transaction,
                                                     # and roll it back in the destructor
                                                     #
@@ -70,15 +67,6 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     $Self->{UnitTestObject} = $Kernel::OM->Get('Kernel::System::UnitTest');
-
-    # make backup of system configuration if needed
-    if ( $Param{RestoreSystemConfiguration} ) {
-        $Self->{SysConfigObject} = Kernel::System::SysConfig->new();
-
-        $Self->{SysConfigBackup} = $Self->{SysConfigObject}->Download();
-
-        $Self->{UnitTestObject}->True( 1, 'Creating backup of the system configuration.' );
-    }
 
     # remove any leftover configuration changes from aborted previous runs
     $Self->ConfigSettingCleanup();
@@ -106,6 +94,19 @@ sub new {
         my $StartedTransaction = $Self->BeginWork();
         $Self->{UnitTestObject}->True( $StartedTransaction, 'Started database transaction.' );
 
+    }
+
+    # disable debugging
+    foreach my $Type ( qw(Permission Cache) ) {
+        my $Success = $Kernel::OM->Get('Kernel::Config')->Set(
+            Key   => $Type."::Debug",
+            Value => 0,
+        );
+
+        $Self->{UnitTestObject}->True(
+            $Success,
+            "Disabled $Type debugging",
+        );
     }
 
     return $Self;
@@ -160,7 +161,7 @@ be set to invalid automatically during the destructor. Returns
 the login name of the new user, the password is the same.
 
     my $TestUserLogin = $Helper->TestUserCreate(
-        Groups => ['admin', 'users'],           # optional, list of groups to add this user to (rw rights)
+        Roles => ['admin', 'users'],            # optional, list of roles to add this user to
         Language => 'de'                        # optional, defaults to 'en' if not set
     );
 
@@ -202,33 +203,25 @@ sub TestUserCreate {
     $Self->{TestUsers} ||= [];
     push( @{ $Self->{TestUsers} }, $TestUserID );
 
-    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserID" );
+    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserLogin ($TestUserID)" );
 
-    # Add user to groups
-    GROUP_NAME:
-    for my $GroupName ( @{ $Param{Groups} || [] } ) {
+    # Add user to roles
+    ROLE_NAME:
+    for my $RoleName ( @{ $Param{Roles} || [] } ) {
 
-        # get group object
-        my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+        # get role object
+        my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
 
-        my $GroupID = $GroupObject->GroupLookup( Group => $GroupName );
-        die "Cannot find group $GroupName" if ( !$GroupID );
+        my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
+        die "Cannot find role $RoleName" if ( !$RoleID );
 
-        $GroupObject->PermissionGroupUserAdd(
-            GID        => $GroupID,
-            UID        => $TestUserID,
-            Permission => {
-                ro        => 1,
-                move_into => 1,
-                create    => 1,
-                owner     => 1,
-                priority  => 1,
-                rw        => 1,
-            },
-            UserID => 1,
-        ) || die "Could not add test user $TestUserLogin to group $GroupName";
+        $RoleObject->RoleUserAdd(
+            AssignUserID => $TestUserID,
+            RoleID       => $RoleID,
+            UserID       => 1,
+        ) || die "Could not add test user $TestUserLogin to role $RoleName";
 
-        $Self->{UnitTestObject}->True( 1, "Added test user $TestUserLogin to group $GroupName" );
+        $Self->{UnitTestObject}->True( 1, "Added test user $TestUserLogin to role $RoleName" );
     }
 
     # set user language
@@ -243,19 +236,19 @@ sub TestUserCreate {
     return $TestUserLogin;
 }
 
-=item TestCustomerUserCreate()
+=item TestContactCreate()
 
 creates a test customer user that can be used in tests. It will
 be set to invalid automatically during the destructor. Returns
 the login name of the new customer user, the password is the same.
 
-    my $TestUserLogin = $Helper->TestCustomerUserCreate(
+    my $TestUserLogin = $Helper->TestContactCreate(
         Language => 'de',   # optional, defaults to 'en' if not set
     );
 
 =cut
 
-sub TestCustomerUserCreate {
+sub TestContactCreate {
     my ( $Self, %Param ) = @_;
 
     # disable email checks to create new user
@@ -264,21 +257,29 @@ sub TestCustomerUserCreate {
 
     # create test user
     my $TestUser;
+    my $TestUserLogin;
     COUNT:
     for my $Count ( 1 .. 10 ) {
 
-        my $TestUserLogin = $Self->GetRandomID();
+        $TestUserLogin = $Self->GetRandomID();
 
-        $TestUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
-            Source         => 'CustomerUser',
-            UserFirstname  => $TestUserLogin,
-            UserLastname   => $TestUserLogin,
-            UserCustomerID => $TestUserLogin,
-            UserLogin      => $TestUserLogin,
-            UserPassword   => $TestUserLogin,
-            UserEmail      => $TestUserLogin . '@localunittest.com',
-            ValidID        => 1,
-            UserID         => 1,
+        my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+            Number  => $TestUserLogin,
+            Name    => $TestUserLogin,
+            ValidID => 1,
+            UserID  => 1,
+        );
+
+        $TestUser = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            Firstname             => $TestUserLogin,
+            Lastname              => $TestUserLogin,
+            PrimaryOrganisationID => $OrgID,
+            OrganisationIDs       => [ $OrgID ],
+            Login                 => $TestUserLogin,
+            Password              => $TestUserLogin,
+            Email                 => $TestUserLogin . '@localunittest.com',
+            ValidID               => 1,
+            UserID                => 1,
         );
 
         last COUNT if $TestUser;
@@ -286,25 +287,87 @@ sub TestCustomerUserCreate {
 
     die 'Could not create test user' if !$TestUser;
 
-    # Remember UserID of the test user to later set it to invalid
+    # Remember IDs of the test user and organisation to later set it to invalid
     #   in the destructor.
-    $Self->{TestCustomerUsers} ||= [];
-    push( @{ $Self->{TestCustomerUsers} }, $TestUser );
+    $Self->{TestContacts} ||= [];
+    push( @{ $Self->{TestContacts} }, $TestUser );
 
     # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True( 1, "Created test contact $TestUser" );
+    $Self->{UnitTestObject}->True( 1, "Created test contact $TestUserLogin ($TestUser)" );
 
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
-    $Kernel::OM->Get('Kernel::System::CustomerUser')->SetPreferences(
-        UserID => $TestUser,
-        Key    => 'UserLanguage',
-        Value  => $UserLanguage,
+    $Kernel::OM->Get('Kernel::System::Contact')->SetPreferences(
+        ContactID => $TestUser,
+        Key       => 'UserLanguage',
+        Value     => $UserLanguage,
     );
     # rkaiser - T#2017020290001194 - changed customer user to contact
     $Self->{UnitTestObject}->True( 1, "Set contact UserLanguage to $UserLanguage" );
 
     return $TestUser;
+}
+
+=item TestRoleCreate()
+
+creates a test role with given permissions that can be used in tests.
+Returns the ID and Name of the new role
+
+    my $RoleID = $Helper->TestRoleCreate(
+        Name => '...',
+        Permissions => {
+            Resource => [
+                { 
+                    Target => '/tickets', 
+                    Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                }
+            ]
+        }
+    );
+
+=cut
+
+sub TestRoleCreate {
+    my ( $Self, %Param ) = @_;
+
+    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+
+    # add ticket_read role
+    my $RoleID = $RoleObject->RoleAdd(
+        Name    => $Param{Name},
+        Comment => $Param{Comment},
+        ValidID => $Param{ValidID} || 1,
+        UserID  => 1,
+    );
+
+    die 'Could not create test role' if !$RoleID;
+
+    # Remember RoleID of the role to later set it to invalid
+    #   in the destructor.
+    $Self->{TestRoles} ||= [];
+    push( @{ $Self->{TestRoles} }, $RoleID );
+
+    $Self->{UnitTestObject}->True( 1, "Created test role $Param{Name} ($RoleID)" );
+
+    if ( ref $Param{Permissions} eq 'HASH' ) {
+        my %PermissionTypes = reverse $RoleObject->PermissionTypeList();
+
+        foreach my $Type ( %{$Param{Permissions}} ) {
+            foreach my $Permission ( @{$Param{Permissions}->{$Type}} ) {
+                my $Success = $RoleObject->PermissionAdd(
+                    RoleID => $RoleID,
+                    TypeID => $PermissionTypes{$Type},
+                    Target => $Permission->{Target},
+                    Value  => $Permission->{Value},
+                    UserID => 1,
+                );
+
+                die 'Could not create test role' if !$Success;
+            }
+        }
+    }
+
+    return $RoleID
 }
 
 =item BeginWork()
@@ -498,7 +561,7 @@ sub DESTROY {
 
     # disable email checks to create new user
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    local $ConfigObject->{CheckEmailAddresses} = 0;
+    local $ConfigObject->{Config}->{CheckEmailAddresses} = 0;
 
     # cleanup temporary article directory
     if ( $Self->{TmpArticleDir} && -d $Self->{TmpArticleDir} ) {
@@ -534,15 +597,15 @@ sub DESTROY {
     }
 
     # invalidate test customer users
-    if ( ref $Self->{TestCustomerUsers} eq 'ARRAY' && @{ $Self->{TestCustomerUsers} } ) {
+    if ( ref $Self->{TestContacts} eq 'ARRAY' && @{ $Self->{TestContacts} } ) {
         TESTCUSTOMERUSERS:
-        for my $TestCustomerUser ( @{ $Self->{TestCustomerUsers} } ) {
+        for my $TestContact ( @{ $Self->{TestContacts} } ) {
 
-            my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-                User => $TestCustomerUser,
+            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                ID => $TestContact,
             );
 
-            if ( !$CustomerUser{UserLogin} ) {
+            if ( !$Contact{UserLogin} ) {
 
                 # if no such customer user exists, there is no need to set it to invalid;
                 # happens when the test customer user is created inside a transaction
@@ -550,19 +613,62 @@ sub DESTROY {
                 next TESTCUSTOMERUSERS;
             }
 
-            my $Success = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserUpdate(
-                %CustomerUser,
-                ID      => $CustomerUser{UserID},
+            my $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+                %Contact,
+                ID      => $Contact{UserID},
                 ValidID => 2,
                 UserID  => 1,
             );
 
             $Self->{UnitTestObject}->True(
                 # rkaiser - T#2017020290001194 - changed customer user to contact
-                $Success, "Set test contact $TestCustomerUser to invalid"
+                $Success, "Set test contact $TestContact to invalid"
+            );
+
+            # disable assigned organisation
+            my %Organisation = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                ID => $Contact{PrimaryOrganisationID}
+            );
+            $Success = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationUpdate(
+                %Organisation,
+                ID      => $Contact{PrimaryOrganisationID},
+                ValidID => 2,
+                UserID  => 1,
+            );
+
+            $Self->{UnitTestObject}->True(
+                $Success, "Set test organisation $Contact{PrimaryOrganisationID} to invalid"
             );
         }
     }
+
+    # invalidate test roles
+    if ( ref $Self->{TestRoles} eq 'ARRAY' && @{ $Self->{TestRoles} } ) {
+        TESTROLES:
+        for my $TestRole ( @{ $Self->{TestRoles} } ) {
+
+            my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+                ID => $TestRole,
+            );
+
+            if ( !$Role{ID} ) {
+
+                # if no such role exists, there is no need to set it to invalid;
+                # happens when the test role is created inside a transaction
+                # that is later rolled back.
+                next TESTROLES;
+            }
+
+            # make test role invalid
+            my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
+                %Role,
+                ValidID      => 2,
+                ChangeUserID => 1,
+            );
+
+            $Self->{UnitTestObject}->True( $Success, "Set test role $TestRole to invalid" );
+        }
+    }    
 }
 
 =item ConfigSettingChange()
@@ -591,51 +697,11 @@ sub ConfigSettingChange {
 
     die "Need 'Key'" if !defined $Key;
 
-    my $RandomNumber = $Self->GetRandomNumber();
-
-    my $KeyDump = $Key;
-    $KeyDump =~ s|'|\\'|smxg;
-    $KeyDump = "\$Self->{'$KeyDump'}";
-    $KeyDump =~ s|\#{3}|'}->{'|smxg;
-
     # Also set at runtime in the ConfigObject. This will be destroyed at the end of the unit test.
     $Kernel::OM->Get('Kernel::Config')->Set(
         Key   => $Key,
         Value => $Valid ? $Value : undef,
     );
-
-    my $ValueDump;
-    if ($Valid) {
-        $ValueDump = $Kernel::OM->Get('Kernel::System::Main')->Dump($Value);
-        $ValueDump =~ s/\$VAR1/$KeyDump/;
-    }
-    else {
-        $ValueDump = "delete $KeyDump;"
-    }
-
-    my $PackageName = "ZZZZUnitTest$RandomNumber";
-
-    my $Content = <<"EOF";
-# OTRS config file (automatically generated)
-# VERSION:1.1
-package Kernel::Config::Files::$PackageName;
-use strict;
-use warnings;
-no warnings 'redefine';
-use utf8;
-sub Load {
-    my (\$File, \$Self) = \@_;
-    $ValueDump
-}
-1;
-EOF
-    my $Home     = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my $FileName = "$Home/Kernel/Config/Files/$PackageName.pm";
-    $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-        Location => $FileName,
-        Mode     => 'utf8',
-        Content  => \$Content,
-    ) || die "Could not write $FileName";
 
     return 1;
 }
@@ -649,16 +715,6 @@ remove all config setting changes from ConfigSettingChange();
 sub ConfigSettingCleanup {
     my ( $Self, %Param ) = @_;
 
-    my $Home  = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => "$Home/Kernel/Config/Files",
-        Filter    => "ZZZZUnitTest*.pm",
-    );
-    for my $File (@Files) {
-        $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
-            Location => $File,
-        ) || die "Could not delete $File";
-    }
     return 1;
 }
 
@@ -699,16 +755,17 @@ sub UseTmpArticleDir {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

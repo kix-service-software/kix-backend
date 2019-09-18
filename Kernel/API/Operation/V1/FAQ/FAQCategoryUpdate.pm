@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/FAQ/FAQCategoryUpdate.pm - API FAQCategory Update operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::FAQ::FAQCategoryUpdate;
@@ -104,9 +99,6 @@ perform FAQCategoryUpdate Operation. This will return the updated TypeID.
                 Comment  => 'Some comment', # optional
                 ParentID => 2,              # optional
                 ValidID  => 1,              # optional
-                GroupIDs => [               # optional
-                    1,2,3,...
-                ]
             },
         },
     );
@@ -139,8 +131,7 @@ sub Run {
  
     if ( !%FAQCategoryData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update FAQCategory. No FAQCategory with ID '$Param{Data}->{FAQCategoryID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -154,7 +145,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Cannot create FAQCategory. Another FAQCategory with the same name and parent already exists.",
+            Message => "Cannot update FAQ category. Another FAQ category with the same name and parent already exists.",
         );
     }
 
@@ -162,33 +153,16 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryUpdate(
         CategoryID => $Param{Data}->{FAQCategoryID},
         Name       => $FAQCategory->{Name} || $FAQCategoryData{Name},
-        Comment    => $FAQCategory->{Comment} || $FAQCategoryData{Comment},
-        ParentID   => $FAQCategory->{ParentID} || $FAQCategoryData{ParentID},
+        Comment    => exists $FAQCategory->{Comment} ? $FAQCategory->{Comment} : $FAQCategoryData{Comment},
+        ParentID   => exists $FAQCategory->{ParentID} ? ($FAQCategory->{ParentID}||0) : $FAQCategoryData{ParentID},
         ValidID    => $FAQCategory->{ValidID} || $FAQCategoryData{ValidID},
         UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update FAQCategory, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
-    }
-
-    # set groups
-    if ( IsArrayRefWithData($FAQCategory->{GroupIDs}) ) {
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
-            CategoryID => $Param{Data}->{FAQCategoryID},
-            GroupIDs   => $FAQCategory->{GroupIDs},
-            UserID     => $Self->{Authorization}->{UserID},
-        );
-
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToCreate',
-                Message => 'Could not create group assignment, please contact the system administrator',
-            );
-        }
     }
 
     # return result    
@@ -198,3 +172,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

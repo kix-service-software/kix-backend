@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/GeneralCatalog/GeneralCatalogClassUpdate.pm - API GeneralCatalogItem Update operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassUpdate;
@@ -89,7 +84,7 @@ sub ParameterDefinition {
         'GeneralCatalogClass' => {
             Required => 1
         },
-        'NewClassName' => {
+        'Name' => {
             Required => 1
         },   
     }
@@ -102,7 +97,7 @@ perform GeneralCatalogClassUpdate Operation. This will return the updated Genera
     my $Result = $OperationObject->Run(
         Data => {
             GeneralCatalogClass => 'ITSM::Service::Type',
-            NewClassName        => '...'
+            Name        => '...'
         },
     );
     
@@ -122,9 +117,9 @@ perform GeneralCatalogClassUpdate Operation. This will return the updated Genera
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # trim NewClassName parameter
-    my $NewClassName = $Self->_Trim( 
-        Data => $Param{Data}->{NewClassName},
+    # trim Name parameter
+    my $Name = $Self->_Trim( 
+        Data => $Param{Data}->{Name},
     );
 
     # check if Class exists 
@@ -132,29 +127,41 @@ sub Run {
 
     if ( !%ClassList || !$ClassList{$Param{Data}->{GeneralCatalogClass}} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update GeneralCatalog class. No GeneralCatalog class '$Param{Data}->{GeneralCatalogClass}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
     # update GeneralCatalog
     my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassRename(
         ClassOld => $Param{Data}->{GeneralCatalogClass},
-        ClassNew => $NewClassName,
+        ClassNew => $Param{Data}->{Name},
         UserID   => $Self->{Authorization}->{UserID},                        
     );
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update GeneralCatalog class, please contact the system administrator',
+            Code => 'Object.UnableToUpdate'
         );
     }
 
     # return result    
     return $Self->_Success(
-        GeneralCatalogClass => $NewClassName,
+        GeneralCatalogClass => $Param{Data}->{Name},
     );    
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

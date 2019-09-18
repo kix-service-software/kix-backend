@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleCreate;
@@ -125,8 +123,9 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 Charset                         => 'some charset',           
 
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
-                ArticleTypeID                   => 123,                        # optional
-                ArticleType                     => 'some article type name',   # optional
+                ChannelID                       => 123,                        # optional
+                Channel                         => 'some channel name',        # optional
+                CustomerVisible                 => 0|1,                        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 AutoResponseType                => 'some auto response type',  # optional
@@ -175,25 +174,6 @@ perform ArticleCreate Operation. This will return the created ArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create article for ticket $Param{Data}->{TicketID}!",
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # get ticket data
@@ -203,23 +183,24 @@ sub Run {
 
     if ( !%Ticket ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Ticket $Param{Data}->{TicketID} not found!",
+            Code => 'ParentObject.NotFound',
         );
     }
 
-    # isolate Article parameter
-    my $Article = $Param{Data}->{Article};
+    # isolate and trim Article parameter
+    my $Article = $Self->_Trim(
+        Data => $Param{Data}->{Article}
+    );
 
-    # add UserType to Validate ArticleType
+    # add UserType
     $Article->{UserType} = $Self->{Authorization}->{UserType};
 
     # set defaults from operation config
     if ( !$Article->{AutoResponseType} ) {
         $Article->{AutoResponseType} = $Self->{Config}->{AutoResponseType} || '';
     }
-    if ( !$Article->{ArticleTypeID} && !$Article->{ArticleType} ) {
-        $Article->{ArticleType} = $Self->{Config}->{ArticleType} || '';
+    if ( !$Article->{ChannelID} && !$Article->{Channel} ) {
+        $Article->{Channel} = $Self->{Config}->{Channel} || '';
     }
     if ( !$Article->{SenderTypeID} && !$Article->{SenderType} ) {
         $Article->{SenderType} = lc($Self->{Authorization}->{UserType});
@@ -246,7 +227,7 @@ sub Run {
     return $Self->_ArticleCreate(
         Ticket   => \%Ticket,
         Article  => $Article,
-        UserID   => $PermissionUserID,
+        UserID   => $Self->{Authorization}->{UserID},
     );
 }
 
@@ -288,16 +269,9 @@ sub _ArticleCreate {
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
-    my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket->{CustomerUser},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Ticket->{ContactID},
     );
-
-    my $CustomerID = $CustomerUserData{UserCustomerID} || '';
-
-    # use user defined CustomerID if defined
-    if ( defined $Ticket->{CustomerID} && $Ticket->{CustomerID} ne '' ) {
-        $CustomerID = $Ticket->{CustomerID};
-    }
 
     # get user object
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
@@ -341,14 +315,14 @@ sub _ArticleCreate {
     if ( $Article->{From} ) {
         $From = $Article->{From};
     }
-    # use data from customer user (if customer user is in database)
-    elsif ( IsHashRefWithData( \%CustomerUserData ) ) {
-        $From = '"' . $CustomerUserData{UserFirstname} . ' ' . $CustomerUserData{UserLastname} . '"'
-            . ' <' . $CustomerUserData{UserEmail} . '>';
+    # use data from contact (if contact is in database)
+    elsif ( IsHashRefWithData( \%ContactData ) ) {
+        $From = '"' . $ContactData{Firstname} . ' ' . $ContactData{Lastname} . '"'
+            . ' <' . $ContactData{Email} . '>';
     }
     # otherwise use customer user as sent from the request (it should be an email)
     else {
-        $From = $Ticket->{CustomerUser};
+        $From = $Ticket->{ContactID};
     }
 
     # set Article To
@@ -371,8 +345,9 @@ sub _ArticleCreate {
     my $ArticleID = $TicketObject->ArticleCreate(
         NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
         TicketID       => $Ticket->{TicketID},
-        ArticleTypeID  => $Article->{ArticleTypeID}  || '',
-        ArticleType    => $Article->{ArticleType}    || '',
+        ChannelID      => $Article->{ChannelID}      || '',
+        Channel        => $Article->{Channel}        || '',
+        CustomerVisible => $Article->{CustomerVisible} || 0,
         SenderTypeID   => $Article->{SenderTypeID}   || '',
         SenderType     => $Article->{SenderType}     || '',
         From           => $From,
@@ -399,9 +374,14 @@ sub _ArticleCreate {
     );
 
     if ( !$ArticleID ) {
+        my $Error = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
+
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create article, please contact the system administrator',
+            Message => $Error,
         );
     }
 
@@ -420,13 +400,6 @@ sub _ArticleCreate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
-
-            my $IsArticleDynamicField = $Self->ValidateDynamicFieldObjectType(
-                %{$DynamicField},
-                Article => 1,
-            );
-            next DYNAMICFIELD if !$IsArticleDynamicField;
-
             my $Result = $Self->SetDynamicFieldValue(
                 %{$DynamicField},
                 TicketID  => $Ticket->{TicketID},
@@ -477,16 +450,17 @@ sub _ArticleCreate {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

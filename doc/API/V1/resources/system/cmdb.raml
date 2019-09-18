@@ -1,0 +1,20 @@
+  displayName: "[System] CMDB"
+  description: !include ../../descriptions/resources/system/cmdb.md
+  /classes:
+    description: !include ../../descriptions/resources/system/cmdb/classes.md
+    type: { collection-nopatch: { typeName: ConfigItemClass } }
+    /{classId}:
+      type: { item: { typeName: ConfigItemClass } }
+      uriParameters:
+        classId:
+          displayName: ClassID
+          type: integer
+      /definitions:
+        description: !include ../../descriptions/resources/system/cmdb/classes/definitions.md
+        type: { collection: { typeName: ConfigItemClassDefinition } }
+        /{definitionId}:
+          type: { item-nopatch: { typeName: ConfigItemClassDefinition } }
+          uriParameters:
+            definitionId:
+              displayName: DefinitionID
+              type: integer

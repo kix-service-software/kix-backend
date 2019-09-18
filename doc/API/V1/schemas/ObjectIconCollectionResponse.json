@@ -1,0 +1,72 @@
+{
+   "$id" : "#ObjectIconCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of object icons.",
+   "type" : "object",
+   "properties" : {
+      "ObjectIcon" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/ObjectIcon"
+         }
+      }
+   },
+   "required" : [
+      "ObjectIcon"
+   ],
+   "definitions" : {
+      "ObjectIcon" : {
+         "$id" : "#ObjectIcon",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The object icon object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID"
+         ]
+      }
+   }
+}

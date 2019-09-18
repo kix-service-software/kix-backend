@@ -1,0 +1,1 @@
+In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If an error occurs the API returns a simple error object. You can find the structure of these objects in the response description for each API resource.

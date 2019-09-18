@@ -1,0 +1,14 @@
+{
+   "$id" : "#SystemAddressPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated system address.",
+   "type" : "object",
+   "properties" : {
+      "SystemAddressID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "SystemAddressID"
+   ]
+}

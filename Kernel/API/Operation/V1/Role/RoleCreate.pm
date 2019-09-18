@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/Role/RoleCreate.pm - API Role Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Role::RoleCreate;
@@ -128,19 +123,19 @@ sub Run {
     );
 
     # check if Role exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Group')->RoleLookup(
+    my $Exists = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
         Role => $Role->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Role. Role with same name '$Role->{Name}' already exists.",
+            Message => "Cannot create role. Role with same name '$Role->{Name}' already exists.",
         );
     }
 
     # create Role
-    my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleAdd(
+    my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
         Name    => $Role->{Name},
         Comment => $Role->{Comment} || '',
         ValidID => $Role->{ValidID} || 1,
@@ -150,10 +145,44 @@ sub Run {
     if ( !$RoleID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Role, please contact the system administrator',
+            Message => 'Could not create role, please contact the system administrator',
         );
     }
     
+    # assign users
+    if ( IsArrayRefWithData($Role->{UserIDs}) ) {
+        foreach my $UserID ( @{$Role->{UserIDs}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Role::RoleUserIDCreate',
+                Data          => {
+                    RoleID => $RoleID,
+                    UserID => $UserID,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+    }
+
+    # assign permissions
+    if ( IsArrayRefWithData($Role->{Permissions}) ) {
+        foreach my $Permission ( @{$Role->{Permissions}} ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::Role::PermissionCreate',
+                Data          => {
+                    RoleID     => $RoleID,
+                    Permission => $Permission,
+                }
+            );
+            
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+    }
+
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
@@ -163,3 +192,17 @@ sub Run {
 
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

@@ -1,0 +1,55 @@
+{
+   "$id" : "#ConfigItemAttachmentResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for config item attachment GET request.",
+   "type" : "object",
+   "properties" : {
+      "Attachment" : {
+         "$ref" : "#/definitions/ConfigItemAttachment"
+      }
+   },
+   "required" : [
+      "Attachment"
+   ],
+   "definitions" : {
+      "ConfigItemAttachment" : {
+         "$id" : "#ConfigItemAttachment",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item attachment object.",
+         "type" : "object",
+         "properties" : {
+            "AttachmentID" : {
+               "type" : "integer"
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "AttachmentID",
+            "ContentType",
+            "Content",
+            "Filesize",
+            "FilesizeRaw",
+            "Filename"
+         ]
+      }
+   }
+}

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::Config::Rebuild;
@@ -22,14 +22,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Rebuild the system configuration of OTRS.');
-
-    $Self->AddOption(
-        Name        => 'cleanup-user-config',
-        Description => "Cleanup the user configuration file ZZZAuto.pm, removing duplicate or obsolete values.",
-        Required    => 0,
-        HasValue    => 0,
-    );
+    $Self->Description('Rebuild the system configuration.');
 
     return;
 }
@@ -39,16 +32,13 @@ sub Run {
 
     $Self->Print("<yellow>Rebuilding the system configuration...</yellow>\n");
 
-    if ( !$Kernel::OM->Get('Kernel::System::SysConfig')->WriteDefault() ) {
-        $Self->PrintError("There was a problem writing ZZZAAuto.pm.");
+    my $Result = $Kernel::OM->Get('Kernel::System::SysConfig')->Rebuild();
+
+    if ( !$Result ) {
+        $Self->Print("<red>Error.</red>\n");
         return $Self->ExitCodeError();
     }
-    if ( $Self->GetOption('cleanup-user-config') ) {
-        if ( !$Kernel::OM->Get('Kernel::System::SysConfig')->CreateConfig() ) {
-            $Self->PrintError("There was a problem writing ZZZAuto.pm.");
-            return $Self->ExitCodeError();
-        }
-    }
+
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
 }
@@ -57,16 +47,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

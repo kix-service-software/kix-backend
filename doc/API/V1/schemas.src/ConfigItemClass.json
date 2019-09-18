@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemClass",
+  "type": "object",
+  "description": "The config item class object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "ConfigItemStats": {
+      "type": "object",
+      "description": "result of include \"ConfigItemStats\"",
+      "properties": {
+        "PostProductiveCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "ProductiveCount": {
+          "type": "integer",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "PostProductiveCount",
+        "ProductiveCount"
+      ]
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "CurrentDefinition": {
+      "type": "object",
+      "description": "added via include \"CurrentDefinition\"",
+      "$ref": "ConfigItemClassDefinition.json"
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Definitions": {
+      "type": "array",
+      "description": "added via include \"Definitions\"",
+      "item": {
+        "$ref": "ConfigItemClassDefinition.json"
+      }
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Name",
+    "ValidID"
+  ]
+}

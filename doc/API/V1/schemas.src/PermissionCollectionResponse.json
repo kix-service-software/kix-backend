@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#PermissionCollectionResponse",
+  "type": "object",
+  "description": "A list of permissions.",
+  "properties": {
+    "Permission": {
+      "type": "array",
+      "items": {
+        "$ref": "Permission.json"
+      }
+    }
+  },
+  "required": [
+    "Permission"
+  ]  
+}

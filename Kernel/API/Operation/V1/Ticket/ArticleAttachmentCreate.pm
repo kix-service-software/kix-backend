@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleAttachmentCreate;
@@ -135,24 +133,10 @@ perform ArticleAttachmentCreate Operation. This will return the created Attachme
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $PermissionUserID = $Self->{Authorization}->{UserID};
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        $PermissionUserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
+    # isolate and trim Attachment parameter
+    my $Attachment = $Self->_Trim(
+        Data => $Param{Data}->{Attachment}
     );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to create attachment for ticket $Param{Data}->{TicketID}!",
-        );
-    }
 
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -163,7 +147,7 @@ sub Run {
 
     if ( !%Ticket ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code => 'ParentObject.NotFound',
             Message => "Ticket $Param{Data}->{TicketID} not found!",
         );
     }
@@ -175,7 +159,7 @@ sub Run {
 
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found!",
         );
     }
@@ -183,14 +167,14 @@ sub Run {
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
     
     # check attachment values
     my $AttachmentCheck = $Self->_CheckAttachment( 
-        Attachment => $Param{Data}->{Attachment} 
+        Attachment => $Attachment 
     );
 
     if ( !$AttachmentCheck->{Success} ) {
@@ -201,16 +185,15 @@ sub Run {
 
     # create the new attachment
     my $AttachmentID = $TicketObject->ArticleWriteAttachment(
-        %{$Param{Data}->{Attachment}},
-        Content    => MIME::Base64::decode_base64( $Param{Data}->{Attachment}->{Content} ),
+        %{$Attachment},
+        Content    => MIME::Base64::decode_base64( $Attachment->{Content} ),
         ArticleID  => $Param{Data}->{ArticleID},
-        UserID     => $PermissionUserID,
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$AttachmentID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create attachment, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
 
@@ -229,16 +212,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

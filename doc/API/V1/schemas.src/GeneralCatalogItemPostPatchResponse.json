@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#GeneralCatalogItemPostPatchResponse",
+    "type": "object",
+    "description": "The ID of the created or updated GeneralCatalog item.",
+    "properties": {
+        "GeneralCatalogItemID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "GeneralCatalogItemID"
+    ]
+}

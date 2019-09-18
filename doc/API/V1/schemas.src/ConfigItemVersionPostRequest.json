@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemVersionPostRequest",
+  "type": "object",
+  "description": "The config item version request object for creation.",
+  "properties": {
+    "ConfigItemVersion": {
+      "$ref": "ConfigItemVersionPostItem.json"
+    }
+  },
+  "required": [
+    "ConfigItemVersion"
+  ]
+}

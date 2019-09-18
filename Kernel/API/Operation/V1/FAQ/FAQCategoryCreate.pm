@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/FAQ/FAQCategoryCreate.pm - API FAQCategory Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::FAQ::FAQCategoryCreate;
@@ -90,11 +85,7 @@ sub ParameterDefinition {
         },
         'FAQCategory::Name' => {
             Required => 1
-        },            
-        'FAQCategory::GroupIDs' => {
-            Type     => 'ARRAY',
-            Required => 1
-        },            
+        }
     }
 }
 
@@ -109,9 +100,6 @@ perform FAQCategoryCreate Operation. This will return the created FAQCategoryID.
                 Comment  => 'Some comment', # optional
                 ParentID => 2,              # optional
                 ValidID  => 1,              # optional, default 1
-                GroupIDs => [
-                    1,2,3,...
-                ]
             },
         },
     );
@@ -164,20 +152,6 @@ sub Run {
         );
     }
 
-    # set groups    
-    my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
-        CategoryID => $FAQCategoryID,
-        GroupIDs   => $FAQCategory->{GroupIDs} || [],
-        UserID     => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create group assignment, please contact the system administrator',
-        );
-    }
-    
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
@@ -187,3 +161,17 @@ sub Run {
 
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

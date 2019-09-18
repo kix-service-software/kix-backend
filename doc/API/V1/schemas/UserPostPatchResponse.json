@@ -1,0 +1,14 @@
+{
+   "$id" : "#UserPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated user.",
+   "type" : "object",
+   "properties" : {
+      "UserID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "UserID"
+   ]
+}

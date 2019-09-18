@@ -1,15 +1,14 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Main;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Dumper)
 
 use strict;
 use warnings;
@@ -604,6 +603,29 @@ get timestamp of file change time
 sub FileGetMTime {
     my ( $Self, %Param ) = @_;
 
+    my $Stat = $Self->FileStat(
+        %Param
+    );
+
+    return $Stat->mtime();
+}
+
+=item FileStat()
+
+get stat of given file
+
+    my $FileStat = $MainObject->FileStat(
+        Directory => 'c:\some\location',
+        Filename  => 'me_to/alal.xml',
+        # or Location
+        Location  => 'c:\some\location\me_to\alal.xml'
+    );
+
+=cut
+
+sub FileStat {
+    my ( $Self, %Param ) = @_;
+
     my $FH;
     if ( $Param{Filename} && $Param{Directory} ) {
 
@@ -649,7 +671,7 @@ sub FileGetMTime {
         return;
     }
 
-    return $Stat->mtime();
+    return $Stat;
 }
 
 =item MD5sum()
@@ -773,7 +795,7 @@ sub Dump {
     if ( !$Type ) {
         $Type = 'binary';
     }
-    if ( $Type ne 'ascii' && $Type ne 'binary' ) {
+    if ( $Type !~ /^ascii/ && $Type ne 'binary' ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => "Invalid Type '$Type'!"
@@ -786,6 +808,11 @@ sub Dump {
 
     # sort hash keys
     $Data::Dumper::Sortkeys = 1;
+
+    # suppress indention if requests
+    if ( $Type =~ /noindent$/ ) {
+        $Data::Dumper::Indent = 0;
+    }
 
     # This Dump() is using Data::Dumper with a utf8 workarounds to handle
     # the bug [rt.cpan.org #28607] Data::Dumper::Dumper is dumping utf8
@@ -1119,16 +1146,17 @@ sub _Dump {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

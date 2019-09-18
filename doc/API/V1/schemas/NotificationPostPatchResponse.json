@@ -1,0 +1,14 @@
+{
+   "$id" : "#NotificationPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated notification.",
+   "type" : "object",
+   "properties" : {
+      "NotificationID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "NotificationID"
+   ]
+}

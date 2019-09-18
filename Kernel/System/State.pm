@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::State;
@@ -124,6 +124,13 @@ sub StateAdd {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'State',
+        ObjectID  => $ID,
     );
 
     return $ID;
@@ -296,11 +303,18 @@ sub StateUpdate {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'State',
+        ObjectID  => $Param{ID},
+    );
+
     # check all sysconfig options
-    return 1 if !$Param{CheckSysConfig};
+    #return 1 if !$Param{CheckSysConfig};
 
     # check all sysconfig options and correct them automatically if neccessary
-    $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }
@@ -477,14 +491,12 @@ returns
 
     my %List = (
         1 => "new",
-        2 => "closed successful",
-        3 => "closed unsuccessful",
-        4 => "open",
-        5 => "removed",
-        6 => "pending reminder",
-        7 => "pending auto close+",
-        8 => "pending auto close-",
-        9 => "merged",
+        2 => "open",
+        3 => "pending reminder",
+        4 => "closed",
+        5 => "pending auto close",
+        6 => "removed",
+        7 => "merged",
     );
 
 =cut
@@ -548,7 +560,7 @@ sub StateList {
 returns the id or the name of a state
 
     my $StateID = $StateObject->StateLookup(
-        State => 'closed successful',
+        State => 'closed',
     );
 
     my $State = $StateObject->StateLookup(
@@ -729,7 +741,7 @@ sub StateTypeLookup {
     return $ReturnData;
 }
 
-sub TicketStateDelete {
+sub StateDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -755,10 +767,18 @@ sub TicketStateDelete {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'State',
+        ObjectID  => $Param{ID},
+    );
+
     return 1;
 }
 
 1;
+
 
 
 
@@ -768,11 +788,11 @@ sub TicketStateDelete {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

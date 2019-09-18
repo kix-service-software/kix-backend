@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/Service/ServiceUpdate.pm - API Service Update operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Service::ServiceUpdate;
@@ -98,7 +93,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ServiceUpdate Operation. This will return the updated TypeID.
+perform ServiceUpdate Operation. This will return the updated ServcieID.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -143,20 +138,24 @@ sub Run {
  
     if ( !%ServiceData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update Service. No Service with ID '$Param{Data}->{ServiceID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
     # check if Service exists
     # prepare full name for lookup
-    my $FullName = $Service->{Name};
-    if ( $Service->{ParentID} ) {
+    my $FullName = $Service->{Name} || $ServiceData{Name};
+    if ( $Service->{ParentID} || $ServiceData{ParentID} ) {
         my $ParentName = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
             ServiceID => $Service->{ParentID} || $ServiceData{ParentID},
-        );
+        );        
         if ($ParentName) {
-            $FullName = $ParentName . '::' . $Service->{Name};
+            $FullName = $ParentName . '::' . ( $Service->{Name} || $ServiceData{Name} );
+        }
+        else {
+            return $Self->_Error(
+                Code => 'ParentObject.NotFound',
+            );
         }
     }
 
@@ -166,10 +165,9 @@ sub Run {
         UserID  => 1,
     );
     
-    if ( $ServiceID != $ServiceData{ServiceID} ) {
+    if ( $ServiceID && $ServiceID != $ServiceData{ServiceID} ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Cannot update Service. Service with same name '$Service->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
 
@@ -177,9 +175,9 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::Service')->ServiceUpdate(
         ServiceID   => $Service->{ServiceID} || $ServiceData{ServiceID},    
         Name        => $Service->{Name} || $ServiceData{Name},
-        Comment     => $Service->{Comment} || $ServiceData{Comment},
+        Comment     => exists $Service->{Comment} ? $Service->{Comment} : $ServiceData{Comment},
         ValidID     => $Service->{ValidID} || $ServiceData{ValidID},
-        ParentID    => $Service->{ParentID} || $ServiceData{ParentID},
+        ParentID    => exists $Service->{ParentID} ? $Service->{ParentID} : $ServiceData{ParentID},
         TypeID      => $Service->{TypeID} || $ServiceData{TypeID},
         Criticality => $Service->{Criticality} || $ServiceData{Criticality},
         UserID      => $Self->{Authorization}->{UserID},
@@ -187,16 +185,29 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update Service, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
 
     # return result    
     return $Self->_Success(
-        ServiceID => $Param{Data}->{ServiceID},
+        ServiceID => $ServiceData{ServiceID},
     );    
 }
 
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

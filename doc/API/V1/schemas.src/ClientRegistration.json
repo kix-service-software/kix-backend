@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ClientRegistration",
+  "type": "object",
+  "description": "The client registration object.",
+  "properties": {
+    "ClientID": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Authorization": {
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "NotificationURL": {
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "NotificationInterval": {
+      "anyOf": [
+        {"type": "integer"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "LastNotificationTimestamp": {
+      "anyOf": [
+        {"type": "number"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ClientID"
+  ]
+}

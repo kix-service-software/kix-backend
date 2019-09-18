@@ -1,0 +1,21 @@
+{
+	"Queue": {
+        "Calendar": "",
+        "ChangeBy": 1,
+        "ChangeTime": "2018-11-08 10:35:37",
+        "Comment": "Postmaster queue.",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-08 10:35:37",
+        "DefaultSignKey": null,
+        "FollowUpID": 1,
+        "FollowUpLock": 0,
+        "Fullname": "Postmaster",
+        "Name": "Postmaster",
+        "ParentID": null,
+        "QueueID": 1,
+        "Signature": "",
+        "SystemAddressID": 1,
+        "UnlockTimeout": 0,
+        "ValidID": 1
+	}
+}

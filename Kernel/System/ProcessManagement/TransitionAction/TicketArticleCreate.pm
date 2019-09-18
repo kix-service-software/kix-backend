@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate;
@@ -71,8 +71,8 @@ sub new {
         TransitionActionEntityID => 'TA123',
         Config                   => {
             # required:
-            ArticleType      => 'note-internal',                        # note-external|phone|fax|sms|...
-                                                                        #   excluding any email type
+            Channel          => 'note',                                 # ...
+            CustomerVisible  => 0|1                                     # optional
             SenderType       => 'agent',                                # agent|system|customer
             ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
             Subject          => 'some short description',               # required
@@ -148,12 +148,12 @@ sub Run {
         }
     }
 
-    # check ArticleType
-    if ( $Param{Config}->{ArticleType} =~ m{\A email }msxi ) {
+    # check Channel
+    if ( $Param{Config}->{Channel} =~ m{\A email }msxi ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
-                . "ArticleType $Param{Config}->{ArticleType} is not supported",
+                . "Channel $Param{Config}->{Channel} is not supported",
         );
         return;
     }
@@ -207,16 +207,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

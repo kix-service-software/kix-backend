@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/User/UserUpdate.pm - API User Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::User::UserUpdate;
@@ -106,7 +101,7 @@ sub ParameterDefinition {
         'User::UserEmail' => {
             RequiresValueIfUsed => 1
         },
-    }
+        }
 }
 
 =item Run()
@@ -149,6 +144,7 @@ sub Run {
     my $User = $Self->_Trim(
         Data => $Param{Data}->{User},
     );
+    delete $User->{UserID};
 
     # check UserLogin exists
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
@@ -156,17 +152,16 @@ sub Run {
     );
     if ( !%UserData ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Can not update user. No user with ID '$Param{Data}->{UserID}' found.",
+            Code => 'Object.NotFound',
         );
     }
 
     # check if UserLogin already exists
-    if ( IsStringWithData($User->{UserLogin}) ) {
+    if ( IsStringWithData( $User->{UserLogin} ) ) {
         my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
             Search => $User->{UserLogin},
         );
-        if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+        if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Can not update user. Another user with same login already exists.',
@@ -174,34 +169,47 @@ sub Run {
         }
     }
 
-
     # check UserEmail exists
-    if ( IsStringWithData($User->{UserEmail}) ) {
+    if ( IsStringWithData( $User->{UserEmail} ) ) {
         my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
             PostMasterSearch => $User->{UserEmail},
         );
-        if ( %UserList && (scalar(keys %UserList) > 1 || !$UserList{$UserData{UserID}})) {        
+        if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Can not update user. Another user with same email address already exists.',
             );
         }
     }
-    
+
     # update User
     my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
         %UserData,
         %{$User},
-        ChangeUserID  => $Self->{Authorization}->{UserID},
-    );    
+        UserPw       => $User->{UserPw},
+        ChangeUserID => $Self->{Authorization}->{UserID},
+    );
     if ( !$Success ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update user, please contact the system administrator',
+            Code => 'Object.UnableToUpdate',
         );
     }
-    
+
     return $Self->_Success(
         UserID => $UserData{UserID},
-    );   
+    );
 }
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

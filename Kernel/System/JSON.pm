@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::JSON;
@@ -68,6 +68,7 @@ Encode a perl data structure to a JSON string.
     my $JSONString = $JSONObject->Encode(
         Data     => $Data,
         SortKeys => 1,          # (optional) (0|1) default 0, to sort the keys of the json data
+        Pretty   => 1,          # (optional) (0|1) default 0, to pretty print the json data
     );
 
 =cut
@@ -92,6 +93,11 @@ sub Encode {
     # sort the keys of the JSON data
     if ( $Param{SortKeys} ) {
         $JSONObject->canonical( [1] );
+    }
+
+    # pretty print the JSON data
+    if ( $Param{Pretty} ) {
+        $JSONObject->pretty( [1,1,1] );
     }
 
     # get JSON-encoded presentation of perl structure
@@ -243,16 +249,17 @@ sub _BooleansProcess {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

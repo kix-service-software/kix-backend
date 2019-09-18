@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleFlagUpdate;
@@ -131,28 +129,6 @@ perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-        # customers are not allowed to update articles
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'No permission to update article flag!',
-        );        
-    }
-
-    # check write permission
-    my $Permission = $Self->CheckWritePermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to update article flag!",
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Article = $TicketObject->ArticleGet(
@@ -163,16 +139,14 @@ sub Run {
     # check if article exists
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 
@@ -184,8 +158,7 @@ sub Run {
 
     if ( !exists($ArticleFlags{$Param{Data}->{FlagName}}) ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot update article flag. No flag with name '$Param{Data}->{FlagName}' found for the given article.",
+            Code => 'Object.NotFound',
         );
     }
 
@@ -198,8 +171,7 @@ sub Run {
 
     if ( !$Success ) {
         return $Self->_Error(
-            Code         => 'Object.UnableToUpdate',
-            Message      => "Unable to update article flag '$Param{Data}->{FlagName}'",
+            Code => 'Object.UnableToUpdate',
         );
     }
 
@@ -211,16 +183,17 @@ sub Run {
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,0 +1,22 @@
+{
+    "SLA": {
+        "Calendar": "24x7",
+        "ChangeBy": 1,
+        "ChangeTime": "2019-03-12 18:24:43",
+        "Comment": "",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-02 10:57:54",
+        "FirstResponseNotify": 0,
+        "FirstResponseTime": 30,
+        "MinTimeBetweenIncidents": 0,
+        "Name": "Level 1",
+        "SLAID": 11,
+        "SolutionNotify": 0,
+        "SolutionTime": 240,
+        "Type": "Other",
+        "TypeID": 21,
+        "UpdateNotify": 0,
+        "UpdateTime": 0,
+        "ValidID": 1
+    }
+}

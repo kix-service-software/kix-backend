@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ITSMConfigItem::Event::CIClassReference_RefreshLinks;
@@ -146,9 +146,9 @@ sub Run {
                 {
                     for my $CurrPrevPartnerID ( @{ $CIReferenceAttrDataRef->{$CurrKeyname} } ) {
                         $Self->{LinkObject}->LinkDelete(
-                            Object1 => 'ITSMConfigItem',
+                            Object1 => 'ConfigItem',
                             Key1    => $Param{ConfigItemID},
-                            Object2 => 'ITSMConfigItem',
+                            Object2 => 'ConfigItem',
                             Key2    => $CurrPrevPartnerID,
                             Type    => $LastLinkType,
                             UserID  => 1,
@@ -187,9 +187,9 @@ sub Run {
                             )
                         {
                             $Self->{LinkObject}->LinkAdd(
-                                SourceObject => 'ITSMConfigItem',
+                                SourceObject => 'ConfigItem',
                                 SourceKey    => $CurrCIReferenceID,
-                                TargetObject => 'ITSMConfigItem',
+                                TargetObject => 'ConfigItem',
                                 TargetKey    => $Param{ConfigItemID},
                                 Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
                                     ->{ReferencedCIClassLinkType},
@@ -199,9 +199,9 @@ sub Run {
                         }
                         else {
                             $Self->{LinkObject}->LinkAdd(
-                                TargetObject => 'ITSMConfigItem',
+                                TargetObject => 'ConfigItem',
                                 TargetKey    => $CurrCIReferenceID,
-                                SourceObject => 'ITSMConfigItem',
+                                SourceObject => 'ConfigItem',
                                 SourceKey    => $Param{ConfigItemID},
                                 Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
                                     ->{ReferencedCIClassLinkType},
@@ -326,16 +326,17 @@ sub _GetAttributeDataByKey {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,0 +1,17 @@
+{
+   "$id" : "#RoleUserIDCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of user IDs.",
+   "type" : "object",
+   "properties" : {
+      "UserIDs" : {
+         "type" : "array",
+         "items" : {
+            "type" : "integer"
+         }
+      }
+   },
+   "required" : [
+      "UserIDs"
+   ]
+}

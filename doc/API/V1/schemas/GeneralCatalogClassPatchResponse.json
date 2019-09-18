@@ -1,0 +1,14 @@
+{
+   "$id" : "#GeneralCatalogClassPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The name of the updated GeneralCatalog class.",
+   "type" : "object",
+   "properties" : {
+      "GeneralCatalogClass" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "GeneralCatalogClass"
+   ]
+}

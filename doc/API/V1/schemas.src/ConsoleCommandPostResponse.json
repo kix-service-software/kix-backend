@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#ConsoleCommandPostResponse",
+    "type": "object",
+    "description": "ExitCode and result output of the command execution.",
+    "properties": {
+        "ExitCode": {
+            "type": "integer",
+            "description": "ok = 0; error = 1; command not found = 127"
+        },
+        "Output": {
+            "type": "string",
+            "description": "The STDOUT and STDERR output of the command"
+        }
+    },
+    "required": [
+        "ExitCode",
+        "Output"
+    ]
+}

@@ -1,0 +1,389 @@
+{
+   "$id" : "#ConfigItemResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for config item GET request.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "$ref" : "#/definitions/ConfigItem"
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
+   "definitions" : {
+      "ConfigItemImage" : {
+         "$id" : "#ConfigItemImage",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item image object.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Comment",
+            "ConfigItemID",
+            "ContentType",
+            "Filename",
+            "ID"
+         ]
+      },
+      "ConfigItemHistory" : {
+         "$id" : "#ConfigItemHistory",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item history object.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryEntryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "HistoryType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserFirstname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserLastname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserLogin" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "HistoryEntryID",
+            "HistoryType",
+            "HistoryTypeID",
+            "UserID",
+            "UserFirstname",
+            "UserLastname",
+            "UserLogin"
+         ]
+      },
+      "ConfigItem" : {
+         "$id" : "#ConfigItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurDeplStateID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CurInciStateID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CurrentVersion" : {
+               "$ref" : "#/definitions/ConfigItemVersion"
+            },
+            "History" : {
+               "description" : "added via include \"History\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemHistory"
+               }
+            },
+            "Images" : {
+               "description" : "added via include \"Images\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemImage"
+               }
+            },
+            "LastVersionID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Versions" : {
+               "description" : "added via include \"Versions\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemVersion"
+               }
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "ConfigItemID"
+         ]
+      },
+      "ConfigItemVersion" : {
+         "$id" : "#ConfigItemVersion",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item version object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurDeplState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurDeplStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CurDeplStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurInciState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurInciStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CurInciStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Data" : {
+               "description" : "added via include \"Data\"",
+               "type" : "object"
+            },
+            "Definition" : {
+               "$ref" : "#/definitions/ConfigItemClassDefinition"
+            },
+            "DeplState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DeplStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DeplStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "InciState" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "InciStateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "InciStateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedData" : {
+               "description" : "added via include \"PreparedData\"",
+               "type" : "object"
+            },
+            "VersionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "ConfigItemID",
+            "CreateBy",
+            "CreateTime",
+            "CurDeplState",
+            "CurDeplStateID",
+            "CurDeplStateType",
+            "CurInciState",
+            "CurInciStateID",
+            "CurInciStateType",
+            "DeplState",
+            "DeplStateID",
+            "DeplStateType",
+            "InciState",
+            "InciStateID",
+            "InciStateType",
+            "Name",
+            "VersionID"
+         ]
+      },
+      "ConfigItemClassDefinition" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      }
+   }
+}

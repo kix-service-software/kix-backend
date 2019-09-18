@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::FAQ;
@@ -31,7 +31,6 @@ our @ObjectDependencies = (
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Encode',
-    'Kernel::System::Group',
     'Kernel::System::LinkObject',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
@@ -81,8 +80,9 @@ sub new {
     # get default options
     $Self->{Voting} = $ConfigObject->Get('FAQ::Voting');
 
-    # get the cache TTL (in seconds)
-    $Self->{CacheTTL} = int( $ConfigObject->Get('FAQ::CacheTTL') || 60 * 60 * 24 * 2 );
+    # init cache settings
+    $Self->{CacheType} = 'FAQ';
+    $Self->{CacheTTL}  = int( $ConfigObject->Get('FAQ::CacheTTL') || 60 * 60 * 24 * 2 );
 
     # init of event handler
     # currently there are no FAQ event modules but is needed to initialize otherwise errors are
@@ -156,7 +156,7 @@ sub FAQGet {
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
     my $Cache = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -250,7 +250,7 @@ sub FAQGet {
 
         # cache result
         $CacheObject->Set(
-            Type  => 'FAQ',
+            Type  => $Self->{CacheType},
             Key   => $CacheKey,
             Value => \%Data,
             TTL   => $Self->{CacheTTL},
@@ -320,7 +320,7 @@ sub ItemFieldGet {
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
     my $Cache = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -371,7 +371,7 @@ sub ItemFieldGet {
 
     # set cache
     $CacheObject->Set(
-        Type  => 'FAQ',
+        Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => $Cache,
         TTL   => $Self->{CacheTTL},
@@ -452,21 +452,22 @@ sub FAQAdd {
     # check if approval feature is used
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') ) {
 
-        # check permission
-        my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'ro',
-            Result => 'HASH',
-        );
+        # TODO!!! rbo-190327
+        # # check permission
+        # my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        #     UserID => $Param{UserID},
+        #     Type   => 'ro',
+        #     Result => 'HASH',
+        # );
 
-        # get the approval group
-        my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
+        # # get the approval group
+        # my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
 
-        # set default to 0 if approved param is not given
-        # or if user does not have the rights to approve
-        if ( !defined $Param{Approved} || !$Groups{$ApprovalGroup} ) {
-            $Param{Approved} = 0;
-        }
+        # # set default to 0 if approved param is not given
+        # # or if user does not have the rights to approve
+        # if ( !defined $Param{Approved} || !$Groups{$ApprovalGroup} ) {
+        #     $Param{Approved} = 0;
+        # }
     }
 
     # if approval feature is not activated, a new FAQ item is always approved
@@ -596,7 +597,9 @@ sub FAQAdd {
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(Type => 'FAQ');
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # check if approval feature is enabled
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
@@ -620,6 +623,13 @@ sub FAQAdd {
             );
         }
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Article',
+        ObjectID  => $ID,
+    );
 
     return $ID;
 }
@@ -716,8 +726,10 @@ sub FAQUpdate {
         );
     }
 
-    # delete cache
-    $Self->_DeleteFromFAQCache(%Param);
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
@@ -725,20 +737,21 @@ sub FAQUpdate {
     # update approval
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{ApprovalOff} ) {
 
-        # check permission
-        my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => 'ro',
-            Result => 'HASH',
-        );
+        # TODO!!! rbo-190327
+        # # check permission
+        # my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        #     UserID => $Param{UserID},
+        #     Type   => 'ro',
+        #     Result => 'HASH',
+        # );
 
-        # get the approval group
-        my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
+        # # get the approval group
+        # my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
 
-        # set approval to 0 if user does not have the rights to approve
-        if ( !$Groups{$ApprovalGroup} ) {
-            $Param{Approved} = 0;
-        }
+        # # set approval to 0 if user does not have the rights to approve
+        # if ( !$Groups{$ApprovalGroup} ) {
+        #     $Param{Approved} = 0;
+        # }
 
         # update the approval
         my $UpdateSuccess = $Self->_FAQApprovalUpdate(
@@ -757,8 +770,10 @@ sub FAQUpdate {
             return;
         }
 
-        # delete cache
-        $Self->_DeleteFromFAQCache(%Param);
+        # clear cache
+        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+            Type => $Self->{CacheType}
+        );
     }
 
     # check if history entry should be added
@@ -769,6 +784,13 @@ sub FAQUpdate {
         Name   => 'Updated',
         ItemID => $Param{ItemID},
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'FAQ.Article',
+        ObjectID  => $Param{ItemID},
     );
 
     return 1;
@@ -910,7 +932,13 @@ sub AttachmentAdd {
         $AttachmentID = $Row[0];
     }
 
-print STDERR "AttachmentID: $AttachmentID\n";
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Article.Attachment',
+        ObjectID  => $Param{ItemID}.'::'.$AttachmentID,
+    );
+    
     return $AttachmentID;
 }
 
@@ -969,8 +997,16 @@ sub AttachmentGet {
     my %File;
     while ( my @Row = $DBObject->FetchrowArray() ) {
 
-        # decode attachment if it's a postgresql backend and not BLOB
-        if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
+        my $DecodeBase64 = 0;
+        if ( $Row[3] =~ /^base64;/ ) {
+            # if the content starts with this pattern we need to replace it
+            # this attachment has been created by the initial data import
+            $Row[3] =~ s/^base64;//g;
+            $DecodeBase64 = 1;
+        }
+
+        # decode attachment if it's a postgresql backend and not BLOB or if it is a base64 encoded attachment from the initial data import
+        if ( $DecodeBase64 || !$DBObject->GetDatabaseFunction('DirectBlob') ) {
             $Row[3] = MIME::Base64::decode_base64( $Row[3] );
         }
 
@@ -1026,6 +1062,13 @@ sub AttachmentDelete {
         Bind => [ \$Param{FileID}, \$Param{ItemID} ],
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article.Attachment',
+        ObjectID  => $Param{ItemID}.'::'.$Param{FileID},
+    );
+
     return 1;
 }
 
@@ -1062,6 +1105,13 @@ sub AttachmentInlineDelete {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => 'DELETE FROM faq_attachment WHERE disposition = \'inline\' AND faq_id = ? ',
         Bind => [ \$Param{ItemID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article.InlineAttachment',
+        ObjectID  => $Param{ItemID},
     );
 
     return 1;
@@ -1366,8 +1416,17 @@ sub FAQDelete {
         Bind => [ \$Param{ItemID} ],
     );
 
-    # delete cache
-    $Self->_DeleteFromFAQCache(%Param);
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article',
+        ObjectID  => $Param{ItemID},
+    );
 
     return 1;
 }
@@ -1410,6 +1469,13 @@ sub FAQHistoryAdd {
         Bind => [
             \$Param{Name}, \$Param{ItemID}, \$Param{UserID}, \$Param{UserID},
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Article.History',
+        ObjectID  => $Param{ItemID},
     );
 
     return 1;
@@ -1569,6 +1635,13 @@ sub FAQHistoryDelete {
         Bind => [ \$Param{ItemID} ],
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article.History',
+        ObjectID  => $Param{ItemID},
+    );
+
     return 1;
 }
 
@@ -1712,12 +1785,7 @@ sub KeywordList {
 
         my $KeywordList = lc $Row[0];
 
-        for my $Keyword ( split /,/, $KeywordList ) {
-
-            # remove leading/tailing spaces
-            $Keyword =~ s{ \A \s+ }{}xmsg;
-            $Keyword =~ s{ \s+ \z }{}xmsg;
-
+        for my $Keyword ( split /\s/, $KeywordList ) {
             # increase keyword counter
             $Data{$Keyword}++;
         }
@@ -1868,6 +1936,13 @@ sub FAQLogAdd {
         Bind => [
             \$Param{ItemID}, \$Param{Interface}, \$IP, \$UserAgent,
         ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Article.Log',
+        ObjectID  => $Param{ItemID},
     );
 
     return 1;
@@ -2212,6 +2287,13 @@ sub FAQContentTypeSet {
                 \$ItemID,
             ],
         );
+
+        # push client callback event
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'FAQ.Article',
+            ObjectID  => $ItemID,
+        );
     }
 
     # Delete cache
@@ -2307,6 +2389,13 @@ sub _FAQApprovalUpdate {
         }
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'FAQ.Article',
+        ObjectID  => $Param{ItemID},
+    );
+
     return 1;
 }
 
@@ -2350,7 +2439,7 @@ sub _FAQApprovalTicketCreate {
 #rbo - T2016121190001552 - added KIX placeholders
     # get subject
     my $Subject = $ConfigObject->Get('FAQ::ApprovalTicketSubject');
-    $Subject =~ s{ <(KIX|OTRS)_FAQ_NUMBER> }{$Param{FAQNumber}}xms;
+    $Subject =~ s{ <KIX_FAQ_NUMBER> }{$Param{FAQNumber}}xms;
 
     # check if we can find existing open approval tickets for this FAQ article
     my @TicketIDs = $TicketObject->TicketSearch(
@@ -2416,17 +2505,16 @@ sub _FAQApprovalTicketCreate {
         }
         my $Category = join( '::', reverse @CategoryNames );
 
-#rbo - T2016121190001552 - added KIX placeholders
         # get body from config
         my $Body = $ConfigObject->Get('FAQ::ApprovalTicketBody');
-        $Body =~ s{ <(KIX|OTRS)_FAQ_CATEGORYID> }{$Param{CategoryID}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_CATEGORY>   }{$Category}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_LANGUAGE>   }{$Param{Language}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_ITEMID>     }{$Param{ItemID}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_NUMBER>     }{$Param{FAQNumber}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_TITLE>      }{$Param{Title}}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_AUTHOR>     }{$UserName}xms;
-        $Body =~ s{ <(KIX|OTRS)_FAQ_STATE>      }{$Param{Visibility}}xms;
+        $Body =~ s{ <KIX_FAQ_CATEGORYID> }{$Param{CategoryID}}xms;
+        $Body =~ s{ <KIX_FAQ_CATEGORY>   }{$Category}xms;
+        $Body =~ s{ <KIX_FAQ_LANGUAGE>   }{$Param{Language}}xms;
+        $Body =~ s{ <KIX_FAQ_ITEMID>     }{$Param{ItemID}}xms;
+        $Body =~ s{ <KIX_FAQ_NUMBER>     }{$Param{FAQNumber}}xms;
+        $Body =~ s{ <KIX_FAQ_TITLE>      }{$Param{Title}}xms;
+        $Body =~ s{ <KIX_FAQ_AUTHOR>     }{$UserName}xms;
+        $Body =~ s{ <KIX_FAQ_STATE>      }{$Param{Visibility}}xms;
 
         #  gather user data
         my %User = $UserObject->GetUserData(
@@ -2439,7 +2527,7 @@ sub _FAQApprovalTicketCreate {
         # create article
         my $ArticleID = $TicketObject->ArticleCreate(
             TicketID    => $TicketID,
-            ArticleType => 'note-internal',
+            Channel     => 'note',
             SenderType  => 'agent',
             From        => $From,
             Subject     => $Subject,
@@ -2460,48 +2548,10 @@ sub _FAQApprovalTicketCreate {
     return;
 }
 
-#
-# Deletes all needed FAQ item cache entries for a given FAQ ItemID.
-#
-sub _DeleteFromFAQCache {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(ItemID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-
-            return;
-        }
-    }
-
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
-    # Clear FAQGet cache
-    $CacheObject->Delete(
-        Type => 'FAQ',
-        Key  => 'FAQGet::ItemID::' . $Param{ItemID} . '::ItemFields::1',
-    );
-    $CacheObject->Delete(
-        Type => 'FAQ',
-        Key  => 'FAQGet::ItemID::' . $Param{ItemID} . '::ItemFields::0',
-    );
-
-    # Clear ItemFeldGet cache
-    $CacheObject->Delete(
-        Type => 'FAQ',
-        Key  => 'ItemFieldGet::ItemID::' . $Param{ItemID},
-    );
-    return 1;
-}
-
 1;
 
 =end Internal:
+
 
 
 
@@ -2511,11 +2561,11 @@ sub _DeleteFromFAQCache {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

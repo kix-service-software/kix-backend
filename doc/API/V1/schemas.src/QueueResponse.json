@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#QueueResponse",
+  "type": "object",
+  "description": "A response for queue GET request.",
+  "properties": {
+    "Queue": {
+      "$ref": "Queue.json"
+    }
+  },
+  "required": [
+    "Queue"
+  ]
+}

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::Base;
@@ -68,13 +68,13 @@ sub ReplaceExtended {
 
     # Extension Placeholder
     # additionel Placeholder KIX_LAST_...
-    # PriorityID, To, ArticleType, AgeTimeUnix, Body, MimeType, InReplyTo, TicketNumber,
+    # PriorityID, To, Channel, AgeTimeUnix, Body, MimeType, InReplyTo, TicketNumber,
     # SenderTypeID, ContentCharset, ResponsibleID, ReplyTo, EscalationSolutionTime,
     # SLA, EscalationUpdateTime, CreateTimeUnix, EscalationResponseTime, UntilTime,
-    # ArticleTypeID, ServiceID, FromRealname, From, Changed, MessageID, State,
+    # ChannelID, ServiceID, FromRealname, From, Changed, MessageID, State,
     # References, TypeID, Subject, ContentType, SenderType, QueueID, Title,
     # Responsible, LockID, Age, Owner, TicketID, Priority, Created, Lock, Queue,
-    # CustomerUserID, CreatedBy, StateType, OwnerID, Service, ArticleID, Cc,
+    # ContactID, CreatedBy, StateType, OwnerID, Service, ArticleID, Cc,
     # CustomerID, StateID, IncomingTime, Type, RealTillTimeNotUsed, EscalationTime, SLAID, Charset,
     # Idea: Code from sub _Replace
 
@@ -125,8 +125,7 @@ sub ReplaceExtended {
         %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{QueueID} );
     }
 
-#rbo - T2016121190001552 - added KIX placeholders
-    my $Tag = $Start . '(KIX|OTRS)_LAST_';
+    my $Tag = $Start . 'KIX_LAST_';
     if ( $Param{Text} =~ /$Tag.+$End/i ) {
 
         # get last article data and replace it with <KIX_LAST_...
@@ -134,9 +133,8 @@ sub ReplaceExtended {
             TicketID => $Param{TicketID},
         );
 
-#rbo - T2016121190001552 - added KIX placeholders
         # replace <KIX_LAST_BODY> and <KIX_LAST_COMMENT> tags
-        for my $Key (qw(KIX_LAST_BODY KIX_LAST_COMMENT OTRS_LAST_BODY OTRS_LAST_COMMENT)) {
+        for my $Key (qw(KIX_LAST_BODY KIX_LAST_COMMENT)) {
             my $Tag2 = $Start . $Key;
             if ( $Param{Text} =~ /$Tag2$End(\n|\r|)/g ) {
                 my $Line       = 2500;
@@ -188,9 +186,8 @@ sub ReplaceExtended {
             }
         }
 
-#rbo - T2016121190001552 - added KIX placeholders
         # replace <KIX_LAST_SUBJECT[]> tags
-        my $Tag2 = $Start . '(KIX|OTRS)_LAST_SUBJECT';
+        my $Tag2 = $Start . 'KIX_LAST_SUBJECT';
         if ( $Param{Text} =~ /$Tag2\[(.+?)\]$End/g ) {
             my $SubjectChar = $2;
 
@@ -226,7 +223,6 @@ sub ReplaceExtended {
     }
     else
     {
-        # using TemplateGenerator from KIX4OTRS
         $Param{Text} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
             RichText => $Param{RichText},
             Text     => $Param{Text},
@@ -342,16 +338,17 @@ sub _ConvertScalar2ArrayRef {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

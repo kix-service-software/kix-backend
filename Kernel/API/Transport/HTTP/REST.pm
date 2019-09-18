@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Transport::HTTP::REST;
@@ -118,8 +116,8 @@ sub ProviderProcessRequest {
 
     my $Operation;
     my %URIData;
-    my $RequestURI = $ENV{REQUEST_URI} || $ENV{PATH_INFO};
-    $RequestURI =~ s{.*webservice\/[^\/]+(\/.*)$}{$1}xms;
+    my $RequestURI = $ENV{REQUEST_URI};
+    $RequestURI =~ s{(\/.*)$}{$1}xms;
 
     # remove any query parameter form the URL
     # e.g. from /Ticket/1/2?UserLogin=user&Password=secret
@@ -135,13 +133,13 @@ sub ProviderProcessRequest {
         # remove question mark '?' in the beginning
         substr $QueryParamsStr, 0, 1, '';
 
-        # convert query parameters into a hash
+        # convert query parameters into a hash (support & and ; as well)
         # e.g. from UserLogin=user&Password=secret
         # to (
         #       UserLogin => 'user',
         #       Password  => 'secret',
         #    );
-        for my $QueryParam ( split '&', $QueryParamsStr ) {
+        for my $QueryParam ( split '&|;', $QueryParamsStr ) {
             my ( $Key, $Value ) = split '=', $QueryParam;
 
             # Convert + characters to its encoded representation, see bug#11917
@@ -171,7 +169,7 @@ sub ProviderProcessRequest {
 
     my %PossibleOperations;
 
-    my $RequestMethod = $ENV{'REQUEST_METHOD'} || 'GET';
+    my $RequestMethod = $ENV{'REQUEST_METHOD'} || 'OPTIONS';
     ROUTE:
     for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
 
@@ -179,7 +177,7 @@ sub ProviderProcessRequest {
 
         my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
 
-        if ( IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
+        if ( $RequestMethod ne 'OPTIONS' && IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
             next ROUTE if !grep { $RequestMethod eq $_ } @{ $RouteMapping{RequestMethod} };
         }
 
@@ -223,44 +221,67 @@ sub ProviderProcessRequest {
         }
     }
 
-    if ( !%PossibleOperations ) {
-        # we didn't find any possible operation, respond with 405 - find all allowed methods for this resource
-        my @AllowedMethods;
-        for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+    # determine all the  allowed methods
+    my %AvailableMethods;
+    for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
 
-            next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
+        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
 
-            my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
-            my $RouteRegEx = $RouteMapping{Route};
-            $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
+        my $RouteRegEx = $RouteMapping{Route};
+        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
-            next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
 
-            push(@AllowedMethods, @{$RouteMapping{RequestMethod}});
-        }        
+        $AvailableMethods{$RouteMapping{RequestMethod}->[0]} = {
+            Operation => $CurrentOperation,
+            Route     => $RouteMapping{Route}
+        };
+    }
 
+    if ( !%PossibleOperations && $RequestMethod ne 'OPTIONS' ) {
+        # if we didn't find any possible operation, respond with 405
         return $Self->_Error(
             Code       => 'NotAllowed',
-            Message    => HTTP::Status::status_message(405),
             Additional => {
                 AddHeader => {
-                    Allow => join(', ', @AllowedMethods),
+                    Allow => join(', ', sort keys %AvailableMethods),
                 }
             }
         );
     }
 
     # use the most recent operation (prefer "hard" routes above parameterized routes)
-    my $CurrentRoute = (reverse sort keys %PossibleOperations)[0];
-    $Operation = $PossibleOperations{$CurrentRoute}->{Operation};
-    %URIData   = %{$PossibleOperations{$CurrentRoute}->{URIParams}};
+    my $CurrentRoute = %PossibleOperations ? (reverse sort keys %PossibleOperations)[0] : $RequestURI;
+    $Operation = $PossibleOperations{$CurrentRoute} ? $PossibleOperations{$CurrentRoute}->{Operation} : '';
+    %URIData   = %PossibleOperations ? %{$PossibleOperations{$CurrentRoute}->{URIParams}} : ();
+
+    # get direct sub-resource for generic including
+    my %ResourceOperationRouteMapping = (
+        $Operation => $CurrentRoute
+    );
+    for my $Op ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+        # ignore invalid config
+        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$Op} );
+        # ignore non-search or -get operations
+        next if $Op !~ /(Search|Get)$/;
+        # ignore anything that has nothing to do with the current Ops route
+        if ( $CurrentRoute ne '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
+            next;
+        }
+        elsif ( $CurrentRoute eq '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
+            next;
+        }
+
+        $ResourceOperationRouteMapping{$Op} = $Config->{RouteOperationMapping}->{$Op}->{Route};
+    }
 
     # combine query params with URIData params, URIData has more precedence
     if (%QueryParams) {
         %URIData = ( %QueryParams, %URIData, );
     }
 
-    if ( !$Operation ) {
+    if ( !$Operation && $RequestMethod ne 'OPTIONS' ) {
         return $Self->_Error(
             Code    => 'Transport.REST.OperationNotFound',
             Message => "HTTP::REST Error while determine Operation for request URI '$RequestURI'.",
@@ -270,12 +291,16 @@ sub ProviderProcessRequest {
     my $Length = $ENV{'CONTENT_LENGTH'};
 
     # no length provided, return the information we have
-    if ( !$Length ) {
+    if ( !$Length || $RequestMethod eq 'OPTIONS' ) {
         return $Self->_Success(
-            Operation => $Operation,
+            Route          => $CurrentRoute,
+            RequestURI     => $RequestURI,
+            Operation      => $Operation,
+            AvailableMethods => \%AvailableMethods,
+            RequestMethod  => $RequestMethod,
+            ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             Data      => {
                 %URIData,
-                RequestMethod => $RequestMethod,
             },
         );
     }
@@ -359,8 +384,13 @@ sub ProviderProcessRequest {
 
     # all ok - return data
     return $Self->_Success(
-        Operation => $Operation,
-        Data      => $ReturnData,
+        Route          => $CurrentRoute,
+        RequestURI     => $RequestURI,
+        Operation      => $Operation,
+        AvailableMethods => \%AvailableMethods,
+        RequestMethod  => $RequestMethod,
+        ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
+        Data           => $ReturnData,
     );
 }
 
@@ -395,6 +425,7 @@ The HTTP code is set accordingly
 sub ProviderGenerateResponse {
     my ( $Self, %Param ) = @_;
     my $MappedCode;
+    my $MappedMessage;
 
     # add headers if given
     my $AddHeader;
@@ -408,25 +439,35 @@ sub ProviderGenerateResponse {
         my $Result = $Self->_MapReturnCode(
             Transport    => 'HTTP::REST',
             Code         => $Param{Code},
+            Message      => $Param{Message}
         );
 
         if ( IsHashRefWithData($Result) ) {
             return $Self->_Output(
                 HTTPCode => 500,
-                Content  => $Result->{Message},
+                Content  => {
+                    Code    => $Param{Code},
+                    Message => $Result->{Message},
+                }
             );            
         }
         else {
-            $MappedCode = $Result;
+            ($MappedCode, $MappedMessage) = split(/:/, $Result, 2);
+            if ( !$MappedMessage ) {
+                $MappedMessage = $Param{Message};
+            }
         }
     }
 
     # do we have to return an error message
-    if ( IsStringWithData( $Param{Message} ) ) {
+    if ( IsStringWithData( $MappedMessage ) ) {
         # return message directly
         return $Self->_Output(
             HTTPCode  => $MappedCode,
-            Content   => $Param{Message},
+            Content   => {
+                Code    => $Param{Code},
+                Message => $MappedMessage,
+            },
             AddHeader => $AddHeader,
         );
     }
@@ -435,7 +476,10 @@ sub ProviderGenerateResponse {
     if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
         return $Self->_Output(
             HTTPCode => 500,
-            Content  => 'Invalid data',
+            Content  => {
+                Code    => 'Transport.REST.InternalError',
+                Message => 'Invalid data',
+            }
         );
     }
 
@@ -444,23 +488,30 @@ sub ProviderGenerateResponse {
     if ( !$Param{Success} ) {
 
         # create Fault structure
-        my $FaultString = $Param{Message} || 'Unknown';
+        my $FaultString = $MappedMessage || 'Unknown';
         $Param{Data} = {
-            faultcode   => 'Server',
-            faultstring => $FaultString,
+            Code    => 'Unknown',
+            Message => $FaultString,
         };
     }
 
     # prepare data
-    my $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
-        Data => $Param{Data},
-    );
-
-    if ( !$JSONString ) {
-        return $Self->_Output(
-            HTTPCode => 500,
-            Content  => 'Error while encoding return JSON structure.',
+    my $JSONString = '';
+    if ( IsHashRefWithData($Param{Data}) ) {
+        $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+            Data     => $Param{Data},
+            SortKeys => 1
         );
+
+        if ( !$JSONString ) {
+            return $Self->_Output(
+                HTTPCode => 500,
+                Content  => {
+                    Code    => 'Transport.REST.InternalError',
+                    Message => 'Error while encoding return JSON structure.',
+                }
+            );
+        }
     }
 
     # no error - return output
@@ -498,13 +549,13 @@ sub RequesterPerformRequest {
 
     # check transport config
     if ( !IsHashRefWithData( $Self->{TransportConfig} ) ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoTransportConfig',
             Message => 'REST Transport: Have no TransportConfig',
         );
     }
     if ( !IsHashRefWithData( $Self->{TransportConfig}->{Config} ) ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoTransportConfig',
             Message => 'REST Transport: Have no Config',
         );
@@ -515,7 +566,7 @@ sub RequesterPerformRequest {
     for my $Needed (qw(Host DefaultCommand)) {
         next NEEDED if IsStringWithData( $Config->{$Needed} );
 
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.TransportConfigInvalid',
             Message => "REST Transport: Have no $Needed in config",
         );
@@ -523,7 +574,7 @@ sub RequesterPerformRequest {
 
     # check data param
     if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.DataMissing',
             Message => 'REST Transport: Invalid Data',
         );
@@ -531,7 +582,7 @@ sub RequesterPerformRequest {
 
     # check operation param
     if ( !IsStringWithData( $Param{Operation} ) ) {
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.DataMissing',
             Message => 'REST Transport: Need Operation',
         );
@@ -574,7 +625,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $Message,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.InternalError',
             Message => $Message,
         );
@@ -616,7 +667,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $Message,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.InvalidMethod',
             Message => $Message,
         );
@@ -636,7 +687,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $Message,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoInvokerControllerMapping',
             Message => $Message,
         );
@@ -790,7 +841,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => $ResponseCode,
             Message => $ResponseError,
         );
@@ -805,7 +856,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.NoContent',
             Message => $ResponseError,
         );
@@ -859,7 +910,7 @@ sub RequesterPerformRequest {
         $Self->{DebuggerObject}->Error(
             Summary => $ResponseError,
         );
-        return $Self->ReturnError(
+        return $Self->_Error(
             Code    => 'Transport.REST.InvalidJSON',
             Message => $ResponseError,
         );
@@ -904,21 +955,46 @@ Returns structure to be passed to provider.
 
 sub _Output {
     my ( $Self, %Param ) = @_;
-
-    # check params
     my $Success = 1;
     my $Message;
+
+    if ( IsHashRefWithData($Param{Content}) ) {
+        $Param{Content} = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+            Data => $Param{Content},
+        );
+
+        if ( !$Param{Content} ) {
+            $Param{HTTPCode} = 500;
+            $Param{Content}  = '
+{ 
+    "Code": "Transport.REST.InternalError",
+    "Message": "Error while encoding return JSON structure."
+}';
+            $Success         = 0;
+            $Message         = 'Error while encoding return JSON structure.';            
+        }
+    }
+
+    # check params
     if ( defined $Param{HTTPCode} && !IsInteger( $Param{HTTPCode} ) ) {
         $Param{HTTPCode} = 500;
-        $Param{Content}  = 'Invalid internal HTTPCode';
+        $Param{Content}  = '
+{ 
+    "Code": "Transport.REST.InternalError",
+    "Message": "Invalid internal HTTPCode"
+}';
         $Success         = 0;
-        $Message    = 'Invalid internal HTTPCode';
+        $Message         = 'Invalid internal HTTPCode';
     }
     elsif ( defined $Param{Content} && !IsString( $Param{Content} ) ) {
         $Param{HTTPCode} = 500;
-        $Param{Content}  = 'Invalid Content';
+        $Param{Content}  = '
+{ 
+    "Code": "Transport.REST.InternalError",
+    "Message": "Invalid Content"
+}';
         $Success         = 0;
-        $Message    = 'Invalid Content';
+        $Message         = 'Invalid Content';
     }
 
     # prepare protocol
@@ -933,13 +1009,7 @@ sub _Output {
     # prepare data
     $Param{Content}  ||= '';
     $Param{HTTPCode} ||= 500;
-    my $ContentType;
-    if ( $Param{HTTPCode} =~ /^2/ ) {
-        $ContentType = 'application/json';
-    }
-    else {
-        $ContentType = 'text/plain';
-    }
+    my $ContentType =  'application/json';
 
     # calculate content length (based on the bytes length not on the characters length)
     my $ContentLength = bytes::length( $Param{Content} );
@@ -973,11 +1043,15 @@ sub _Output {
     # reproducible, and not tested in this solution).
     binmode STDOUT, ':utf8';    ## no critic
 
-
+    # adjust HTTP code
+    my $HTTPCode = $Param{HTTPCode};
+    if ( $Param{HTTPCode} eq 200 && !$Param{Content} ) {
+        $HTTPCode = 204;        # No Content
+    }
 
     # print data to http - '\r' is required according to HTTP RFCs
-    my $StatusMessage = HTTP::Status::status_message( $Param{HTTPCode} );
-    print STDOUT "Status: $Param{HTTPCode} $StatusMessage\r\n";
+    my $StatusMessage = HTTP::Status::status_message( $HTTPCode );
+    print STDOUT "Status: $HTTPCode $StatusMessage\r\n";
     print STDOUT "Content-Type: $ContentType; charset=UTF-8\r\n";
     print STDOUT "Content-Length: $ContentLength\r\n";
     print STDOUT "Connection: $Connection\r\n";
@@ -1011,16 +1085,17 @@ sub _Output {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

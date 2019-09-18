@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Provider;
@@ -85,10 +83,8 @@ sub Run {
 
     my $Webservice;
 
-    # on Microsoft IIS 7.0, $ENV{REQUEST_URI} is not set. See bug#9172.
-    my $RequestURI = $ENV{REQUEST_URI} || $ENV{PATH_INFO};
-
-    my ($WebserviceName) = $RequestURI =~ m{ api[.]pl [/] webservice [/] ([^/?]+) }smx;
+    my ($Tmp, $Entrypoint, $WebserviceName, $RequestURI) = split(/\//, $ENV{REQUEST_URI}, 4);
+    $ENV{REQUEST_URI} = '/'.$RequestURI;
 
     if ( !$WebserviceName ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -182,17 +178,111 @@ sub Run {
         );
     }
 
-    my $Operation = $FunctionResult->{Operation};
+    # save FunctionResult for later use
+    my %ProcessRequestResult = %{$FunctionResult};
 
-    $Self->{DebuggerObject}->Debug(
-        Summary => "Detected operation '$Operation'",
-    );
+    my $Operation = $FunctionResult->{Operation};
+    my $DataIn    = $FunctionResult->{Data};
+
+    if ( $Operation ) {
+        $Self->{DebuggerObject}->Debug(
+            Summary => "Detected operation '$Operation'",
+        );
+    }
+
+    # check authorization if needed
+    my $Authorization;
+    if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
+        $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
+
+        if ( $ProcessRequestResult{RequestMethod} ne 'OPTIONS' && !$FunctionResult->{Success} ) {
+            return $Self->_GenerateErrorResponse(
+                %{$FunctionResult},
+            );
+        }
+        else {
+            $Authorization = $FunctionResult->{Data}->{Authorization};
+        }
+    }
+
+    # check if we have to respond to an OPTIONS request instead of executing the operation
+    if ( $ProcessRequestResult{RequestMethod} && $ProcessRequestResult{RequestMethod} eq 'OPTIONS' ) {
+        my $Data;
+
+        # add information about each available method
+        foreach my $Method ( sort keys %{$ProcessRequestResult{AvailableMethods}} ) {
+
+            # create an operation object for each allowed method and ask it for options
+            my $Operation = $ProcessRequestResult{AvailableMethods}->{$Method}->{Operation}; 
+
+            my $OperationObject = Kernel::API::Operation->new(
+                DebuggerObject          => $Self->{DebuggerObject},
+                APIVersion              => $Webservice->{Config}->{APIVersion},
+                Operation               => $Operation,
+                OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
+                WebserviceID            => $WebserviceID,
+                AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+                OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+                RequestMethod           => $Method,
+                CurrentRoute            => $ProcessRequestResult{Route},
+                RequestURI              => $ProcessRequestResult{RequestURI},
+                Authorization           => $Authorization,
+            );
+
+            # if operation init failed, bail out
+            if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
+                # only bail out if it's not a 403
+                if ( $OperationObject->{Code} ne 'Forbidden' ) {
+                    return $Self->_GenerateErrorResponse(
+                        %{$OperationObject},
+                    );
+                }
+            }
+            else {
+                # get options from operation
+                my $OptionsResult = $OperationObject->Options();
+                my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
+
+                $Data->{Methods}->{$Method} = {
+                    %OptionsData,
+                    Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
+                    AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
+                }
+            }
+        }
+
+        # add information about sub-resources
+        my $CurrentRoute = $ProcessRequestResult{Route};
+        $CurrentRoute = '' if $CurrentRoute eq '/';
+        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessRequestResult{ResourceOperationRouteMapping}});
+        if ( @ChildResources ) {
+            $Data->{Resources} = \@ChildResources;
+        }
+
+        my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
+            Success => 1,
+            Data    => $Data,
+            Additional => {
+                AddHeader => {
+                    Allow => join(', ', sort keys %{$Data->{Methods}}),
+                }
+            }
+        );
+
+        if ( !$FunctionResult->{Success} ) {
+            $Self->_Error(
+                Code    => 'Provider.InternalError',
+                Message => 'Response could not be sent',
+                Data    => $FunctionResult->{ErrorMessage},
+            );
+        }
+
+        return;
+    }
 
     #
     # Map the incoming data based on the configured mapping
     #
-
-    my $DataIn = $FunctionResult->{Data};
 
     $Self->{DebuggerObject}->Debug(
         Summary => "Incoming data before mapping",
@@ -201,7 +291,7 @@ sub Run {
 
     # decide if mapping needs to be used or not
     if (
-        IsHashRefWithData( $ProviderConfig->{Operation}->{$Operation}->{MappingInbound} )
+        $Operation && IsHashRefWithData( $ProviderConfig->{Operation}->{$Operation}->{MappingInbound} )
         )
     {
         my $MappingInObject = Kernel::API::Mapping->new(
@@ -244,22 +334,6 @@ sub Run {
         );
     }
 
-    # check authorization if needed
-    my $Authorization;
-    if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
-        $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
-
-        if ( !$FunctionResult->{Success} ) {
-
-            return $Self->_GenerateErrorResponse(
-                %{$FunctionResult},
-            );
-        }
-        else {
-            $Authorization = $FunctionResult->{Data}->{Authorization};
-        }
-    }
-
     #
     # Execute actual operation.
     #
@@ -270,6 +344,12 @@ sub Run {
         Operation               => $Operation,
         OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
         WebserviceID            => $WebserviceID,
+        AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+        OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+        AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+        RequestMethod           => $ProcessRequestResult{RequestMethod},
+        CurrentRoute            => $ProcessRequestResult{Route},
+        RequestURI              => $ProcessRequestResult{RequestURI},
         Authorization           => $Authorization,
     );
 
@@ -280,6 +360,7 @@ sub Run {
         );
     }
 
+    # execute the actual operation
     my $FunctionResultOperation = $OperationObject->Run(
         Data => $DataIn,
     );
@@ -396,16 +477,17 @@ sub _GenerateErrorResponse {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

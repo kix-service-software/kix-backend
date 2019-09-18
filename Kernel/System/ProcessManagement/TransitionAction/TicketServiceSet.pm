@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::TicketServiceSet;
@@ -113,7 +113,7 @@ sub Run {
         return;
     }
 
-    if ( !$Param{Ticket}->{CustomerUserID} ) {
+    if ( !$Param{Ticket}->{ContactID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "To set a service the ticket requires a customer!",
@@ -148,7 +148,7 @@ sub Run {
 
         # check if serivce is assigned to Customer User otherwise return
         $Success = $Self->_CheckService(
-            UserLogin => $Param{Ticket}->{CustomerUserID},
+            UserLogin => $Param{Ticket}->{ContactID},
             ServiceID => $Param{Config}->{ServiceID}
         );
 
@@ -160,7 +160,7 @@ sub Run {
                     . $Param{Config}->{ServiceID}
                     # rkaiser - T#2017020290001194 - changed customer user to contact
                     . ' is not assigned to contact '
-                    . $Param{Ticket}->{CustomerUserID}
+                    . $Param{Ticket}->{ContactID}
             );
             return;
         }
@@ -225,7 +225,7 @@ sub Run {
 
         # check if service is assigned to Customer User, otherwise return
         $Success = $Self->_CheckService(
-            UserLogin => $Param{Ticket}->{CustomerUserID},
+            UserLogin => $Param{Ticket}->{ContactID},
             ServiceID => $ServiceID,
         );
 
@@ -237,7 +237,7 @@ sub Run {
                     . $Param{Config}->{Service}
                     # rkaiser - T#2017020290001194 - changed customer user to contact
                     . ' is not assigned to contact '
-                    . $Param{Ticket}->{CustomerUserID}
+                    . $Param{Ticket}->{ContactID}
             );
             return;
         }
@@ -291,8 +291,8 @@ sub _CheckService {
     my ( $Self, %Param ) = @_;
 
     # get a list of assigned services to the customer user
-    my %Services = $Kernel::OM->Get('Kernel::System::Service')->CustomerUserServiceMemberList(
-        CustomerUserLogin => $Param{UserLogin},
+    my %Services = $Kernel::OM->Get('Kernel::System::Service')->ContactServiceMemberList(
+        ContactLogin => $Param{UserLogin},
         Result            => 'HASH',
         DefaultServices   => 1,
     );
@@ -312,16 +312,17 @@ sub _CheckService {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Dev::Package::RepositoryIndex;
@@ -23,10 +23,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Generate an index file (otrs.xml) for an OTRS package repository.');
+    $Self->Description('Generate an index file (packages.xml) for a KIX package repository.');
     $Self->AddArgument(
         Name        => 'source-directory',
-        Description => "Specify the directory containing the OTRS packages.",
+        Description => "Specify the directory containing the KIX packages.",
         Required    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -49,11 +49,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $Result = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
-    $Result .= "<otrs_package_list version=\"1.0\">\n";
+    $Result .= "<kix_package_list version=\"1.0\">\n";
     my $SourceDirectory = $Self->GetArgument('source-directory');
     my @List            = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
         Directory => $SourceDirectory,
-        Filter    => '*.opm',
+        Filter    => '*.kpm',
         Recursive => 1,
     );
     for my $File (@List) {
@@ -81,7 +81,7 @@ sub Run {
         $Result .= "  <File>$RelativeFile</File>\n";
         $Result .= "</Package>\n";
     }
-    $Result .= "</otrs_package_list>\n";
+    $Result .= "</kix_package_list>\n";
     $Self->Print($Result);
 
     return $Self->ExitCodeOk();
@@ -91,16 +91,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

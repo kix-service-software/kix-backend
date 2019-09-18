@@ -1,60 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigItemGet" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SysConfigItemGet</Item>
+                <Item Key="Name">SysConfigOptionGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SysConfig</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
-                <Item Key="ObjectID">SysConfigItemID</Item>
+                <Item Key="ObjectID">Option</Item>
+                <Item Key="ResponseObject">SysConfigOptionResponse</Item>
+                <Item Key="CacheType">API_sysconfig</Item>
+                <Item Key="CacheTypeDependency">SysConfig</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigItemSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SysConfigItemSearch</Item>
+                <Item Key="Name">SysConfigOptionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SysConfig</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SysConfigOptionCollectionResponse</Item>
+                <Item Key="CacheType">API_sysconfig</Item>
+                <Item Key="CacheTypeDependency">SysConfig</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigItemUpdate" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SysConfigItemUpdate</Item>
+                <Item Key="Name">SysConfigOptionUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SysConfig</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">SysConfigOptionPatchRequest</Item>
+                <Item Key="ResponseObject">SysConfigOptionPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigItemDefinitionGet" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SysConfigItemDefinitionGet</Item>
+                <Item Key="Name">SysConfigOptionTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SysConfig</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">SysConfigOptionTypeCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigItemDefinitionSearch" Required="0" Valid="1">
+
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SysConfigItemDefinitionSearch</Item>
+                <Item Key="Name">SysConfigOptionDefinitionGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">SysConfig</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ObjectID">OptionDefinition</Item>
+                <Item Key="ResponseObject">SysConfigOptionDefinitionResponse</Item>
+                <Item Key="CacheType">API_sysconfig</Item>
+                <Item Key="CacheTypeDependency">SysConfig</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">SysConfigOptionDefinitionCollectionResponse</Item>
+                <Item Key="CacheType">API_sysconfig</Item>
+                <Item Key="CacheTypeDependency">SysConfig</Item>
             </Hash>
         </Setting>
     </ConfigItem>

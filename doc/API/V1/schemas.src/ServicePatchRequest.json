@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ServicePatchRequest",
+  "type": "object",
+  "description": "The service request object for update.",
+  "properties": {
+    "Service": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Criticality": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "TypeID": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "Service"
+  ]
+}

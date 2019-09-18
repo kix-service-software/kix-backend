@@ -1,16 +1,9 @@
 # --
-# Kernel/API/Operation/Contact/ContactGet.pm - API Contact Get operation backend
-# based upon Kernel/API/Operation/Ticket/TicketGet.pm
-# original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Contact::ContactGet;
@@ -92,6 +85,7 @@ sub ParameterDefinition {
 
     return {
         'ContactID' => {
+            DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
         }                
@@ -131,53 +125,24 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @ContactList;
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('CustomerUser');
   
     # start loop
     foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
 
         # get the Contact data
-        my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $ContactID,
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            ID => $ContactID,
         );
 
         if ( !IsHashRefWithData( \%ContactData ) ) {
 
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No Contact data found for ContactID $ContactID.",
+                Code => 'Object.NotFound',
             );
         }
 
-        # map UserID to ContactID
-        $ContactData{ContactID} = $ContactData{UserID};
-        delete $ContactData{UserID};
-
-        # map Source to SourceID
-        $ContactData{SourceID} = $ContactData{Source};
-        delete $ContactData{Source};
-
-        my $AttributeWhitelist = $Self->{Config}->{AttributeWhitelist};
-
-        # add attributes from Map to whitelist
-        foreach my $Field ( @{$ContactData{Config}->{Map}} ) {
-            next if !$Field->{Exposed};
-            $AttributeWhitelist->{$Field->{Attribute}} = 1;
-        }
-
-        # add required attributes to whitelist
-        foreach my $Attr ( qw(SourceID ContactID CreateBy CreateTime ChangeBy ChangeTime ValidID DisplayValue UserCustomerIDs) ) {
-            $AttributeWhitelist->{$Attr} = 1;
-        } 
-
-        # always add UserCustomerIDs (override existing one)
-        my @CustomerIDs = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerIDs(
-            User => $ContactID,
-        );
-        $ContactData{UserCustomerIDs} = \@CustomerIDs;
-
         # filter valid attributes
-        if ( IsHashRefWithData($AttributeWhitelist) ) {
+        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
             foreach my $Attr (sort keys %ContactData) {
                 delete $ContactData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
             }
@@ -190,28 +155,6 @@ sub Run {
             }
         }
 
-        # include Tickets if requested
-        if ( $Param{Data}->{include}->{Tickets} ) {
-            # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'CustomerUserID',
-                            Operator => 'EQ',
-                            Value    => $ContactID,
-                        }
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'ARRAY',
-            );
-            $ContactData{Tickets} = \@TicketIDs;
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
-        }
-
         # include TicketStats if requested
         if ( $Param{Data}->{include}->{TicketStats} ) {
             # execute ticket searches
@@ -221,7 +164,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -240,7 +183,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -259,7 +202,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -278,7 +221,7 @@ sub Run {
                 Search => {
                     AND => [
                         {
-                            Field    => 'CustomerUserID',
+                            Field    => 'ContactID',
                             Operator => 'EQ',
                             Value    => $ContactID,
                         },
@@ -315,3 +258,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

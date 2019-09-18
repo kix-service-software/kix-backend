@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Dev::UnitTest::Run;
@@ -27,6 +27,13 @@ sub Configure {
     $Self->AddOption(
         Name        => 'test',
         Description => "Run single test files, e.g. 'Ticket' or 'Ticket:Queue'.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'exclude',
+        Description => "Exclude one or more test. You can give a RegEx pattern.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -72,6 +79,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'pretty',
+        Description => "Break lines in non-verbose mode.",
+        Required    => 0,
+        HasValue    => 0,
+    );
 }
 
 sub PreRun {
@@ -95,11 +108,13 @@ sub Run {
 
     my $FunctionResult = $Kernel::OM->Get('Kernel::System::UnitTest')->Run(
         Name                   => $Self->GetOption('test')                       || '',
+        Exclude                => $Self->GetOption('exclude')                    || '',
         Directory              => $Self->GetOption('directory')                  || '',
         Product                => $Self->GetOption('product')                    || '',
         SubmitURL              => $Self->GetOption('submit-url')                 || '',
         SubmitResultAsExitCode => $Self->GetOption('submit-result-as-exit-code') || '',
         Verbose                => $Self->GetOption('verbose')                    || '',
+        Pretty                 => $Self->GetOption('pretty')                     || '',
     );
 
     if ($FunctionResult) {
@@ -112,16 +127,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

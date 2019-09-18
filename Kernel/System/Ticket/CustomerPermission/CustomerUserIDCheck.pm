@@ -1,20 +1,20 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::CustomerPermission::CustomerUserIDCheck;
+package Kernel::System::Ticket::CustomerPermission::ContactIDCheck;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
 );
@@ -50,10 +50,10 @@ sub Run {
     );
 
     return if !%Ticket;
-    return if !$Ticket{CustomerUserID};
+    return if !$Ticket{ContactID};
 
     # get user data
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
+    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         User => $Param{UserID},
     );
 
@@ -61,7 +61,7 @@ sub Run {
     return if !$CustomerData{UserLogin};
 
     # check user login, return access if customer user id is the same
-    return 1 if lc $Ticket{CustomerUserID} eq lc $CustomerData{UserLogin};
+    return 1 if lc $Ticket{ContactID} eq lc $CustomerData{UserLogin};
 
     # return no access
     return;
@@ -71,16 +71,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

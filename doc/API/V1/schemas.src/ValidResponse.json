@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ValidResponse",
+  "type": "object",
+  "description": "A response for valid GET request.",
+  "properties": {
+    "Valid": {
+      "$ref": "Valid.json"
+    }
+  },
+  "required": [
+    "Valid"
+  ]
+}

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Event::AddToAddressBook;
@@ -14,7 +14,7 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::AddressBook',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::SystemAddress',
     'Kernel::System::Ticket',
@@ -36,7 +36,7 @@ sub new {
     # create needed objects
     $Self->{ConfigObject}        = $Kernel::OM->Get('Kernel::Config');
     $Self->{AddressBookObject}   = $Kernel::OM->Get('Kernel::System::AddressBook');
-    $Self->{CustomerUserObject}  = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject}  = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LogObject}           = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{SystemAddressObject} = $Kernel::OM->Get('Kernel::System::SystemAddress');
     $Self->{TicketObject}        = $Kernel::OM->Get('Kernel::System::Ticket');
@@ -90,11 +90,11 @@ sub Run {
             # ignore system addresses
             next if ($Self->{SystemAddressObject}->SystemAddressIsLocalAddress( Address => $CurrEmailAddress ));
 
-            # check customer backends for this mail address
-            my %UserListCustomer = $Self->{CustomerUserObject}->CustomerSearch(
+            # check contacts for this mail address
+            my %ContactList = $Self->{ContactObject}->ContactSearch(
                 PostMasterSearch => $CurrEmailAddress,
             );
-            next MAILADDRESS if (%UserListCustomer);
+            next MAILADDRESS if (%ContactList);
             
             # check address book
             my %AddressList = $Self->{AddressBookObject}->AddressList(
@@ -122,16 +122,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::CustomerPermission::CustomerIDCheck;
@@ -15,7 +15,7 @@ use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
     'Kernel::System::Ticket',
 );
@@ -58,15 +58,15 @@ sub Run {
     return if !$Ticket{CustomerID};
 
     # get customer user object
-    my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
     # check customer id
-    my %CustomerData = $CustomerUserObject->CustomerUserDataGet(
+    my %CustomerData = $ContactObject->ContactGet(
         User => $Param{UserID},
     );
 
     # get customer ids
-    my @CustomerIDs = $CustomerUserObject->CustomerIDs(
+    my @CustomerIDs = $ContactObject->CustomerIDs(
         User => $Param{UserID},
     );
 
@@ -92,16 +92,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

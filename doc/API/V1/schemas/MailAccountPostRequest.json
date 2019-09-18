@@ -1,0 +1,58 @@
+{
+   "$id" : "#MailAccountPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The mail account request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "MailAccount" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "DispatchingBy" : {
+               "description" : "Can be either 'From' or 'Queue'.",
+               "type" : "string"
+            },
+            "Host" : {
+               "type" : "string"
+            },
+            "IMAPFolder" : {
+               "description" : "The IMAP folder to use if type is 'IMAP'.",
+               "type" : "string"
+            },
+            "Login" : {
+               "type" : "string"
+            },
+            "Password" : {
+               "type" : "string"
+            },
+            "QueueID" : {
+               "description" : "The ID of the queue to dispatch to if DispatchingBy is 'Queue'.",
+               "type" : "integer"
+            },
+            "Trusted" : {
+               "description" : "If set to 1 the KIX-X-Headers will be interpreted.",
+               "type" : "integer"
+            },
+            "Type" : {
+               "description" : "One of the available types from resource /system/communication/mailaccounts/types.",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "DispatchingBy",
+            "Host",
+            "Login",
+            "Password",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "MailAccount"
+   ]
+}

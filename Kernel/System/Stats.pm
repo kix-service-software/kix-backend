@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Stats;
@@ -30,7 +30,6 @@ our @ObjectDependencies = (
     'Kernel::System::Cache',
     'Kernel::System::DB',
     'Kernel::System::Encode',
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::Main',
     'Kernel::System::Time',
@@ -742,45 +741,6 @@ sub StatsListGet {
 
     }
 
-    # get user groups
-    my %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-        UserID => $Param{UserID},
-        Type   => 'ro',
-    );
-
-    my %Result;
-
-    for my $StatID (@SearchResult) {
-
-        my $Stat = $Self->StatsGet(
-            StatID             => $StatID,
-            NoObjectAttributes => 1,
-        );
-
-        my $UserPermission = 0;
-        if ( $Param{AccessRw} || $Param{UserID} == 1 ) {
-
-            $UserPermission = 1;
-        }
-        elsif ( $Stat->{Valid} ) {
-
-            GROUPID:
-            for my $GroupID ( @{ $Stat->{Permission} } ) {
-
-                next GROUPID if !$GroupID;
-                next GROUPID if !$GroupList{$GroupID};
-
-                $UserPermission = 1;
-
-                last GROUPID;
-            }
-        }
-
-        if ( $UserPermission == 1 ) {
-            $Result{$StatID} = $Stat;
-        }
-    }
-
     return \%Result;
 }
 
@@ -1301,16 +1261,6 @@ sub Export {
         delete $StatsXML->{StatNumber};
     }
 
-    # wrapper to change ids in used spelling
-    # wrap permissions
-    PERMISSION:
-    for my $ID ( @{ $StatsXML->{Permission} } ) {
-        next PERMISSION if !$ID;
-        my $Name = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup( GroupID => $ID->{Content} );
-        next PERMISSION if !$Name;
-        $ID->{Content} = $Name;
-    }
-
     # wrap object dependend ids
     if ( $StatsXML->{Object}->[1]->{Content} ) {
 
@@ -1511,32 +1461,6 @@ sub Import {
             delete $StatsXML->{File}->[1]->{Location};
             delete $StatsXML->{File}->[1]->{Permission};
             delete $StatsXML->{File}->[1]->{Encode};
-        }
-    }
-
-    # wrapper to change used spelling in ids
-    # wrap permissions
-    my %Groups = $Kernel::OM->Get('Kernel::System::Group')->GroupList( Valid => 1 );
-
-    NAME:
-    for my $Name ( @{ $StatsXML->{Permission} } ) {
-        next NAME if !$Name;
-
-        my $Flag = 1;
-        ID:
-        for my $ID ( sort keys %Groups ) {
-            if ( $Groups{$ID} eq $Name->{Content} ) {
-                $Name->{Content} = $ID;
-                $Flag = 0;
-                last ID;
-            }
-        }
-        if ($Flag) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Can't find the permission (group) $Name->{Content}!"
-            );
-            $Name = undef;
         }
     }
 
@@ -3829,16 +3753,17 @@ sub _GetCacheString {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

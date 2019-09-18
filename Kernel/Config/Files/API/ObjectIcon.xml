@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ObjectIconGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ObjectIcon</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ObjectIconID</Item>
+                <Item Key="ResponseObject">ObjectIconResponse</Item>
                 <Item Key="CacheType">API_objecticons</Item>
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">ObjectIconSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ObjectIcon</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ObjectIconCollectionResponse</Item>
                 <Item Key="CacheType">API_objecticons</Item>                
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">ObjectIconCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ObjectIcon</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ObjectIconPostRequest</Item>
+                <Item Key="ResponseObject">ObjectIconPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -45,8 +43,8 @@
             <Hash>
                 <Item Key="Name">ObjectIconUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ObjectIcon</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ObjectIconPatchRequest</Item>
+                <Item Key="ResponseObject">ObjectIconPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -56,8 +54,6 @@
             <Hash>
                 <Item Key="Name">ObjectIconDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">ObjectIcon</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

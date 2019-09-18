@@ -7,9 +7,8 @@
             <Hash>
                 <Item Key="Name">ValidGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Valid</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ValidID</Item>
+                <Item Key="ResponseObject">ValidResponse</Item>
                 <Item Key="CacheType">API_valid</Item>
                 <Item Key="CacheTypeDependency">Valid</Item>
             </Hash>
@@ -21,8 +20,7 @@
             <Hash>
                 <Item Key="Name">ValidSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Valid</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ValidCollectionResponse</Item>
                 <Item Key="CacheType">API_valid</Item>                
                 <Item Key="CacheTypeDependency">Valid</Item>
             </Hash>

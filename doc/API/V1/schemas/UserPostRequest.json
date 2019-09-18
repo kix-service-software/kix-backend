@@ -1,0 +1,84 @@
+{
+   "$id" : "#UserPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The user request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "User" : {
+         "type" : "object",
+         "properties" : {
+            "Preferences" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/UserPreferencePostItem"
+               }
+            },
+            "RoleIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "UserComment" : {
+               "type" : "string"
+            },
+            "UserEmail" : {
+               "type" : "string"
+            },
+            "UserFirstname" : {
+               "type" : "string"
+            },
+            "UserLastname" : {
+               "type" : "string"
+            },
+            "UserLogin" : {
+               "type" : "string"
+            },
+            "UserMobile" : {
+               "type" : "string"
+            },
+            "UserPhone" : {
+               "type" : "string"
+            },
+            "UserPw" : {
+               "type" : "string"
+            },
+            "UserTitle" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "UserLogin",
+            "UserFirstname",
+            "UserLastname",
+            "UserEmail"
+         ]
+      }
+   },
+   "required" : [
+      "User"
+   ],
+   "definitions" : {
+      "UserPreferencePostItem" : {
+         "$id" : "#UserPreferencePostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The user preference request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string"
+            },
+            "Value" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "ID",
+            "Value"
+         ]
+      }
+   }
+}

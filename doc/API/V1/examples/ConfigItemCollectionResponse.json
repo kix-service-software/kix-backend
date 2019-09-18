@@ -1,0 +1,24 @@
+{
+    "ConfigItem": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-07-31 16:07:38",
+            "Class": "Computer",
+            "ClassID": 22,
+            "ConfigItemID": 61,
+            "CreateBy": 1,
+            "CreateTime": "2018-07-31 16:07:38",
+            "Number": "1022000001"
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-07-31 16:47:48",
+            "Class": "Computer",
+            "ClassID": 22,
+            "ConfigItemID": 62,
+            "CreateBy": 1,
+            "CreateTime": "2018-07-31 16:47:48",
+            "Number": "1022000002"
+        }
+    ]
+}

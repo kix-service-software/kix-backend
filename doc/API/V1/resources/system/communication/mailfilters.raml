@@ -1,0 +1,9 @@
+  displayName: "[System] Communication - Mail Filters"
+  description: !include ../../../descriptions/resources/system/communication/mailfilters.md
+  type: { collection: { typeName: MailFilter } }
+  /{mailFilterId}:
+    type: { item: { typeName: MailFilter } }
+    uriParameters:
+      mailFilterId:
+        displayName: MailFilterID
+        type: integer

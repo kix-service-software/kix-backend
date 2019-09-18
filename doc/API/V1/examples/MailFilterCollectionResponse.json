@@ -1,0 +1,57 @@
+{
+    "MailFilter": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-06-11 09:00:00",
+            "Comment": "...",
+            "CreateBy": 1,
+            "CreateTime": "2019-05-28 11:35:42",
+            "ID": 1,
+            "Match": [
+                {
+                    "Key": "From",
+                    "Value": "email@example.com",
+                    "Not": 0
+                },
+                {
+                    "Key": "Subject",
+                    "Value": "Test",
+                    "Not": 1
+                }
+            ],
+            "Name": "filter one",
+            "Set": [
+                {
+                    "Key": "X-KIX-Queue",
+                    "Value": "Some::Queue"
+                }
+            ],
+            "StopAfterMatch": 1,
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-06-05 09:38:00",
+            "Comment": "...",
+            "CreateBy": 1,
+            "CreateTime": "2019-05-05 09:38:00",
+            "ID": 2,
+            "Match": [
+                {
+                    "Key": "From",
+                    "Value": "another_email@example.com",
+                    "Not": 1
+                }
+            ],
+            "Set": [
+                {
+                    "Key": "X-KIX-State",
+                    "Value": "SomeState"
+                }
+            ],
+            "Name": "filter two",
+            "StopAfterMatch": 0,
+            "ValidID": 1
+        }
+    ]
+}

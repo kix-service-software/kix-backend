@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/V1/MailAccount/MailAccountGet.pm - API MailAccount Get operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::MailAccount::MailAccountGet;
@@ -92,14 +87,14 @@ sub ParameterDefinition {
         'MailAccountID' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
-    }
+            }
+    };
 }
 
 =item Run()
 
 perform MailAccountGet Operation. This function is able to return
-one or more ticket entries in one call.
+one or more mail accounts in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -131,7 +126,7 @@ sub Run {
     my @MailAccountList;
 
     # start loop
-    foreach my $MailAccountID ( @{$Param{Data}->{MailAccountID}} ) {
+    foreach my $MailAccountID ( @{ $Param{Data}->{MailAccountID} } ) {
 
         # get the MailAccount data
         my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
@@ -140,19 +135,21 @@ sub Run {
 
         if ( !IsHashRefWithData( \%MailAccountData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for MailAccountID $MailAccountID.",
+                Code => 'Object.NotFound',
             );
         }
-        
+
+        # remove password
+        delete $MailAccountData{Password};
+
         # add
-        push(@MailAccountList, \%MailAccountData);
+        push( @MailAccountList, \%MailAccountData );
     }
 
     if ( scalar(@MailAccountList) == 1 ) {
         return $Self->_Success(
             MailAccount => $MailAccountList[0],
-        );    
+        );
     }
 
     # return result
@@ -162,3 +159,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

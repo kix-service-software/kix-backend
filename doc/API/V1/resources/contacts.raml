@@ -1,0 +1,12 @@
+  displayName: Contacts
+  description: !include ../descriptions/resources/contacts.md
+  type: { collection: { typeName: Contact } }
+  /{contactId}:
+    type: { item: { typeName: Contact } }
+    uriParameters:
+      contactId:
+        displayName: ContactID
+        type: integer
+    /tickets:
+      description: !include ../descriptions/resources/contacts/tickets.md
+      type: { collection-readonly: { typeName: Ticket } }

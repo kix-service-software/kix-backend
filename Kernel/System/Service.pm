@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Service;
@@ -825,6 +825,13 @@ sub ServiceAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Service',
+        ObjectID  => $ServiceID,
+    );
+
     return $ServiceID;
 }
 
@@ -1001,6 +1008,13 @@ sub ServiceUpdate {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Service',
+        ObjectID  => $Param{ServiceID},
+    );
+
     return 1;
 }
 
@@ -1098,12 +1112,12 @@ sub ServiceSearch {
     return @ServiceList;
 }
 
-=item CustomerUserServiceMemberList()
+=item ContactServiceMemberList()
 
 returns a list of customeruser/service members
 
     ServiceID: service id
-    CustomerUserLogin: customer user login
+    ContactLogin: customer user login
     DefaultServices: activate or deactivate default services
 
     Result: HASH -> returns a hash of key => service id, value => service name
@@ -1112,22 +1126,22 @@ returns a list of customeruser/service members
 
     Example (get services of customer user):
 
-    $ServiceObject->CustomerUserServiceMemberList(
-        CustomerUserLogin => 'Test',
+    $ServiceObject->ContactServiceMemberList(
+        ContactLogin => 'Test',
         Result            => 'HASH',
         DefaultServices   => 0,
     );
 
     Example (get customer user of service):
 
-    $ServiceObject->CustomerUserServiceMemberList(
+    $ServiceObject->ContactServiceMemberList(
         ServiceID => $ID,
         Result    => 'HASH',
     );
 
 =cut
 
-sub CustomerUserServiceMemberList {
+sub ContactServiceMemberList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1154,29 +1168,29 @@ sub CustomerUserServiceMemberList {
         $DefaultServiceUnknownCustomer
         && $Param{DefaultServices}
         && !$Param{ServiceID}
-        && !$Param{CustomerUserLogin}
+        && !$Param{ContactLogin}
         )
     {
-        $Param{CustomerUserLogin} = '<DEFAULT>';
+        $Param{ContactLogin} = '<DEFAULT>';
     }
 
     # check more needed stuff
-    if ( !$Param{ServiceID} && !$Param{CustomerUserLogin} ) {
+    if ( !$Param{ServiceID} && !$Param{ContactLogin} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need ServiceID or CustomerUserLogin!',
+            Message  => 'Need ServiceID or ContactLogin!',
         );
         return;
     }
 
     # create cache key
-    my $CacheKey = 'CustomerUserServiceMemberList::' . $Param{Result} . '::'
+    my $CacheKey = 'ContactServiceMemberList::' . $Param{Result} . '::'
         . 'DefaultServices::' . $Param{DefaultServices} . '::';
     if ( $Param{ServiceID} ) {
         $CacheKey .= 'ServiceID::' . $Param{ServiceID};
     }
-    elsif ( $Param{CustomerUserLogin} ) {
-        $CacheKey .= 'CustomerUserLogin::' . $Param{CustomerUserLogin};
+    elsif ( $Param{ContactLogin} ) {
+        $CacheKey .= 'ContactLogin::' . $Param{ContactLogin};
     }
 
     # check cache
@@ -1212,8 +1226,8 @@ sub CustomerUserServiceMemberList {
     if ( $Param{ServiceID} ) {
         $SQL .= " scu.service_id = $Param{ServiceID}";
     }
-    elsif ( $Param{CustomerUserLogin} ) {
-        $SQL .= " scu.customer_user_login = '$Param{CustomerUserLogin}'";
+    elsif ( $Param{ContactLogin} ) {
+        $SQL .= " scu.customer_user_login = '$Param{ContactLogin}'";
     }
 
     $Self->{DBObject}->Prepare( SQL => $SQL );
@@ -1230,14 +1244,14 @@ sub CustomerUserServiceMemberList {
         }
     }
     if (
-        $Param{CustomerUserLogin}
-        && $Param{CustomerUserLogin} ne '<DEFAULT>'
+        $Param{ContactLogin}
+        && $Param{ContactLogin} ne '<DEFAULT>'
         && $Param{DefaultServices}
         && !keys(%Data)
         )
     {
-        %Data = $Self->CustomerUserServiceMemberList(
-            CustomerUserLogin => '<DEFAULT>',
+        %Data = $Self->ContactServiceMemberList(
+            ContactLogin => '<DEFAULT>',
             Result            => 'HASH',
             DefaultServices   => 0,
         );
@@ -1250,8 +1264,8 @@ sub CustomerUserServiceMemberList {
         && $Param{DefaultServices}
         )
     {
-        my %TmpData = $Self->CustomerUserServiceMemberList(
-            CustomerUserLogin => '<DEFAULT>',
+        my %TmpData = $Self->ContactServiceMemberList(
+            ContactLogin => '<DEFAULT>',
             Result            => 'HASH',
             DefaultServices   => 0,
         );
@@ -1288,14 +1302,14 @@ sub CustomerUserServiceMemberList {
     return @Data;
 }
 
-=item CustomerUserServiceMemberAdd()
+=item ContactServiceMemberAdd()
 
 to add a member to a service
 
 if 'Active' is 0, the customer is removed from the service
 
-    $ServiceObject->CustomerUserServiceMemberAdd(
-        CustomerUserLogin => 'Test1',
+    $ServiceObject->ContactServiceMemberAdd(
+        ContactLogin => 'Test1',
         ServiceID         => 6,
         Active            => 1,
         UserID            => 123,
@@ -1303,11 +1317,11 @@ if 'Active' is 0, the customer is removed from the service
 
 =cut
 
-sub CustomerUserServiceMemberAdd {
+sub ContactServiceMemberAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CustomerUserLogin ServiceID UserID)) {
+    for my $Argument (qw(ContactLogin ServiceID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1320,7 +1334,7 @@ sub CustomerUserServiceMemberAdd {
     # delete existing relation
     return if !$Self->{DBObject}->Do(
         SQL  => 'DELETE FROM service_customer_user WHERE customer_user_login = ? AND service_id = ?',
-        Bind => [ \$Param{CustomerUserLogin}, \$Param{ServiceID} ],
+        Bind => [ \$Param{ContactLogin}, \$Param{ServiceID} ],
     );
 
     # return if relation is not active
@@ -1336,7 +1350,7 @@ sub CustomerUserServiceMemberAdd {
         SQL => 'INSERT INTO service_customer_user '
             . '(customer_user_login, service_id, create_time, create_by) '
             . 'VALUES (?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{CustomerUserLogin}, \$Param{ServiceID}, \$Param{UserID} ]
+        Bind => [ \$Param{ContactLogin}, \$Param{ServiceID}, \$Param{UserID} ]
     );
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
@@ -1359,13 +1373,21 @@ set service preferences
 =cut
 
 sub ServicePreferencesSet {
-    my $Self = shift;
+    my ($Self, %Param) = @_;
 
-    $Self->{PreferencesObject}->ServicePreferencesSet(@_);
+    $Self->{PreferencesObject}->ServicePreferencesSet(%Param);
 
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Service.Preference',
+        ObjectID  => $Param{ServiceID}.'::'.$Param{Key},
+    );
+
     return 1;
 }
 
@@ -1475,61 +1497,6 @@ sub ServiceParentsGet {
     return \@Data;
 }
 
-=item GetAllCustomServices()
-
-get all custom services of one user
-
-    my @Services = $ServiceObject->GetAllCustomServices( UserID => 123 );
-
-=cut
-
-sub GetAllCustomServices {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
-    }
-
-    # check cache
-    my $CacheKey = 'GetAllCustomServices::' . $Param{UserID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-
-    return @{$Cache} if $Cache;
-
-    # search all custom services
-    return if !$Self->{DBObject}->Prepare(
-        SQL => '
-            SELECT service_id
-            FROM personal_services
-            WHERE user_id = ?',
-        Bind => [ \$Param{UserID} ],
-    );
-
-    # fetch the result
-    my @ServiceIDs;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        push @ServiceIDs, $Row[0];
-    }
-
-    # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \@ServiceIDs,
-    );
-
-    return @ServiceIDs;
-}
-
 =item GetAllSubServices()
 
 get all sub Services of a Service
@@ -1563,7 +1530,7 @@ sub GetAllSubServices {
 
     # search all custom Services
     return if !$DBObject->Prepare(
-        SQL  => "SELECT s2.id, s2.name FROM service s1, service s2 WHERE s1.id = ? AND s2.id <> ? AND s2.name like s1.name||'::%'",
+        SQL  => "SELECT s2.id, s2.name FROM service s1, service s2 WHERE s1.id = ? AND s2.id <> ? AND s2.name like CONCAT(s1.name, '::%')",
         Bind => [ \$Param{ServiceID}, \$Param{ServiceID} ],
     );
 
@@ -1681,7 +1648,7 @@ sub _ServiceGetCurrentIncidentState {
                 my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyListWithData(
                     Object1   => 'Service',
                     Key1      => $ServiceData{ServiceID},
-                    Object2   => 'ITSMConfigItem',
+                    Object2   => 'ConfigItem',
                     State     => 'Valid',
                     Type      => $LinkType,
                     Direction => $LinkDirection,
@@ -1844,10 +1811,18 @@ sub ServiceDelete {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Service',
+        ObjectID  => $Param{ServiceID},
+    );
+
     return 1;
 }
 
 1;
+
 
 
 
@@ -1857,11 +1832,11 @@ sub ServiceDelete {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

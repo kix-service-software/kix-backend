@@ -1,0 +1,85 @@
+#%RAML 1.0
+title: KIX REST API
+version: v1
+protocols: [ HTTP, HTTPS ]
+baseUri: http://{fqdn}:{port}/api/$version
+baseUriParameters:
+  fqdn:
+    description: |
+      The FQDN of the KIX backend server.
+  port:
+    description: |
+      The port the KIX backend server uses.
+mediaType: application/json
+
+description: !include descriptions/description.md
+
+documentation:
+  - title: Getting started
+    content: !include descriptions/gettingStarted.md
+  - title: Responses
+    content: !include descriptions/responses.md
+  - title: Permissions
+    content: !include descriptions/permissions.md
+  - title: Populate queries
+    content: !include descriptions/populateQueries.md
+  - title: Search objects
+    content: !include descriptions/searchObjects.md
+  - title: Filter results
+    content: !include descriptions/filterResults.md
+  - title: Sort results
+    content: !include descriptions/sortResults.md
+  - title: Limit results
+    content: !include descriptions/limitResults.md
+  - title: Select properties
+    content: !include descriptions/selectProperties.md
+  - title: Include more information
+    content: !include descriptions/includeInformation.md
+  - title: Expand objects
+    content: !include descriptions/expandObjects.md
+
+# security
+securedBy: webToken
+securitySchemes:
+  webToken: !include securitySchemes/webToken.raml
+
+# some definitions
+types: !include lib/types.raml
+traits: !include lib/traits.raml
+resourceTypes: !include lib/resourceTypes.raml
+
+# resources
+/auth: !include resources/auth.raml
+/clientregistrations: !include resources/clientregistrations.raml
+/cmdb: !include resources/cmdb.raml
+/contacts: !include resources/contacts.raml
+/faq: !include resources/faq.raml
+/i18n: !include resources/i18n.raml
+/links: !include resources/links.raml
+/organisations: !include resources/organisations.raml
+/session: !include resources/session.raml
+/system/cmdb: !include resources/system/cmdb.raml
+/system/communication/channels: !include resources/system/communication/channels.raml
+/system/communication/mailaccounts: !include resources/system/communication/mailaccounts.raml
+/system/communication/mailfilters: !include resources/system/communication/mailfilters.raml
+/system/communication/notifications: !include resources/system/communication/notifications.raml
+/system/communication/sendertypes: !include resources/system/communication/sendertypes.raml
+/system/communication/systemaddresses: !include resources/system/communication/systemaddresses.raml
+/system/config: !include resources/system/config.raml
+/system/console: !include resources/system/console.raml
+/system/i18n: !include resources/system/i18n.raml
+/system/generalcatalog: !include resources/system/generalcatalog.raml
+/system/logs: !include resources/system/logs.raml
+/system/objecticons: !include resources/system/objecticons.raml
+/system/roles: !include resources/system/roles.raml
+/system/services: !include resources/system/services.raml
+/system/sessions: !include resources/system/sessions.raml
+/system/slas: !include resources/system/slas.raml
+/system/textmodules: !include resources/system/textmodules.raml
+/system/ticket/locks: !include resources/system/ticket/locks.raml
+/system/ticket/priorities: !include resources/system/ticket/priorities.raml
+/system/ticket/queues: !include resources/system/ticket/queues.raml
+/system/ticket/states: !include resources/system/ticket/states.raml
+/system/ticket/types: !include resources/system/ticket/types.raml
+/system/users: !include resources/system/users.raml
+/system/valid: !include resources/system/valid.raml

@@ -1,0 +1,7 @@
+{
+    "GeneralCatalogClass": [
+        "ITSM::ConfigItem::Class",
+		"ITSM::SLA::Type",
+		"ITSM::Service::Type"
+    ]
+}

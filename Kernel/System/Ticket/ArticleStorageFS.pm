@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::ArticleStorageFS;
@@ -49,7 +49,6 @@ sub ArticleStorageInit {
     }
     else {
         my $Error = $!;
-#rbo - T2016121190001552 - replaced OTRS wording
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'notice',
             Message  => "Can't create $Path: $Error!",
@@ -63,7 +62,6 @@ sub ArticleStorageInit {
     # get activated cache backend configuration
     my $CacheModule = $ConfigObject->Get('Cache::Module') || '';
 
-    return 1 if $CacheModule ne 'Kernel::System::Cache::MemcachedFast';
     return 1 if !$ConfigObject->Get('Cache::ArticleStorageCache');
 
     $Self->{ArticleStorageCache} = 1;
@@ -85,6 +83,11 @@ sub ArticleDelete {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     my $DynamicFieldListArticle = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
         ObjectType => 'Article',
@@ -169,6 +172,13 @@ sub ArticleDelete {
         );
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
     return 1;
 }
 
@@ -185,6 +195,11 @@ sub ArticleDeletePlain {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # delete from fs
     my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
@@ -207,6 +222,13 @@ sub ArticleDeletePlain {
             Key  => 'ArticlePlain',
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Plain',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
 
     # return if only delete in my backend
     return 1 if $Param{OnlyMyBackend};
@@ -233,6 +255,11 @@ sub ArticleDeleteAttachment {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # delete from fs
     my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
@@ -267,6 +294,13 @@ sub ArticleDeleteAttachment {
             Type => 'ArticleStorageFS_' . $Param{ArticleID},
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Attachment',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
 
     # return if only delete in my backend
     return 1 if $Param{OnlyMyBackend};
@@ -348,6 +382,11 @@ sub ArticleWriteAttachment {
             return;
         }
     }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
 
     # prepare/filter ArticleID
     $Param{ArticleID} = quotemeta( $Param{ArticleID} );
@@ -480,6 +519,13 @@ sub ArticleWriteAttachment {
         );
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Article.Attachment',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
+    );
+    
     return 1;
 }
 
@@ -1162,16 +1208,17 @@ sub _ArticleDeleteDirectory {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

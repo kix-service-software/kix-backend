@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ImportExport::ObjectBackend::FAQ;
@@ -16,7 +16,6 @@ our @ObjectDependencies = (
     'Kernel::System::Time',
     'Kernel::System::CSV',
     'Kernel::System::User',
-    'Kernel::System::Group',
     'Kernel::System::FAQ',
     'Kernel::Config'
 );
@@ -50,33 +49,9 @@ sub ObjectAttributesGet {
     my %CategoryList = %{$CategoryTreeListRef};
     my %StateList    = $Kernel::OM->Get('Kernel::System::FAQ')->StateList( UserID => 1, );
     my %LanguageList = $Kernel::OM->Get('Kernel::System::FAQ')->LanguageList( UserID => 1, );
-    my %GroupList    = $Kernel::OM->Get('Kernel::System::Group')->GroupList();
     my %FormatList   = ( "plain" => "PlainText", "html" => "HTML" );
 
     my $Attributes = [
-        {
-            Key   => 'DefaultGroupID',
-            Name  => 'Default group for new category',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%GroupList,
-                Required     => 1,
-                Translation  => 0,
-                PossibleNone => 0,
-            },
-        },
-
-        {
-            Key   => 'DefaultCategoryID',
-            Name  => 'Default Category (if empty/invalid)',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%CategoryList,
-                Required     => 0,
-                Translation  => 1,
-                PossibleNone => 1,
-            },
-        },
         {
             Key   => 'DefaultLanguageID',
             Name  => 'Default Language (if empty/invalid)',
@@ -359,7 +334,7 @@ sub ExportDataGet {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message =>
-                "FAQ2CustomerUser: search data is not a hash ref - ignoring search limitation.",
+                "FAQ2Contact: search data is not a hash ref - ignoring search limitation.",
         );
     }
 
@@ -644,9 +619,7 @@ sub ImportDataSave {
         Counter        => $Param{Counter}                  || '',
         CategoryID     => $NewFAQData{CategoryID}          || '',
         Category       => $NewFAQData{Category}            || '',
-        DefaultGroupID => $ObjectData->{DefaultCategoryID} || '',
     );
-
     if ( $NewFAQData{Category} && !$NewFAQData{CategoryID} ) {
         $NewFAQData{CategoryID} = $CategoryID || '';
     }
@@ -791,14 +764,6 @@ sub _CheckCategory {
     my %Result   = ();
     my $ParentID = '0';
 
-    # get group id for faq group
-    my $DefaultFAQGroupID = $Param{DefaultGroupID};
-    if ( !$DefaultFAQGroupID ) {
-        $DefaultFAQGroupID = $Kernel::OM->Get('Kernel::System::Group')->GroupLookup(
-            Group => 'faq',
-        );
-    }
-
     my @CategoryNamePartsArray = split( "::", $Param{Category} );
 
     my $CategoryHashRef = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryList(
@@ -832,11 +797,6 @@ sub _CheckCategory {
                     ValidID  => 1,
                     UserID   => 1,
                 );
-                $Kernel::OM->Get('Kernel::System::FAQ')->SetCategoryGroup(
-                    CategoryID => $NewCategoryID,
-                    GroupIDs   => [$DefaultFAQGroupID],
-                    UserID     => 1,
-                );
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'notice',
                     Message  => "New category '$CurrNamePart' (parent $ParentID)"
@@ -865,16 +825,17 @@ sub _CheckCategory {
 1;
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ITSMConfigItem::XML::Type::Contact;
@@ -16,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Log',
 );
 
@@ -67,11 +65,14 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %CustomerSearchList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-        Search => $Param{Value},
+    my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Param{Value}
     );
 
-    return $CustomerSearchList{ $Param{Value} } || $Param{Value};
+    if ( IsHashRefWithData( \%Contact ) ) {
+        return $Contact{Login}
+    }
+    return $Param{Value};
 }
 
 =item StatsAttributeCreate()
@@ -130,7 +131,7 @@ sub ExportSearchValuePrepare {
 
     return if !defined $Param{Value};
     return $Param{Value};
-    
+
 }
 
 =item ExportValuePrepare()
@@ -201,20 +202,20 @@ sub ValidateValue {
 
     return if !$Value;
 
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Param{Value},
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Param{Value},
     );
 
     # if customer is not registered in the database
-     if (!IsHashRefWithData( \%CustomerData )) {
+    if ( !IsHashRefWithData( \%ContactData ) ) {
         return 'contact not found';
     }
 
     # if ValidID is present, check if it is valid!
-    if ( defined $CustomerData{ValidID} ) {
+    if ( defined $ContactData{ValidID} ) {
 
         # return false if customer is not valid
-        if ($Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $CustomerData{ValidID} ) ne 'valid') {
+        if ( $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $ContactData{ValidID} ) ne 'valid' ) {
             return 'invalid contact';
         }
     }
@@ -224,19 +225,16 @@ sub ValidateValue {
 
 1;
 
-
-
-
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Event::NotificationToOutOfOfficeSubstitute;
@@ -92,32 +92,32 @@ sub Run {
     }
 
     # check if user's out of office-time is configured
-    return if !%User || !$User{OutOfOffice} || !$User{OutOfOfficeSubstitute};
+    return if !%User || !$User{Preferences}->{OutOfOffice} || !$User{Preferences}->{OutOfOfficeSubstitute};
 
     # check if user is out of office right now
     my $CurrTime = $Self->{TimeObject}->SystemTime();
     my $StartTime
-        = "$User{OutOfOfficeStartYear}-$User{OutOfOfficeStartMonth}-$User{OutOfOfficeStartDay} 00:00:00";
+        = "$User{Preferences}->{OutOfOfficeStartYear}-$User{Preferences}->{OutOfOfficeStartMonth}-$User{Preferences}->{OutOfOfficeStartDay} 00:00:00";
     $StartTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $StartTime );
     my $EndTime
-        = "$User{OutOfOfficeEndYear}-$User{OutOfOfficeEndMonth}-$User{OutOfOfficeEndDay} 23:59:59";
+        = "$User{Preferences}->{OutOfOfficeEndYear}-$User{Preferences}->{OutOfOfficeEndMonth}-$User{Preferences}->{OutOfOfficeEndDay} 23:59:59";
     $EndTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $EndTime );
     return if ( $StartTime > $CurrTime || $EndTime < $CurrTime );
 
     # get substitute data
     my %SubstituteUser = $Self->{UserObject}->GetUserData(
-        UserID => $User{OutOfOfficeSubstitute},
+        UserID => $User{Preferences}->{OutOfOfficeSubstitute},
         Valid  => 1,
     );
     return if !%SubstituteUser || !$SubstituteUser{UserEmail};
 
     # prepare notification body
-    if ( $User{OutOfOfficeSubstituteNote} ) {
+    if ( $User{Preferences}->{OutOfOfficeSubstituteNote} ) {
         if ( $Notification{ContentType} && $Notification{ContentType} eq 'text/html' ) {
             $Notification{Body} = $Self->{HTMLUtilsObject}->DocumentStrip(
                 String => $Notification{Body},
             );
-            $Notification{Body} = $User{OutOfOfficeSubstituteNote}
+            $Notification{Body} = $User{Preferences}->{OutOfOfficeSubstituteNote}
                 . "<br/>**********************************************************************<br/><br/>"
                 . $Notification{Body};
             $Notification{Body} = $Self->{HTMLUtilsObject}->DocumentComplete(
@@ -126,7 +126,7 @@ sub Run {
             );
         }
         else {
-            $Notification{Body} = $User{OutOfOfficeSubstituteNote}
+            $Notification{Body} = $User{Preferences}->{OutOfOfficeSubstituteNote}
                 . "\n**********************************************************************\n\n"
                 . $Notification{Body};
         }
@@ -158,16 +158,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

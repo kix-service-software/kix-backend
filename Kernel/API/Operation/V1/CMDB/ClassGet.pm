@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::CMDB::ClassGet;
@@ -88,7 +86,7 @@ sub ParameterDefinition {
             DataType => 'NUMERIC',
             Required => 1
         },
-    }
+        }
 }
 
 =item Run()
@@ -117,22 +115,21 @@ perform ClassGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @ClassList;        
-    foreach my $ClassID ( @{$Param{Data}->{ClassID}} ) {                 
+    my @ClassList;
+    foreach my $ClassID ( @{ $Param{Data}->{ClassID} } ) {
 
         my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
             ItemID => $ClassID,
         );
 
-        if (!IsHashRefWithData($ItemData) || $ItemData->{Class} ne 'ITSM::ConfigItem::Class') {
+        if ( !IsHashRefWithData($ItemData) || $ItemData->{Class} ne 'ITSM::ConfigItem::Class' ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ClassID $ClassID",
+                Code => 'Object.NotFound',
             );
-        }        
+        }
 
         my %Class = %{$ItemData};
-            
+
         # prepare data
         $Class{ID} = $ClassID;
         foreach my $Key (qw(ItemID Class Permission)) {
@@ -141,36 +138,25 @@ sub Run {
 
         # include CurrentDefinition if requested
         if ( $Param{Data}->{include}->{CurrentDefinition} ) {
+
             # get already prepared data of current definition from ClassDefinitionSearch operation
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::CMDB::ClassDefinitionSearch',
                 Data          => {
-                    ClassID   => $ClassID,
-                    sort      => 'ConfigItemClassDefinition.-DefinitionID',
-                    limit     => 1,
+                    ClassID => $ClassID,
+                    sort    => 'ConfigItemClassDefinition.-DefinitionID:numeric',
+                    limit   => 1,
                 }
             );
+
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $Class{CurrentDefinition} = IsArrayRefWithData($Result->{Data}->{ConfigItemClassDefinition}) ? $Result->{Data}->{ConfigItemClassDefinition}->[0] : undef;
+                $Class{CurrentDefinition} = IsArrayRefWithData( $Result->{Data}->{ConfigItemClassDefinition} ) ? $Result->{Data}->{ConfigItemClassDefinition}->[0] : undef;
             }
         }
 
-        # include Definitions if requested
-        if ( $Param{Data}->{include}->{Definitions} ) {
-            # get already prepared Definitions data from ClassDefinitionSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ClassDefinitionSearch',
-                Data          => {
-                    ClassID   => $ClassID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $Class{Definitions} = $Result->{Data}->{ConfigItemClassDefinition};
-            }
-        }
-
-                # include ConfigItemStats if requested
+        # include ConfigItemStats if requested
         if ( $Param{Data}->{include}->{ConfigItemStats} ) {
+
             # execute CI searches
             my %ConfigItemStats;
 
@@ -191,10 +177,10 @@ sub Run {
                                     Operator => 'IN',
                                     Value    => [ 'preproductive', 'productive' ]
                                 }
-                            ]
+                                ]
+                            }
                         }
                     }
-                }
             );
 
             if ( !IsHashRefWithData($Response) || !$Response->{Success} ) {
@@ -203,24 +189,24 @@ sub Run {
 
             my @PreProductiveDeplStateIDs;
             my @ProductiveDeplStateIDs;
-            foreach my $Item  (@{$Response->{Data}->{GeneralCatalogItem}}) {
-                if ($Item->{Functionality} && $Item->{Functionality} eq 'preproductive') {
-                    push(@PreProductiveDeplStateIDs, $Item->{ItemID});
+            foreach my $Item ( @{ $Response->{Data}->{GeneralCatalogItem} } ) {
+                if ( $Item->{Functionality} && $Item->{Functionality} eq 'preproductive' ) {
+                    push( @PreProductiveDeplStateIDs, $Item->{ItemID} );
                 }
-                elsif ($Item->{Functionality} && $Item->{Functionality} eq 'productive') {
-                    push(@ProductiveDeplStateIDs, $Item->{ItemID});
+                elsif ( $Item->{Functionality} && $Item->{Functionality} eq 'productive' ) {
+                    push( @ProductiveDeplStateIDs, $Item->{ItemID} );
                 }
             }
 
             my $PreProductiveList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
-                ClassIDs     => [ $ClassID ],
+                ClassIDs     => [$ClassID],
                 DeplStateIDs => \@PreProductiveDeplStateIDs,
                 UserID       => $Self->{Authorization}->{UserID},
             );
             $ConfigItemStats{PreProductiveCount} = @{$PreProductiveList};
 
             my $ProductiveList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
-                ClassIDs     => [ $ClassID ],
+                ClassIDs     => [$ClassID],
                 DeplStateIDs => \@ProductiveDeplStateIDs,
                 UserID       => $Self->{Authorization}->{UserID},
             );
@@ -229,22 +215,21 @@ sub Run {
             $Class{ConfigItemStats} = \%ConfigItemStats;
 
             # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'ITSMConfigItem');
+            $Self->AddCacheDependency( Type => 'ITSMConfigurationManagement' );
         }
 
-        push(@ClassList, \%Class);
+        push( @ClassList, \%Class );
     }
 
     if ( scalar(@ClassList) == 0 ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for ClassID ".join(',', $Param{Data}->{ClassID}),
+            Code => 'Object.NotFound',
         );
     }
     elsif ( scalar(@ClassList) == 1 ) {
         return $Self->_Success(
             ConfigItemClass => $ClassList[0],
-        );    
+        );
     }
 
     return $Self->_Success(
@@ -255,18 +240,16 @@ sub Run {
 1;
 
 
-
-
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

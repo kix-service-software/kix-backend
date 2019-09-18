@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/Contact/ContactCreate.pm - API Contact Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Contact::ContactCreate;
@@ -83,26 +78,26 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    # determine required attributes from Map config
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get($Param{Data}->{SourceID});
-    my %RequiredAttributes;
-    foreach my $MapItem ( @{$Config->{Map}} ) {
-        next if !$MapItem->{Required} || $MapItem->{Attribute} eq 'ValidID';
-
-        $RequiredAttributes{'Contact::'.$MapItem->{Attribute}} = {
-            Required => 1
-        };
-    }
-
     return {
-        'SourceID' => {
-            Required => 1
-        },
         'Contact' => {
             Type     => 'HASH',
             Required => 1
         },          
-        %RequiredAttributes,
+        'Contact::Firstname' => {
+            Required => 1
+        },            
+        'Contact::Lastname' => {
+            Required => 1
+        },
+        'Contact::Email' => {
+            Required => 1
+        },
+        'Contact::PrimaryOrganisationID' => {
+            Required => 1,
+        },
+        'Contact::OrganisationIDs' => {
+            Required => 1,
+        },
     }
 }
 
@@ -112,9 +107,8 @@ perform ContactCreate Operation. This will return the created ContactLogin.
 
     my $Result = $OperationObject->Run(
         Data => {
-            SourceID => '...'       # required (ID of backend to write to - backend must be writeable)
             Contact => {
-                ...                 # attributes (required and optional) depend on Map config 
+                ...                 # attributes
             },
         },
     );
@@ -133,50 +127,74 @@ perform ContactCreate Operation. This will return the created ContactLogin.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if backend (Source) is writeable
-    my %SourceList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSourceList(
-        ReadOnly => 0
-    );    
-    if ( !$SourceList{$Param{Data}->{SourceID}} ) {
-        return $Self->_Error(
-            Code    => 'Forbidden',
-            Message => 'Can not create Contact. Backend with given SourceID is not writable or does not exist.',
-        );        
-    }
-
     # isolate and trim Contact parameter
     my $Contact = $Self->_Trim(
         Data => $Param{Data}->{Contact}
     );
 
-    # check Userlogin exists
-    my %ContactData = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        UserLogin => $Contact->{UserLogin},
+    # check Login exists
+    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+        Login => $Contact->{Login},
     );
     if ( %ContactData ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Contact. Another Contact with same login already exists.",
+            Message => "Cannot create contact. Another contact with same login already exists.",
         );
     }
 
-    # check UserEmail exists
-    my %ContactList = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerSearch(
-        PostMasterSearch => $Contact->{UserEmail},
+    # check Email exists
+    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+        PostMasterSearch => $Contact->{Email},
     );
     if ( %ContactList ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Can not create Contact. Another Contact with same email address already exists.',
+            Message => 'Cannot create contact. Another contact with same email address already exists.',
         );
     }
+
+    # check if primary OrganisationID exists
+    if ( $Contact->{PrimaryOrganisationID} ) {
+        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            ID => $Contact->{PrimaryOrganisationID},
+        );
+
+        if ( !%OrgData || $OrgData{ValidID} != 1 ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. No valid organisation found for primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'".',
+            );
+        }
+    }
     
+    if ( IsArrayRefWithData($Contact->{OrganisationIDs}) || IsArrayRefWithData($ContactData{OrganisationIDs}) ) {
+        # check if primary OrganisationID is contained in assigned OrganisationIDs
+        my @OrgIDs = @{IsArrayRefWithData($Contact->{OrganisationIDs}) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs}};
+        if ( !grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. Primary organisation ID "'.$Contact->{PrimaryOrganisationID}.'" is not available in assigned organisation IDs "'.(join(", ", @OrgIDs)).'".',
+            );
+        }
+        # check each assigned customer 
+        foreach my $OrgID ( @OrgIDs ) {
+            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                ID => $OrgID,
+            );
+            if ( !%OrgData || $OrgData{ValidID} != 1 ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => 'Validation failed. No valid organisation found for assigned organisation ID "'.$OrgID.'".',
+                );
+            }
+        }
+    }
+
     # create Contact
-    my $ContactID = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserAdd(
+    my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
         %{$Contact},
-        UserCustomerIDs => IsArrayRefWithData($Contact->{UserCustomerIDs}) ? join(',', @{$Contact->{UserCustomerIDs}}) : $Contact->{UserCustomerID},
         ValidID         => $Contact->{ValidID} || 1,
-        Source          => $Param{Data}->{SourceID},
         UserID          => $Self->{Authorization}->{UserID},
     );    
     if ( !$ContactID ) {
@@ -191,3 +209,17 @@ sub Run {
         ContactID => $ContactID,
     );    
 }
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Event::TicketStateWorkflowAutomaticStateAction;
@@ -172,7 +172,7 @@ sub Run {
         #check and replace placeholders...
         for my $QueueNamePart (@SingleQueueNames) {
 #rbo - T2016121190001552 - added KIX placeholders
-            $QueueNamePart =~ s/<(KIX|OTRS)_Ticket_(.+)>/$Ticket{$2}/e;
+            $QueueNamePart =~ s/<KIX_Ticket_(.+)>/$Ticket{$2}/e;
             $SingleQueueNames[$Index] = $QueueNamePart;
             $Index++;
         }
@@ -233,9 +233,9 @@ sub Run {
             if ( $WFConfigRef->{FallbackOnErrorNote} ) {
                 $Self->{TicketObject}->ArticleCreate(
                     TicketID    => $Param{Data}->{TicketID},
-                    ArticleType => 'note-internal',
+                    Channel     => 'note',
                     SenderType  => 'system',
-                    From        => 'KIX4OTRS Systeminformation',
+                    From        => 'KIX Systeminformation',
                     Subject     => 'Automatic move failed due to a misconfiguration.',
                     Body        => 'Hello,
 
@@ -340,16 +340,17 @@ Furthermore this ticket has been moved to "'
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,12 +1,9 @@
 # --
-# Kernel/API/Operation/User/ArticleAttachmentSearch.pm - API User Search operation backend
-# based upon Kernel/API/Operation/Ticket/TicketSearch.pm
-# original Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleAttachmentSearch;
@@ -116,20 +113,6 @@ perform ArticleAttachmentSearch Operation. This will return a article attachment
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check ticket permission
-    my $Permission = $Self->CheckAccessPermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Article = $TicketObject->ArticleGet(
@@ -140,7 +123,7 @@ sub Run {
     # check if article exists
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Could not get data for article $Param{Data}->{ArticleID}",
         );
     }
@@ -148,16 +131,15 @@ sub Run {
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
 
     # restrict article sender types
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' && $Article{ArticleSenderType} ne 'customer') {
+    if ( $Self->{Authorization}->{UserType} eq 'Customer' && $Article{ArticleSenderType} ne 'external') {
         return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access article $Param{Data}->{ArticleID}.",
+            Code => 'Object.NoPermission',
         );
     }    
 
@@ -179,7 +161,7 @@ sub Run {
             Data          => {
                 TicketID     => $Param{Data}->{TicketID},
                 ArticleID    => $Param{Data}->{ArticleID},
-                AttachmentID => join(',', keys %AttachmentIndex),
+                AttachmentID => join(',', sort keys %AttachmentIndex),
                 include      => $Param{Data}->{include},
                 expand       => $Param{Data}->{expand},
             }
@@ -204,3 +186,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

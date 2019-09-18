@@ -7,11 +7,10 @@
             <Hash>
                 <Item Key="Name">ContactGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">ContactID</Item>
+                <Item Key="ResponseObject">ContactResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>
-                <Item Key="CacheTypeDependency">CustomerUser</Item>
+                <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -21,10 +20,9 @@
             <Hash>
                 <Item Key="Name">ContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                
-                <Item Key="CacheTypeDependency">CustomerUser</Item>
+                <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -34,8 +32,8 @@
             <Hash>
                 <Item Key="Name">ContactCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ContactPostRequest</Item>
+                <Item Key="ResponseObject">ContactPostPatchResponse</Item>
                 <Item Key="DefaultSource">Contact</Item>
             </Hash>
         </Setting>
@@ -48,20 +46,32 @@
             <Hash>
                 <Item Key="Name">ContactUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="RequestObject">ContactPatchRequest</Item>
+                <Item Key="ResponseObject">ContactPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Group>BIS Connector</Group>
+        <SubGroup>API::Operation::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ContactDelete</Item>
+                <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactSourceSearch" Required="0" Valid="1">
+    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactTicketSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">ContactSourceSearch</Item>
+                <Item Key="Name">ContactTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">Contact</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
+                <Item Key="ResponseObject">TicketCollectionResponse</Item>
+                <Item Key="CacheType">API_contacts</Item>                
+                <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -81,14 +91,5 @@
             </Hash>
         </Setting>
     </ConfigItem>  
-
-    <ConfigItem Name="API::Operation::GenericExpand###Contact.Tickets" Required="0" Valid="1">
-        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Operation">V1::Ticket::TicketGet</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
 
 </kix_config>

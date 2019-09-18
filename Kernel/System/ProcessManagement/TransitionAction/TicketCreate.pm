@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::TicketCreate;
@@ -83,7 +83,7 @@ sub new {
             Priority      => '3 normal',         # or PriorityID => 2,
             State         => 'new',              # or StateID => 5,
             CustomerID    => '123465',
-            CustomerUser  => 'customer@example.com',
+            Contact  => 'customer@example.com',
             Owner         => 'someuserlogin',    # or OwnerID => 123
 
             # ticket optional:
@@ -97,8 +97,8 @@ sub new {
             PendingTimeDiff => 123 ,                  # optional (for pending states)
 
             # article required: (if one of them is not present, article will not be created without any error message)
-            ArticleType      => 'note-internal',                        # note-external|phone|fax|sms|...
-                                                                        #   excluding any email type
+            Channel          => 'note-internal',                        # ...excluding email
+            CustomerVisible  => 0|1,                                    # optional
             SenderType       => 'agent',                                # agent|system|customer
             ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
             Subject          => 'some short description',               # required
@@ -181,7 +181,7 @@ sub Run {
     my %TicketParam;
     for my $Attribute (
         qw( Title Queue QueueID Lock LockID Priority PriorityID State StateID
-        CustomerID CustomerUser Owner OwnerID TN Type TypeID Service ServiceID SLA SLAID
+        CustomerID Contact Owner OwnerID TN Type TypeID Service ServiceID SLA SLAID
         Responsible ResponsibleID ArchiveFlag
         )
         )
@@ -287,7 +287,7 @@ sub Run {
     # extract the article params
     my %ArticleParam;
     for my $Attribute (
-        qw( ArticleType SenderType ContentType Subject Body HistoryType
+        qw( Channel SenderType ContentType Subject Body HistoryType
         HistoryComment From To Cc ReplyTo MessageID InReplyTo References NoAgentNotify
         AutoResponseType ForceNotificationToUserID ExcludeNotificationToUserID
         ExcludeMuteNotificationToUserID
@@ -301,7 +301,7 @@ sub Run {
 
     # check if article can be created
     my $ArticleCreate = 1;
-    for my $Needed (qw(ArticleType SenderType ContentType Subject Body HistoryType HistoryComment)) {
+    for my $Needed (qw(Channel SenderType ContentType Subject Body HistoryType HistoryComment)) {
         if ( !$ArticleParam{$Needed} ) {
             $ArticleCreate = 0;
         }
@@ -311,19 +311,19 @@ sub Run {
 
     if ($ArticleCreate) {
 
-        my $ValidArticleType = 1;
+        my $ValidChannel = 1;
 
-        # check ArticleType
-        if ( $ArticleParam{ArticleType} =~ m{\A email }msxi ) {
+        # check Channel
+        if ( $ArticleParam{Channel} =~ m{\A email }msxi ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
-                    . "ArticleType $Param{Config}->{ArticleType} is not supported",
+                    . "Channel $Param{Config}->{Channel} is not supported",
             );
-            $ValidArticleType = 0;
+            $ValidChannel = 0;
         }
 
-        if ($ValidArticleType) {
+        if ($ValidChannel) {
 
             # create article for the new ticket
             $ArticleID = $TicketObject->ArticleCreate(
@@ -484,16 +484,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Cache::Redis;
@@ -12,8 +12,12 @@ use strict;
 use warnings;
 
 use Redis;
+use Storable qw();
+use MIME::Base64;
 use Digest::MD5 qw();
 umask 002;
+
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -57,9 +61,9 @@ sub Set {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Self->_prepareMemCacheKey(%Param);
+    my $PreparedKey = $Self->_prepareRedisKey(%Param);
     my $TTL = $Param{TTL};
-    if ($Self->{Config}->{OverrideTTL}) {
+    if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
         foreach my $TypePattern (keys %{$Self->{Config}->{OverrideTTL}}) {
             if ($Param{Type} =~ /^$TypePattern$/g) {
                 $TTL = $Self->{Config}->{OverrideTTL}->{$TypePattern};
@@ -68,72 +72,23 @@ sub Set {
         }
     }
 
-    if ($Self->{Config}->{CacheMetaInfo}) {
-		my $Result;
-		
-        # update indexes
-        $Result->{'Memcached::CachedObjects'} = $Self->{RedisObject}->get(
-            "Memcached::CachedObjects",
-		);
-		
-		$Result->{"Memcached::CacheIndex::$Param{Type}"} = $Self->{RedisObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
-		
-        # update global object index
-        if ( !$Result->{'Memcached::CachedObjects'} || ref( $Result->{'Memcached::CachedObjects'} ) ne 'HASH' ) {
-            $Result->{'Memcached::CachedObjects'} = {};
-        }
-        $Result->{'Memcached::CachedObjects'}->{ $Param{Type} } = 1;
-
-        # update cache index for Type
-        if (
-            !$Result->{"Memcached::CacheIndex::$Param{Type}"}
-            || ref( $Result->{"Memcached::CacheIndex::$Param{Type}"} ) ne 'HASH'
-            )
-        {
-            $Result->{"Memcached::CacheIndex::$Param{Type}"} = {};
-        }
-        $Result->{"Memcached::CacheIndex::$Param{Type}"}->{$PreparedKey} = 1;
-
-		$Self->{RedisObject}->set(
-			"Memcached::CacheIndex::$Param{Type}", 
-			$Result->{"Memcached::CacheIndex::$Param{Type}"},
-		);
-
-		$Self->{RedisObject}->set(
-			"Memcached::CachedObjects",
-			$Result->{"Memcached::CachedObjects"},
-		);
-
-        return $Self->{RedisObject}->setex(
-            $PreparedKey, 
-			$TTL, 
-			$Param{Value},
-        );
+    # prepare value for Redis
+    my $Value = $Param{Value};
+    if ( ref $Value ) {
+        $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );     
     }
-    else {
-        # update indexes
-        my $Result = $Self->{RedisObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
 
-        # update cache index for Type
-        if (!$Result || ref( $Result ) ne 'HASH') {
-            $Result = {};
-        }
-        $Result->{$PreparedKey} = 1;
+    my $Result = $Self->{RedisObject}->setex(
+        $PreparedKey, 
+        $TTL, 
+        $Value,
+    );
 
-        $Self->{RedisObject}->set(
-			"Memcached::CacheIndex::$Param{Type}", $Result
-		),
-
-        return $Self->{RedisObject}->setex(
-            $PreparedKey, 
-			$TTL, 
-			$Param{Value},
-        );
+    if ( $Self->{Config}->{Debug} ) {
+        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
     }
+
+    return $Result;
 }
 
 sub Get {
@@ -149,9 +104,21 @@ sub Get {
 
     return if !$Self->{RedisObject};
 
-    return $Self->{RedisObject}->get(
-        $Self->_prepareMemCacheKey(%Param),
+    my $PreparedKey = $Self->_prepareRedisKey(%Param);
+
+    my $Value = $Self->{RedisObject}->get(
+        $PreparedKey,
     );
+
+    if ($Value && $Self->{Config}->{Debug} ) {
+        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: get() for key \"$PreparedKey\" returned value");
+    }
+
+    return $Value if !$Value || substr($Value, 0, 10) ne '__base64::';
+
+    # restore Value
+    $Value = substr($Value, 10);
+    return eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
 }
 
 sub Delete {
@@ -168,7 +135,7 @@ sub Delete {
     return if ( !$Self->{RedisObject} );
 
     return $Self->{RedisObject}->del(
-        $Self->_prepareMemCacheKey(%Param)
+        $Self->_prepareRedisKey(%Param)
     );
 }
 
@@ -178,37 +145,46 @@ sub CleanUp {
     return if ( !$Self->{RedisObject} );
 
     if ( $Param{Type} ) {
+        # get keys for type 
+        my @Keys = $Self->{RedisObject}->keys($Param{Type}.'::*');
+        my $KeyCount = @Keys;
+        return 1 if !$KeyCount;
 
-        # get cache index for Type
-        my $CacheIndex = $Self->{RedisObject}->get(
-            "Memcached::CacheIndex::$Param{Type}",
-        );
-        if ( $CacheIndex && ref($CacheIndex) eq 'HASH' ) {
-            $Self->{RedisObject}->delete_multi(
-                keys %{$CacheIndex},
-            );
+        if ( $Self->{Config}->{Debug} ) {
+            use Data::Dumper;
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
+        }
 
-            # delete cache index
-            $Self->{RedisObject}->del(
-                "Memcached::CacheIndex::$Param{Type}",
-            );
+        # delete keys
+        my $OK = $Self->{RedisObject}->del(@Keys);
 
-            if ($Self->{Config}->{CacheMetaInfo}) {
-                # delete from global object index
-                $CacheIndex = $Self->{RedisObject}->get(
-                    "Memcached::CachedObjects",
-                );
-                delete $CacheIndex->{ $Param{Type} };
-                $Self->{RedisObject}->set(
-                    "Memcached::CachedObjects",
-                    $CacheIndex,
-                );
-            }
+        if ( $Self->{Config}->{Debug} ) {
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
+            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
         }
         return 1;
     }
     else {
-        return $Self->{RedisObject}->flushall();
+        if ( $Param{KeepTypes} ) {
+            my %KeepTypeLookup;
+            @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
+
+            # get all keys
+            my @Keys = $Self->{RedisObject}->keys('*');
+
+            for my $Key ( @Keys ) {                
+                $Key =~ /^(.+?)::/;
+                my $Type = $1;
+                next if $KeepTypeLookup{$Type};
+                $Self->CleanUp( Type => $Type );
+            }        
+        } 
+        else {
+            if ( $Self->{Config}->{Debug} ) {
+                $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executing flushall()");
+            }
+            return $Self->{RedisObject}->flushall();
+        }        
     }
 }
 
@@ -225,7 +201,7 @@ sub _initRedis {
 
     my %InitParams = (
         server => $Self->{Config}->{Server},
-        %{ $Self->{Config}->{Parameters} },
+        %{ $Self->{Config}->{Parameters} || {} },
     );
 
     $Self->{RedisObject} = Redis->new(%InitParams)
@@ -234,19 +210,19 @@ sub _initRedis {
     return 1;
 }
 
-=item _prepareMemCacheKey()
+=item _prepareRedisKey()
 
-Use MD5 digest of Key for memcached key (memcached key max length is 250);
+Use MD5 digest of Key (to prevent special and possibly unsupported characters in key);
 we use here algo similar to original one from FileStorable.pm.
 (thanks to Informatyka Boguslawski sp. z o.o. sp.k., http://www.ib.pl/ for testing and contributing the MD5 change)
 
-    my $PreparedKey = $CacheInternalObject->_prepareMemCacheKey(
+    my $PreparedKey = $CacheInternalObject->_prepareRedisKey(
         'SomeKey',
     );
 
 =cut
 
-sub _prepareMemCacheKey {
+sub _prepareRedisKey {
     my ( $Self, %Param ) = @_;
 
     if ($Param{Raw}) {
@@ -264,16 +240,17 @@ sub _prepareMemCacheKey {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

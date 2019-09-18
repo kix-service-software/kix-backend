@@ -1,0 +1,84 @@
+{
+   "$id" : "#ConfigItemPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The config item object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "object",
+         "properties" : {
+            "ClassID" : {
+               "type" : "integer"
+            },
+            "Images" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/ConfigItemImagePostItem"
+               }
+            },
+            "Version" : {
+               "$ref" : "#/definitions/ConfigItemVersionPostItem"
+            }
+         },
+         "required" : [
+            "ClassID",
+            "Version"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
+   "definitions" : {
+      "ConfigItemVersionPostItem" : {
+         "$id" : "#ConfigItemVersionPostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item version request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Data" : {
+               "type" : "object"
+            },
+            "DeplStateID" : {
+               "type" : "integer"
+            },
+            "InciStateID" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Name",
+            "DeplStateID",
+            "InciStateID"
+         ]
+      },
+      "ConfigItemImagePostItem" : {
+         "$id" : "#ConfigItemImagePostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The config item image request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Content" : {
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Filename" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Filename"
+         ]
+      }
+   }
+}

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::IndexAccelerator::StaticDB;
@@ -16,7 +16,6 @@ use warnings;
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::DB',
-    'Kernel::System::Group',
     'Kernel::System::Lock',
     'Kernel::System::Log',
     'Kernel::System::State',
@@ -110,10 +109,10 @@ sub TicketAcceleratorUpdate {
                 $Kernel::OM->Get('Kernel::System::DB')->Do(
                     SQL => '
                         UPDATE ticket_index
-                        SET queue_id = ?, queue = ?, group_id = ?, s_lock = ?, s_state = ?
+                        SET queue_id = ?, queue = ?, s_lock = ?, s_state = ?
                         WHERE ticket_id = ?',
                     Bind => [
-                        \$TicketData{QueueID}, \$TicketData{Queue}, \$TicketData{GroupID},
+                        \$TicketData{QueueID}, \$TicketData{Queue},
                         \$TicketData{Lock},    \$TicketData{State}, \$Param{TicketID},
                     ],
                 );
@@ -245,11 +244,11 @@ sub TicketAcceleratorAdd {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             INSERT INTO ticket_index
-                (ticket_id, queue_id, queue, group_id, s_lock, s_state, create_time_unix)
-                VALUES (?, ?, ?, ?, ?, ?, ?)',
+                (ticket_id, queue_id, queue, s_lock, s_state, create_time_unix)
+                VALUES (?, ?, ?, ?, ?, ?)',
         Bind => [
             \$Param{TicketID},     \$TicketData{QueueID}, \$TicketData{Queue},
-            \$TicketData{GroupID}, \$TicketData{Lock},    \$TicketData{State},
+            \$TicketData{Lock},    \$TicketData{State},
             \$TicketData{CreateTimeUnix},
         ],
     );
@@ -375,43 +374,6 @@ sub TicketAcceleratorIndex {
         }
     }
 
-    # get user groups
-    my $Type             = 'rw';
-    my $AgentTicketQueue = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::AgentTicketQueue');
-
-    if (
-        $AgentTicketQueue
-        && ref $AgentTicketQueue eq 'HASH'
-        && $AgentTicketQueue->{ViewAllPossibleTickets}
-        )
-    {
-        $Type = 'ro';
-    }
-
-    my %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
-        UserID => $Param{UserID},
-        Type   => $Type,
-    );
-
-    my @GroupIDs = sort keys %GroupList;
-
-    # get index
-    $Queues{MaxAge} = 0;
-
-    # check if user is in min. one group! if not, return here
-    if ( !@GroupIDs ) {
-
-        my %Hashes;
-        $Hashes{QueueID} = 0;
-        $Hashes{Queue}   = 'CustomQueue';
-        $Hashes{MaxAge}  = 0;
-        $Hashes{Count}   = 0;
-
-        push @{ $Queues{Queues} }, \%Hashes;
-
-        return %Queues;
-    }
-
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -428,11 +390,11 @@ sub TicketAcceleratorIndex {
     #    );
     my $SQL = "
             SELECT count(*), ti.s_lock
-            FROM ticket_index ti, personal_queues suq, ticket_lock_type tl
-            WHERE suq.queue_id = ti.queue_id
+            FROM ticket_index ti, user_preferences up, ticket_lock_type tl
+            WHERE up.preferences_value = ti.queue_id
                 AND tl.name = ti.s_lock
-                AND ti.group_id IN ( ${\(join ', ', @GroupIDs)} )
-                AND suq.user_id = $Param{UserID}";
+                AND up.preferences_key = 'MyQueues'
+                AND up.user_id = $Param{UserID}";
 
     if ( $Self->{UserPreferences}->{UserViewAllTickets} ) {
         $SQL .= " AND tl.id IN ( ${\(join ', ', @ViewableLockIDs)} )";
@@ -469,15 +431,11 @@ sub TicketAcceleratorIndex {
         $SQL = "
                 SELECT queue_id, queue, min(create_time_unix), s_lock, count(*)
                 FROM ticket_index ti, ticket_lock_type tl
-                WHERE group_id IN ( ${\(join ', ', @GroupIDs)} )
-                  AND tl.name = ti.s_lock
+                WHERE tl.name = ti.s_lock
                   AND tl.id IN ( ${\(join ', ', @ViewableLockIDs)} )";
     }
     else {
-        $SQL = "
-            SELECT queue_id, queue, min(create_time_unix), s_lock, count(*)
-            FROM ticket_index
-            WHERE group_id IN ( ${\(join ', ', @GroupIDs)} )";
+        $SQL = "SELECT queue_id, queue, min(create_time_unix), s_lock, count(*) FROM ticket_index";
     }
 
     $SQL .= "GROUP BY queue_id, queue, s_lock
@@ -561,7 +519,7 @@ sub TicketAcceleratorRebuild {
 
     # get all viewable tickets
     my $SQL = "
-        SELECT st.id, st.queue_id, sq.name, sq.group_id, slt.name, tsd.name, st.create_time_unix
+        SELECT st.id, st.queue_id, sq.name, slt.name, tsd.name, st.create_time_unix
         FROM ticket st
             JOIN queue sq             ON st.queue_id = sq.id
             JOIN ticket_state tsd     ON st.ticket_state_id = tsd.id
@@ -578,10 +536,9 @@ sub TicketAcceleratorRebuild {
         $Data{TicketID}       = $Row[0];
         $Data{QueueID}        = $Row[1];
         $Data{Queue}          = $Row[2];
-        $Data{GroupID}        = $Row[3];
-        $Data{Lock}           = $Row[4];
-        $Data{State}          = $Row[5];
-        $Data{CreateTimeUnix} = $Row[6];
+        $Data{Lock}           = $Row[3];
+        $Data{State}          = $Row[4];
+        $Data{CreateTimeUnix} = $Row[5];
 
         push @RowBuffer, \%Data;
     }
@@ -596,10 +553,10 @@ sub TicketAcceleratorRebuild {
         $DBObject->Do(
             SQL => '
                 INSERT INTO ticket_index
-                    (ticket_id, queue_id, queue, group_id, s_lock, s_state, create_time_unix)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    (ticket_id, queue_id, queue, s_lock, s_state, create_time_unix)
+                    VALUES (?, ?, ?, ?, ?, ?)',
             Bind => [
-                \$Data{TicketID}, \$Data{QueueID}, \$Data{Queue}, \$Data{GroupID},
+                \$Data{TicketID}, \$Data{QueueID}, \$Data{Queue},
                 \$Data{Lock}, \$Data{State}, \$Data{CreateTimeUnix},
             ],
         );
@@ -648,7 +605,7 @@ sub GetIndexTicket {
     # sql query
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT ticket_id, queue_id, queue, group_id, s_lock, s_state, create_time_unix
+            SELECT ticket_id, queue_id, queue, s_lock, s_state, create_time_unix
             FROM ticket_index
             WHERE ticket_id = ?',
         Bind => [ \$Param{TicketID} ]
@@ -659,10 +616,9 @@ sub GetIndexTicket {
         $Data{TicketID}       = $Row[0];
         $Data{QueueID}        = $Row[1];
         $Data{Queue}          = $Row[2];
-        $Data{GroupID}        = $Row[3];
-        $Data{Lock}           = $Row[4];
-        $Data{State}          = $Row[5];
-        $Data{CreateTimeUnix} = $Row[6];
+        $Data{Lock}           = $Row[3];
+        $Data{State}          = $Row[4];
+        $Data{CreateTimeUnix} = $Row[5];
     }
 
     return %Data;
@@ -703,16 +659,17 @@ sub _GetIndexTicketLock {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

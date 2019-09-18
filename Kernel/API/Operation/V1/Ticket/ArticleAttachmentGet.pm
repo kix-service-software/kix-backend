@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::ArticleAttachmentGet;
@@ -139,20 +137,6 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check ticket permission
-    my $Permission = $Self->CheckAccessPermission(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-    );
-
-    if ( !$Permission ) {
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $Param{Data}->{TicketID}.",
-        );
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -164,15 +148,14 @@ sub Run {
     # check if article exists
     if ( !%Article ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Could not get data for article $Param{Data}->{ArticleID}",
+            Code => 'ParentObject.NotFound',
         );
     }
 
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
-            Code    => 'Object.NotFound',
+            Code    => 'ParentObject.NotFound',
             Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
@@ -180,7 +163,7 @@ sub Run {
     my @AttachmentList;
 
     # start loop
-    foreach my $AttachmentID ( sort @{$Param{Data}->{AttachmentID}} ) {
+    foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
         
         my %Attachment = $TicketObject->ArticleAttachment(
             ArticleID          => $Param{Data}->{ArticleID},
@@ -219,16 +202,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

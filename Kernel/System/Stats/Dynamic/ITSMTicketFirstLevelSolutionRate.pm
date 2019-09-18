@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Stats::Dynamic::ITSMTicketFirstLevelSolutionRate;
@@ -150,11 +150,11 @@ sub GetObjectAttributes {
             Block            => 'InputField',
         },
         {
-            Name             => 'CustomerUserLogin',
+            Name             => 'ContactLogin',
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLogin',
+            Element          => 'ContactLogin',
             Block            => 'InputField',
         },
         {
@@ -313,7 +313,7 @@ sub GetObjectAttributes {
     if ( $Kernel::OM->Get('Kernel::Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
 
         # Get CustomerID
-        # (This way also can be the solution for the CustomerUserID)
+        # (This way also can be the solution for the ContactID)
         $Self->{DBSlaveObject}->Prepare(
             SQL => 'SELECT DISTINCT customer_id FROM ticket',
         );
@@ -452,7 +452,7 @@ sub GetStatElement {
         next TICKETID if @{$ArticleDataList} > 2;
 
         # first article is a phone article
-        if ( $ArticleDataList->[0]->{ArticleTypeID} eq $Self->{PhoneTypeID} ) {
+        if ( $ArticleDataList->[0]->{ChannelID} eq $Self->{PhoneTypeID} ) {
 
             if ( !$ArticleDataList->[1] ) {
                 $FirstLevelSolutionTickets++;
@@ -462,7 +462,7 @@ sub GetStatElement {
         }
 
         # first article is an external email article
-        if ( $ArticleDataList->[0]->{ArticleTypeID} eq $Self->{EmailExternalTypeID} ) {
+        if ( $ArticleDataList->[0]->{ChannelID} eq $Self->{EmailExternalTypeID} ) {
 
             # first article comes from an agent (Email-Ticket)
             if (
@@ -499,17 +499,17 @@ sub _ArticleDataGet {
 
     return if !$Param{TicketID};
 
-    # get id of article type 'phone'
+    # get id of channel 'phone'
     if ( !$Self->{PhoneTypeID} ) {
-        $Self->{PhoneTypeID} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeLookup(
-            ArticleType => 'phone',
+        $Self->{PhoneTypeID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+            Name => 'phone-outbound',
         );
     }
 
-    # get id of article type 'email-external'
-    if ( !$Self->{EmailExternalTypeID} ) {
-        $Self->{EmailExternalTypeID} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeLookup(
-            ArticleType => 'email-external',
+    # get id of article type 'email'
+    if ( !$Self->{EmailTypeID} ) {
+        $Self->{EmailTypeID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+            Name => 'email',
         );
     }
 
@@ -520,17 +520,17 @@ sub _ArticleDataGet {
         );
     }
 
-    # get id of article sender type 'customer'
+    # get id of article sender type 'external'
     if ( !$Self->{CustomerSenderTypeID} ) {
         $Self->{CustomerSenderTypeID} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
-            SenderType => 'customer',
+            SenderType => 'external',
         );
     }
 
     # ask database
     $Self->{DBSlaveObject}->Prepare(
-        SQL => 'SELECT article_type_id, article_sender_type_id FROM article '
-            . 'WHERE ticket_id = ? AND article_type_id IN ( ?, ? ) AND '
+        SQL => 'SELECT channel_id, article_sender_type_id FROM article '
+            . 'WHERE ticket_id = ? AND channel_id IN ( ?, ? ) AND '
             . 'article_sender_type_id IN ( ?, ? ) '
             . 'ORDER BY create_time',
         Bind => [
@@ -548,7 +548,7 @@ sub _ArticleDataGet {
     while ( my @Row = $Self->{DBSlaveObject}->FetchrowArray() ) {
 
         my %ArticleData;
-        $ArticleData{ArticleTypeID}       = $Row[0];
+        $ArticleData{ChannelID}           = $Row[0];
         $ArticleData{ArticleSenderTypeID} = $Row[1];
 
         push @ArticleDataList, \%ArticleData;
@@ -573,16 +573,17 @@ sub ImportWrapper {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

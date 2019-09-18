@@ -1,0 +1,14 @@
+{
+    "Permission": {
+        "ChangeBy": 1,
+        "ChangeTime": "2018-09-28 09:17:03",
+        "Comment": "Full access to the tickets resource",
+        "CreateBy": 1,
+        "CreateTime": "2018-08-28 11:34:55",
+        "ID": 1,
+        "IsRequired": 1,
+        "Target": "/tickets",
+        "TypeID": 1,
+        "Value": 15
+    }
+}

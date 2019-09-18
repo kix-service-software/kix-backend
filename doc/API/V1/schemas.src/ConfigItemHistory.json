@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemHistory",
+  "type": "object",
+  "description": "The config item history object.",
+  "properties": {
+    "Comment": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ConfigItemID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "HistoryEntryID": {
+      "type": "integer",
+      "readOnly": true
+    },    
+    "HistoryType": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "HistoryTypeID": {
+      "type": "integer",
+      "readOnly": true
+    },    
+    "UserID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "UserFirstname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "UserLastname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "UserLogin": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "CreateBy",
+    "CreateTime",
+    "HistoryEntryID",
+    "HistoryType",
+    "HistoryTypeID",
+    "UserID",
+    "UserFirstname",
+    "UserLastname",
+    "UserLogin"
+  ]
+}

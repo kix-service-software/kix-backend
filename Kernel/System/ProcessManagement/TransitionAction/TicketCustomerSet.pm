@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ProcessManagement::TransitionAction::TicketCustomerSet;
@@ -71,7 +71,7 @@ sub new {
         Config                   => {
             CustomerID     => 'client123',
             # or
-            CustomerUserID => 'client-user-123',
+            ContactID => 'client-user-123',
 
             #OR (Framework wording)
             No             => 'client123',
@@ -115,13 +115,13 @@ sub Run {
     if (
         !$Param{Config}->{CustomerID}
         && !$Param{Config}->{No}
-        && !$Param{Config}->{CustomerUserID}
+        && !$Param{Config}->{ContactID}
         && !$Param{Config}->{User}
         )
     {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => $CommonMessage . "No CustomerID/No or CustomerUserID/User configured!",
+            Message  => $CommonMessage . "No CustomerID/No or ContactID/User configured!",
         );
         return;
     }
@@ -129,8 +129,8 @@ sub Run {
     if ( !$Param{Config}->{CustomerID} && $Param{Config}->{No} ) {
         $Param{Config}->{CustomerID} = $Param{Config}->{No};
     }
-    if ( !$Param{Config}->{CustomerUserID} && $Param{Config}->{User} ) {
-        $Param{Config}->{CustomerUserID} = $Param{Config}->{User};
+    if ( !$Param{Config}->{ContactID} && $Param{Config}->{User} ) {
+        $Param{Config}->{ContactID} = $Param{Config}->{User};
     }
 
     if (
@@ -165,11 +165,11 @@ sub Run {
     }
 
     if (
-        defined $Param{Config}->{CustomerUserID}
+        defined $Param{Config}->{ContactID}
         &&
         (
-            !defined $Param{Ticket}->{CustomerUserID}
-            || $Param{Config}->{CustomerUserID} ne $Param{Ticket}->{CustomerUserID}
+            !defined $Param{Ticket}->{ContactID}
+            || $Param{Config}->{ContactID} ne $Param{Ticket}->{ContactID}
         )
         )
     {
@@ -178,7 +178,7 @@ sub Run {
 
         my $Success = $TicketObject->TicketCustomerSet(
             TicketID => $Param{Ticket}->{TicketID},
-            User     => $Param{Config}->{CustomerUserID},
+            User     => $Param{Config}->{ContactID},
             UserID   => $Param{UserID},
         );
 
@@ -186,8 +186,8 @@ sub Run {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
-                    . 'Ticket CustomerUserID: '
-                    . $Param{Config}->{CustomerUserID}
+                    . 'Ticket ContactID: '
+                    . $Param{Config}->{ContactID}
                     . ' could not be updated for Ticket: '
                     . $Param{Ticket}->{TicketID} . '!',
             );
@@ -203,16 +203,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

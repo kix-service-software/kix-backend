@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::StdAttachment;
@@ -118,6 +118,14 @@ sub StdAttachmentAdd {
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         $ID = $Row[0];
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'StandardAttachment',
+        ObjectID  => $ID,
+    );
+
     return $ID;
 }
 
@@ -253,6 +261,14 @@ sub StdAttachmentUpdate {
             ],
         );
     }
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'StandardAttachment',
+        ObjectID  => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -305,6 +321,14 @@ sub StdAttachmentDelete {
         SQL  => 'DELETE FROM standard_attachment WHERE ID = ?',
         Bind => [ \$Param{ID} ],
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'StandardAttachment',
+        ObjectID  => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -403,53 +427,6 @@ sub StdAttachmentLookup {
     return $DBValue;
 }
 
-=item StdAttachmentsByResponseID()
-
-DEPRECATED: This function will be removed in further versions of OTRS
-
-return a hash (ID => Name) of std. attachment by response id
-
-    my %StdAttachment = $StdAttachmentObject->StdAttachmentsByResponseID(
-        ID => 4711,
-    );
-
-=cut
-
-sub StdAttachmentsByResponseID {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no ID!'
-        );
-        return;
-    }
-
-    # db quote
-    for (qw(ID)) {
-        $Param{$_} = $Self->{DBObject}->Quote( $Param{$_}, 'Integer' );
-    }
-
-    # return data
-    my %Relation = $Self->{DBObject}->GetTableData(
-        Table => 'standard_template_attachment',
-        What  => 'standard_attachment_id, standard_template_id',
-        Where => "standard_template_id = $Param{ID}",
-    );
-    my %AllStdAttachments = $Self->StdAttachmentList( Valid => 1 );
-    my %Data;
-    for ( sort keys %Relation ) {
-        if ( $AllStdAttachments{$_} ) {
-            $Data{$_} = $AllStdAttachments{$_};
-        }
-        else {
-            delete $Data{$_};
-        }
-    }
-    return %Data;
-}
 
 =item StdAttachmentList()
 
@@ -475,59 +452,6 @@ sub StdAttachmentList {
         Clamp => 1,
         Valid => $Param{Valid},
     );
-}
-
-=item StdAttachmentSetResponses()
-
-DEPRECATED: This function will be removed in further versions of OTRS
-
-set std responses of response id
-
-    $StdAttachmentObject->StdAttachmentSetResponses(
-        ID               => 123,
-        AttachmentIDsRef => [1, 2, 3],
-        UserID           => 1,
-    );
-
-=cut
-
-sub StdAttachmentSetResponses {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(ID AttachmentIDsRef UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # add attachments to response
-    return if !$Self->{DBObject}->Do(
-        SQL  => 'DELETE FROM standard_template_attachment WHERE standard_template_id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
-    ATTACHMENT:
-    for my $ID ( @{ $Param{AttachmentIDsRef} } ) {
-        next ATTACHMENT if !$ID;
-        $Self->{DBObject}->Do(
-            SQL => 'INSERT INTO standard_template_attachment (standard_attachment_id, '
-                . 'standard_template_id, create_time, create_by, change_time, change_by)'
-                . ' VALUES ( ?, ?, current_timestamp, ?, current_timestamp, ?)',
-            Bind => [
-                \$ID, \$Param{ID}, \$Param{UserID}, \$Param{UserID},
-            ],
-        );
-    }
-
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-    return 1;
 }
 
 =item StdAttachmentStandardTemplateMemberAdd()
@@ -588,6 +512,14 @@ sub StdAttachmentStandardTemplateMemberAdd {
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'StandardAttachment.TemplateMember',
+        ObjectID  => $Param{AttachmentID}.'::'.$Param{StandardTemplateID},
+    );
+
     return $Success;
 }
 
@@ -707,16 +639,17 @@ sub StdAttachmentStandardTemplateMemberList {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

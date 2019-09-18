@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#ConfigItemClassDefinitionPostResponse",
+    "type": "object",
+    "description": "The ID of the created config item class definition.",
+    "properties": {
+        "ConfigItemClassDefinitionID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "ConfigItemClassDefinitionID"
+    ]
+}

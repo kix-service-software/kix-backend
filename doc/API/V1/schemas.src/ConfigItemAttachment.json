@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConfigItemAttachment",
+  "type": "object",
+  "description": "The config item attachment object.",
+  "properties": {
+    "AttachmentID": {
+      "type": "integer"
+    },    
+    "Content": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "ContentType": {
+      "type": "string",
+      "readOnly": true
+    },    
+    "Filesize": {
+      "type": "string",
+      "readOnly": true
+    },
+    "FilesizeRaw": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Filename": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "AttachmentID",
+    "ContentType",
+    "Content",
+    "Filesize",
+    "FilesizeRaw",
+    "Filename"
+  ]
+}

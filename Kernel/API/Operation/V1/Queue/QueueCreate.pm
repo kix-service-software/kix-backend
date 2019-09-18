@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/Queue/QueueCreate.pm - API Queue Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Queue::QueueCreate;
@@ -90,10 +85,7 @@ sub ParameterDefinition {
         },
         'Queue::Name' => {
             Required => 1
-        },
-        'Queue::GroupID' => {
-            Required => 1
-        },            
+        }
     }
 }
 
@@ -107,21 +99,13 @@ perform QueueCreate Operation. This will return the created QueueID.
 	        	Name                => '...',
 	        	Comment             => '...',     # (optional)
 	        	ValidID             => '...',     # (optional)	        	
-		        GroupID             => '...',
 		        Calendar            => '...',     # (optional)
-		        FirstResponseTime   => '...',     # (optional)
-		        FirstResponseNotify => '...',     # (optional, notify agent if first response escalation is 60% reached)
-		        UpdateTime          => '...',     # (optional)
-		        UpdateNotify        => '...',     # (optional, notify agent if update escalation is 80% reached)
-		        SolutionTime        => '...',     # (optional)
-		        SolutionNotify      => '...',     # (optional, notify agent if solution escalation is 80% reached)
 		        UnlockTimeout       => '...',,    # (optional)
 		        FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
 		        FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
 		        DefaultSignKey      => '...',     # (optional)
 		        SystemAddressID     => '...',
-		        SalutationID        => '...',
-		        SignatureID         => '...', 		               	        	
+		        Signature           => '...', 		               	        	
 	    	},
 	    },
     );
@@ -166,8 +150,7 @@ sub Run {
     
     if ( $Exists ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Cannot create Queue. Queue '$Queue->{Name}' already exists.",
+            Code => 'Object.AlreadyExists',
         );
     }
 
@@ -176,28 +159,19 @@ sub Run {
         Name                => $Queue->{Name},
         Comment             => $Queue->{Comment} || '',
         ValidID             => $Queue->{ValidID} || 1,
-        GroupID             => $Queue->{GroupID},
         Calendar            => $Queue->{Calendar} || '',
-        FirstResponseTime   => $Queue->{FirstResponseTime} || '',
-        FirstResponseNotify => $Queue->{FirstResponseNotify} || '',
-        UpdateTime          => $Queue->{UpdateTime} || '',
-        UpdateNotify        => $Queue->{UpdateNotify} || '',
-        SolutionTime        => $Queue->{SolutionTime} || '',
-        SolutionNotify      => $Queue->{SolutionNotify} || '',
         UnlockTimeout       => $Queue->{UnlockTimeout} || '',
         FollowUpID          => $Queue->{FollowUpID} || '',
         FollowUpLock        => $Queue->{FollowUpLock} || '',
         DefaultSignKey      => $Queue->{DefaultSignKey} || '',
         SystemAddressID     => $Queue->{SystemAddressID} || 1,
-        SalutationID        => $Queue->{SalutationID} || 1,
-        SignatureID         => $Queue->{SignatureID} || 1, 
+        Signature           => $Queue->{Signature} || '', 
         UserID              => $Self->{Authorization}->{UserID},
     );
 
     if ( !$QueueID ) {
         return $Self->_Error(
-            Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Queue, please contact the system administrator',
+            Code => 'Object.UnableToCreate',
         );
     }
     
@@ -210,3 +184,17 @@ sub Run {
 
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

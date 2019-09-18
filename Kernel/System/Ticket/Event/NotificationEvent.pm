@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::Event::NotificationEvent;
@@ -19,16 +19,16 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DB',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Email',
-    'Kernel::System::Group',
     'Kernel::System::HTMLUtils',
     'Kernel::System::JSON',
     'Kernel::System::Log',
     'Kernel::System::NotificationEvent',
+    'Kernel::System::Role',
     'Kernel::System::Queue',
     'Kernel::System::SystemAddress',
     'Kernel::System::TemplateGenerator',
@@ -69,7 +69,7 @@ sub Run {
         return;
     }
 
-    # get ticket object
+    # get objects
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # return if no notification is active
@@ -130,6 +130,7 @@ sub Run {
             Notification             => \%Notification,
             DynamicFieldConfigLookup => \%DynamicFieldConfigLookup,
         );
+
         next NOTIFICATION if !$PassFilter;
 
         # add attachments only on ArticleCreate or ArticleSend event
@@ -207,7 +208,7 @@ sub Run {
             );
 
             my $UserNotificationTransport = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
-                Data => $Recipient->{NotificationTransport},
+                Data => $Recipient->{Preferences}->{NotificationTransport},
             );
 
             push @NotificationBundle, {
@@ -299,14 +300,12 @@ sub Run {
                 {
                     next BUNDLE;
                 }
-
-                # Check if notification should not send to the customer.
+                # Check if notification should not be send to the customer.
                 if (
                     $Bundle->{Recipient}->{Type} eq 'Customer'
                     && $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
                     )
                 {
-
                     # No UserID means it's not a mapped customer.
                     next BUNDLE if !$Bundle->{Recipient}->{UserID};
                 }
@@ -362,12 +361,12 @@ sub Run {
             }
         }
 
-        if ( %AlreadySent && $Param{Data}->{ArticleID} && $Param{Data}->{ArticleType} ) {
+        if ( %AlreadySent && $Param{Data}->{ArticleID} && $Param{Data}->{Channel} ) {
 
             # update to field
             my $UpdateToSuccess = $Self->_ArticleToUpdate(
                 ArticleID   => $Param{Data}->{ArticleID},
-                ArticleType => $Param{Data}->{ArticleType},
+                Channel     => $Param{Data}->{Channel},
                 UserIDs     => \%AlreadySent,
                 UserID      => $Param{UserID},
             );
@@ -407,21 +406,20 @@ sub _NotificationFilter {
         next KEY if $Key eq 'Recipients';
         next KEY if $Key eq 'SkipRecipients';
         next KEY if $Key eq 'RecipientAgents';
-        next KEY if $Key eq 'RecipientGroups';
         next KEY if $Key eq 'RecipientRoles';
         next KEY if $Key eq 'TransportEmailTemplate';
         next KEY if $Key eq 'Events';
-        next KEY if $Key eq 'ArticleTypeID';
+        next KEY if $Key eq 'Channel';
         next KEY if $Key eq 'ArticleSenderTypeID';
         next KEY if $Key eq 'ArticleSubjectMatch';
         next KEY if $Key eq 'ArticleBodyMatch';
         next KEY if $Key eq 'ArticleAttachmentInclude';
-        next KEY if $Key eq 'NotificationArticleTypeID';
         next KEY if $Key eq 'Transports';
         next KEY if $Key eq 'OncePerDay';
         next KEY if $Key eq 'MarkAsSeenForAgents';
         next KEY if $Key eq 'VisibleForAgent';
         next KEY if $Key eq 'VisibleForAgentTooltip';
+        next KEY if $Key eq 'VisibleForCustomer';
         next KEY if $Key eq 'LanguageID';
         next KEY if $Key eq 'SendOnOutOfOffice';
         next KEY if $Key eq 'AgentEnabledByDefault';
@@ -493,7 +491,7 @@ sub _NotificationFilter {
             }
             else {
 
-                if ( $Value eq $Param{Ticket}->{$Key} ) {
+                if ( $Param{Ticket}->{$Key} && $Value eq $Param{Ticket}->{$Key} ) {
                     $Match = 1;
                     last VALUE;
                 }
@@ -516,16 +514,16 @@ sub _NotificationFilter {
             DynamicFields => 0,
         );
 
-        # check article type
-        if ( $Notification{Data}->{ArticleTypeID} ) {
+        # check channel
+        if ( $Notification{Data}->{ChannelID} ) {
 
             my $Match = 0;
             VALUE:
-            for my $Value ( @{ $Notification{Data}->{ArticleTypeID} } ) {
+            for my $Value ( @{ $Notification{Data}->{ChannelID} } ) {
 
                 next VALUE if !$Value;
 
-                if ( $Value == $Article{ArticleTypeID} ) {
+                if ( $Value == $Article{ChannelID} ) {
                     $Match = 1;
                     last VALUE;
                 }
@@ -592,7 +590,6 @@ sub _RecipientsGet {
 
     # get needed objects
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $GroupObject  = $Kernel::OM->Get('Kernel::System::Group');
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     my @RecipientUserIDs;
@@ -611,7 +608,7 @@ sub _RecipientsGet {
 
         # get needed objects
         my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
-        my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
         # KIX4OTRS-capeIT
         my @LinkedAgents = ();
@@ -652,8 +649,7 @@ sub _RecipientsGet {
             if (
                 $Recipient
                 # KIX4OTRS-capeIT
-                # =~ /^Agent(Owner|Responsible|Watcher|WritePermissions|MyQueues|MyServices|MyQueuesMyServices)$/
-                =~ /^Agent(Owner|Responsible|Watcher|WritePermissions|MyQueues|MyServices|MyQueuesMyServices|LinkedPerson)$/
+                =~ /^Agent(Owner|Responsible|Watcher|ReadPermissions|WritePermissions|MyQueues|MyServices|MyQueuesMyServices|)$/
                 # EO KIX4OTRS-capeIT
                 )
             {
@@ -678,30 +674,47 @@ sub _RecipientsGet {
                         Result   => 'ARRAY',
                     );
                 }
-                elsif ( $Recipient eq 'AgentWritePermissions' ) {
+                elsif ( $Recipient eq 'AgentReadPermissions' ) {
 
-                    my $GroupID = $QueueObject->GetQueueGroupID(
-                        QueueID => $Ticket{QueueID},
+                    # check each valid user if he has READ permission on /tickets
+                    my @UserIDs;
+                    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+                        Valid => 1,
+                        Short => 1,
                     );
-
-                    my %UserList = $GroupObject->PermissionGroupUserGet(
-                        GroupID => $GroupID,
-                        Type    => 'rw',
-                        UserID  => $Param{UserID},
-                    );
-
-                    my %RoleList = $GroupObject->PermissionGroupRoleGet(
-                        GroupID => $GroupID,
-                        Type    => 'rw',
-                    );
-                    for my $RoleID ( sort keys %RoleList ) {
-                        my %RoleUserList = $GroupObject->PermissionRoleUserGet(
-                            RoleID => $RoleID,
+                    foreach my $UserID ( sort keys %UserList ) {
+                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                            UserID              => $UserID,
+                            Types               => [ 'Resource' ],
+                            Target              => '/tickets/' . $Ticket{TicketID},
+                            RequestedPermission => 'READ'
                         );
-                        %UserList = ( %RoleUserList, %UserList );
+                        if ( $Granted ) {
+                            push @UserIDs, $UserID;
+                        }
                     }
 
-                    my @UserIDs = sort keys %UserList;
+                    push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
+                }
+                elsif ( $Recipient eq 'AgentWritePermissions' ) {
+
+                    # check each valid user if he has UPDATE permission on /tickets
+                    my @UserIDs;
+                    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+                        Valid => 1,
+                        Short => 1,
+                    );
+                    foreach my $UserID ( sort keys %UserList ) {
+                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                            UserID              => $UserID,
+                            Types               => [ 'Resource' ],
+                            Target              => '/tickets/' . $Ticket{TicketID},
+                            RequestedPermission => 'UPDATE'
+                        );
+                        if ( $Granted ) {
+                            push @UserIDs, $UserID;
+                        }
+                    }
 
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
@@ -765,12 +778,7 @@ sub _RecipientsGet {
                 # EO KIX4OTRS-capeIT
             }
 
-            # Other OTRS packages might add other kind of recipients that are normally handled by
-            #   other modules then an elsif condition here is useful.
-            # KIX4OTRS-capeIT
-            # elsif ( $Recipient eq 'Customer' ) {
-            elsif ( $Recipient eq 'Customer' || $Recipient eq 'CustomerLinkedPerson' ) {
-            # EO KIX4OTRS-capeIT
+            elsif ( $Recipient eq 'Customer' ) {
 
                 # get old article for quoting
                 my %Article = $TicketObject->ArticleLastCustomerArticle(
@@ -778,98 +786,65 @@ sub _RecipientsGet {
                     DynamicFields => 0,
                 );
 
-                # If the ticket has no articles yet, get the raw ticket data
-                if ( !%Article ) {
-                    %Article = $TicketObject->TicketGet(
-                        TicketID      => $Param{Data}->{TicketID},
-                        DynamicFields => 0,
-                    );
-                }
+                # get the raw ticket data
+                my %Ticket = $TicketObject->TicketGet(
+                    TicketID      => $Param{Data}->{TicketID},
+                    DynamicFields => 0,
+                );
 
                 my %Recipient;
 
-                # KIX4OTRS-capeIT
-                my @CustomerRecipients = ();
-                if ( $Recipient eq 'CustomerLinkedPerson' ) {
-                    @CustomerRecipients = @LinkedCustomers;
+                # Check if we actually do have an article
+                if ( defined $Article{SenderType} ) {
+                    if ( $Article{SenderType} eq 'external' ) {
+                        $Recipient{Email} = $Article{From};
+                    }
+                    else {
+                        $Recipient{Email} = $Article{To};
+                    }
                 }
-                else {
-                    push @CustomerRecipients, $Article{CustomerUserID};
+                $Recipient{Type} = 'Customer';
+
+                # check if customer notifications should be send
+                if (
+                    $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
+                    && !$Ticket{ContactID}
+                    )
+                {
+                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        Priority => 'info',
+                        Message  => 'Send no customer notification because no customer is set!',
+                    );
+                    next RECIPIENT;
                 }
 
-                for my $Customer ( @CustomerRecipients ) {
-                # EO KIX4OTRS-capeIT
-                    # ArticleLastCustomerArticle() returns the latest customer article but if there
-                    # is no customer article, it returns the latest agent article. In this case
-                    # notification must not be send to the "From", but to the "To" article field.
+                # get language and send recipient
+                $Recipient{Language} = $ConfigObject->Get('DefaultLanguage') || 'en';
 
-                    # Check if we actually do have an article
-                    if ( defined $Article{SenderType} ) {
-                        if ( $Article{SenderType} eq 'customer' ) {
-                            $Recipient{UserEmail} = $Article{From};
-                        }
-                        else {
-                            $Recipient{UserEmail} = $Article{To};
-                        }
-                    }
-                    $Recipient{Type} = 'Customer';
+                if ( $Ticket{ContactID} ) {
 
-                    # check if customer notifications should be send
-                    if (
-                        $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
-                        # KIX4OTRS-capeIT
-                        # && !$Article{CustomerUserID}
-                        && !$Customer
-                        # EO KIX4OTRS-capeIT
-                        )
-                    {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
-                            Priority => 'info',
-                            Message  => 'Send no customer notification because no customer is set!',
-                        );
-                        next RECIPIENT;
+                    my %Contact = $ContactObject->ContactGet(
+                        ID => $Ticket{ContactID},
+                    );
+
+                    # join Recipient data with Contact data
+                    %Recipient = ( %Recipient, %Contact );
+
+                    # get user language
+                    if ( $Contact{Language} ) {
+                        $Recipient{Language} = $Contact{Language};
                     }
 
-                    # get language and send recipient
-                    $Recipient{Language} = $ConfigObject->Get('DefaultLanguage') || 'en';
-
-                    if ( $Article{CustomerUserID} ) {
-
-                        my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
-                            # KIX4OTRS-capeIT
-                            # User => $Article{CustomerUserID},
-                            User => $Customer,
-                            # EO KIX4OTRS-capeIT
-                        );
-
-                        # join Recipient data with CustomerUser data
-                        %Recipient = ( %Recipient, %CustomerUser );
-
-                        # get user language
-                        if ( $CustomerUser{UserLanguage} ) {
-                            $Recipient{Language} = $CustomerUser{UserLanguage};
-                        }
-                    }
-
-                    # get real name
-                    if ( $Article{CustomerUserID} ) {
-                        $Recipient{Realname} = $CustomerUserObject->CustomerName(
-                            # KIX4OTRS-capeIT
-                            # UserLogin => $Article{CustomerUserID},
-                            UserLogin => $Customer,
-                            # EO KIX4OTRS-capeIT
-                        );
-                    }
-                    if ( !$Recipient{Realname} ) {
-                        $Recipient{Realname} = $Article{From} || '';
-                        $Recipient{Realname} =~ s/<.*>|\(.*\)|\"|;|,//g;
-                        $Recipient{Realname} =~ s/( $)|(  $)//g;
-                    }
-
-                    push @RecipientUsers, \%Recipient;
-                # KIX4OTRS-capeIT
+                    $Recipient{Realname} = $Contact{Firstname}.' '.$Contact{Lastname};
                 }
-                # EO KIX4OTRS-capeIT
+
+                if ( !$Recipient{Realname} ) {
+                    $Recipient{Realname} = $Article{From} || '';
+                    $Recipient{Realname} =~ s/<.*>|\(.*\)|\"|;|,//g;
+                    $Recipient{Realname} =~ s/( $)|(  $)//g;
+                }
+
+                push @RecipientUsers, \%Recipient;
             }
         }
     }
@@ -882,42 +857,18 @@ sub _RecipientsGet {
     # hash to keep track which agents are already receiving this notification
     my %AgentUsed = map { $_ => 1 } @RecipientUserIDs;
 
-    # get recipients by RecipientGroups
-    if ( $Notification{Data}->{RecipientGroups} ) {
-
-        RECIPIENT:
-        for my $GroupID ( @{ $Notification{Data}->{RecipientGroups} } ) {
-
-            my %GroupMemberList = $GroupObject->PermissionGroupUserGet(
-                GroupID => $GroupID,
-                Type    => 'ro',
-            );
-
-            GROUPMEMBER:
-            for my $UserID ( sort keys %GroupMemberList ) {
-
-                next GROUPMEMBER if $UserID == 1;
-                next GROUPMEMBER if $AgentUsed{$UserID};
-
-                $AgentUsed{$UserID} = 1;
-
-                push @RecipientUserIDs, $UserID;
-            }
-        }
-    }
-
     # get recipients by RecipientRoles
     if ( $Notification{Data}->{RecipientRoles} ) {
 
         RECIPIENT:
         for my $RoleID ( @{ $Notification{Data}->{RecipientRoles} } ) {
 
-            my %RoleMemberList = $GroupObject->PermissionRoleUserGet(
+            my @RoleMemberList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
                 RoleID => $RoleID,
             );
 
             ROLEMEMBER:
-            for my $UserID ( sort keys %RoleMemberList ) {
+            for my $UserID ( sort @RoleMemberList ) {
 
                 next ROLEMEMBER if $UserID == 1;
                 next ROLEMEMBER if $AgentUsed{$UserID};
@@ -985,19 +936,19 @@ sub _RecipientsGet {
         }
 
         # skip users out of the office if configured
-        if ( !$Notification{Data}->{SendOnOutOfOffice} && $User{OutOfOffice} ) {
+        if ( !$Notification{Data}->{SendOnOutOfOffice} && $User{Preferences}->{OutOfOffice} ) {
             my $Start = sprintf(
                 "%04d-%02d-%02d 00:00:00",
-                $User{OutOfOfficeStartYear}, $User{OutOfOfficeStartMonth},
-                $User{OutOfOfficeStartDay}
+                $User{Preferences}->{OutOfOfficeStartYear}, $User{Preferences}->{OutOfOfficeStartMonth},
+                $User{Preferences}->{OutOfOfficeStartDay}
             );
             my $TimeStart = $TimeObject->TimeStamp2SystemTime(
                 String => $Start,
             );
             my $End = sprintf(
                 "%04d-%02d-%02d 23:59:59",
-                $User{OutOfOfficeEndYear}, $User{OutOfOfficeEndMonth},
-                $User{OutOfOfficeEndDay}
+                $User{Preferences}->{OutOfOfficeEndYear}, $User{Preferences}->{OutOfOfficeEndMonth},
+                $User{Preferences}->{OutOfOfficeEndDay}
             );
             my $TimeEnd = $TimeObject->TimeStamp2SystemTime(
                 String => $End,
@@ -1006,14 +957,13 @@ sub _RecipientsGet {
             next RECIPIENT if $TimeStart < $Time && $TimeEnd > $Time;
         }
 
-        # skip users with out ro permissions
-        my $Permission = $TicketObject->TicketPermission(
-            Type     => 'ro',
-            TicketID => $Ticket{TicketID},
-            UserID   => $User{UserID}
+        # skip users with out READ permissions
+        my ($Granted) = $UserObject->CheckPermission(
+            UserID              => $User{UserID},
+            Target              => '/tickets/' . $Ticket{TicketID},
+            RequestedPermission => 'READ'
         );
-
-        next RECIPIENT if !$Permission;
+        next RECIPIENT if !$Granted;
 
         # skip PostMasterUserID
         my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
@@ -1044,7 +994,11 @@ sub _SendRecipientNotification {
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     # check if the notification needs to be sent just one time per day
-    if ( $Param{Notification}->{Data}->{OncePerDay} && $Param{Recipient}->{UserLogin} ) {
+    if ( 
+        IsArrayRefWithData($Param{Notification}->{Data}->{OncePerDay}) 
+        && $Param{Notification}->{Data}->{OncePerDay}->[0]
+        && $Param{Recipient}->{UserLogin} 
+    ) {
 
         # get ticket history
         my @HistoryLines = $TicketObject->HistoryGet(
@@ -1146,7 +1100,7 @@ sub _ArticleToUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed params
-    for my $Needed (qw(ArticleID ArticleType UserIDs UserID)) {
+    for my $Needed (qw(ArticleID Channel UserIDs UserID)) {
         return if !$Param{$Needed};
     }
 
@@ -1158,7 +1112,7 @@ sub _ArticleToUpdate {
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
     # not update if its not a note article
-    return 1 if $Param{ArticleType} !~ /^note\-/;
+    return 1 if $Param{Channel} ne 'note';
 
     my $NewTo = $Param{To} || '';
     for my $UserID ( sort keys %{ $Param{UserIDs} } ) {
@@ -1185,16 +1139,17 @@ sub _ArticleToUpdate {
 
 1;
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

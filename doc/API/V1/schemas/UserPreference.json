@@ -1,0 +1,25 @@
+{
+   "$id" : "#UserPreference",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The user preference object.",
+   "type" : "object",
+   "properties" : {
+      "ID" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "UserID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Value" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ID",
+      "UserID",
+      "Value"
+   ]
+}

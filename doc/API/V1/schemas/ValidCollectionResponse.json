@@ -1,0 +1,35 @@
+{
+   "$id" : "#ValidCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of valid items.",
+   "type" : "object",
+   "properties" : {
+      "Valid" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Valid"
+         }
+      }
+   },
+   "required" : [
+      "Valid"
+   ],
+   "definitions" : {
+      "Valid" : {
+         "$id" : "#Valid",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The valid object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         }
+      }
+   }
+}

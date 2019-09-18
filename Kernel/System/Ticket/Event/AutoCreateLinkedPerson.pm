@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::Event::AutoCreateLinkedPerson;
@@ -13,7 +13,7 @@ use warnings;
 
 our @ObjectDependencies = (
     'Kernel::Config',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Link',
     'Kernel::System::Log',
     'Kernel::System::SystemAddress',
@@ -37,7 +37,7 @@ sub new {
 
     # create needed objects
     $Self->{ConfigObject}        = $Kernel::OM->Get('Kernel::Config');
-    $Self->{CustomerUserObject}  = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    $Self->{ContactObject}  = $Kernel::OM->Get('Kernel::System::Contact');
     $Self->{LinkObject}          = $Kernel::OM->Get('Kernel::System::LinkObject');
     $Self->{LogObject}           = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{SystemAddressObject} = $Kernel::OM->Get('Kernel::System::SystemAddress');
@@ -89,7 +89,7 @@ sub Run {
             ArticleID => $Data{ArticleID},
         );
 
-        if ( $Article{ArticleTypeID} && $Article{ArticleTypeID} <= 5 ) {
+        if ( $Article{Channel} eq 'email' ) {
 
             # extract all receipients mail addresses...
             my @SplitAddresses;
@@ -167,13 +167,13 @@ sub Run {
 
                 #---------------------------------------------------------------
                 # check in customer backend for this mail address...
-                my %UserListCustomer = $Self->{CustomerUserObject}->CustomerSearch(
+                my %UserListCustomer = $Self->{ContactObject}->CustomerSearch(
                     PostMasterSearch => $CurrEmailAddress,
                 );
                 for my $CurrUserLogin ( keys(%UserListCustomer) ) {
 
-                    my %CustomerUserData =
-                        $Self->{CustomerUserObject}->CustomerUserDataGet( User => $CurrUserLogin, );
+                    my %ContactData =
+                        $Self->{ContactObject}->ContactGet( User => $CurrUserLogin, );
 
                     # set type customer if users CustomerID equals tickets CustomerID...
                     my $Type = "3rdParty";
@@ -189,19 +189,19 @@ sub Run {
                     # next if customer already linked
                     next
                         if defined $LinkList->{Person}->{Customer}->{Source}
-                            ->{ $CustomerUserData{UserLogin} }
+                            ->{ $ContactData{UserLogin} }
                             && $LinkList->{Person}->{Customer}->{Source}
-                            ->{ $CustomerUserData{UserLogin} };
+                            ->{ $ContactData{UserLogin} };
                     next
                         if defined $LinkList->{Person}->{'3rdParty'}->{Source}
-                            ->{ $CustomerUserData{UserLogin} }
+                            ->{ $ContactData{UserLogin} }
                             && $LinkList->{Person}->{'3rdParty'}->{Source}
-                            ->{ $CustomerUserData{UserLogin} };
+                            ->{ $ContactData{UserLogin} };
 
                     if (
-                        $CustomerUserData{UserCustomerID}
+                        $ContactData{UserCustomerID}
                         && $Ticket{CustomerID}
-                        && $Ticket{CustomerID} eq $CustomerUserData{UserCustomerID}
+                        && $Ticket{CustomerID} eq $ContactData{UserCustomerID}
                         )
                     {
                         $Type = "Customer";
@@ -218,7 +218,7 @@ sub Run {
                     # add links to database
                     my $Success = $Self->{LinkObject}->LinkAdd(
                         SourceObject => 'Person',
-                        SourceKey    => $CustomerUserData{UserLogin},
+                        SourceKey    => $ContactData{UserLogin},
                         TargetObject => 'Ticket',
                         TargetKey    => $Data{TicketID},
                         Type         => $Type,
@@ -331,12 +331,12 @@ sub Run {
             TicketID => $Data{TicketID},
             UserID   => 1,
         );
-        my %CustomerUserData =
-            $Self->{CustomerUserObject}->CustomerUserDataGet( User => $Ticket{CustomerUserID} );
+        my %ContactData =
+            $Self->{ContactObject}->ContactGet( User => $Ticket{ContactID} );
 
         $Blacklisted = 0;
         for my $Item (@Blacklist) {
-            next if $Ticket{CustomerUserID} !~ m/$Item/ && $CustomerUserData{UserEmail} !~ m/$Item/;
+            next if $Ticket{ContactID} !~ m/$Item/ && $ContactData{UserEmail} !~ m/$Item/;
             $Blacklisted = 1;
             last;
         }
@@ -344,7 +344,7 @@ sub Run {
 
         my $Success = $Self->{LinkObject}->LinkAdd(
             SourceObject => 'Person',
-            SourceKey    => $Ticket{CustomerUserID},
+            SourceKey    => $Ticket{ContactID},
             TargetObject => 'Ticket',
             TargetKey    => $Data{TicketID},
             Type         => 'Customer',
@@ -352,7 +352,7 @@ sub Run {
         );
 
         $Self->{TicketObject}->HistoryAdd(
-            Name         => 'added involved person ' . $Ticket{CustomerUserID},
+            Name         => 'added involved person ' . $Ticket{ContactID},
             HistoryType  => 'TicketLinkAdd',
             TicketID     => $Ticket{TicketID},
             CreateUserID => 1,
@@ -418,16 +418,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/TextModule/TextModuleCreate.pm - API TextModule Create operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::TextModule::TextModuleCreate;
@@ -101,28 +96,7 @@ sub ParameterDefinition {
         'TextModule::Language' => {
             RequiresValueIfUsed => 1,
             OneOf => \@LanguageIDs
-        },
-        'TextModule::AgentFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::CustomerFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
-        'TextModule::PublicFrontend' => {
-            RequiresValueIfUsed => 1,
-            OneOf    => [
-                0,
-                1
-            ]
-        },
+        }
     }
 }
 
@@ -142,9 +116,6 @@ perform TextModuleCreate Operation. This will return the created TextModuleID.
                     'some', 'keyword'
                 ],                                  # optional
                 Subject             => '...',       # optional
-                AgentFrontend       => 0|1,         # optional
-                CustomerFrontend    => 0|1,         # optional
-                PublicFrontend      => 0|1,         # optional
                 ValidID             => 1            # optional
             },
         },
@@ -190,9 +161,6 @@ sub Run {
         Subject            => $TextModule->{Subject} || '',
         Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
         Comment            => $TextModule->{Comment} || '',
-        AgentFrontend      => $TextModule->{AgentFrontend},
-        CustomerFrontend   => $TextModule->{CustomerFrontend},
-        PublicFrontend     => $TextModule->{PublicFrontend},        
         ValidID            => $TextModule->{ValidID} || 1,
         UserID             => $Self->{Authorization}->{UserID},
     );
@@ -213,3 +181,17 @@ sub Run {
 
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableAlter Name="queue">
+        <ColumnAdd Name="signature" Required="false"  Size="10000" Type="VARCHAR"/>
+        <ColumnDrop Name="signature_id"/>
+        <ColumnDrop Name="salutation_id"/>
+    </TableAlter>
+    <TableDrop Name="salutation"/>
+    <TableDrop Name="signature"/>
+
+</database>

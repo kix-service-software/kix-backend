@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    
+    <TableCreate Name="mail_filter">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+        <Column Name="stop" Required="false" Type="SMALLINT"/>
+        <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+        <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Index Name="mail_filter_name">
+            <IndexColumn Name="name"/>
+        </Index>
+        <ForeignKey ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+    <TableAlter NameOld="postmaster_filter" NameNew="mail_filter_properties">
+        <ColumnAdd Name="id" Required="true" Type="INTEGER"/>
+        <ColumnDrop Name="f_name"/>
+        <ColumnDrop Name="f_stop"/>
+        <ColumnChange NameOld="f_type" NameNew="type" Required="true" Size="20" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_key" NameNew="filter_key" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_value" NameNew="filter_value" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_not" NameNew="negate" Required="false" Type="SMALLINT"/>
+        <ForeignKeyCreate ForeignTable="mail_filter">
+            <Reference Local="id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+</database>

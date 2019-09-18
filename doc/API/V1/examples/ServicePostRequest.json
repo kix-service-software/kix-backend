@@ -1,0 +1,10 @@
+{
+    "Service": {
+        "Comment": "",
+        "Criticality": "3 normal",
+        "Name": "testservice1",
+        "ParentID": 1,
+        "TypeID": 1,
+        "ValidID": 1
+    }
+}

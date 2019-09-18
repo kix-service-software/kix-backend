@@ -1,0 +1,37 @@
+{
+    "GeneralCatalogItem": [
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2019-05-09 15:27:10",
+			"Class": "ITSM::ConfigItem::Class",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2019-05-09 15:27:10",
+			"ItemID": 22,
+			"Name": "Computer",
+			"ValidID": 1
+		},
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2019-05-09 15:27:10",
+			"Class": "ITSM::ConfigItem::Class",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2019-05-09 15:27:10",
+			"ItemID": 23,
+			"Name": "Hardware",
+			"ValidID": 1
+		},
+		{
+			"ChangeBy": 1,
+			"ChangeTime": "2019-05-09 15:27:10",
+			"Class": "ITSM::ConfigItem::Class",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2019-05-09 15:27:10",
+			"ItemID": 24,
+			"Name": "Location",
+			"ValidID": 1
+		}   
+    ]
+}

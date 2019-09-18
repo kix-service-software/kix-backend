@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::ITSMConfigItem::Version;
@@ -54,6 +54,13 @@ sub VersionZoomList {
         );
         return;
     }
+
+    my $CacheKey = 'VersionZoomList::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # get config item
     my $ConfigItem = $Self->ConfigItemGet(
@@ -110,6 +117,14 @@ sub VersionZoomList {
         $Version->{CurInciState}     = $ConfigItem->{CurInciState};
         $Version->{CurInciStateType} = $ConfigItem->{CurInciStateType};
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@VersionList,
+    );
 
     return \@VersionList;
 }
@@ -277,6 +292,13 @@ sub VersionList {
         return;
     }
 
+    my $CacheKey = 'VersionList::'.$Param{ConfigItemID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # get version list
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'SELECT id FROM configitem_version WHERE configitem_id = ? ORDER BY id',
@@ -288,6 +310,14 @@ sub VersionList {
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
         push @VersionList, $Row[0];
     }
+
+    # cache the result
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@VersionList,
+    );
 
     return \@VersionList;
 }
@@ -652,9 +682,12 @@ sub VersionConfigItemIDGet {
         return;
     }
 
-    # check if result is already cached
-    return $Self->{Cache}->{VersionConfigItemIDGet}->{ $Param{VersionID} }
-        if $Self->{Cache}->{VersionConfigItemIDGet}->{ $Param{VersionID} };
+    my $CacheKey = 'VersionConfigItemIDGet::'.$Param{VersionID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # get config item id
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
@@ -670,7 +703,12 @@ sub VersionConfigItemIDGet {
     }
 
     # cache the result
-    $Self->{Cache}->{VersionConfigItemIDGet}->{ $Param{VersionID} } = $ConfigItemID;
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $ConfigItemID,
+    );
 
     return $ConfigItemID;
 }
@@ -998,20 +1036,6 @@ sub VersionAdd {
 
     return if !$Success;
 
-    # delete affected caches
-    my $CacheKey    = 'VersionGet::ConfigItemID::' . $Param{ConfigItemID} . '::XMLData::';
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-    for my $XMLData (qw(0 1)) {
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey . $XMLData,
-        );
-    }
-    $CacheObject->Delete(
-        Type => $Self->{CacheType},
-        Key  => 'VersionNameGet::ConfigItemID::' . $Param{ConfigItemID},
-    );
-
     # get id of new version
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'SELECT id, create_time FROM configitem_version WHERE '
@@ -1063,11 +1087,9 @@ sub VersionAdd {
         ],
     );
 
-    # delete config item cache
-    $CacheKey = 'ConfigItemGet::ConfigItemID::' . $Param{ConfigItemID};
-    $CacheObject->Delete(
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
-        Key  => $CacheKey,
     );
 
     # trigger VersionCreate event
@@ -1140,6 +1162,13 @@ sub VersionAdd {
     # recalculate the current incident state of all linked config items
     $Self->CurInciStateRecalc(
         ConfigItemID => $Param{ConfigItemID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'CMDB.ConfigItem.Version',
+        ObjectID  => $Param{ConfigItemID}.'::'.$VersionID,
     );
 
     return $VersionID;
@@ -1231,8 +1260,6 @@ sub VersionDelete {
     # get config item id for version (needed for event handling)
     my $ConfigItemID = $Param{ConfigItemID};
 
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
     # to store unique config item ids if there are versions from different config items
     my %ConfigItemIDs;
 
@@ -1273,38 +1300,19 @@ sub VersionDelete {
                 UserID => $Param{UserID},
             );
 
-            # delete affected caches
-            my $CacheKey = 'VersionGet::VersionID::' . $VersionID . '::XMLData::';
-            for my $XMLData (qw(0 1)) {
-                $CacheObject->Delete(
-                    Type => $Self->{CacheType},
-                    Key  => $CacheKey . $XMLData,
-                );
-            }
-            $CacheObject->Delete(
-                Type => $Self->{CacheType},
-                Key  => 'VersionNameGet::VersionID::' . $VersionID,
+            # push client callback event
+            $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+                Event     => 'DELETE',
+                Namespace => 'CMDB.ConfigItem.Version',
+                ObjectID  => $Param{ConfigItemID}.'::'.$VersionID,
             );
-
-            delete $Self->{Cache}->{VersionConfigItemIDGet}->{$VersionID};
         }
     }
 
-    for my $ConfigItemID ( sort keys %ConfigItemIDs ) {
-
-        # delete affected caches for ConfigItemID (most recent version might have been removed)
-        my $CacheKey = 'VersionGet::ConfigItemID::' . $ConfigItemID . '::XMLData::';
-        for my $XMLData (qw(0 1)) {
-            $CacheObject->Delete(
-                Type => $Self->{CacheType},
-                Key  => $CacheKey . $XMLData,
-            );
-        }
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => 'VersionNameGet::ConfigItemID::' . $ConfigItemID,
-        );
-    }
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     return $Success;
 }
@@ -1935,16 +1943,17 @@ sub _PreEventHandlerForChangedXMLValues {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

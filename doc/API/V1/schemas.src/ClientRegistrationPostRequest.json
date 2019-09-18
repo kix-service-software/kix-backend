@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ClientRegistrationPostRequest",
+  "type": "object",
+  "description": "The client registration request object for creation.",
+  "properties": {
+    "ClientRegistration": {
+      "type": "object",
+      "properties": {
+        "Authorization": {
+          "type": "string"
+        },
+        "NotificationURL": {
+          "type": "string"
+        },
+        "NotificationInterval": {
+          "type": "integer"
+        },
+        "ClientID": {
+          "type": "string"
+        },
+        "Tanslations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Language": {
+                "type": "string"
+              },
+              "Content": {
+                "type": "string",
+                "description": "base64 encoded content of the PO file"
+              }
+            },
+            "required": [
+              "Language",
+              "Content"
+            ]
+          }
+        }
+      },
+      "required": [
+        "ClientID"
+      ]
+    }
+  },
+  "required": [
+    "ClientRegistration"
+  ]
+}

@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::ImportExport::ObjectBackend::SLA;
@@ -25,11 +25,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::ImportExport::ObjectBackend::CustomerUser - import/export backend for CustomerUser
+Kernel::System::ImportExport::ObjectBackend::Contact - import/export backend for Contact
 
 =head1 SYNOPSIS
 
-All functions to import and export CustomerUser entries
+All functions to import and export Contact entries
 
 =over 4
 
@@ -43,7 +43,7 @@ create an object
     use Kernel::System::DB;
     use Kernel::System::Log;
     use Kernel::System::Main;
-    use Kernel::System::ImportExport::ObjectBackend::CustomerUser;
+    use Kernel::System::ImportExport::ObjectBackend::Contact;
 
     my $ConfigObject = Kernel::Config->new();
     my $LogObject = Kernel::System::Log->new(
@@ -58,7 +58,7 @@ create an object
         LogObject    => $LogObject,
         MainObject   => $MainObject,
     );
-    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::CustomerUser->new(
+    my $BackendObject = Kernel::System::ImportExport::ObjectBackend::Contact->new(
         ConfigObject       => $ConfigObject,
         LogObject          => $LogObject,
         DBObject           => $DBObject,
@@ -1029,16 +1029,17 @@ sub ImportDataSave {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

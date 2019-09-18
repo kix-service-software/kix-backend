@@ -1,15 +1,14 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::TemplateGenerator;
-## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 
 use strict;
 use warnings;
@@ -21,7 +20,7 @@ use Kernel::System::VariableCheck qw(:all);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::AutoResponse',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::DynamicField',
     'Kernel::System::DynamicField::Backend',
     'Kernel::System::Encode',
@@ -77,215 +76,6 @@ sub new {
     # EO KIX4OTRS-capeIT
 
     return $Self;
-}
-
-=item Salutation()
-
-generate salutation
-
-    my $Salutation = $TemplateGeneratorObject->Salutation(
-        TicketID => 123,
-        UserID   => 123,
-        Data     => $ArticleHashRef,
-    );
-
-returns
-    Text
-    ContentType
-
-=cut
-
-sub Salutation {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(TicketID Data UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # get  queue
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 0,
-    );
-
-    # get salutation
-    my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
-        ID => $Ticket{QueueID},
-    );
-    my %Salutation = $Kernel::OM->Get('Kernel::System::Salutation')->SalutationGet(
-        ID => $Queue{SalutationID},
-    );
-
-    # do text/plain to text/html convert
-    if ( $Self->{RichText} && $Salutation{ContentType} =~ /text\/plain/i ) {
-        $Salutation{ContentType} = 'text/html';
-        $Salutation{Text}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
-            String => $Salutation{Text},
-        );
-    }
-
-    # do text/html to text/plain convert
-    if ( !$Self->{RichText} && $Salutation{ContentType} =~ /text\/html/i ) {
-        $Salutation{ContentType} = 'text/plain';
-        $Salutation{Text}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
-            String => $Salutation{Text},
-        );
-    }
-
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
-    # replace place holder stuff
-    my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT OTRS_AGENT_SUBJECT OTRS_AGENT_BODY OTRS_CUSTOMER_BODY OTRS_CUSTOMER_SUBJECT/;
-
-    my $SalutationText = $Self->_RemoveUnSupportedTag(
-        Text => $Salutation{Text} || '',
-        ListOfUnSupportedTag => \@ListOfUnSupportedTag,
-    );
-
-    # replace place holder stuff
-    $SalutationText = $Self->_Replace(
-        RichText => $Self->{RichText},
-        Text     => $SalutationText,
-        TicketID => $Param{TicketID},
-        Data     => $Param{Data},
-        UserID   => $Param{UserID},
-    );
-
-    # add urls
-    if ( $Self->{RichText} ) {
-        $SalutationText = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
-            String => $SalutationText,
-        );
-    }
-
-    return $SalutationText;
-}
-
-=item Signature()
-
-generate salutation
-
-    my $Signature = $TemplateGeneratorObject->Signature(
-        TicketID => 123,
-        UserID   => 123,
-        Data     => $ArticleHashRef,
-    );
-
-or
-
-    my $Signature = $TemplateGeneratorObject->Signature(
-        QueueID => 123,
-        UserID  => 123,
-        Data    => $ArticleHashRef,
-    );
-
-returns
-    Text
-    ContentType
-
-=cut
-
-sub Signature {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(Data UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # need ticket id or queue id
-    if ( !$Param{TicketID} && !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TicketID or QueueID!'
-        );
-        return;
-    }
-
-    # get queue object
-    my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
-
-    # get salutation ticket based
-    my %Queue;
-    if ( $Param{TicketID} ) {
-
-        my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
-            TicketID      => $Param{TicketID},
-            DynamicFields => 0,
-        );
-
-        %Queue = $QueueObject->QueueGet(
-            ID => $Ticket{QueueID},
-        );
-    }
-
-    # get salutation queue based
-    else {
-        %Queue = $QueueObject->QueueGet(
-            ID => $Param{QueueID},
-        );
-    }
-
-    # get signature
-    my %Signature = $Kernel::OM->Get('Kernel::System::Signature')->SignatureGet(
-        ID => $Queue{SignatureID},
-    );
-
-    # do text/plain to text/html convert
-    if ( $Self->{RichText} && $Signature{ContentType} =~ /text\/plain/i ) {
-        $Signature{ContentType} = 'text/html';
-        $Signature{Text}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
-            String => $Signature{Text},
-        );
-    }
-
-    # do text/html to text/plain convert
-    if ( !$Self->{RichText} && $Signature{ContentType} =~ /text\/html/i ) {
-        $Signature{ContentType} = 'text/plain';
-        $Signature{Text}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
-            String => $Signature{Text},
-        );
-    }
-
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
-    # replace place holder stuff
-    my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT OTRS_AGENT_SUBJECT OTRS_AGENT_BODY OTRS_CUSTOMER_BODY OTRS_CUSTOMER_SUBJECT/;
-
-    my $SignatureText = $Self->_RemoveUnSupportedTag(
-        Text => $Signature{Text} || '',
-        ListOfUnSupportedTag => \@ListOfUnSupportedTag,
-    );
-
-    # replace place holder stuff
-    $SignatureText = $Self->_Replace(
-        RichText => $Self->{RichText},
-        Text     => $SignatureText,
-        TicketID => $Param{TicketID} || '',
-        Data     => $Param{Data},
-        QueueID  => $Param{QueueID},
-        UserID   => $Param{UserID},
-    );
-
-    # add urls
-    if ( $Self->{RichText} ) {
-        $SignatureText = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
-            String => $SignatureText,
-        );
-    }
-
-    return $SignatureText;
 }
 
 =item Sender()
@@ -446,8 +236,8 @@ sub Template {
         );
 
         # get recipient
-        my %User = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $Ticket{CustomerUserID},
+        my %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            ID => $Ticket{ContactID},
         );
         $Language = $User{UserLanguage};
     }
@@ -455,9 +245,8 @@ sub Template {
     # if customer language is not defined, set default language
     $Language //= $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # replace place holder stuff
-    my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT OTRS_AGENT_SUBJECT OTRS_AGENT_BODY OTRS_CUSTOMER_BODY OTRS_CUSTOMER_SUBJECT/;
+    my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT/;
 
     my $TemplateText = $Self->_RemoveUnSupportedTag(
         Text => $Template{Template} || '',
@@ -637,12 +426,12 @@ sub AutoResponse {
     }
 
     # get recipient
-    my %User = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-        User => $Ticket{CustomerUserID},
+    my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        ID => $Ticket{ContactID},
     );
 
     # get user language
-    my $Language = $User{UserLanguage} || $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+    my $Language = $Contact{Language} || $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
 
     # do text/plain to text/html convert
     if ( $Self->{RichText} && $AutoResponse{ContentType} =~ /text\/plain/i ) {
@@ -733,7 +522,7 @@ sub AutoResponse {
 
 =item NotificationEvent()
 
-replace all OTRS smart tags in the notification body and subject
+replace all KIX placeholders in the notification body and subject
 
     my %NotificationEvent = $TemplateGeneratorObject->NotificationEvent(
         TicketID              => 123,
@@ -853,7 +642,7 @@ sub NotificationEvent {
         $Notification{$Attribute} = $Notification{Message}->{$Language}->{$Attribute};
     }
 
-    for my $Key (qw(From To Cc Subject Body ContentType ArticleType)) {
+    for my $Key (qw(From To Cc Subject Body ContentType Channel)) {
         if ( !$Param{CustomerMessageParams}->{$Key} ) {
             $Param{CustomerMessageParams}->{$Key} = $Article{$Key} || '';
         }
@@ -915,9 +704,8 @@ sub NotificationEvent {
 
         next KEY if !$Param{CustomerMessageParams}->{$Key};
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
-        $Notification{Body} =~ s/${Start}(KIX|OTRS)_CUSTOMER_DATA_$Key${End}/$Param{CustomerMessageParams}->{$Key}/gi;
-        $Notification{Subject} =~ s/<(KIX|OTRS)_CUSTOMER_DATA_$Key>/$Param{CustomerMessageParams}->{$Key}{$_}/gi;
+        $Notification{Body} =~ s/${Start}KIX_CUSTOMER_DATA_$Key${End}/$Param{CustomerMessageParams}->{$Key}/gi;
+        $Notification{Subject} =~ s/<KIX_CUSTOMER_DATA_$Key>/$Param{CustomerMessageParams}->{$Key}{$_}/gi;
     }
 
     # do text/plain to text/html convert
@@ -1041,10 +829,6 @@ sub _Replace {
             return;
         }
     }
-
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
-    $Param{Text} =~ s{OTRS_}{KIX_}g;
-    $Param{RichText} =~ s{OTRS_}{KIX_}g;
 
     # check for mailto links
     # since the subject and body of those mailto links are
@@ -1180,11 +964,9 @@ sub _Replace {
         $Param{Text} =~ s/(?:$Tag)($Keys)$End/$H{ lc $1 }/ieg;
     };
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get recipient data and replace it with <KIX_...
     $Tag = $Start . 'KIX_';
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # include more readable tag <KIX_NOTIFICATION_RECIPIENT
     my $RecipientTag = $Start . 'KIX_NOTIFICATION_RECIPIENT_';
 
@@ -1207,11 +989,9 @@ sub _Replace {
     # cleanup
     $Param{Text} =~ s/$RecipientTag.+?$End/-/gi;
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get owner data and replace it with <KIX_OWNER_...
     $Tag = $Start . 'KIX_OWNER_';
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # include more readable version <KIX_TICKET_OWNER
     my $OwnerTag = $Start . 'KIX_TICKET_OWNER_';
 
@@ -1241,11 +1021,9 @@ sub _Replace {
     $Param{Text} =~ s/$Tag.+?$End/-/gi;
     $Param{Text} =~ s/$OwnerTag.+?$End/-/gi;
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get owner data and replace it with <KIX_RESPONSIBLE_...
     $Tag = $Start . 'KIX_RESPONSIBLE_';
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # include more readable version <KIX_TICKET_RESPONSIBLE
     my $ResponsibleTag = $Start . 'KIX_TICKET_RESPONSIBLE_';
 
@@ -1283,7 +1061,6 @@ sub _Replace {
         && ( !$Param{Frontend} || ( $Param{Frontend} && $Param{Frontend} ne 'Customer' ) )
         )
     {
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         $Tag = $Start . 'KIX_Agent_';
 
         $Tag2 = $Start . 'KIX_CURRENT_';
@@ -1309,7 +1086,6 @@ sub _Replace {
 
         $HashGlobalReplace->( "$Tag|$Tag2", %CurrentUser );
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         # replace other needed stuff
         $Param{Text} =~ s/$Start KIX_FIRST_NAME $End/$CurrentUser{UserFirstname}/gxms;
         $Param{Text} =~ s/$Start KIX_LAST_NAME $End/$CurrentUser{UserLastname}/gxms;
@@ -1322,7 +1098,6 @@ sub _Replace {
 
     # EO KIX4OTRS-capeIT
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # ticket data
     $Tag = $Start . 'KIX_TICKET_';
 
@@ -1416,7 +1191,6 @@ sub _Replace {
     # replace it
     $HashGlobalReplace->( $Tag, %Ticket, %DynamicFieldDisplayValues );
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # COMPAT
     $Param{Text} =~ s/$Start KIX_TICKET_ID $End/$Ticket{TicketID}/gixms;
     $Param{Text} =~ s/$Start KIX_TICKET_NUMBER $End/$Ticket{TicketNumber}/gixms;
@@ -1436,7 +1210,6 @@ sub _Replace {
         }
         my @Service = split( $ServiceLevelSeparator, $Ticket{Service} );
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         my $MatchPattern = $Start . "KIX_TICKET_Service_Level_(.*?)" . $End;
         while ( $Param{Text} =~ /$MatchPattern/ ) {
             my $ReplacePattern = $Start . "KIX_TICKET_Service_Level_" . $1 . $End;
@@ -1456,14 +1229,12 @@ sub _Replace {
     # cleanup
     $Param{Text} =~ s/$Tag.+?$End/-/gi;
  
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get customer and agent params and replace it with <KIX_CUSTOMER_... or <KIX_AGENT_...
     my %ArticleData = (
         'KIX_CUSTOMER_' => $Param{Data}      || {},
         'KIX_AGENT_'    => $Param{DataAgent} || {},
     );
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # use a list to get customer first
     for my $DataType (qw(KIX_CUSTOMER_ KIX_AGENT_)) {
         my %Data = %{ $ArticleData{$DataType} };
@@ -1491,7 +1262,7 @@ sub _Replace {
             if ( $Data{'ContentType'} && $Data{'ContentType'} =~ /application\/json/ ) {
 
                 # if article is chat related
-                if ( $Data{'ArticleType'} =~ /chat/ ) {
+                if ( $Data{'Channel'} =~ /chat/ ) {
 
                     # remove spaces
                     $Data{Body} =~ s/\n/ /gms;
@@ -1519,7 +1290,6 @@ sub _Replace {
             $Tag = $Start . $DataType;
             $HashGlobalReplace->( $Tag, %Data );
 
-            #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
             # prepare body (insert old email) <KIX_CUSTOMER_EMAIL[n]>, <KIX_CUSTOMER_NOTE[n]>
             #   <KIX_CUSTOMER_BODY[n]>, <KIX_AGENT_EMAIL[n]>..., <KIX_COMMENT>
             if ( $Param{Text} =~ /$Start(?:(?:$DataType(EMAIL|NOTE|BODY)\[(.+?)\])|(?:KIX_COMMENT))$End/g ) {
@@ -1569,7 +1339,6 @@ sub _Replace {
                     );
                 }
 
-                #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
                 # replace tag
                 $Param{Text}
                     =~ s/$Start(?:(?:$DataType(EMAIL|NOTE|BODY)\[(.+?)\])|(?:KIX_COMMENT))$End/$NewOldBody/g;
@@ -1589,7 +1358,6 @@ sub _Replace {
                 $Param{Text} =~ s/$Tag\[.+?\]$End/$Subject/g;
             }
 
-            #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
             # KIX4OTRS-capeIT
             # replace <KIX_> tags
             $Tag = $Start . 'KIX_';
@@ -1600,13 +1368,11 @@ sub _Replace {
 
             # EO KIX4OTRS-capeIT
 
-            #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
             if ( $DataType eq 'KIX_CUSTOMER_' ) {
 
                 # Arnold Ligtvoet - otrs@ligtvoet.org
                 # get <KIX_EMAIL_DATE[]> from body and replace with received date
                 use POSIX qw(strftime);
-                #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
                 $Tag = $Start . 'KIX_EMAIL_DATE';
 
                 if ( $Param{Text} =~ /$Tag\[(.+?)\]$End/g ) {
@@ -1619,20 +1385,18 @@ sub _Replace {
             }
         }
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         if ( $DataType eq 'KIX_CUSTOMER_' ) {
 
-            #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
             # get and prepare realname
             $Tag = $Start . 'KIX_CUSTOMER_REALNAME';
             if ( $Param{Text} =~ /$Tag$End/i ) {
 
                 my $From = '';
 
-                if ( $Ticket{CustomerUserID} ) {
+                if ( $Ticket{ContactID} ) {
 
-                    my %CustomerUserData = $Kernel::OM->Get('Kernel::System::CustomerUser')
-                        ->CustomerUserDataGet( User => $Ticket{CustomerUserID} );
+                    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')
+                        ->ContactGet( ID => $Ticket{ContactID} );
 
                     if (
 
@@ -1640,15 +1404,15 @@ sub _Replace {
                         # Or check if this is auto response replacement.
                         # Take ticket customer as 'From'.
                         (
-                            $CustomerUserData{UserEmail}
+                            $ContactData{UserEmail}
                             && $Data{From}
-                            && $CustomerUserData{UserEmail} =~ /$Data{From}/
+                            && $ContactData{UserEmail} =~ /$Data{From}/
                         )
                         || $Param{AutoResponse}
                         )
                     {
-                        $From = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerName(
-                            UserLogin => $Ticket{CustomerUserID}
+                        $From = $Kernel::OM->Get('Kernel::System::Contact')->CustomerName(
+                            UserLogin => $Ticket{ContactID}
                         );
                     }
                     else {
@@ -1690,39 +1454,37 @@ sub _Replace {
         }
     }
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get customer data and replace it with <KIX_CUSTOMER_DATA_...
     $Tag  = $Start . 'KIX_CUSTOMER_';
     $Tag2 = $Start . 'KIX_CUSTOMER_DATA_';
 
     # KIX4OTRS-capeIT
-    # if ( $Ticket{CustomerUserID} || $Param{Data}->{CustomerUserID} ) {
-    if ( $Ticket{CustomerUserID} || $Param{Data}->{CustomerUserID} || ( defined $Param{Frontend} && $Param{Frontend} eq 'Customer' ) )
+    # if ( $Ticket{ContactID} || $Param{Data}->{ContactID} ) {
+    if ( $Ticket{ContactID} || $Param{Data}->{ContactID} || ( defined $Param{Frontend} && $Param{Frontend} eq 'Customer' ) )
     {
 
-        my $CustomerUserID = $Param{Data}->{CustomerUserID} || $Ticket{CustomerUserID};
+        my $ContactID = $Param{Data}->{ContactID} || $Ticket{ContactID};
 
-        my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $CustomerUserID,
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            ID => $ContactID,
         );
 
         # HTML quoting of content
         if ( $Param{RichText} ) {
 
             ATTRIBUTE:
-            for my $Attribute ( sort keys %CustomerUser ) {
-                next ATTRIBUTE if !$CustomerUser{$Attribute};
-                $CustomerUser{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
-                    String => $CustomerUser{$Attribute},
+            for my $Attribute ( sort keys %Contact ) {
+                next ATTRIBUTE if !$Contact{$Attribute};
+                $Contact{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                    String => $Contact{$Attribute},
                 );
             }
         }
 
         # replace it
-        $HashGlobalReplace->( "$Tag|$Tag2", %CustomerUser );
+        $HashGlobalReplace->( "$Tag|$Tag2", %Contact );
     }
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # cleanup all not needed <KIX_CUSTOMER_DATA_ tags
     $Param{Text} =~ s/(?:$Tag|$Tag2).+?$End/-/gi;
 
@@ -1734,7 +1496,6 @@ sub _Replace {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # get article data and replace it with <KIX_ARTICLE_DATA_...
     $Tag  = $Start . 'KIX_ARTICLE_';
     $Tag2 = $Start . 'KIX_ARTICLE_DATA_';
@@ -1761,7 +1522,6 @@ sub _Replace {
         }
     }
 
-    #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
     # cleanup all not needed <KIX_ARTICLE_ and <KIX_ARTICLE_DATA_ tags
     $Param{Text} =~ s/$Tag.+?$End/-/gi;
     $Param{Text} =~ s/$Tag2.+?$End/-/gi;
@@ -1773,7 +1533,6 @@ sub _Replace {
             TicketID => $Param{TicketID},
         );
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         # replace <KIX_FIRST_BODY> and <KIX_FIRST_COMMENT> tags
         for my $Key (qw(KIX_FIRST_BODY KIX_FIRST_COMMENT)) {
             $Tag2 = $Start . $Key;
@@ -1826,7 +1585,6 @@ sub _Replace {
             }
         }
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         # replace <KIX_FIRST_EMAIL[]> tags
         $Tag2 = $Start . 'KIX_FIRST_EMAIL';
         if ( $Param{Text} =~ /$Tag2\[(.+?)\]$End/g ) {
@@ -1877,7 +1635,6 @@ sub _Replace {
             $Param{Text} =~ s/$Tag2\[.+?\]$End/$NewOldBody/g;
         }
 
-        #rbo - T2016121190001552 - added KIX placeholders and left OTRS as fallback
         # replace <KIX_FIRST_SUBJECT[]> tags
         $Tag2 = $Start . 'KIX_FIRST_SUBJECT';
         if ( $Param{Text} =~ /$Tag2\[(.+?)\]$End/g ) {
@@ -1961,16 +1718,17 @@ sub _RemoveUnSupportedTag {
 
 =end Internal:
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

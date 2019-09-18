@@ -1,0 +1,9 @@
+  displayName: "[System] Console Command"
+  description: !include ../../descriptions/resources/system/console.md
+  type: { collection-nopatch: { typeName: ConsoleCommand } }
+  /{consoleCommand}:
+    type: { item-readonly: { typeName: ConsoleCommand } }
+    uriParameters:
+      consoleCommand:
+        displayName: ConsoleCommand
+        type: string

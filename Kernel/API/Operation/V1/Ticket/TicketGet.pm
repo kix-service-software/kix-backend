@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Ticket::TicketGet;
@@ -126,8 +124,8 @@ one or more ticket entries in one call.
                     LockID             => 123,
                     Queue              => 'some queue',
                     QueueID            => 123,
-                    CustomerID         => 'customer_id_123',
-                    CustomerUserID     => 'customer_user_id_123',
+                    OrganisationID     => 'customer_id_123',
+                    ContactID          => 'customer_user_id_123',
                     Owner              => 'some_owner_login',
                     OwnerID            => 123,
                     Type               => 'some ticket type',
@@ -223,8 +221,8 @@ one or more ticket entries in one call.
                             References
                             SenderType
                             SenderTypeID
-                            ArticleType
-                            ArticleTypeID
+                            Channel
+                            ChannelID
                             ContentType
                             Charset
                             MimeType
@@ -304,24 +302,6 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check ticket permission
-    TICKET:
-    for my $TicketID ( @{$Param{Data}->{TicketID}} ) {
-
-        my $Permission = $Self->CheckAccessPermission(
-            TicketID => $TicketID,
-            UserID   => $Self->{Authorization}->{UserID},
-            UserType => $Self->{Authorization}->{UserType},
-        );
-
-        next TICKET if $Permission;
-
-        return $Self->_Error(
-            Code    => 'Object.NoPermission',
-            Message => "No permission to access ticket $TicketID.",
-        );
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -341,8 +321,7 @@ sub Run {
         if ( !IsHashRefWithData( \%TicketRaw ) ) {
 
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "Could not get data for ticket $TicketID",
+                Code => 'Object.NotFound',
             );
         }
 
@@ -373,6 +352,8 @@ sub Run {
                         
                         push @DynamicFields, {
                             ID           => $DynamicFieldConfig->{ID},
+                            Name         => $DynamicFieldConfig->{Name},
+                            Label        => $DynamicFieldConfig->{Label},
                             Value        => $TicketRaw{$Attribute},
                             DisplayValue => $DFDisplayValue,
                         };
@@ -392,69 +373,11 @@ sub Run {
             $TicketData{DynamicFields} = [];
         }
 
-        # include articles if requested
-        if ( $Param{Data}->{include}->{Articles} ) {
-            my $ArticleTypes;
-            if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-                $ArticleTypes = [ $TicketObject->ArticleTypeList( Type => 'Customer' ) ];
-            }
-
-            my @ArticleIndex = $TicketObject->ArticleIndex(
-                TicketID   => $TicketID,
-                SenderType => $ArticleTypes,
-                UserID     => $Self->{Authorization}->{UserID},
-            );
-
-            $TicketData{Articles} = \@ArticleIndex;
-        }
-
-        # include history if requested
-        if ( $Param{Data}->{include}->{History} ) {
-            my @HistoryItems = $TicketObject->HistoryGet(
-                TicketID   => $TicketID,
-                UserID     => $Self->{Authorization}->{UserID},
-            );
-
-            my @HistoryIDs;
-            foreach my $HistoryItem ( @HistoryItems ) {
-                push(@HistoryIDs, $HistoryItem->{HistoryID});
-            }
-            $TicketData{History} = \@HistoryIDs;
-        }
-
         # include TimeUnits if requested
         if ( $Param{Data}->{include}->{TimeUnits} ) {
             $TicketData{TimeUnits} = $TicketObject->TicketAccountedTimeGet(
                 TicketID => $TicketID,
             );
-        }
-
-        # include Checklist if requested
-        if ( $Param{Data}->{include}->{Checklist} ) {
-            # get already prepared Checklist data from ChecklistSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::ChecklistSearch',
-                Data          => {
-                    TicketID  => $TicketID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $TicketData{Checklist} = $Result->{Data}->{ChecklistItem};
-            }
-        }
-
-        # include Watchers if requested
-        if ( $Param{Data}->{include}->{Watchers} ) {
-            # get already prepared Watchers data from WatcherSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::WatcherSearch',
-                Data          => {
-                    TicketID  => $TicketID,
-                }
-            );
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $TicketData{Watchers} = $Result->{Data}->{Watcher};
-            }
         }
 
         # add
@@ -477,16 +400,17 @@ sub Run {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

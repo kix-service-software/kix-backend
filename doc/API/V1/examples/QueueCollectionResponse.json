@@ -1,0 +1,42 @@
+{
+	"Queue": [
+		{
+			"Calendar": "",
+			"ChangeBy": 1,
+			"ChangeTime": "2018-11-08 09:37:53",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2018-11-08 09:37:53",
+			"DefaultSignKey": 1,
+			"FollowUpID": 3,
+			"FollowUpLock": 0,
+			"Fullname": "2nd-Level",
+			"Name": "2nd-Level",
+			"ParentID": null,
+			"QueueID": 7,
+			"Signature": "",
+			"SystemAddressID": 1,
+			"UnlockTimeout": 0,
+			"ValidID": 1
+		},
+		{
+			"Calendar": "",
+			"ChangeBy": 1,
+			"ChangeTime": "2018-11-08 09:37:53",
+			"Comment": "",
+			"CreateBy": 1,
+			"CreateTime": "2018-11-08 09:37:53",
+			"DefaultSignKey": 1,
+			"FollowUpID": 3,
+			"FollowUpLock": 0,
+			"Fullname": "2nd-Level::Application Support",
+			"Name": "Application Support",
+			"ParentID": 7,
+			"QueueID": 8,
+			"Signature": "",
+			"SystemAddressID": 1,
+			"UnlockTimeout": 0,
+			"ValidID": 1
+		}
+	]
+}

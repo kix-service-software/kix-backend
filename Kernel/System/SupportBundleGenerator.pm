@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::SupportBundleGenerator;
@@ -72,7 +72,7 @@ sub new {
 
 Generates a support bundle tar or tar.gz with the following contents: Registration Information,
 Support Data, Installed Packages, and another tar or tar.gz with all changed or new files in the
-OTRS installation directory.
+KIX installation directory.
 
     my $Result = $SupportBundleGeneratorObject->Generate();
 
@@ -347,7 +347,7 @@ sub GenerateCustomFilesArchive {
     $Config =~ s/(\$Self->\{'[^']+(?:Password|Pw)\d*'\}\s*=\s*)\'.*?\'/$1\'xxx\'/mg;
 
     # Complex settings like:
-    #     $Self->{CustomerUser1} = {
+    #     $Self->{Contact1} = {
     #         Params => {
     #             UserPw => 'xxx',
     $Config =~ s/((?:Password|Pw)\d*\s*=>\s*)\'.*?\'/$1\'xxx\'/mg;
@@ -655,16 +655,17 @@ sub _GetCustomFileList {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

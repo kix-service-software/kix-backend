@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::FAQ::Vote;
@@ -96,11 +96,16 @@ sub VoteAdd {
         $VoteID = $Row[0];
     }
 
-    # delete cache
-    my $CacheKey = 'ItemVoteDataGet::' . $Param{ItemID};
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
-        Type => 'FAQ',
-        Key  => $CacheKey,
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Article.Vote',
+        ObjectID  => $Param{ItemID},
     );
 
     return $VoteID;
@@ -136,11 +141,28 @@ sub VoteDelete {
         }
     }
 
+    my %Vote = $Self->VoteGet(
+        VoteID => $Param{VoteID},
+        UserID => 1,
+    );
+
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
             DELETE FROM faq_voting
             WHERE id = ?',
         Bind => [ \$Param{VoteID} ],
+    );
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article.Vote',
+        ObjectID  => $Vote{ItemID}.'::'.$Param{VoteID},
     );
 
     return 1;
@@ -304,7 +326,7 @@ sub ItemVoteDataGet {
     # check cache
     my $CacheKey = 'ItemVoteDataGet::' . $Param{ItemID};
     my $Cache    = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -332,10 +354,10 @@ sub ItemVoteDataGet {
 
     # cache result
     $CacheObject->Set(
-        Type  => 'FAQ',
+        Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Data,
-        TTL   => 60 * 60 * 24 * 2,
+        TTL   => $Self->{CacheTTL},
     );
 
     return \%Data;
@@ -346,16 +368,17 @@ sub ItemVoteDataGet {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

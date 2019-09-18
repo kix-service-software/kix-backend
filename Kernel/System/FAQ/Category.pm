@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::FAQ::Category;
@@ -13,11 +13,11 @@ package Kernel::System::FAQ::Category;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::System::Cache',
-    'Kernel::System::CustomerGroup',
     'Kernel::System::DB',
-    'Kernel::System::Group',
     'Kernel::System::Log',
     'Kernel::System::Valid'
 );
@@ -124,6 +124,18 @@ sub CategoryAdd {
         Priority => 'notice',
         Message  => "FAQCategory: '$Param{Name}' CategoryID: '$CategoryID' "
             . "created successfully ($Param{UserID})!",
+    );
+
+    # clear cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'FAQ.Category',
+        ObjectID  => $CategoryID,
     );
 
     return $CategoryID;
@@ -249,12 +261,11 @@ sub CategoryDelete {
         Bind => [ \$Param{CategoryID} ],
     );
 
-    # delete the category groups
-    return if !$DBObject->Do(
-        SQL => '
-            DELETE FROM faq_category_group
-            WHERE category_id = ?',
-        Bind => [ \$Param{CategoryID} ],
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Category',
+        ObjectID  => $Param{CategoryID},
     );
 
     return 1;
@@ -350,6 +361,10 @@ Returns:
         Name       => 'My Category',
         Comment    => 'This is my first category.',
         ValidID    => 1,
+        CreateTime => '2010-04-07 15:41:15',
+        CreateBy   => 1,
+        ChangeTime => '2010-04-07 15:41:15',
+        ChangeBy   => 1
     );
 
 =cut
@@ -384,7 +399,7 @@ sub CategoryGet {
     my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
 
     my $Cache = $CacheObject->Get(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
 
@@ -396,7 +411,7 @@ sub CategoryGet {
     # SQL
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT id, parent_id, name, comments, valid_id
+            SELECT id, parent_id, name, comments, valid_id, created, created_by, changed, changed_by
             FROM faq_category
             WHERE id = ?',
         Bind  => [ \$Param{CategoryID} ],
@@ -411,149 +426,34 @@ sub CategoryGet {
             Name       => $Row[2],
             Comment    => $Row[3],
             ValidID    => $Row[4],
+            CreateTime => $Row[5],
+            CreateBy   => $Row[6],
+            ChangeTime => $Row[7],
+            ChangeBy   => $Row[8],
         );
     }
+
+    # build fullname
+    if ( $Data{ParentID} ) {
+        my %ParentCategory = $Self->CategoryGet(
+            CategoryID => $Data{ParentID},
+            UserID     => 1,
+        );
+        $Data{Fullname} = $ParentCategory{Fullname}.'::'.$Data{Name};
+    }
+    else {
+        $Data{Fullname} = $Data{Name};
+    } 
 
     # cache result
     $CacheObject->Set(
-        Type  => 'FAQ',
+        Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Data,
-        TTL   => 60 * 60 * 24 * 2,
+        TTL   => $Self->{CacheTTL}
     );
 
     return %Data;
-}
-
-=item CategoryGroupGet()
-
-get groups of a category
-
-    my $GroupArrayRef = $FAQObject->CategoryGroupGet(
-        CategoryID => 3,
-        UserID     => 1,
-    );
-
-Returns:
-
-    $GroupArrayRef = [
-        2,
-        9,
-        10,
-    ];
-
-=cut
-
-sub CategoryGroupGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(CategoryID UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # get groups
-    return if !$DBObject->Prepare(
-        SQL => '
-            SELECT group_id
-            FROM faq_category_group
-            WHERE category_id = ?',
-        Bind => [ \$Param{CategoryID} ],
-    );
-
-    my @Groups;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        push @Groups, $Row[0];
-    }
-
-    return \@Groups;
-}
-
-=item CategoryGroupGetAll()
-
-get all category-groups
-
-    my $AllCategoryGroupHashRef = $FAQObject->CategoryGroupGetAll(
-        UserID => 1,
-    );
-
-Returns:
-
-    $AllCategoryGroupHashRef = {
-        1 => {
-            2  => 1,
-        },
-        2 => {
-            2  => 1,
-            9  => 1,
-            10 => 1,
-        },
-        3 => {
-            2  => 1,
-            9  => 1,
-            10 => 1,
-        },
-        4 => {
-            1  => 1,
-            2  => 1,
-            3  => 1,
-            4  => 1,
-            5  => 1,
-            9  => 1,
-            10 => 1,
-        },
-    };
-
-=cut
-
-sub CategoryGroupGetAll {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need UserID!",
-        );
-
-        return;
-    }
-
-    # check cache
-    if ( $Self->{Cache}->{CategoryGroupGetAll} ) {
-
-        return $Self->{Cache}->{CategoryGroupGetAll};
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # get groups
-    return if !$DBObject->Prepare(
-        SQL => '
-            SELECT group_id, category_id
-            FROM faq_category_group',
-    );
-
-    my %Groups;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Groups{ $Row[1] }->{ $Row[0] } = 1;
-    }
-
-    # cache
-    $Self->{Cache}->{CategoryGroupGetAll} = \%Groups;
-
-    return \%Groups;
 }
 
 =item CategoryList()
@@ -599,12 +499,6 @@ sub CategoryList {
         $Valid = $Param{Valid};
     }
 
-    # check cache
-    if ( $Self->{Cache}->{CategoryList}->{$Valid} ) {
-
-        return $Self->{Cache}->{CategoryList}->{$Valid};
-    }
-
     # build SQL
     my $SQL = '
         SELECT id, parent_id, name
@@ -629,10 +523,66 @@ sub CategoryList {
         $Data{ $Row[1] }->{ $Row[0] } = $Row[2];
     }
 
-    # cache
-    $Self->{Cache}->{CategoryList}->{$Valid} = \%Data;
-
     return \%Data;
+}
+
+=item CategoryLookup()
+
+get id or name of a category
+
+    my $Category = $FAQObject->CategoryLookup( CategoryID => $CategoryID );
+
+    my $CategoryID = $FAQObject->CategoryLookup( Name => $Category );
+
+=cut
+
+sub CategoryLookup {
+    my ( $Self, %Param ) = @_;
+    my $Key;
+    my $Value;
+    my $ReturnData;
+
+    # check needed stuff
+    if ( !$Param{Name} && !$Param{CategoryID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name or CategoryID!',
+        );
+        return;
+    }
+
+    if ( $Param{CategoryID} ) {
+        $Key   = 'CategoryID';
+        $Value = $Param{CategoryID};
+
+        my %Category = $Self->CategoryGet(
+            CategoryID => $Param{CategoryID} 
+        );
+        $ReturnData = $Category{Name};
+    }
+    else {
+        $Key   = 'Name';
+        $Value = $Param{Name};
+
+        my $CategoryList = $Self->CategorySearch(
+            Name   => $Param{Name}, 
+            UserID => 1,
+        );
+        if ( IsArrayRefWithData($CategoryList) ) {
+            $ReturnData = $CategoryList->[0];
+        }
+    }
+
+    # check if data exists
+    if ( !defined $ReturnData ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No $Key for $Value found!",
+        );
+        return;
+    }
+
+    return $ReturnData;
 }
 
 =item CategorySearch()
@@ -644,8 +594,10 @@ get the category search as an array ref
         ParentID    => 3,
         ParentIDs   => [ 1, 3, 8 ],
         CategoryIDs => [ 2, 5, 7 ],
+        ValidIDs    => [ 1, 2 ],
         OrderBy     => 'Name',
         SortBy      => 'down',
+        Limit       => 500,
         UserID      => 1,
     );
 
@@ -674,10 +626,7 @@ sub CategorySearch {
     my $SQL = '
         SELECT id
         FROM faq_category
-        WHERE valid_id IN ('
-        . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
-        . ')';
-
+        WHERE 1 = 1';
     my $Ext = '';
 
     # get database object
@@ -693,7 +642,7 @@ sub CategorySearch {
     }
 
     # search for parent id
-    elsif ( defined $Param{ParentID} ) {
+    if ( defined $Param{ParentID} ) {
 
         # db integer quote
         $Param{ParentID} = $DBObject->Quote( $Param{ParentID}, 'Integer' );
@@ -702,7 +651,7 @@ sub CategorySearch {
     }
 
     # search for parent ids
-    elsif (
+    if (
         defined $Param{ParentIDs}
         && ref $Param{ParentIDs} eq 'ARRAY'
         && @{ $Param{ParentIDs} }
@@ -721,7 +670,7 @@ sub CategorySearch {
     }
 
     # search for category ids
-    elsif (
+    if (
         defined $Param{CategoryIDs}
         && ref $Param{CategoryIDs} eq 'ARRAY'
         && @{ $Param{CategoryIDs} }
@@ -737,6 +686,23 @@ sub CategorySearch {
         my $InString = join ', ', @{ $Param{CategoryIDs} };
 
         $Ext = ' AND id IN (' . $InString . ')';
+    }
+    
+    if (
+        defined $Param{ValidIDs}
+        && ref $Param{ValidIDs} eq 'ARRAY'
+        && @{ $Param{ValidIDs} }
+        ) 
+    {
+        # integer quote the valid ids
+        for my $ValidID ( @{ $Param{ValidIDs} } ) {
+            $ValidID = $DBObject->Quote( $ValidID, 'Integer' );
+        }
+
+        # create string
+        my $InString = join ', ', @{ $Param{ValidIDs} };
+
+        $Ext = ' AND valid_id IN (' . $InString . ')';
     }
 
     # ORDER BY
@@ -762,7 +728,7 @@ sub CategorySearch {
 
     return if !$DBObject->Prepare(
         SQL   => $SQL,
-        Limit => 500,
+        Limit => $Param{Limit},
     );
 
     my @List;
@@ -780,7 +746,7 @@ get all subcategory ids of of a category
     my $SubCategoryIDArrayRef = $FAQObject->CategorySubCategoryIDList(
         ParentID     => 1,
         Mode         => 'Public', # (Agent, Customer, Public)
-        CustomerUser => 'tt',
+        Contact => 'tt',
         UserID       => 1,
     );
 
@@ -833,7 +799,7 @@ sub CategorySubCategoryIDList {
         # get customer categories
         $Categories = $Self->GetCustomerCategories(
             Type         => 'ro',
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             UserID       => $Param{UserID},
         );
     }
@@ -909,12 +875,6 @@ sub CategoryTreeList {
         $Valid = $Param{Valid};
     }
 
-    # check cache
-    if ( $Self->{Cache}->{GetCategoryTree}->{$Valid} ) {
-
-        return $Self->{Cache}->{GetCategoryTree}->{$Valid};
-    }
-
     # build SQL
     my $SQL = '
         SELECT id, parent_id, name
@@ -971,9 +931,6 @@ sub CategoryTreeList {
             $CategoryTree{$CategoryID} = $CategoryName;
         }
     }
-
-    # cache
-    $Self->{Cache}->{GetCategoryTree}->{$Valid} = \%CategoryTree;
 
     return \%CategoryTree;
 }
@@ -1057,9 +1014,16 @@ sub CategoryUpdate {
             . "ID: '$Param{CategoryID}' updated successfully ($Param{UserID})!",
     );
 
-    # delete all cache, as FAQGet() will be also affected.
+    # clear cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'FAQ',
+        Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'FAQ.Category',
+        ObjectID  => $Param{CategoryID},
     );
 
     return 1;
@@ -1116,7 +1080,7 @@ sub AgentCategorySearch {
 get the category search as hash
 
     my $CategoryIDArrayRef = @{$FAQObject->CustomerCategorySearch(
-        CustomerUser  => 'tt',
+        Contact  => 'tt',
         ParentID      => 3,   # (optional, default 0)
         Mode          => 'Customer',
         UserID        => 1,
@@ -1135,7 +1099,7 @@ sub CustomerCategorySearch {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CustomerUser Mode UserID)) {
+    for my $Argument (qw(Contact Mode UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1152,7 +1116,7 @@ sub CustomerCategorySearch {
     }
 
     my $Categories = $Self->GetCustomerCategories(
-        CustomerUser => $Param{CustomerUser},
+        Contact => $Param{Contact},
         Type         => 'ro',
         UserID       => $Param{UserID},
     );
@@ -1191,9 +1155,6 @@ sub CustomerCategorySearch {
         while ( my @Row = $DBObject->FetchrowArray() ) {
             $Articles{ $Row[1] }++;
         }
-
-        # cache
-        $Self->{Cache}->{$CacheKey} = \%Articles;
     }
 
     for my $CategoryID (@CategoryIDs) {
@@ -1202,7 +1163,7 @@ sub CustomerCategorySearch {
         my $SubCategoryIDs = $Self->CategorySubCategoryIDList(
             ParentID     => $CategoryID,
             Mode         => $Param{Mode},
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             UserID       => $Param{UserID},
         );
 
@@ -1282,7 +1243,7 @@ sub PublicCategorySearch {
         my $SubCategoryIDs = $Self->CategorySubCategoryIDList(
             ParentID     => $CategoryID,
             Mode         => $Param{Mode},
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             UserID       => $Param{UserID},
         );
 
@@ -1324,323 +1285,6 @@ sub PublicCategorySearch {
 
     return \@AllowedCategoryIDs;
 
-}
-
-=item GetUserCategories()
-
-get user category-groups
-
-    my $UserCategoryGroupHashRef = $FAQObject->GetUserCategories(
-        Type   => 'rw',
-        UserID => 1,
-    );
-
-Returns:
-
-    $UserCategoryGroupHashRef = {
-        1 => {},
-        0 => {
-            1 => 'Misc',
-            2 => 'My Category',
-        },
-        2 => {
-            3 => 'Sub Category A',
-            4 => 'Sub Category B',
-        },
-        3 => {},
-        4 => {},
-    };
-
-=cut
-
-sub GetUserCategories {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Type UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    my $Categories = $Self->CategoryList(
-        Valid  => 1,
-        UserID => $Param{UserID},
-    );
-
-    my $CategoryGroups = $Self->CategoryGroupGetAll(
-        UserID => $Param{UserID},
-    );
-    my %UserGroups;
-    if ( !$Self->{Cache}->{GetUserCategories}->{GroupMemberList} ) {
-        %UserGroups = $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
-            UserID => $Param{UserID},
-            Type   => $Param{Type},
-            Result => 'HASH',
-        );
-        $Self->{Cache}->{GetUserCategories}->{GroupMemberList} = \%UserGroups;
-    }
-    else {
-        %UserGroups = %{ $Self->{Cache}->{GetUserCategories}->{GroupMemberList} };
-    }
-
-    my $UserCategories = $Self->_UserCategories(
-        Categories     => $Categories,
-        CategoryGroups => $CategoryGroups,
-        UserGroups     => \%UserGroups,
-        UserID         => $Param{UserID},
-    );
-
-    return $UserCategories;
-}
-
-=item GetUserCategoriesLongNames()
-
-get user category-groups (show category long names)
-
-    my $UserCategoryGroupHashRef = $FAQObject->GetUserCategoriesLongNames(
-        Type   => 'rw',
-        UserID => 1,
-    );
-
-Returns:
-
-    $UserCategoryGroupHashRef = {
-        1 => 'Misc',
-        2 => 'My Category',
-        3 => 'My Category::Sub Category A',
-        4 => 'My Category::Sub Category A',
-    };
-
-=cut
-
-sub GetUserCategoriesLongNames {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Type UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # get categories where user has rights
-    my $UserCategories = $Self->GetUserCategories(
-        Type   => $Param{Type},
-        UserID => $Param{UserID},
-    );
-
-    # get all categories with their long names
-    my $CategoryTree = $Self->CategoryTreeList(
-        Valid  => 1,
-        UserID => $Param{UserID},
-    );
-
-    # to store the user categories with their long names
-    my %UserCategoriesLongNames;
-
-    # get the long names of the categories where user has rights
-    PARENTID:
-    for my $ParentID ( sort keys %{$UserCategories} ) {
-
-        next PARENTID if !$UserCategories->{$ParentID};
-        next PARENTID if ref $UserCategories->{$ParentID} ne 'HASH';
-        next PARENTID if !%{ $UserCategories->{$ParentID} };
-
-        for my $CategoryID ( sort keys %{ $UserCategories->{$ParentID} } ) {
-            $UserCategoriesLongNames{$CategoryID} = $CategoryTree->{$CategoryID};
-        }
-    }
-
-    return \%UserCategoriesLongNames;
-}
-
-=item GetCustomerCategories()
-
-get customer user categories
-
-    my $CustomerUserCategoryHashRef = $FAQObject->GetCustomerCategories(
-        CustomerUser => 'hans',
-        Type         => 'rw',
-        UserID       => 1,
-    );
-
-Returns:
-
-    $CustomerUserCategoryHashRef = {
-        1 => {},
-        0 => {
-            1 => 'Misc',
-            2 => 'My Category',
-        },
-        2 => {
-            3 => 'Sub Category A',
-            4 => 'Sub Category B',
-        },
-        3 => {},
-        4 => {},
-    };
-
-=cut
-
-sub GetCustomerCategories {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(CustomerUser Type UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # check cache
-    my $CacheKey = 'GetCustomerCategories::CustomerUser::' . $Param{CustomerUser};
-    if ( defined $Self->{Cache}->{$CacheKey} ) {
-
-        return $Self->{Cache}->{$CacheKey};
-    }
-
-    # get all valid categories
-    my $Categories = $Self->CategoryList(
-        Valid  => 1,
-        UserID => $Param{UserID},
-    );
-
-    my $CategoryGroups = $Self->CategoryGroupGetAll(
-        UserID => $Param{UserID},
-    );
-
-    my %UserGroups = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
-        UserID => $Param{CustomerUser},
-        Type   => 'ro',
-        Result => 'HASH',
-    );
-
-    my $CustomerCategories = $Self->_UserCategories(
-        Categories     => $Categories,
-        CategoryGroups => $CategoryGroups,
-        UserGroups     => \%UserGroups,
-        UserID         => $Param{UserID},
-    );
-
-    # cache
-    $Self->{Cache}->{$CacheKey} = $CustomerCategories;
-
-    return $CustomerCategories;
-}
-
-=item GetCustomerCategoriesLongNames()
-
-get customer category-groups (show category long names)
-
-    my $CustomerCategoryGroupHashRef = $FAQObject->GetCustomerCategoriesLongNames(
-        CustomerUser => 'hans',
-        Type   => 'rw',
-        UserID => 1,
-    );
-
-Returns:
-
-    $CustomerCategoryGroupHashRef = {
-        1 => 'Misc',
-        2 => 'My Category',
-        3 => 'My Category::Sub Category A',
-        4 => 'My Category::Sub Category A',
-    };
-
-=cut
-
-sub GetCustomerCategoriesLongNames {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(CustomerUser Type UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # get categories where user has rights
-    my $CustomerCategories = $Self->GetCustomerCategories(
-        CustomerUser => $Param{CustomerUser},
-        Type         => $Param{Type},
-        UserID       => $Param{UserID},
-    );
-
-    # extract category ids
-    my %AllCategoryIDs;
-    for my $ParentID ( sort keys %{$CustomerCategories} ) {
-        for my $CategoryID ( sort keys %{ $CustomerCategories->{$ParentID} } ) {
-            $AllCategoryIDs{$CategoryID} = 1;
-        }
-    }
-
-    # get all customer category ids
-    my @CustomerCategoryIDs;
-    for my $CategoryID ( 0, keys %AllCategoryIDs ) {
-        push @CustomerCategoryIDs, @{
-            $Self->CustomerCategorySearch(
-                ParentID     => $CategoryID,
-                CustomerUser => $Param{CustomerUser},
-                Mode         => 'Customer',
-                UserID       => $Param{UserID},
-                )
-        };
-    }
-
-    # build customer category hash
-    $CustomerCategories = {};
-    for my $CategoryID (@CustomerCategoryIDs) {
-        my %Category = $Self->CategoryGet(
-            CategoryID => $CategoryID,
-            UserID     => $Param{UserID},
-        );
-        $CustomerCategories->{ $Category{ParentID} }->{ $Category{CategoryID} } = $Category{Name};
-    }
-
-    # get all categories with their long names
-    my $CategoryTree = $Self->CategoryTreeList(
-        Valid  => 1,
-        UserID => $Param{UserID},
-    );
-
-    # to store the user categories with their long names
-    my %CustomerCategoriesLongNames;
-
-    # get the long names of the categories where user has rights
-    PARENTID:
-    for my $ParentID ( sort keys %{$CustomerCategories} ) {
-
-        next PARENTID if !$CustomerCategories->{$ParentID};
-        next PARENTID if ref $CustomerCategories->{$ParentID} ne 'HASH';
-        next PARENTID if !%{ $CustomerCategories->{$ParentID} };
-
-        for my $CategoryID ( sort keys %{ $CustomerCategories->{$ParentID} } ) {
-            $CustomerCategoriesLongNames{$CategoryID} = $CategoryTree->{$CategoryID};
-        }
-    }
-
-    return \%CustomerCategoriesLongNames;
 }
 
 =item GetPublicCategoriesLongNames()
@@ -1791,7 +1435,7 @@ sub CheckCategoryUserPermission {
 get customer user permission for a category
 
     my $PermissionString $FAQObject->CheckCategoryCustomerPermission(
-        CustomerUser => 'mm',
+        Contact => 'mm',
         CategoryID   => '123',
         UserID       => 1,
     );
@@ -1806,7 +1450,7 @@ sub CheckCategoryCustomerPermission {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CustomerUser CategoryID UserID)) {
+    for my $Argument (qw(Contact CategoryID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -1819,7 +1463,7 @@ sub CheckCategoryCustomerPermission {
 
     for my $Permission (qw(rw ro)) {
         my $CustomerCategories = $Self->GetCustomerCategories(
-            CustomerUser => $Param{CustomerUser},
+            Contact => $Param{Contact},
             Type         => 'ro',
             UserID       => $Param{UserID},
         );
@@ -1837,151 +1481,8 @@ sub CheckCategoryCustomerPermission {
     return '';
 }
 
-=item SetCategoryGroup()
-
-set groups to a category
-
-    my $Success = $FAQObject->SetCategoryGroup(
-        CategoryID => 3,
-        GroupIDs   => [ 2,4,1,5,77 ],
-        UserID     => 1,
-    );
-
-Returns:
-
-    $Success = 1;               # or undef if groups could not be set to a category
-
-=cut
-
-sub SetCategoryGroup {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(CategoryID GroupIDs UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # delete old groups
-    return if !$DBObject->Do(
-        SQL => '
-            DELETE FROM faq_category_group
-            WHERE category_id = ?',
-        Bind => [ \$Param{CategoryID} ],
-    );
-
-    # insert groups
-    $Param{CategoryID} = $DBObject->Quote( $Param{CategoryID}, 'Integer' );
-    for my $GroupID ( @{ $Param{GroupIDs} } ) {
-
-        # db quote
-        $GroupID = $DBObject->Quote( $GroupID, 'Integer' );
-
-        my $SQL = "
-            INSERT INTO faq_category_group (category_id, group_id, changed, changed_by, created,
-                created_by)
-            VALUES ($Param{CategoryID}, $GroupID, current_timestamp, $Param{UserID},
-                current_timestamp, $Param{UserID})";
-
-        # write attachment to db
-        return if !$DBObject->Do( SQL => $SQL );
-    }
-
-    return 1;
-}
-
-=begin Internal:
-
-=item _UserCategories()
-
-reduces the categories ( from CategoryList() ) to only the ones where the user has privileges.
-
-    my $UserCategories = $FAQObject->_UserCategories(
-        Categories     => $CategoryHashRef,         # as returned form CategoryList()
-        CategoryGroups => $CategoryGroupHashRef,     # as returned from CategoryGroupGetAll
-        UserGroups     => $UserGroupsHashRef,
-        UserID         => 123,
-    );
-
-Returns:
-
-    $UserCategoies = {
-        0 => {
-            1 => 'Misc',
-            2 => 'My Category',
-        },
-        2 => {
-            3 => 'Sub Category A',
-        },
-    };
-
-=cut
-
-sub _UserCategories {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Categories UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    my %UserCategories;
-
-    PARENTID:
-    for my $ParentID ( sort { $a <=> $b } keys %{ $Param{Categories} } ) {
-
-        my %SubCategories;
-
-        CATEGORYID:
-        for my $CategoryID ( sort keys %{ $Param{Categories}->{$ParentID} } ) {
-
-            # check category groups
-            next CATEGORYID if !defined $Param{CategoryGroups}->{$CategoryID};
-
-            # check user groups
-            GROUPID:
-            for my $GroupID ( sort keys %{ $Param{CategoryGroups}->{$CategoryID} } ) {
-
-                next GROUPID if !defined $Param{UserGroups}->{$GroupID};
-
-                # add category
-                $SubCategories{$CategoryID} = $Param{Categories}->{$ParentID}->{$CategoryID};
-
-                # add empty hash if category has no subcategories
-                if ( !$UserCategories{$CategoryID} ) {
-                    $UserCategories{$CategoryID} = {};
-                }
-
-                last GROUPID;
-            }
-        }
-        $UserCategories{$ParentID} = \%SubCategories;
-    }
-
-    return \%UserCategories;
-}
-
-=end Internal:
-
-=cut
-
 1;
+
 
 
 
@@ -1991,11 +1492,11 @@ sub _UserCategories {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

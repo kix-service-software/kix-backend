@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Stats::Dynamic::ITSMTicketSolutionTimeAverage;
@@ -150,11 +150,11 @@ sub GetObjectAttributes {
             Block            => 'InputField',
         },
         {
-            Name             => 'CustomerUserLogin',
+            Name             => 'ContactLogin',
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
             UseAsRestriction => 1,
-            Element          => 'CustomerUserLogin',
+            Element          => 'ContactLogin',
             Block            => 'InputField',
         },
         {
@@ -313,7 +313,7 @@ sub GetObjectAttributes {
     if ( $Kernel::OM->Get('Kernel::Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
 
         # Get CustomerID
-        # (This way also can be the solution for the CustomerUserID)
+        # (This way also can be the solution for the ContactID)
         $Self->{DBSlaveObject}->Prepare(
             SQL => 'SELECT DISTINCT customer_id FROM ticket',
         );
@@ -683,16 +683,17 @@ sub ImportWrapper {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

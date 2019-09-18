@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#StateTypeCollectionResponse",
+  "type": "object",
+  "description": "A list of state types.",
+  "properties": {
+    "StateType": {
+      "type": "array",
+      "items": {
+        "$ref": "StateType.json"
+      }
+    }
+  },
+  "required": [
+    "StateType"
+  ]
+}

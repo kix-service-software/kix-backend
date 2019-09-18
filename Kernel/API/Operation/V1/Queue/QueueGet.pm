@@ -1,14 +1,9 @@
 # --
-# Kernel/API/Operation/V1/Queue/QueueGet.pm - API Queue Get operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::Queue::QueueGet;
@@ -124,25 +119,17 @@ one or more ticket entries in one call.
                     "ChangeTime": "...",
                     "Email": "...",
                     "Calendar": "",
-                    "SalutationID": ...,
                     "CreateTime": "...",
                     "ValidID": ...,
                     "QueueID": ...,
-                    "FirstResponseNotify":...,
-                    "UpdateNotify": ...,
                     "FollowUpLock": ...,
                     "Comment": "...",
                     "ParentID": ...,
                     "DefaultSignKey": ...,
-                    "GroupID": ...,
-                    "SolutionTime": ...,
                     "FollowUpID": ...,
                     "Name": "...",
-                    "SolutionNotify": ...,
                     "RealName": "...",
-                    "SignatureID": ...,
-                    "UpdateTime": ...,
-                    "FirstResponseTime": ... 
+                    "Signature": "...",
                     # If Include=TicketStats was passed, you'll get an entry like this:
                     "TicketStats": {
                         "EscalatedCount":...,
@@ -184,8 +171,7 @@ sub Run {
 
         if ( !IsHashRefWithData( \%QueueData ) ) {
             return $Self->_Error(
-                Code    => 'Object.NotFound',
-                Message => "No data found for QueueID $QueueID.",
+                Code => 'Object.NotFound',
             );
         }
         # include SubQueues if requested
@@ -286,7 +272,7 @@ sub Run {
             );
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
-            }
+            }            
             $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
@@ -295,7 +281,7 @@ sub Run {
                 Result => 'COUNT',
             );
 
-            # open tickets
+            # all relevant tickets
             @Filter = (
                 {
                     Field    => 'QueueID',
@@ -306,7 +292,7 @@ sub Run {
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
             }
-            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{TotalCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
                 },
@@ -368,3 +354,17 @@ sub Run {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

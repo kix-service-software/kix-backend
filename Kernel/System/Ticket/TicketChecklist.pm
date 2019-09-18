@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::Ticket::TicketChecklist;
@@ -186,6 +184,11 @@ sub TicketChecklistItemStateUpdate {
         }
     }
 
+    # get ChecklistItem
+    my %ChecklistItem = $Self->TicketChecklistItemGet(
+        ItemID => $Param{ItemID}
+    );
+
     # db quote
     $Param{ItemID} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{ItemID}, 'Integer' );
     $Param{State} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{State} );
@@ -194,6 +197,13 @@ sub TicketChecklistItemStateUpdate {
     return 0 if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE kix_ticket_checklist SET state = ? WHERE id = ?',
         Bind => [ \$Param{State}, \$Param{ItemID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
     );
 
     return 1;
@@ -222,6 +232,11 @@ sub TicketChecklistItemUpdate {
         }
     }
 
+    # get ChecklistItem
+    my %ChecklistItem = $Self->TicketChecklistItemGet(
+        ItemID => $Param{ItemID}
+    );
+
     # db quote
     $Param{ItemID}   = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{ItemID},   'Integer' );
     $Param{Position} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{Position}, 'Integer' );
@@ -232,6 +247,13 @@ sub TicketChecklistItemUpdate {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => 'UPDATE kix_ticket_checklist SET task = ?, position = ?, state = ? WHERE id = ?',
         Bind => [ \$Param{Text}, \$Param{Position}, \$Param{State}, \$Param{ItemID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
     );
 
     return 1;
@@ -284,6 +306,13 @@ sub TicketChecklistItemCreate {
         $ID = $Row[0];
     }
 
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $Param{TicketID}.'::'.$ID,
+    );
+
     return $ID;
 }
 
@@ -307,6 +336,11 @@ sub TicketChecklistItemDelete {
         return;
     }
 
+    # get ChecklistItem
+    my %ChecklistItem = $Self->TicketChecklistItemGet(
+        ItemID => $Param{ItemID}
+    );
+
     # db quote
     $Param{ItemID} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{ItemID}, 'Integer' );
 
@@ -314,6 +348,13 @@ sub TicketChecklistItemDelete {
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'DELETE FROM kix_ticket_checklist WHERE id = ?',
         Bind => [ \$Param{ItemID} ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Checklist',
+        ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
     );
 
     return 1;
@@ -366,7 +407,53 @@ sub TicketChecklistGet {
     return \%Checklist;
 }
 
+=item TicketChecklistItemGet()
+
+Returns a specific item
+
+    my $HashRef = $TicketObject->TicketChecklistItemGet(
+        ItemID => 123,
+    );
+
+=cut
+
+sub TicketChecklistItemGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ItemID)) {
+        if ( !defined( $Param{$Needed} ) ) {
+            $Kernel::OM->Get('Kernel::System::Log')
+                ->Log( Priority => 'error', Message => "TicketChecklistItemGet: Need $Needed!" );
+            return;
+        }
+    }
+
+    # fetch the result
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        SQL => 'SELECT id, ticket_id, task, state, position'
+            . ' FROM kix_ticket_checklist'
+            . ' WHERE id = ?',
+        Bind => [ \$Param{ItemID} ],
+    );
+
+    # get checklist item
+    my %ChecklistItem;
+
+    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        $ChecklistItem{ID}       = $Row[0];
+        $ChecklistItem{TicketID} = $Row[1];
+        $ChecklistItem{Text}     = $Row[2];
+        $ChecklistItem{State}    = $Row[3];
+        $ChecklistItem{Position} = $Row[4] || 0;
+    }
+
+    # return hash
+    return \%ChecklistItem;
+}
+
 1;
+
 
 
 =back
@@ -374,11 +461,11 @@ sub TicketChecklistGet {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut

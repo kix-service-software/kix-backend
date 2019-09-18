@@ -1,14 +1,9 @@
-# --# --
-# Kernel/API/Operation/FAQ/FAQArticleSearch.pm - API FAQArticle Search operation backend
-# Copyright (C) 2006-2016 c.a.p.e. IT GmbH, http://www.cape-it.de
-#
-# written/edited by:
-# * Rene(dot)Boehm(at)cape(dash)it(dot)de
-# 
+# --
+# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::API::Operation::V1::FAQ::FAQArticleSearch;
@@ -89,34 +84,38 @@ perform FAQArticleSearch Operation. This will return a FAQArticle ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
+
     # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
     my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
-        UserID     => $Self->{Authorization}->{UserID},
+        UserID   => $Self->{Authorization}->{UserID},
+        ValidIDs => \@ValidIDs
     );
 
     # get already prepared FAQ data from FAQArticleGet operation
-    if ( @ArticleIDs ) {
+    if (@ArticleIDs) {
 
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
 
         my $FAQArticleGetResult = $Self->ExecOperation(
             OperationType => 'V1::FAQ::FAQArticleGet',
-            Data      => {
-                FAQArticleID => join(',', sort @ArticleIDs),
+            Data          => {
+                FAQArticleID => join( ',', sort @ArticleIDs ),
             }
         );
-  
+
         if ( !IsHashRefWithData($FAQArticleGetResult) || !$FAQArticleGetResult->{Success} ) {
             return $FAQArticleGetResult;
         }
 
-        my @FAQArticleDataList = IsArrayRefWithData($FAQArticleGetResult->{Data}->{FAQArticle}) ? @{$FAQArticleGetResult->{Data}->{FAQArticle}} : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
+        my @FAQArticleDataList = IsArrayRefWithData( $FAQArticleGetResult->{Data}->{FAQArticle} ) ? @{ $FAQArticleGetResult->{Data}->{FAQArticle} } : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
 
-        if ( IsArrayRefWithData(\@FAQArticleDataList) ) {
+        if ( IsArrayRefWithData( \@FAQArticleDataList ) ) {
             return $Self->_Success(
                 FAQArticle => \@FAQArticleDataList,
-            )
+                )
         }
     }
 
@@ -126,5 +125,18 @@ sub Run {
     );
 }
 
-
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut

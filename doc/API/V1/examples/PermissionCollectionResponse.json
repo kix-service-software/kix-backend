@@ -1,0 +1,28 @@
+{
+    "Permission": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-09-28 09:17:03",
+            "Comment": "Full access to the tickets resource",
+            "CreateBy": 1,
+            "CreateTime": "2018-08-28 11:34:55",
+            "ID": 1,
+            "IsRequired": 1,
+            "Target": "/tickets",
+            "TypeID": 1,
+            "Value": 15
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-28 10:17:03",
+            "Comment": "Read access to queue 1",
+            "CreateBy": 1,
+            "CreateTime": "2018-11-20 12:34:55",
+            "ID": 2,
+            "IsRequired": 0,
+            "Target": "/queues/1",
+            "TypeID": 2,
+            "Value": 2
+        }
+    ]
+}

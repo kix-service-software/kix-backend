@@ -1,16 +1,14 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Ticket::Event::NotificationEvent::Transport::Email;
-## nofilter(TidyAll::Plugin::OTRS::Perl::LayoutObject)
-## nofilter(TidyAll::Plugin::OTRS::Perl::ParamObject)
 
 use strict;
 use warnings;
@@ -23,7 +21,7 @@ use base qw(Kernel::System::Ticket::Event::NotificationEvent::Transport::Base);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::Output::HTML::Layout',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
     'Kernel::System::Email',
     'Kernel::System::Log',
     'Kernel::System::Main',
@@ -105,7 +103,7 @@ sub SendNotification {
         && $Recipient{DynamicFieldType}
     ) {
         # get objects
-        my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
         my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
         my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
 
@@ -140,12 +138,12 @@ sub SendNotification {
                 );
                 next FIELDRECIPIENT if !$UserData{UserEmail};
                 $AddressLine = $UserData{UserEmail};
-            } elsif ($Recipient{DynamicFieldType} eq 'CustomerUser') {
-                my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
-                    User => $FieldRecipient,
+            } elsif ($Recipient{DynamicFieldType} eq 'Contact') {
+                my %Contact = $ContactObject->ContactGet(
+                    ID => $FieldRecipient,
                 );
-                next FIELDRECIPIENT if !$CustomerUser{UserEmail};
-                $AddressLine = $CustomerUser{UserEmail};
+                next FIELDRECIPIENT if !$Contact{UserEmail};
+                $AddressLine = $Contact{Email};
             } else {
                 $AddressLine = $FieldRecipient;
             }
@@ -182,23 +180,28 @@ sub SendNotification {
     # EO NotificationEventX-capeIT
 
     # Verify a customer have an email
-    if ( $Recipient{Type} eq 'Customer' && $Recipient{UserID} && !$Recipient{UserEmail} ) {
-
-        my %CustomerUser = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserDataGet(
-            User => $Recipient{UserID},
-        );
-
-        if ( !$CustomerUser{UserEmail} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'info',
-                Message  => "Send no customer notification because of missing "
-                    . "customer email (CustomerUserID=$CustomerUser{CustomerUserID})!",
+    if ( $Recipient{Type} eq 'Customer' ) {
+        if ( !$Recipient{Email} && $Recipient{ID} ) {
+            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                ID => $Recipient{ID},
             );
-            return;
-        }
 
-        # Set calculated email.
-        $Recipient{UserEmail} = $CustomerUser{UserEmail};
+            if ( !$Contact{Email} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'info',
+                    Message  => "Send no customer notification because of missing "
+                        . "customer email (ContactID=$Contact{ContactID})!",
+                );
+                return;
+            }
+
+            # Set calculated email.
+            $Recipient{UserEmail} = $Contact{Email};
+        }
+        else {
+            # prepare UserEmail to be compatible with agent users
+            $Recipient{UserEmail} = $Recipient{Email};
+        }
     }
 
     return if !$Recipient{UserEmail};
@@ -224,17 +227,16 @@ sub SendNotification {
         # Get configured template with fallback to Default.
         my $EmailTemplate = $Param{Notification}->{Data}->{TransportEmailTemplate}->[0] || 'Default';
 
-        my $Home              = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-        my $TemplateDir       = "$Home/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
-        my $CustomTemplateDir = "$Home/Custom/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
+        my $Home        = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+        my $TemplateDir = "$Home/Kernel/Output/HTML/Templates/Notification/Email";
 
-        if ( !-r "$TemplateDir/$EmailTemplate.tt" && !-r "$CustomTemplateDir/$EmailTemplate.tt" ) {
+        if ( !-r "$TemplateDir/$EmailTemplate.tt" ) {
             $EmailTemplate = 'Default';
         }
 
         # generate HTML
         $Notification{Body} = $LayoutObject->Output(
-            TemplateFile => "NotificationEvent/Email/$EmailTemplate",
+            TemplateFile => "Notification/Email/$EmailTemplate",
             Data         => {
                 TicketID => $Param{TicketID},
                 Body     => $Notification{Body},
@@ -381,8 +383,6 @@ sub SendNotification {
         # get queue object
         my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
 
-        my $QueueID;
-
         # get article
         my %Article = $TicketObject->ArticleLastCustomerArticle(
             TicketID      => $Param{TicketID},
@@ -390,18 +390,11 @@ sub SendNotification {
         );
 
         # set "From" address from Article if exist, otherwise use ticket information, see bug# 9035
-        if (%Article) {
-            $QueueID = $Article{QueueID};
-        }
-        else {
-
-            # get ticket data
-            my %Ticket = $TicketObject->TicketGet(
-                TicketID => $Param{TicketID},
-            );
-            $QueueID = $Ticket{QueueID};
-        }
-
+        my %Ticket = $TicketObject->TicketGet(
+            TicketID => $Param{TicketID},
+        );
+        my $QueueID = $Ticket{QueueID};
+        
         my %Address = $QueueObject->GetSystemAddress( QueueID => $QueueID );
 
         # get queue
@@ -417,18 +410,19 @@ sub SendNotification {
         );
         return if !$SecurityOptions;
 
-        my $ArticleType = 'email-notification-ext';
-
-        if ( IsArrayRefWithData( $Param{Notification}->{Data}->{NotificationArticleTypeID} ) ) {
-
-            # get notification article type
-            $ArticleType = $TicketObject->ArticleTypeLookup(
-                ArticleTypeID => $Param{Notification}->{Data}->{NotificationArticleTypeID}->[0],
-            );
+        my $Channel = 'email';
+        if ( IsArrayRefWithData( $Param{Notification}->{Data}->{Channel} ) ) {
+            $Channel = $Param{Notification}->{Data}->{Channel}->[0],
         }
 
-        my $ArticleID = $TicketObject->ArticleSend(
-            ArticleType    => $ArticleType,
+        my $VisibleForCustomer = 0;
+        if ( IsArrayRefWithData( $Param{Notification}->{Data}->{VisibleForCustomer} ) ) {
+            $VisibleForCustomer = $Param{Notification}->{Data}->{VisibleForCustomer}->[0],
+        }
+
+        my $ArticleID = $TicketObject->ArticleCreate(
+            Channel        => $Channel,
+            CustomerVisible => $VisibleForCustomer,
             SenderType     => 'system',
             TicketID       => $Param{TicketID},
             HistoryType    => 'SendCustomerNotification',
@@ -508,17 +502,17 @@ sub GetTransportRecipients {
             my %Recipient;
             $Recipient{Realname}  = '';
             $Recipient{Type}      = 'Customer';
-            $Recipient{UserEmail} = $Param{Notification}->{Data}->{RecipientEmail}->[0];
+            $Recipient{Email} = $Param{Notification}->{Data}->{RecipientEmail}->[0];
 
-            # check if we have a specified article type
-            if ( $Param{Notification}->{Data}->{NotificationArticleTypeID} ) {
-                $Recipient{NotificationArticleType} = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeLookup(
-                    ArticleTypeID => $Param{Notification}->{Data}->{NotificationArticleTypeID}->[0]
-                ) || 'email-notification-ext';
+            # check if we have a specified channel
+            if ( $Param{Notification}->{Data}->{ChannelID} ) {
+                $Recipient{NotificationChannel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+                    ID => $Param{Notification}->{Data}->{ChannelID}->[0]
+                ) || 'email';
             }
 
             # check recipients
-            if ( $Recipient{UserEmail} && $Recipient{UserEmail} =~ /@/ ) {
+            if ( $Recipient{Email} && $Recipient{Email} =~ /@/ ) {
                 push @Recipients, \%Recipient;
             }
         }
@@ -582,294 +576,290 @@ sub GetTransportRecipients {
     return @Recipients;
 }
 
-sub TransportSettingsDisplayGet {
-    my ( $Self, %Param ) = @_;
+# TODO: Frontend Code
+# sub TransportSettingsDisplayGet {
+#     my ( $Self, %Param ) = @_;
 
-    KEY:
-    for my $Key (qw(RecipientEmail)) {
-        next KEY if !$Param{Data}->{$Key};
-        next KEY if !defined $Param{Data}->{$Key}->[0];
-        $Param{$Key} = $Param{Data}->{$Key}->[0];
-    }
+#     KEY:
+#     for my $Key (qw(RecipientEmail)) {
+#         next KEY if !$Param{Data}->{$Key};
+#         next KEY if !defined $Param{Data}->{$Key}->[0];
+#         $Param{$Key} = $Param{Data}->{$Key}->[0];
+#     }
 
-    my $Home              = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my $TemplateDir       = "$Home/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
-    my $CustomTemplateDir = "$Home/Custom/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
+#     my $Home              = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+#     my $TemplateDir       = "$Home/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
+#     my $CustomTemplateDir = "$Home/Custom/Kernel/Output/HTML/Templates/Standard/NotificationEvent/Email";
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $TemplateDir,
-        Filter    => '*.tt',
-    );
-    if ( -d $CustomTemplateDir ) {
-        push @Files, $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-            Directory => $CustomTemplateDir,
-            Filter    => '*.tt',
-        );
-    }
+#     my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+#         Directory => $TemplateDir,
+#         Filter    => '*.tt',
+#     );
+#     if ( -d $CustomTemplateDir ) {
+#         push @Files, $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+#             Directory => $CustomTemplateDir,
+#             Filter    => '*.tt',
+#         );
+#     }
 
-    # for deduplication
-    my %Templates;
+#     # for deduplication
+#     my %Templates;
 
-    for my $File (@Files) {
-        $File =~ s{^.*/([^/]+)\.tt}{$1}smxg;
-        $Templates{$File} = $File;
-    }
+#     for my $File (@Files) {
+#         $File =~ s{^.*/([^/]+)\.tt}{$1}smxg;
+#         $Templates{$File} = $File;
+#     }
 
-    # get layout object
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+#     # get layout object
+#     my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 
-    # Display article types for article creation if notification is sent
-    # only use 'email-notification-*'-type articles
-    my %NotificationArticleTypes = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeList( Result => 'HASH' );
-    for my $NotifArticleTypeID ( sort keys %NotificationArticleTypes ) {
-        if ( $NotificationArticleTypes{$NotifArticleTypeID} !~ /^email-notification-/ ) {
-            delete $NotificationArticleTypes{$NotifArticleTypeID};
-        }
-    }
-    $Param{NotificationArticleTypesStrg} = $LayoutObject->BuildSelection(
-        Data        => \%NotificationArticleTypes,
-        Name        => 'NotificationArticleTypeID',
-        Translation => 1,
-        SelectedID  => $Param{Data}->{NotificationArticleTypeID},
-        Class       => 'Modernize W50pc',
-    );
+#     # Display article types for article creation if notification is sent
+#     # only use 'email-notification-*'-type articles
+#     my %NotificationArticleTypes = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleTypeList( Result => 'HASH' );
+#     for my $NotifArticleTypeID ( sort keys %NotificationArticleTypes ) {
+#         if ( $NotificationArticleTypes{$NotifArticleTypeID} !~ /^email-notification-/ ) {
+#             delete $NotificationArticleTypes{$NotifArticleTypeID};
+#         }
+#     }
+#     $Param{NotificationArticleTypesStrg} = $LayoutObject->BuildSelection(
+#         Data        => \%NotificationArticleTypes,
+#         Name        => 'NotificationArticleTypeID',
+#         Translation => 1,
+#         SelectedID  => $Param{Data}->{NotificationArticleTypeID},
+#         Class       => 'Modernize W50pc',
+#     );
 
-    $Param{TransportEmailTemplateStrg} = $LayoutObject->BuildSelection(
-        Data        => \%Templates,
-        Name        => 'TransportEmailTemplate',
-        Translation => 0,
-        SelectedID  => $Param{Data}->{TransportEmailTemplate},
-        Class       => 'Modernize W50pc',
-    );
+#     $Param{TransportEmailTemplateStrg} = $LayoutObject->BuildSelection(
+#         Data        => \%Templates,
+#         Name        => 'TransportEmailTemplate',
+#         Translation => 0,
+#         SelectedID  => $Param{Data}->{TransportEmailTemplate},
+#         Class       => 'Modernize W50pc',
+#     );
 
-    # security fields
+#     # security fields
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+#     # get config object
+#     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    my %SecuritySignEncryptOptions;
+#     my %SecuritySignEncryptOptions;
 
-    if ( $ConfigObject->Get('PGP') ) {
-        $SecuritySignEncryptOptions{'PGPSign'}      = Translatable('PGP sign only');
-        $SecuritySignEncryptOptions{'PGPCrypt'}     = Translatable('PGP encrypt only');
-        $SecuritySignEncryptOptions{'PGPSignCrypt'} = Translatable('PGP sign and encrypt');
-    }
+#     if ( $ConfigObject->Get('PGP') ) {
+#         $SecuritySignEncryptOptions{'PGPSign'}      = Translatable('PGP sign only');
+#         $SecuritySignEncryptOptions{'PGPCrypt'}     = Translatable('PGP encrypt only');
+#         $SecuritySignEncryptOptions{'PGPSignCrypt'} = Translatable('PGP sign and encrypt');
+#     }
 
-    if ( $ConfigObject->Get('SMIME') ) {
-        $SecuritySignEncryptOptions{'SMIMESign'}      = Translatable('SMIME sign only');
-        $SecuritySignEncryptOptions{'SMIMECrypt'}     = Translatable('SMIME encrypt only');
-        $SecuritySignEncryptOptions{'SMIMESignCrypt'} = Translatable('SMIME sign and encrypt');
-    }
+#     if ( $ConfigObject->Get('SMIME') ) {
+#         $SecuritySignEncryptOptions{'SMIMESign'}      = Translatable('SMIME sign only');
+#         $SecuritySignEncryptOptions{'SMIMECrypt'}     = Translatable('SMIME encrypt only');
+#         $SecuritySignEncryptOptions{'SMIMESignCrypt'} = Translatable('SMIME sign and encrypt');
+#     }
 
-    # set security settings enabled
-    $Param{EmailSecuritySettings} = ( $Param{Data}->{EmailSecuritySettings} ? 'checked="checked"' : '' );
-    $Param{SecurityDisabled} = 0;
+#     # set security settings enabled
+#     $Param{EmailSecuritySettings} = ( $Param{Data}->{EmailSecuritySettings} ? 'checked="checked"' : '' );
+#     $Param{SecurityDisabled} = 0;
 
-    if ( $Param{EmailSecuritySettings} eq '' ) {
-        $Param{SecurityDisabled} = 1;
-    }
+#     if ( $Param{EmailSecuritySettings} eq '' ) {
+#         $Param{SecurityDisabled} = 1;
+#     }
 
-    if ( !IsHashRefWithData( \%SecuritySignEncryptOptions ) ) {
-        $Param{EmailSecuritySettings} = 'disabled="disabled"';
-        $Param{EmailSecurityInfo}     = Translatable('PGP and SMIME not enabled.');
-    }
+#     if ( !IsHashRefWithData( \%SecuritySignEncryptOptions ) ) {
+#         $Param{EmailSecuritySettings} = 'disabled="disabled"';
+#         $Param{EmailSecurityInfo}     = Translatable('PGP and SMIME not enabled.');
+#     }
 
-    # create security methods field
-    $Param{EmailSigningCrypting} = $LayoutObject->BuildSelection(
-        Data         => \%SecuritySignEncryptOptions,
-        Name         => 'EmailSigningCrypting',
-        SelectedID   => $Param{Data}->{EmailSigningCrypting},
-        Class        => 'Security Modernize W50pc',
-        Multiple     => 0,
-        Translation  => 1,
-        PossibleNone => 1,
-        Disabled     => $Param{SecurityDisabled},
-    );
+#     # create security methods field
+#     $Param{EmailSigningCrypting} = $LayoutObject->BuildSelection(
+#         Data         => \%SecuritySignEncryptOptions,
+#         Name         => 'EmailSigningCrypting',
+#         SelectedID   => $Param{Data}->{EmailSigningCrypting},
+#         Class        => 'Security Modernize W50pc',
+#         Multiple     => 0,
+#         Translation  => 1,
+#         PossibleNone => 1,
+#         Disabled     => $Param{SecurityDisabled},
+#     );
 
-    # create missing signing actions field
-    $Param{EmailMissingSigningKeys} = $LayoutObject->BuildSelection(
-        Data => [
-            {
-                Key   => 'Skip',
-                Value => Translatable('Skip notification delivery'),
-            },
-            {
-                Key   => 'Send',
-                Value => Translatable('Send unsigned notification'),
-            },
-        ],
-        Name        => 'EmailMissingSigningKeys',
-        SelectedID  => $Param{Data}->{EmailMissingSigningKeys},
-        Class       => 'Security Modernize W50pc',
-        Multiple    => 0,
-        Translation => 1,
-        Disabled    => $Param{SecurityDisabled},
-    );
+#     # create missing signing actions field
+#     $Param{EmailMissingSigningKeys} = $LayoutObject->BuildSelection(
+#         Data => [
+#             {
+#                 Key   => 'Skip',
+#                 Value => Translatable('Skip notification delivery'),
+#             },
+#             {
+#                 Key   => 'Send',
+#                 Value => Translatable('Send unsigned notification'),
+#             },
+#         ],
+#         Name        => 'EmailMissingSigningKeys',
+#         SelectedID  => $Param{Data}->{EmailMissingSigningKeys},
+#         Class       => 'Security Modernize W50pc',
+#         Multiple    => 0,
+#         Translation => 1,
+#         Disabled    => $Param{SecurityDisabled},
+#     );
 
-    # create missing crypting actions field
-    $Param{EmailMissingCryptingKeys} = $LayoutObject->BuildSelection(
-        Data => [
-            {
-                Key   => 'Skip',
-                Value => Translatable('Skip notification delivery'),
-            },
-            {
-                Key   => 'Send',
-                Value => Translatable('Send unencrypted notification'),
-            },
-        ],
-        Name        => 'EmailMissingCryptingKeys',
-        SelectedID  => $Param{Data}->{EmailMissingCryptingKeys},
-        Class       => 'Security Modernize W50pc',
-        Multiple    => 0,
-        Translation => 1,
-        Disabled    => $Param{SecurityDisabled},
-    );
+#     # create missing crypting actions field
+#     $Param{EmailMissingCryptingKeys} = $LayoutObject->BuildSelection(
+#         Data => [
+#             {
+#                 Key   => 'Skip',
+#                 Value => Translatable('Skip notification delivery'),
+#             },
+#             {
+#                 Key   => 'Send',
+#                 Value => Translatable('Send unencrypted notification'),
+#             },
+#         ],
+#         Name        => 'EmailMissingCryptingKeys',
+#         SelectedID  => $Param{Data}->{EmailMissingCryptingKeys},
+#         Class       => 'Security Modernize W50pc',
+#         Multiple    => 0,
+#         Translation => 1,
+#         Disabled    => $Param{SecurityDisabled},
+#     );
 
-    # NotificationEventX-capeIT
-    # get objects
-    my $DynamicFieldObject  = $Kernel::OM->Get('Kernel::System::DynamicField');
+#     # NotificationEventX-capeIT
+#     # get objects
+#     my $DynamicFieldObject  = $Kernel::OM->Get('Kernel::System::DynamicField');
 
-    # get DynamicFields
-    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-        ObjectType => ['Ticket'],
-        Valid      => 1,
-    );
+#     # get DynamicFields
+#     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+#         ObjectType => ['Ticket'],
+#         Valid      => 1,
+#     );
 
-    if (
-        $DynamicFieldList
-        && ref($DynamicFieldList) eq 'ARRAY'
-        && @{$DynamicFieldList}
-    ) {
+#     if (
+#         $DynamicFieldList
+#         && ref($DynamicFieldList) eq 'ARRAY'
+#         && @{$DynamicFieldList}
+#     ) {
 
-        my %AgentDynamicFieldHash = ();
-        my %CustomerDynamicFieldHash = ();
-        my %AttachmentDynamicFieldHash = ();
-        for my $DynamicField (@{$DynamicFieldList}) {
-            next if (
-                !$DynamicField
-                || ref($DynamicField) ne 'HASH'
-                || !%{$DynamicField}
-            );
+#         my %AgentDynamicFieldHash = ();
+#         my %CustomerDynamicFieldHash = ();
+#         my %AttachmentDynamicFieldHash = ();
+#         for my $DynamicField (@{$DynamicFieldList}) {
+#             next if (
+#                 !$DynamicField
+#                 || ref($DynamicField) ne 'HASH'
+#                 || !%{$DynamicField}
+#             );
 
-            $AgentDynamicFieldHash{$DynamicField->{ID}} = $DynamicField->{Name};
-            $CustomerDynamicFieldHash{$DynamicField->{ID}} = $DynamicField->{Name};
+#             $AgentDynamicFieldHash{$DynamicField->{ID}} = $DynamicField->{Name};
+#             $CustomerDynamicFieldHash{$DynamicField->{ID}} = $DynamicField->{Name};
 
-            if ($DynamicField->{'FieldType'} eq 'Attachment') {
-                $AttachmentDynamicFieldHash{$DynamicField->{ID}} = $DynamicField->{Name};
-            }
-        }
+#             if ($DynamicField->{'FieldType'} eq 'Attachment') {
+#                 $AttachmentDynamicFieldHash{$DynamicField->{ID}} = $DynamicField->{Name};
+#             }
+#         }
 
-        my %BlockData;
-        $BlockData{RecipientAgentDFStrg} .= $LayoutObject->BuildSelection(
-            Data        => \%AgentDynamicFieldHash,
-            Name        => 'RecipientAgentDF',
-            Translation => 0,
-            Multiple    => 1,
-            Size        => 5,
-            SelectedID  => $Param{Data}->{RecipientAgentDF},
-            Sort        => 'AlphanumericID',
-        );
-        $BlockData{RecipientCustomerDFStrg} .= $LayoutObject->BuildSelection(
-            Data        => \%CustomerDynamicFieldHash,
-            Name        => 'RecipientCustomerDF',
-            Translation => 0,
-            Multiple    => 1,
-            Size        => 5,
-            SelectedID  => $Param{Data}->{RecipientCustomerDF},
-            Sort        => 'AlphanumericID',
-        );
-        $LayoutObject->Block(
-            Name => 'EmailXDynamicField',
-            Data => \%BlockData,
-        );
+#         my %BlockData;
+#         $BlockData{RecipientAgentDFStrg} .= $LayoutObject->BuildSelection(
+#             Data        => \%AgentDynamicFieldHash,
+#             Name        => 'RecipientAgentDF',
+#             Translation => 0,
+#             Multiple    => 1,
+#             Size        => 5,
+#             SelectedID  => $Param{Data}->{RecipientAgentDF},
+#             Sort        => 'AlphanumericID',
+#         );
+#         $BlockData{RecipientCustomerDFStrg} .= $LayoutObject->BuildSelection(
+#             Data        => \%CustomerDynamicFieldHash,
+#             Name        => 'RecipientCustomerDF',
+#             Translation => 0,
+#             Multiple    => 1,
+#             Size        => 5,
+#             SelectedID  => $Param{Data}->{RecipientCustomerDF},
+#             Sort        => 'AlphanumericID',
+#         );
+#         $LayoutObject->Block(
+#             Name => 'EmailXDynamicField',
+#             Data => \%BlockData,
+#         );
 
-        if ( scalar( keys( %AttachmentDynamicFieldHash ) ) ) {
-            my %BlockData;
-            $BlockData{RecipientAttachmentDFStrg} .= $LayoutObject->BuildSelection(
-                Data        => \%AttachmentDynamicFieldHash,
-                Name        => 'RecipientAttachmentDF',
-                Translation => 0,
-                Multiple    => 1,
-                Size        => 5,
-                SelectedID  => $Param{Data}->{RecipientAttachmentDF},
-                Sort        => 'AlphanumericID',
-            );
-            $LayoutObject->Block(
-                Name => 'EmailDFAttachmentDynamicField',
-                Data => \%BlockData,
-            );
-        }
-    }
+#         if ( scalar( keys( %AttachmentDynamicFieldHash ) ) ) {
+#             my %BlockData;
+#             $BlockData{RecipientAttachmentDFStrg} .= $LayoutObject->BuildSelection(
+#                 Data        => \%AttachmentDynamicFieldHash,
+#                 Name        => 'RecipientAttachmentDF',
+#                 Translation => 0,
+#                 Multiple    => 1,
+#                 Size        => 5,
+#                 SelectedID  => $Param{Data}->{RecipientAttachmentDF},
+#                 Sort        => 'AlphanumericID',
+#             );
+#             $LayoutObject->Block(
+#                 Name => 'EmailDFAttachmentDynamicField',
+#                 Data => \%BlockData,
+#             );
+#         }
+#     }
 
-    my %SubjectSelection = (
-        0 => 'Without Ticketnumber',
-        1 => 'With Ticketnumber',
-    );
-    $Param{RecipientSubjectStrg} .= $LayoutObject->BuildSelection(
-        Data        => \%SubjectSelection,
-        Name        => 'RecipientSubject',
-        Translation => 1,
-        SelectedID  => $Param{Data}->{RecipientSubject} || '1',
-        Sort        => 'AlphanumericID',
-    );
-# EO NotificationEventX-capeIT
+#     my %SubjectSelection = (
+#         0 => 'Without Ticketnumber',
+#         1 => 'With Ticketnumber',
+#     );
+#     $Param{RecipientSubjectStrg} .= $LayoutObject->BuildSelection(
+#         Data        => \%SubjectSelection,
+#         Name        => 'RecipientSubject',
+#         Translation => 1,
+#         SelectedID  => $Param{Data}->{RecipientSubject} || '1',
+#         Sort        => 'AlphanumericID',
+#     );
+# # EO NotificationEventX-capeIT
 
-    # generate HTML
-    my $Output = $LayoutObject->Output(
-# NotificationEventX-capeIT
-#        TemplateFile => 'AdminNotificationEventTransportEmailSettings',
-        TemplateFile => 'AdminNotificationEventTransportEmailXSettings',
-# EO NotificationEventX-capeIT
-        Data         => \%Param,
-    );
+#     # generate HTML
+#     my $Output = $LayoutObject->Output(
+# # NotificationEventX-capeIT
+# #        TemplateFile => 'AdminNotificationEventTransportEmailSettings',
+#         TemplateFile => 'AdminNotificationEventTransportEmailXSettings',
+# # EO NotificationEventX-capeIT
+#         Data         => \%Param,
+#     );
 
-    return $Output;
-}
+#     return $Output;
+# }
 
-sub TransportParamSettingsGet {
-    my ( $Self, %Param ) = @_;
+# sub TransportParamSettingsGet {
+#     my ( $Self, %Param ) = @_;
 
-    for my $Needed (qw(GetParam)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed",
-            );
-        }
-    }
+#     for my $Needed (qw(GetParam)) {
+#         if ( !$Param{$Needed} ) {
+#             $Kernel::OM->Get('Kernel::System::Log')->Log(
+#                 Priority => 'error',
+#                 Message  => "Need $Needed",
+#             );
+#         }
+#     }
 
-    # get param object
-    my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
+#     # get param object
+#     my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
 
-    PARAMETER:
-    for my $Parameter (
-# NotificationEventX-capeIT
-#        qw(RecipientEmail NotificationArticleTypeID TransportEmailTemplate
-#        EmailSigningCrypting EmailMissingSigningKeys EmailMissingCryptingKeys
-#        EmailSecuritySettings)
-        qw(RecipientEmail NotificationArticleTypeID TransportEmailTemplate
-        EmailSigningCrypting EmailMissingSigningKeys EmailMissingCryptingKeys
-        EmailSecuritySettings
-        RecipientAgentDF RecipientCustomerDF
-        RecipientSubject
-        RecipientAttachmentDF
-        )
-# EO NotificationEventX-capeIT
-        )
-    {
-        my @Data = $ParamObject->GetArray( Param => $Parameter );
-        next PARAMETER if !@Data;
-        $Param{GetParam}->{Data}->{$Parameter} = \@Data;
-    }
+#     PARAMETER:
+#     for my $Parameter (
+#         qw(RecipientEmail ChannelID VisibleForCustomer TransportEmailTemplate
+#         EmailSigningCrypting EmailMissingSigningKeys EmailMissingCryptingKeys
+#         EmailSecuritySettings
+#         RecipientAgentDF RecipientCustomerDF
+#         RecipientSubject
+#         RecipientAttachmentDF
+#         )
+#         )
+#     {
+#         my @Data = $ParamObject->GetArray( Param => $Parameter );
+#         next PARAMETER if !@Data;
+#         $Param{GetParam}->{Data}->{$Parameter} = \@Data;
+#     }
 
-    # Note: Example how to set errors and use them
-    # on the normal AdminNotificationEvent screen
-    # # set error
-    # $Param{GetParam}->{$Parameter.'ServerError'} = 'ServerError';
+#     # Note: Example how to set errors and use them
+#     # on the normal AdminNotificationEvent screen
+#     # # set error
+#     # $Param{GetParam}->{$Parameter.'ServerError'} = 'ServerError';
 
-    return 1;
-}
+#     return 1;
+# }
 
 sub IsUsable {
     my ( $Self, %Param ) = @_;
@@ -1070,16 +1060,17 @@ sub SecurityOptionsGet {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

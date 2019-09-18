@@ -1,0 +1,6 @@
+{
+    "GeneralCatalogItem": {
+        "Class": "ITSM::ConfigItem::Computer::Type",
+        "Name": "Tablet"
+    }
+}

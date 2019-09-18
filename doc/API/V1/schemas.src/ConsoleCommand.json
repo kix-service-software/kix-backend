@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ConsoleCommand",
+  "type": "object",
+  "description": "The console command object.",
+  "properties": {
+    "AdditionalHelp": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Arguments": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "Description": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Required": {
+            "type": "integer",
+            "description": "is required = 1"
+          }
+        }
+      }
+    },
+    "Command": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Description": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Parameters": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "Description": {
+            "type": "string"
+          },
+          "HasValue": {
+            "type": "integer",
+            "description": "needs value = 1"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Required": {
+            "type": "integer",
+            "description": "is required = 1"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "AdditionalHelp",
+    "Arguments",
+    "Command",
+    "Description",
+    "Parameters"
+  ]
+}

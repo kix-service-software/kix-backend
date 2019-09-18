@@ -1,0 +1,14 @@
+{
+   "$id" : "#MailAccountPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated mail account.",
+   "type" : "object",
+   "properties" : {
+      "MailAccountID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "MailAccountID"
+   ]
+}

@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Admin::User::Add;
@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Group',
+    'Kernel::System::Role',
     'Kernel::System::User',
 );
 
@@ -60,11 +60,10 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'group',
-        Description => "Name of the group to which the new user should be added (with rw permissions!).",
+        Name        => 'roles',
+        Description => "Comma separated list of roles to which the new user should be added.",
         Required    => 0,
         HasValue    => 1,
-        Multiple    => 1,
         ValueRegex  => qr/.*/smx,
     );
 
@@ -75,15 +74,15 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     # check if all groups exist
-    my @Groups = @{ $Self->GetOption('group') // [] };
-    my %GroupList = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupList();
+    my @Roles = split( /\s*,\s*/, ( $Self->GetOption('roles') || '' ) );
+    my %RoleList = reverse $Kernel::OM->Get('Kernel::System::Role')->RoleList( Valid => 1 );
 
-    GROUP:
-    for my $Group (@Groups) {
-        if ( !$GroupList{$Group} ) {
-            die "Group '$Group' does not exist.\n";
+    ROLE:
+    for my $Role (@Roles) {
+        if ( !$RoleList{$Role} ) {
+            die "Role '$Role' does not exist or is not valid.\n";
         }
-        $Self->{Groups}->{ $GroupList{$Group} } = $Group;
+        $Self->{Roles}->{ $RoleList{$Role} } = $Role;
     }
 
     return;
@@ -111,19 +110,18 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    for my $GroupID ( sort keys %{ $Self->{Groups} } ) {
+    for my $RoleID ( sort keys %{ $Self->{Roles} } ) {
 
-        my $Success = $Kernel::OM->Get('Kernel::System::Group')->PermissionGroupUserAdd(
-            UID        => $UserID,
-            GID        => $GroupID,
-            Permission => { 'rw' => 1 },
-            UserID     => 1,
+        my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+            AssignUserID => $UserID,
+            RoleID       => $RoleID,
+            UserID       => 1,
         );
         if ($Success) {
-            $Self->Print( "<green>User added to group '" . $Self->{Groups}->{$GroupID} . "'</green>\n" );
+            $Self->Print( "<green>User added to role '" . $Self->{Roles}->{$RoleID} . "'</green>\n" );
         }
         else {
-            $Self->PrintError( "Failed to add user to group '" . $Self->{Groups}->{$GroupID} . "'." );
+            $Self->PrintError( "Failed to add user to role '" . $Self->{Role}->{$RoleID} . "'." );
         }
     }
 
@@ -133,18 +131,16 @@ sub Run {
 
 1;
 
-
-
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

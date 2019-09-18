@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::Console::Command::Maint::SMIME::CustomerCertificate::Fetch;
@@ -19,7 +19,7 @@ our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::CheckItem',
     'Kernel::System::Crypt::SMIME',
-    'Kernel::System::CustomerUser',
+    'Kernel::System::Contact',
 );
 
 sub Configure {
@@ -113,31 +113,31 @@ sub Run {
 
     my ( $ListOfCertificates, $EmailsFromCertificates ) = $Self->_GetCurrentData();
 
-    my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
+    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
-    # Check customer user for UserSMIMECertificate property (Limit = CustomerUserSearchListLimit from customer backend)
-    my %CustomerUsers = $CustomerUserObject->CustomerSearch(
+    # Check customer user for UserSMIMECertificate property (Limit = ContactSearchListLimit from customer backend)
+    my %Contacts = $ContactObject->CustomerSearch(
         PostMasterSearch => '*',
     );
 
     LOGIN:
-    for my $Login ( sort keys %CustomerUsers ) {
-        my %CustomerUser = $CustomerUserObject->CustomerUserDataGet(
+    for my $Login ( sort keys %Contacts ) {
+        my %Contact = $ContactObject->ContactGet(
             User => $Login,
         );
 
-        next LOGIN if !$CustomerUser{UserSMIMECertificate};
+        next LOGIN if !$Contact{UserSMIMECertificate};
 
         $Self->Print("  Searching SMIME certificates for <yellow>$Login</yellow>...");
 
-        if ( $ListOfCertificates->{ $CustomerUser{UserSMIMECertificate} } ) {
+        if ( $ListOfCertificates->{ $Contact{UserSMIMECertificate} } ) {
             $Self->Print(" Already added\n");
             next LOGIN;
         }
         else {
 
             my @Files = $CryptObject->FetchFromCustomer(
-                Search => $CustomerUser{UserEmail},
+                Search => $Contact{UserEmail},
             );
 
             for my $Filename (@Files) {
@@ -207,16 +207,17 @@ sub _GetCurrentData {
 
 
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut

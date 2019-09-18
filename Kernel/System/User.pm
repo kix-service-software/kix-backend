@@ -1,11 +1,11 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2017 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 package Kernel::System::User;
@@ -15,6 +15,10 @@ use warnings;
 
 use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
+use Data::Dumper;
+
+use Kernel::System::Role::Permission;
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -64,7 +68,7 @@ sub new {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # get user table
-    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'user';
+    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'users';
     $Self->{UserTableUserID} = $ConfigObject->Get('DatabaseUserTableUserID') || 'id';
     $Self->{UserTableUserPW} = $ConfigObject->Get('DatabaseUserTableUserPW') || 'pw';
     $Self->{UserTableUser}   = $ConfigObject->Get('DatabaseUserTableUser')   || 'login';
@@ -97,6 +101,8 @@ get user data (UserLogin, UserFirstname, UserLastname, UserEmail, ...)
                                   # returns only data if user is valid
         NoOutOfOffice => 1,       # not required -> 0|1 (default 0)
                                   # returns data without out of office infos
+        NoPreferences => 1,       # not required -> 0|1 (default 0)
+                                  # returns data without preferences
     );
 
 =cut
@@ -132,6 +138,12 @@ sub GetUserData {
     else {
         $Param{NoOutOfOffice} = 0;
     }
+    if ( $Param{NoPreferences} ) {
+        $Param{NoPreferences} = 1;
+    }
+    else {
+        $Param{NoPreferences} = 0;
+    }
 
     my $CacheKey;
     if ( $Param{User} ) {
@@ -139,14 +151,16 @@ sub GetUserData {
             $Param{User},
             $Param{Valid},
             $FirstnameLastNameOrder,
-            $Param{NoOutOfOffice};
+            $Param{NoOutOfOffice},
+            $Param{NoPreferences};
     }
     else {
         $CacheKey = join '::', 'GetUserData', 'UserID',
             $Param{UserID},
             $Param{Valid},
             $FirstnameLastNameOrder,
-            $Param{NoOutOfOffice};
+            $Param{NoOutOfOffice},
+            $Param{NoPreferences};
     }
 
     # check cache
@@ -159,8 +173,8 @@ sub GetUserData {
     # get initial data
     my @Bind;
     my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, "
-        . " title, first_name, last_name, $Self->{UserTableUserPW}, valid_id, "
-        . " create_time, change_time FROM $Self->{UserTable} WHERE ";
+        . " title, first_name, last_name, $Self->{UserTableUserPW}, email, phone, mobile, "
+        . " comments, valid_id, create_time, change_time, create_by, change_by FROM $Self->{UserTable} WHERE ";
 
     if ( $Param{User} ) {
         my $User = lc $Param{User};
@@ -189,9 +203,15 @@ sub GetUserData {
         $Data{UserFirstname} = $Row[3];
         $Data{UserLastname}  = $Row[4];
         $Data{UserPw}        = $Row[5];
-        $Data{ValidID}       = $Row[6];
-        $Data{CreateTime}    = $Row[7];
-        $Data{ChangeTime}    = $Row[8];
+        $Data{UserEmail}     = $Row[6];
+        $Data{UserPhone}     = $Row[7];
+        $Data{UserMobile}    = $Row[8];
+        $Data{UserComment}   = $Row[9];
+        $Data{ValidID}       = $Row[10];
+        $Data{CreateTime}    = $Row[11];
+        $Data{ChangeTime}    = $Row[12];
+        $Data{CreateBy}      = $Row[13];
+        $Data{ChangeBy}      = $Row[14];
     }
 
     # check data
@@ -253,18 +273,6 @@ sub GetUserData {
 
     my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
 
-    # add last login timestamp
-    if ( $Preferences{UserLastLogin} ) {
-        $Preferences{UserLastLoginTimestamp} = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $Preferences{UserLastLogin},
-        );
-    }
-
-    # check compat stuff
-    if ( !$Preferences{UserEmail} ) {
-        $Preferences{UserEmail} = $Data{UserLogin};
-    }
-
     # out of office check
     if ( !$Param{NoOutOfOffice} ) {
         if ( $Preferences{OutOfOffice} ) {
@@ -289,8 +297,7 @@ sub GetUserData {
                     $Preferences{OutOfOfficeEndDay}
                 );
                 my $Till = int( ( $TimeEnd - $Time ) / 60 / 60 / 24 );
-                $Preferences{OutOfOfficeMessage} = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
-                $Data{UserLastname} .= ' ' . $Preferences{OutOfOfficeMessage};
+                $Data{OutOfOfficeMessage} = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
             }
 
             # Reduce CacheTTL to one hour for users that are out of office to make sure the cache expires timely
@@ -299,24 +306,34 @@ sub GetUserData {
         }
     }
 
-    # merge hash
-    %Data = ( %Data, %Preferences );
+    if ( !$Param{NoPreferences} ) {
 
-    # add preferences defaults
-    my $Config = $ConfigObject->Get('PreferencesGroups');
-    if ( $Config && ref $Config eq 'HASH' ) {
-
-        KEY:
-        for my $Key ( sort keys %{$Config} ) {
-
-            next KEY if !defined $Config->{$Key}->{DataSelected};
-
-            # check if data is defined
-            next KEY if defined $Data{ $Config->{$Key}->{PrefKey} };
-
-            # set default data
-            $Data{ $Config->{$Key}->{PrefKey} } = $Config->{$Key}->{DataSelected};
+        # add last login timestamp
+        if ( $Preferences{UserLastLogin} ) {
+            $Preferences{UserLastLoginTimestamp} = $TimeObject->SystemTime2TimeStamp(
+                SystemTime => $Preferences{UserLastLogin},
+            );
         }
+
+        # add preferences defaults
+        my $Config = $ConfigObject->Get('PreferencesGroups');
+        if ( $Config && ref $Config eq 'HASH' ) {
+
+            KEY:
+            for my $Key ( sort keys %{$Config} ) {
+
+                next KEY if !defined $Config->{$Key}->{DataSelected};
+
+                # check if data is defined
+                next KEY if defined $Preferences{ $Config->{$Key}->{PrefKey} };
+
+                # set default data
+                $Preferences{ $Config->{$Key}->{PrefKey} } = $Config->{$Key}->{DataSelected};
+            }
+        }
+
+        # add preferences to data hash
+        $Data{Preferences} = \%Preferences;
     }
 
     # set cache
@@ -338,9 +355,11 @@ to add new users
         UserFirstname => 'Huber',
         UserLastname  => 'Manfred',
         UserLogin     => 'mhuber',
-        UserPw        => 'some-pass', # not required
+        UserPw        => 'some-pass',           # optional
         UserEmail     => 'email@example.com',
-        UserMobile    => '1234567890', # not required
+        UserPhone     => '1234567890',          # optional
+        UserMobile    => '1234567890',          # optional
+        UserComment   => 'some comment',        # optional
         ValidID       => 1,
         ChangeUserID  => 123,
     );
@@ -399,14 +418,15 @@ sub UserAdd {
     # sql
     return if !$DBObject->Do(
         SQL => "INSERT INTO $Self->{UserTable} "
-            . "(title, first_name, last_name, "
+            . "(title, first_name, last_name, email, phone, mobile, "
             . " $Self->{UserTableUser}, $Self->{UserTableUserPW}, "
-            . " valid_id, create_time, create_by, change_time, change_by)"
+            . " comments, valid_id, create_time, create_by, change_time, change_by)"
             . " VALUES "
-            . " (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
+            . " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
         Bind => [
             \$Param{UserTitle}, \$Param{UserFirstname}, \$Param{UserLastname},
-            \$Param{UserLogin}, \$RandomPassword, \$Param{ValidID},
+            \$Param{UserEmail}, \$Param{UserPhone}, \$Param{UserMobile}, 
+            \$Param{UserLogin}, \$RandomPassword, \$Param{UserComment}, \$Param{ValidID},
             \$Param{ChangeUserID}, \$Param{ChangeUserID},
         ],
     );
@@ -448,23 +468,16 @@ sub UserAdd {
         PW        => $Param{UserPw}
     );
 
-    # set email address
-    $Self->SetPreferences(
-        UserID => $UserID,
-        Key    => 'UserEmail',
-        Value  => $Param{UserEmail}
-    );
-
-    # set mobile phone
-    $Self->SetPreferences(
-        UserID => $UserID,
-        Key    => 'UserMobile',
-        Value  => $Param{UserMobile} || '',
-    );
-
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'User',
+        ObjectID  => $UserID,
     );
 
     return $UserID;
@@ -479,9 +492,11 @@ to update users
         UserFirstname => 'Huber',
         UserLastname  => 'Manfred',
         UserLogin     => 'mhuber',
-        UserPw        => 'some-pass', # not required
+        UserPw        => 'some-pass',           # optional
         UserEmail     => 'email@example.com',
-        UserMobile    => '1234567890', # not required
+        UserPhone     => '1234567890',          # optional
+        UserMobile    => '1234567890',          # optional
+        UserComment   => 'some comment',        # optional
         ValidID       => 1,
         ChangeUserID  => 123,
     );
@@ -492,22 +507,10 @@ sub UserUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    # KIX4OTRS-capeIT
-    my @FixUserStuffArray =
-        qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID);
-    my %FixUserStuffHash = ();
+    for (qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID)) {
 
-    # for (qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID)) {
-    for my $FixUserStuff (@FixUserStuffArray) {
-        $FixUserStuffHash{$FixUserStuff} = 1;
-
-       # if ( !$Param{$_} ) {
-       # $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
-        if ( !$Param{$FixUserStuff} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
-                ->Log( Priority => 'error', Message => "Need $FixUserStuff!" );
-
-            # EO KIX4OTRS-capeIT
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -548,13 +551,15 @@ sub UserUpdate {
 
     # update db
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => "UPDATE $Self->{UserTable} SET title = ?, first_name = ?, last_name = ?, "
-            . " $Self->{UserTableUser} = ?, valid_id = ?, "
+        SQL => "UPDATE $Self->{UserTable} SET title = ?, first_name = ?, last_name = ?, email = ?, phone = ?, mobile = ?, "
+            . " $Self->{UserTableUser} = ?, comments = ?, valid_id = ?, "
             . " change_time = current_timestamp, change_by = ? "
             . " WHERE $Self->{UserTableUserID} = ?",
         Bind => [
             \$Param{UserTitle}, \$Param{UserFirstname}, \$Param{UserLastname},
-            \$Param{UserLogin}, \$Param{ValidID}, \$Param{ChangeUserID}, \$Param{UserID},
+            \$Param{UserEmail}, \$Param{UserPhone}, \$Param{UserMobile},
+            \$Param{UserLogin}, \$Param{UserComment}, \$Param{ValidID}, 
+            \$Param{ChangeUserID}, \$Param{UserID},
         ],
     );
 
@@ -564,43 +569,7 @@ sub UserUpdate {
             UserLogin => $Param{UserLogin},
             PW        => $Param{UserPw}
         );
-
-        # KIX4OTRS-capeIT
-        $FixUserStuffHash{UserPw} = 1;
-
-        # EO KIX4OTRS-capeIT
     }
-
-    # KIX4OTRS-capeIT
-    # set email address
-    # $Self->SetPreferences(
-    #     UserID => $Param{UserID},
-    #     Key    => 'UserEmail',
-    #     Value  => $Param{UserEmail}
-    # );
-    foreach my $ParamKey ( keys %Param ) {
-        if (
-            ( $ParamKey =~ /^User/ )
-            &&
-            ( !$FixUserStuffHash{$ParamKey} )
-            )
-        {
-            $Self->SetPreferences(
-                UserID => $Param{UserID},
-                Key    => $ParamKey,
-                Value  => $Param{$ParamKey}
-            );
-        }
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # set email address
-    $Self->SetPreferences(
-        UserID => $Param{UserID},
-        Key    => 'UserMobile',
-        Value  => $Param{UserMobile} || '',
-    );
 
     # update search profiles if the UserLogin changed
     if ( lc $OldUserLogin ne lc $Param{UserLogin} ) {
@@ -611,28 +580,16 @@ sub UserUpdate {
         );
     }
 
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
     # delete cache
-    $CacheObject->CleanUp(
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
-    # TODO Not needed to delete the cache if ValidID or Name was not changed
-
-    my $SystemPermissionConfig = $Kernel::OM->Get('Kernel::Config')->Get('System::Permission') || [];
-
-    for my $Type ( @{$SystemPermissionConfig}, 'rw' ) {
-
-        $CacheObject->Delete(
-            Type => 'GroupPermissionUserGet',
-            Key  => 'PermissionUserGet::' . $Param{UserID} . '::' . $Type,
-        );
-    }
-
-    $CacheObject->CleanUp(
-        Type => 'GroupPermissionGroupGet',
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
     );
 
     return 1;
@@ -690,6 +647,15 @@ sub UserSearch {
         return;
     }
 
+    my $CacheKey = 'UserSearch::'.($Param{Search} || '').'::'.($Param{PostMasterSearch} || '').'::'.($Param{Userlogin} || '').'::'.($Param{Valid} || '').'::'.($Param{Limit} || '');
+
+    # check cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -697,14 +663,13 @@ sub UserSearch {
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string
-    my $SQL = "SELECT $Self->{UserTableUserID}, login
-                   FROM $Self->{UserTable} WHERE ";
+    my $SQL = "SELECT $Self->{UserTableUserID}, login FROM $Self->{UserTable} WHERE ";
     my @Bind;
 
     if ( $Param{Search} ) {
 
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(login first_name last_name)],
+            Key      => [qw(login first_name last_name email phone mobile)],
             Value    => $Param{Search},
             BindMode => 1,
         );
@@ -713,18 +678,25 @@ sub UserSearch {
     }
     elsif ( $Param{PostMasterSearch} ) {
 
-        my %UserID = $Self->SearchPreferences(
-            Key   => 'UserEmail',
-            Value => $Param{PostMasterSearch},
+        return if !$DBObject->Prepare(
+            SQL   => $SQL. ' email = ?',
+            Bind  => [ \$Param{PostMasterSearch} ],
         );
 
-        for ( sort keys %UserID ) {
+        # fetch the result
+        my %UserList;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $UserList{ $Row[0] } = $Row[1];
+        }
+
+        foreach my $UserID ( sort keys %UserList ) {
             my %User = $Self->GetUserData(
-                UserID => $_,
+                UserID => $UserID,
                 Valid  => $Param{Valid},
             );
             if (%User) {
-                return %UserID;
+                $UserList{$UserID} = $User{UserEmail};
+                return %UserList;
             }
         }
 
@@ -740,8 +712,7 @@ sub UserSearch {
 
     # add valid option
     if ($Valid) {
-        $SQL .= "AND valid_id IN ("
-            . join( ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet() ) . ")";
+        $SQL .= "AND valid_id IN (" . join( ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet() ) . ")";
     }
 
     # get data
@@ -755,6 +726,14 @@ sub UserSearch {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Users{ $Row[0] } = $Row[1];
     }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Users,
+    );
 
     return %Users;
 }
@@ -902,6 +881,13 @@ sub SetPassword {
     $Kernel::OM->Get('Kernel::System::Log')->Log(
         Priority => 'notice',
         Message  => "User: '$Param{UserLogin}' changed password successfully!",
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $User{UserID},
     );
 
     return 1;
@@ -1093,16 +1079,16 @@ sub UserList {
 
     my $SelectStr;
     if ( $Type eq 'Short' ) {
-        $SelectStr = "$ConfigObject->{DatabaseUserTableUserID}, "
-            . " $ConfigObject->{DatabaseUserTableUser}";
+        $SelectStr = "$Self->{UserTableUserID}, "
+            . " $Self->{UserTableUser}";
     }
     else {
-        $SelectStr = "$ConfigObject->{DatabaseUserTableUserID}, "
+        $SelectStr = "$Self->{UserTableUserID}, "
             . " last_name, first_name, "
-            . " $ConfigObject->{DatabaseUserTableUser}";
+            . " $Self->{UserTableUser}";
     }
 
-    my $SQL = "SELECT $SelectStr FROM $ConfigObject->{DatabaseUserTable}";
+    my $SQL = "SELECT $SelectStr FROM $Self->{UserTable}";
 
     # sql query
     if ($Valid) {
@@ -1151,8 +1137,8 @@ sub UserList {
             my %User = $Self->GetUserData(
                 UserID => $UserID,
             );
-            if ( $User{OutOfOfficeMessage} ) {
-                $Users{$UserID} .= ' ' . $User{OutOfOfficeMessage};
+            if ( $User{Preferences}->{OutOfOfficeMessage} ) {
+                $Users{$UserID} .= ' ' . $User{Preferences}->{OutOfOfficeMessage};
             }
         }
     }
@@ -1166,6 +1152,405 @@ sub UserList {
     );
 
     return %Users;
+}
+
+=item UserLoginExistsCheck()
+
+return 1 if another user with this login (username) already exists
+
+    $Exist = $UserObject->UserLoginExistsCheck(
+        UserLogin => 'Some::UserLogin',
+        UserID => 1, # optional
+    );
+
+=cut
+
+sub UserLoginExistsCheck {
+    my ( $Self, %Param ) = @_;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare(
+        SQL =>
+            "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
+        Bind => [ \$Param{UserLogin} ],
+    );
+
+    # fetch the result
+    my $Flag;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        if ( !$Param{UserID} || $Param{UserID} ne $Row[0] ) {
+            $Flag = 1;
+        }
+    }
+    if ($Flag) {
+        return 1;
+    }
+    return 0;
+}
+
+=item PermissionList()
+
+return a list of all permission of a given user
+
+    my %List = $UserObject->PermissionList(
+        UserID => 123
+        RoleID => 456,                           # optional, restrict result to this role
+        Types  => [ 'Resource', 'Object' ]       # optional
+    );
+
+=cut
+
+sub PermissionList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'PermissionList::'.($Param{UserID}||'').'::'.($Param{RoleID}||'').'::'.(IsArrayRefWithData($Param{Types}) ? join('::', @{$Param{Types}}) : '');
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    # get all permissions from every valid role the user is assigned to
+    my @Bind;
+    my $SQL = 'SELECT id FROM role_permission WHERE role_id IN (SELECT role_id FROM role_user WHERE user_id = ? AND role_id IN (SELECT id FROM roles WHERE valid_id = 1)';
+    push(@Bind, \$Param{UserID});
+    if ( $Param{RoleID} ) {
+        $SQL .= ' AND role_id = ?';
+        push(@Bind, \$Param{RoleID});
+    }
+
+    # filter specific permission types
+    if ( IsArrayRefWithData($Param{Types}) ) {
+        my %TypesMap = map { $_ => 1 } @{$Param{Types}};
+        my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeList();
+        my @PermissionTypeIDs;
+        foreach my $ID ( sort keys %PermissionTypeList ) {
+            next if !$TypesMap{$PermissionTypeList{$ID}};
+            push(@PermissionTypeIDs, $ID);
+        }
+        if ( @PermissionTypeIDs ) {
+            $SQL .= ' AND type_id IN (' . join(',', sort @PermissionTypeIDs) . ')';
+        }
+    }
+
+    # close sub-query
+    $SQL .= ')';
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare( 
+        SQL  => $SQL,
+        Bind => \@Bind
+    );
+
+    # fetch the result
+    my %Result;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Result{ $Row[0] } = $Row[1];
+    }
+
+    # resolve permissions for IDs
+    foreach my $ID ( keys %Result ) {
+        my %Permission = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
+            ID => $ID
+        );
+        $Result{$ID} = \%Permission;
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Result,
+    );
+
+    return %Result;
+}
+
+=item RoleList()
+
+return a list of all roles of a given user
+
+    my @RoleIDs = $UserObject->RoleList(
+        UserID => 123
+    );
+
+=cut
+
+sub RoleList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'RoleList::'.$Param{UserID};
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    return if !$DBObject->Prepare( 
+        SQL  => 'SELECT role_id FROM role_user WHERE user_id = ?',
+        Bind => [
+            \$Param{UserID}
+        ]
+    );
+
+    # fetch the result
+    my @Result;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push(@Result, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
+
+    return @Result;
+}
+
+=item CheckPermission()
+
+returns true if the requested permission is granted
+
+    my ($Granted, $ResultingPermission) = $UserObject->CheckPermission(
+        UserID              => 123,
+        Types               => [ 'Resource', 'Object' ]
+        Target              => '/tickets',
+        RequestedPermission => 'READ'
+    );
+
+=cut
+
+sub CheckPermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(UserID Target RequestedPermission) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    # UserID 1 has God Mode ;)
+    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD) if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+
+    $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for target $Param{Target}");
+
+    # get list of all roles to resolve names
+    my %RoleList = $Kernel::OM->Get('Kernel::System::Role')->RoleList();
+
+    # get all roles the user is assigned to
+    my @UserRoleList = $Self->RoleList(
+        UserID => $Param{UserID}
+    );
+    
+    $Self->_PermissionDebug("roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($RoleList{$_} || '')."\" (ID $_)" } sort @UserRoleList));
+
+    # check the permission for each target level (from top to bottom) and role
+    my $ResultingPermission;
+    my $Target;
+    my %RolePermissionHistory;    
+    TARGETPART:
+    foreach my $TargetPart ( split(/\//, $Param{Target}) ) {
+        next if !$TargetPart;
+
+        # save parent for history
+        my $ParentTarget = $Target;
+
+        $Target .= "/$TargetPart";
+
+        my $TargetPermission;
+        ROLEID:
+        foreach my $RoleID ( sort @UserRoleList ) {
+            my ($RoleGranted, $RolePermission) = $Self->_CheckPermissionForRole(
+                %Param,
+                Target => $Target,
+                RoleID => $RoleID,
+            );
+
+            # use parent permission if no permissions have been found
+            if ( !defined $RolePermission && $ParentTarget ) {
+                $RolePermission = $RolePermissionHistory{$ParentTarget}->{$RoleID};
+                $Self->_PermissionDebug("no permissions found for role $RoleID on target $Target, using parent permission");
+            }
+
+            # init the value
+            if ( !defined $TargetPermission ) {
+                $TargetPermission = 0;
+            }
+
+            # combine permissions
+            $TargetPermission |= ($RolePermission || 0);
+
+            # store permission in history
+            $RolePermissionHistory{$Target}->{$RoleID} = $RolePermission;
+        }
+
+        # if we don't have a target permission don't try to use it
+        next TARGETPART if !defined $TargetPermission;
+
+        # combine permissions
+        if ( defined $ResultingPermission ) {
+            $ResultingPermission &= ($TargetPermission || 0);
+        }
+        else {
+            $ResultingPermission = ($TargetPermission || 0);
+        }
+
+        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => $ResultingPermission,
+            Format => 'Short'
+        );
+
+        $Self->_PermissionDebug("resulting permission on target $Target: $ResultingPermissionShort");
+    }
+
+    # check if we have a DENY 
+    return 0 if !defined $ResultingPermission || ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    my $Granted = ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}}) == Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}};
+
+    return ( $Granted, $ResultingPermission);
+}
+
+=item CheckPermissionForRole()
+
+returns true if the requested permission is granted for a given role
+
+    my ($Granted, $ResultingPermission) = $UserObject->CheckPermissionForRole(
+        UserID              => 123,
+        RoleID              => 456,
+        Types               => [ 'Resource', 'Object' ]
+        Target              => '/tickets',
+        RequestedPermission => 'READ'
+    );
+
+=cut
+
+sub _CheckPermissionForRole {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(UserID RoleID Target RequestedPermission) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    # UserID 1 has God Mode ;)
+    return (1, Kernel::System::Role::Permission->PERMISSION_CRUD)  if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
+
+    $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}");
+
+    my %PermissionList = $Self->PermissionList(
+        UserID => $Param{UserID},
+        RoleID => $Param{RoleID},
+        Types  => $Param{Types},
+    );
+
+    my $Result = 0;
+    my %RelevantPermissions;
+    my %SpecificPermissions;
+    foreach my $ID ( sort keys %PermissionList ) {
+        my $Permission = $PermissionList{$ID};
+
+        # prepare target
+        my $Target = $Permission->{Target};
+        $Target =~ s/\//\\\//g;
+        $Target =~ s/\*/(\\w|\\d)+?/g;
+
+        # check if permission target matches the target to be checked (check whole resources)
+        next if $Param{Target} !~ /^$Target$/;
+
+        my %PermissionType = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
+            ID => $Permission->{TypeID}
+        );
+
+        $RelevantPermissions{$PermissionType{Name}}->{$ID} = $Permission;
+    }
+
+    $Self->_PermissionDebug("relevant permissions for role $Param{RoleID} on target $Param{Target}: ".Dumper(\%RelevantPermissions));
+
+    # return if no relevant permissions exist
+    if ( !IsHashRefWithData(\%RelevantPermissions) ) {
+        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            Value  => 0,
+            Format => 'Short'
+        );
+        $Self->_PermissionDebug("no relevant permissions found, returning");
+
+        return 0;
+    }
+    
+    # sum up all the relevant permissions
+    my $ResultingPermission = 0;
+    TYPE_RELEVANT:
+    foreach my $Type ( qw(Resource Object) ) {
+        PERMISSION_RELEVANT:
+        foreach my $ID ( sort { length($RelevantPermissions{$Type}->{$a}->{Target}) <=> length($RelevantPermissions{$Type}->{$b}->{Target}) } keys %{$RelevantPermissions{$Type}} ) {            
+            my $Permission = $RelevantPermissions{$Type}->{$ID};
+            $ResultingPermission |= $Permission->{Value};
+            if ( ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} for role $Param{RoleID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                last TYPE_RELEVANT;
+            }
+        }
+    }
+
+    # check if we have a DENY already
+    return (0, Kernel::System::Role::Permission->PERMISSION->{NONE}) if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+        Value  => $ResultingPermission,
+        Format => 'Short'
+    );
+
+    $Self->_PermissionDebug("resulting permissions for role $Param{RoleID} on target $Param{Target}: $ResultingPermissionShort");
+
+    # check if we have a DENY 
+    return 0 if ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
+
+    my $Granted = ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}}) == Kernel::System::Role::Permission->PERMISSION->{$Param{RequestedPermission}};
+
+    return ( $Granted, $ResultingPermission);
 }
 
 =item GenerateRandomPassword()
@@ -1239,39 +1624,6 @@ sub SetPreferences {
     # get configuration for the full name order
     my $FirstnameLastNameOrder = $ConfigObject->Get('FirstnameLastnameOrder') || 0;
 
-    # create cachekey
-    my $Login = $Self->UserLookup( UserID => $Param{UserID} );
-    my @CacheKeys = (
-        'GetUserData::User::' . $Login . '::0::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::User::' . $Login . '::0::' . $FirstnameLastNameOrder . '::1',
-        'GetUserData::User::' . $Login . '::1::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::User::' . $Login . '::1::' . $FirstnameLastNameOrder . '::1',
-        'GetUserData::UserID::' . $Param{UserID} . '::0::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::UserID::' . $Param{UserID} . '::0::' . $FirstnameLastNameOrder . '::1',
-        'GetUserData::UserID::' . $Param{UserID} . '::1::' . $FirstnameLastNameOrder . '::0',
-        'GetUserData::UserID::' . $Param{UserID} . '::1::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Short::0::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Short::0::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Short::1::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Short::1::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Long::0::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Long::0::' . $FirstnameLastNameOrder . '::1',
-        'UserList::Long::1::' . $FirstnameLastNameOrder . '::0',
-        'UserList::Long::1::' . $FirstnameLastNameOrder . '::1',
-    );
-
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
-
-    # delete cache
-    for my $CacheKey (@CacheKeys) {
-
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-    }
-
     # get user preferences config
     my $GeneratorModule = $ConfigObject->Get('User::PreferencesModule')
         || 'Kernel::System::User::Preferences::DB';
@@ -1304,6 +1656,30 @@ sub GetPreferences {
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
     return $PreferencesObject->GetPreferences(%Param);
+}
+
+=item DeletePreferences()
+
+delete a user preference
+
+    my $Succes = $UserObject->DeletePreferences(
+        UserID => 123,
+        Key    => 'UserEmail',
+    );
+
+=cut
+
+sub DeletePreferences {
+    my $Self = shift;
+
+    # get user preferences config
+    my $GeneratorModule = $Kernel::OM->Get('Kernel::Config')->Get('User::PreferencesModule')
+        || 'Kernel::System::User::Preferences::DB';
+
+    # get generator preferences module
+    my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+    return $PreferencesObject->DeletePreferences(@_);
 }
 
 =item SearchPreferences()
@@ -1489,47 +1865,20 @@ sub _UserFullname {
     return $UserFullname;
 }
 
+sub _PermissionDebug {
+    my ( $Self, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
+
+    printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
+}
+
 =end Internal:
 
 =cut
 
-=item UserLoginExistsCheck()
-
-return 1 if another user with this login (username) already exists
-
-    $Exist = $UserObject->UserLoginExistsCheck(
-        UserLogin => 'Some::UserLogin',
-        UserID => 1, # optional
-    );
-
-=cut
-
-sub UserLoginExistsCheck {
-    my ( $Self, %Param ) = @_;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    return if !$DBObject->Prepare(
-        SQL =>
-            "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
-        Bind => [ \$Param{UserLogin} ],
-    );
-
-    # fetch the result
-    my $Flag;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        if ( !$Param{UserID} || $Param{UserID} ne $Row[0] ) {
-            $Flag = 1;
-        }
-    }
-    if ($Flag) {
-        return 1;
-    }
-    return 0;
-}
-
 1;
+
 
 
 
@@ -1539,11 +1888,11 @@ sub UserLoginExistsCheck {
 =head1 TERMS AND CONDITIONS
 
 This software is part of the KIX project
-(L<http://www.kixdesk.com/>).
+(L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-COPYING for license information (AGPL). If you did not receive this file, see
+LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
 
-<http://www.gnu.org/licenses/agpl.txt>.
+<https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
