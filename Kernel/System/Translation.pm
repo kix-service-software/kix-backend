@@ -262,9 +262,12 @@ sub PatternExistsCheck {
     );
     return $Cache if $Cache;
 
+    # generate MD5 sum of value
+    my $MD5 = Digest::MD5::md5_hex($Param{Value});
+
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'SELECT id FROM translation_pattern WHERE value_md5= ?',
-        Bind => [ \$Param{MD5} ] 
+        Bind => [ \$MD5 ] 
     );
 
     # fetch the result
