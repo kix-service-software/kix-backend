@@ -981,19 +981,26 @@ sub _SendRecipientNotification {
 
     return if !$Success;
 
-    if (
-        $Param{Recipient}->{Type} eq 'Agent'
-        && $Param{Recipient}->{UserLogin}
-        )
-    {
-
-        # write history
-        $TicketObject->HistoryAdd(
-            TicketID     => $Param{TicketID},
-            HistoryType  => 'SendAgentNotification',
-            Name         => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
-            CreateUserID => $Param{UserID},
-        );
+    # create separate history entries if no article has been created
+    if ( !IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) || !$Param{Notification}->{Data}->{CreateArticle}->[0] ) {
+        if ( $Param{Recipient}->{Type} eq 'Agent'&& $Param{Recipient}->{UserLogin} ) {
+            # write history
+            $TicketObject->HistoryAdd(
+                TicketID     => $Param{TicketID},
+                HistoryType  => 'SendAgentNotification',
+                Name         => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
+                CreateUserID => $Param{UserID},
+            );
+        }
+        elsif ( $Param{Recipient}->{Type} eq 'Customer' && $Param{Recipient}->{Email} ) {        
+            # write history
+            $TicketObject->HistoryAdd(
+                TicketID     => $Param{TicketID},
+                HistoryType  => 'SendCustomerNotification',
+                Name         => "\%\%$Param{Recipient}->{Email}",
+                CreateUserID => $Param{UserID},
+            );
+        }
     }
 
     my %EventData = %{ $TransportObject->GetTransportEventData() };
