@@ -102,21 +102,21 @@ sub Search {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        'CreatedTypeID'     => 'th.type_id',
-        'CreatedStateID'    => 'th.state_id',
-        'CreatedUserID'     => 'th.create_by',
-        'CreatedQueueID'    => 'th.queue_id',
-        'CreatedPriorityID' => 'th.priority_id',
-    );
-
-    my %JoinType = (
-        'AND' => 'INNER',
-        'OR'  => 'FULL OUTER'
+        'CreatedTypeID'     => 'type_id',
+        'CreatedStateID'    => 'state_id',
+        'CreatedUserID'     => 'create_by',
+        'CreatedQueueID'    => 'queue_id',
+        'CreatedPriorityID' => 'priority_id',
     );
 
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN ticket_history th ON st.id = th.ticket_id' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, 'LEFT OUTER JOIN ticket_history th_left ON st.id = th_left.ticket_id' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN ticket_history th_right ON st.id = th_right.ticket_id' );
+        } else {
+            push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
+        }
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
@@ -143,29 +143,53 @@ sub Search {
             return;
         }
 
-        push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
-
         if ( $Param{Search}->{Field} eq 'CloseTime' ) {
             # get close state ids
             my @List = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
                 StateType => ['closed'],
                 Result    => 'ID',
             );
-            my @StateID = ( $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'NewTicket' ) );
-            push( @StateID, $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'StateUpdate' ) );
+            my @StateID = ( 
+                $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'NewTicket' ),
+                $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'StateUpdate' )
+            );
             if (@StateID) {
-                push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
-                push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
+                if ( $Param{BoolOperator} eq 'OR') {
+                    push( @SQLWhere, 'th_left.history_type_id IN ('.(join(', ', sort @StateID)).')' );
+                    push( @SQLWhere, 'th_left.state_id IN ('.(join(', ', sort @List)).')' );
+                    push( @SQLWhere, 'th_right.history_type_id IN ('.(join(', ', sort @StateID)).')' );
+                    push( @SQLWhere, 'th_right.state_id IN ('.(join(', ', sort @List)).')' );
+                } else {
+                    push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
+                    push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
+                }
+            }
+        } else {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
+                push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
+            } else {
+                push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
             }
         }
     }
     else {
         # all other attributes
         if ( $Param{Search}->{Operator} eq 'EQ' ) {
-            push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
+            }
         }
         elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-            push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+            }
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -179,7 +203,12 @@ sub Search {
         my $HistoryTypeID = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
             Type => 'NewTicket',
         );
-        push( @SQLWhere, "th.history_type_id = $HistoryTypeID" );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, "th_left.history_type_id = $HistoryTypeID" );
+            push( @SQLWhere, "th_right.history_type_id = $HistoryTypeID" );
+        } else {
+            push( @SQLWhere, "th.history_type_id = $HistoryTypeID" );
+        }
     }
 
     return {

@@ -97,11 +97,6 @@ sub Search {
         return;
     }
 
-    my %JoinType = (
-        'AND' => 'INNER',
-        'OR'  => 'FULL OUTER'
-    );
-
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         my $Index = 1;
         foreach my $SearchValue ( sort @{ $Param{Search}->{Value} } ) {
@@ -114,8 +109,15 @@ sub Search {
             }
             
             if ( !$Param{Search}->{Not} ) {
-                push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN ticket_flag tf$Index ON st.id = tf$Index.ticket_id" );
-                push( @SQLWhere, "tf$Index.ticket_key = '$SearchValue->{Flag}'" );
+                if ( $Param{BoolOperator} eq 'OR') {
+                    push( @SQLJoin, "LEFT OUTER JOIN ticket_flag tf$Index\_left ON st.id = tf$Index\_left.ticket_id" );
+                    push( @SQLJoin, "RIGHT OUTER JOIN ticket_flag tf$Index\_right ON st.id = tf$Index\_right.ticket_id" );
+                    push( @SQLWhere, "tf$Index\_left.ticket_key = '$SearchValue->{Flag}'" );
+                    push( @SQLWhere, "tf$Index\_right.ticket_key = '$SearchValue->{Flag}'" );
+                } else {
+                    push( @SQLJoin, "INNER JOIN ticket_flag tf$Index ON st.id = tf$Index.ticket_id" );
+                    push( @SQLWhere, "tf$Index.ticket_key = '$SearchValue->{Flag}'" );
+                }
             }
             else {
                 push( @SQLJoin, "LEFT JOIN ticket_flag ntf$Index ON st.id = ntf$Index.ticket_id" );
@@ -125,7 +127,12 @@ sub Search {
             # add value restriction if given
             if ( $SearchValue->{Value} ) {
                 if ( !$Param{Search}->{Not} ) {
-                    push( @SQLWhere, "tf$Index.ticket_value = '$SearchValue->{Value}'" );
+                    if ( $Param{BoolOperator} eq 'OR') {
+                        push( @SQLWhere, "tf$Index\_left.ticket_value = '$SearchValue->{Value}'" );
+                        push( @SQLWhere, "tf$Index\_right.ticket_value = '$SearchValue->{Value}'" );
+                    } else {
+                        push( @SQLWhere, "tf$Index.ticket_value = '$SearchValue->{Value}'" );
+                    }
                 }
                 else {
                     push( @SQLWhere, "(ntf$Index.ticket_value IS NULL OR ntf$Index.ticket_value <> '$SearchValue->{Value}')" );
@@ -135,7 +142,12 @@ sub Search {
             # add user restriction if given
             if ( $SearchValue->{UserID} ) {
                 if ( !$Param{Search}->{Not} ) {
-                    push( @SQLWhere, "tf$Index.create_by = $SearchValue->{UserID}" );
+                    if ( $Param{BoolOperator} eq 'OR') {
+                        push( @SQLWhere, "tf$Index\_left.create_by = $SearchValue->{UserID}" );
+                        push( @SQLWhere, "tf$Index\_right.create_by = $SearchValue->{UserID}" );
+                    } else {
+                        push( @SQLWhere, "tf$Index.create_by = $SearchValue->{UserID}" );
+                    }
                 }
                 else {
                     push( @SQLWhere, "ntf$Index.create_by = $SearchValue->{UserID}" );                    
