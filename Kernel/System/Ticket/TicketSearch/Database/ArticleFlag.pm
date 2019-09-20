@@ -95,11 +95,6 @@ sub Search {
         return;
     }
 
-    my %JoinType = (
-        'AND' => 'INNER',
-        'OR'  => 'FULL OUTER'
-    );
-
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         my $Index = 1;
         foreach my $SearchValue ( sort @{ $Param{Search}->{Value} } ) {
@@ -112,14 +107,28 @@ sub Search {
             }
             
             if ( !$Param{Search}->{Not} ) {
-                push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
-                push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag$Index.id = af$Index.article_id" );
-                push( @SQLWhere, "af$Index.article_key = '$SearchValue->{Flag}'" );
+                if ( $Param{BoolOperator} eq 'OR') {
+                    push( @SQLJoin, "LEFT OUTER JOIN article art_for_aflag$Index\_left ON st.id = art_for_aflag$Index\_left.ticket_id" );
+                    push( @SQLJoin, "RIGHT OUTER JOIN article art_for_aflag$Index\_right ON st.id = art_for_aflag$Index\_right.ticket_id" );
+                    push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag\_left$Index.id = af$Index.article_id OR art_for_aflag\_right$Index.id = af$Index.article_id" );
+                    push( @SQLWhere, "af$Index.article_key = '$SearchValue->{Flag}'" );
+                } else {
+                    push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
+                    push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag$Index.id = af$Index.article_id" );
+                    push( @SQLWhere, "af$Index.article_key = '$SearchValue->{Flag}'" );
+                }
             }
             else {
-                push( @SQLJoin, $JoinType{$Param{BoolOperator}}." JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
-                push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag$Index.id = af$Index.article_id" );
-                push( @SQLWhere, "naf$Index.article_key = '$SearchValue->{Flag}'" );
+                if ( $Param{BoolOperator} eq 'OR') {
+                    push( @SQLJoin, "LEFT OUTER JOIN article art_for_aflag$Index\_left ON st.id = art_for_aflag$Index\_left.ticket_id" );
+                    push( @SQLJoin, "RIGHT OUTER JOIN article art_for_aflag$Index\_right ON st.id = art_for_aflag$Index\_right.ticket_id" );
+                    push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag\_left$Index.id = naf$Index.article_id OR art_for_aflag\_right$Index.id = naf$Index.article_id" );
+                    push( @SQLWhere, "naf$Index.article_key = '$SearchValue->{Flag}'" );
+                } else {
+                    push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
+                    push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag$Index.id = naf$Index.article_id" );
+                    push( @SQLWhere, "naf$Index.article_key = '$SearchValue->{Flag}'" );
+                }
             }
 
             # add value restriction if given
