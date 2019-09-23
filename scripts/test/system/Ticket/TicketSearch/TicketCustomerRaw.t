@@ -33,7 +33,7 @@ $Kernel::OM->Get('Kernel::Config')->Set(
     Value => 0,
 );
 
-my @CustomerLogins;
+my @ContactIDs;
 
 # add two customer users
 for ( 1 .. 2 ) {
@@ -50,7 +50,7 @@ for ( 1 .. 2 ) {
         ValidID        => 1,
         UserID         => 1,
     );
-    push @CustomerLogins, $ContactID;
+    push @ContactIDs, $ContactID;
 
     $Self->True(
         $ContactID,
@@ -60,7 +60,7 @@ for ( 1 .. 2 ) {
 
 my @TicketIDs;
 my %CustomerIDTickets;
-for my $ContactLogin (@CustomerLogins) {
+for my $ContactID (@ContactIDs) {
     for ( 1 .. 3 ) {
 
         # create a new ticket
@@ -70,29 +70,32 @@ for my $ContactLogin (@CustomerLogins) {
             Lock         => 'unlock',
             Priority     => '3 normal',
             State        => 'open',
-            Contact => $ContactLogin,
-            CustomerID   => "CustomerID-$ContactLogin",
+            ContactID    => $ContactID,
+            OrganisationID => "CustomerID-$ContactID",
             OwnerID      => 1,
             UserID       => 1,
         );
 
         $Self->True(
             $TicketID,
-            "Ticket created for test - $ContactLogin - $TicketID",
+            "Ticket created for test - $ContactID - $TicketID",
         );
         push @TicketIDs, $TicketID;
-        push @{ $CustomerIDTickets{$ContactLogin} }, $TicketID;
+        push @{ $CustomerIDTickets{$ContactID} }, $TicketID;
 
     }
 }
 
-# test search by ContactLoginRaw, when ContactLogin have special chars or whitespaces
+# test search by ContactLognRaw, when ContactLogin have special chars or whitespaces
 
-for my $ContactLogin (@CustomerLogins) {
+for my $ContactID (@ContactIDs) {
 
+    my %Contact = $ContactObject->ContactGet(
+        ID => $ContactID,
+    );
     my @ReturnedTicketIDs = $TicketObject->TicketSearch(
         Result               => 'ARRAY',
-        ContactLoginRaw => $ContactLogin,
+        ContactLoginRaw      => $Contact{Login},
         UserID               => 1,
         OrderBy              => ['Up'],
         SortBy               => ['TicketNumber'],
@@ -100,8 +103,8 @@ for my $ContactLogin (@CustomerLogins) {
 
     $Self->IsDeeply(
         \@ReturnedTicketIDs,
-        $CustomerIDTickets{$ContactLogin},
-        "Test TicketSearch for CustomerLoginRaw: \'$ContactLogin\'",
+        $CustomerIDTickets{$ContactID},
+        "Test TicketSearch for CustomerLoginRaw: \'$Contact{Login}\'",
     );
 
 }
@@ -109,11 +112,11 @@ for my $ContactLogin (@CustomerLogins) {
 # test search by ContactLogin, when ContactLogin have special chars or whitespaces
 # result is empty
 
-for my $ContactLogin (@CustomerLogins) {
+for my $ContactID (@ContactIDs) {
 
     my @ReturnedTicketIDs = $TicketObject->TicketSearch(
         Result            => 'ARRAY',
-        ContactLogin => $ContactLogin,
+        ContactID         => $ContactID,
         UserID            => 1,
         OrderBy           => ['Up'],
         SortBy            => ['TicketNumber'],
@@ -121,17 +124,17 @@ for my $ContactLogin (@CustomerLogins) {
 
     $Self->IsNotDeeply(
         \@ReturnedTicketIDs,
-        $CustomerIDTickets{$ContactLogin},
-        "Test TicketSearch for CustomerLoginRaw: \'$ContactLogin\'",
+        $CustomerIDTickets{$ContactID},
+        "Test TicketSearch for CustomerLoginRaw: \'$ContactID\'",
     );
 
 }
 
 # test search by CustomerIDRaw, when CustomerID have special chars or whitespaces
 
-for my $ContactLogin (@CustomerLogins) {
+for my $ContactID (@ContactIDs) {
 
-    my %User              = $ContactObject->ContactGet( User => $ContactLogin );
+    my %User              = $ContactObject->ContactGet( ID => $ContactID );
     my $CustomerIDRaw     = $User{UserCustomerID};
     my @ReturnedTicketIDs = $TicketObject->TicketSearch(
         Result        => 'ARRAY',
@@ -143,7 +146,7 @@ for my $ContactLogin (@CustomerLogins) {
 
     $Self->IsDeeply(
         \@ReturnedTicketIDs,
-        $CustomerIDTickets{$ContactLogin},
+        $CustomerIDTickets{$ContactID},
         "Test TicketSearch for CustomerIDRaw \'$CustomerIDRaw\'",
     );
 }
@@ -151,21 +154,21 @@ for my $ContactLogin (@CustomerLogins) {
 # test search by CustomerID, when CustomerID have special chars or whitespaces
 # result is empty
 
-for my $ContactLogin (@CustomerLogins) {
+for my $ContactID (@ContactIDs) {
 
-    my %User              = $ContactObject->ContactGet( User => $ContactLogin );
-    my $CustomerIDRaw     = $User{UserCustomerID};
+    my %User              = $ContactObject->ContactGet( ID => $ContactID );
+    my $CustomerIDRaw     = $User{PrimaryOrganisationID};
     my @ReturnedTicketIDs = $TicketObject->TicketSearch(
-        Result     => 'ARRAY',
-        CustomerID => $CustomerIDRaw,
-        UserID     => 1,
-        OrderBy    => ['Up'],
-        SortBy     => ['TicketNumber'],
+        Result        => 'ARRAY',
+        OrgaisationID => $CustomerIDRaw,
+        UserID        => 1,
+        OrderBy       => ['Up'],
+        SortBy        => ['TicketNumber'],
     );
 
     $Self->IsNotDeeply(
         \@ReturnedTicketIDs,
-        $CustomerIDTickets{$ContactLogin},
+        $CustomerIDTickets{$ContactID},
         "Test TicketSearch for CustomerIDRaw \'$CustomerIDRaw\'",
     );
 }

@@ -62,7 +62,7 @@ sub Run {
 
     # check customer id
     my %CustomerData = $ContactObject->ContactGet(
-        User => $Param{UserID},
+        ID => $Param{UserID},
     );
 
     # get customer ids

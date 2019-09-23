@@ -355,7 +355,7 @@ sub EditFieldRender {
         my $UserDataString = '';
         if ($Value) {
             my %ContactData = $Self->{ContactObject}->ContactGet(
-                User => $Value,
+                ID => $Value,
             );
             $UserDataString
                 = "$ContactData{UserFirstname} $ContactData{UserLastname}" . " <"
@@ -593,18 +593,28 @@ sub DisplayValueRender {
         # EO KIX4OTRS-capeIT
 
         # KIX4OTRS-capeIT
-        my %UserData = $Self->{ContactObject}->ContactGet(
-            User => $ReadableValue,
+        my %Contacts = $Self->{ContactObject}->ContactSearch(
+            Login => $ReadableValue,
+            Limit => 1,
+            Valid => 0
         );
+        my %ContactData;
+        if ( IsHashRefWithData(\%Contacts)) {
+            for my $ContactID ( keys %Contacts) {
+                %ContactData = $Self->{ContactObject}->ContactGet(
+                    ID => $ContactID,
+                );
+            }
+        }
         $ReadableValue
-            = $UserData{UserFirstname} . " "
-            . $UserData{UserLastname} . " <"
-            . $UserData{UserEmail} . ">";
+            = $ContactData{UserFirstname} . " "
+            . $ContactData{UserLastname} . " <"
+            . $ContactData{UserEmail} . ">";
 
         # alternative display string defined ?
         if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
             $ReadableValue = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-            $ReadableValue =~ s{<(.+?)>}{$UserData{$1}}egx;
+            $ReadableValue =~ s{<(.+?)>}{$ContactData{$1}}egx;
         }
 
         # EO KIX4OTRS-capeIT
@@ -769,7 +779,7 @@ sub SearchFieldRender {
         my $UserDataString = '';
         if ($Value) {
             my %ContactData = $Self->{ContactObject}->ContactGet(
-                User => $Value,
+                ID => $Value,
             );
             $UserDataString
                 = "$ContactData{UserFirstname} $ContactData{UserLastname}" . " <"
@@ -1161,7 +1171,7 @@ sub ValueLookup {
 #            }
 #        }
         my %ContactData = $Self->{ContactObject}->ContactGet(
-            User => $Value,
+            ID => $Value,
         );
         $Value = $ContactData{UserFirstname}
                . " "

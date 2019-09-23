@@ -534,9 +534,18 @@ sub ImportDataSave {
     #(2) search customer user...
     my %ContactData;
     if ( $ImportData{ContactLogin} && $ImportData{ContactLogin} !~ /DEFAULT/ ) {
-        %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $ImportData{ContactLogin}
+        my %Contacts = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+            Login => $ImportData{ContactLogin},
+            Limit => 1,
+            Valid => 0
         );
+        if ( IsHashRefWithData(\%Contacts)) {
+            for my $ContactID ( keys %Contacts) {
+                %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                    ID => $ContactID,
+                );
+            }
+        }
         if ( !%ContactData ) {
 
             #customer user login does not exist - drop line...

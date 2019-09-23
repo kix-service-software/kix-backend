@@ -713,7 +713,7 @@ sub FetchFromCustomer {
 
         # If valid email address, only do a PostMasterSearch
         if ($ValidEmail) {
-            %Contacts = $ContactObject->CustomerSearch(
+            %Contacts = $ContactObject->ContactSearch(
                 PostMasterSearch => $Param{Search},
             );
         }
@@ -722,9 +722,9 @@ sub FetchFromCustomer {
     my @CertFileList;
 
     # Check found Contacts
-    for my $Login ( sort keys %Contacts ) {
+    for my $ContactID ( sort keys %Contacts ) {
         my %Contact = $ContactObject->ContactGet(
-            User => $Login,
+            ID => $ContactID,
         );
 
         # Add Certificate if available

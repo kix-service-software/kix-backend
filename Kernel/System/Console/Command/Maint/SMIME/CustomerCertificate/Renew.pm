@@ -66,17 +66,17 @@ sub Run {
     EMAIL:
     for my $Email ( sort keys %{$EmailsFromCertificates} ) {
 
-        my %UserList = $ContactObject->CustomerSearch(
+        my %ContactList = $ContactObject->ContactSearch(
             PostMasterSearch => $Email,
             Limit            => 1,
         );
 
-        next EMAIL if !%UserList;
+        next EMAIL if !%ContactList;
 
-        my @UserLogins = sort keys %UserList;
+        my @UserIDs = sort keys %ContactList;
 
         my %Contact = $ContactObject->ContactGet(
-            User => $UserLogins[0],
+            ID => $UserIDs[0],
         );
 
         next EMAIL if !%Contact;
@@ -97,7 +97,7 @@ sub Run {
                 Filename    => $Filename,
             );
 
-            $Self->Print("  Found new SMIME certificates for <yellow>$UserLogins[0]</yellow> ...\n");
+            $Self->Print("  Found new SMIME certificates for <yellow>$Contact{Login}</yellow> ...\n");
             $Self->Print("    Added certificate $CertificateAttributes{Fingerprint} (<yellow>$Filename</yellow>)\n")
         }
     }

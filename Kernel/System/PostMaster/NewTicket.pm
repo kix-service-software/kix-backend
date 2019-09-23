@@ -188,9 +188,17 @@ sub Run {
         my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
         # get customer user data form X-KIX-Contact
-        my %ContactData = $ContactObject->ContactGet(
-            User => $GetParam{'X-KIX-Contact'},
+        my %Contacts = $ContactObject->ContactSearch(
+            Search => $GetParam{'X-KIX-Contact'},
+            Limit => 1,
+            Valid => 0
         );
+        my %ContactData;
+        for my $ContactID ( sort keys %Contacts ) {
+            %ContactData = $ContactObject->ContactGet(
+                ID => $ContactID,
+            );
+        }
 
         if (%ContactData) {
             $GetParam{'X-KIX-CustomerNo'} = $ContactData{UserCustomerID};
@@ -220,11 +228,13 @@ sub Run {
 
                 my %List = $ContactObject->ContactSearch(
                     PostMasterSearch => lc( $GetParam{EmailFrom} ),
+                    Limit            => 1,
+                    Valid            => 0
                 );
 
-                for my $UserLogin ( sort keys %List ) {
+                for my $UserID ( sort keys %List ) {
                     %ContactData = $ContactObject->ContactGet(
-                        User => $UserLogin,
+                        ID => $UserID,
                     );
                 }
             }
