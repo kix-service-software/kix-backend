@@ -58,10 +58,10 @@ my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
 my $UserID = $UserData{UserID};
 
 # create new customer user for current test
-my $ContactLogin = $Helper->TestContactCreate();
+my $ContactID = $Helper->TestContactCreate();
 
 my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-    User => $ContactLogin,
+    ID => $ContactID,
 );
 
 # get ticket object
@@ -74,8 +74,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
-    CustomerID   => 'example.com',
-    Contact      => $ContactData{UserEmail},
+    OrganisationID => 'example.com',
+    ContactID      => $ContactData{Email},
     OwnerID      => $UserID,
     UserID       => $UserID,
 );

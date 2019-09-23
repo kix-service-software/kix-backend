@@ -1027,7 +1027,7 @@ sub SendLinkedPersonNotification {
         }
         else {
             %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-                User => $RecipientID,
+                ID => $RecipientID,
             );
         }
         next if !$User{UserEmail} || $User{UserEmail} !~ /@/;
@@ -1164,10 +1164,19 @@ sub _GetUserInfoString {
     return '' if !$Param{UserType};
     my %User = %{ $Param{User} };
 
-    my %ContactData
-        = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $User{UserLogin},
-        );
+    my %Contacts = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+        Login => $User{UserLogin},
+        Limit => 1,
+        Valid => 0
+    );
+    my %ContactData;
+    if (IsHashRefWithData(\%Contacts)) {
+        for my $ID (keys %Contacts) {
+            %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                ID => $ID,
+            );
+        }
+    }
 
     # if no customer data found use agent data
     if ( !%ContactData ) {

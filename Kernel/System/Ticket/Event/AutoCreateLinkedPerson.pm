@@ -170,10 +170,10 @@ sub Run {
                 my %UserListCustomer = $Self->{ContactObject}->CustomerSearch(
                     PostMasterSearch => $CurrEmailAddress,
                 );
-                for my $CurrUserLogin ( keys(%UserListCustomer) ) {
+                for my $CurrUserID ( keys(%UserListCustomer) ) {
 
                     my %ContactData =
-                        $Self->{ContactObject}->ContactGet( User => $CurrUserLogin, );
+                        $Self->{ContactObject}->ContactGet( ID => $CurrUserID, );
 
                     # set type customer if users CustomerID equals tickets CustomerID...
                     my $Type = "3rdParty";
@@ -209,7 +209,7 @@ sub Run {
 
                     $Blacklisted = 0;
                     for my $Item (@Blacklist) {
-                        next if $CurrUserLogin !~ m/$Item/;
+                        next if $UserListCustomer{$CurrUserID} !~ m/$Item/;
                         $Blacklisted = 1;
                         last;
                     }
@@ -226,7 +226,7 @@ sub Run {
                     );
 
                     $Self->{TicketObject}->HistoryAdd(
-                        Name         => 'added involved person ' . $CurrUserLogin,
+                        Name         => 'added involved person ' . $UserListCustomer{$CurrUserID},
                         HistoryType  => 'TicketLinkAdd',
                         TicketID     => $Ticket{TicketID},
                         CreateUserID => 1,
@@ -332,7 +332,7 @@ sub Run {
             UserID   => 1,
         );
         my %ContactData =
-            $Self->{ContactObject}->ContactGet( User => $Ticket{ContactID} );
+            $Self->{ContactObject}->ContactGet( ID => $Ticket{ContactID} );
 
         $Blacklisted = 0;
         for my $Item (@Blacklist) {

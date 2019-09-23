@@ -120,19 +120,19 @@ sub Run {
         PostMasterSearch => '*',
     );
 
-    LOGIN:
-    for my $Login ( sort keys %Contacts ) {
+    CONTACT:
+    for my $ContactID ( sort keys %Contacts ) {
         my %Contact = $ContactObject->ContactGet(
-            User => $Login,
+            ID => $ContactID,
         );
 
-        next LOGIN if !$Contact{UserSMIMECertificate};
+        next CONTACT if !$Contact{UserSMIMECertificate};
 
-        $Self->Print("  Searching SMIME certificates for <yellow>$Login</yellow>...");
+        $Self->Print("  Searching SMIME certificates for <yellow>$Contacts{$ContactID}</yellow>...");
 
         if ( $ListOfCertificates->{ $Contact{UserSMIMECertificate} } ) {
             $Self->Print(" Already added\n");
-            next LOGIN;
+            next CONTACT;
         }
         else {
 

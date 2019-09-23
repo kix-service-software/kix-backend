@@ -409,17 +409,17 @@ sub ExportDataGet {
     }
 
     # search the customer users...
-    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSearch(
+    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
         Search => '*',
         Valid  => 0,
     );
 
     my @ExportData;
 
-    for my $CurrUser (%ContactList) {
+    for my $ContactID (keys %ContactList) {
 
         my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $CurrUser,
+            ID => $ContactID,
         );
 
         # prepare validity...
@@ -628,13 +628,13 @@ sub ImportDataSave {
             last;
         }
         if ( !$ContactKey ) {
-            $ContactKey = "UserLogin";
+            $ContactKey = "ID";
         }
     }
 
     if ( $NewContactData{$ContactKey} ) {
         %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $NewContactData{$ContactKey}
+            ID => $NewContactData{$ContactKey}
         );
     }
 
@@ -810,7 +810,7 @@ sub ImportDataSave {
                 delete( $Kernel::OM->Get('Kernel::System::Contact')->{ $ContactData{Source} } );
 
                 %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-                    User => $NewContactData{$ContactKey}
+                    ID => $NewContactData{$ContactKey}
                 );
             }
 

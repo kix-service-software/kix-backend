@@ -111,7 +111,7 @@ sub LinkListWithData {
                 else {
                     %PersonData =
                         $Self->{ContactObject}
-                        ->ContactGet( User => $PersonID, );
+                        ->ContactGet( ID => $PersonID, );
                     $PersonData{Type} = 'Customer';
                 }
 
@@ -238,7 +238,7 @@ sub ObjectSearch {
         );
         for my $ID ( keys %Contacts ) {
             my %ContactData =
-                $Self->{ContactObject}->ContactGet( User => $ID, );
+                $Self->{ContactObject}->ContactGet( ID => $ID, );
             $ContactData{Type} = 'Customer';
             $FoundPersons{NOTLINKED}->{Source}->{$ID} = \%ContactData;
         }

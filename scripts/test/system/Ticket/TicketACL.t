@@ -62,20 +62,20 @@ my %NewUserData = $UserObject->GetUserData(
 );
 
 # set customer user options
-my $ContactLogin = $Helper->TestContactCreate()
+my $TestContactID = $Helper->TestContactCreate()
     # rkaiser - T#2017020290001194 - changed customer user to contact
     || die "Did not get test contact";
 
-my %ContactData = $ContactObject->ContactGet(
-    User => $ContactLogin,
+my %TestContact = $ContactObject->ContactGet(
+    ID => $TestContactID,
 );
 
-my $NewContactLogin = $Helper->TestContactCreate()
+my $NewContactID = $Helper->TestContactCreate()
     # rkaiser - T#2017020290001194 - changed customer user to contact
     || die "Did not get test contact";
 
-my %NewContactData = $ContactObject->ContactGet(
-    User => $NewContactLogin,
+my %NewContact = $ContactObject->ContactGet(
+    ID => $NewContactID,
 );
 
 my $RandomID = $Helper->GetRandomID();
@@ -319,7 +319,7 @@ my %TestACLs = (
     'Contact-1' => {
         Properties => {
             Contact => {
-                UserLogin => [$ContactLogin],
+                UserLogin => [$TestContact{Login}],
             },
         },
         Possible => {
@@ -452,8 +452,8 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority      => $PriorityName,
     SLA           => $SLAName,
     State         => $StateName,
-    CustomerID    => '123465',
-    Contact  => $ContactLogin,
+    OrganisationID => '123465',
+    ContactID      => $TestContactID,
     OwnerID       => $UserID,
     ResponsibleID => $UserID,
     UserID        => 1,
@@ -669,7 +669,7 @@ my @Tests = (
             },
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
-            ContactID => $ContactData{UserID},
+            ContactID      => $TestContactID,
         },
         SuccessMatch => 1,
         ReturnData   => {
@@ -1439,7 +1439,7 @@ $Self->True(
             'DB-Contact-1-A' => {
                 PropertiesDatabase => {
                     Contact => {
-                        UserLogin => [$NewContactLogin],
+                        UserLogin => [$NewContact{Login}],
                     },
                 },
                 Possible => {
@@ -1457,7 +1457,7 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            ContactID => $NewContactData{UserID},
+            ContactID      => $NewContactID,
         },
         SuccessMatch => 0,
         ReturnData   => {},
@@ -1468,7 +1468,7 @@ $Self->True(
             'DB-Contact-1-B' => {
                 PropertiesDatabase => {
                     Contact => {
-                        UserLogin => [$ContactLogin],
+                        UserLogin => [$TestContact{Login}],
                     },
                 },
                 Possible => {
@@ -1486,7 +1486,7 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            ContactID => $NewContactData{UserID},
+            ContactID      => $NewContactID,
         },
         SuccessMatch => 1,
         ReturnData   => {
@@ -1500,12 +1500,12 @@ $Self->True(
             'DB-Contact-1-C' => {
                 Properties => {
                     Contact => {
-                        UserLogin => [$ContactLogin],
+                        UserLogin => [$TestContact{Login}],
                     },
                 },
                 PropertiesDatabase => {
                     Contact => {
-                        UserLogin => [$ContactLogin],
+                        UserLogin => [$TestContact{Login}],
                     },
                 },
                 Possible => {
@@ -1523,7 +1523,7 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            ContactID => $NewContactData{UserID},
+            ContactID      => $NewContactID,
         },
         SuccessMatch => 0,
         ReturnData   => {},
@@ -1535,12 +1535,12 @@ $Self->True(
             'DB-Contact-1-S' => {
                 Properties => {
                     Contact => {
-                        UserLogin => [$NewContactLogin],
+                        UserLogin => [$NewContact{Login}],
                     },
                 },
                 PropertiesDatabase => {
                     Contact => {
-                        UserLogin => [$ContactLogin],
+                        UserLogin => [$TestContact{Login}],
                     },
                 },
                 Possible => {
@@ -1558,7 +1558,7 @@ $Self->True(
             ReturnType     => 'Ticket',
             ReturnSubType  => 'State',
             TicketID       => $TicketID,
-            ContactID => $NewContactData{UserID},
+            ContactID      => $NewContactID,
         },
         SuccessMatch => 1,
         ReturnData   => {

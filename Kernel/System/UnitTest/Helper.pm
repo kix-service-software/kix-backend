@@ -242,7 +242,7 @@ creates a test customer user that can be used in tests. It will
 be set to invalid automatically during the destructor. Returns
 the login name of the new customer user, the password is the same.
 
-    my $TestUserLogin = $Helper->TestContactCreate(
+    my $TestUserID = $Helper->TestContactCreate(
         Language => 'de',   # optional, defaults to 'en' if not set
     );
 
@@ -256,56 +256,56 @@ sub TestContactCreate {
     local $ConfigObject->{CheckEmailAddresses} = 0;
 
     # create test user
-    my $TestUser;
-    my $TestUserLogin;
+    my $TestContactID;
+    my $TestContactLogin;
     COUNT:
     for my $Count ( 1 .. 10 ) {
 
-        $TestUserLogin = $Self->GetRandomID();
+        $TestContactLogin = $Self->GetRandomID();
 
         my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
-            Number  => $TestUserLogin,
-            Name    => $TestUserLogin,
+            Number  => $TestContactLogin,
+            Name    => $TestContactLogin,
             ValidID => 1,
             UserID  => 1,
         );
 
-        $TestUser = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
-            Firstname             => $TestUserLogin,
-            Lastname              => $TestUserLogin,
+        $TestContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            Firstname             => $TestContactLogin,
+            Lastname              => $TestContactLogin,
             PrimaryOrganisationID => $OrgID,
             OrganisationIDs       => [ $OrgID ],
-            Login                 => $TestUserLogin,
-            Password              => $TestUserLogin,
-            Email                 => $TestUserLogin . '@localunittest.com',
+            Login                 => $TestContactLogin,
+            Password              => $TestContactLogin,
+            Email                 => $TestContactLogin . '@localunittest.com',
             ValidID               => 1,
             UserID                => 1,
         );
 
-        last COUNT if $TestUser;
+        last COUNT if $TestContactID;
     }
 
-    die 'Could not create test user' if !$TestUser;
+    die 'Could not create test user' if !$TestContactID;
 
     # Remember IDs of the test user and organisation to later set it to invalid
     #   in the destructor.
     $Self->{TestContacts} ||= [];
-    push( @{ $Self->{TestContacts} }, $TestUser );
+    push( @{ $Self->{TestContacts} }, $TestContactID );
 
     # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True( 1, "Created test contact $TestUserLogin ($TestUser)" );
+    $Self->{UnitTestObject}->True( 1, "Created test contact $TestContactLogin ($TestContactID)" );
 
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
     $Kernel::OM->Get('Kernel::System::Contact')->SetPreferences(
-        ContactID => $TestUser,
+        ContactID => $TestContactID,
         Key       => 'UserLanguage',
         Value     => $UserLanguage,
     );
     # rkaiser - T#2017020290001194 - changed customer user to contact
     $Self->{UnitTestObject}->True( 1, "Set contact UserLanguage to $UserLanguage" );
 
-    return $TestUser;
+    return $TestContactID;
 }
 
 =item TestRoleCreate()

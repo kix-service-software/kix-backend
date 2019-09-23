@@ -2317,7 +2317,7 @@ sub SendAutoResponse {
     if ( $Ticket{ContactID} ) {
 
         my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User => $Ticket{ContactID},
+            ID => $Ticket{ContactID},
         );
 
         $Param{Channel} //= '';
