@@ -1019,7 +1019,7 @@ Returns:
         Responsible        => 'some_responsible_login',
         ResponsibleID      => 123,
         Age                => 3456,
-        PendingTime        => '2010-10-27 20:15:00'
+        PendingTime        => '2010-10-27 20:15:00'      # empty string if PendingTimeUnix == 0
         PendingTimeUnix    => 1231414141
         Created            => '2010-10-27 20:15:00'
         CreateTimeUnix     => 1231414141,
@@ -1256,9 +1256,13 @@ sub TicketGet {
         SystemTime => $Ticket{CreateTimeUnix},
     );
 
-    $Ticket{PendingTime} = $TimeObject->SystemTime2TimeStamp(
-        SystemTime => $Ticket{PendingTimeUnix},
-    );
+    if ($Ticket{PendingTimeUnix} > 0) {
+        $Ticket{PendingTime} = $TimeObject->SystemTime2TimeStamp(
+            SystemTime => $Ticket{PendingTimeUnix},
+        );
+    } else {
+        $Ticket{PendingTime} = '';
+    }
 
     my %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
         ID => $Ticket{QueueID},

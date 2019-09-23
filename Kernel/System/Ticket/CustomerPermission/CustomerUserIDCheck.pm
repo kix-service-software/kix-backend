@@ -54,7 +54,7 @@ sub Run {
 
     # get user data
     my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $Param{UserID},
+        ID => $Param{UserID},
     );
 
     return if !%CustomerData;

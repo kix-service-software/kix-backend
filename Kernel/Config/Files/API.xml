@@ -200,6 +200,7 @@
                 <Item Key="Object.UnableToCreate">400:Could not create item, please contact the system administrator.</Item>
                 <Item Key="Object.UnableToUpdate">400:Could not update item, please contact the system administrator.</Item>
                 <Item Key="Object.UnableToDelete">400:Could not delete item, please contact the system administrator.</Item>
+                <Item Key="Object.ExecFailed">500</Item>
                 <Item Key="OK">200</Item>
                 <Item Key="Operation.InternalError">500</Item>
                 <Item Key="ParentObject.NotFound">404:The parent item(s) cannot be found.</Item>

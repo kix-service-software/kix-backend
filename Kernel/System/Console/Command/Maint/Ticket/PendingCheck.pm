@@ -136,7 +136,7 @@ sub Run {
             DynamicFields => 0,
         );
 
-        next TICKETID if $Ticket{UntilTime} >= 1;
+        next TICKETID if $Ticket{UntilTime} >= 1 || !$Ticket{PendingTime} || $Ticket{StateType} !~ m/^pending/i ;
 
         # get used calendar
         my $Calendar = $TicketObject->TicketCalendarGet(

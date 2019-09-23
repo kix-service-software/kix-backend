@@ -62,19 +62,16 @@ sub new {
 perform ContactSearch Operation. This will return a Contact ID list.
 
     my $Result = $OperationObject->Run(
-        Data => {
-        }
+        Data => { }
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
-        Message => '',                               # In case of an error
-        Data         => {
+        Success     => 1,                                # 0 or 1
+        Message     => '',                               # In case of an error
+        Data        => {
             Contact => [
-                {
-                },
-                {                    
-                }
+                { },
+                { }
             ],
         },
     };
@@ -86,12 +83,12 @@ sub Run {
     my %ContactList;
 
     # prepare search if given
-    my %SearchParam;
     if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{Contact} } ) {
             my %SearchTypeResult;
             foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
                 my $Value = $SearchItem->{Value};
+                my %SearchParam;
 
                 if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
                     $Value = '*' . $Value . '*';
@@ -113,12 +110,19 @@ sub Run {
                     $SearchParam{Search} = $Value;
                 }
 
-                # perform Contact search
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
-                    %SearchParam,
-                    Valid => 0
-                );
+                my %SearchResult;
 
+                # perform Contact search
+                if ( $SearchItem->{Field} eq 'Fulltext' ) {
+                    %SearchResult = $Self->_DoFulltextSearch( Search => $Value );
+                } else {
+                    %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                        %SearchParam,
+                        Valid => 0
+                    );
+                }
+
+                # merge results
                 if ( $SearchType eq 'AND' ) {
                     if ( !%SearchTypeResult ) {
                         %SearchTypeResult = %SearchResult;
@@ -131,8 +135,6 @@ sub Run {
                     }
                 }
                 elsif ( $SearchType eq 'OR' ) {
-
-                    # merge results
                     %SearchTypeResult = (
                         %SearchTypeResult,
                         %SearchResult,
@@ -185,6 +187,48 @@ sub Run {
     return $Self->_Success(
         Contact => [],
     );
+}
+
+sub _DoFulltextSearch {
+    my ( $Self, %Param ) = @_;
+
+    my %EndSearchResult;
+    if ( $Param{Search} ) {
+
+        # split on OR
+        my @OrCombinedGroups = split( /\|/, $Param{Search} );
+        for my $OrCombined (@OrCombinedGroups) {
+
+            my %AndResult;
+
+            # split on AND
+            my @AndCombinedGroups = split( /\+|\&/, $OrCombined );
+            for my $AndSearchString (@AndCombinedGroups) {
+                my %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                    Search => $AndSearchString,
+                    Valid  => 0
+                );
+
+                if ( !%AndResult ) {
+                    %AndResult = %SearchResult;
+                }
+                else {
+                    # remove all IDs from type result that we don't have in this search
+                    foreach my $Key ( keys %AndResult ) {
+                        delete $AndResult{$Key} if !exists $SearchResult{$Key};
+                    }
+                }
+            }
+
+            # merge OR results
+            %EndSearchResult = (
+                %EndSearchResult,
+                %AndResult,
+            );
+        }
+
+    }
+    return %EndSearchResult;
 }
 
 1;

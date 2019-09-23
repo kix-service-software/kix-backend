@@ -92,6 +92,7 @@ sub Run {
      	
 	    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
 	        Class => $Class,
+            Valid => 0,
 	    );
    
 	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
