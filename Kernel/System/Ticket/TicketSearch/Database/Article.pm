@@ -100,16 +100,11 @@ sub Search {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        'From'              => 'art.a_from',
-        'To'                => 'art.a_to',
-        'Cc'                => 'art.a_cc',
-        'Subject'           => 'art.a_subject',
-        'Body'              => 'art.a_body',
-    );
-
-    my %JoinType = (
-        'AND' => 'INNER',
-        'OR'  => 'FULL OUTER'
+        'From'              => 'a_from',
+        'To'                => 'a_to',
+        'Cc'                => 'a_cc',
+        'Subject'           => 'a_subject',
+        'Body'              => 'a_body',
     );
 
     my $IsStaticSearch = 0;
@@ -125,7 +120,12 @@ sub Search {
         if ( $IsStaticSearch ) {
             $ArticleSearchTable = 'article_search';
         }
-        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, 'LEFT OUTER JOIN '.$ArticleSearchTable.' art_left ON st.id = art_left.ticket_id' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN '.$ArticleSearchTable.' art_right ON st.id = art_right.ticket_id' );
+        } else {
+            push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
+        }
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
@@ -151,7 +151,12 @@ sub Search {
             return;
         }
 
-        push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'art_left.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+            push( @SQLWhere, 'art_right.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+        } else {
+            push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+        }
     }
     else {
         my $Field      = $AttributeMapping{$Param{Search}->{Field}};
@@ -180,32 +185,37 @@ sub Search {
             return;
         }
 
-        # check if database supports LIKE in large text types (in this case for body)
-        if ( !$IsStaticSearch && $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
-            # lower attributes if we don't do a static search
-            if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
-                $Field      = "LCASE($Field)";
-                $FieldValue = "LCASE('$FieldValue')";
-            }
-            else {
-                $Field      = "LOWER($Field)";
-                $FieldValue = "LOWER('$FieldValue')";
-            }
+        if ( $Param{BoolOperator} eq 'OR') {
+            my @Where = $Self->_prepareField(
+                Field          => 'art_left.' . $Field,
+                FieldValue     => $FieldValue,
+                IsStaticSearch => $IsStaticSearch
+            );
+            push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
+            @Where = $Self->_prepareField(
+                Field          => 'art_right.' . $Field,
+                FieldValue     => $FieldValue,
+                IsStaticSearch => $IsStaticSearch
+            );
+            push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
+        } else {
+            my @Where = $Self->_prepareField(
+                Field          => 'art.' . $Field,
+                FieldValue     => $FieldValue,
+                IsStaticSearch => $IsStaticSearch
+            );
+            push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
         }
-        else {
-            $FieldValue = "'$FieldValue'";
-            if ( $IsStaticSearch ) {
-                # lower search pattern if we use static search
-                $FieldValue = lc($FieldValue);
-            }
-        }
-
-        push( @SQLWhere, $Field.' LIKE '.$FieldValue );
     }
     
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {
-        push( @SQLWhere, 'art.customer_visible = 1' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'art_left.customer_visible = 1' );
+            push( @SQLWhere, 'art_right.customer_visible = 1' );
+        } else {
+            push( @SQLWhere, 'art.customer_visible = 1' );
+        }
     }
 
     return {
@@ -250,6 +260,33 @@ sub Sort {
             $AttributeMapping{$Param{Attribute}}
         ],
     };       
+}
+
+sub _prepareField {
+    my ( $Self, %Param ) = @_;
+
+    my $Field = $Param{Field};
+    my $FieldValue = $Param{FieldValue};
+
+    # check if database supports LIKE in large text types (in this case for body)
+    if ( !$Param{IsStaticSearch} && $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+        # lower attributes if we don't do a static search
+        if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+            $Field      = "LCASE($Field)";
+            $FieldValue = "LCASE('$FieldValue')";
+        } else {
+            $Field      = "LOWER($Field)";
+            $FieldValue = "LOWER('$FieldValue')";
+        }
+    } else {
+        $FieldValue = "'$FieldValue'";
+        if ( $Param{IsStaticSearch} ) {
+            # lower search pattern if we use static search
+            $FieldValue = lc($FieldValue);
+        }
+    }
+
+    return ($Field, $FieldValue);
 }
 
 1;

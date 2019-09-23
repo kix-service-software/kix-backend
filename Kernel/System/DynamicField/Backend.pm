@@ -2059,6 +2059,92 @@ sub HasBehavior {
     return $Self->{$DynamicFieldBackend}->HasBehavior(%Param);
 }
 
+=head2 Functions For IsNotificationEventCondition Behavior
+
+The following functions should be only used if the dynamic field has IsNotificationEventCondition
+behavior
+
+=over 4
+
+=cut
+
+=item ObjectMatch()
+
+return if the current field values matches with the value got in an objects attribute structure (
+like the result of a TicketGet() )
+
+    my $Match = $BackendObject->ObjectMatch(
+        DynamicFieldConfig => $DynamicFieldConfig,       # complete config of the DynamicField
+        Value              => $Value,                    # single value to match
+        ObjectAttributes   => $ObjectAttributes,         # the complete set of attributes from an object
+                                                         #      ( i.e. the result of a TicketGet() )
+    );
+
+    Returns:
+
+    $Match                                 # 1 or 0
+
+=cut
+
+sub ObjectMatch {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(DynamicFieldConfig ObjectAttributes)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # check DynamicFieldConfig (general)
+    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "The field configuration is invalid",
+        );
+        return;
+    }
+
+    # check DynamicFieldConfig (internally)
+    for my $Needed (qw(ID FieldType ObjectType)) {
+        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed in DynamicFieldConfig!"
+            );
+            return;
+        }
+    }
+
+    if ( !defined $Param{Value} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need Value!"
+        );
+        return;
+    }
+
+    # do not perform the action if the ObjectAttributes parameter is empty
+    return if !IsHashRefWithData( $Param{ObjectAttributes} );
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    # call ObjectMatch on the specific backend
+    return $Self->{$DynamicFieldBackend}->ObjectMatch(%Param);
+}
 
 =back
 

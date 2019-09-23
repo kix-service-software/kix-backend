@@ -99,7 +99,7 @@ sub Run {
     }
     elsif ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
         %UserData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            User          => $Self->{Authorization}->{UserID},
+            ID            => $Self->{Authorization}->{UserID},
             NoPreferences => 1
         );
     }

@@ -99,16 +99,22 @@ sub ParameterDefinition {
             OneOf               => [
                 'Queue',
                 'From'
-                ]
+            ]
         },
         'MailAccount::Trusted' => {
             RequiresValueIfUsed => 1,
             OneOf               => [
                 0,
                 1
-                ]
+            ]
         },
-        }
+        'MailAccount::ExecFetch' => {
+            RequiresValueIfUsed => 1,
+            OneOf               => [
+                1
+            ]
+        },
+    }
 }
 
 =item Run()
@@ -127,8 +133,8 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
                 ValidID       => 1,                 # optional
                 Trusted       => 0,                 # optional
                 DispatchingBy => 'Queue',           # Queue|From
+                QueueID       => 12,                # optional, requuired if DispatchingBy is "Queue"
                 Comment       => '...',             # optional
-                QueueID       => 12,
             },
         },
     );
@@ -191,6 +197,24 @@ sub Run {
         return $Self->_Error(
             Code => 'Object.UnableToUpdate',
         );
+    }
+
+    if ( $MailAccount->{ExecFetch} ) {
+        my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountFetch(
+            %MailAccountData,
+            UserID => 1,
+        );
+
+        if ( !$Success ) {
+            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+                Type => 'error', 
+                What => 'Message',
+            );
+            return $Self->_Error(
+                Code    => 'Object.ExecFailed',
+                Message => "An error occured during fetch (error: $LogMessage).",
+            );
+        }
     }
 
     # return result

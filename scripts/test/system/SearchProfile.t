@@ -340,7 +340,7 @@ for my $SearchProfileName (@SearchProfileNames) {
     );
 }
 
-my $TestContactLogin = $Helper->TestContactCreate();
+my $TestContactID = $Helper->TestContactCreate();
 my $CustomerBase          = 'CustomerTicketSearch';
 my %CustomerSearches      = (
     First => {
@@ -359,6 +359,10 @@ my %CustomerSearches      = (
 
 );
 
+my %TestContact = $ContactObject->ContactGet(
+    ID => $TestContactID,
+);
+
 for my $SearchProfile ( sort keys %CustomerSearches ) {
     for my $Key ( sort keys %{ $CustomerSearches{$SearchProfile}->{Search} } ) {
         my $AddResult = $SearchProfileObject->SearchProfileAdd(
@@ -366,18 +370,18 @@ for my $SearchProfile ( sort keys %CustomerSearches ) {
             Name      => $SearchProfile,
             Key       => $Key,
             Value     => $CustomerSearches{$SearchProfile}->{Search}->{$Key},
-            UserLogin => $TestContactLogin,
+            UserLogin => $TestContact{Login},
         );
         $Self->True(
             $AddResult,
-            "Adding key '$Key' to searchprofile '$SearchProfile' for '$TestContactLogin'",
+            "Adding key '$Key' to searchprofile '$SearchProfile' for '$TestContact{Login}'",
         );
     }
 }
 
 %SearchProfileList = $SearchProfileObject->SearchProfileList(
     Base      => $CustomerBase,
-    UserLogin => $TestContactLogin,
+    UserLogin => $TestContact{Login},
 );
 $Self->Is(
     scalar keys %SearchProfileList,
@@ -386,24 +390,21 @@ $Self->Is(
 );
 
 # rename customer user
-my %Customer = $ContactObject->ContactGet(
-    User => $TestContactLogin,
-);
 my $NewContactLogin = $Helper->GetRandomID();
-my $Update               = $ContactObject->ContactUpdate(
-    %Customer,
-    ID        => $Customer{UserLogin},
-    UserLogin => $NewContactLogin,
+my $Update          = $ContactObject->ContactUpdate(
+    %TestContact,
+    ID        => $TestContactID,
+    Login     => $NewContactLogin,
     UserID    => 1,
 );
 $Self->True(
     $Update,
-    "ContactUpdate - $Customer{UserLogin} - $NewContactLogin",
+    "ContactUpdate - $TestContact{Login} - $NewContactLogin",
 );
 
 %SearchProfileList = $SearchProfileObject->SearchProfileList(
     Base      => $CustomerBase,
-    UserLogin => $TestContactLogin,
+    UserLogin => $TestContact{Login},
 );
 $Self->Is(
     scalar keys %SearchProfileList,
@@ -424,8 +425,8 @@ $Self->Is(
 # change back customer user login so invalidation at test destruction is ok
 $Update = $ContactObject->ContactUpdate(
     %Customer,
-    ID        => $NewContactLogin,
-    UserLogin => $TestContactLogin,
+    ID        => $TestContactID,
+    UserLogin => $TestContact{Login},
     UserID    => 1,
 );
 
@@ -433,17 +434,17 @@ for my $SearchProfile ( sort keys %CustomerSearches ) {
     my $DeleteSuccess = $SearchProfileObject->SearchProfileDelete(
         Base      => $CustomerBase,
         Name      => $SearchProfile,
-        UserLogin => $TestContactLogin,
+        UserLogin => $TestContact{Login},
     );
     $Self->True(
         $DeleteSuccess,
-        "Deleting searchprofile '$SearchProfile' for '$TestContactLogin'",
+        "Deleting searchprofile '$SearchProfile' for '$TestContact{Login}'",
     );
 }
 
 %SearchProfileList = $SearchProfileObject->SearchProfileList(
     Base      => $CustomerBase,
-    UserLogin => $TestContactLogin,
+    UserLogin => $TestContact{Login},
 );
 $Self->Is(
     scalar keys %SearchProfileList,

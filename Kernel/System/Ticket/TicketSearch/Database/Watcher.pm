@@ -85,22 +85,32 @@ sub Search {
         return;
     }
 
-    my %JoinType = (
-        'AND' => 'INNER',
-        'OR'  => 'FULL OUTER'
-    );
-
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN ticket_watcher tw ON st.id = tw.ticket_id' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, 'LEFT OUTER JOIN ticket_watcher tw_left ON st.id = tw_left.ticket_id' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN ticket_watcher tw_right ON st.id = tw_right.ticket_id' );
+        } else {
+            push( @SQLJoin, 'INNER JOIN ticket_watcher tw ON st.id = tw.ticket_id' );
+        }
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'tw.user_id = '.$Param{Search}->{Value} );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'tw_left.user_id = '.$Param{Search}->{Value} );
+            push( @SQLWhere, 'tw_right.user_id = '.$Param{Search}->{Value} );
+        } else {
+            push( @SQLWhere, 'tw.user_id = '.$Param{Search}->{Value} );
+        }
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'tw.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'tw_left.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+            push( @SQLWhere, 'tw_right.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        } else {
+            push( @SQLWhere, 'tw.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        }
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
