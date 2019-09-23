@@ -193,12 +193,6 @@ sub Run {
             Limit  => 1,
             Valid  => 0
         );
-        my %ContactData;
-        for my $ContactID ( sort keys %Contacts ) {
-            %ContactData = $ContactObject->ContactGet(
-                ID => $ContactID,
-            );
-        }
 
         if (%OrgList) {
             $GetParam{'X-KIX-CustomerNo'} = (keys %OrgList)[0];
