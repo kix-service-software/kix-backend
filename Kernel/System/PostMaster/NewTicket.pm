@@ -181,17 +181,17 @@ sub Run {
         );
     }
 
-    # get customer id (sender email) if there is no customer id given
-    if ( (!$GetParam{'X-KIX-CustomerNo'} && $GetParam{'X-KIX-Contact'}) ) {
+    # get customer id if X-KIX-CustomerNo is given
+    if ( $GetParam{'X-KIX-CustomerNo'} ) {
 
-        # get customer user object
-        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+        # get organisation object
+        my $OrgObject = $Kernel::OM->Get('Kernel::System::Organisation');
 
-        # get customer user data form X-KIX-Contact
-        my %Contacts = $ContactObject->ContactSearch(
-            Search => $GetParam{'X-KIX-Contact'},
-            Limit => 1,
-            Valid => 0
+        # search organisation based on X-KIX-CustomerNo
+        my %OrgList = $OrgObject->OrganisationSearch(
+            Number => $GetParam{'X-KIX-CustomerNo'},
+            Limit  => 1,
+            Valid  => 0
         );
         my %ContactData;
         for my $ContactID ( sort keys %Contacts ) {
@@ -200,8 +200,8 @@ sub Run {
             );
         }
 
-        if (%ContactData) {
-            $GetParam{'X-KIX-CustomerNo'} = $ContactData{UserCustomerID};
+        if (%OrgList) {
+            $GetParam{'X-KIX-CustomerNo'} = (keys %OrgList)[0];
         }
     }
 
@@ -232,22 +232,22 @@ sub Run {
                     Valid            => 0
                 );
 
-                for my $UserID ( sort keys %List ) {
+                if ( %List ) {
                     %ContactData = $ContactObject->ContactGet(
-                        ID => $UserID,
+                        ID => (keys %List)[0],
                     );
                 }
             }
         }
 
         # take PrimaryOrganisationID from contact lookup or from "from" field
-        if ( $ContactData{Login} && !$GetParam{'X-KIX-Contact'} ) {
-            $GetParam{'X-KIX-Contact'} = $ContactData{Login};
+        if ( $ContactData{ID} && !$GetParam{'X-KIX-Contact'} ) {
+            $GetParam{'X-KIX-Contact'} = $ContactData{ID};
 
             # notice that Login is from contact data
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'notice',
-                Message  => "Take Login ($ContactData{Login}) from contact based on ($GetParam{'EmailFrom'}).",
+                Message  => "Take Login ($ContactData{ID}) from contact based on ($GetParam{'EmailFrom'}).",
             );
         }
         if ( $ContactData{PrimaryOrganisationID} && !$GetParam{'X-KIX-CustomerNo'} ) {
@@ -259,6 +259,23 @@ sub Run {
                 Message  => "Take PrimaryOrganisationID ($ContactData{PrimaryOrganisationID})"
                     . " from contact based on ($GetParam{'EmailFrom'}).",
             );
+        }
+    }
+    else {
+        # transform X-KIX-Contact to ID
+        my %ContactData;
+
+        # get contact object
+        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+
+        my %List = $ContactObject->ContactSearch(
+            PostMasterSearch => $GetParam{'X-KIX-Contact'},
+            Limit            => 1,
+            Valid            => 0
+        );
+
+        if ( %List ) {
+            $GetParam{'X-KIX-Contact'} = (keys %List)[0];
         }
     }
 
