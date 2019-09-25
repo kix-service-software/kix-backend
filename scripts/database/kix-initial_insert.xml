@@ -3044,6 +3044,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="f_number" Type="Quote">17006</Data>
         <Data Key="f_subject" Type="Quote">Selected Ticket Features</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241906</Data>
@@ -3071,6 +3072,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="f_number" Type="Quote">17007</Data>
         <Data Key="f_subject" Type="Quote">Neues Ticket</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241907</Data>
@@ -3090,6 +3092,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="f_number" Type="Quote">17008</Data>
         <Data Key="f_subject" Type="Quote">New Ticket</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241908</Data>
