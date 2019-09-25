@@ -215,20 +215,6 @@ sub _TicketUpdate {
 
     my $Ticket = $Param{Ticket};
 
-    # get customer information
-    # with information will be used to create the ticket if customer is not defined in the
-    # database, customer ticket information need to be empty strings
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        ID => $Ticket->{ContactID},
-    );
-
-    my $OrgID = $ContactData{PrimaryOrganisationID} || '';
-
-    # use user defined OrganisationID if defined
-    if ( defined $Ticket->{OrganisationID} && $Ticket->{OrganisationID} ne '' ) {
-        $OrgID = $Ticket->{OrganisationID};
-    }
-
     # get database object
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
@@ -535,9 +521,9 @@ sub _TicketUpdate {
 
         # set values to empty if they are not defined
         $TicketData{ContactID}      = $TicketData{ContactID} || '';
-        $TicketData{OrganisationID} = $TicketData{OrganisationID}     || '';
-        $Ticket->{ContactID}        = $Ticket->{ContactID}   || '';
-        $Ticket->{OrganisationID}   = $Ticket->{OrganisationID}       || '';
+        $TicketData{OrganisationID} = $TicketData{OrganisationID} || '';
+        $Ticket->{ContactID}        = $Ticket->{ContactID} || $TicketData{ContactID} ||'';
+        $Ticket->{OrganisationID}   = $Ticket->{OrganisationID} || $TicketData{OrganisationID} || '';
 
         my $Success;
         if (
@@ -545,15 +531,8 @@ sub _TicketUpdate {
             || $Ticket->{OrganisationID} ne $TicketData{OrganisationID}
             )
         {
-            my $OrgID = $ContactData{PrimaryOrganisationID} || '';
-
-            # use user defined OrganisationID if defined
-            if ( defined $Ticket->{OrganisationID} && $Ticket->{OrganisationID} ne '' ) {
-                $OrgID = $Ticket->{OrganisationID};
-            }
-
             $Success = $TicketObject->TicketCustomerSet(
-                OrganisationID => $OrgID,
+                OrganisationID => $Ticket->{OrganisationID},
                 ContactID      => $Ticket->{ContactID},
                 TicketID       => $Param{TicketID},
                 UserID         => $Param{UserID},

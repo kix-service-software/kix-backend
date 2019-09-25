@@ -91,11 +91,9 @@ sub Run {
             $Self->{ContactObject}
             ->CustomerSearch( UserLogin => $Ticket{$Field}->[0], );
 
-        for my $CurrUserLogin ( keys(%UserListCustomer) ) {
+        for my $CurrUserID ( keys(%UserListCustomer) ) {
 
-            my %ContactData =
-                $Self->{ContactObject}
-                ->ContactGet( User => $CurrUserLogin, );
+            my %ContactData = $Self->{ContactObject}->ContactGet( ID => $CurrUserID, );
 
             # add links to database
             my $Success = $Self->{LinkObject}->LinkAdd(
@@ -108,7 +106,7 @@ sub Run {
             );
 
             $Self->{TicketObject}->HistoryAdd(
-                Name         => 'added involved person ' . $CurrUserLogin,
+                Name         => 'added involved person ' . $UserListCustomer{$CurrUserID},
                 HistoryType  => 'TicketLinkAdd',
                 TicketID     => $Ticket{TicketID},
                 CreateUserID => 1,

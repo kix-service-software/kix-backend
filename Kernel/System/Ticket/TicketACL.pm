@@ -1310,7 +1310,7 @@ sub _GetChecks {
     if ( ( $CheckAll || $RequiredChecks{Contact} ) && $Param{ContactID} ) {
 
         my %Contact = $ContactObject->ContactGet(
-            User => $Param{ContactID},
+            ID => $Param{ContactID},
         );
 
         for my $Type ( @{ $ConfigObject->Get('System::Customer::Permission') } ) {
@@ -1335,7 +1335,7 @@ sub _GetChecks {
 
             # get customer data from the ticket
             my %Contact = $ContactObject->ContactGet(
-                User => $Checks{Ticket}->{ContactID},
+                ID => $Checks{Ticket}->{ContactID},
             );
 
             for my $Type ( @{ $ConfigObject->Get('System::Customer::Permission') } ) {
@@ -1373,7 +1373,7 @@ sub _GetChecks {
         else {
 
             my %Contact = $ContactObject->ContactGet(
-                User => $ChecksDatabase{Ticket}->{ContactID},
+                ID => $ChecksDatabase{Ticket}->{ContactID},
             );
 
             for my $Type ( @{ $ConfigObject->Get('System::Customer::Permission') } ) {

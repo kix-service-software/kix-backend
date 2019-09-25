@@ -85,7 +85,7 @@ sub Run {
     my $DynamicFieldsReverse = { reverse %{$DynamicFields} };
 
     my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-        User => $Ticket{ContactID},
+        ID => $Ticket{ContactID},
     );
 
     # also continue if there was no Contact data found - erase values

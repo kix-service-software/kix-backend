@@ -98,37 +98,37 @@ for my $DynamicFieldConfig (@DynamicFields) {
 }
 
 # create a customer user
-my $TestUserLogin = $Helper->TestContactCreate();
+my $TestContactID = $Helper->TestContactCreate();
 
 # get customer user data
-my %TestUserData = $ContactObject->ContactGet(
-    User => $TestUserLogin,
+my %TestContactData = $ContactObject->ContactGet(
+    ID => $TestContactID,
 );
 
 # set customer Firstname and Lastname
-$TestUserData{UserFirstname} = 'UserFirstName' . $RandomID;
-$TestUserData{UserLastname}  = 'UserLastName' . $RandomID;
+$TestContactData{UserFirstname} = 'UserFirstName' . $RandomID;
+$TestContactData{UserLastname}  = 'UserLastName' . $RandomID;
 
 # update the user manually because First and LastNames are important
 $ContactObject->ContactUpdate(
     %TestUserData,
     Source  => 'Contact',
-    ID      => $TestUserLogin,
+    ID      => $TestContactID,
     ValidID => 1,
     UserID  => 1,
 );
 
 # create a new ticket with the test user information
 my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket Title',
-    Queue        => 'Raw',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'new',
-    CustomerID   => $TestUserData{CustomerID},
-    Contact => $TestUserLogin,
-    OwnerID      => 1,
-    UserID       => 1,
+    Title          => 'Some Ticket Title',
+    Queue          => 'Raw',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'new',
+    OrganisationID => $TestContactData{PrimaryOrganisationID},
+    Contact        => $TestContactID,
+    OwnerID        => 1,
+    UserID         => 1,
 );
 
 # at this point the information should be already stored in the dynamic fields
@@ -151,17 +151,17 @@ for my $DynamicFieldName (@AddedDynamicFieldNames) {
 
 $Self->Is(
     $Ticket{ 'DynamicField_CustomerLogin' . $RandomID },
-    $TestUserLogin,
+    $TestContactData{Login},
     "DynamicField 'CustomerLogin$RandomID' for Ticket ID:'$TicketID' match TestUser Login",
 );
 $Self->Is(
     $Ticket{ 'DynamicField_CustomerFirstname' . $RandomID },
-    $TestUserData{UserFirstname},
+    $TestContactData{UserFirstname},
     "DynamicField 'CustomerFirstname$RandomID' for Ticket ID:'$TicketID' match TestUser Firstname",
 );
 $Self->Is(
     $Ticket{ 'DynamicField_CustomerLastname' . $RandomID },
-    $TestUserData{UserLastname},
+    $TestContactData{UserLastname},
     "DynamicField 'CustomerLastname$RandomID' for Ticket ID:'$TicketID' match TestUser Lastname",
 );
 

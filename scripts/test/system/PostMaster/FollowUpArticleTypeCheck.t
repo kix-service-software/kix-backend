@@ -334,26 +334,26 @@ for my $Test (@Tests) {
 }
 
 # Now add the customer to the customer database and run the tests again.
-my $TestCustomerLogin  = $Helper->TestContactCreate();
+my $TestContactID = $Helper->TestContactCreate();
 my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-my %CustomerData       = $ContactObject->ContactGet(
-    User => $TestCustomerLogin,
+my %ContactData  = $ContactObject->ContactGet(
+    ID => $TestContact{ID},
 );
 $ContactObject->ContactUpdate(
-    %CustomerData,
+    %ContactData,
     Source    => 'Contact',       # Contact source config
-    ID        => $TestCustomerLogin,
+    ID        => $TestContactID,
     UserEmail => $CustomerAddress,
     UserID    => 1,
 );
-%CustomerData = $ContactObject->ContactGet(
-    User => $TestCustomerLogin,
+%ContactData = $ContactObject->ContactGet(
+    ID => $TestContactID,
 );
 $TicketObject->TicketCustomerSet(
-    No       => $CustomerData{CustomerID},
-    User     => $TestCustomerLogin,
-    TicketID => $TicketID,
-    UserID   => 1,
+    OrganisationID => $ContactData{CustomerID},
+    ContactID      => $TestContactID,
+    TicketID       => $TicketID,
+    UserID         => 1,
 );
 
 for my $Test (@Tests) {
