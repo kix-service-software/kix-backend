@@ -232,6 +232,28 @@ $Self->True(
     "TicketCreate() successful for Ticket ID $TicketID",
 );
 
+# create article
+my $ArticleID = $TicketObject->ArticleCreate(
+    TicketID      => $TicketID,
+    Channel       => 'note',
+    SenderType    => 'external',
+    Charset       => 'utf-8',
+    ContentType   => 'text/plain',
+    From          => 'test@example.com',
+    To            => 'test123@example.com',
+    Subject       => 'article subject test',
+    Body          => 'article body test',
+    HistoryType   => 'NewTicket',
+    HistoryComment => '%%',
+    UserID        => $UserID,
+);
+
+# sanity check
+$Self->True(
+    $ArticleID,
+    "ArticleCreate() successful for Article ID $ArticleID",
+);
+
 my $DynamicFieldObject      = $Kernel::OM->Get('Kernel::System::DynamicField');
 my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
 
@@ -844,9 +866,9 @@ my @Tests = (
             Events         => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientEmail => ['test@kixexample.com'],
 
-            # Filter by unchecked checbox dynamic field value. Note that the search value (-1) is
+            # Filter by unchecked checkbox dynamic field value. Note that the search value (-1) is
             #   different than the match value (0). See bug#12257 for more information.
-            'Search_DynamicField_DFT1' . $RandomID => [-1],
+            'Ticket::DynamicField_DFT1' . $RandomID => [0],
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -865,14 +887,160 @@ my @Tests = (
         Success => 1,
     },
     {
+        Name => 'article subject match',
+        Data => {
+            Events             => [ 'ArticleCreate' ],
+            RecipientEmail     => ['test@kixexample.com'],
+            'Article::Subject' => ['subject te'],
+        },
+        Config => {
+            Event => 'ArticleCreate',
+            Data  => {
+                ArticleID => $ArticleID,
+                TicketID  => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                ToArray => [ 'test@kixexample.com' ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'article ChannelID match',
+        Data => {
+            Events             => [ 'ArticleCreate' ],
+            RecipientEmail     => ['test@kixexample.com'],
+            'Article::ChannelID' => [1],
+        },
+        Config => {
+            Event => 'ArticleCreate',
+            Data  => {
+                ArticleID => $ArticleID,
+                TicketID  => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                ToArray => [ 'test@kixexample.com' ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'create article - agent notification',
+        Data => {
+            Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            RecipientAgents    => [$UserID],
+            Channel            => ['note'],
+            CreateArticle      => [1],
+        },
+        Config => {
+            Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
+            Data  => {
+                TicketID => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserData{UserEmail} ],
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'create article - customer notification',
+        Data => {
+            Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            Recipients         => ['Customer'],
+            Channel            => ['note'],
+            CreateArticle      => [1],
+        },
+        Config => {
+            Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
+            Data  => {
+                TicketID => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [$Contact{Email}],
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'create article - agent notification (visible for customer)',
+        Data => {
+            Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            RecipientAgents    => [$UserID],
+            Channel            => ['note'],
+            VisibleForCustomer => [1],
+            CreateArticle      => [1],
+        },
+        Config => {
+            Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
+            Data  => {
+                TicketID => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserData{UserEmail} ],
+            },
+        ],
+        Success => 1,
+    },
+    {
+        Name => 'create article - customer notification (visible for customer)',
+        Data => {
+            Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            Recipients         => ['Customer'],
+            Channel            => ['note'],
+            VisibleForCustomer => [1],
+            CreateArticle      => [1],
+        },
+        Config => {
+            Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
+            Data  => {
+                TicketID => $TicketID,
+            },
+            Config => {},
+            UserID => 1,
+        },
+        ExpectedResults => [
+            {
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [$Contact{Email}],
+            },
+        ],
+        Success => 1,
+    },
+    {
         Name => 'HTML email',
         ContentType => 'text/html',
         Data => {
-            Events          => [ 'TicketCreate' ],
+            Events          => [ 'TicketPriorityUpdate' ],
             RecipientAgents => [$UserID],
         },
         Config => {
-            Event => 'TicketCreate',
+            Event => 'TicketPriorityUpdate',
             Data  => {
                 TicketID => $TicketID,
             },
@@ -1025,6 +1193,12 @@ my $NotificationID;
 TEST:
 for my $Test (@Tests) {
 
+    # save article count of ticket for later use
+    my @ArticleBoxInitial = $TicketObject->ArticleContentIndex(
+        TicketID => $TicketID,
+        UserID   => 1,
+    );
+
     # add transport setting
     $Test->{Data}->{Transports} = ['Email'];
 
@@ -1160,19 +1334,31 @@ for my $Test (@Tests) {
         "$Test->{Name} - Recipients",
     );
 
-    # check if there is an article visible for the customer when sending notification
-    # to customer see bug#11592
-    if ( $Test->{Name} =~ /RecipientCustomer/i ) {
+    # check if there is a new article if one has to be created
+    if ( IsArrayRefWithData($Test->{Data}->{CreateArticle}) && $Test->{Data}->{CreateArticle}->[0] ) {
         my @ArticleBox = $TicketObject->ArticleContentIndex(
-            TicketID        => $TicketID,
-            UserID          => 1,
-            CustomerVisible => 1,
+            TicketID => $TicketID,
+            UserID   => 1,
         );
         $Self->Is(
             scalar @ArticleBox,
-            1,
-            "$Test->{Name} - Channel email created for Customer recipient",
+            (scalar @ArticleBoxInitial) + 1,
+            "$Test->{Name} - article created",
         );
+
+        # check if the new article is customer visible
+        if ( IsArrayRefWithData($Test->{Data}->{VisibleForCustomer}) && $Test->{Data}->{VisibleForCustomer}->[0] ) {
+            $Self->True(
+                ($ArticleBox[-1]->{CustomerVisible} == 1),
+                "$Test->{Name} - article is visible for the customer",
+            );
+        }
+        else {
+            $Self->True(
+                ($ArticleBox[-1]->{CustomerVisible} == 0),
+                "$Test->{Name} - article is not visible for the customer",
+            );
+        }
     }
 }
 continue {

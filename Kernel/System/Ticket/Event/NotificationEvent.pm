@@ -290,7 +290,7 @@ sub Run {
                     $AgentSendNotification = 1;
                 }
 
-                # skip sending the notification if the agent has disable it in its preferences
+                # skip sending the notification if the agent has disabled it in its preferences
                 if (
                     IsArrayRefWithData( $Notification{Data}->{VisibleForAgent} )
                     && $Notification{Data}->{VisibleForAgent}->[0]
@@ -401,41 +401,22 @@ sub _NotificationFilter {
 
     KEY:
     for my $Key ( sort keys %{ $Notification{Data} } ) {
+        # ignore not ticket or article related attributes
+        next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
 
-        # ignore not ticket related attributes
-        next KEY if $Key eq 'Recipients';
-        next KEY if $Key eq 'SkipRecipients';
-        next KEY if $Key eq 'RecipientAgents';
-        next KEY if $Key eq 'RecipientRoles';
-        next KEY if $Key eq 'TransportEmailTemplate';
-        next KEY if $Key eq 'Events';
-        next KEY if $Key eq 'Channel';
-        next KEY if $Key eq 'ArticleSenderTypeID';
-        next KEY if $Key eq 'ArticleSubjectMatch';
-        next KEY if $Key eq 'ArticleBodyMatch';
-        next KEY if $Key eq 'ArticleAttachmentInclude';
-        next KEY if $Key eq 'Transports';
-        next KEY if $Key eq 'OncePerDay';
-        next KEY if $Key eq 'MarkAsSeenForAgents';
-        next KEY if $Key eq 'VisibleForAgent';
-        next KEY if $Key eq 'VisibleForAgentTooltip';
-        next KEY if $Key eq 'VisibleForCustomer';
-        next KEY if $Key eq 'LanguageID';
-        next KEY if $Key eq 'SendOnOutOfOffice';
-        next KEY if $Key eq 'AgentEnabledByDefault';
-        next KEY if $Key eq 'EmailSecuritySettings';
-        next KEY if $Key eq 'EmailSigningCrypting';
-        next KEY if $Key eq 'EmailMissingCryptingKeys';
-        next KEY if $Key eq 'EmailMissingSigningKeys';
-        next KEY if $Key eq 'EmailDefaultSigningKeys';
-        next KEY if $Key eq 'NotificationType';
+        # store extracted attribute name
+        my $Attribute = $2;
 
-        # check recipient fields from transport methods
-        if ( $Key =~ m{\A Recipient}xms ) {
-            next KEY;
+        my %Article;
+        if ( $Param{Data}->{ArticleID} ) {
+            %Article = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
+                ArticleID     => $Param{Data}->{ArticleID},
+                UserID        => $Param{UserID},
+                DynamicFields => 0,
+            );
         }
 
-        # check ticket attributes
+        # ignore anything that isn't ok
         next KEY if !$Notification{Data}->{$Key};
         next KEY if !@{ $Notification{Data}->{$Key} };
         next KEY if !$Notification{Data}->{$Key}->[0];
@@ -446,52 +427,65 @@ sub _NotificationFilter {
 
             next VALUE if !$Value;
 
-            # check if key is a search dynamic field
-            if ( $Key =~ m{\A Search_DynamicField_}xms ) {
+            if ( $Key =~ /^Ticket::/ ) {
+                # check if key is a search dynamic field
+                if ( $Attribute =~ m{\A DynamicField_(.*?)$}xms ) {
 
-                # remove search prefix
-                my $DynamicFieldName = $Key;
+                    # remove search prefix
+                    my $DynamicFieldName = $1;
 
-                $DynamicFieldName =~ s{Search_DynamicField_}{};
+                    # get the dynamic field config for this field
+                    my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
 
-                # get the dynamic field config for this field
-                my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
+                    next VALUE if !$DynamicFieldConfig;
 
-                next VALUE if !$DynamicFieldConfig;
+                    my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Behavior           => 'IsNotificationEventCondition',
+                    );
 
-                my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
-                    DynamicFieldConfig => $DynamicFieldConfig,
-                    Behavior           => 'IsNotificationEventCondition',
-                );
+                    next VALUE if !$IsNotificationEventCondition;
 
-                next VALUE if !$IsNotificationEventCondition;
+                    # Get match value from the dynamic field backend, if applicable (bug#12257).
+                    my $MatchValue;
+                    my $SearchFieldParameter = $DynamicFieldBackendObject->SearchFieldParameterBuild(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Profile            => {
+                            $Key => $Value,
+                        },
+                    );
+                    if ( defined $SearchFieldParameter->{Parameter}->{Equals} ) {
+                        $MatchValue = $SearchFieldParameter->{Parameter}->{Equals};
+                    }
+                    else {
+                        $MatchValue = $Value;
+                    }
 
-                # Get match value from the dynamic field backend, if applicable (bug#12257).
-                my $MatchValue;
-                my $SearchFieldParameter = $DynamicFieldBackendObject->SearchFieldParameterBuild(
-                    DynamicFieldConfig => $DynamicFieldConfig,
-                    Profile            => {
-                        $Key => $Value,
-                    },
-                );
-                if ( defined $SearchFieldParameter->{Parameter}->{Equals} ) {
-                    $MatchValue = $SearchFieldParameter->{Parameter}->{Equals};
+                    $Match = $DynamicFieldBackendObject->ObjectMatch(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Value              => $MatchValue,
+                        ObjectAttributes   => $Param{Ticket},
+                    );
+
+                    last VALUE if $Match;
                 }
                 else {
-                    $MatchValue = $Value;
+
+                    if ( $Param{Ticket}->{$Attribute} && $Value eq $Param{Ticket}->{$Attribute} ) {
+                        $Match = 1;
+                        last VALUE;
+                    }
                 }
-
-                $Match = $DynamicFieldBackendObject->ObjectMatch(
-                    DynamicFieldConfig => $DynamicFieldConfig,
-                    Value              => $MatchValue,
-                    ObjectAttributes   => $Param{Ticket},
-                );
-
-                last VALUE if $Match;
             }
-            else {
+            elsif ( $Key =~ /^Article::/ ) {
+                # only accept relevant events
+                next KEY if $Param{Event} !~ /ArticleCreate|ArticleSend/ || !IsHashRefWithData(\%Article);
 
-                if ( $Param{Ticket}->{$Key} && $Value eq $Param{Ticket}->{$Key} ) {
+                if ( $Article{$Attribute} && $Attribute =~ /(Body|Subject)/ && $Article{$Attribute} =~ /\Q$Value\E/i ) {
+                    $Match = 1;
+                    last VALUE;                    
+                }
+                elsif ( $Article{$Attribute} && $Value eq $Article{$Attribute} ) {
                     $Match = 1;
                     last VALUE;
                 }
@@ -501,79 +495,7 @@ sub _NotificationFilter {
         return if !$Match;
     }
 
-    # match article types only on ArticleCreate or ArticleSend event
-    if (
-        ( ( $Param{Event} eq 'ArticleCreate' ) || ( $Param{Event} eq 'ArticleSend' ) )
-        && $Param{Data}->{ArticleID}
-        )
-    {
-
-        my %Article = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
-            ArticleID     => $Param{Data}->{ArticleID},
-            UserID        => $Param{UserID},
-            DynamicFields => 0,
-        );
-
-        # check channel
-        if ( $Notification{Data}->{ChannelID} ) {
-
-            my $Match = 0;
-            VALUE:
-            for my $Value ( @{ $Notification{Data}->{ChannelID} } ) {
-
-                next VALUE if !$Value;
-
-                if ( $Value == $Article{ChannelID} ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-            }
-
-            return if !$Match;
-        }
-
-        # check article sender type
-        if ( $Notification{Data}->{ArticleSenderTypeID} ) {
-
-            my $Match = 0;
-            VALUE:
-            for my $Value ( @{ $Notification{Data}->{ArticleSenderTypeID} } ) {
-
-                next VALUE if !$Value;
-
-                if ( $Value == $Article{SenderTypeID} ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-            }
-
-            return if !$Match;
-        }
-
-        # check subject & body
-        KEY:
-        for my $Key (qw(Subject Body)) {
-
-            next KEY if !$Notification{Data}->{ 'Article' . $Key . 'Match' };
-
-            my $Match = 0;
-            VALUE:
-            for my $Value ( @{ $Notification{Data}->{ 'Article' . $Key . 'Match' } } ) {
-
-                next VALUE if !$Value;
-
-                if ( $Article{$Key} =~ /\Q$Value\E/i ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-            }
-
-            return if !$Match;
-        }
-    }
-
     return 1;
-
 }
 
 sub _RecipientsGet {
@@ -1059,19 +981,26 @@ sub _SendRecipientNotification {
 
     return if !$Success;
 
-    if (
-        $Param{Recipient}->{Type} eq 'Agent'
-        && $Param{Recipient}->{UserLogin}
-        )
-    {
-
-        # write history
-        $TicketObject->HistoryAdd(
-            TicketID     => $Param{TicketID},
-            HistoryType  => 'SendAgentNotification',
-            Name         => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
-            CreateUserID => $Param{UserID},
-        );
+    # create separate history entries if no article has been created
+    if ( !IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) || !$Param{Notification}->{Data}->{CreateArticle}->[0] ) {
+        if ( $Param{Recipient}->{Type} eq 'Agent'&& $Param{Recipient}->{UserLogin} ) {
+            # write history
+            $TicketObject->HistoryAdd(
+                TicketID     => $Param{TicketID},
+                HistoryType  => 'SendAgentNotification',
+                Name         => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
+                CreateUserID => $Param{UserID},
+            );
+        }
+        elsif ( $Param{Recipient}->{Type} eq 'Customer' && $Param{Recipient}->{Email} ) {        
+            # write history
+            $TicketObject->HistoryAdd(
+                TicketID     => $Param{TicketID},
+                HistoryType  => 'SendCustomerNotification',
+                Name         => "\%\%$Param{Recipient}->{Email}",
+                CreateUserID => $Param{UserID},
+            );
+        }
     }
 
     my %EventData = %{ $TransportObject->GetTransportEventData() };

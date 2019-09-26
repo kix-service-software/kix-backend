@@ -85,11 +85,6 @@ sub Search {
         return;
     }
 
-    my %JoinType = (
-        'AND' => 'INNER',
-        'OR'  => 'FULL OUTER'
-    );
-
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         my $StorageModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule');
@@ -98,11 +93,17 @@ sub Search {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'notice',
                 Message  => "Attachments cannot be searched if articles are not stored in the database!",
-            );            
+            );
             return;
         }
-        push( @SQLJoin, $JoinType{$Param{BoolOperator}}.' JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
-        push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, 'LEFT OUTER JOIN article art_for_att_left ON st.id = art_for_att_left.ticket_id' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN article art_for_att_right ON st.id = art_for_att_right.ticket_id' );
+            push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att_left.id OR att.article_id = art_for_att_right.id' );
+        } else {
+            push( @SQLJoin, 'INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
+            push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
+        }
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }
 
@@ -151,7 +152,12 @@ sub Search {
 
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {
-        push( @SQLWhere, 'art_for_att.customer_visible = 1)' );
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'art_for_att_left.customer_visible = 1)' );
+            push( @SQLWhere, 'art_for_att_right.customer_visible = 1)' );
+        } else {
+            push( @SQLWhere, 'art_for_att.customer_visible = 1)' );
+        }
     }
     
     return {

@@ -228,6 +228,9 @@ sub Run {
         ContactID => 0 + $ContactData{ID}   # force numeric ID
     );   
 }
+
+1;
+
 =back
 
 =head1 TERMS AND CONDITIONS

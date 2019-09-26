@@ -35,6 +35,7 @@ For every Request, two methods are called:
 
 =item L</HandleResponse()>
 
+1;
 
 =back
 

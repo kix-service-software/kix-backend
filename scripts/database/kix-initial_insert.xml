@@ -2390,6 +2390,11 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">11</Data>
+        <Data Key="event_key" Type="Quote">CreateArticle</Data>
+        <Data Key="event_value" Type="Quote">1</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">11</Data>
         <Data Key="event_key" Type="Quote">OncePerDay</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
@@ -2413,7 +2418,7 @@
         <Data Key="notification_id">2</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_CUSTOMER_Subject[64]> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_CUSTOMER_Subject_64> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
@@ -2421,7 +2426,7 @@
         <Data Key="notification_id">3</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_CUSTOMER_Subject[64]> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_CUSTOMER_Subject_64> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received:[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
@@ -2485,7 +2490,7 @@
         <Data Key="notification_id">11</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject[64]>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject_64>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Thank you for your message. We will take care of it as soon as possible.</p><br/><br/><p>Your request is handled under number&nbsp;[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;].</p><br/><br/><p>--&nbsp;</p><br/><br/><p>&nbsp;</p>]]></Data>
     </Insert>
 
@@ -2503,7 +2508,7 @@
         <Data Key="notification_id">2</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject[64]> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject_64> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
@@ -2511,7 +2516,7 @@
         <Data Key="notification_id">3</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject[64]> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject_64> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
@@ -2543,7 +2548,7 @@
         <Data Key="notification_id">7</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject[64]> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject_64> [<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>]]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Ein neuer Artikel wurde angelegt: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
@@ -2575,7 +2580,7 @@
         <Data Key="notification_id">11</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject[64]>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject_64>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Vielen Dank f&uuml;r Ihre Nachricht. Wir werden Ihr Anliegen so schnell wie m&ouml;glich bearbeiten.</p><br/><br/><p>Ihre Anfrage wird unter der Vorgangsnummer&nbsp;[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;] gef&uuml;hrt.</p><br/><br/><p>--&nbsp;</p>]]></Data>
     </Insert>
 
@@ -3039,6 +3044,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="f_number" Type="Quote">17006</Data>
         <Data Key="f_subject" Type="Quote">Selected Ticket Features</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241906</Data>
@@ -3066,6 +3072,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="f_number" Type="Quote">17007</Data>
         <Data Key="f_subject" Type="Quote">Neues Ticket</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241907</Data>
@@ -3085,6 +3092,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="f_number" Type="Quote">17008</Data>
         <Data Key="f_subject" Type="Quote">New Ticket</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241908</Data>

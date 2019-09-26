@@ -404,7 +404,7 @@ my %List               = $ContactObject->CustomerSearch(
 CUSTOMERUSER:
 for my $Contact ( sort keys %List ) {
     my %User = $ContactObject->ContactGet(
-        User => $Contact,
+        ID => $Contact,
     );
     next CUSTOMERUSER if !$User{UserSMIMECertificate};
 

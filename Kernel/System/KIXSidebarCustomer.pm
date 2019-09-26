@@ -49,7 +49,7 @@ sub KIXSidebarCustomerSearch {
 
         for my $ID ( keys %LinkKeyList ) {
             my %Contact = $Self->{ContactObject}->ContactGet(
-                User => $ID,
+                ID => $ID,
             );
 
             if (
@@ -88,7 +88,7 @@ sub KIXSidebarCustomerSearch {
             next ID if ( $Result{ $ID } );
 
             my %Contact = $Self->{ContactObject}->ContactGet(
-                User => $ID,
+                ID => $ID,
             );
 
             if (
