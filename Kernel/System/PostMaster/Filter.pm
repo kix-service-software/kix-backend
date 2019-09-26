@@ -341,7 +341,7 @@ sub FilterUpdate {
 
     # delete existing properties
     return if !$DBObject->Do(
-        SQL  => 'DELETE FROM mail_filter_properties WHERE id = ?',
+        SQL  => 'DELETE FROM mail_filter_properties WHERE filter_id = ?',
         Bind => [ \$Param{ID} ]
     );
 
@@ -390,7 +390,7 @@ sub FilterDelete {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Do(
-        SQL  => 'DELETE FROM mail_filter_properties WHERE id = ?',
+        SQL  => 'DELETE FROM mail_filter_properties WHERE filter_id = ?',
         Bind => [ \$Param{ID} ]
     );
 
@@ -487,7 +487,7 @@ sub FilterGet {
     return if !$Filter{ID};
 
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT type, filter_key, filter_value, negate FROM mail_filter_properties WHERE id = ?',
+        SQL  => 'SELECT type, filter_key, filter_value, negate FROM mail_filter_properties WHERE filter_id = ?',
         Bind => [ \$Filter{ID} ]
     );
 
@@ -518,7 +518,7 @@ sub _addProperties {
         my %Data = %{ $Param{$Type} };
         for my $Key ( sort keys %Data ) {
             return if !$DBObject->Do(
-                SQL => 'INSERT INTO mail_filter_properties (id, type, filter_key, filter_value, negate)'
+                SQL => 'INSERT INTO mail_filter_properties (filter_id, type, filter_key, filter_value, negate)'
                     . ' VALUES (?, ?, ?, ?, ?)',
                 Bind => [ \$Param{FilterID}, \$Type, \$Key, \$Data{$Key}, \$Not{$Key} ]
             );
