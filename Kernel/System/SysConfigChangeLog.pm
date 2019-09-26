@@ -107,6 +107,8 @@ sub new {
     return $Self;
 }
 
+1;
+
 =item Log()
 
 log something. log priorities are 'debug', 'info', 'notice' and 'error'.
@@ -130,7 +132,6 @@ Normal but significant condition; events that are unusual but not error conditio
 =item error
 
 Error conditions. Non-urgent failures, should be relayed to developers or admins, each item must be resolved.
-
 
 =back
 

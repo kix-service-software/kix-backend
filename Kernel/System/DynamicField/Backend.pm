@@ -2146,6 +2146,8 @@ sub ObjectMatch {
     return $Self->{$DynamicFieldBackend}->ObjectMatch(%Param);
 }
 
+1;
+
 =back
 
 =head1 TERMS AND CONDITIONS
