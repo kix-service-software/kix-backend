@@ -60,6 +60,7 @@
 "FAQ Reader";"resource";"/faq";;"x";;;
 "FAQ Reader";"resource";"/faq/*";;;;;
 "FAQ Reader";"resource";"/faq/articles";;"x";;;
+"FAQ Reader";"resource";"/faq/articles/*/votes";"x";"x";"x";"x";
 "FAQ Reader";"resource";"/links";;"x";;;
 "FAQ Editor";"resource";"/system/faq";;"x";;;
 "FAQ Editor";"resource";"/system/faq/*";;;;;
