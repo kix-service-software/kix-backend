@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#Watcher",
+  "type": "object",
+  "description": "The watcher object.",
+  "properties": {
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Object": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The type of the object."
+    },
+    "ObjectID": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The ID of the object."
+    },
+    "UserID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Object",
+    "ObjectID",
+    "UserID"
+  ]
+}

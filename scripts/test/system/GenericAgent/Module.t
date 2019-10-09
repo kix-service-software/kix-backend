@@ -32,7 +32,7 @@ my %Jobs;
 # create a Ticket to test JobRun and JobRunTicket
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Testticket for Untittest of the Generic Agent',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     PriorityID   => 1,
     StateID      => 1,

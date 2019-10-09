@@ -88,10 +88,10 @@ sub Search {
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN ticket_watcher tw_left ON st.id = tw_left.ticket_id' );
-            push( @SQLJoin, 'RIGHT OUTER JOIN ticket_watcher tw_right ON st.id = tw_right.ticket_id' );
+            push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON CAST(st.id AS CHAR) = tw_left.object_id' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN watcher tw_right ON CAST(st.id AS CHAR) = tw_right.object_id' );
         } else {
-            push( @SQLJoin, 'INNER JOIN ticket_watcher tw ON st.id = tw.ticket_id' );
+            push( @SQLJoin, 'INNER JOIN watcher tw ON CAST(st.id AS CHAR) = tw.object_id' );
         }
         $Self->{ModuleData}->{AlreadyJoined} = 1;
     }

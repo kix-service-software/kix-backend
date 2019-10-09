@@ -653,7 +653,7 @@ sub TicketDelete {
 
     # remove ticket watcher
     return if !$DBObject->Do(
-        SQL  => 'DELETE FROM ticket_watcher WHERE ticket_id = ?',
+        SQL  => 'DELETE FROM watcher WHERE object_id = ?',
         Bind => [ \$Param{TicketID} ],
     );
 
@@ -4199,8 +4199,9 @@ sub TicketArchiveFlagSet {
             $ConfigObject->Get('Ticket::ArchiveSystem::RemoveTicketWatchers')
             )
         {
-            $Self->TicketWatchUnsubscribe(
-                TicketID => $Param{TicketID},
+            $Kernel::OM->Get('Kernel::System::Watcher')->WatcherDelete(
+                Object   => 'Ticket',
+                ObjectID => $Param{TicketID},
                 AllUsers => 1,
                 UserID   => $Param{UserID},
             );
@@ -6300,36 +6301,10 @@ sub TicketMerge {
 
     # tranfer watchers - only those that were not already watching the main ticket
     # delete all watchers from the merge ticket that are already watching the main ticket
-    my %MainWatchers = $Self->TicketWatchGet(
-        TicketID => $Param{MainTicketID},
-    );
-
-    my %MergeWatchers = $Self->TicketWatchGet(
-        TicketID => $Param{MergeTicketID},
-    );
-
-    WATCHER:
-    for my $WatcherID ( sort keys %MergeWatchers ) {
-
-        next WATCHER if !$MainWatchers{$WatcherID};
-        return if !$DBObject->Do(
-            SQL => '
-                DELETE FROM ticket_watcher
-                    WHERE user_id = ?
-                    AND ticket_id = ?
-                ',
-            Bind => [ \$WatcherID, \$Param{MergeTicketID} ],
-        );
-    }
-
-    # transfer remaining watchers to new ticket
-    return if !$DBObject->Do(
-        SQL => '
-            UPDATE ticket_watcher
-                SET ticket_id = ?
-                WHERE ticket_id = ?
-            ',
-        Bind => [ \$Param{MainTicketID}, \$Param{MergeTicketID} ],
+    my $MergeSuccess = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherTransfer(
+        Object         => 'Ticket',
+        SourceObjectID => $Param{MergeTicketID},
+        TargetObjectID => $Param{MainTicketID},
     );
 
     # link tickets
@@ -6525,297 +6500,6 @@ sub TicketMergeDynamicFields {
         Event     => 'UPDATE',
         Namespace => 'Ticket',
         ObjectID  => $Param{MergeTicketID},
-    );
-
-    return 1;
-}
-
-=item TicketWatchGet()
-
-to get all user ids and additional attributes of an watched ticket
-
-    my %Watch = $TicketObject->TicketWatchGet(
-        TicketID => 123,
-    );
-
-get list of users to notify
-
-    my %Watch = $TicketObject->TicketWatchGet(
-        TicketID => 123,
-        Notify   => 1,
-    );
-
-get list of users as array
-
-    my @Watch = $TicketObject->TicketWatchGet(
-        TicketID => 123,
-        Result   => 'ARRAY',
-    );
-
-=cut
-
-sub TicketWatchGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need TicketID!"
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # get all attributes of an watched ticket
-    return if !$DBObject->Prepare(
-        SQL => '
-            SELECT user_id, create_time, create_by, change_time, change_by
-            FROM ticket_watcher
-            WHERE ticket_id = ?',
-        Bind => [ \$Param{TicketID} ],
-    );
-
-    # fetch the result
-    my %Data;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Data{ $Row[0] } = {
-            CreateTime => $Row[1],
-            CreateBy   => $Row[2],
-            ChangeTime => $Row[3],
-            ChangeBy   => $Row[4],
-        };
-    }
-
-    if ( $Param{Notify} ) {
-
-        for my $UserID ( sort keys %Data ) {
-
-            # get user object
-            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-
-            my %UserData = $UserObject->GetUserData(
-                UserID => $UserID,
-                Valid  => 1,
-            );
-
-            if ( !$UserData{UserSendWatcherNotification} ) {
-                delete $Data{$UserID};
-            }
-        }
-    }
-
-    # check result
-    if ( $Param{Result} && $Param{Result} eq 'ARRAY' ) {
-
-        my @UserIDs;
-
-        for my $UserID ( sort keys %Data ) {
-            push @UserIDs, $UserID;
-        }
-
-        return @UserIDs;
-    }
-
-    return %Data;
-}
-
-=item TicketWatchSubscribe()
-
-to subscribe a ticket to watch it
-
-    my $Success = $TicketObject->TicketWatchSubscribe(
-        TicketID    => 111,
-        WatchUserID => 123,
-        UserID      => 123,
-    );
-
-Events:
-    TicketSubscribe
-
-=cut
-
-sub TicketWatchSubscribe {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID WatchUserID UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
-
-    # db access
-    return if !$DBObject->Do(
-        SQL => '
-            DELETE FROM ticket_watcher
-            WHERE ticket_id = ?
-                AND user_id = ?',
-        Bind => [ \$Param{TicketID}, \$Param{WatchUserID} ],
-    );
-    return if !$DBObject->Do(
-        SQL => '
-            INSERT INTO ticket_watcher (ticket_id, user_id, create_time, create_by, change_time, change_by)
-            VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
-        Bind => [ \$Param{TicketID}, \$Param{WatchUserID}, \$Param{UserID}, \$Param{UserID} ],
-    );
-
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-    # get user data
-    my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-        UserID => $Param{WatchUserID},
-    );
-
-    # add history
-    $Self->HistoryAdd(
-        TicketID     => $Param{TicketID},
-        CreateUserID => $Param{UserID},
-        HistoryType  => 'Subscribe',
-        Name         => "\%\%$User{UserFirstname} $User{UserLastname} ($User{UserLogin})",
-    );
-
-    # trigger event
-    $Self->EventHandler(
-        Event => 'TicketSubscribe',
-        Data  => {
-            TicketID => $Param{TicketID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
-        Namespace => 'Ticket.Watcher',
-        ObjectID  => $Param{TicketID}.'::'.$Param{WatchUserID},
-    );
-
-    return 1;
-}
-
-=item TicketWatchUnsubscribe()
-
-to remove a subscribtion of a ticket
-
-    my $Success = $TicketObject->TicketWatchUnsubscribe(
-        TicketID    => 111,
-        WatchUserID => 123,
-        UserID      => 123,
-    );
-
-Events:
-    TicketUnsubscribe
-
-=cut
-
-sub TicketWatchUnsubscribe {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # only one of these parameters is needed
-    if ( !$Param{WatchUserID} && !$Param{AllUsers} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need WatchUserID or AllUsers param!"
-        );
-        return;
-    }
-
-    # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-
-    if ( $Param{AllUsers} ) {
-        my @WatchUsers = $Self->TicketWatchGet(
-            TicketID => $Param{TicketID},
-            Result   => 'ARRAY',
-        );
-
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-            SQL  => 'DELETE FROM ticket_watcher WHERE ticket_id = ?',
-            Bind => [ \$Param{TicketID} ],
-        );
-
-        # clear ticket cache
-        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-        for my $WatchUser (@WatchUsers) {
-
-            my %User = $UserObject->GetUserData(
-                UserID => $WatchUser,
-            );
-
-            $Self->HistoryAdd(
-                TicketID     => $Param{TicketID},
-                CreateUserID => $Param{UserID},
-                HistoryType  => 'Unsubscribe',
-                Name         => "\%\%$User{UserFirstname} $User{UserLastname} ($User{UserLogin})",
-            );
-
-            $Self->EventHandler(
-                Event => 'TicketUnsubscribe',
-                Data  => {
-                    TicketID => $Param{TicketID},
-                },
-                UserID => $Param{UserID},
-            );
-        }
-
-    }
-    else {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-            SQL  => 'DELETE FROM ticket_watcher WHERE ticket_id = ? AND user_id = ?',
-            Bind => [ \$Param{TicketID}, \$Param{WatchUserID} ],
-        );
-
-        # clear ticket cache
-        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-        my %User = $UserObject->GetUserData(
-            UserID => $Param{WatchUserID},
-        );
-
-        $Self->HistoryAdd(
-            TicketID     => $Param{TicketID},
-            CreateUserID => $Param{UserID},
-            HistoryType  => 'Unsubscribe',
-            Name         => "\%\%$User{UserFirstname} $User{UserLastname} ($User{UserLogin})",
-        );
-
-        $Self->EventHandler(
-            Event => 'TicketUnsubscribe',
-            Data  => {
-                TicketID => $Param{TicketID},
-            },
-            UserID => $Param{UserID},
-        );
-    }
-
-    # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event     => 'DELETE',
-        Namespace => 'Ticket.Watcher',
-        ObjectID  => $Param{TicketID}.'::'.$Param{WatchUserID},
     );
 
     return 1;

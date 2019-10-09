@@ -724,34 +724,6 @@
     </ForeignKey>
 </Table>
 
-<!-- ticket_watcher -->
-<Table Name="ticket_watcher">
-    <Column Name="ticket_id" Required="true" Type="BIGINT"/>
-    <Column Name="user_id" Required="true" Type="INTEGER"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique>
-        <UniqueColumn Name="ticket_id"/>
-        <UniqueColumn Name="user_id"/>
-    </Unique>
-    <Index Name="ticket_watcher_ticket_id">
-        <IndexColumn Name="ticket_id"/>
-    </Index>
-    <Index Name="ticket_watcher_user_id">
-        <IndexColumn Name="user_id"/>
-    </Index>
-    <ForeignKey ForeignTable="ticket">
-        <Reference Local="ticket_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="user_id" Foreign="id"/>
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- ticket_index -->
 <Table Name="ticket_index">
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
@@ -795,6 +767,36 @@
     <Index Name="ticket_loop_protection_sent_date">
         <IndexColumn Name="sent_date"/>
     </Index>
+</Table>
+
+
+<!-- watcher -->
+<Table Name="watcher">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+    <Column Name="object" Required="true" Size="50" Type="VARCHAR"/>
+    <Column Name="object_id" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="user_id" Required="true" Type="INTEGER"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique>
+        <UniqueColumn Name="object"/>
+        <UniqueColumn Name="object_id"/>
+        <UniqueColumn Name="user_id"/>
+    </Unique>
+    <Index Name="watcher_object">
+        <IndexColumn Name="object"/>
+        <IndexColumn Name="object_id"/>
+    </Index>
+    <Index Name="watcher_user_id">
+        <IndexColumn Name="user_id"/>
+    </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="user_id" Foreign="id"/>
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
 </Table>
 
 <!-- channel - all channels to "send" articles -->

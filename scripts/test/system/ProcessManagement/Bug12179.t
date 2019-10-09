@@ -173,7 +173,7 @@ my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
 # Create tickets.
 my %TicketTemplate = (
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'open',

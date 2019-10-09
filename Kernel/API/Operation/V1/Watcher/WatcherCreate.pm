@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::Ticket::WatcherCreate;
+package Kernel::API::Operation::V1::Watcher::WatcherCreate;
 
 use strict;
 use warnings;
@@ -14,14 +14,14 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
-    Kernel::API::Operation::V1::Ticket::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::WatcherCreate - API WatcherCreate Operation backend
+Kernel::API::Operation::V1::Watcher::WatcherCreate - API WatcherCreate Operation backend
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,10 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TicketID' => {
+        'Watcher::Object' => {
+            Required => 1
+        },
+        'Watcher::ObjectID' => {
             Required => 1
         },
         'Watcher::UserID' => {
@@ -96,9 +99,10 @@ perform WatcherCreate Operation. This will return the created WatcherItemID
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID  => 123,                                  # required
-            Watcher => {                                       # required
-                UserID => 123,                                 # required
+            Watcher => {                                     # required
+                Object   => 'Ticket',                        # required
+                ObjectID => 123,                             # required
+                UserID   => 123,                             # required
             },
         },
     );
@@ -123,9 +127,11 @@ sub Run {
     );
 
     # check if Watcher exists
-    my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
-        TicketID => $Param{Data}->{TicketID},
+    my @WatcherList = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherList(
+        Object   => $Watcher->{Object},
+        ObjectID => $Watcher->{ObjectID},
     );
+    my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
     
     if ( $Watchers{$Watcher->{UserID}} ) {
         return $Self->_Error(
@@ -134,13 +140,14 @@ sub Run {
         );
     }
     
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchSubscribe(
-        TicketID    => $Param{Data}->{TicketID},
+    my $WatcherID = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherAdd(
+        Object      => $Watcher->{Object},
+        ObjectID    => $Watcher->{ObjectID},
         WatchUserID => $Watcher->{UserID},
         UserID      => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$Success ) {
+    if ( !$WatcherID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create Watcher, please contact the system administrator',
@@ -149,7 +156,7 @@ sub Run {
 
     return $Self->_Success(
         Code      => 'Object.Created',
-        WatcherID => $Watcher->{UserID},
+        WatcherID => $WatcherID,
     );
 }
 

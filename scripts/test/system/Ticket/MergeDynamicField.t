@@ -51,7 +51,7 @@ for my $DynamicField (@DynamicFields) {
 
 my $MainTicketID = $TicketObject->TicketCreate(
     Title        => 'Main Ticket',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     CustomerNo   => '123456',
@@ -74,7 +74,7 @@ $Self->True( $Success, 'Set dynamic field on main ticket' );
 
 my $MergeTicketID = $TicketObject->TicketCreate(
     Title        => 'Merge Ticket',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     CustomerNo   => '123456',

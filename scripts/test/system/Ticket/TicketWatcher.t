@@ -16,6 +16,7 @@ use vars (qw($Self));
 
 # get needed objects
 my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $WatcherObject = $Kernel::OM->Get('Kernel::System::Watcher');
 my $UserObject   = $Kernel::OM->Get('Kernel::System::User');
 
 # get helper object
@@ -42,12 +43,12 @@ for ( 1 .. 2 ) {
     # create a new ticket
     my $TicketID = $TicketObject->TicketCreate(
         Title        => 'My ticket for watching',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',
-        Contact => 'customer@example.com',
-        CustomerID   => 'example.com',
+        ContactID    => 'customer@example.com',
+        OrgansationID => 'example.com',
         OwnerID      => 1,
         UserID       => 1,
     );
@@ -59,80 +60,89 @@ for ( 1 .. 2 ) {
     push @TicketIDs, $TicketID;
 }
 
-my $Subscribe = $TicketObject->TicketWatchSubscribe(
-    TicketID    => $TicketIDs[0],
+my $Subscribe = $WatcherObject->WatcherAdd(
+    Object      => 'Ticket',
+    ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[0],
     UserID      => 1,
 );
 $Self->True(
     $Subscribe || 0,
-    'TicketWatchSubscribe()',
+    'WatcherAdd()',
 );
-my $Unsubscribe = $TicketObject->TicketWatchUnsubscribe(
-    TicketID    => $TicketIDs[0],
+my $Unsubscribe = $WatcherObject->WatcherDelete(
+    Object      => 'Ticket',
+    ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[0],
     UserID      => 1,
 );
 $Self->True(
     $Unsubscribe || 0,
-    'TicketWatchUnsubscribe()',
+    'WatcherDelete()',
 );
 
 # add new subscription (will be deleted by TicketDelete(), also check foreign keys)
-$Subscribe = $TicketObject->TicketWatchSubscribe(
-    TicketID    => $TicketIDs[0],
+$Subscribe = $WatcherObject->WatcherAdd(
+    Object      => 'Ticket',
+    ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[0],
     UserID      => 1,
 );
 $Self->True(
     $Subscribe || 0,
-    'TicketWatchSubscribe()',
+    'WatcherAdd()',
 );
 
 # subscribe first ticket with second user
-$Subscribe = $TicketObject->TicketWatchSubscribe(
-    TicketID    => $TicketIDs[0],
+$Subscribe = $WatcherObject->WatcherAdd(
+    Object      => 'Ticket',
+    ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[1],
     UserID      => 1,
 );
 $Self->True(
     $Subscribe || 0,
-    'TicketWatchSubscribe()',
+    'WatcherAdd()',
 );
 
 # subscribe second ticket with second user
-$Subscribe = $TicketObject->TicketWatchSubscribe(
-    TicketID    => $TicketIDs[1],
+$Subscribe = $WatcherObject->WatcherAdd(
+    Object      => 'Ticket',
+    ObjectID    => $TicketIDs[1],
     WatchUserID => $TestUserIDs[1],
     UserID      => 1,
 );
 $Self->True(
     $Subscribe || 0,
-    'TicketWatchSubscribe()',
+    'WatcherAdd()',
 );
 
-my %Watch = $TicketObject->TicketWatchGet(
-    TicketID => $TicketIDs[0],
+my @WatcherList = $WatcherObject->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[0],
+);
+my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->True(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList - first user',
 );
 $Self->True(
-    $Watch{ $TestUserIDs[0] } || 0,
-    'TicketWatchGet - first user',
-);
-$Self->True(
-    $Watch{ $TestUserIDs[1] },
-    'TicketWatchGet - second user',
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList - second user',
 );
 
-%Watch = $TicketObject->TicketWatchGet(
-    TicketID => $TicketIDs[1],
+@WatcherList = $WatcherObject->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[1],
 );
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
 $Self->False(
-    $Watch{ $TestUserIDs[0] } || 0,
-    'TicketWatchGet - first user',
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList - first user',
 );
 $Self->True(
-    $Watch{ $TestUserIDs[1] },
-    'TicketWatchGet - second user',
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList - second user',
 );
 
 # merge tickets
@@ -147,28 +157,32 @@ $Self->True(
     'TicketMerge',
 );
 
-%Watch = $TicketObject->TicketWatchGet(
-    TicketID => $TicketIDs[0],
+@WatcherList = $WatcherObject->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[0],
+);
+my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->True(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList - first user',
 );
 $Self->True(
-    $Watch{ $TestUserIDs[0] } || 0,
-    'TicketWatchGet - first user',
-);
-$Self->True(
-    $Watch{ $TestUserIDs[1] } || 0,
-    'TicketWatchGet - second user',
+    $Watchers{ $TestUserIDs[1] } || 0,
+    'WatcherList - second user',
 );
 
-%Watch = $TicketObject->TicketWatchGet(
-    TicketID => $TicketIDs[1],
+@WatcherList = $WatcherObject->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[1],
+);
+my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->False(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList - first user',
 );
 $Self->False(
-    $Watch{ $TestUserIDs[0] } || 0,
-    'TicketWatchGet - first user',
-);
-$Self->False(
-    $Watch{ $TestUserIDs[1] } || 0,
-    'TicketWatchGet - second user',
+    $Watchers{ $TestUserIDs[1] } || 0,
+    'WatcherList - second user',
 );
 
 # cleanup is done by RestoreDatabase.

@@ -46,7 +46,7 @@ for my $TicketID (@TicketIDs) {
 # setup the environment
 my %TicketConfig = (
     Title        => 'UnitTestSafeToDelete',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     PriorityID   => 3,
     State        => 'new',

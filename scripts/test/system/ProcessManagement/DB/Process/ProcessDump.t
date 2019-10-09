@@ -221,7 +221,7 @@ my $TransitionActionID = $TransitionActionObject->TransitionActionAdd(
     Config   => {
         Module => 'Kernel::System::Process::Transition::Action::QueueMove',
         Config => {
-            TargetQueue => 'Raw',
+            TargetQueue => 'Junk',
             NewOwner    => 'root@localhost',
         },
     },
