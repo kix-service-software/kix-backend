@@ -373,6 +373,17 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "Ticket Reader": permission CRUD_ on /tickets/*/articles/*/flags -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">4</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*/flags</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Ticket Reader": permission _R___ on /system/services -->
     <Insert Table="role_permission">
         <Data Key="role_id">4</Data>
