@@ -1940,6 +1940,8 @@ sub _ApplyExpand {
             foreach my $AttributeToExpand ( keys %{ $Self->{Expand} } ) {
                 next if !$GenericExpands->{ $Object . '.' . $AttributeToExpand } && !$GenericExpands->{$AttributeToExpand};
 
+                $Self->_Debug( $Self->{LevelIndent}, "GenericExpand: $AttributeToExpand" );
+
                 my @ItemList;
                 if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
                     @ItemList = @{ $Param{Data}->{$Object} };
@@ -2011,6 +2013,9 @@ sub _ExpandObject {
         }
     }
 
+use Data::Dumper;
+$Data::Dumper::Indent=2;
+print STDERR Dumper($Param{Data});
     my @Data;
     if ( IsArrayRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
         @Data = @{ $Param{Data}->{ $Param{AttributeToExpand} } };
