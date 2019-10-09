@@ -368,7 +368,7 @@ for my $Test (@Tests) {
     # create a ticket for test DynamicField Value
     my $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket Title',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'new',

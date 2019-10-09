@@ -110,7 +110,7 @@ my $JobCounter1 = keys %Jobs;
 # Create a Ticket to test JobRun and JobRunTicket
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Test ticket for Untittest of the Generic Agent',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     PriorityID   => 1,
     StateID      => 1,

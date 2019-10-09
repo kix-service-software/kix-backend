@@ -37,7 +37,7 @@ $Helper->FixedTimeSet();
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',
@@ -62,7 +62,7 @@ $Self->Is(
 );
 $Self->Is(
     $Ticket{Queue},
-    'Raw',
+    'Junk',
     'TicketGet() (Queue)',
 );
 $Self->Is(
@@ -138,7 +138,7 @@ my $TestUserID = $UserObject->UserLookup(
 
 my $TicketIDCreatedBy = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',
@@ -778,7 +778,7 @@ $TicketObject->MoveTicket(
 );
 
 $TicketObject->MoveTicket(
-    Queue              => 'Raw',
+    Queue              => 'Junk',
     TicketID           => $TicketID,
     SendNoNotification => 1,
     UserID             => 1,
@@ -1544,7 +1544,7 @@ my @MoveQueueList = $TicketObject->MoveQueueList(
 
 $Self->Is(
     $MoveQueueList[0],
-    'Raw',
+    'Junk',
     'MoveQueueList() (Raw)',
 );
 $Self->Is(
@@ -1648,7 +1648,7 @@ if ( $TicketStatus{$TicketID} ) {
     );
     $Self->Is(
         $TicketHistory{CreateQueue},
-        'Raw',
+        'Junk',
         "HistoryTicketStatusGet() (CreateQueue)",
     );
     $Self->Is(
@@ -1704,7 +1704,7 @@ my $OrganisationID = 'OrganisationID' . $Helper->GetRandomID();
 # ticket search sort/order test
 my $TicketIDSortOrder1 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
@@ -1724,7 +1724,7 @@ $Helper->FixedTimeAddSeconds(2);
 
 my $TicketIDSortOrder2 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests2',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
@@ -1756,7 +1756,7 @@ $Self->IsNot(
 );
 
 # find newest ticket by priority, age
-my $QueueID = $QueueObject->QueueLookup( Queue => 'Raw' );
+my $QueueID = $QueueObject->QueueLookup( Queue => 'Junk' );
 my @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
@@ -1937,7 +1937,7 @@ $Self->Is(
 
 my $TicketIDSortOrder3 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests2',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '4 high',
     State        => 'new',
@@ -1952,7 +1952,7 @@ $Helper->FixedTimeAddSeconds(2);
 
 my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests2',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '4 high',
     State        => 'new',
@@ -2210,7 +2210,7 @@ for my $StateTypeID ( sort keys %StateTypeList ) {
 # to be sure that you have a result ticket create one
 $TicketID = $TicketObject->TicketCreate(
     Title        => 'StateTypeTest',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',

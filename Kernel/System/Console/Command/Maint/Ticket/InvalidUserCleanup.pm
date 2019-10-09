@@ -172,7 +172,7 @@ sub Run {
             SQL => "
                 SELECT DISTINCT(ticket.id)
                 FROM ticket
-                    INNER JOIN ticket_watcher ON ticket.id = ticket_watcher.ticket_id",
+                    INNER JOIN watcher ON ticket.id = watcher.object_id",
             Limit => 1_000_000,
         );
 

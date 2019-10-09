@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#WatcherPostRequest",
+  "type": "object",
+  "description": "The watcher request object for creation.",
+  "properties": {
+    "Watcher": {
+      "type": "object",
+      "properties": {
+        "Object": {
+          "type": "string",
+          "description": "The type of the object."
+        },
+        "ObjectID": {
+          "type": "string",
+          "description": "The ID of the object."
+        },
+        "UserID": {
+          "type": "integer",
+          "description": "The ID of the watching user."
+        }
+      },
+      "required": [
+        "Object",
+        "ObjectID",
+        "UserID"
+      ]
+    }
+  },
+  "required": [
+    "Watcher"
+  ]
+}

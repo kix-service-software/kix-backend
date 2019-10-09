@@ -1,0 +1,9 @@
+  displayName: Watchers
+  description: !include ../../../descriptions/resources/watchers.md
+  type: { collection-nopatch: { typeName: Watcher } }
+  /{watcherId}:
+    type: { item-deleteonly: { typeName: Watcher } }
+    uriParameters:
+      watcherId:
+        displayName: WatcherID
+        type: integer

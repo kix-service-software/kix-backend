@@ -312,7 +312,7 @@ my %TestACLs = (
         },
         Possible => {
             Ticket => {
-                Queue => ['Raw'],
+                Queue => ['Junk'],
             },
         },
     },
@@ -336,7 +336,7 @@ my %TestACLs = (
         },
         Possible => {
             Ticket => {
-                Queue => ['Raw'],
+                Queue => ['Junk'],
             },
         },
     },
@@ -360,7 +360,7 @@ my %TestACLs = (
         },
         PossibleNot => {
             Ticket => {
-                Queue => ['Raw'],
+                Queue => ['Junk'],
             },
         },
     },
@@ -495,7 +495,7 @@ my @Tests = (
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'State',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 0,
@@ -626,7 +626,7 @@ my @Tests = (
         Name   => 'ACL Type-1 - correct Type',
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -638,14 +638,14 @@ my @Tests = (
         },
         SuccessMatch => 1,
         ReturnData   => {
-            1 => 'Raw',
+            1 => 'Junk',
         },
     },
     {
         Name   => 'ACL Type-1 - correct TypeID',
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -657,7 +657,7 @@ my @Tests = (
         },
         SuccessMatch => 1,
         ReturnData   => {
-            1 => 'Raw',
+            1 => 'Junk',
         },
     },
     {
@@ -680,7 +680,7 @@ my @Tests = (
         Name   => 'ACL Priority-1 - correct Priority',
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -692,14 +692,14 @@ my @Tests = (
         },
         SuccessMatch => 1,
         ReturnData   => {
-            1 => 'Raw',
+            1 => 'Junk',
         },
     },
     {
         Name   => 'ACL Priority-1 - correct PriorityID',
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -711,7 +711,7 @@ my @Tests = (
         },
         SuccessMatch => 1,
         ReturnData   => {
-            1 => 'Raw',
+            1 => 'Junk',
         },
     },
     {
@@ -756,7 +756,7 @@ my @Tests = (
         Name   => 'ACL State-1 - correct State',
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -777,7 +777,7 @@ my @Tests = (
         Name   => 'ACL State-1 - correct StateID',
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1300,14 +1300,14 @@ $Self->True(
                 },
                 Possible => {
                     Ticket => {
-                        Queue => ['Raw'],
+                        Queue => ['Junk'],
                     },
                 },
             },
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1339,7 +1339,7 @@ $Self->True(
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1371,14 +1371,14 @@ $Self->True(
                 },
                 Possible => {
                     Ticket => {
-                        Queue => ['Raw'],
+                        Queue => ['Junk'],
                     },
                 },
             },
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1408,14 +1408,14 @@ $Self->True(
                 },
                 Possible => {
                     Ticket => {
-                        Queue => ['Raw'],
+                        Queue => ['Junk'],
                     },
                 },
             },
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1428,7 +1428,7 @@ $Self->True(
         },
         SuccessMatch => 1,
         ReturnData   => {
-            1 => 'Raw',
+            1 => 'Junk',
         },
     },
 
@@ -1858,14 +1858,14 @@ $Self->True(
                 },
                 PossibleNot => {
                     Ticket => {
-                        Queue => ['Raw'],
+                        Queue => ['Junk'],
                     },
                 },
             },
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1897,7 +1897,7 @@ $Self->True(
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1910,7 +1910,7 @@ $Self->True(
         },
         SuccessMatch => 1,
         ReturnData   => {
-            1 => 'Raw',
+            1 => 'Junk',
             2 => 'PostMaster',
             4 => 'Misc',
         },
@@ -1931,14 +1931,14 @@ $Self->True(
                 },
                 PossibleNot => {
                     Ticket => {
-                        Queue => ['Raw'],
+                        Queue => ['Junk'],
                     },
                 },
             },
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -1969,14 +1969,14 @@ $Self->True(
                 },
                 PossibleNot => {
                     Ticket => {
-                        Queue => ['Raw'],
+                        Queue => ['Junk'],
                     },
                 },
             },
         },
         Config => {
             Data => {
-                1 => 'Raw',
+                1 => 'Junk',
                 2 => 'PostMaster',
                 3 => 'Junk',
                 4 => 'Misc',
@@ -2983,7 +2983,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 0,
@@ -3087,7 +3087,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 0,
@@ -3191,7 +3191,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 0,
@@ -3240,7 +3240,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 Possible => {
@@ -3252,7 +3252,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority2' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleNot => {
@@ -3272,7 +3272,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 1,
@@ -3287,7 +3287,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 Possible => {
@@ -3312,7 +3312,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 1,
@@ -3327,7 +3327,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority2' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleNot => {
@@ -3347,7 +3347,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 1,
@@ -3494,7 +3494,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority1' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleNot => {
@@ -3506,7 +3506,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority2' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleAdd => {
@@ -3526,7 +3526,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 1,
@@ -3543,7 +3543,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority1' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleNot => {
@@ -3555,7 +3555,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority2' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 Possible => {
@@ -3575,7 +3575,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 1,
@@ -3591,7 +3591,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority1' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 Possible => {
@@ -3603,7 +3603,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority2' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleAdd => {
@@ -3615,7 +3615,7 @@ $ExecuteTests->( Tests => \@Tests );
             'Queue-Possible-Priority3' => {
                 Properties => {
                     Queue => {
-                        Name => ['Raw'],
+                        Name => ['Junk'],
                     },
                 },
                 PossibleNot => {
@@ -3635,7 +3635,7 @@ $ExecuteTests->( Tests => \@Tests );
             },
             ReturnType    => 'Ticket',
             ReturnSubType => 'Priority',
-            Queue         => 'Raw',
+            Queue         => 'Junk',
             UserID        => $UserID,
         },
         SuccessMatch => 1,

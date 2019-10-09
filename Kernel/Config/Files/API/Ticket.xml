@@ -336,51 +336,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherGet" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketWatcherResponse</Item>
-                <Item Key="CacheType">API_tickets</Item>
-                <Item Key="CacheTypeDependency">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherSearch" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherSearch</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketWatcherCollectionResponse</Item>
-                <Item Key="CacheType">API_tickets</Item>
-                <Item Key="CacheTypeDependency">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherCreate" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherCreate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketWatcherPostRequest</Item>
-                <Item Key="ResponseObject">TicketWatcherPostResponse</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherDelete" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherDelete</Item>
-                <Item Key="APIVersion">V1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     
     <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentZipGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>

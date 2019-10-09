@@ -1,0 +1,28 @@
+{
+    "Watcher": [
+        {
+            "CreateBy": 1,
+            "CreateTime": "2009-01-20 09:27:53",
+            "ID": 1,
+            "Object": "Ticket",
+            "ObjectID": "180",
+            "UserID": 99
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2009-01-20 10:43:17",
+            "ID": 2,
+            "Object": "Ticket",
+            "ObjectID": "180",
+            "UserID": 7
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2011-01-20 09:28:32",
+            "ID": 3,
+            "Object": "Ticket",
+            "ObjectID": "181",
+            "UserID": 99
+        }
+    ]
+}

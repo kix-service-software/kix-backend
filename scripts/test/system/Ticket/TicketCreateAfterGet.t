@@ -37,7 +37,7 @@ $Helper->FixedTimeSet();
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',
@@ -70,7 +70,7 @@ my $TestUserID = $UserObject->UserLookup(
 
 my $TicketIDCreatedBy = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',

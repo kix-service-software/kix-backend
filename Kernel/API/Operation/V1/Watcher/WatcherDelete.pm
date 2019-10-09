@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::Ticket::WatcherDelete;
+package Kernel::API::Operation::V1::Watcher::WatcherDelete;
 
 use strict;
 use warnings;
@@ -14,14 +14,14 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 use base qw(
-    Kernel::API::Operation::V1::Ticket::Common
+    Kernel::API::Operation::V1::Common
 );
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::WatcherDelete - API WatcherDelete Operation backend
+Kernel::API::Operation::V1::Watcher::WatcherDelete - API WatcherDelete Operation backend
 
 =head1 SYNOPSIS
 
@@ -81,10 +81,6 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'TicketID' => {
-            DataType => 'NUMERIC',
-            Required => 1
-        },
         'WatcherID' => {
             DataType => 'NUMERIC',
             Required => 1
@@ -94,12 +90,11 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform WatcherDelete Operation. This will return the deleted WatcherUserID.
+perform WatcherDelete Operation. This will return nothing.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID    => 123,                                  # required
-            WatcherID   => 1                                     # required
+            WatcherID => 1                                     # required
         },
     );
 
@@ -113,21 +108,19 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if Watcher exists
-    my %Watchers = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
-        TicketID => $Param{Data}->{TicketID},
+    my %WatcherData = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherGet(
+        ID => $Param{Data}->{WatcherID}
     );
     
-    if ( !$Watchers{$Param{Data}->{WatcherID}} ) {
+    if ( !%WatcherData ) {
         return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Watcher $Param{Data}->{WatcherID} not found in ticket $Param{Data}->{TicketID}",
+            Code => 'Object.NotFound',
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchUnsubscribe(
-        TicketID    => $Param{Data}->{TicketID},
-        WatchUserID => $Param{Data}->{WatcherID},
-        UserID   	=> $Self->{Authorization}->{UserID},
+    my $Success = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherDelete(
+        ID     => $Param{Data}->{WatcherID},
+        UserID => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {

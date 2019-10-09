@@ -42,7 +42,7 @@ my $TestUserID = $UserObject->UserLookup(
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'lock',
     Priority     => '3 normal',
     State        => 'closed',

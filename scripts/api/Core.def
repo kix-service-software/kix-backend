@@ -264,7 +264,6 @@
 /tickets/:TicketID/history                                                     |   GET             | V1::Ticket::HistorySearch
 /tickets/:TicketID/history/:HistoryID                                          |   GET             | V1::Ticket::HistoryGet
 /tickets/:TicketID                                                             |   PATCH           | V1::Ticket::TicketUpdate
-/tickets/:TicketID/watchers                                                    |   GET             | V1::Ticket::WatcherSearch
-/tickets/:TicketID/watchers                                                    |   POST            | V1::Ticket::WatcherCreate
-/tickets/:TicketID/watchers/:WatcherID                                         |   DELETE          | V1::Ticket::WatcherDelete
-/tickets/:TicketID/watchers/:WatcherID                                         |   GET             | V1::Ticket::WatcherGet
+/watchers                                                                      |   GET             | V1::Watcher::WatcherSearch
+/watchers                                                                      |   POST            | V1::Watcher::WatcherCreate
+/watchers/:WatcherID                                                           |   DELETE          | V1::Watcher::WatcherDelete

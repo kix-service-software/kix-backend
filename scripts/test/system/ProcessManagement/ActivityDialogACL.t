@@ -75,7 +75,7 @@ my %TestActivityDialogs = (
             Queue => {
                 DescriptionShort => '',
                 DescriptionLong  => '',
-                DefaultValue     => 'Raw',
+                DefaultValue     => 'Junk',
                 Display          => 2,
             },
         },

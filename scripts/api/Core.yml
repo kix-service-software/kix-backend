@@ -1848,34 +1848,27 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::TicketUpdate
-    V1::Ticket::WatcherSearch:
+    V1::Watcher::WatcherSearch:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::WatcherSearch
-    V1::Ticket::WatcherCreate:
+        Type: V1::Watcher::WatcherSearch
+    V1::Watcher::WatcherCreate:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::WatcherCreate
-    V1::Ticket::WatcherDelete:
+        Type: V1::Watcher::WatcherCreate
+    V1::Watcher::WatcherDelete:
         Description: ''
         MappingInbound:
             Type: Simple
         MappingOutbound:
             Type: Simple
-        Type: V1::Ticket::WatcherDelete
-    V1::Ticket::WatcherGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::WatcherGet
+        Type: V1::Watcher::WatcherDelete
 
   Transport:
     Config:
@@ -2934,22 +2927,18 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /tickets/:TicketID
-        V1::Ticket::WatcherSearch:
+        V1::Watcher::WatcherSearch:
           RequestMethod:
           - GET
-          Route: /tickets/:TicketID/watchers
-        V1::Ticket::WatcherCreate:
+          Route: /watchers
+        V1::Watcher::WatcherCreate:
           RequestMethod:
           - POST
-          Route: /tickets/:TicketID/watchers
-        V1::Ticket::WatcherDelete:
+          Route: /watchers
+        V1::Watcher::WatcherDelete:
           RequestMethod:
           - DELETE
-          Route: /tickets/:TicketID/watchers/:WatcherID
-        V1::Ticket::WatcherGet:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/watchers/:WatcherID
+          Route: /watchers/:WatcherID
 
     Type: HTTP::REST
 RemoteSystem: ''
