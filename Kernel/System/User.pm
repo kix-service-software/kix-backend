@@ -1425,8 +1425,8 @@ sub CheckPermission {
 
         # combine permissions
         if ( defined $ResultingPermission ) {
-            # only if we have READ upto here, we can expand the permissions
-            if ( $ResultingPermission && Kernel::System::Role::Permission->PERMISSION->{READ} == Kernel::System::Role::Permission->PERMISSION->{READ} ) {
+            # only if we have READ upto here, we can expand(!) the permissions
+            if ( $ResultingPermission && Kernel::System::Role::Permission->PERMISSION->{READ} == Kernel::System::Role::Permission->PERMISSION->{READ} && $TargetPermission > $ResultingPermission ) {
                 $ResultingPermission |= ($TargetPermission || 0);
             }
             else {
