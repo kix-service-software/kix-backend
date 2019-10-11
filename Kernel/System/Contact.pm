@@ -580,7 +580,7 @@ sub ContactSearch {
             $SQL .= " AND ";
         }
 
-        $SQL .= "(primary_org_id = ? OR org_ids LIKE CONCAT('%,', ?, ',%'))";
+        $SQL .= "(primary_org_id = ? OR org_ids LIKE CONCAT('%,', CAST(? AS CHAR), ',%'))";
         push(@Bind, \$Param{OrganisationID});
         push(@Bind, \$Param{OrganisationID});
     }
