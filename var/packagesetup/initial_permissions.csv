@@ -30,6 +30,8 @@
 "Ticket Reader";"resource";"/system/communication/sendertypes";;"x";;;
 "Ticket Reader";"resource";"/system/communication/systemaddresses";;"x";;;
 "Ticket Reader";"resource";"/links";;"x";;;
+"Ticket Reader";"resource";"/watchers";"x";"x";"x";"x";
+"Ticket Agent";"resource";"/watchers";"x";"x";"x";"x";
 "Ticket Agent";"resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent";"resource";"/system/ticket/*";;;;;
 "Ticket Agent";"resource";"/system/ticket";;"x";;;
