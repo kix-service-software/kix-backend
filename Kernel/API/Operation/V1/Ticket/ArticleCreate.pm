@@ -431,7 +431,7 @@ sub _ArticleCreate {
             
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                 )
             }
         }
@@ -439,7 +439,7 @@ sub _ArticleCreate {
 
     return $Self->_Success(
         Code         => 'Object.Created',
-        ArticleID    => $ArticleID,
+        ArticleID    => 0 + $ArticleID,
     );
 }
 
