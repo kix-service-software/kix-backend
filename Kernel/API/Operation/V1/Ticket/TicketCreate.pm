@@ -462,7 +462,7 @@ sub _TicketCreate {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                     )
             }
         }
@@ -482,7 +482,7 @@ sub _TicketCreate {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                     )
             }
         }
@@ -490,7 +490,7 @@ sub _TicketCreate {
 
     return $Self->_Success(
         Code     => 'Object.Created',
-        TicketID => $TicketID,
+        TicketID => 0 + $TicketID,
     );
 }
 
