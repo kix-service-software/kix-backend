@@ -774,7 +774,7 @@
 <Table Name="watcher">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="object" Required="true" Size="50" Type="VARCHAR"/>
-    <Column Name="object_id" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="object_id" Required="true" Type="INTEGER"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
