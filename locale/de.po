@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-05 15:52+0000\n"
-"PO-Revision-Date: 2019-10-25 13:31+0000\n"
+"PO-Revision-Date: 2019-10-30 11:31+0000\n"
 "Last-Translator: tczirfusz <Tobias.Czirfusz@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
@@ -2199,7 +2199,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Alternative to"
-msgstr ""
+msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Article"
@@ -2328,7 +2328,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Connected to"
-msgstr ""
+msgstr "Verbunden mit"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3208,7 +3208,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Depends on"
-msgstr ""
+msgstr "Hängt ab von"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3733,7 +3733,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
-msgstr ""
+msgstr "Beinhaltet"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Input"
@@ -4093,7 +4093,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Relevant to"
-msgstr ""
+msgstr "Relevant für"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4110,7 +4110,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Required for"
-msgstr ""
+msgstr "Benötigt für"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
