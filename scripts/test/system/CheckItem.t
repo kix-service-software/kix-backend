@@ -45,6 +45,14 @@ my @Tests = (
         Valid => 0,
     },
     {
+        Email => 'a@sömehöst.cöm',
+        Valid => 0,
+    },
+    {
+        Email => 'a%40someh%C3%B6st.com', # URL encoded
+        Valid => 0,
+    },
+    {
         Email => '.somebody@somehost.com',
         Valid => 0,
     },
@@ -304,7 +312,7 @@ for my $Test (@Tests) {
         Result => 'aäöüß€z',
     },
     {
-        String => eval {'a�z'},    # iso-8859 string
+        String => eval {'a�z'},    # iso-8859 string
         Params => {},
         Result => undef,
     },

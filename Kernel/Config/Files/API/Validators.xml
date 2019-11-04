@@ -94,7 +94,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">EmailAddressValidator</Item>
-                <Item Key="Validates">From,Cc,Bcc,To</Item>
+                <Item Key="Validates">From,Cc,Bcc,To,Email</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
@@ -289,4 +289,3 @@
     </ConfigItem>
 
 </kix_config>
-    
