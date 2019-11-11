@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#JobPatchRequest",
+    "type": "object",
+    "description": "The job request object for update.",
+    "properties": {
+        "Job": {
+            "type": "object",
+            "properties": {
+                "Comment": {
+                    "type": "string"
+                },
+                "Filter": {
+                    "type": "object"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "string",
+                    "description": ""
+                },
+                "ValidID": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "required": [
+        "Job"
+    ]
+}

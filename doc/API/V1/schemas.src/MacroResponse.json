@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MacroResponse",
+  "type": "object",
+  "description": "A response for macro GET request.",
+  "properties": {
+    "Macro": {
+      "$ref": "Macro.json"
+    }
+  },
+  "required": [
+    "Macro"
+  ]
+}

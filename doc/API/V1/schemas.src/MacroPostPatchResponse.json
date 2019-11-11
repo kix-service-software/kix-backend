@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#MacroPostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated macro.",
+  "properties": {
+    "MacroID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "MacroID"
+  ]
+}

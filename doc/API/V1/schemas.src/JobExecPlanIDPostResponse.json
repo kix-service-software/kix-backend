@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#JobExecPlanIDPostResponse",
+  "type": "object",
+  "description": "A response for job - execution plan ID POST request.",
+  "properties": {
+    "ExecPlanID": {
+        "type": "integer"
+    }
+  },
+  "required": [
+    "ExecPlanID"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+   "$id" : "#JobExecPlanIDPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The job - execution plan ID request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ExecPlanID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ExecPlanID"
+   ]
+}

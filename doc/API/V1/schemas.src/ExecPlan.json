@@ -1,0 +1,82 @@
+{
+   "$schema": "http://json-schema.org/schema",
+   "$id": "#ExecPlan",
+   "type": "object",
+   "description": "The execution plan object.",
+   "properties": {
+      "ChangeBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "ChangeTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Comment": {
+         "type": "string",
+         "readOnly": true
+      },
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "CreateTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "Name": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Parameters": {
+         "type": "object",
+         "readOnly": true,
+         "properties": {
+            "Weekdays": {
+              "type": "array",
+              "readOnly": true,
+              "item": {
+                "type": "integer"
+              },
+              "description": "List of weekday: 0 = sunday, 1 = monday, ..."
+            },
+            "Time": {
+               "type": "string",
+               "readOnly": true,
+               "description": "time for the weekdays as \"hh:mm:ss\""
+            },
+            "Events": {
+               "type": "array",
+               "readOnly": true,
+               "item": {
+                  "type": "string"
+               },
+               "description": "list of events, e.g. \"TicketCreate\""
+            }
+         },
+         "description": "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert"
+      },
+      "Type": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ValidID": {
+         "type": "integer",
+         "readOnly": true
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Name",
+      "Type",
+      "ValidID"
+   ]
+}

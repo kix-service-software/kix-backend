@@ -1,0 +1,102 @@
+{
+   "$id" : "#JobExecPlansResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A response for job - execution plans GET request.",
+   "type" : "object",
+   "properties" : {
+      "ExecPlan" : {
+         "description" : "List of assigned execution plans of the job",
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/_ExecPlan_json"
+         }
+      }
+   },
+   "required" : [
+      "ExecPlan"
+   ],
+   "definitions" : {
+      "_ExecPlan_json" : {
+         "$id" : "#ExecPlan",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The execution plan object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Parameters" : {
+               "description" : "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert",
+               "type" : "object",
+               "properties" : {
+                  "Events" : {
+                     "description" : "list of events, e.g. \"TicketCreate\"",
+                     "type" : "array",
+                     "item" : {
+                        "type" : "string"
+                     },
+                     "readOnly" : true
+                  },
+                  "Time" : {
+                     "description" : "time for the weekdays as \"hh:mm:ss\"",
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Weekdays" : {
+                     "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
+                     "type" : "array",
+                     "item" : {
+                        "type" : "integer"
+                     },
+                     "readOnly" : true
+                  }
+               },
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "Type",
+            "ValidID"
+         ]
+      }
+   }
+}

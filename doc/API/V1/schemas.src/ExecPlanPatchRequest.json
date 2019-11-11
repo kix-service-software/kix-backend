@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ExecPlanPatchRequest",
+  "type": "object",
+  "description": "The execution plan request object for update.",
+  "properties": {
+    "ExecPlan": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Parameters": {
+           "$ref": "ExecPlanParametersPostPatchItem.json"
+        },
+        "Type": {
+          "type": "string",
+          "description": ""
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "ExecPlan"
+  ]
+}

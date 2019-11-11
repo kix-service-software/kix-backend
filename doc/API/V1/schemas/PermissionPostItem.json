@@ -1,7 +1,7 @@
 {
-   "$id" : "#PermissionPostRequest",
+   "$id" : "#PermissionPostItem",
    "$schema" : "http://json-schema.org/schema",
-   "description" : "The permission request object for creation.",
+   "description" : "The permission item object for creation.",
    "type" : "object",
    "properties" : {
       "Comment" : {

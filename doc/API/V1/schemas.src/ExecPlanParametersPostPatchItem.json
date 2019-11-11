@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ExecPlanParametersPostPatchItem",
+  "type": "object",
+  "description": "The parameters object for creation and update, for when and/or by what the corresponding job of the execution plan will be triggert.",
+  "properties": {
+    "Weekdays": {
+      "type": "array",
+      "item": {
+        "type": "integer"
+      },
+      "description": "List of weekday: 0 = sunday, 1 = monday, ..."
+    },
+    "Time": {
+       "type": "string",
+       "description": "time for the weekdays as \"hh:mm:ss\""
+    },
+    "Events": {
+       "type": "array",
+       "item": {
+          "type": "string"
+       },
+       "description": "list of events, e.g. \"TicketCreate\""
+    }
+  }
+}

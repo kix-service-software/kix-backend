@@ -1,0 +1,72 @@
+  displayName: "[System] Automation"
+  description: !include ../../descriptions/resources/system/automation.md
+  /jobs:
+    description: !include ../../descriptions/resources/system/automation/jobs.md
+    type: { collection: { typeName: Job } }
+    /types:
+      description: !include ../../descriptions/resources/system/automation/jobs/types.md
+      type: { collection-readonly: { typeName: JobType } }
+    /{jobId}:
+      type: { item: { typeName: Job } }
+      uriParameters:
+        jobId:
+          displayName: JobID
+          type: integer
+      /execPlanIds:
+        description: !include ../../descriptions/resources/system/automation/jobs/execplanids.md
+        type: { collection-nopatch: { typeName: JobExecPlanID } }
+        /{execPlanId}:
+          type: { item-deleteonly: { typeName: ExecPlanID } }
+          uriParameters:
+            execPlanId:
+              displayName: ExecPlanID
+              type: integer
+      /macroIds:
+        description: !include ../../descriptions/resources/system/automation/jobs/macroids.md
+        type: { collection-nopatch: { typeName: JobMacroID } }
+        /{macroId}:
+          type: { item-deleteonly: { typeName: MacroID } }
+          uriParameters:
+            macroId:
+              displayName: MacroID
+              type: integer
+  /execplans:
+    description: !include ../../descriptions/resources/system/automation/execplans.md
+    type: { collection: { typeName: ExecPlan } }
+    /types:
+      description: !include ../../descriptions/resources/system/automation/execplans/types.md
+      type: { collection-readonly: { typeName: ExecPlanType } }
+    /{execPlanId}:
+      type: { item: { typeName: ExecPlan } }
+      uriParameters:
+        execPlanId:
+          displayName: ExecPlanID
+          type: integer
+  /macros:
+    description: !include ../../descriptions/resources/system/automation/macros.md
+    type: { collection: { typeName: Macro } }
+    /types:
+      description: !include ../../descriptions/resources/system/automation/macros/types.md
+      type: { collection-readonly: { typeName: MacroType } }
+      /{macroType}:
+        type: { item-readonly: { typeName: MacroType } }
+        /actiontypes:
+          description: !include ../../descriptions/resources/system/automation/macros/types/actiontypes.md
+          type: { collection-readonly: { typeName: MacroActionType } }
+          /{macroActionType}:
+            type: { item-readonly: { typeName: MacroActionType } }
+    /{macroId}:
+      type: { item: { typeName: Macro } }
+      uriParameters:
+        macroId:
+          displayName: MacroID
+          type: integer
+      /actions:
+        description: !include ../../descriptions/resources/system/automation/macros/actions.md
+        type: { collection: { typeName: MacroAction } }
+        /{macroActionId}:
+          type: { item: { typeName: MacroAction } }
+          uriParameters:
+            macroActionId:
+              displayName: MacroActionID
+              type: integer
