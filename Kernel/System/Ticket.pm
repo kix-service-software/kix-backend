@@ -4021,6 +4021,15 @@ sub TicketLockSet {
     );
     return 1 if $Ticket{Lock} eq $Param{Lock};
 
+    # tickets can't be locked for OwnerID = 1
+    if ( $Ticket{OwnerID} == 1 && $Param{Lock} eq 'lock' ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'notice',
+            Message  => 'Tickets can\'t be locked for OwnerID 1.'
+        );
+        return;
+    }
+
     # db update
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => 'UPDATE ticket SET ticket_lock_id = ?, '
@@ -4714,6 +4723,19 @@ sub TicketOwnerSet {
             . ' user_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [ \$Param{NewUserID}, \$Param{UserID}, \$Param{TicketID} ],
     );
+
+    # tickets have to be unlocked if OwnerID = 1
+    if ( $Param{NewUserID} == 1 ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'notice',
+            Message  => 'Unlocking ticket '.$Param{TicketID}.' because OwnerID 1 has been set.'
+        );
+        $Self->TicketLockSet(
+            TicketID => $Param{TicketID},
+            Lock     => 'unlock',
+            UserID   => 1,
+        );
+    }    
 
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
