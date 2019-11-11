@@ -1,0 +1,17 @@
+{
+    "Macro": {
+        "Actions": [ 
+            {
+                "Comment": "some comment",
+                "Name": "new macro",
+                "Parameters": {},
+                "Type": "Ticket",
+                "ValidID": 1
+            }
+        ],
+        "Comment": "some comment",
+        "Name": "new macro",
+        "Type": "Ticket",
+        "ValidID": 1
+    }
+}

@@ -10251,6 +10251,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
+
     <!-- links for user manuals -->
     <ConfigItem Name="KIX::UserManual" Required="0" Valid="1">
         <Description Translatable="1">Link to the user manual.</Description>
@@ -10275,6 +10276,82 @@ via the Preferences button after logging in.
         <SubGroup>Core::Console</SubGroup>
         <Setting>
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp/console</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="Automation::JobType###Ticket" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a job type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="Automation::MacroType###Ticket" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="Automation::MacroActionType::Ticket###StateSet" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Set Ticket State</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Automation::MacroActionType::Ticket###OwnerSet" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Set Ticket Owner</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Automation::MacroActionType::Ticket###ResponsibleSet" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Set Ticket Responsible</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Automation::MacroActionType::Ticket###TypeSet" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Set Ticket Type</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="Automation::ExecPlanType###EventBased" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a execution plan type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Event Based</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="Automation::ExecPlanType###TimeBased" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a execution plan type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Time Based</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 </kix_config>

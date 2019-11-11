@@ -2,7 +2,7 @@
 <kix_config version="1.0" init="Framework">
 
     <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationGet" Required="0" Valid="1">
-        <Description TranNotificationtable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationGet</Item>
@@ -13,7 +13,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationSearch" Required="0" Valid="1">
-        <Description TranNotificationtable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationSearch</Item>
@@ -23,7 +23,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationCreate" Required="0" Valid="1">
-        <Description TranNotificationtable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationCreate</Item>
@@ -34,7 +34,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationUpdate" Required="0" Valid="1">
-        <Description TranNotificationtable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationUpdate</Item>
@@ -45,7 +45,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationDelete" Required="0" Valid="1">
-        <Description TranNotificationtable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationDelete</Item>

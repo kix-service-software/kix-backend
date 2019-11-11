@@ -2013,9 +2013,9 @@ sub _ExpandObject {
         }
     }
 
-use Data::Dumper;
-$Data::Dumper::Indent=2;
-print STDERR Dumper($Param{Data});
+# use Data::Dumper;
+# $Data::Dumper::Indent=2;
+# print STDERR Dumper($Param{Data});
     my @Data;
     if ( IsArrayRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
         @Data = @{ $Param{Data}->{ $Param{AttributeToExpand} } };

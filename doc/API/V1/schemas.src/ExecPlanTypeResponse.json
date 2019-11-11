@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ExecPlanTypeResponse",
+  "type": "object",
+  "description": "A response for execution plan type GET request.",
+  "properties": {
+    "ExecPlanType": {
+      "$ref": "ExecPlanType.json"
+    }
+  },
+  "required": [
+    "ExecPlanType"
+  ]  
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#JobResponse",
+  "type": "object",
+  "description": "A response for job GET request.",
+  "properties": {
+    "Job": {
+      "$ref": "Job.json"
+    }
+  },
+  "required": [
+    "Job"
+  ]
+}

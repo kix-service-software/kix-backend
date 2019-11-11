@@ -215,7 +215,7 @@ sub Run {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                 )
             }
         }

@@ -1,0 +1,36 @@
+{
+   "$id" : "#MacroPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The macro request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Macro" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "ExecOrder" : {
+               "description" : "Order of corresponding macro actions as IDs.",
+               "type" : "array",
+               "item" : {
+                  "type" : "number"
+               }
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "Macro"
+   ]
+}

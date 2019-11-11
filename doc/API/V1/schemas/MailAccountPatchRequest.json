@@ -1,5 +1,5 @@
 {
-   "$id" : "#MailAccountPostRequest",
+   "$id" : "#MailAccountPatchRequest",
    "$schema" : "http://json-schema.org/schema",
    "description" : "The mail account request object for update.",
    "type" : "object",

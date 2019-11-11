@@ -1,0 +1,36 @@
+{
+   "$id" : "#JobPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The job request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Job" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Filter" : {
+               "type" : "object"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "Job"
+   ]
+}

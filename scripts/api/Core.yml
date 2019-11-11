@@ -6,6 +6,230 @@ Description: KIX Core API
 FrameworkVersion: __VERSION__
 Provider:
   Operation:
+    V1::Automation::JobTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobTypeSearch
+    V1::Automation::JobSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobSearch
+    V1::Automation::JobCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobCreate
+    V1::Automation::JobGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobGet
+    V1::Automation::JobUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobUpdate
+    V1::Automation::JobDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobDelete
+    V1::Automation::JobExecPlanIDSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobExecPlanIDSearch
+    V1::Automation::JobExecPlanIDCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobExecPlanIDCreate
+    V1::Automation::JobExecPlanIDDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobExecPlanIDDelete
+    V1::Automation::JobMacroIDSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobMacroIDSearch
+    V1::Automation::JobMacroIDCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobMacroIDCreate
+    V1::Automation::JobMacroIDDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobMacroIDDelete
+    V1::Automation::ExecPlanTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanTypeSearch
+    V1::Automation::ExecPlanTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanTypeGet
+    V1::Automation::ExecPlanSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanSearch
+    V1::Automation::ExecPlanCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanCreate
+    V1::Automation::ExecPlanGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanGet
+    V1::Automation::ExecPlanUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanUpdate
+    V1::Automation::ExecPlanDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::ExecPlanDelete
+    V1::Automation::MacroTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroTypeSearch
+    V1::Automation::MacroActionTypeSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionTypeSearch
+    V1::Automation::MacroActionTypeGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionTypeGet
+    V1::Automation::MacroSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroSearch
+    V1::Automation::MacroCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroCreate
+    V1::Automation::MacroGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroGet
+    V1::Automation::MacroUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroUpdate
+    V1::Automation::MacroDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroDelete
+    V1::Automation::MacroActionSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionSearch
+    V1::Automation::MacroActionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionCreate
+    V1::Automation::MacroActionGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionGet
+    V1::Automation::MacroActionUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionUpdate
+    V1::Automation::MacroActionDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::MacroActionDelete
     V1::CMDB::ClassDefinitionDelete:
         Description: ''
         MappingInbound:
@@ -1875,6 +2099,134 @@ Provider:
       KeepAlive: ''
       MaxLength: '10485760'
       RouteOperationMapping:
+        V1::Automation::JobTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/types
+        V1::Automation::JobSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs
+        V1::Automation::JobCreate:
+          RequestMethod:
+          - POST
+          Route: /system/automation/jobs
+        V1::Automation::JobGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/:JobID
+        V1::Automation::JobUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/automation/jobs/:JobID
+        V1::Automation::JobDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/automation/jobs/:JobID
+        V1::Automation::JobExecPlanIDSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/:JobID/execplanids
+        V1::Automation::JobExecPlanIDCreate:
+          RequestMethod:
+          - POST
+          Route: /system/automation/jobs/:JobID/execplanids
+        V1::Automation::JobExecPlanIDDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/automation/jobs/:JobID/execplanids/:ExecPlanID
+        V1::Automation::JobMacroIDSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/:JobID/macroids
+        V1::Automation::JobMacroIDCreate:
+          RequestMethod:
+          - POST
+          Route: /system/automation/jobs/:JobID/macroids
+        V1::Automation::JobMacroIDDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/automation/jobs/:JobID/macroids/:MacroID
+        V1::Automation::ExecPlanTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/execplans/types
+        V1::Automation::ExecPlanTypeGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/execplans/types/:ExecPlanType
+        V1::Automation::ExecPlanSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/execplans
+        V1::Automation::ExecPlanCreate:
+          RequestMethod:
+          - POST
+          Route: /system/automation/execplans
+        V1::Automation::ExecPlanGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/execplans/:ExecPlanID
+        V1::Automation::ExecPlanUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/automation/execplans/:ExecPlanID
+        V1::Automation::ExecPlanDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/automation/execplans/:ExecPlanID
+        V1::Automation::MacroTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros/types
+        V1::Automation::MacroActionTypeSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros/types/:MacroType/actiontypes
+        V1::Automation::MacroActionTypeGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros/types/:MacroType/actiontypes/:MacroActionType
+        V1::Automation::MacroSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros
+        V1::Automation::MacroCreate:
+          RequestMethod:
+          - POST
+          Route: /system/automation/macros
+        V1::Automation::MacroGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros/:MacroID
+        V1::Automation::MacroUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/automation/macros/:MacroID
+        V1::Automation::MacroDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/automation/macros/:MacroID
+        V1::Automation::MacroActionSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros/:MacroID/actions
+        V1::Automation::MacroActionCreate:
+          RequestMethod:
+          - POST
+          Route: /system/automation/macros/:MacroID/actions
+        V1::Automation::MacroActionGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/macros/:MacroID/actions/:MacroActionID
+        V1::Automation::MacroActionUpdate:
+          RequestMethod:
+          - PATCH
+          Route: /system/automation/macros/:MacroID/actions/:MacroActionID
+        V1::Automation::MacroActionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/automation/macros/:MacroID/actions/:MacroActionID
         V1::CMDB::ClassDefinitionDelete:
           RequestMethod:
           - DELETE

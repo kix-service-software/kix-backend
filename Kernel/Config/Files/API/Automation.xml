@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">JobTypeCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">JobID</Item>
+                <Item Key="ResponseObject">JobResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">JobCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">JobPostRequest</Item>
+                <Item Key="ResponseObject">JobPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">JobPatchRequest</Item>
+                <Item Key="ResponseObject">JobPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobExecPlanIDSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobExecPlanIDSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">JobExecPlanIDCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobExecPlanIDCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobExecPlanIDCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">JobExecPlanIDPostRequest</Item>
+                <Item Key="ResponseObject">JobExecPlanIDPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+        <ConfigItem Name="API::Operation::Module###V1::Automation::JobExecPlanIDDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobExecPlanIDDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobMacroIDSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobMacroIDSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">JobMacroIDCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::JobMacroIDCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobMacroIDCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">JobMacroIDPostRequest</Item>
+                <Item Key="ResponseObject">JobMacroIDPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+        <ConfigItem Name="API::Operation::Module###V1::Automation::JobMacroIDDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobMacroIDDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">ExecPlanTypeCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanTypeGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanTypeGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">ExecPlanTypeResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">ExecPlanID</Item>
+                <Item Key="ResponseObject">ExecPlanResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">ExecPlanCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">ExecPlanPostRequest</Item>
+                <Item Key="ResponseObject">ExecPlanPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">ExecPlanPatchRequest</Item>
+                <Item Key="ResponseObject">ExecPlanPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::ExecPlanDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ExecPlanDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">MacroTypeCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">MacroID</Item>
+                <Item Key="ResponseObject">MacroResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">MacroCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">MacroPostRequest</Item>
+                <Item Key="ResponseObject">MacroPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">MacroPatchRequest</Item>
+                <Item Key="ResponseObject">MacroPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionTypeSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">MacroActionTypeCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionTypeGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionTypeGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">MacroActionTypeResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">MacroActionID</Item>
+                <Item Key="ResponseObject">MacroActionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseObject">MacroActionCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">MacroActionPostRequest</Item>
+                <Item Key="ResponseObject">MacroActionPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">MacroActionPatchRequest</Item>
+                <Item Key="ResponseObject">MacroActionPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::Automation::MacroActionDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MacroActionDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>
