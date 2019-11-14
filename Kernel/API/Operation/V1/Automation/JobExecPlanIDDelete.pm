@@ -110,14 +110,14 @@ sub Run {
     foreach my $ExecPlanID ( @{$Param{Data}->{ExecPlanID}} ) {
 
         my $Found = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanLookup(
-            ID => $Param{Data}->{JobID},
+            ID => $ExecPlanID,
         );
 
         if ( !$Found ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "Exec plan with ID $ExecPlanID not found!",
-            );    		
+            );
         }
 
         # unassign ExecPlan from Job 
@@ -126,7 +126,7 @@ sub Run {
             ExecPlanID => $ExecPlanID,
             UserID     => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

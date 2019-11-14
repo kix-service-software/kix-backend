@@ -105,19 +105,19 @@ perform JobMacroIDDelete Operation. This will return {}.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-        
+
     # start loop
     foreach my $MacroID ( @{$Param{Data}->{MacroID}} ) {
 
         my $Found = $Kernel::OM->Get('Kernel::System::Automation')->MacroLookup(
-            ID => $Param{Data}->{JobID},
+            ID => $MacroID,
         );
 
         if ( !$Found ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
                 Message => "Macro with ID $MacroID not found!",
-            );    		
+            );
         }
 
         # unassign Macro from Job 
