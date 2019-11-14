@@ -139,17 +139,17 @@ sub Run {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => "Cannot create exec plan. An exec plan with the same name '$ExecPlan->{Name}' already exists.",
-        );    		
+        );
     }
 
     # create ExecPlan
-    my $ExecPlanID = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanAdd(
+    $ExecPlanID = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanAdd(
         Name       => $ExecPlan->{Name},
         Type       => $ExecPlan->{Type},
         Parameters => $ExecPlan->{Parameters},
         Comment    => $ExecPlan->{Comment} || '',
         ValidID    => $ExecPlan->{ValidID} || 1,
-        UserID     => $Self->{Authorization}->{UserID},              
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$ExecPlanID ) {
@@ -158,11 +158,11 @@ sub Run {
         );
     }
     
-    # return result    
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         ExecPlanID => $ExecPlanID,
-    );    
+    );
 }
 
 

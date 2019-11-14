@@ -107,7 +107,7 @@
                 <Item Key="Module">ExecPlanValidator</Item>
                 <Item Key="Validates">ExecPlanID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">ExecPlanGet|ExecPlanDelete</Item>
+                <Item Key="IgnoreOperationRegEx">ExecPlanGet|ExecPlanDelete|JobExecPlanIDDelete</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -140,7 +140,7 @@
                 <Item Key="Module">JobValidator</Item>
                 <Item Key="Validates">JobID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">JobGet|JobDelete</Item>
+                <Item Key="IgnoreOperationRegEx">JobGet|JobDelete|JobMacroIDSearch|JobExecPlanIDSearch</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -162,7 +162,7 @@
                 <Item Key="Module">MacroValidator</Item>
                 <Item Key="Validates">MacroID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">MacroGet|MacroDelete</Item>
+                <Item Key="IgnoreOperationRegEx">MacroGet|MacroDelete|JobMacroIDDelete</Item>
             </Hash>
         </Setting>
     </ConfigItem>
