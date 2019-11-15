@@ -23,6 +23,28 @@
          ],
          "readOnly" : true
       },
+      "Context" : {
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
+      "ContextMetadata" : {
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
       "CreateBy" : {
          "type" : "integer",
          "readOnly" : true

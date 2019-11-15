@@ -1,0 +1,8 @@
+{
+    "SysConfigOptionDefinition": {
+        "Name": "test",
+        "Type": "String",
+        "Description": "this is just a test option",
+        "Default": "this is a test"
+    }
+}

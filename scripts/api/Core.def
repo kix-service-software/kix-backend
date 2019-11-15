@@ -66,7 +66,10 @@
 /system/communication/systemaddresses/:SystemAddressID                         |   GET             | V1::SystemAddress::SystemAddressGet
 /system/communication/systemaddresses/:SystemAddressID                         |   PATCH           | V1::SystemAddress::SystemAddressUpdate
 /system/config/definitions                                                     |   GET             | V1::SysConfig::SysConfigOptionDefinitionSearch
+/system/config/definitions                                                     |   POST            | V1::SysConfig::SysConfigOptionDefinitionCreate
+/system/config/definitions/:Option                                             |   DELETE          | V1::SysConfig::SysConfigOptionDefinitionDelete
 /system/config/definitions/:Option                                             |   GET             | V1::SysConfig::SysConfigOptionDefinitionGet
+/system/config/definitions/:Option                                             |   PATCH           | V1::SysConfig::SysConfigOptionDefinitionUpdate
 /system/config                                                                 |   GET             | V1::SysConfig::SysConfigOptionSearch
 /system/config/:Option                                                         |   GET             | V1::SysConfig::SysConfigOptionGet
 /system/config/:Option                                                         |   PATCH           | V1::SysConfig::SysConfigOptionUpdate

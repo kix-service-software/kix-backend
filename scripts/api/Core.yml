@@ -475,6 +475,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigOptionDefinitionSearch
+    V1::SysConfig::SysConfigOptionDefinitionCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionCreate
+    V1::SysConfig::SysConfigOptionDefinitionDelete:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionDelete
     V1::SysConfig::SysConfigOptionDefinitionGet:
         Description: ''
         MappingInbound:
@@ -482,6 +496,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::SysConfig::SysConfigOptionDefinitionGet
+    V1::SysConfig::SysConfigOptionDefinitionUpdate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::SysConfig::SysConfigOptionDefinitionUpdate
     V1::SysConfig::SysConfigOptionSearch:
         Description: ''
         MappingInbound:
@@ -2367,9 +2388,21 @@ Provider:
           RequestMethod:
           - GET
           Route: /system/config/definitions
+        V1::SysConfig::SysConfigOptionDefinitionCreate:
+          RequestMethod:
+          - POST
+          Route: /system/config/definitions
+        V1::SysConfig::SysConfigOptionDefinitionDelete:
+          RequestMethod:
+          - DELETE
+          Route: /system/config/definitions/:Option
         V1::SysConfig::SysConfigOptionDefinitionGet:
           RequestMethod:
           - GET
+          Route: /system/config/definitions/:Option
+        V1::SysConfig::SysConfigOptionDefinitionUpdate:
+          RequestMethod:
+          - PATCH
           Route: /system/config/definitions/:Option
         V1::SysConfig::SysConfigOptionSearch:
           RequestMethod:

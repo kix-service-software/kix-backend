@@ -1,31 +1,11 @@
 {
-   "$id" : "#SysConfigOptionDefinitionResponse",
+   "$id" : "#SysConfigOptionDefinitionPatchRequest",
    "$schema" : "http://json-schema.org/schema",
-   "description" : "A response for SysConfig option definition GET request.",
+   "description" : "The SysConfig option definition request object for update.",
    "type" : "object",
    "properties" : {
       "SysConfigOptionDefinition" : {
-         "$ref" : "#/definitions/SysConfigOptionDefinition"
-      }
-   },
-   "required" : [
-      "SysConfigOptionDefinition"
-   ],
-   "definitions" : {
-      "SysConfigOptionDefinition" : {
-         "$id" : "#SysConfigOptionDefinition",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The SysConfig option definition object.",
-         "type" : "object",
          "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
             "Comment" : {
                "anyOf" : [
                   {
@@ -34,8 +14,7 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
+               ]
             },
             "Context" : {
                "anyOf" : [
@@ -45,8 +24,7 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
+               ]
             },
             "ContextMetadata" : {
                "anyOf" : [
@@ -56,16 +34,7 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
+               ]
             },
             "Default" : {
                "anyOf" : [
@@ -78,24 +47,16 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
+               ]
             },
             "Description" : {
-               "type" : "string",
-               "readOnly" : true
+               "type" : "string"
             },
             "Group" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "IsModified" : {
-               "type" : "integer",
-               "readOnly" : true
+               "type" : "string"
             },
             "IsRequired" : {
-               "type" : "integer",
-               "readOnly" : true
+               "type" : "integer"
             },
             "Level" : {
                "anyOf" : [
@@ -105,12 +66,10 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
+               ]
             },
             "Name" : {
-               "type" : "string",
-               "readOnly" : true
+               "type" : "string"
             },
             "Setting" : {
                "anyOf" : [
@@ -120,16 +79,13 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
+               ]
             },
             "Type" : {
-               "type" : "string",
-               "readOnly" : true
+               "type" : "string"
             },
             "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
+               "type" : "integer"
             },
             "Value" : {
                "anyOf" : [
@@ -142,19 +98,12 @@
                   {
                      "type" : "null"
                   }
-               ],
-               "readOnly" : true
+               ]
             }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "Name",
-            "Type",
-            "ValidID"
-         ]
+         }
       }
-   }
+   },
+   "required" : [
+      "SysConfigOptionDefinition"
+   ]
 }

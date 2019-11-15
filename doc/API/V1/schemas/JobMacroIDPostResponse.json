@@ -4,15 +4,11 @@
    "description" : "A response for job - macro ID POST request.",
    "type" : "object",
    "properties" : {
-      "JobID" : {
-         "type" : "integer"
-      },
       "MacroID" : {
          "type" : "integer"
       }
    },
    "required" : [
-      "JobID",
       "MacroID"
    ]
 }

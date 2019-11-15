@@ -12,9 +12,9 @@
         type: string
   /definitions:
     description: !include ../descriptions/resources/system/config/definitions.md
-    type: { collection-readonly: { typeName: SysConfigOptionDefinition } }
+    type: { collection: { typeName: SysConfigOptionDefinition } }
     /{option}:
-      type: { item-readonly: { typeName: SysConfigOptionDefinition } }
+      type: { item: { typeName: SysConfigOptionDefinition } }
       uriParameters:
         option:
           displayName: Option

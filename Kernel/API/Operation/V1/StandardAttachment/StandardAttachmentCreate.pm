@@ -142,7 +142,7 @@ sub Run {
     if ( $ID ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create StandardAttachment entry. Another StandardAttachment with same name already exists.",
+            Message => "Can not create StandardAttachment entry. Another StandardAttachment with the name already exists.",
         );
     }
     
