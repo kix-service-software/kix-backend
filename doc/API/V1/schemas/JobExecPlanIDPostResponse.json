@@ -6,13 +6,9 @@
    "properties" : {
       "ExecPlanID" : {
          "type" : "integer"
-      },
-      "JobID" : {
-         "type" : "integer"
       }
    },
    "required" : [
-      "ExecPlanID",
-      "JobID"
+      "ExecPlanID"
    ]
 }

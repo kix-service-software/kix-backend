@@ -100,7 +100,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Type="varchar" Size="1000" />
+    <Column Name="preferences_value" Required="false" Type="varchar" Size="1800000" />
     <Index Name="user_preferences_user_id">
         <IndexColumn Name="user_id"/>
     </Index>
@@ -2829,6 +2829,8 @@
 
 <Table Name="sysconfig">
     <Column Name="name" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true" />
+    <Column Name="context" Required="false" Type="VARCHAR" Size="255"/>
+    <Column Name="context_metadata" Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="description" Required="true" Type="VARCHAR" Size="10000" />
     <Column Name="level" Required="false" Default="0" Type="INTEGER" />
     <Column Name="type" Required="true" Type="VARCHAR" Size="50" />
@@ -2851,6 +2853,12 @@
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
     </ForeignKey>    
+    <Index Name="sysconfig_name">
+        <IndexColumn Name="name"/>
+    </Index>
+    <Index Name="sysconfig_context">
+        <IndexColumn Name="context"/>
+    </Index>
 </Table>
 
 <!-- job -->

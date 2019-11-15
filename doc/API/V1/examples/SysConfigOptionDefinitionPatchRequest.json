@@ -1,0 +1,6 @@
+{
+    "SysConfigOptionDefinition": {
+        "Description": "this is a test",
+        "IsRequired": 1
+    }
+}

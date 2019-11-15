@@ -74,5 +74,36 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">SysConfigOptionDefinitionPostRequest</Item>
+                <Item Key="ResponseObject">SysConfigOptionDefinitionPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestObject">SysConfigOptionDefinitionPatchRequest</Item>
+                <Item Key="ResponseObject">SysConfigOptionDefinitionPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionDelete" Required="0" Valid="1">
+        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
 </kix_config>

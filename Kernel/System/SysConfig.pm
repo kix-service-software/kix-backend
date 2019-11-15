@@ -90,7 +90,7 @@ sub new {
 
 returns a list of supported SysConfig option types.
 
-    %OptionTypeList = $RoleObject->OptionTypeList();
+    @OptionTypeList = $RoleObject->OptionTypeList();
 
 =cut
 
@@ -139,7 +139,7 @@ sub Exists {
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return %{$Cache} if $Cache;
+    return $Cache if $Cache;
     
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
         SQL   => "SELECT name FROM sysconfig WHERE (name = ? or name like ?)",
@@ -200,7 +200,7 @@ sub OptionGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
-        SQL   => "SELECT name, description, level, type, group_name, setting,
+        SQL   => "SELECT name, context, context_metadata, description, level, type, group_name, setting,
                   is_required, is_modified, default_value, value, comments, valid_id,
                   create_time, create_by, change_time, change_by
                   FROM sysconfig WHERE name = ?",
@@ -212,23 +212,25 @@ sub OptionGet {
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
         %Data = (
-            Name        => $Row[0],
-            Description => $Row[1],
-            Level       => $Row[2],
-            Type        => $Row[3],
-            Group       => $Row[4],
-            Setting     => $Row[5],
-            IsRequired  => $Row[6],
-            IsModified  => $Row[7],
-            Default     => $Row[8],
-            Value       => $Row[9],
-            Comment     => $Row[10],
-            ValidID     => $Row[11],
-            CreateTime  => $Row[12],
-            CreateBy    => $Row[13],
-            ChangeTime  => $Row[14],
-            ChangeBy    => $Row[15],
-        );
+            Name            => $Row[0],
+            Context         => $Row[1],
+            ContextMetadata => $Row[2],
+            Description     => $Row[3],
+            Level           => $Row[4],
+            Type            => $Row[5],
+            Group           => $Row[6],
+            Setting         => $Row[7],
+            IsRequired      => $Row[8],
+            IsModified      => $Row[9],
+            Default         => $Row[10],
+            Value           => $Row[11],
+            Comment         => $Row[12],
+            ValidID         => $Row[13],
+            CreateTime      => $Row[14],
+            CreateBy        => $Row[15],
+            ChangeTime      => $Row[16],
+            ChangeBy        => $Row[17],
+        );  
     }
 
     # no data found...
@@ -283,7 +285,7 @@ sub OptionGetAll {
     return %{$Cache} if $Cache;
     
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
-        SQL   => "SELECT name, description, level, type, group_name, setting,
+        SQL   => "SELECT name, context, context_metadata, description, level, type, group_name, setting,
                   is_required, is_modified, default_value, value, comments, valid_id,
                   create_time, create_by, change_time, change_by
                   FROM sysconfig"
@@ -291,8 +293,8 @@ sub OptionGetAll {
     
     # fetch the result
     my $FetchResult = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
-        Columns => [ 'Name', 'Description', 'Level', 'Type', 'Group', 'Setting', 'IsRequired', 'IsModified', 'Default', 
-                     'Value', 'Comment', 'ValidID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy']
+        Columns => [ 'Name', 'Context', 'ContextMetadata', 'Description', 'Level', 'Type', 'Group', 'Setting', 'IsRequired', 
+                     'IsModified', 'Default', 'Value', 'Comment', 'ValidID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy']
     );
 
     # no data found...
@@ -335,8 +337,10 @@ Adds a new SysConfig option
     my $Result = $SysConfigObject->OptionAdd(
         Name        => 'some name',
         Description => 'some description',
-        Level       => 200,                     # optional
         Type        => 1,
+        Context     => '...'                    # optional
+        ContextMetadata => '...'                # optional
+        Level       => 200,                     # optional
         Group       => 'some group',            # optional
         IsRequired  => 1,                       # optional
         Setting     => 'whatever',              # optional
@@ -382,14 +386,14 @@ sub OptionAdd {
     # do the db insert...
     my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => "INSERT INTO sysconfig 
-                 (name, description, level, type, group_name, setting, 
+                 (name, context, context_metadata, description, level, type, group_name, setting, 
                   is_required, is_modified, default_value, comments, valid_id,
                   create_time, create_by, change_time, change_by) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
         Bind => [
-            \$Param{Name}, \$Param{Description}, \$Param{Level}, \$Param{Type},
-            \$Param{Group}, \$Param{Setting}, \$IsRequired, \$Param{Default}, 
-            \$Param{Comment}, \$ValidID, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{Context}, \$Param{ContextMetadata}, \$Param{Description}, 
+            \$Param{Level}, \$Param{Type}, \$Param{Group}, \$Param{Setting}, \$IsRequired, 
+            \$Param{Default}, \$Param{Comment}, \$ValidID, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -425,6 +429,8 @@ Update a SysConfig option
     my $Result = $SysConfigObject->OptionUpdate(
         Name        => 'some name',             
         Description => 'some description',      # optional
+        Context     => '...'                    # optional
+        ContextMetadata => '...'                # optional
         Level       => 200,                     # optional
         Type        => 1,                       # optional
         Group       => 'some group',            # optional
@@ -462,7 +468,7 @@ sub OptionUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key (qw(Name Description Level Type Group IsRequired Setting Default Value Comment ValidID)) {
+    for my $Key (qw(Name Context ContextMetadata Description Level Type Group IsRequired Setting Default Value Comment ValidID)) {
 
         next KEY if defined $OptionData{$Key} && $OptionData{$Key} eq $Param{$Key};
 
@@ -504,14 +510,14 @@ sub OptionUpdate {
     # do the db update...
     my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => "UPDATE sysconfig set 
-                 name = ?, description = ?, level = ?, type = ?, group_name = ?,
-                 setting = ?, is_required = ?, is_modified = ?, default_value = ?,
-                 value = ?, comments = ?, valid_id = ?, change_time = current_timestamp, 
-                 change_by = ? WHERE name = ?", 
+                 name = ?, context = ?, context_metadata = ?, description = ?, level = ?, 
+                 type = ?, group_name = ?, setting = ?, is_required = ?, is_modified = ?, 
+                 default_value = ?, value = ?, comments = ?, valid_id = ?, 
+                 change_time = current_timestamp, change_by = ? WHERE name = ?", 
         Bind => [
-            \$Param{Name}, \$Param{Description}, \$Param{Level}, \$Param{Type},
-            \$Param{Group}, \$Param{Setting}, \$Param{IsRequired}, \$IsModified,
-            \$Param{Default}, \$Param{Value}, \$Param{Comment}, \$Param{ValidID}, 
+            \$Param{Name}, \$Param{Context}, \$Param{ContextMetadata}, \$Param{Description}, 
+            \$Param{Level}, \$Param{Type}, \$Param{Group}, \$Param{Setting}, \$Param{IsRequired}, 
+            \$IsModified, \$Param{Default}, \$Param{Value}, \$Param{Comment}, \$Param{ValidID}, 
             \$Param{UserID}, \$Param{Name}
         ],
     );

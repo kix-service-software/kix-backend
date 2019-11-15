@@ -10,8 +10,20 @@
             "Comment" : {
                "type" : "string"
             },
+            "ExecPlanIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
             "Filter" : {
                "type" : "object"
+            },
+            "MacroIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
             },
             "Name" : {
                "type" : "string"
