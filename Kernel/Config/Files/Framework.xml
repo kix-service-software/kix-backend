@@ -14,8 +14,8 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://www.kixdesk.com/de/impressum-datenschutz.html</Item>
-                <Item Key="en">https://www.kixdesk.com/en/legal-notes.html</Item>
+                <Item Key="de">https://kixdesk.com/impressum.html</Item>
+                <Item Key="en">https://kixdesk.com/impressum.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10258,7 +10258,7 @@ via the Preferences button after logging in.
         <Group>Framework</Group>
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
-            <String Regex="">http://www.kixdesk.com</String>
+            <String Regex="">https://kixdesk.com/dokumentation.html</String>
         </Setting>
     </ConfigItem>
     <ConfigItem Name="KIX::AdminManual" Required="0" Valid="1">
@@ -10266,7 +10266,7 @@ via the Preferences button after logging in.
         <Group>Framework</Group>
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
-            <String Regex="">http://www.kixdesk.com</String>
+            <String Regex="">https://kixdesk.com/dokumentation.html</String>
         </Setting>
     </ConfigItem>
 
