@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Automation::MacroAction::Ticket::LockSet;
+package Kernel::System::Automation::MacroAction::Ticket::TeamSet;
 
 use strict;
 use warnings;
@@ -21,16 +21,16 @@ use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 our @ObjectDependencies = (
     'Kernel::System::Log',
     'Kernel::System::Ticket',
-    'Kernel::System::Lock'
+    'Kernel::System::Queue'
 );
 
 =head1 NAME
 
-Kernel::System::Automation::MacroAction::Ticket::LockSet - A module to lock or unlock a ticket
+Kernel::System::Automation::MacroAction::Ticket::TeamSet - A module to move a ticket to a new team
 
 =head1 SYNOPSIS
 
-All LockSet functions.
+All TeamSet functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -47,12 +47,12 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the lock state of a ticket.');
+    $Self->Description('Sets the team of a ticket.');
     $Self->AddOption(
-        Name        => 'Lock',
-        Label       => 'Lock',
-        Description => 'The lock state to be set.',
-        Required    => 1,
+        Name        => 'Team',
+        Label       => 'Team',
+        Description => 'The name of the team to be set.',
+        Required    => 1
     );
 
     return;
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Lock => 'unlock',
+            Team => 'Junk',
         },
         UserID   => 123,
     );
@@ -89,35 +89,35 @@ sub Run {
         return;
     }
 
-    # set the new owner
-    my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
-        Lock => $Param{Config}->{Lock},
+    # set the new team
+    my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        Queue => $Param{Config}->{Team}
     );
 
-    if ( !$LockID ) {
+    if ( !$QueueID ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - can't find lock state \"$Param{Config}->{Lock}\"!",
+            Message  => "Couldn't update ticket $Param{TicketID} - can't find ticket team \"$Param{Config}->{Team}\"!",
             UserID   => $Param{UserID}
         );
         return;
     }
 
-    # do nothing if the desired lock state is already set
-    if ( $LockID eq $Ticket{LockID} ) {
+    # do nothing if the desired team is already set
+    if ( $QueueID eq $Ticket{QueueID} ) {
         return 1;
     }
 
-    my $Success = $TicketObject->LockSet(
+    my $Success = $TicketObject->TicketQueueSet(
         TicketID => $Param{TicketID},
-        LockID   => $LockID,
+        QueueID  => $QueueID,
         UserID   => $Param{UserID},
     );
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the lock state \"$Param{Config}->{Lock}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the team \"$Param{Config}->{Team}\" failed!",
             UserID   => $Param{UserID}
         );
         return;

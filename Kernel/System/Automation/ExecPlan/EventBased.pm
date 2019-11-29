@@ -60,30 +60,6 @@ sub Describe {
     return;
 }
 
-=item Validate()
-
-Validates the configuration hash. Returns 1 if the config is valid and nothing if not.
-
-Example:
-    my $Result = $Object->Validate(Config => {});
-
-=cut
-
-sub Validate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{Config} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Config!',
-        );
-        return;
-    }
-
-    return 1;
-}
-
 =item Run()
 
 Check if the criteria are met, based on the given event. Returns 1 if the job can be executed and 0 if not.
@@ -99,16 +75,25 @@ Example:
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{Event} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Event!',
-        );
-        return;
-    }
+    # just return in case it's not an event based check
+    return 0 if !$Param{Event};
 
-    return 1;
+    # check needed stuff
+    for (qw(Config)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }    
+
+    return 0 if !IsHashRefWithData($Param{Config}) || !IsArrayRefWithData($Param{Config}->{Event});
+
+    my %RelevantEvents = map { $_ => 1 } @{$Param{Config}->{Event}};
+
+    return $RelevantEvents{$Param{Event}} || 0;
 }
 
 =back

@@ -37,116 +37,82 @@ All TitleSet functions.
 
 =cut
 
-=item new()
+=item Describe()
 
-create an object. Do not use it directly, instead use:
-
-    use Kernel::System::ObjectManager;
-    local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TitleSetObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Ticket::TitleSet');
+Describe this macro action module.
 
 =cut
 
-sub new {
-    my ( $Type, %Param ) = @_;
+sub Describe {
+    my ( $Self, %Param ) = @_;
 
-    # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
+    $Self->Description('Sets the title of a ticket.');
+    $Self->AddOption(
+        Name        => 'Title',
+        Label       => 'Title',
+        Description => 'The new title of a ticket to be set.',
+        Required    => 1,
+    );
 
-    return $Self;
+    return;
 }
 
 =item Run()
 
-    Run Data
+Run this module. Returns 1 if everything is ok.
 
-    my $TitleSetResult = $TitleSetActionObject->Run(
-        UserID                   => 123,
-        Ticket                   => \%Ticket,   # required
-        ProcessEntityID          => 'P123',
-        ActivityEntityID         => 'A123',
-        TransitionEntityID       => 'T123',
-        TransitionActionEntityID => 'TA123',
-        Config                   => {
-            Title  => 'Some ticket title',
-            UserID => 123,                      # optional, to override the UserID from the logged user
-
-        }
+Example:
+    my $Success = $Object->Run(
+        TicketID => 123,
+        Config   => {
+            Title   => 'A new ticket title'
+        },
+        UserID   => 123,
     );
-    Ticket contains the result of TicketGet including DynamicFields
-    Config is the Config Hash stored in a Process::TransitionAction's  Config key
-    Returns:
-
-    $TitleSetResult = 1; # 0
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # define a common message to output in case of any error
-    my $CommonMessage = "Process: $Param{ProcessEntityID} Activity: $Param{ActivityEntityID}"
-        . " Transition: $Param{TransitionEntityID}"
-        . " TransitionAction: $Param{TransitionActionEntityID} - ";
+    # check incoming parameters
+    return if !$Self->_CheckParams(%Param);
 
-    # check for missing or wrong params
-    my $Success = $Self->_CheckParams(
-        %Param,
-        CommonMessage => $CommonMessage,
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    my %Ticket = $TicketObject->TicketGet(
+        TicketID => $Param{TicketID},
     );
-    return if !$Success;
 
-    # override UserID if specified as a parameter in the TA config
-    $Param{UserID} = $Self->_OverrideUserID(%Param);
-
-    # use ticket attributes if needed
-    $Self->_ReplaceTicketAttributes(%Param);
-
-    # Check for required parameters in ConfigHash
-    if ( !defined $Param{Config}->{Title} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => $CommonMessage . "No Title configured!",
-        );
+    if (!%Ticket) {
         return;
     }
 
-    $Success = 0;
-    if (
-        $Param{Config}->{Title} ne $Param{Ticket}->{Title}
-        )
-    {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketTitleUpdate(
-            Title    => $Param{Config}->{Title},
-            TicketID => $Param{Ticket}->{TicketID},
-            UserID   => $Param{UserID},
-        );
+    # do nothing if the desired title is already set
+    if ( $Param{Title} && $Param{Title} eq $Ticket{Title} ) {
+        return 1;
     }
-    else {
 
-        # data is the same as in ticket nothing to do
-        $Success = 1;
-    }
+    my $Success = $TicketObject->TicketTitleUpdate(
+        TicketID => $Param{TicketID},
+        Title    => $Param{Config}->{Title},
+        UserID   => $Param{UserID},
+    );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => $CommonMessage
-                . 'Ticket title could not be updated for Ticket: '
-                . $Param{Ticket}->{TicketID} . '!',
+        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the title \"$Param{Config}->{Title}\" failed!",
+            UserID   => $Param{UserID}
         );
         return;
     }
+
 
     return 1;
 }
 
 1;
-
-
-
-
 
 =back
 

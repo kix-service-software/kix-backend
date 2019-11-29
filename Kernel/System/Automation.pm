@@ -64,27 +64,28 @@ sub new {
     return $Self;
 }
 
-=item LogError()
+=item ExecuteEventbasedJobs()
 
-Logs an error message.
+Execute all relevant eventbased jobs for a given type
 
 Example:
-    my $Success = $Object->LogError(
-        Referrer => $Object,
-        Message  => '...',
-        UserID   => 123,
+    my $Success = $Object->ExecuteEventbasedJobs(
+        Type      => 'Ticket',
+        Event     => 'TicketCreate',
+        Data      => {
+            ...
+        },
+        Config    => {},
+        UserID    => 123,
     );
 
 =cut
 
-sub LogError {
+sub ExecuteJobsForEvent {
     my ( $Self, %Param ) = @_;
-    my $JobID;
-    my $MacroID;
-    my $MacroActionID;
 
     # check needed stuff
-    for (qw(Message UserID)) {
+    for (qw(Type Event UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -94,17 +95,114 @@ sub LogError {
         }
     }
 
-    if ( $Param{Referrer} ) {
-        $JobID = $Param{Referrer}->{JobID};
-        $MacroID = $Param{Referrer}->{MacroID};
-        $MacroActionID = $Param{Referrer}->{MacroActionID};        
+    # get all valid jobs
+    my %JobList = $Self->JobList(
+        Valid => 1
+    );
+    foreach my $JobID ( sort keys %JobList ) {
+        my %Job = $Self->JobGet(
+            ID => $JobID
+        );
+        # ignore jobs of non-relevant types
+        next if $Job{Type} ne $Param{Type};
+
+        my $CanExecute = $Self->JobIsExecutable(
+            ID => $JobID,
+            %Param,
+        );
+
+        if ( $CanExecute ) {
+            # execute the job
+            my $Result = $Self->JobExecute(
+                ID => $JobID,
+                %Param,
+            );
+        }
     }
 
+    return 1;
+}
+
+=item LogInfo()
+
+Logs an information message.
+
+Example:
+    my $Success = $Object->LogInfo(
+        Message  => '...',
+        UserID   => 123,
+    );
+
+=cut
+
+sub LogInfo {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->_Log(
+        %Param,
+        Priority => 'info',
+    )
+}
+
+=item LogError()
+
+Logs an error message.
+
+Example:
+    my $Success = $Object->LogError(
+        Message  => '...',
+        UserID   => 123,
+    );
+
+=cut
+
+sub LogError {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->_Log(
+        %Param,
+        Priority => 'error',
+    )
+}
+
+=item _Log()
+
+Logs a message.
+
+Example:
+    my $Success = $Object->_Log(
+        Priority => '...'               # see Kernel::System::Log::LogLevel
+        Message  => '...',
+        UserID   => 123,
+    );
+
+=cut
+
+sub _Log {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Message Priority UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }
+
+    my $JobID         = $Self->{JobID};
+    my $RunID         = $Self->{RunID};
+    my $MacroID       = $Self->{MacroID};
+    my $MacroActionID = $Self->{MacroActionID};        
+    my $ObjectID      = $Self->{ObjectID};        
+
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'INSERT INTO automation_log (job_id, macro_id, macro_action_id, priority, message, create_time, create_by) '
-            . 'VALUES (?, ?, ?, \'error\', ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
+            . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
-            \$JobID, \$MacroID, \$MacroActionID, \$Param{Message}, \$Param{UserID}
+            \$JobID, \$RunID, \$MacroID, \$MacroActionID, \$ObjectID, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
         ],
     );
 
@@ -132,13 +230,13 @@ sub LogError {
         my %MacroAction = $Self->MacroActionGet(
             ID => $MacroActionID
         );
-        $MacroActionInfo = "$MacroAction{Name} ($MacroActionID)";
+        $MacroActionInfo = "$MacroAction{Type} ($MacroActionID)";
     }
 
     # log in system log
     $Kernel::OM->Get('Kernel::System::Log')->Log(
-        Priority => 'error',
-        Message  => "$Param{Message} (Job: $JobInfo, Macro: $MacroInfo, MacroAction: $MacroActionInfo)",
+        Priority => $Param{Priority},
+        Message  => "$Param{Message} (Job: $JobInfo, RunID: $RunID, Macro: $MacroInfo, MacroAction: $MacroActionInfo)",
     );
 
     return 1;

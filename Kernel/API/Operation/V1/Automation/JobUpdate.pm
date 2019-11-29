@@ -170,6 +170,24 @@ sub Run {
         );
     }
 
+    if ( $Job->{Exec} ) {
+        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->JobExecute(
+            ID     => $Param{Data}->{JobID},
+            UserID => $Self->{Authorization}->{UserID},
+        );
+
+        if ( !$Success ) {
+            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+                Type => 'error', 
+                What => 'Message',
+            );
+            return $Self->_Error(
+                Code    => 'Object.ExecFailed',
+                Message => "An error occured during job execution (error: $LogMessage).",
+            );
+        }
+    }
+
     # return result    
     return $Self->_Success(
         JobID => 0 + $Param{Data}->{JobID},

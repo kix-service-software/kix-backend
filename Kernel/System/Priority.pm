@@ -126,9 +126,27 @@ sub PriorityList {
 
 get a priority
 
-    my %List = $PriorityObject->PriorityGet(
+    my %Priority = $PriorityObject->PriorityGet(
         PriorityID => 123,
         UserID     => 1,
+    );
+
+    my %Priority = $PriorityObject->PriorityGet(
+        Name   => '3 normal',
+        UserID => 1,
+    );
+
+Returns:
+
+    Priority = (
+        ID                  => '123',
+        Name                => '3 normal',
+        Comment             => '...',
+        ValidID             => '1',
+        CreateTime          => '2010-04-07 15:41:15',
+        CreateBy            => '321',
+        ChangeTime          => '2010-04-07 15:59:45',
+        ChangeBy            => '223',
     );
 
 =cut
@@ -136,8 +154,40 @@ get a priority
 sub PriorityGet {
     my ( $Self, %Param ) = @_;
 
+    # either ID or Name must be passed
+    if ( !$Param{PriorityID} && !$Param{Name} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need PriorityID or Name!',
+        );
+        return;
+    }
+
+    # check that not both ID and Name are given
+    if ( $Param{PriorityID} && $Param{Name} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need either PriorityID OR Name - not both!',
+        );
+        return;
+    }
+
+    # lookup the ID
+    if ( $Param{Name} ) {
+        $Param{PriorityID} = $Self->PriorityLookup(
+            Priority => $Param{Name},
+        );
+        if ( !$Param{PriorityID} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "ID for Priority '$Param{Name}' not found!",
+            );
+            return;
+        }
+    }
+
     # check needed stuff
-    for (qw(PriorityID UserID)) {
+    for (qw(UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',

@@ -21,6 +21,7 @@ use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 our @ObjectDependencies = (
     'Kernel::System::Log',
     'Kernel::System::Ticket',
+    'Kernel::System::User'
 );
 
 =head1 NAME
@@ -49,7 +50,7 @@ sub Describe {
     $Self->Description('Sets the owner of a ticket.');
     $Self->AddOption(
         Name        => 'Owner',
-        Label       => 'Owner',        
+        Label       => 'Owner',
         Description => 'The login of the agent to be set.',
         Required    => 1,
     );
@@ -76,13 +77,17 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check incoming parameters
-    return if !$Self->_CheckParams(\%Param);
+    return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
     );
+
+    if (!%Ticket) {
+        return;
+    }
 
     # set the new owner
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
@@ -91,18 +96,19 @@ sub Run {
 
     if ( !$UserID ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-            Referrer  => $Self,
+            Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - can't find user with login \"$Param{Config}->{Owner}\"!",
+            UserID   => $Param{UserID}
         );
         return;
     }
 
     # do nothing if the desired owner is already set
-    if ( defined $UserID && $UserID eq $Ticket{OwnerID} ) {
+    if ( $UserID eq $Ticket{OwnerID} ) {
         return 1;
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketOwnerSet(
+    my $Success = $TicketObject->TicketOwnerSet(
         TicketID  => $Param{TicketID},
         NewUserID => $UserID,
         UserID    => $Param{UserID},
@@ -110,8 +116,9 @@ sub Run {
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-            Referrer  => $Self,
+            Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the owner \"$Param{Config}->{Owner}\" failed!",
+            UserID   => $Param{UserID}
         );
         return;
     }

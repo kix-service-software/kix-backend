@@ -11,6 +11,8 @@ package Kernel::System::Automation::ExecPlan::TimeBased;
 use strict;
 use warnings;
 
+use Date::Pcalc qw(:all);
+
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -66,12 +68,14 @@ sub Describe {
     return;
 }
 
-=item Validate()
+=item ValidateConfig()
 
-Validates the configuration hash. Returns 1 if the config is valid and nothing is not.
+Validates the parameters of the config.
 
 Example:
-    my $Result = $Object->Validate(Config => {});
+    my $Valid = $Self->ValidateConfig(
+        Config => {}                # required
+    );
 
 =cut
 
@@ -87,34 +91,96 @@ sub Validate {
         return;
     }
 
+    # do some basic checks
+    return if !$Self->SUPER::Validate(%Param);
+
+    # check the weekdays
+
     return 1;
 }
 
-=item Check()
+=item Run()
 
 Check if the criteria are met, based on the given date+time. Returns 1 if the job can be executed and 0 if not.
 
 Example:
-    my $CanExecute = $Object->Check(
-        Time   => '2019-10-25 13:55:26',
-        Config => {},
+    my $CanExecute = $Object->Run(
+        Time              => '2019-10-25 13:55:26',
+        Config            => {},
+        LastExecutionTime => '2019-10-25 13:55:05'
     );
 
 =cut
 
-sub Check {
+sub Run {
     my ( $Self, %Param ) = @_;
 
+    # just return in case it's not a time based check
+    return 0 if !$Param{Time};
+
     # check needed stuff
-    if ( !$Param{Time} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Time!',
-        );
-        return;
+    for (qw(Config)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }    
+
+    return 0 if !IsHashRefWithData($Param{Config}) || !IsArrayRefWithData($Param{Config}->{Weekday}) || !IsArrayRefWithData($Param{Config}->{Time});
+
+    # convert given time to system time and split
+    my $CheckSystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        String => $Param{Time}
+    );
+    my ($Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay) = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
+        SystemTime => $CheckSystemTime
+    );
+
+    # check weekday
+    my @DayMap = qw/Sun Mon Tue Wed Thu Fri Sat/;
+    my $CanExecute = 0;
+    foreach my $RelevantDay ( @{$Param{Config}->{Weekday}} ) {
+        next if $RelevantDay ne $DayMap[$WeekDay];
+        $CanExecute = 1;
+        last;
     }
 
-    return 1;
+    return 0 if !$CanExecute;
+
+    # check time
+    my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear ) = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
+        SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime()
+    );
+    my $LastRunSystemTime = 0;
+    if ( $Param{LastExecutionTime} ) {
+        $LastRunSystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            String => $Param{LastExecutionTime}
+        );
+    }
+
+    $CanExecute = 0;
+    foreach my $Time ( @{$Param{Config}->{Time}} ) {
+        # calculate time of next run 
+        my $NextRunSystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            String => "$CurrYear-$CurrMonth-$CurrDay ".$Time.':00'
+        );
+        # ignore if next run time is not after the last job run
+        next if $NextRunSystemTime > $CheckSystemTime;
+
+        # ignore if next run time is not after the last job run
+        next if $NextRunSystemTime <= $LastRunSystemTime;
+
+        # ignore if the job could be executed but it was already executed
+        next if $NextRunSystemTime <= $CheckSystemTime && $LastRunSystemTime >= $CheckSystemTime;
+
+        $CanExecute = 1;
+        last;
+    }
+
+    return $CanExecute;
 }
 
 =back

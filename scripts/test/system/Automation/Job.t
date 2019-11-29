@@ -256,7 +256,10 @@ $Self->True(
 # create job with execplan assignment
 my $ExecPlanID = $AutomationObject->ExecPlanAdd(
     Name    => 'execplan-'.$NameRandom,
-    Type    => 'TimeBased',
+    Type    => 'EventBased',
+    Parameters => {
+        Event => [ 'TicketCreate' ]
+    },
     ValidID => 1,
     UserID  => 1,
 );

@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Automation::MacroAction::Ticket::LockSet;
+package Kernel::System::Automation::MacroAction::Ticket::PrioritySet;
 
 use strict;
 use warnings;
@@ -21,16 +21,16 @@ use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 our @ObjectDependencies = (
     'Kernel::System::Log',
     'Kernel::System::Ticket',
-    'Kernel::System::Lock'
+    'Kernel::System::Priority',
 );
 
 =head1 NAME
 
-Kernel::System::Automation::MacroAction::Ticket::LockSet - A module to lock or unlock a ticket
+Kernel::System::Automation::MacroAction::Ticket::PrioritySet - A module to set the ticket priority
 
 =head1 SYNOPSIS
 
-All LockSet functions.
+All PrioritySet functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -47,12 +47,12 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the lock state of a ticket.');
+    $Self->Description('Sets the priority of a ticket.');
     $Self->AddOption(
-        Name        => 'Lock',
-        Label       => 'Lock',
-        Description => 'The lock state to be set.',
-        Required    => 1,
+        Name        => 'Priority',
+        Label       => 'Priority',
+        Description => 'The name of the priority to be set.',
+        Required    => 1
     );
 
     return;
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Lock => 'unlock',
+            Priority => '3 normal',
         },
         UserID   => 123,
     );
@@ -89,35 +89,36 @@ sub Run {
         return;
     }
 
-    # set the new owner
-    my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
-        Lock => $Param{Config}->{Lock},
+    # set the new priority
+    my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+        Priority => $Param{Config}->{Priority}
     );
 
-    if ( !$LockID ) {
+    if ( !$PriorityID ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - can't find lock state \"$Param{Config}->{Lock}\"!",
+            Message  => "Couldn't update ticket $Param{TicketID} - can't find ticket priority \"$Param{Config}->{Priority}\"!",
             UserID   => $Param{UserID}
         );
         return;
     }
 
-    # do nothing if the desired lock state is already set
-    if ( $LockID eq $Ticket{LockID} ) {
+    # do nothing if the desired priority is already set
+    if ( $PriorityID eq $Ticket{PriorityID} ) {
         return 1;
     }
 
-    my $Success = $TicketObject->LockSet(
-        TicketID => $Param{TicketID},
-        LockID   => $LockID,
-        UserID   => $Param{UserID},
+    my $Success = $TicketObject->PrioritySet(
+        TicketID   => $Param{TicketID},
+        PriorityID => $PriorityID,
+        Priority   => $Param{Config}->{Priority},
+        UserID     => $Param{UserID},
     );
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the lock state \"$Param{Config}->{Lock}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the priority \"$Param{Config}->{Priority}\" failed!",
             UserID   => $Param{UserID}
         );
         return;

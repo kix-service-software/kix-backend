@@ -41,7 +41,7 @@ Example:
 
 =cut
 
-sub Run {
+sub _CheckParams {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -55,7 +55,61 @@ sub Run {
         }
     }
 
+    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        TicketID => $Param{TicketID},
+    );
+
+    if (!%Ticket) {
+        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't update ticket $Param{TicketID} - ticket not found!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    if (ref $Param{Config} ne 'HASH') {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Config is no object!",
+        );
+        return;
+    }
+
+    my %Definition = $Self->DefinitionGet();
+
+    if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
+        for my $Option ( values %{$Definition{Options}}) {
+            if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Option->{Name} in Config!",
+                );
+                return;
+            }
+        }
+    }
+
     return 1;
+}
+
+sub _ConvertScalar2ArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    # FIXME: check if correct
+    # BPMX-capeIT
+    #    my @Data = split /,/, $Param{Data};
+    my @Data = split( '/,/,', $Param{Data} );
+
+    # EO BPMX-capeIT
+
+    # remove any possible heading and tailing white spaces
+    for my $Item (@Data) {
+        $Item =~ s{\A\s+}{};
+        $Item =~ s{\s+\z}{};
+    }
+
+    return \@Data;
 }
 
 1;

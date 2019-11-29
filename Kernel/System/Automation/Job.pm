@@ -492,56 +492,12 @@ sub JobDelete {
 
 }
 
-=item LastExecutionTimeSet()
-
-updates last execution time of a job
-
-    my $Success = $AutomationObject->LastExecutionTimeSet(
-        ID         => 123,
-        UserID     => 123,
-    );
-
-=cut
-
-sub LastExecutionTimeSet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(ID UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
-            return;
-        }
-    }
-
-    # update ExecPlan in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE job SET last_exec_time = current_timestamp WHERE id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
-    # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
-
-    # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Job',
-        ObjectID  => $Param{ID},
-    );
-
-    return 1;
-}
-
 =item JobMacroList()
 
 returns a list of all Macro ids assigned to given Job
 
     my @MacroIDs = $AutomationObject->JobMacroList(
-        JobID => 123
+        ID => 123
     );
 
 =cut
@@ -853,6 +809,380 @@ sub JobExecPlanDelete {
     );
 
     return 1;
+}
+
+=item JobIsExecutable()
+
+checks if a job is executable. Return 0 or 1.
+
+    my $Result = $AutomationObject->JobIsExecutable(
+        ID       => 123,        # the ID of the job
+        UserID    => 1
+        ...
+    );
+
+=cut
+
+sub JobIsExecutable {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my @ExecPlanList = $Self->JobExecPlanList(
+        JobID => $Param{ID}
+    );
+
+    my $CanExecute = 0;
+    foreach my $ExecPlanID ( @ExecPlanList ) {
+        $CanExecute = $Self->ExecPlanCheck(
+            %Param,
+            JobID => $Param{ID},
+            ID    => $ExecPlanID,
+        );
+        last if $CanExecute;
+    }
+
+    return $CanExecute;
+}
+
+=item JobExecute()
+
+executes a job
+
+    my $Success = $AutomationObject->JobExecute(
+        ID        => 123,       # the ID of the job
+        Data      => {},        # optional, contains the relevant data given by an event or otherwise
+        UserID    => 1
+    );
+
+=cut
+
+sub JobExecute {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # add JobID for log reference
+    $Self->{JobID} = $Param{ID};
+
+    # get Job data
+    my %Job = $Self->JobGet(
+        ID => $Param{ID}
+    );
+
+    if ( !%Job ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such job with ID $Param{ID}!"
+        );
+        return;        
+    }
+
+    # create job run
+    my $RunID = $Self->_JobRunAdd(
+        %Param,
+        JobID => $Param{ID},
+    );
+
+    if ( !$RunID ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to create a new run for job with ID $Param{ID}!"
+        );
+        return;        
+    }
+
+    # add RunID for log reference
+    $Self->{RunID} = $RunID;
+
+    # get all assigned macros
+    my @MacroIDs = $Self->JobMacroList(
+        JobID => $Param{ID}
+    );
+
+    # return success if we have nothing to do
+    if ( !IsArrayRefWithData(\@MacroIDs) ) {
+        $Self->LogInfo(
+            Message  => "Job \"$Job{Name}\" has no macros to execute.",
+            UserID   => $Param{UserID},
+        );
+        return 1;
+    }
+
+    # check the macro if they are executable, return success if not
+    my $ExecutableMacroCount = 0;
+    foreach my $MacroID ( @MacroIDs ) {
+         $ExecutableMacroCount++ if $Self->MacroIsExecutable(
+            ID     => $MacroID,
+            UserID => $Param{UserID},
+        );
+    }
+    if ( !$ExecutableMacroCount ) {
+        $Self->LogInfo(
+            Message  => "Job \"$Job{Name}\" has assigned macros but non of them is executable. Aborting job execution.",
+            UserID   => $Param{UserID},
+        );
+    }
+
+    # load type backend module
+    my $BackendObject = $Self->_LoadJobTypeBackend(
+        Name => $Job{Type},
+    );
+    return if !$BackendObject;
+
+    # add referrer data
+    $BackendObject->{JobID} = $Self->{JobID};
+    $BackendObject->{RunID} = $Self->{RunID};
+
+    # execute backend object for given type to get the (real) list of objects (search or filter)
+    my @ObjectIDs = $BackendObject->Run(
+        Data      => $Param{Data},
+        Filter    => $Job{Filter},
+        UserID    => $Param{UserID},
+    );
+
+    if ( !@ObjectIDs ) {
+        $Self->LogInfo(
+            Message  => "No relevant objects. Aborting job execution.",
+            UserID   => $Param{UserID},
+        );
+        return;
+    }
+
+    # update execution time of job
+    my $Success = $Self->_JobLastExecutionTimeSet(
+        ID         => $Param{ID},
+        UserID     => $Param{UserID},
+    );
+
+    $Self->LogInfo(
+        Message  => "executing job \"$Job{Name}\" with $ExecutableMacroCount macros on ".(scalar(@ObjectIDs))." objects.",
+        UserID   => $Param{UserID},
+    );
+
+    # execute any macro with the list of objects
+    my $Warning = 0;
+    foreach my $MacroID ( sort @MacroIDs ) {
+        foreach my $ObjectID ( @ObjectIDs ) {
+            my $Result = $Self->MacroExecute(
+                ID        => $MacroID,
+                ObjectID  => $ObjectID,
+                UserID    => $Param{UserID},
+            );
+
+            if ( !$Result ) {
+                my %Macro = $Self->MacroGet(
+                    ID        => $MacroID,
+                    UserID    => $Param{UserID},
+                );
+
+                $Self->LogError(
+                    Message  => "Macro $Macro{Name} returned execution error for ObjectID $ObjectID.",
+                    UserID   => $Param{UserID},
+                );
+                $Warning = 1;
+            }
+        }
+    }
+
+    $Self->LogInfo(
+        Message  => "job execution finished successfully.",
+        UserID   => $Param{UserID},
+    );
+
+    # update job run
+    my $StateID = 2;        # finished 
+    if ( $Warning ) {
+        $StateID = 3        # finished with errors
+    }
+    $Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'UPDATE job_run SET end_time = current_timestamp, state_id = ? WHERE id = ?',
+        Bind => [ \$StateID, \$RunID ],
+    );
+
+    # remove JobID and RunID from log reference
+    delete $Self->{JobID};
+    delete $Self->{RunID};
+
+    return 1;
+}
+
+=item _LastExecutionTimeSet()
+
+updates last execution time of a job
+
+    my $Success = $AutomationObject->_JobLastExecutionTimeSet(
+        ID         => 123,
+        UserID     => 123,
+        Time       => '...',        # optional, set explicit time instead of current timestamp        
+    );
+
+=cut
+
+sub _JobLastExecutionTimeSet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }
+
+    # update ExecPlan in database
+    if ( $Param{Time} ) {
+        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+            SQL => 'UPDATE job SET last_exec_time = ? WHERE id = ?',
+            Bind => [ \$Param{Time}, \$Param{ID} ],
+        );
+    }
+    else {
+        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+            SQL => 'UPDATE job SET last_exec_time = current_timestamp WHERE id = ?',
+            Bind => [ \$Param{ID} ],
+        );
+    }
+
+    # delete whole cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Job',
+        ObjectID  => $Param{ID},
+    );
+
+    return 1;
+}
+
+sub _LoadJobTypeBackend {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Name)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # load type backend
+    $Self->{JobTypeModules} //= {};
+
+    if ( !$Self->{JobTypeModules}->{$Param{Name}} ) {
+        my $Backend = 'Kernel::System::Automation::Job::' . $Param{Name};
+
+        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!"
+            );   
+            return;
+        }
+
+        my $BackendObject = $Backend->new( %{$Self} );
+        if ( !$BackendObject ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!"
+            );        
+            return;
+        }
+
+        $Self->{JobTypeModules}->{$Param{Name}} = $BackendObject;
+    }
+
+    return $Self->{JobTypeModules}->{$Param{Name}};
+}
+
+sub _JobRunAdd {    
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(JobID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get Job data
+    my %Job = $Self->JobGet(
+        ID => $Param{JobID}
+    );
+
+    if ( !%Job ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such job with ID $Param{JobID}!"
+        );
+        return;        
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # prepare filter as JSON
+    my $Filter;
+    if ( $Job{Filter} ) {
+        $Filter = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+            Data => $Job{Filter}
+        );
+    }    
+
+    return if !$DBObject->Do(
+        SQL => 'INSERT INTO job_run (job_id, filter, state_id, start_time, create_by) '
+             . 'VALUES (?, ?, 1, current_timestamp, ?)',
+        Bind => [
+            \$Param{JobID}, \$Filter, \$Param{UserID}
+        ],
+    );
+
+    # get new id
+    return if !$DBObject->Prepare(
+        SQL  => 'SELECT id FROM job_run WHERE job_id = ? ORDER by id DESC',
+        Bind => [ 
+            \$Param{JobID}, 
+        ],
+        Limit => 1,
+    );
+
+    # fetch the result
+    my $ID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $ID = $Row[0];
+    }    
+
+    return $ID;
 }
 
 1;
