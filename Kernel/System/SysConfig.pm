@@ -984,6 +984,9 @@ sub Rebuild {
     foreach my $Name ( @OptionList ) {
         next if $ExistingKeys{$Name};
 
+        # keep options with context
+        next if IsHashRefWithData($AllOptions{$Name}) && $AllOptions{$Name}->{Context};
+
         # delete DB entry
         $Self->OptionDelete(
             Name => $Name
