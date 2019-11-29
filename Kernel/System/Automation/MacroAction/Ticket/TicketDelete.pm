@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Automation::MacroAction::Ticket::LockSet;
+package Kernel::System::Automation::MacroAction::Ticket::TicketDelete;
 
 use strict;
 use warnings;
@@ -21,16 +21,16 @@ use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 our @ObjectDependencies = (
     'Kernel::System::Log',
     'Kernel::System::Ticket',
-    'Kernel::System::Lock'
+    'Kernel::System::Priority',
 );
 
 =head1 NAME
 
-Kernel::System::Automation::MacroAction::Ticket::LockSet - A module to lock or unlock a ticket
+Kernel::System::Automation::MacroAction::Ticket::TicketDelete - A module to delete a ticket
 
 =head1 SYNOPSIS
 
-All LockSet functions.
+All TicketDelete functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -47,13 +47,7 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the lock state of a ticket.');
-    $Self->AddOption(
-        Name        => 'Lock',
-        Label       => 'Lock',
-        Description => 'The lock state to be set.',
-        Required    => 1,
-    );
+    $Self->Description('Deletes a ticket.');
 
     return;
 }
@@ -65,9 +59,7 @@ Run this module. Returns 1 if everything is ok.
 Example:
     my $Success = $Object->Run(
         TicketID => 123,
-        Config   => {
-            Lock => 'unlock',
-        },
+        Config   => {},
         UserID   => 123,
     );
 
@@ -89,35 +81,15 @@ sub Run {
         return;
     }
 
-    # set the new owner
-    my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
-        Lock => $Param{Config}->{Lock},
-    );
-
-    if ( !$LockID ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-            Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - can't find lock state \"$Param{Config}->{Lock}\"!",
-            UserID   => $Param{UserID}
-        );
-        return;
-    }
-
-    # do nothing if the desired lock state is already set
-    if ( $LockID eq $Ticket{LockID} ) {
-        return 1;
-    }
-
-    my $Success = $TicketObject->LockSet(
-        TicketID => $Param{TicketID},
-        LockID   => $LockID,
-        UserID   => $Param{UserID},
+    my $Success = $TicketObject->TicketDelete(
+        TicketID   => $Param{TicketID},
+        UserID     => $Param{UserID}
     );
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the lock state \"$Param{Config}->{Lock}\" failed!",
+            Message  => "Couldn't delete ticket $Param{TicketID}!",
             UserID   => $Param{UserID}
         );
         return;

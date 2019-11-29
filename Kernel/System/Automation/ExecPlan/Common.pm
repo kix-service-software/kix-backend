@@ -134,16 +134,18 @@ sub AddOption {
     return 1;
 }
 
-=item Validate()
+=item ValidateConfig()
 
-Validates the configuration hash. Returns 1 if the config is valid and nothing if not.
+Validates the required parameters of the config.
 
 Example:
-    my $Result = $Object->Validate(Config => {});
+    my $Valid = $Self->ValidateConfig(
+        Config => {}                # required
+    );
 
 =cut
 
-sub Validate {
+sub ValidateConfig {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -155,6 +157,14 @@ sub Validate {
         return;
     }
 
+    foreach my $Option ( sort keys %{$Self->{Definition}->{Options}} ) {
+        next if !$Self->{Definition}->{Options}->{$Option}->{Required};
+
+        if ( !exists $Param{Config}->{$Option} ) {
+            return;
+        }
+    }
+    
     return 1;
 }
 

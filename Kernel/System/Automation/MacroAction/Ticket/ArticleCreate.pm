@@ -38,57 +38,103 @@ All ArticleCreate functions.
 
 =cut
 
+=item Describe()
+
+Describe this macro action module.
+
+=cut
+
+sub Describe {
+    my ( $Self, %Param ) = @_;
+
+    $Self->Description('Creates an article for a ticket.');
+    $Self->AddOption(
+        Name        => 'Channel',
+        Label       => 'Channel',
+        Description => '(Optional) The channel of the new article. "note" will be used if omitted.',
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'SenderType',
+        Label       => 'Sender Type',
+        Description => '(Optional) The sender type of the new article. "agent" will be used if omitted.',
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'From',
+        Label       => 'From',
+        Description => '(Optional) The email address of the sender for the new article. Agent data will be used if omitted.',
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'To',
+        Label       => 'To',
+        Description => '(Optional) The email addresses of the receiver of the new article.',
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Cc',
+        Label       => 'Cc',
+        Description => '(Optional) The email addresses of the Cc receiver of the new article.',
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Bcc',
+        Label       => 'Bcc',
+        Description => '(Optional) The email addresses of the Bcc receiver of the new article.',
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Subject',
+        Label       => 'Subject',
+        Description => 'The subject of the new article.',
+        Required    => 1,
+    );
+    $Self->AddOption(
+        Name        => 'Body',
+        Label       => 'Body',
+        Description => 'The text of the new article.',
+        Required    => 1,
+    );
+    $Self->AddOption(
+        Name        => 'TimeUnits',
+        Label       => 'TimeUnits',
+        Description => 'The time units to add for the new article.',
+        Required    => 0,
+    );
+    # FIXME: add if necessary
+    # $Self->AddOption(
+    #     Name        => 'CustomerVisible',
+    #     Label       => 'For Customer Visible',
+    #     Description => '(Optional) If the new article is visible for customer. Possible are 0 or 1.',
+    #     Required    => 0,
+    # );
+    # Charset          => 'utf-8',                                # 'ISO-8859-15'
+    # MimeType         => 'text/plain',
+    # HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
+    # HistoryComment   => 'Some free text!',
+    # UnlockOnAway     => 1,                                      # Unlock ticket if owner is away
+    # ForceNotificationToUserID
+    # ExcludeNotificationToUserID
+    # ExcludeMuteNotificationToUserID
+
+    return;
+}
+
 =item Run()
 
-    Run Data
+Run this module. Returns 1 if everything is ok.
 
-    my $ArticleCreateResult = $ArticleCreateActionObject->Run(
-        UserID                   => 123,
-        Ticket                   => \%Ticket,   # required
-        ProcessEntityID          => 'P123',
-        ActivityEntityID         => 'A123',
-        TransitionEntityID       => 'T123',
-        TransitionActionEntityID => 'TA123',
-        Config                   => {
-            # required:
-            Channel          => 'note',                                 # ...
-            CustomerVisible  => 0|1                                     # optional
-            SenderType       => 'agent',                                # agent|system|customer
-            ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
-            Subject          => 'some short description',               # required
-            Body             => 'the message text',                     # required
-            HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
-            HistoryComment   => 'Some free text!',
-
-            # optional:
-            From             => 'Some Agent <email@example.com>',       # not required but useful
-            To               => 'Some Customer A <customer-a@example.com>', # not required but useful
-            Cc               => 'Some Customer B <customer-b@example.com>', # not required but useful
-            ReplyTo          => 'Some Customer B <customer-b@example.com>', # not required
-            MessageID        => '<asdasdasd.123@example.com>',          # not required but useful
-            InReplyTo        => '<asdasdasd.12@example.com>',           # not required but useful
-            References       => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
-            NoAgentNotify    => 0,                                      # if you don't want to send agent notifications
-            AutoResponseType => 'auto reply'                            # auto reject|auto follow up|auto reply/new ticket|auto remove
-
-            ForceNotificationToUserID   => [ 1, 43, 56 ],               # if you want to force somebody
-            ExcludeNotificationToUserID => [ 43,56 ],                   # if you want full exclude somebody from notfications,
-                                                                        # will also be removed in To: line of article,
-                                                                        # higher prio as ForceNotificationToUserID
-            ExcludeMuteNotificationToUserID => [ 43,56 ],               # the same as ExcludeNotificationToUserID but only the
-                                                                        # sending gets muted, agent will still shown in To:
-                                                                        # line of article
-
-            TimeUnit => 123                                             # optional, to set the acouting time
-            UserID   => 123,                                            # optional, to override the UserID from the logged user
-        }
-    );
-    Ticket contains the result of TicketGet including DynamicFields
-    Config is the Config Hash stored in a Process::TransitionAction's  Config key
-    Returns:
-
-    $ArticleCreateResult = 1; # 0
-
+Example:
+    my $Success = $Object->Run(
+        TicketID => 123,
+        Config   => {
+            Channel          => 'note',
+            SenderType       => 'agent',
+            Subject          => 'some short description',
+            Body             => 'the message text',
+        },
+        UserID   => 123
     );
 
 =cut
@@ -96,31 +142,12 @@ All ArticleCreate functions.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # define a common message to output in case of any error
-    my $CommonMessage = "Process: $Param{ProcessEntityID} Activity: $Param{ActivityEntityID}"
-        . " Transition: $Param{TransitionEntityID}"
-        . " TransitionAction: $Param{TransitionActionEntityID} - ";
+    # check incoming parameters
+    return if !$Self->_CheckParams(%Param);
 
-    # check for missing or wrong params
-    my $Success = $Self->_CheckParams(
-        %Param,
-        CommonMessage => $CommonMessage,
-    );
-    return if !$Success;
-
-    # override UserID if specified as a parameter in the TA config
-    $Param{UserID} = $Self->_OverrideUserID(%Param);
-
-    # use ticket attributes if needed
-    $Self->_ReplaceTicketAttributes(%Param);
-
+    # FIXME: needed?
     # convert scalar items into array references
-    for my $Attribute (
-        qw(ForceNotificationToUserID ExcludeNotificationToUserID
-        ExcludeMuteNotificationToUserID
-        )
-        )
-    {
+    for my $Attribute ( qw(ForceNotificationToUserID ExcludeNotificationToUserID ExcludeMuteNotificationToUserID) ) {
         if ( IsStringWithData( $Param{Config}->{$Attribute} ) ) {
             $Param{Config}->{$Attribute} = $Self->_ConvertScalar2ArrayRef(
                 Data => $Param{Config}->{$Attribute},
@@ -128,65 +155,108 @@ sub Run {
         }
     }
 
-    # check Channel
-    if ( $Param{Config}->{Channel} =~ m{\A email }msxi ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => $CommonMessage
-                . "Channel $Param{Config}->{Channel} is not supported",
-        );
-        return;
-    }
-
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    # If "From" is not set
+    # if "From" is not set use current user
     if ( !$Param{Config}->{From} ) {
-
-        # Get current user data
         my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
             UserID => $Param{UserID},
         );
-
-        # Set "From" field according to user - UserFullname <UserEmail>
         $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
     }
 
-    my $ArticleID = $TicketObject->ArticleCreate(
+    $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} || 0,
+    $Param{Config}->{Channel} = $Param{Config}->{Channel} || 'note';
+    $Param{Config}->{SenderType} = $Param{Config}->{SenderType} || 'agent';
+    $Param{Config}->{Charset} = $Param{Config}->{Charset} || 'utf-8';
+    $Param{Config}->{MimeType} = $Param{Config}->{MimeType} || 'text/html';
+    $Param{Config}->{HistoryType} = $Param{Config}->{HistoryType} || 'AddNote';
+    $Param{Config}->{HistoryComment} = $Param{Config}->{HistoryComment} || 'Added during job execution.';
+
+    if ( $Param{Config}->{Channel} ) {
+        my $ChannelID = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $Param{Config}->{Channel} );
+
+        if ( !$ChannelID ) {
+            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find channel with name \"$Param{Config}->{Channel}\"!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
+    }
+
+    if ( $Param{Config}->{SenderType} ) {
+        my $SenderTypeID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup( SenderType => $Param{Config}->{SenderType} );
+
+        if ( !$SenderTypeID ) {
+            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find sender type with name \"$Param{Config}->{SenderType}\"!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
+    }
+    $Param{Config}->{Body} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 1,
+        Text     => $Param{Config}->{Body},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+    $Param{Config}->{Subject} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Subject},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
+    my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
         %{ $Param{Config} },
-        TicketID => $Param{Ticket}->{TicketID},
+        TicketID => $Param{TicketID},
         UserID   => $Param{UserID},
     );
 
     if ( !$ArticleID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => $CommonMessage
-                . "Couldn't create article for Ticket: "
-                . $Param{Ticket}->{TicketID} . '!',
+        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't update ticket $Param{TicketID} - creating new article failed!",
+            UserID   => $Param{UserID}
         );
         return;
     }
 
-    # set time units
-    if ( $Param{Config}->{TimeUnit} ) {
-        $TicketObject->TicketAccountTime(
-            TicketID  => $Param{Ticket}->{TicketID},
-            ArticleID => $ArticleID,
-            TimeUnit  => $Param{Config}->{TimeUnit},
-            UserID    => $Param{UserID},
+    return 1;
+}
+
+=item ValidateConfig()
+
+Validates the parameters of the config.
+
+Example:
+    my $Valid = $Self->ValidateConfig(
+        Config => {}                # required
+    );
+
+=cut
+
+sub ValidateConfig {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->SUPER::ValidateConfig(%Param);
+
+    if ( $Param{Config}->{TimeUnits} && !IsNumber( $Param{Config}->{TimeUnits} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Validation of parameter \"TimeUnits\" failed."
         );
+        return;
     }
 
     return 1;
 }
 
 1;
-
-
-
-
 
 =back
 

@@ -465,7 +465,7 @@ sub ArticleCreate {
     if ( $Param{TimeUnits} ) {
         my $UpdateSuccess = $Self->TicketAccountTime(
             TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
+            ArticleID => $ArticleID,
             TimeUnit  => $Param{TimeUnits},
             UserID    => $Param{UserID},
         );

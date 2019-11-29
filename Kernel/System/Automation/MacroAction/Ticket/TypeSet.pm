@@ -50,7 +50,7 @@ sub Describe {
     $Self->Description('Sets the type of a ticket.');
     $Self->AddOption(
         Name        => 'Type',
-        Label       => 'Type',        
+        Label       => 'Type',
         Description => 'The name of the type to be set.',
         Required    => 1,
     );
@@ -66,8 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            State           => 'wait for customer',
-            PendingTimeDiff => 36000
+            Type => 'problem'
         },
         UserID   => 123,
     );
@@ -78,42 +77,48 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check incoming parameters
-    return if !$Self->_CheckParams(\%Param);
+    return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
     );
 
-    # do nothing if the desired type is already set
-    if ( defined $Param{Config}->{Type} && $Param{Config}->{Type} eq $Ticket{Type} ) {
-        return 1;
+    if (!%Ticket) {
+        return;
     }
 
     # set the new type
-    my %Type = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
-        Name => $Param{Config}->{Type},
+    my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+        Type => $Param{Config}->{Type},
     );
 
-    if ( !IsHashRefWithData(\%Type) ) {
+    if ( !$TypeID ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-            Referrer  => $Self,
+            Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - can't find ticket type \"$Param{Config}->{Type}\"!",
+            UserID   => $Param{UserID}
         );
         return;
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TypeSet(
+    # do nothing if the desired type is already set
+    if ( $TypeID eq $Ticket{TypeID} ) {
+        return 1;
+    }
+
+    my $Success = $TicketObject->TicketTypeSet(
         TicketID => $Param{TicketID},
-        TypeID   => $Type{ID},
+        TypeID   => $TypeID,
         UserID   => $Param{UserID},
     );
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-            Referrer  => $Self,
+            Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the type \"$Param{Config}->{Type}\" failed!",
+            UserID   => $Param{UserID}
         );
         return;
     }

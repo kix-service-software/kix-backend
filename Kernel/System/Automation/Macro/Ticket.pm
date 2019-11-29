@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Automation::Macro::EventBased;
+package Kernel::System::Automation::Macro::Ticket;
 
 use strict;
 use warnings;
@@ -46,9 +46,9 @@ Run this macro module.
 
 Example:
     my $Result = $Object->Run(
-        MacroID  => 123,
-        TicketID => 123,
-        UserID   => 123,
+        ObjectID     => 123,
+        ExecOrder    => [],
+        UserID       => 123,
     );
 
 =cut
@@ -57,7 +57,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(MacroID TicketID UserID)) {
+    for (qw(ObjectID ExecOrder UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -65,6 +65,17 @@ sub Run {
             );
             return;
         }
+    }
+
+    
+    # execute all macro action given in the execution order attribute
+    foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
+        my $Result = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionExecute(
+            ID        => $MacroActionID,
+            TicketID  => $Param{ObjectID},
+            UserID    => $Param{UserID},
+        );
+        # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
     }
 
     return 1;

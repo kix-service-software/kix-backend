@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Daemon::DaemonModules::SchedulerGenericAgentTaskManager;
+package Kernel::System::Daemon::DaemonModules::SchedulerAutomationTaskManager;
 
 use strict;
 use warnings;
@@ -22,18 +22,18 @@ our @ObjectDependencies = (
     'Kernel::System::CronEvent',
     'Kernel::System::DB',
     'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::GenericAgent',
+    'Kernel::System::Automation',
     'Kernel::System::Log',
     'Kernel::System::Time',
 );
 
 =head1 NAME
 
-Kernel::System::Daemon::DaemonModules::SchedulerGenericAgentTaskManager - daemon to manage scheduler generic agent tasks
+Kernel::System::Daemon::DaemonModules::SchedulerAutomationTaskManager - daemon to manage scheduler automation tasks
 
 =head1 SYNOPSIS
 
-Scheduler generic agent task daemon
+Scheduler automation task daemon
 
 =head1 PUBLIC INTERFACE
 
@@ -43,7 +43,7 @@ Scheduler generic agent task daemon
 
 =item new()
 
-Create scheduler future task manager object.
+Create scheduler automation manager object.
 
 =cut
 
@@ -56,7 +56,7 @@ sub new {
 
     # Get objects in constructor to save performance.
     $Self->{CacheObject}        = $Kernel::OM->Get('Kernel::System::Cache');
-    $Self->{GenericAgentObject} = $Kernel::OM->Get('Kernel::System::GenericAgent');
+    $Self->{AutomationObject}   = $Kernel::OM->Get('Kernel::System::Automation');
     $Self->{DBObject}           = $Kernel::OM->Get('Kernel::System::DB');
     $Self->{SchedulerDBObject}  = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
 
@@ -79,13 +79,13 @@ sub new {
     }
 
     # Do not change the following values!
-    $Self->{SleepPost} = 20;         # sleep 20 seconds after each loop
+    $Self->{SleepPost} = 5;          # sleep 5 seconds after each loop
     $Self->{Discard}   = 60 * 60;    # discard every hour
 
     $Self->{DiscardCount} = $Self->{Discard} / $Self->{SleepPost};
 
     $Self->{Debug}      = $Param{Debug};
-    $Self->{DaemonName} = 'Daemon: SchedulerGenericAgentTaskManager';
+    $Self->{DaemonName} = 'Daemon: SchedulerAutomationTaskManager';
 
     return $Self;
 }
@@ -104,7 +104,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    return if !$Self->{SchedulerDBObject}->GenericAgentTaskToExecute(
+    return if !$Self->{SchedulerDBObject}->AutomationTaskToExecute(
         NodeID => $Self->{NodeID},
         PID    => $$,
     );
@@ -125,12 +125,12 @@ sub PostRun {
 
     # Unlock long locked tasks.
     $Self->{SchedulerDBObject}->RecurrentTaskUnlockExpired(
-        Type => 'GenericAgent',
+        Type => 'Automation',
     );
 
     # Remove obsolete tasks before destroy.
     if ( $Self->{DiscardCount} == 0 ) {
-        $Self->{SchedulerDBObject}->GenericAgentTaskCleanup();
+        $Self->{SchedulerDBObject}->AutomationTaskCleanup();
     }
 
     return if $Self->{DiscardCount} <= 0;
@@ -140,7 +140,7 @@ sub PostRun {
 sub Summary {
     my ( $Self, %Param ) = @_;
 
-    return $Self->{SchedulerDBObject}->GenericAgentTaskSummary();
+    return $Self->{SchedulerDBObject}->AutomationTaskSummary();
 }
 
 sub DESTROY {

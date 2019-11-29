@@ -19,14 +19,15 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
     'Kernel::System::Log',
+    'Kernel::System::Ticket',
+    'Kernel::System::DynamicField',
+    'Kernel::System::DynamicField::Backend'
 );
 
 =head1 NAME
 
-Kernel::System::Automation::MacroAction::Ticket::DynamicFieldSet - A module to set a new ticket owner
+Kernel::System::Automation::MacroAction::Ticket::DynamicFieldSet - A module to set a dynamic field value of a ticket
 
 =head1 SYNOPSIS
 
@@ -38,53 +39,44 @@ All DynamicFieldSet functions.
 
 =cut
 
-=item new()
+=item Describe()
 
-create an object. Do not use it directly, instead use:
-
-    use Kernel::System::ObjectManager;
-    local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $DynamicFieldSetObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Ticket::DynamicFieldSet');
+Describe this macro action module.
 
 =cut
 
-sub new {
-    my ( $Type, %Param ) = @_;
+sub Describe {
+    my ( $Self, %Param ) = @_;
 
-    # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
+    $Self->Description('Sets a dynamic field value of a ticket.');
+    $Self->AddOption(
+        Name        => 'DynamicFieldName',
+        Label       => 'Dynamic Field Name',
+        Description => 'The name of the dynamic field.',
+        Required    => 1,
+    );
+    $Self->AddOption(
+        Name        => 'DynamicFieldValue',
+        Label       => 'Dynamic Field Value',
+        Description => 'The value for the dynamic field to be set.',
+        Required    => 1,
+    );
 
-    return $Self;
+    return;
 }
 
 =item Run()
 
-    Run Data
+Run this module. Returns 1 if everything is ok.
 
-    my $DynamicFieldSetResult = $DynamicFieldSetActionObject->Run(
-        UserID                   => 123,
-        Ticket                   => \%Ticket,   # required
-        ProcessEntityID          => 'P123',
-        ActivityEntityID         => 'A123',
-        TransitionEntityID       => 'T123',
-        TransitionActionEntityID => 'TA123',
-        Config                   => {
-            MasterSlave => 'Master',
-            Approved    => '1',
-            UserID      => 123,                 # optional, to override the UserID from the logged user
-        }
-    );
-    Ticket contains the result of TicketGet including DynamicFields
-    Config is the Config Hash stored in a Process::TransitionAction's  Config key
-
-    If a Dynamic Field is named UserID (to avoid conflicts) it must be set in the config as:
-    DynamicField_UserID => $Value,
-
-    Returns:
-
-    $DynamicFieldSetResult = 1; # 0
-
+Example:
+    my $Success = $Object->Run(
+        TicketID => 123,
+        Config   => {
+            DynamicFieldName  => 'SomeDFName',
+            DynamicFieldValue => 'New Value'
+        },
+        UserID   => 123,
     );
 
 =cut
@@ -92,81 +84,64 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # define a common message to output in case of any error
-    my $CommonMessage = "Process: $Param{ProcessEntityID} Activity: $Param{ActivityEntityID}"
-        . " Transition: $Param{TransitionEntityID}"
-        . " TransitionAction: $Param{TransitionActionEntityID} - ";
+    # check incoming parameters
+    return if !$Self->_CheckParams(%Param);
 
-    # check for missing or wrong params
-    my $Success = $Self->_CheckParams(
-        %Param,
-        CommonMessage => $CommonMessage,
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    my %Ticket = $TicketObject->TicketGet(
+        TicketID      => $Param{TicketID},
+        DynamicFields => 1
     );
-    return if !$Success;
 
-    # override UserID if specified as a parameter in the TA config
-    $Param{UserID} = $Self->_OverrideUserID(%Param);
-
-    # special case for DyanmicField UserID, convert form DynamicField_UserID to UserID
-    if ( defined $Param{Config}->{DynamicField_UserID} ) {
-        $Param{Config}->{UserID} = $Param{Config}->{DynamicField_UserID};
-        delete $Param{Config}->{DynamicField_UserID};
+    if (!%Ticket) {
+        return;
     }
 
-    # use ticket attributes if needed
-    $Self->_ReplaceTicketAttributes(%Param);
+    # do nothing if the desired value is already set
+    if ( 
+        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } &&
+        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } eq $Param{Config}->{DynamicFieldValue}
+    ) {
+        return 1;
+    }
 
-    # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    # get required DynamicField config
+    my $DynamicFieldConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+        Name => $Param{Config}->{DynamicFieldName},
+    );
 
-    for my $CurrentDynamicField ( sort keys %{ $Param{Config} } ) {
-
-        # get required DynamicField config
-        my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
-            Name => $CurrentDynamicField,
+    # check if we have a valid DynamicField
+    if ( !IsHashRefWithData($DynamicFieldConfig) ) {
+        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Can't get DynamicField config for DynamicField: \"$Param{Config}->{DynamicFieldName}\"!",
+            UserID   => $Param{UserID}
         );
+        return;
+    }
 
-        # check if we have a valid DynamicField
-        if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => $CommonMessage
-                    . "Can't get DynamicField config for DynamicField: '$CurrentDynamicField'!",
-            );
-            return;
-        }
+    # set the new value
+    my $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueSet(
+        DynamicFieldConfig => $DynamicFieldConfig,
+        ObjectID           => $Param{TicketID},
+        Value              => $Param{Config}->{DynamicFieldValue},
+        UserID             => $Param{UserID},
+    );
 
-        # try to set the configured value
-        my $Success = $DynamicFieldBackendObject->ValueSet(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            ObjectID           => $Param{Ticket}->{TicketID},
-            Value              => $Param{Config}->{$CurrentDynamicField},
-            UserID             => $Param{UserID},
+    if ( !$Success ) {
+        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't update ticket $Param{TicketID} - setting dynamic field \"$Param{Config}->{DynamicFieldName}\" failed!",
+            UserID   => $Param{UserID}
         );
-
-        # check if everything went right
-        if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => $CommonMessage
-                    . "Can't set value '"
-                    . $Param{Config}->{$CurrentDynamicField}
-                    . "' for DynamicField '$CurrentDynamicField',"
-                    . "TicketID '" . $Param{Ticket}->{TicketID} . "'!",
-            );
-            return;
-        }
+        return;
     }
 
     return 1;
 }
 
 1;
-
-
-
-
 
 =back
 

@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Automation::MacroAction::Ticket::LockSet;
+package Kernel::System::Automation::MacroAction::Ticket::ContactSet;
 
 use strict;
 use warnings;
@@ -21,16 +21,16 @@ use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 our @ObjectDependencies = (
     'Kernel::System::Log',
     'Kernel::System::Ticket',
-    'Kernel::System::Lock'
+    'Kernel::System::Contact'
 );
 
 =head1 NAME
 
-Kernel::System::Automation::MacroAction::Ticket::LockSet - A module to lock or unlock a ticket
+Kernel::System::Automation::MacroAction::Ticket::ContactSet - A module to set the ticket contact
 
 =head1 SYNOPSIS
 
-All LockSet functions.
+All ContactSet functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the lock state of a ticket.');
+    $Self->Description('Sets the contact (and its primary organisation as organisation) of a ticket.');
     $Self->AddOption(
-        Name        => 'Lock',
-        Label       => 'Lock',
-        Description => 'The lock state to be set.',
+        Name        => 'Contact',
+        Label       => 'Contact',
+        Description => 'The login of the contact to be set.',
         Required    => 1,
     );
 
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Lock => 'unlock',
+            Contact => 'test',
         },
         UserID   => 123,
     );
@@ -89,35 +89,40 @@ sub Run {
         return;
     }
 
-    # set the new owner
-    my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
-        Lock => $Param{Config}->{Lock},
+    my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+        Login  => $Param{Config}->{Contact},
+        Silent => 1
     );
 
-    if ( !$LockID ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-            Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - can't find lock state \"$Param{Config}->{Lock}\"!",
-            UserID   => $Param{UserID}
+    my $OrganisationID;
+    if ($ContactID) {
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            ID => $ContactID
         );
-        return;
+        if ( %Contact ) {
+            $OrganisationID = $Contact{PrimaryOrganisationID};
+        }
+    } else {
+        $ContactID = $Param{Config}->{Contact};
+        $OrganisationID = $Param{Config}->{Contact};
     }
 
-    # do nothing if the desired lock state is already set
-    if ( $LockID eq $Ticket{LockID} ) {
+    # do nothing if the desired contact is already set
+    if ( $ContactID eq $Ticket{ContactID} ) {
         return 1;
     }
 
-    my $Success = $TicketObject->LockSet(
-        TicketID => $Param{TicketID},
-        LockID   => $LockID,
-        UserID   => $Param{UserID},
+    my $Success = $TicketObject->TicketCustomerSet(
+        TicketID       => $Param{TicketID},
+        OrganisationID => $OrganisationID,
+        ContactID      => $ContactID,
+        UserID         => $Param{UserID}
     );
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the lock state \"$Param{Config}->{Lock}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the contact \"$Param{Config}->{Contact}\" failed!",
             UserID   => $Param{UserID}
         );
         return;

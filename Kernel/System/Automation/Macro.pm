@@ -476,6 +476,172 @@ sub MacroDelete {
 
 }
 
+=item MacroIsExecutable()
+
+checks if a macro is executable. Return 0 or 1.
+
+    my $Result = $AutomationObject->MacroIsExecutable(
+        ID       => 123,        # the ID of the macro
+        UserID    => 1
+    );
+
+=cut
+
+sub MacroIsExecutable {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get Macro data
+    my %Macro = $Self->MacroGet(
+        ID => $Param{ID}
+    );
+
+    if ( !%Macro ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such macro with ID $Param{ID}!"
+        );
+        return;        
+    }
+
+    return IsArrayRefWithData($Macro{ExecOrder});
+}
+
+=item MacroExecute()
+
+executes a macro
+
+    my $Success = $AutomationObject->MacroExecute(
+        ID       => 123,        # the ID of the macro
+        ObjectID => 123,        # the ID of the object to execute the macro onto
+        UserID    => 1
+    );
+
+=cut
+
+sub MacroExecute {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID ObjectID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # add MacroID for log reference
+    $Self->{MacroID}  = $Param{ID};
+    $Self->{ObjectID} = $Param{ObjectID};
+
+    # get Macro data
+    my %Macro = $Self->MacroGet(
+        ID => $Param{ID}
+    );
+
+    if ( !%Macro ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such macro with ID $Param{ID}!"
+        );
+        return;        
+    }
+
+    if ( !IsArrayRefWithData($Macro{ExecOrder}) ) {
+        $Self->LogInfo(
+            Message  => "Macro \"$Macro{Name}\" has no executable actions. Aborting macro execution.",
+            UserID   => $Param{UserID},
+        );
+        return 1;
+    }
+
+    $Self->LogInfo(
+        Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}}))." macro actions on ObjectID $Param{ObjectID}.",
+        UserID   => $Param{UserID},
+    );
+
+    # load type backend module
+    my $BackendObject = $Self->_LoadMacroTypeBackend(
+        Name => $Macro{Type},
+    );
+    return if !$BackendObject;
+
+    # add referrer data
+    $BackendObject->{MacroID}  = $Param{ID};
+    $BackendObject->{ObjectID} = $Param{ObjectID};
+
+    my $BackendResult = $BackendObject->Run(
+        ObjectID  => $Param{ObjectID},
+        ExecOrder => $Macro{ExecOrder},
+        UserID    => $Param{UserID}
+    );
+
+    # remove IDs from log reference
+    delete $Self->{MacroID};
+    delete $Self->{ObjectID};
+
+    return $BackendResult;
+}
+
+sub _LoadMacroTypeBackend {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Name)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # load type backend
+    $Self->{MacroTypeModules} //= {};
+
+    if ( !$Self->{MacroTypeModules}->{$Param{Name}} ) {
+        my $Backend = 'Kernel::System::Automation::Macro::' . $Param{Name};
+
+        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!"
+            );   
+            return;
+        }
+
+        my $BackendObject = $Backend->new( %{$Self} );
+        if ( !$BackendObject ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!"
+            );        
+            return;
+        }
+
+        # add referrer data
+        $BackendObject->{JobID} = $Self->{JobID};
+
+        $Self->{MacroTypeModules}->{$Param{Name}} = $BackendObject;        
+    }
+
+    return $Self->{MacroTypeModules}->{$Param{Name}};
+}
+
 1;
 
 =back

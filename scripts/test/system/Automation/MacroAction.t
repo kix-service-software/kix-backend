@@ -29,9 +29,24 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
 my $NameRandom  = $Helper->GetRandomID();
 my %MacroActionIDByMacroActionType = (
-    'test-macroaction-' . $NameRandom . '-1' => undef,
-    'test-macroaction-' . $NameRandom . '-2' => undef,
-    'test-macroaction-' . $NameRandom . '-3' => undef,
+    'test-macroaction-' . $NameRandom . '-1' => {
+        Type => 'TitleSet',
+        Parameters => {
+            Title => 'test',
+        }
+    },
+    'test-macroaction-' . $NameRandom . '-2' => {
+        Type => 'StateSet',
+        Parameters => {
+            State => 'open',
+        }
+    },
+    'test-macroaction-' . $NameRandom . '-3' => {
+        Type => 'PrioritySet',
+        Parameters => {
+            Priority => '3 normal'
+        }
+    },
 );
 
 # create macro
@@ -51,7 +66,8 @@ $Self->True(
 for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
     my $MacroActionID = $AutomationObject->MacroActionAdd(
         MacroID => $MacroID,
-        Type    => $MacroActionType,
+        Type    => $MacroActionIDByMacroActionType{$MacroActionType}->{Type},
+        Parameters => $MacroActionIDByMacroActionType{$MacroActionType}->{Parameters},
         ValidID => 1,
         UserID  => 1,
     );
@@ -62,13 +78,13 @@ for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
     );
 
     if ($MacroActionID) {
-        $MacroActionIDByMacroActionType{$MacroActionType} = $MacroActionID;
+        $MacroActionIDByMacroActionType{$MacroActionType}->{ID} = $MacroActionID;
     }
 }
 
 # try to fetch data of existing MacroActions
 for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
-    my $MacroActionID = $MacroActionIDByMacroActionType{$MacroActionType};
+    my $MacroActionID = $MacroActionIDByMacroActionType{$MacroActionType}->{ID};
     my %MacroAction = $AutomationObject->MacroActionGet( ID => $MacroActionID );
 
     $Self->Is(
@@ -83,7 +99,7 @@ my %MacroActions = $AutomationObject->MacroActionList(
     MacroID => $MacroID
 );
 for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
-    my $MacroActionID = $MacroActionIDByMacroActionType{$MacroActionType};
+    my $MacroActionID = $MacroActionIDByMacroActionType{$MacroActionType}->{ID};
 
     $Self->True(
         exists $MacroActions{$MacroActionID} && $MacroActions{$MacroActionID} eq $MacroActionType,
@@ -94,11 +110,11 @@ for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
 # change type of a single MacroAction
 my $MacroActionTypeToChange = 'test-macroaction-' . $NameRandom . '-1';
 my $ChangedMacroActionType  = $MacroActionTypeToChange . '-changed';
-my $MacroActionIDToChange   = $MacroActionIDByMacroActionType{$MacroActionTypeToChange};
+my $MacroActionIDToChange   = $MacroActionIDByMacroActionType{$MacroActionTypeToChange}->{ID};
 
 my $MacroActionUpdateResult = $AutomationObject->MacroActionUpdate(
     ID      => $MacroActionIDToChange,
-    Type    => $ChangedMacroActionType,
+    Type    => '',
     ValidID => 1,
     UserID  => 1,
 );

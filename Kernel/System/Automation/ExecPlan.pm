@@ -58,30 +58,13 @@ sub ExecPlanTypeGet {
         return;
     }
 
-    $Self->{ExecPlanTypeModules} //= {};
+    # load type backend module
+    my $BackendObject = $Self->_LoadExecPlanTypeBackend(
+        %Param
+    );
+    return if !$BackendObject;
 
-    if ( !$Self->{ExecPlanTypeModules}->{$Param{Name}} ) {
-        my $Backend = 'Kernel::System::Automation::ExecPlan::' . $Param{Name};
-
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to require $Backend!"
-            );        
-        }
-
-        my $BackendObject = $Backend->new( %{$Self} );
-        if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create instance of $Backend!"
-            );        
-        }
-
-        $Self->{ExecPlanTypeModules}->{$Param{Name}} = $BackendObject;
-    }
-
-    return $Self->{ExecPlanTypeModules}->{$Param{Name}}->DefinitionGet();
+    return $BackendObject->DefinitionGet();
 }
 
 =item ExecPlanLookup()
@@ -112,7 +95,7 @@ sub ExecPlanLookup {
         return;
     }
 
-    # get exec_plan list
+    # get ExecPLan list
     my %ExecPlanList = $Self->ExecPlanList(
         Valid => 0,
     );
@@ -127,7 +110,7 @@ sub ExecPlanLookup {
 
 =item ExecPlanGet()
 
-returns a hash with the exec_plan data
+returns a hash with the ExecPlan data
 
     my %ExecPlanData = $AutomationObject->ExecPlanGet(
         ID => 2,
@@ -273,6 +256,24 @@ sub ExecPlanAdd {
         return;
     }
 
+    # validate Parameters
+    my $BackendObject = $Self->_LoadExecPlanTypeBackend(
+        Name      => $Param{Type},
+    );
+    return if !$BackendObject;
+
+    my $IsValid = $BackendObject->ValidateConfig(
+        Config => $Param{Parameters}
+    );
+
+    if ( !$IsValid ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "ExecPlan config is invalid!"
+        );
+        return;
+    }
+
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
@@ -365,9 +366,30 @@ sub ExecPlanUpdate {
     if ( $ID && $ID != $Param{ID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "A exec_plan with the same name already exists.",
+            Message  => "A ExecPlan with the same name already exists.",
         );
         return;
+    }
+
+    # validate parameters if given
+    if ( $Param{Parameters} ) {
+        # validate Parameters
+        my $BackendObject = $Self->_LoadExecPlanTypeBackend(
+            Name => $Param{Type} || $Data{Type},
+        );
+        return if !$BackendObject;
+
+        my $IsValid = $BackendObject->ValidateConfig(
+            Config => $Param{Parameters}
+        );
+
+        if ( !$IsValid ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "ExecPlan config is invalid!"
+            );
+            return;
+        }
     }
 
     # set default value
@@ -538,6 +560,118 @@ sub ExecPlanDelete {
 
     return 1;
 
+}
+
+=item ExecPlanCheck()
+
+checks an exec plan if the job can run
+
+    my $CanExecute = $AutomationObject->ExecPlanCheck(
+        ID        => 123,       # the ID of the macro action
+        JobID     => 123,       # the ID of the job to be executed
+        Time      => '...',     # optional, required for time based execplans
+        Event     => '...',     # optional, required for event based execplans
+        UserID    => 1
+    );
+
+=cut
+
+sub ExecPlanCheck {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID JobID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get ExecPlan data
+    my %ExecPlan = $Self->ExecPlanGet(
+        ID => $Param{ID}
+    );
+
+    if ( !%ExecPlan ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such ExecPlan with ID $Param{ID}!"
+        );
+        return;        
+    }
+
+    # igonore invalid exec plans
+    return if $ExecPlan{ValidID} != 1;
+
+    # get Job data
+    my %Job = $Self->JobGet(
+        ID => $Param{JobID}
+    );
+
+    if ( !%Job ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such job with ID $Param{JobID}!"
+        );
+        return;        
+    }
+
+    # load type backend module
+    my $BackendObject = $Self->_LoadExecPlanTypeBackend(
+        Name => $ExecPlan{Type},
+    );
+    return if !$BackendObject;
+
+    my $BackendResult = $BackendObject->Run(
+        %Param,
+        Config            => $ExecPlan{Parameters},
+        LastExecutionTime => $Job{LastExecutionTime},
+    );
+
+    return $BackendResult;
+}
+
+sub _LoadExecPlanTypeBackend {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Name)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    $Self->{ExecPlanTypeModules} //= {};
+
+    if ( !$Self->{ExecPlanTypeModules}->{$Param{Name}} ) {
+        my $Backend = 'Kernel::System::Automation::ExecPlan::' . $Param{Name};
+
+        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!"
+            );        
+        }
+
+        my $BackendObject = $Backend->new( %{$Self} );
+        if ( !$BackendObject ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!"
+            );        
+        }
+
+        $Self->{ExecPlanTypeModules}->{$Param{Name}} = $BackendObject;
+    }
+
+    return $Self->{ExecPlanTypeModules}->{$Param{Name}};
 }
 
 1;

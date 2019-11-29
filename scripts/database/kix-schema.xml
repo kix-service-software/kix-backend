@@ -2886,6 +2886,48 @@
     </ForeignKey>
 </Table>
 
+<!-- job_state -->
+<Table Name="job_run_state">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique Name="job_run_state_name">
+        <UniqueColumn Name="name"/>
+    </Unique>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+
+<!-- job_run -->
+<Table Name="job_run">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="job_id" Required="true" Type="INTEGER"/>
+    <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="state_id" Required="false" Type="SMALLINT"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="start_time" Required="true" Type="DATE"/>
+    <Column Name="end_time" Required="false" Type="DATE"/>
+    <ForeignKey ForeignTable="job">
+        <Reference Local="job_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="job_run_state">
+        <Reference Local="state_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+
 <!-- exec_plan -->
 <Table Name="exec_plan">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
@@ -3022,14 +3064,19 @@
 <Table Name="automation_log">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="job_id" Required="false" Type="INTEGER"/>
+    <Column Name="run_id" Required="false" Type="INTEGER"/>
     <Column Name="macro_id" Required="false" Type="INTEGER"/>
     <Column Name="macro_action_id" Required="false" Type="INTEGER"/>
+    <Column Name="object_id" Required="false" Type="BIGINT"/>
     <Column Name="priority" Required="false" Size="20" Type="VARCHAR"/>
     <Column Name="message" Required="false" Size="10000" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Index Name="automation_log_job_id">
         <IndexColumn Name="job_id"/>
+    </Index>
+    <Index Name="automation_log_run_id">
+        <IndexColumn Name="run_id"/>
     </Index>
     <Index Name="automation_log_macro_id">
         <IndexColumn Name="macro_id"/>

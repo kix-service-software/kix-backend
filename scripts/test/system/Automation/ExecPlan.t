@@ -38,7 +38,10 @@ my %ExecPlanIDByExecPlanName = (
 for my $ExecPlanName ( sort keys %ExecPlanIDByExecPlanName ) {
     my $ExecPlanID = $AutomationObject->ExecPlanAdd(
         Name    => $ExecPlanName,
-        Type    => 'Time',
+        Type    => 'EventBased',
+        Parameters => {
+            Event => [ 'TicketCreate' ]
+        },
         ValidID => 1,
         UserID  => 1,
     );
@@ -57,7 +60,10 @@ for my $ExecPlanName ( sort keys %ExecPlanIDByExecPlanName ) {
 for my $ExecPlanName ( sort keys %ExecPlanIDByExecPlanName ) {
     my $ExecPlanID = $AutomationObject->ExecPlanAdd(
         Name    => $ExecPlanName,
-        Type    => 'Time',
+        Type    => 'EventBased',
+        Parameters  => {
+            Event => [ 'TicketCreate' ]
+        },
         ValidID => 1,
         UserID  => 1,
     );
@@ -115,11 +121,14 @@ my $ExecPlanNameToChange = 'test-execplan-' . $NameRandom . '-1';
 my $ChangedExecPlanName  = $ExecPlanNameToChange . '-changed';
 my $ExecPlanIDToChange   = $ExecPlanIDByExecPlanName{$ExecPlanNameToChange};
 
+my %ExecPlan = $AutomationObject->ExecPlanGet(
+    ID => $ExecPlanIDToChange
+);
+
 my $ExecPlanUpdateResult = $AutomationObject->ExecPlanUpdate(
     ID      => $ExecPlanIDToChange,
+    %ExecPlan,
     Name    => $ChangedExecPlanName,
-    Type    => 'Time',
-    ValidID => 1,
     UserID  => 1,
 );
 
@@ -131,10 +140,9 @@ $Self->True(
 # update parameters of a single ExecPlan
 $ExecPlanUpdateResult = $AutomationObject->ExecPlanUpdate(
     ID      => $ExecPlanIDToChange,
-    Name    => $ChangedExecPlanName,
-    Type    => 'Time',
+    %ExecPlan,
     Parameters => {
-        Test => 123
+        Event => [ 'ArticleCreate ']
     },
     ValidID => 1,
     UserID  => 1,
@@ -158,12 +166,12 @@ delete $ExecPlanIDByExecPlanName{$ExecPlanNameToChange};
 # try to add execution plan with previous name
 my $ExecPlanID1 = $AutomationObject->ExecPlanAdd(
     Name    => $ExecPlanNameToChange,
-    Type    => 'Time',
+    Type    => 'TimeBased',
     ValidID => 1,
     UserID  => 1,
 );
 
-$Self->True(
+$Self->False(
     $ExecPlanID1,
     'ExecPlanAdd() for new execution plan ' . $ExecPlanNameToChange,
 );
@@ -175,7 +183,10 @@ if ($ExecPlanID1) {
 # try to add execution plan with changed name
 $ExecPlanID1 = $AutomationObject->ExecPlanAdd(
     Name    => $ChangedExecPlanName,
-    Type    => 'Time',
+    Type    => 'EventBased',
+    Parameters => {
+        Event => [ 'TicketCreate' ]
+    },
     ValidID => 1,
     UserID  => 1,
 );
@@ -188,12 +199,15 @@ $Self->False(
 my $ExecPlanName2 = $ChangedExecPlanName . 'update';
 my $ExecPlanID2   = $AutomationObject->ExecPlanAdd(
     Name    => $ExecPlanName2,
-    Type    => 'Time',
+    Type    => 'EventBased',
+    Parameters => {
+        Event => [ 'TicketCreate' ]
+    },
     ValidID => 1,
     UserID  => 1,
 );
 
-$Self->True(
+$Self->False(
     $ExecPlanID2,
     'ExecPlanAdd() add the second test execution plan ' . $ExecPlanName2,
 );

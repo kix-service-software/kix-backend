@@ -51,7 +51,7 @@ sub Describe {
     $Self->Description('Sets the state of a ticket.');
     $Self->AddOption(
         Name        => 'State',
-        Label       => 'State',        
+        Label       => 'State',
         Description => 'The name of the state to be set.',
         Required    => 1,
     );
@@ -85,48 +85,55 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check incoming parameters
-    return if !$Self->_CheckParams(\%Param);
+    return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
     );
 
-    # do nothing if the desired state is already set
-    if ( defined $Param{Config}->{State} && $Param{Config}->{State} eq $Ticket{State} ) {
-        return 1;
+    if (!%Ticket) {
+        return;
     }
 
     # set the new state
     my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
-        Name => $Param{Config}->{State},
+        Name => $Param{Config}->{State}
     );
 
-    if ( !IsHashRefWithData(\%State) ) {
+    if ( !%State || !$State{ID} ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - can't find ticket state \"$Param{Config}->{State}\"!",
+            UserID   => $Param{UserID},
         );
         return;
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->StateSet(
-        TicketID => $Param{TicketID},
-        StateID  => $State{ID},
-        UserID   => $Param{UserID},
-    );
+    my $Success = 1;
+
+    # do nothing if the desired state is already set
+    if ( $State{ID} ne $Ticket{StateID} ) {
+        $Success = $TicketObject->StateSet(
+            TicketID => $Param{TicketID},
+            StateID  => $State{ID},
+            UserID   => $Param{UserID}
+        );
+    }
 
     if ( !$Success ) {
         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
             Referrer  => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the state \"$Param{Config}->{State}\" failed!",
+            UserID   => $Param{UserID},
         );
         return;
     }
 
     # set pending time if needed
     if ( $Success && $State{TypeName} =~ m{\A pending}msxi && IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
+
         # get time object
         my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
 
@@ -150,8 +157,42 @@ sub Run {
 
         if ( !$Success ) {
             $Kernel::OM->Get('Kernel::System::Automation')->LogError(
-                Referrer  => $Self,
+                Referrer => $Self,
                 Message  => "Couldn't update ticket $Param{TicketID} - setting the pending time for state \"$Param{Config}->{State}\" failed!",
+                UserID   => $Param{UserID},
+            );
+            return;
+        }
+    }
+
+    return 1;
+}
+
+=item ValidateConfig()
+
+Validates the parameters of the config.
+
+Example:
+    my $Valid = $Self->ValidateConfig(
+        Config => {}                # required
+    );
+
+=cut
+
+sub ValidateConfig {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->SUPER::ValidateConfig(%Param);
+
+    my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        Name => $Param{Config}->{State}
+    );
+
+    if (%State) {
+        if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
             );
             return;
         }

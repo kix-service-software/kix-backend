@@ -27,11 +27,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Automation::ExecPlan::Common - execution plan type base class for automation lib
+Kernel::System::Automation::MacroAction::Common - macro action base class for automation lib
 
 =head1 SYNOPSIS
 
-Provides the base class methods for execution plan modules.
+Provides the base class methods for macro action modules.
 
 =head1 PUBLIC INTERFACE
 
@@ -45,7 +45,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $MacroActionObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Ticket::StateSet');
+    my $MacroActionObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Common');
 
 =cut
 
@@ -63,7 +63,7 @@ sub new {
 
 =item Describe()
 
-Describe this execution plan module.
+Describe this macro action module.
 
 =cut
 
@@ -77,7 +77,7 @@ sub Describe {
 
 =item DefinitionGet()
 
-get the definition of this execution plan module.
+get the definition of this macro action module.
 
 Example:
     my $Config = $Object->DefinitionGet();
@@ -92,7 +92,7 @@ sub DefinitionGet {
 
 =item Description()
 
-Add a description for this execution plan module.
+Add a description for this macro action module.
 
 Example:
     $Self->Description('This is just a test');
@@ -109,7 +109,7 @@ sub Description {
 
 =item AddOption()
 
-Add a new option for this execution plan module.
+Add a new option for this macro action module.
 
 Example:
     $Self->AddOption(
@@ -133,6 +133,46 @@ sub AddOption {
     }
 
     $Self->{Definition}->{Options}->{$Param{Name}} = \%Param;
+
+    return 1;
+}
+
+=item ValidateConfig()
+
+Validates the required parameters of the config.
+
+Example:
+    my $Valid = $Self->ValidateConfig(
+        Config => {}                # required
+    );
+
+=cut
+
+sub ValidateConfig {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Config} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Config!',
+        );
+        return;
+    }
+
+    return if (ref $Param{Config} ne 'HASH');
+
+    foreach my $Option ( sort keys %{$Self->{Definition}->{Options}} ) {
+        next if !$Self->{Definition}->{Options}->{$Option}->{Required};
+
+        if ( !exists $Param{Config}->{$Option} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Required parameter \"$Option\" missing!",
+            );
+            return;
+        }
+    }
 
     return 1;
 }

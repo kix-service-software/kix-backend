@@ -61,30 +61,13 @@ sub MacroActionTypeGet {
         }
     }
 
-    $Self->{MacroActionTypeModules} //= {};
+    # load type backend module
+    my $BackendObject = $Self->_LoadMacroActionTypeBackend(
+        %Param
+    );
+    return if !$BackendObject;
 
-    if ( !$Self->{MacroActionTypeModules}->{$Param{MacroType}} || !$Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} ) {
-        my $Backend = 'Kernel::System::Automation::MacroAction::' . $Param{MacroType} . '::' . $Param{Name};
-
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to require $Backend!"
-            );        
-        }
-
-        my $BackendObject = $Backend->new( %{$Self} );
-        if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create instance of $Backend!"
-            );        
-        }
-
-        $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} = $BackendObject;
-    }
-
-    return $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}}->DefinitionGet();
+    return $BackendObject->DefinitionGet();
 }
 
 =item MacroActionGet()
@@ -216,6 +199,38 @@ sub MacroActionAdd {
         $Param{ValidID} = 1;
     }
 
+    # get macro data
+    my %Macro = $Self->MacroGet(
+        ID => $Param{MacroID}
+    );
+    if ( !%Macro ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Macro with ID $Param{MacroID} doesn't exist!"
+        );
+        return;
+    }
+
+    # validate Parameters
+    my $BackendObject = $Self->_LoadMacroActionTypeBackend(
+        MacroType => $Macro{Type},
+        Name      => $Param{Type},
+    );
+    return if !$BackendObject;
+
+    $Param{Parameters} = $Param{Parameters} || {};
+    my $IsValid = $BackendObject->ValidateConfig(
+        Config => $Param{Parameters}
+    );
+
+    if ( !$IsValid ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "MacroAction config is invalid!"
+        );
+        return;
+    }
+
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
@@ -297,6 +312,40 @@ sub MacroActionUpdate {
     my %Data = $Self->MacroActionGet(
         ID => $Param{ID},
     );
+
+    # validate parameters if given
+    if ( $Param{Parameters} ) {
+        # get macro data
+        my %Macro = $Self->MacroGet(
+            ID => $Param{MacroID} || $Data{MacroID}
+        );
+        if ( !%Macro ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Macro with ID $Data{MacroID} doesn't exist!"
+            );
+            return;
+        }
+
+        # validate Parameters
+        my $BackendObject = $Self->_LoadMacroActionTypeBackend(
+            MacroType => $Macro{Type},
+            Name      => $Param{Type} || $Data{Type},
+        );
+        return if !$BackendObject;
+
+        my $IsValid = $BackendObject->ValidateConfig(
+            Config => $Param{Parameters}
+        );
+
+        if ( !$IsValid ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "MacroAction config is invalid!"
+            );
+            return;
+        }
+    }
 
     # set default value
     $Param{Comment} ||= '';
@@ -476,6 +525,147 @@ sub MacroActionDelete {
 
     return 1;
 
+}
+
+=item MacroActionExecute()
+
+executes a macro action
+
+    my $Success = $AutomationObject->MacroActionExecute(
+        ID        => 123,       # the ID of the macro action
+        UserID    => 1
+        ....
+    );
+
+=cut
+
+sub MacroActionExecute {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # add MacroActionID for log reference
+    $Self->{MacroActionID} = $Param{ID};
+
+    # get MacroAction data
+    my %MacroAction = $Self->MacroActionGet(
+        ID => $Param{ID}
+    );
+
+    if ( !%MacroAction ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such macro action with ID $Param{ID}!"
+        );
+        return;        
+    }
+
+    # return success if action has been marked to be skipped
+    if ( $MacroAction{ValidID} != 1 ) {
+        $Self->LogInfo(
+            Message  => "Macro action \"$MacroAction{Type}\" has been marked to be skipped.",
+            UserID   => $Param{UserID},
+        );
+        return 1;
+    }
+
+    # get macro to determine type
+    my %Macro = $Self->MacroGet(
+        ID => $MacroAction{MacroID}
+    );
+
+    if ( !%Macro ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No such macro with ID $MacroAction{MacroID}!"
+        );
+        return;        
+    }
+
+    # load type backend module
+    my $BackendObject = $Self->_LoadMacroActionTypeBackend(
+        MacroType => $Macro{Type},
+        Name      => $MacroAction{Type},
+    );
+    return if !$BackendObject;
+
+    # add referrer data
+    for ( qw(JobID RunID MacroID MacroActionID) ) {
+        $BackendObject->{$_} = $Self->{$_};
+    }
+
+    my $BackendResult = $BackendObject->Run(
+        %Param,
+        Config => $MacroAction{Parameters}
+    );
+
+    if ( !$BackendResult ) {
+        # get last error message from system log
+        my $Message = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );            
+        $Self->LogError(
+            Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
+            UserID   => $Param{UserID},
+        );
+    }
+
+    # remove MacroActionID from log reference
+    delete $Self->{MacroActionID};
+
+    return $BackendResult;
+}
+
+sub _LoadMacroActionTypeBackend {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(MacroType Name)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    $Self->{MacroActionTypeModules} //= {};
+
+    if ( !$Self->{MacroActionTypeModules}->{$Param{MacroType}} || !$Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} ) {
+        my $Backend = 'Kernel::System::Automation::MacroAction::' . $Param{MacroType} . '::' . $Param{Name};
+
+        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!"
+            );     
+            return;   
+        }
+
+        my $BackendObject = $Backend->new( %{$Self} );
+        if ( !$BackendObject ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!"
+            );        
+            return;
+        }
+
+        $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} = $BackendObject;
+    }
+
+    return $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}};
 }
 
 1;

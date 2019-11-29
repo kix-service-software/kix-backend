@@ -225,10 +225,10 @@ sub _GetMacros {
                             MacroID => $Macro->{ID}
                         }
                     );
-                    if ( !IsHashRefWithData($MacroActionSearchResult) || !$MacroActionSearchResult->{Success} ) {
+                    if ( !IsHashRefWithData($MacroActionSearchResult) || !$MacroActionSearchResult->{Success} || !IsHashRefWithData($MacroActionSearchResult->{Data}) ) {
                         $Macro->{Actions} = [];
                     } else {
-                        $Macro->{Actions} = IsArrayRefWithData($MacroActionSearchResult->{Data}->{MacroAction}) ? 
+                        $Macro->{Actions} = (ref $MacroActionSearchResult->{Data}->{MacroAction} eq 'ARRAY') ? 
                             $MacroActionSearchResult->{Data}->{MacroAction} : [ $MacroActionSearchResult->{Data}->{MacroAction} ]
                     }
                 }
