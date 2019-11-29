@@ -125,8 +125,8 @@
     </Insert>
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">9</Data>
-        <Data Key="name" Type="Quote" Translatable="1">CMDB Reader</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">allows to read any config items information in any CI class and allows to READ links</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Asset Reader</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows to read any asset information in any asset class and allows to READ links</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -135,8 +135,8 @@
     </Insert>
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">10</Data>
-        <Data Key="name" Type="Quote" Translatable="1">CMDB Maintainer</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">same as CMDB-Reader, but additionally  allows to create new or update any existing config item entry and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Asset Maintainer</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">same as Asset-Reader, but additionally  allows to create new or update any existing asset entry and allows to CREATE, UPDATE, DELETE links</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
