@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="sysconfig">
+        <ColumnAdd Name="context" Required="false" Type="VARCHAR" Size="255"/>
+        <ColumnAdd Name="context_metadata" Required="false" Type="VARCHAR" Size="255"/>
+        <IndexCreate Name="sysconfig_name">
+            <IndexColumn Name="name"/>
+        </IndexCreate>
+        <IndexCreate Name="sysconfig_context">
+            <IndexColumn Name="context"/>
+        </IndexCreate>
+    </TableAlter>
+
+    <TableAlter Name="user_preferences">
+        <ColumnChange NameOld="preferences_value" NameNew="preferences_value" Required="false" Type="varchar" Size="1800000" />
+    </TableAlter>
+
+</database>

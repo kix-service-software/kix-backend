@@ -35,7 +35,7 @@ for my $IDCount ( 0 .. $Limit ) {
     # create the ticket
     my $TicketID = $TicketObject->TicketCreate(
         Title        => 'Ticket_' . $IDCount,
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         CustomerNo   => '123456',

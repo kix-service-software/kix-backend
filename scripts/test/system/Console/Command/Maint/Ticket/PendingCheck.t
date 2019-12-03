@@ -29,7 +29,7 @@ my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'My ticket created by Agent A',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'pending auto close',

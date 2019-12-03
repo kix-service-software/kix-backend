@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="API::Cache" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="API::Cache" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Enable API level caching.</Description>
         <Group>API</Group>
         <Setting>
@@ -10,7 +10,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Debug" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="API::Debug" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Enable API debugging.</Description>
         <Group>API</Group>
         <Setting>
@@ -20,7 +20,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###999-API" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###999-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -30,7 +30,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Package::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Package::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -40,7 +40,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Organisation::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Organisation::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -50,7 +50,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Contact::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Contact::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -60,7 +60,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Queue::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Queue::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -70,7 +70,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicField::EventModulePost###1000-API" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DynamicField::EventModulePost###1000-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>
             <Hash>
@@ -80,13 +80,13 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::WebserviceConfig::CacheTTL" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::WebserviceConfig::CacheTTL" Required="1" Valid="1">
         <Description Translatable="1">Cache time in seconds for the web service config backend.</Description>
         <Setting>
             <String Regex="">86400</String><!-- default 1 day -->
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Transport::Module###HTTP::SOAP" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Transport::Module###HTTP::SOAP" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the transport layer.</Description>
         <Setting>
             <Hash>
@@ -96,7 +96,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Transport::Module###HTTP::REST" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Transport::Module###HTTP::REST" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the transport layer.</Description>
         <Setting>
             <Hash>
@@ -106,7 +106,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Transport::Module###HTTP::Test" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="API::Transport::Module###HTTP::Test" Required="0" Valid="0">
         <Description Translatable="1">API module registration for the transport layer.</Description>
         <Setting>
             <Hash>
@@ -116,7 +116,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###Test::Test" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###Test::Test" Required="0" Valid="0">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -126,7 +126,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Invoker::Module###Test::Test" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="API::Invoker::Module###Test::Test" Required="0" Valid="0">
         <Description Translatable="1">API module registration for the invoker layer.</Description>
         <Setting>
             <Hash>
@@ -136,7 +136,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Invoker::Module###Test::TestSimple" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="API::Invoker::Module###Test::TestSimple" Required="0" Valid="0">
         <Description Translatable="1">API module registration for the invoker layer.</Description>
         <Setting>
             <Hash>
@@ -146,7 +146,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Mapping::Module###Test" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="API::Mapping::Module###Test" Required="0" Valid="0">
         <Description Translatable="1">API module registration for the mapping layer.</Description>
         <Setting>
             <Hash>
@@ -154,7 +154,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Mapping::Module###Simple" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Mapping::Module###Simple" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the mapping layer.</Description>
         <Setting>
             <Hash>
@@ -162,7 +162,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Mapping::Module###XSLT" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Mapping::Module###XSLT" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the mapping layer.</Description>
         <Setting>
             <Hash>
@@ -170,14 +170,14 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::ResponseLoggingMaxSize" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::ResponseLoggingMaxSize" Required="1" Valid="1">
         <Description Translatable="1">Defines the maximum size in KiloByte of API responses that get logged to the gi_debugger_entry_content table.</Description>
         <Setting>
             <String Regex="">200</String>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Transport::ReturnCodeMapping###HTTP::REST" Required="1" Valid="1">
         <Description Translatable="1">API return code mapping configuration for specific transport. Key=ErrorCode, Value=mapped code[:DefaultMessage]</Description>
         <Setting>
             <Hash>
@@ -188,6 +188,7 @@
                 <Item Key="Conflict">409</Item>                
                 <Item Key="ExecOperation.MissingParameter">500</Item>
                 <Item Key="Forbidden">403:No permission to execute this operation.</Item>
+                <Item Key="InternalError">500</Item>
                 <Item Key="Mapping.InternalError">500</Item>
                 <Item Key="Mapping.InvalidData">400</Item>
                 <Item Key="NotAllowed">405:The resource does not support the requested method. Please have a look into the "Allow" header which methods are supported by this resource.</Item>
@@ -232,14 +233,14 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::JSONSchema::Location" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::JSONSchema::Location" Required="1" Valid="1">
         <Description Translatable="1">Defines the location where the JSON schema files are located.</Description>
         <Setting>
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/doc/API/V1/schemas</String>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Example::Location" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Example::Location" Required="1" Valid="1">
         <Description Translatable="1">Defines the location where the example files are located.</Description>
         <Setting>
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/doc/API/V1/examples</String>

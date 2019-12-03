@@ -142,7 +142,7 @@ sub Run {
         if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update organisation. Another organisation with same name already exists.',
+                Message => 'Cannot update organisation. Another organisation with the name already exists.',
             );
         }
     }
@@ -155,7 +155,7 @@ sub Run {
         if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update organisation. Another organisation with same name already exists.',
+                Message => 'Cannot update organisation. Another organisation with the name already exists.',
             );
         }
     }

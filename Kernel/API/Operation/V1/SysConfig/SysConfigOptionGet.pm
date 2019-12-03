@@ -125,6 +125,9 @@ sub Run {
 
     my @SysConfigList;
 
+    # perform SysConfig search
+    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
+
     # start loop 
     foreach my $Option ( @{$Param{Data}->{Option}} ) {
 
@@ -159,8 +162,11 @@ sub Run {
 
         # add
         push(@SysConfigList, { 
-            Name  => $OrgOption,
-            Value => $Value
+            Name            => $OrgOption,
+            Value           => $Value,
+            AccessLevel     => $AllOptions{$OrgOption}->{AccessLevel},
+            Context         => $AllOptions{$OrgOption}->{Context},
+            ContextMetadata => $AllOptions{$OrgOption}->{ContextMetadata},
         });
     }
 

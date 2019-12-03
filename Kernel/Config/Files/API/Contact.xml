@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Contact::ContactGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ContactGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ContactID</Item>
-                <Item Key="ResponseObject">ContactResponse</Item>
+                <Item Key="ResponseSchema">ContactResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>
                 <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Contact::ContactSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ContactCollectionResponse</Item>
+                <Item Key="ResponseSchema">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                
                 <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Contact::ContactCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ContactCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ContactPostRequest</Item>
-                <Item Key="ResponseObject">ContactPostPatchResponse</Item>
+                <Item Key="RequestSchema">ContactPostRequest</Item>
+                <Item Key="ResponseSchema">ContactPostPatchResponse</Item>
                 <Item Key="DefaultSource">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Contact::ContactUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Group>BIS Connector</Group>
         <SubGroup>API::Operation::ModuleRegistration</SubGroup>
@@ -46,12 +46,12 @@
             <Hash>
                 <Item Key="Name">ContactUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ContactPatchRequest</Item>
-                <Item Key="ResponseObject">ContactPostPatchResponse</Item>
+                <Item Key="RequestSchema">ContactPatchRequest</Item>
+                <Item Key="ResponseSchema">ContactPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Contact::ContactDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Group>BIS Connector</Group>
         <SubGroup>API::Operation::ModuleRegistration</SubGroup>
@@ -63,27 +63,27 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Contact::ContactTicketSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Contact::ContactTicketSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ContactTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::V1::Contact::ContactGet###AttributeWhitelist" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::Contact::ContactGet###AttributeWhitelist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the contact data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
             </Hash>
         </Setting>
     </ConfigItem>    
-    <ConfigItem Name="API::Operation::V1::Contact::ContactGet###AttributeBlacklist" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::Contact::ContactGet###AttributeBlacklist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the contact data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>

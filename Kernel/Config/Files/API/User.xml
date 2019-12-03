@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::User::UserGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">UserID</Item>
-                <Item Key="ResponseObject">UserResponse</Item>
+                <Item Key="ResponseSchema">UserResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">UserCollectionResponse</Item>
+                <Item Key="ResponseSchema">UserCollectionResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">UserPostRequest</Item>
-                <Item Key="ResponseObject">UserPostPatchResponse</Item>
+                <Item Key="RequestSchema">UserPostRequest</Item>
+                <Item Key="ResponseSchema">UserPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">UserPatchRequest</Item>
-                <Item Key="ResponseObject">UserPostPatchResponse</Item>
+                <Item Key="RequestSchema">UserPatchRequest</Item>
+                <Item Key="ResponseSchema">UserPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::V1::User::UserGet###AttributeWhitelist" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::User::UserGet###AttributeWhitelist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the user data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
             </Hash>
         </Setting>
     </ConfigItem>    
-    <ConfigItem Name="API::Operation::V1::User::UserGet###AttributeBlacklist" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::User::UserGet###AttributeBlacklist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the user data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
@@ -65,54 +65,54 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::User::UserPreferenceGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserPreferenceGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">UserPreferenceID</Item>
-                <Item Key="ResponseObject">UserPreferenceResponse</Item>
+                <Item Key="ResponseSchema">UserPreferenceResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserPreferenceSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserPreferenceSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">UserPreferenceCollectionResponse</Item>
+                <Item Key="ResponseSchema">UserPreferenceCollectionResponse</Item>
                 <Item Key="CacheType">API_users</Item>
                 <Item Key="CacheTypeDependency">User</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserPreferenceCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserPreferenceCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">UserPreferencePostRequest</Item>
-                <Item Key="ResponseObject">UserPreferencePostPatchResponse</Item>
+                <Item Key="RequestSchema">UserPreferencePostRequest</Item>
+                <Item Key="ResponseSchema">UserPreferencePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserPreferenceUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserPreferenceUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">UserPreferencePatchRequest</Item>
-                <Item Key="ResponseObject">UserPreferencePostPatchResponse</Item>
+                <Item Key="RequestSchema">UserPreferencePatchRequest</Item>
+                <Item Key="ResponseSchema">UserPreferencePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserPreferenceDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserPreferenceDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -122,28 +122,28 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::User::UserRoleIDSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserRoleIDSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserRoleIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">UserRoleIDCollectionResponse</Item>
+                <Item Key="ResponseSchema">UserRoleIDCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::User::UserRoleIDCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserRoleIDCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">UserRoleIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">UserRoleIDPostRequest</Item>
-                <Item Key="ResponseObject">UserRoleIDPostResponse</Item>
+                <Item Key="RequestSchema">UserRoleIDPostRequest</Item>
+                <Item Key="ResponseSchema">UserRoleIDPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-        <ConfigItem Name="API::Operation::Module###V1::User::UserRoleIDDelete" Required="0" Valid="1">
+        <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::User::UserRoleIDDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

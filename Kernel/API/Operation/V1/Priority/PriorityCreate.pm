@@ -132,7 +132,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Priority. Priority with same name '$Priority->{Name}' already exists.",
+            Message => "Can not create Priority. Priority with the name '$Priority->{Name}' already exists.",
         );
     }
 

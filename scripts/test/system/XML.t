@@ -596,7 +596,7 @@ if ( open( my $DATA, "<", "$Path/$File" ) ) {    ## no critic
     # charset test - use file form the article attachment and parse it
     my $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket Title',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'closed',

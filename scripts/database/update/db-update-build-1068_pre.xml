@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="watcher">
+        <ColumnAdd Name="object_id_int" Required="true" Type="INTEGER"/>
+        <IndexDrop Name="watcher_object"/>
+    </TableAlter>    
+
+</database>

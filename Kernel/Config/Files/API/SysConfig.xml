@@ -1,76 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">Option</Item>
-                <Item Key="ResponseObject">SysConfigOptionResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionResponse</Item>
                 <Item Key="CacheType">API_sysconfig</Item>
                 <Item Key="CacheTypeDependency">SysConfig</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">SysConfigOptionCollectionResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionCollectionResponse</Item>
                 <Item Key="CacheType">API_sysconfig</Item>
                 <Item Key="CacheTypeDependency">SysConfig</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">SysConfigOptionPatchRequest</Item>
-                <Item Key="ResponseObject">SysConfigOptionPatchResponse</Item>
+                <Item Key="RequestSchema">SysConfigOptionPatchRequest</Item>
+                <Item Key="ResponseSchema">SysConfigOptionPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionTypeSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">SysConfigOptionTypeCollectionResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionTypeCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionDefinitionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">OptionDefinition</Item>
-                <Item Key="ResponseObject">SysConfigOptionDefinitionResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionDefinitionResponse</Item>
                 <Item Key="CacheType">API_sysconfig</Item>
                 <Item Key="CacheTypeDependency">SysConfig</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionDefinitionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">SysConfigOptionDefinitionCollectionResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionDefinitionCollectionResponse</Item>
                 <Item Key="CacheType">API_sysconfig</Item>
                 <Item Key="CacheTypeDependency">SysConfig</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">SysConfigOptionDefinitionPostRequest</Item>
+                <Item Key="ResponseSchema">SysConfigOptionDefinitionPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">SysConfigOptionDefinitionPatchRequest</Item>
+                <Item Key="ResponseSchema">SysConfigOptionDefinitionPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionDelete" Required="0" Valid="1">
+        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">SysConfigOptionDefinitionDelete</Item>
+                <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
     </ConfigItem>

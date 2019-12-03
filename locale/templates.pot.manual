@@ -225,3 +225,190 @@ msgstr ""
 
 msgid "Expiration Date"
 msgstr ""
+
+
+# Macro actions
+msgid "Set Contact"
+msgstr ""
+
+msgid "Sets the contact (and its primary organisation as organisation) of a ticket."
+msgstr ""
+
+msgid "The login of the contact to be set."
+msgstr ""
+
+msgid "Set Dynamic Field"
+msgstr ""
+
+msgid "Sets a dynamic field value of a ticket."
+msgstr ""
+
+msgid "Dynamic Field Name"
+msgstr ""
+
+msgid "The name of the dynamic field."
+msgstr ""
+
+msgid "Dynamic Field Value"
+msgstr ""
+
+msgid "The value for the dynamic field to be set."
+msgstr ""
+
+msgid "Set Lock"
+msgstr ""
+
+msgid "Sets the lock state of a ticket."
+msgstr ""
+
+msgid "The lock state to be set."
+msgstr ""
+
+msgid "Set Organisation"
+msgstr ""
+
+msgid "Sets the organisation of a ticket."
+msgstr ""
+
+msgid "The number of the organisation to be set."
+msgstr ""
+
+msgid "Set Owner"
+msgstr ""
+
+msgid "Sets the owner of a ticket."
+msgstr ""
+
+msgid "The login of the agent to be set."
+msgstr ""
+
+msgid "Set Priority"
+msgstr ""
+
+msgid "Sets the priority of a ticket."
+msgstr ""
+
+msgid "The name of the priority to be set."
+msgstr ""
+
+msgid "Set Responsible"
+msgstr ""
+
+msgid "Sets the responsible of a ticket."
+msgstr ""
+
+msgid "Set State"
+msgstr ""
+
+msgid "Sets the state of a ticket."
+msgstr ""
+
+msgid "The name of the state to be set."
+msgstr ""
+
+msgid "Pending Time Difference"
+msgstr ""
+
+msgid "(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only."
+msgstr ""
+
+msgid "Set Team"
+msgstr ""
+
+msgid "Sets the team of a ticket."
+msgstr ""
+
+msgid "The name of the team to be set."
+msgstr ""
+
+msgid "Delete Ticket"
+msgstr ""
+
+msgid "Deletes a ticket."
+msgstr ""
+
+msgid "Set Title"
+msgstr ""
+
+msgid "Sets the title of a ticket."
+msgstr ""
+
+msgid "The new title of a ticket to be set."
+msgstr ""
+
+msgid "Set Type"
+msgstr ""
+
+msgid "Sets the type of a ticket."
+msgstr ""
+
+msgid "The name of the type to be set."
+msgstr ""
+
+# Create Article action
+msgid "Create Article"
+msgstr ""
+
+msgid "Creates an article for a ticket."
+msgstr ""
+
+msgid "(Optional) The channel of the new article. "note" will be used if omitted."
+msgstr ""
+
+msgid "Sender Type"
+msgstr ""
+
+msgid "(Optional) The sender type of the new article. "agent" will be used if omitted."
+msgstr ""
+
+msgid "(Optional) The email address of the sender for the new article. Agent data will be used if omitted."
+msgstr ""
+
+msgid "(Optional) The email addresses of the receiver of the new article."
+msgstr ""
+
+msgid "(Optional) The email addresses of the Cc receiver of the new article."
+msgstr ""
+
+msgid "(Optional) The email addresses of the Bcc receiver of the new article."
+msgstr ""
+
+msgid "The subject of the new article."
+msgstr ""
+
+msgid "The text of the new article."
+msgstr ""
+
+msgid "The time units to add for the new article."
+msgstr ""
+
+# Create Ticket action
+msgid "The login of the contact of the new ticket."
+msgstr ""
+
+msgid "The lock state of the new ticket."
+msgstr ""
+
+msgid "The number of the organisation of the new ticket. Primary organisation of contact will be used if omitted."
+msgstr ""
+
+msgid "The login of the owner of the new ticket. Current user will be used if omitted."
+msgstr ""
+
+msgid "The name of the priority of the new ticket."
+msgstr ""
+
+msgid "The login of the responsible of the new ticket. Root user (ID = 1) will be used if omitted."
+msgstr ""
+
+msgid "The name of the state of the new ticket."
+msgstr ""
+
+msgid "The title of the new ticket and subject of the first article."
+msgstr ""
+
+msgid "The name of the team of the new ticket."
+msgstr ""
+
+msgid "The name of the type of the new ticket. Configured default will be used (Ticket::Type::Default) if omitted."
+msgstr ""

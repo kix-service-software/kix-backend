@@ -157,6 +157,14 @@ sub Run {
         TicketID => $Param{Data}->{TicketID}
     );
 
+    # Lock can only be set if OwnerID != 1
+    if ( $Ticket->{LockID} && $Ticket->{LockID} == 2 && (($TicketData{OwnerID} == 1 && !$Ticket->{OwnerID}) || ($Ticket->{OwnerID} && $Ticket->{OwnerID} == 1)) ) {
+        return $Self->_Error(
+            Code    => 'Conflict',
+            Message => "Ticket can't be locked if OwnerID is 1!",
+        );            
+    }
+
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket( 
         Ticket => {
@@ -284,37 +292,6 @@ sub _TicketUpdate {
         elsif ( defined $Ticket->{QueueID} && $Ticket->{QueueID} ne $TicketData{QueueID} ) {
             $Success = $TicketObject->TicketQueueSet(
                 QueueID  => $Ticket->{QueueID},
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-        else {
-
-            # data is the same as in ticket nothing to do
-            $Success = 1;
-        }
-
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToUpdate',
-                Message => 'Unable to update ticket, please contact system administrator!',
-            );
-        }
-    }
-
-    # update Ticket->Lock
-    if ( $Ticket->{Lock} || $Ticket->{LockID} ) {
-        my $Success;
-        if ( defined $Ticket->{Lock} && $Ticket->{Lock} ne $TicketData{Lock} ) {
-            $Success = $TicketObject->TicketLockSet(
-                Lock     => $Ticket->{Lock},
-                TicketID => $Param{TicketID},
-                UserID   => $Param{UserID},
-            );
-        }
-        elsif ( defined $Ticket->{LockID} && $Ticket->{LockID} ne $TicketData{LockID} ) {
-            $Success = $TicketObject->TicketLockSet(
-                LockID   => $Ticket->{LockID},
                 TicketID => $Param{TicketID},
                 UserID   => $Param{UserID},
             );
@@ -643,6 +620,37 @@ sub _TicketUpdate {
                 NewUserID => $Ticket->{ResponsibleID},
                 TicketID  => $Param{TicketID},
                 UserID    => $Param{UserID},
+            );
+        }
+        else {
+
+            # data is the same as in ticket nothing to do
+            $Success = 1;
+        }
+
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToUpdate',
+                Message => 'Unable to update ticket, please contact system administrator!',
+            );
+        }
+    }
+
+    # update Ticket->Lock (lock has to be done after owner set)
+    if ( $Ticket->{Lock} || $Ticket->{LockID} ) {
+        my $Success;
+        if ( defined $Ticket->{Lock} && $Ticket->{Lock} ne $TicketData{Lock} ) {
+            $Success = $TicketObject->TicketLockSet(
+                Lock     => $Ticket->{Lock},
+                TicketID => $Param{TicketID},
+                UserID   => $Param{UserID},
+            );
+        }
+        elsif ( defined $Ticket->{LockID} && $Ticket->{LockID} ne $TicketData{LockID} ) {
+            $Success = $TicketObject->TicketLockSet(
+                LockID   => $Ticket->{LockID},
+                TicketID => $Param{TicketID},
+                UserID   => $Param{UserID},
             );
         }
         else {

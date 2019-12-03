@@ -39,7 +39,7 @@ for ( 1 .. 4 ) {
     my $TicketID     = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
         TN           => $TicketNumber,
         Title        => 'Test ticket',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',

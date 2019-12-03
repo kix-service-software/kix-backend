@@ -1,0 +1,90 @@
+{
+   "$schema": "http://json-schema.org/schema",
+   "$id": "#Job",
+   "type": "object",
+   "description": "The job object.",
+   "properties": {
+      "ChangeBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "ChangeTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Comment": {
+         "type": "string",
+         "readOnly": true
+      },
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "CreateTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ExecPlanIDs": {
+        "type": "array",
+        "readOnly": true,
+        "item": {
+          "type": "integer"
+        },
+        "description": "IDs of assigned execution plans - added via include \"ExecPlanIDs\""
+      },
+      "ExecPlans": {
+        "type": "array",
+        "description": "assigned execution plans - added via include \"ExecPlans\"",
+        "readOnly": true,
+        "item": {
+          "$ref": "ExecPlan.json"
+        }
+      },
+      "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "LastExecutionTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "MacroIDs": {
+        "type": "array",
+        "readOnly": true,
+        "item": {
+          "type": "integer"
+        },
+        "description": "IDs of assigned macros - added via include \"MacroIDs\""
+      },
+      "Macros": {
+        "type": "array",
+        "description": "assigned macros - added via include \"Macros\"",
+        "readOnly": true,
+        "item": {
+          "$ref": "Macro.json"
+        }
+      },
+      "Name": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Type": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ValidID": {
+         "type": "integer",
+         "readOnly": true
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Name",
+      "Type",
+      "ValidID"
+   ]
+}

@@ -1,0 +1,32 @@
+{
+    "Job": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-10-10 09:13:05",
+            "Comment": "...",
+            "CreateBy": 1,
+            "CreateTime": "2019-05-02 13:35:42",
+            "ExecPlanIDs": [ 1,5 ],
+            "ID": 1,
+            "LastExecutionTime": "",
+            "MacroIDs": [],
+            "Name": "Some Job",
+            "Type": "...",
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-10-01 15:30:14",
+            "Comment": "...",
+            "CreateBy": 1,
+            "CreateTime": "2019-10-01 15:30:14",
+            "ExecPlanIDs": [ 2 ],
+            "ID": 2,
+            "LastExecutionTime": "2019-10-01 14:00:00",
+            "MacroIDs": [ 2,4 ],
+            "Name": "Another Job",
+            "Type": "...",
+            "ValidID": 1
+        }
+    ]
+}

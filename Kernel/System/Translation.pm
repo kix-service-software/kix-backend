@@ -1078,6 +1078,9 @@ sub ImportPO {
 
         foreach my $MsgId ( sort keys %{$Items} ) {
             $CountTotal++;
+            
+            # the pattern is obsolete, go to the next one
+            next if $Items->{$MsgId}->obsolete;
 
             my $MsgStr = $EncodeObject->EncodeInput($Items->{$MsgId}->msgstr);
             $MsgId =~ s/(?<!\\)"//g;

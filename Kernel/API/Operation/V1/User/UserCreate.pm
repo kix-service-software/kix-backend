@@ -194,7 +194,7 @@ sub Run {
             
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                 )
             }
         }
@@ -214,7 +214,7 @@ sub Run {
             
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                 )
             }
         }

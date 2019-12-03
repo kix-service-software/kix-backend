@@ -125,8 +125,8 @@
     </Insert>
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">9</Data>
-        <Data Key="name" Type="Quote" Translatable="1">CMDB Reader</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">allows to read any config items information in any CI class and allows to READ links</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Asset Reader</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows to read any asset information in any asset class and allows to READ links</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -135,8 +135,8 @@
     </Insert>
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">10</Data>
-        <Data Key="name" Type="Quote" Translatable="1">CMDB Maintainer</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">same as CMDB-Reader, but additionally  allows to create new or update any existing config item entry and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Asset Maintainer</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">same as Asset-Reader, but additionally  allows to create new or update any existing asset entry and allows to CREATE, UPDATE, DELETE links</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -179,17 +179,7 @@
     <Insert Table="permission_type">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">Resource</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a collection resource.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="permission_type">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Object</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a item resource.</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that corresponds with a API resource.</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -263,11 +253,33 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Agent User": permission _R___ on /system/config  -->
+    <!-- role "Agent User": permission _R___ on /system/config -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/system/config</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission _R___ on /system/config/*{SysConfigOption.AccessLevel EQ 'internal'} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel EQ 'internal'}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission _R___ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ 'internal'} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ 'internal'}</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -296,7 +308,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Agent User": permission _R___ on /system/objecticons  -->
+    <!-- role "Agent User": permission _R___ on /system/objecticons -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
@@ -307,7 +319,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Agent User": permission _R___ on /system/generalcatalog  -->
+    <!-- role "Agent User": permission _R___ on /system/generalcatalog -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
@@ -368,6 +380,17 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/tickets</Data>
         <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Ticket Reader": permission CRUD_ on /tickets/*/articles/*/flags -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">4</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*/flags</Data>
+        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -472,7 +495,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/communication  -->
+    <!-- role "Ticket Reader": permission _R___ on /system/communication -->
     <Insert Table="role_permission">
         <Data Key="role_id">4</Data>
         <Data Key="type_id">1</Data>
@@ -533,6 +556,28 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/links</Data>
         <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Ticket Reader": permission CRUD_ on /watchers -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">4</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/watchers</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Ticket Agent": permission CRUD_ on /watchers -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">5</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/watchers</Data>
+        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -637,7 +682,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/communication  -->
+    <!-- role "Ticket Agent": permission _R___ on /system/communication -->
     <Insert Table="role_permission">
         <Data Key="role_id">5</Data>
         <Data Key="type_id">1</Data>
@@ -758,7 +803,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication  -->
+    <!-- role "Ticket Creator": permission _R___ on /system/communication -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -780,7 +825,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication/channels  -->
+    <!-- role "Ticket Creator": permission _R___ on /system/communication/channels -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -791,7 +836,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication/sendertypes  -->
+    <!-- role "Ticket Creator": permission _R___ on /system/communication/sendertypes -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -802,7 +847,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication/systemaddresses  -->
+    <!-- role "Ticket Creator": permission _R___ on /system/communication/systemaddresses -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -874,6 +919,17 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/faq/articles</Data>
         <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "FAQ Reader": permission CRUD_ on /faq/articles/*/votes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">7</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
+        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -1165,11 +1221,33 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "System Admin": permission CRUD_ on /system  -->
+    <!-- role "System Admin": permission CRUD_ on /system -->
     <Insert Table="role_permission">
         <Data Key="role_id">2</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/system</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -1181,6 +1259,28 @@
         <Data Key="role_id">1</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/*</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Superuser": permission CRUD_ on /system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">1</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Superuser": permission CRUD_ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">1</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -3044,6 +3144,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="f_number" Type="Quote">17006</Data>
         <Data Key="f_subject" Type="Quote">Selected Ticket Features</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241906</Data>
@@ -3071,6 +3172,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="f_number" Type="Quote">17007</Data>
         <Data Key="f_subject" Type="Quote">Neues Ticket</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241907</Data>
@@ -3090,6 +3192,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
         <Data Key="changed_by">1</Data>
     </Insert>
     <Insert Table="faq_item">
+        <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="f_number" Type="Quote">17008</Data>
         <Data Key="f_subject" Type="Quote">New Ticket</Data>
         <Data Key="f_name" Type="Quote">1563537998-85.9252951241908</Data>
@@ -9164,6 +9267,38 @@ vielen Dank für Ihre Nachricht.
         <Data Key="text" Type="Quote">Lorem ipsum dolor sit amet, vis an tibique adversarium, est error commodo atomorum ne, veniam utamur iudicabit qui cu. Cu insolens tincidunt mea, sensibus repudiare eu per. Decore vivendum reprimique mel cu, nemore vocibus cum ne. Ad invenire consequat nam. Mea vidit labores id, quando consetetur mei eu.</Data>
         <Data Key="comment" Type="Quote">Just for demonstration purpose.</Data>
         <Data Key="valid_id">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+<!-- job_run_state -->
+    <Insert Table="job_run_state">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">running</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">The job is running.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_run_state">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">finished</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">The last job run has been finished.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_run_state">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">warning</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">The last job run has been finished but some errors occured.</Data>
+        <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>

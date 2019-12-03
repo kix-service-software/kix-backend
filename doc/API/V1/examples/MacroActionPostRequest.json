@@ -1,0 +1,10 @@
+{
+    "MacroAction": {
+        "Comment": "some comment",
+        "MacroID": 1,
+        "Name": "new macro",
+        "Parameters": {},
+        "Type": "Ticket",
+        "ValidID": 1
+    }
+}

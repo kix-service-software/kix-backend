@@ -1,0 +1,14 @@
+{
+   "$id" : "#JobPostPatchResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The ID of the created or updated job.",
+   "type" : "object",
+   "properties" : {
+      "JobID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "JobID"
+   ]
+}

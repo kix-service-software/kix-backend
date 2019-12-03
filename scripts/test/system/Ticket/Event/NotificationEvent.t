@@ -292,8 +292,9 @@ $Self->True(
     'ValueSet - Checkbox value set to unchecked',
 );
 
-my $SuccessWatcher = $TicketObject->TicketWatchSubscribe(
-    TicketID    => $TicketID,
+my $SuccessWatcher = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherAdd(
+    Object      => 'Ticket',
+    ObjectID    => $TicketID,
     WatchUserID => $UserID,
     UserID      => $UserID,
 );
@@ -301,7 +302,7 @@ my $SuccessWatcher = $TicketObject->TicketWatchSubscribe(
 # sanity check
 $Self->True(
     $SuccessWatcher,
-    "TicketWatchSubscribe() successful for Ticket ID $TicketID",
+    "WatcherAdd() successful for Ticket ID $TicketID",
 );
 
 my @Tests = (

@@ -16,6 +16,7 @@ use warnings;
 use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 use Data::Dumper;
+use Time::HiRes;
 
 use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
@@ -1368,6 +1369,7 @@ sub CheckPermission {
     # UserID 1 has God Mode ;)
     return (1, Kernel::System::Role::Permission->PERMISSION_CRUD) if (!$Kernel::OM->Get('Kernel::Config')->Get('SecureMode') && $Param{UserID} == 1);
 
+    my $StartTime = Time::HiRes::time();
     $Self->_PermissionDebug("checking $Param{RequestedPermission} permission for target $Param{Target}");
 
     # get list of all roles to resolve names
@@ -1425,7 +1427,14 @@ sub CheckPermission {
 
         # combine permissions
         if ( defined $ResultingPermission ) {
-            $ResultingPermission &= ($TargetPermission || 0);
+            # only if we have READ upto here, we can expand(!) the permissions
+            if ( $ResultingPermission && Kernel::System::Role::Permission->PERMISSION->{READ} == Kernel::System::Role::Permission->PERMISSION->{READ} && $TargetPermission > $ResultingPermission ) {
+                $ResultingPermission |= ($TargetPermission || 0);
+            }
+            else {
+                # no READ no expansion
+                $ResultingPermission &= ($TargetPermission || 0);
+            }
         }
         else {
             $ResultingPermission = ($TargetPermission || 0);
@@ -1438,6 +1447,9 @@ sub CheckPermission {
 
         $Self->_PermissionDebug("resulting permission on target $Target: $ResultingPermissionShort");
     }
+
+    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+    $Self->_PermissionDebug(sprintf("permission check on target $Target took %i ms", $TimeDiff));
 
     # check if we have a DENY 
     return 0 if !defined $ResultingPermission || ($ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY};
@@ -1454,7 +1466,7 @@ returns true if the requested permission is granted for a given role
     my ($Granted, $ResultingPermission) = $UserObject->CheckPermissionForRole(
         UserID              => 123,
         RoleID              => 456,
-        Types               => [ 'Resource', 'Object' ]
+        Types               => [ 'Resource' ]
         Target              => '/tickets',
         RequestedPermission => 'READ'
     );

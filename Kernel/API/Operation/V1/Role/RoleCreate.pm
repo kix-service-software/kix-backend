@@ -130,7 +130,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Cannot create role. Role with same name '$Role->{Name}' already exists.",
+            Message => "Cannot create role. Role with the name '$Role->{Name}' already exists.",
         );
     }
 

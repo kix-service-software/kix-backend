@@ -302,7 +302,7 @@ sub _CheckPermission {
 
     # return false if access is explicitly denied by token
     if ( !$Access ) {
-        $Self->_PermissionDebug("RequestURI = $Self->{RequestURI}, requested permission = $RequestedPermission --> permission denied by token");
+        $Self->_PermissionDebug("RequestURI: $Self->{RequestURI}, requested permission: $RequestedPermission --> permission denied by token");
         return;
     }
 
