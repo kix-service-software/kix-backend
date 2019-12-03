@@ -93,6 +93,9 @@ sub ParameterDefinition {
         'SysConfigOptionDefinition::Description' => {
             RequiresValueIfUsed => 1,
         },
+        'SysConfigOptionDefinition::AccessLevel' => {
+            RequiresValueIfUsed => 1,
+        },
         'SysConfigOptionDefinition::IsRequired' => {
             RequiresValueIfUsed => 1,
             OneOf               => [ 0, 1 ]
@@ -162,7 +165,8 @@ sub Run {
         ContextMetadata => exists $SysConfigOptionDefinition->{ContextMetadata} ? $SysConfigOptionDefinition->{ContextMetadata} : $OptionData{ContextMetadata},
         Description     => exists $SysConfigOptionDefinition->{Description} ? $SysConfigOptionDefinition->{Description} : $OptionData{Description},
         Comment         => exists $SysConfigOptionDefinition->{Comment} ? $SysConfigOptionDefinition->{Comment} : $OptionData{Comment},
-        Level           => exists $SysConfigOptionDefinition->{Level} ? $SysConfigOptionDefinition->{Level} : $OptionData{Level},
+        AccessLevel     => exists $SysConfigOptionDefinition->{AccessLevel} ? $SysConfigOptionDefinition->{AccessLevel} : $OptionData{AccessLevel},
+        ExperienceLevel => exists $SysConfigOptionDefinition->{ExperienceLevel} ? $SysConfigOptionDefinition->{ExperienceLevel} : $OptionData{ExperienceLevel},
         Group           => exists $SysConfigOptionDefinition->{Group} ? $SysConfigOptionDefinition->{Group} : $OptionData{Group},
         IsRequired      => exists $SysConfigOptionDefinition->{IsRequired} ? $SysConfigOptionDefinition->{IsRequired} : $OptionData{IsRequired},
         Setting         => exists $SysConfigOptionDefinition->{Setting} ? $SysConfigOptionDefinition->{Setting} : $OptionData{Setting},

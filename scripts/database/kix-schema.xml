@@ -2832,7 +2832,8 @@
     <Column Name="context" Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="context_metadata" Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="description" Required="true" Type="VARCHAR" Size="10000" />
-    <Column Name="level" Required="false" Default="0" Type="INTEGER" />
+    <Column Name="access_level" Required="true" Type="VARCHAR" Size="50"/>
+    <Column Name="experience_level" Required="false" Default="0" Type="INTEGER" />
     <Column Name="type" Required="true" Type="VARCHAR" Size="50" />
     <Column Name="group_name" Required="false" Type="VARCHAR" Size="255" />
     <Column Name="setting" Required="false" Type="VARCHAR" Size="10000" />

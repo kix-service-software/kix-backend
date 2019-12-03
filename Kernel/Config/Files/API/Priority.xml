@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Priority::PriorityGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Priority::PriorityGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">PriorityID</Item>
-                <Item Key="ResponseObject">PriorityResponse</Item>
+                <Item Key="ResponseSchema">PriorityResponse</Item>
                 <Item Key="CacheType">API_priorities</Item>
                 <Item Key="CacheTypeDependency">Priority</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Priority::PrioritySearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Priority::PrioritySearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PrioritySearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">PriorityCollectionResponse</Item>
+                <Item Key="ResponseSchema">PriorityCollectionResponse</Item>
                 <Item Key="CacheType">API_priorities</Item>                
                 <Item Key="CacheTypeDependency">Priority</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Priority::PriorityCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Priority::PriorityCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">PriorityPostRequest</Item>
-                <Item Key="ResponseObject">PriorityPostPatchResponse</Item>
+                <Item Key="RequestSchema">PriorityPostRequest</Item>
+                <Item Key="ResponseSchema">PriorityPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Priority::PriorityUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Priority::PriorityUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">PriorityPatchRequest</Item>
-                <Item Key="ResponseObject">PriorityPostPatchResponse</Item>
+                <Item Key="RequestSchema">PriorityPatchRequest</Item>
+                <Item Key="ResponseSchema">PriorityPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Priority::PriorityDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Priority::PriorityDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

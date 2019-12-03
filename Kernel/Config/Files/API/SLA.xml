@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::SLA::SLAGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SLA::SLAGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SLAGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">SLAResponse</Item>
+                <Item Key="ResponseSchema">SLAResponse</Item>
                 <Item Key="ObjectID">SLAID</Item>
                 <Item Key="CacheType">API_slas</Item>
                 <Item Key="CacheTypeDependency">SLA</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SLA::SLASearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SLA::SLASearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SLASearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">SLACollectionResponse</Item>
+                <Item Key="ResponseSchema">SLACollectionResponse</Item>
                 <Item Key="CacheType">API_slas</Item>                
                 <Item Key="CacheTypeDependency">SLA</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SLA::SLACreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SLA::SLACreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SLACreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">SLAPostRequest</Item>
-                <Item Key="ResponseObject">SLAPostPatchResponse</Item>
+                <Item Key="RequestSchema">SLAPostRequest</Item>
+                <Item Key="ResponseSchema">SLAPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SLA::SLAUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SLA::SLAUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SLAUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">SLAPatchRequest</Item>
-                <Item Key="ResponseObject">SLAPostPatchResponse</Item>
+                <Item Key="RequestSchema">SLAPatchRequest</Item>
+                <Item Key="ResponseSchema">SLAPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SLA::SLADelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SLA::SLADelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

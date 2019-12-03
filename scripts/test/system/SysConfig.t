@@ -48,6 +48,7 @@ my $Random = 'Option' . $Helper->GetRandomID();
 my $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'String',
     Description => 'some description',
+    AccessLevel => 'internal',
     Setting     => { 
         "RegEx" => "" 
     },
@@ -63,6 +64,7 @@ $Self->True(
 $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'Option',
     Description => 'some description',
+    AccessLevel => 'internal',
     Setting     => { 
         "0" => "No",
         "1" => "Yes" 
@@ -80,6 +82,7 @@ $Self->True(
 $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'Array',
     Description => 'some description',
+    AccessLevel => 'internal',
     Setting     => [ "Normal", "ParentChild" ],
     Type        => 'Array',
     UserID      => 1,
@@ -93,6 +96,7 @@ $Self->True(
 $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'Hash',
     Description => 'some description',
+    AccessLevel => 'internal',
     Setting     => { 
         "SourceName" => "Parent", 
         "TargetName" => "Child" 

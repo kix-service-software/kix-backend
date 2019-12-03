@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Notification::NotificationGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">NotificationID</Item>
-                <Item Key="ResponseObject">NotificationResponse</Item>
+                <Item Key="ResponseSchema">NotificationResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Notification::NotificationSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">NotificationCollectionResponse</Item>
+                <Item Key="ResponseSchema">NotificationCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Notification::NotificationCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">NotificationPostRequest</Item>
-                <Item Key="ResponseObject">NotificationPostPatchResponse</Item>
+                <Item Key="RequestSchema">NotificationPostRequest</Item>
+                <Item Key="ResponseSchema">NotificationPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Notification::NotificationUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">NotificationPatchRequest</Item>
-                <Item Key="ResponseObject">NotificationPostPatchResponse</Item>
+                <Item Key="RequestSchema">NotificationPatchRequest</Item>
+                <Item Key="ResponseSchema">NotificationPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Notification::NotificationDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Notification::NotificationDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

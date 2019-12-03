@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::TicketState::TicketStateGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketState::TicketStateGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketStateGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">StateID</Item>
-                <Item Key="ResponseObject">TicketStateResponse</Item>
+                <Item Key="ResponseSchema">TicketStateResponse</Item>
                 <Item Key="CacheType">API_ticketstates</Item>
                 <Item Key="CacheTypeDependency">State</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketState::TicketStateSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketState::TicketStateSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketStateSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketStateCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketStateCollectionResponse</Item>
                 <Item Key="CacheType">API_ticketstates</Item>
                 <Item Key="CacheTypeDependency">State</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketState::TicketStateCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketState::TicketStateCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketStateCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketStatePostRequest</Item>
-                <Item Key="ResponseObject">TicketStatePostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketStatePostRequest</Item>
+                <Item Key="ResponseSchema">TicketStatePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketState::TicketStateUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketState::TicketStateUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketStateUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketStatePatchRequest</Item>
-                <Item Key="ResponseObject">TicketStatePostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketStatePatchRequest</Item>
+                <Item Key="ResponseSchema">TicketStatePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketState::TicketStateDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketState::TicketStateDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

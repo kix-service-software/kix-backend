@@ -74,10 +74,13 @@ sub RunOperation {
 
         my %Permissions = $Kernel::OM->Get('Kernel::System::User')->PermissionList(
             UserID => $Self->{Authorization}->{UserID},
-            Types  => ['PropertyValue'],
+            Types  => [ 'PropertyValue' ],
         );
 
-        foreach my $Permission ( values %Permissions ) {
+        foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
+
+            # ignore targets without filter expression (non PropertyValue permission)
+            next if $Permission->{Target} !~ /[{}]/;
 
             # prepare target
             my $Target = $Permission->{Target};
@@ -86,15 +89,19 @@ sub RunOperation {
             $Target =~ s/\{.*?\}$//g;
 
             # only match the current RequestURI
-            next if $Self->{RequestURI} !~ /^$Target$/g;
+            next if $Self->{RequestURI} !~ /^$Target$/;
 
+            # extract property value permission
             next if $Permission->{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/;
 
             my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+            # replace string quotes
+            $Value =~ s/["']//g;
 
-            $Self->_PermissionDebug( sprintf( "found relevant PropertyValue permission on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+            $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
 
             if ( $Self->{RequestMethod} =~ /GET|POST/ ) {
+                # GET and POST need some special handling
                 my $Not = 0;
 
                 # add a NOT filter if we have no READ permission (including DENY)
@@ -102,6 +109,21 @@ sub RunOperation {
                     ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{READ} ) != Kernel::System::Role::Permission->PERMISSION->{READ}
                     || ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
                 );
+
+                # prepare value for IN operator
+                if ( $Operator eq 'IN' ) {
+                    if ( $Value =~ /^\[(.*?)\]$/ ) {
+                        my @ValueParts = split(/\s*,\s*/, $1);
+                        $Value = \@ValueParts;
+                    }
+                    else {
+                        $Self->_PermissionDebug( sprintf("Value part of PropertyValue permission on target \"%s\" is invalid!", $Permission->{Target}) );
+                        $Self->_Error(
+                            Code    => 'InternalError',
+                            Message => 'Permission value is invalid!',
+                        );
+                    }
+                }
 
                 # add a filter accordingly
                 my $Result = $Self->AddPermissionFilterForObject(
@@ -120,7 +142,9 @@ sub RunOperation {
 
                 if ( $Self->{RequestMethod} eq 'POST' ) {
 
-                    # we need some special handling here sind we don't have the object yet to be read
+                    # we need some special handling here since we don't have the object yet to be read
+                    # we use the same GET filters but apply them to the given object
+
                     # return 403 if we don't have permission to execute this
                     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
@@ -129,14 +153,14 @@ sub RunOperation {
                         || ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
                     ) {
 
-                        my %Data = %{ $Param{Data} };
+                        my %Data = %{ $Param{Data} };       # a deref is required here
 
                         # active the permission filters
                         $Self->_ActivatePermissionFilters();
 
                         # we need to check the object against the filters
                         my $Result = $Self->_ApplyFilter(
-                            Data               => \%Data,
+                            Data               => \%Data,       
                             IsPermissionFilter => 1,
                         );
 
@@ -151,10 +175,12 @@ sub RunOperation {
                     }
                 }
 
-                # save the filtered object for later use
+                # save the filtered object so that we know which object has permission filters
                 $FilteredPermissionObjects{$Object} = 1;
             }
             else {
+                # PATCH and DELETE will be handled here 
+
                 # for all other methods we need to get the object with permission filters to check if it matches (use a "faked" ExecOperation)
                 my $GetResult = $Self->ExecOperation(
                     RequestMethod => 'GET',
@@ -239,7 +265,9 @@ sub RunOperation {
 
     # check the result for filtered objects
     if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($Result) && $Result->{Success} && %FilteredPermissionObjects ) {
+
         foreach my $Object ( keys %FilteredPermissionObjects ) {
+            next if !exists $Result->{Data}->{$Object};
 
             # if the filtered object is undef then we don't have permission to read it
             if ( !$Result->{Data}->{$Object} ) {
@@ -360,7 +388,7 @@ sub Options {
     my $SchemaLocation = $Kernel::OM->Get('Kernel::Config')->Get('API::JSONSchema::Location');
     if ( $SchemaLocation && -d $SchemaLocation ) {
         foreach my $Type (qw(Request Response)) {
-            my $Object = $Self->{OperationConfig}->{ $Type . 'Object' };
+            my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
                     Location => "$SchemaLocation/$Object.json",
@@ -378,7 +406,7 @@ sub Options {
     my $ExampleLocation = $Kernel::OM->Get('Kernel::Config')->Get('API::Example::Location');
     if ( $ExampleLocation && -d $ExampleLocation ) {
         foreach my $Type (qw(Request Response)) {
-            my $Object = $Self->{OperationConfig}->{ $Type . 'Object' };
+            my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
                     Location => "$ExampleLocation/$Object.json",
@@ -897,63 +925,68 @@ sub _Success {
     # handle Search parameter if we have to
     if ( !$Param{IsOptionsResponse} ) {
         if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
+            my $StartTime = Time::HiRes::time();
+            
             $Self->_ApplyFilter(
                 Data   => \%Param,
                 Filter => $Self->{Search}
             );
+            
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", $TimeDiff));
         }
 
         # honor a filter, if we have one
         if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Filter} ) ) {
+            my $StartTime = Time::HiRes::time();
+
             $Self->_ApplyFilter(
                 Data => \%Param,
             );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", $TimeDiff));
         }
 
         # honor a sorter, if we have one
         if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Sort} ) ) {
+            my $StartTime = Time::HiRes::time();
+
             $Self->_ApplySort(
                 Data => \%Param,
             );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", $TimeDiff));
         }
 
         # honor an offset, if we have one
         if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Offset} ) ) {
+            my $StartTime = Time::HiRes::time();
+
             $Self->_ApplyOffset(
                 Data => \%Param,
             );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
         }
 
         # honor a limiter, if we have one
         if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Limit} ) ) {
+            my $StartTime = Time::HiRes::time();
+
             $Self->_ApplyLimit(
                 Data => \%Param,
             );
-        }
 
-        # honor a field selector, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
-            $Self->_ApplyFieldSelector(
-                Data => \%Param,
-            );
-        }
-
-        # honor a generic include, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
-            $Self->_ApplyInclude(
-                Data => \%Param,
-            );
-        }
-
-        # honor an expander, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
-            $Self->_ApplyExpand(
-                Data => \%Param,
-            );
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", $TimeDiff));
         }
 
         # honor permission filters
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{PermissionFilters} ) ) {
+            my $StartTime = Time::HiRes::time();
 
             # in case of a GET request to a collection resource, this should have been done in the filter already
             # but we will make sure nothing gets out that should not and we have to honor item resources as well
@@ -961,6 +994,45 @@ sub _Success {
                 Data               => \%Param,
                 IsPermissionFilter => 1,
             );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", $TimeDiff));
+        }
+
+        # honor a field selector, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyFieldSelector(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", $TimeDiff));
+        }
+
+        # honor a generic include, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyInclude(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", $TimeDiff));
+        }
+
+        # honor an expander, if we have one
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyExpand(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
         }
 
         # cache request without offset and limit if CacheType is set for this operation
@@ -1300,6 +1372,7 @@ sub _ApplyFilter {
             $ObjectData = [ $Param{Data}->{$Object} ];
         }
         if ( IsArrayRefWithData($ObjectData) ) {
+            $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             # filter each contained hash
             my @FilteredResult;
@@ -1569,6 +1642,9 @@ sub _ApplyFilter {
             else {
                 $Param{Data}->{$Object} = \@FilteredResult;
             }
+            if ( ref $Param{Data}->{$Object} eq 'ARRAY' ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @{$Param{Data}->{$Object}}));
+            }
         }
     }
 
@@ -1697,6 +1773,8 @@ sub _ApplySort {
 
     foreach my $Object ( keys %{ $Self->{Sort} } ) {
         if ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
+
+            $Self->_Debug($Self->{LevelIndent}, sprintf("sorting %i objects of type %s", scalar @{$Param{Data}->{$Object}}, $Object));
 
             # sort array by given criteria
             my @SortCriteria;
@@ -1986,12 +2064,12 @@ sub _ActivatePermissionFilters {
         );
 
         # init filter and search if not done already
-        $Self->{Filter}->{ $Filter->{Object} }->{AND} ||= [];
-        $Self->{Search}->{ $Filter->{Object} }->{AND} ||= [];
+        $Self->{Filter}->{ $Filter->{Object} }->{OR} ||= [];
+        $Self->{Search}->{ $Filter->{Object} }->{OR} ||= [];
 
         # add definition to filters
-        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{AND} }, \%FilterDef );
-        push( @{ $Self->{Search}->{ $Filter->{Object} }->{AND} }, \%FilterDef );
+        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
+        push( @{ $Self->{Search}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
     }
 
     $Self->_PermissionDebug( "filter after activation of permission filters: " . Dumper( $Self->{Filter} ) );
@@ -2013,9 +2091,6 @@ sub _ExpandObject {
         }
     }
 
-# use Data::Dumper;
-# $Data::Dumper::Indent=2;
-# print STDERR Dumper($Param{Data});
     my @Data;
     if ( IsArrayRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
         @Data = @{ $Param{Data}->{ $Param{AttributeToExpand} } };

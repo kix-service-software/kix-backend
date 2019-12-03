@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Lock::LockGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Lock::LockGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">LockGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">LockID</Item>
-                <Item Key="ResponseObject">LockResponse</Item>
+                <Item Key="ResponseSchema">LockResponse</Item>
                 <Item Key="CacheType">API_ticketlocks</Item>
                 <Item Key="CacheTypeDependency">Lock</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Lock::LockSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Lock::LockSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">LockSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">LockCollectionResponse</Item>
+                <Item Key="ResponseSchema">LockCollectionResponse</Item>
                 <Item Key="CacheType">API_ticketlocks</Item>                
                 <Item Key="CacheTypeDependency">Lock</Item>
             </Hash>

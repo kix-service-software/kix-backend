@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">RoleGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">RoleID</Item>
-                <Item Key="ResponseObject">RoleResponse</Item>
+                <Item Key="ResponseSchema">RoleResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">RoleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">RoleCollectionResponse</Item>
+                <Item Key="ResponseSchema">RoleCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">RoleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">RolePostRequest</Item>
-                <Item Key="ResponseObject">RolePostPatchResponse</Item>
+                <Item Key="RequestSchema">RolePostRequest</Item>
+                <Item Key="ResponseSchema">RolePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">RolePatchRequest</Item>
-                <Item Key="ResponseObject">RolePostPatchResponse</Item>
+                <Item Key="RequestSchema">RolePatchRequest</Item>
+                <Item Key="ResponseSchema">RolePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -58,28 +58,28 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserIDSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleUserIDSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUserIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">RoleUserIDCollectionResponse</Item>
+                <Item Key="ResponseSchema">RoleUserIDCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserIDCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleUserIDCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUserIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">RoleUserIDPostRequest</Item>
-                <Item Key="ResponseObject">RoleUserIDPostResponse</Item>
+                <Item Key="RequestSchema">RoleUserIDPostRequest</Item>
+                <Item Key="ResponseSchema">RoleUserIDPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::RoleUserIDDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::RoleUserIDDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -89,67 +89,67 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Role::PermissionTypeSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::PermissionTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">PermissionTypeCollectionResponse</Item>
+                <Item Key="ResponseSchema">PermissionTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Role::PermissionGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::PermissionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">PermissionID</Item>
-                <Item Key="ResponseObject">PermissionResponse</Item>
+                <Item Key="ResponseSchema">PermissionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::PermissionSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::PermissionSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">PermissionCollectionResponse</Item>
+                <Item Key="ResponseSchema">PermissionCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
                 <Item Key="CacheTypeDependency">Role</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::PermissionCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::PermissionCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">PermissionPostRequest</Item>
-                <Item Key="ResponseObject">PermissionPostPatchResponse</Item>
+                <Item Key="RequestSchema">PermissionPostRequest</Item>
+                <Item Key="ResponseSchema">PermissionPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::PermissionUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::PermissionUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">PermissionPatchRequest</Item>
-                <Item Key="ResponseObject">PermissionPostPatchResponse</Item>
+                <Item Key="RequestSchema">PermissionPatchRequest</Item>
+                <Item Key="ResponseSchema">PermissionPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Role::PermissionDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Role::PermissionDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -159,7 +159,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericInclude###ConfiguredPermissions" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericInclude###ConfiguredPermissions" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

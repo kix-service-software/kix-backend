@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Console::ConsoleCommandSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Console::ConsoleCommandSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConsoleCommandSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ConsoleCommandCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConsoleCommandCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Console::ConsoleCommandGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Console::ConsoleCommandGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConsoleCommandGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">Command</Item>
-                <Item Key="ResponseObject">ConsoleCommandResponse</Item>                
+                <Item Key="ResponseSchema">ConsoleCommandResponse</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Console::ConsoleCommandExecute" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Console::ConsoleCommandExecute" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConsoleCommandExecute</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ConsoleCommandExecuteResponse</Item>                
+                <Item Key="ResponseSchema">ConsoleCommandExecuteResponse</Item>                
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Console::ConsoleFileSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Console::ConsoleFileSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConsoleFileSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ConsoleFileCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConsoleFileCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Console::ConsoleFileDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Console::ConsoleFileDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

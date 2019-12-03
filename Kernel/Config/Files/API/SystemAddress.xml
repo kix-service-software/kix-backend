@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::SystemAddress::SystemAddressGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressGet" Required="0" Valid="1">
         <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">SystemAddressID</Item>
-                <Item Key="ResponseObject">SystemAddressResponse</Item>
+                <Item Key="ResponseSchema">SystemAddressResponse</Item>
                 <Item Key="CacheType">API_systemaddresses</Item>
                 <Item Key="CacheTypeDependency">SystemAddress</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SystemAddress::SystemAddressSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressSearch" Required="0" Valid="1">
         <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">SystemAddressCollectionResponse</Item>
+                <Item Key="ResponseSchema">SystemAddressCollectionResponse</Item>
                 <Item Key="CacheType">API_systemaddresses</Item>                
                 <Item Key="CacheTypeDependency">SystemAddress</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SystemAddress::SystemAddressCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressCreate" Required="0" Valid="1">
         <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">SystemAddressPostRequest</Item>
-                <Item Key="ResponseObject">SystemAddressPostPatchResponse</Item>
+                <Item Key="RequestSchema">SystemAddressPostRequest</Item>
+                <Item Key="ResponseSchema">SystemAddressPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SystemAddress::SystemAddressUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressUpdate" Required="0" Valid="1">
         <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">SystemAddressPatchRequest</Item>
-                <Item Key="ResponseObject">SystemAddressPostPatchResponse</Item>
+                <Item Key="RequestSchema">SystemAddressPatchRequest</Item>
+                <Item Key="ResponseSchema">SystemAddressPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::SystemAddress::SystemAddressDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressDelete" Required="0" Valid="1">
         <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
