@@ -1,6 +1,7 @@
 {
     "SysConfigOptionDefinition": [
         {
+            "AccessLevel": "internal",
             "ChangeBy": 1,
             "ChangeTime": "2019-05-14 20:43:11",
             "Comment": null,
@@ -17,7 +18,7 @@
             "Group": "Ticket",
             "IsModified": 1,
             "IsRequired": 0,
-            "Level": null,
+            "ExperienceLevel": null,
             "Name": "Notification::Transport###AgentOverlay",
             "Setting": null,
             "Type": "Hash",
@@ -25,6 +26,7 @@
             "Value": null
         },
         {
+            "AccessLevel": "internal",
             "ChangeBy": 1,
             "ChangeTime": "2019-05-14 20:43:17",
             "Comment": null,
@@ -35,7 +37,7 @@
             "Group": "Framework",
             "IsModified": 1,
             "IsRequired": 1,
-            "Level": 200,
+            "ExperienceLevel": 200,
             "Name": "WebUserAgent::Timeout",
             "Setting": {
               "Regex": ""

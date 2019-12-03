@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateGet" Required="0" Valid="1">
         <Description TranStandardTemplatetable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -13,7 +13,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateSearch" Required="0" Valid="1">
         <Description TranStandardTemplatetable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -24,7 +24,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateCreate" Required="0" Valid="1">
         <Description TranStandardTemplatetable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -35,7 +35,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateUpdate" Required="0" Valid="1">
         <Description TranStandardTemplatetable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -46,7 +46,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::StandardTemplate::StandardTemplateDelete" Required="0" Valid="1">
         <Description TranStandardTemplatetable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

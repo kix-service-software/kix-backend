@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ClassID</Item>
-                <Item Key="ResponseObject">ConfigItemClassResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemClassResponse</Item>
                 <Item Key="CacheType">API_cmdb_classes</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
                 <Item Key="RelevantPropertyValuePermissions">CIClass-to-ConfigItem</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ConfigItemClassCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemClassCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_classes</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ConfigItemClassPostRequest</Item>
-                <Item Key="ResponseObject">ConfigItemClassPostPatchResponse</Item>
+                <Item Key="RequestSchema">ConfigItemClassPostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemClassPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ConfigItemClassPatchRequest</Item>
-                <Item Key="ResponseObject">ConfigItemClassPostPatchResponse</Item>
+                <Item Key="RequestSchema">ConfigItemClassPatchRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemClassPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -59,33 +59,33 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDefinitionGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassDefinitionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
-                <Item Key="ResponseObject">ConfigItemClassDefinitionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemClassDefinitionResponse</Item>
                 <Item Key="CacheType">API_cmdb_classes</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDefinitionSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassDefinitionSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
-                <Item Key="ResponseObject">ConfigItemClassDefinitionCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemClassDefinitionCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_classes</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDefinitionDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassDefinitionDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -94,66 +94,66 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ClassDefinitionCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ClassDefinitionCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ConfigItemClassDefinitionPostRequest</Item>
-                <Item Key="ResponseObject">ConfigItemClassDefinitionPostResponse</Item>
+                <Item Key="RequestSchema">ConfigItemClassDefinitionPostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemClassDefinitionPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ConfigItemID</Item>
-                <Item Key="ResponseObject">ConfigItemResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ConfigItemCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ConfigItemPostRequest</Item>
-                <Item Key="ResponseObject">ConfigItemPostPatchResponse</Item>
+                <Item Key="RequestSchema">ConfigItemPostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ConfigItemPatchRequest</Item>
-                <Item Key="ResponseObject">ConfigItemPostPatchResponse</Item>
+                <Item Key="RequestSchema">ConfigItemPatchRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -163,80 +163,80 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemVersionGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemVersionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemVersionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">VersionID</Item>
-                <Item Key="ResponseObject">ConfigItemVersionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemVersionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemVersionSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemVersionSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemVersionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ConfigItemVersionCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemVersionCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemVersionCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemVersionCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemVersionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ConfigItemVersionPostRequest</Item>
-                <Item Key="ResponseObject">ConfigItemVersionPostResponse</Item>
+                <Item Key="RequestSchema">ConfigItemVersionPostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemVersionPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemImageGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemImageGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageGet</Item>
                 <Item Key="APIImage">V1</Item>
                 <Item Key="ObjectID">ImageID</Item>
-                <Item Key="ResponseObject">ConfigItemImageResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemImageResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemImageSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemImageSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageSearch</Item>
                 <Item Key="APIImage">V1</Item>
-                <Item Key="ResponseObject">ConfigItemImageCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemImageCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemImageCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemImageCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageCreate</Item>
                 <Item Key="APIImage">V1</Item>
-                <Item Key="RequestObject">ConfigItemImagePostRequest</Item>
-                <Item Key="ResponseObject">ConfigItemImagePostResponse</Item>
+                <Item Key="RequestSchema">ConfigItemImagePostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemImagePostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemImageDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemImageDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -248,40 +248,40 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemHistoryGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemHistoryGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemHistoryGet</Item>
                 <Item Key="APIHistory">V1</Item>
                 <Item Key="ObjectID">HistoryID</Item>
-                <Item Key="ResponseObject">ConfigItemHistoryResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemHistoryResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemHistorySearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemHistorySearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemHistorySearch</Item>
                 <Item Key="APIHistory">V1</Item>
-                <Item Key="ResponseObject">ConfigItemHistoryCollectionResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemHistoryCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::CMDB::ConfigItemAttachmentGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemAttachmentGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
-                <Item Key="ResponseObject">ConfigItemAttachmentResponse</Item>
+                <Item Key="ResponseSchema">ConfigItemAttachmentResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>

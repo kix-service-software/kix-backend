@@ -181,6 +181,7 @@ sub Run {
                 # create new option
                 my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionAdd(
                     Name            => $Item->{Name},
+                    AccessLevel     => $Item->{AccessLevel},
                     Type            => $Item->{Type},
                     Context         => $Item->{Context},
                     ContextMetadata => $Item->{ContextMetadata},
@@ -206,6 +207,7 @@ sub Run {
                 # update existing option
                 my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
                     Name            => $Item->{Name},
+                    AccessLevel     => $Item->{AccessLevel},
                     Type            => $Item->{Type},
                     Context         => $Item->{Context},
                     ContextMetadata => $Item->{ContextMetadata},

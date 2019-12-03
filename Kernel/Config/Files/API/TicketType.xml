@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::TicketType::TicketTypeGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketType::TicketTypeGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TypeID</Item>
-                <Item Key="ResponseObject">TicketTypeResponse</Item>
+                <Item Key="ResponseSchema">TicketTypeResponse</Item>
                 <Item Key="CacheType">API_tickettypes</Item>
                 <Item Key="CacheTypeDependency">Type</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketType::TicketTypeSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketType::TicketTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TickeTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketTypeCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_tickettypes</Item>                
                 <Item Key="CacheTypeDependency">Type</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketType::TicketTypeCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketType::TicketTypeCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketTypePostRequest</Item>
-                <Item Key="ResponseObject">TicketTypePostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketTypePostRequest</Item>
+                <Item Key="ResponseSchema">TicketTypePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketType::TicketTypeUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketType::TicketTypeUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketTypePatchRequest</Item>
-                <Item Key="ResponseObject">TicketTypePostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketTypePatchRequest</Item>
+                <Item Key="ResponseSchema">TicketTypePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::TicketType::TicketTypeDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketType::TicketTypeDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>

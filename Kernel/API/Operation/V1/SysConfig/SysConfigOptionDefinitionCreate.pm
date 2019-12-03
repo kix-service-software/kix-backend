@@ -91,6 +91,9 @@ sub ParameterDefinition {
         'SysConfigOptionDefinition::Description' => {
             Required => 1,
         },
+        'SysConfigOptionDefinition::AccessLevel' => {
+            Required => 1,
+        },
         'SysConfigOptionDefinition::IsRequired' => {
             RequiresValueIfUsed => 1,
             OneOf               => [ 0, 1 ]
@@ -154,7 +157,8 @@ sub Run {
         ContextMetadata => $SysConfigOptionDefinition->{ContextMetadata},
         Description     => $SysConfigOptionDefinition->{Description},
         Comment         => $SysConfigOptionDefinition->{Comment},
-        Level           => $SysConfigOptionDefinition->{Level},
+        AccessLevel     => $SysConfigOptionDefinition->{AccessLevel},
+        ExperienceLevel => $SysConfigOptionDefinition->{ExperienceLevel},
         Group           => $SysConfigOptionDefinition->{Group},
         IsRequired      => $SysConfigOptionDefinition->{IsRequired},
         Setting         => $SysConfigOptionDefinition->{Setting},

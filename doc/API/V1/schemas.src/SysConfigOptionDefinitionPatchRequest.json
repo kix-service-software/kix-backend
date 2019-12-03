@@ -6,6 +6,9 @@
     "properties": {
         "SysConfigOptionDefinition": {
             "properties": {
+                "AccessLevel": {
+                    "type": "string"
+                },
                 "Comment": {
                     "anyOf": [
                         {
@@ -58,7 +61,7 @@
                 "IsRequired": {
                     "type": "integer"
                 },
-                "Level": {
+                "ExperienceLevel": {
                     "anyOf": [
                         {
                             "type": "integer"

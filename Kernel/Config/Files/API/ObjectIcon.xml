@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::ObjectIcon::ObjectIconGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectIcon::ObjectIconGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ObjectIconID</Item>
-                <Item Key="ResponseObject">ObjectIconResponse</Item>
+                <Item Key="ResponseSchema">ObjectIconResponse</Item>
                 <Item Key="CacheType">API_objecticons</Item>
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::ObjectIcon::ObjectIconSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectIcon::ObjectIconSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ObjectIconCollectionResponse</Item>
+                <Item Key="ResponseSchema">ObjectIconCollectionResponse</Item>
                 <Item Key="CacheType">API_objecticons</Item>                
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::ObjectIcon::ObjectIconCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectIcon::ObjectIconCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ObjectIconPostRequest</Item>
-                <Item Key="ResponseObject">ObjectIconPostPatchResponse</Item>
+                <Item Key="RequestSchema">ObjectIconPostRequest</Item>
+                <Item Key="ResponseSchema">ObjectIconPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::ObjectIcon::ObjectIconUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectIcon::ObjectIconUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">ObjectIconPatchRequest</Item>
-                <Item Key="ResponseObject">ObjectIconPostPatchResponse</Item>
+                <Item Key="RequestSchema">ObjectIconPatchRequest</Item>
+                <Item Key="ResponseSchema">ObjectIconPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::ObjectIcon::ObjectIconDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectIcon::ObjectIconDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -58,7 +58,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericInclude###ObjectIcon" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericInclude###ObjectIcon" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -70,7 +70,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###ObjectIcon" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###ObjectIcon" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

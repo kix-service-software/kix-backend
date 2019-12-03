@@ -4,6 +4,10 @@
     "type": "object",
     "description": "The SysConfig option definition object.",
     "properties": {
+        "AccessLevel": {
+            "type": "string",
+            "readOnly": true
+        },
         "ChangeBy": {
             "type": "integer",
             "readOnly": true
@@ -83,7 +87,7 @@
             "type": "integer",
             "readOnly": true
         },
-        "Level": {
+        "ExperienceLevel": {
             "anyOf": [
                 {
                     "type": "integer"

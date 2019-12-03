@@ -4,6 +4,24 @@
   "type": "object",
   "description": "The SysConfig option object.",
   "properties": {
+    "AccessLevel": {
+        "type": "string",
+        "readOnly": true
+    },
+    "Context": {
+        "anyOf": [
+            {"type": "string"},
+            {"type": "null"}
+        ],
+        "readOnly": true
+    },
+    "ContextMetadata": {
+        "anyOf": [
+            {"type": "string"},
+            {"type": "null"}
+        ],
+        "readOnly": true
+    },
     "Name": {
       "type": "string",
       "readOnly": true

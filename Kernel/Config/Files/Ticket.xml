@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="Ticket::CustomModule###002-TicketTemplateHandler" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###002-TicketTemplateHandler" Required="0" Valid="1">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -8,7 +8,7 @@
             <String Regex="">Kernel::System::Ticket::TicketTemplateHandler</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###850-LimitTemplateSelections" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###850-LimitTemplateSelections" Required="0" Valid="1">
         <Description Translatable="1">Ticket-ACL to restrict selection values if ticket templates are used.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -20,7 +20,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Hook" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a ticket, e.g. Ticket#, Call#, MyTicket#. The default is Ticket#.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -28,7 +28,7 @@
             <String Regex="">Ticket#</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::HookDivider" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::HookDivider" Required="1" Valid="1">
         <Description Translatable="1">The divider between TicketHook and ticket number. E.g ': '.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -36,7 +36,7 @@
             <String Regex=""></String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SubjectSize" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SubjectSize" Required="1" Valid="1">
         <Description Translatable="1">Max size of the subjects in an email reply and in some overview screens.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -44,7 +44,7 @@
             <String Regex="^[0-9]{1,3}$">100</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SubjectRe" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SubjectRe" Required="1" Valid="1">
         <Description Translatable="1">The text at the beginning of the subject in an email reply, e.g. RE, AW, or AS.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -52,7 +52,7 @@
             <String Regex="">Re</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SubjectFwd" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SubjectFwd" Required="1" Valid="1">
         <Description Translatable="1">The text at the beginning of the subject when an email is forwarded, e.g. FW, Fwd, or WG.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -60,7 +60,7 @@
             <String Regex="">Fwd</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SubjectFormat" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SubjectFormat" Required="1" Valid="1">
         <Description Translatable="1">The format of the subject. 'Left' means '[TicketHook#:12345] Some Subject', 'Right' means 'Some Subject [TicketHook#:12345]', 'None' means 'Some Subject' and no ticket number. In the latter case you should verify that the setting PostMaster::CheckFollowUpModule###0200-References is activated to recognize followups based on email headers.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -72,7 +72,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::MergeDynamicFields" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::MergeDynamicFields" Required="1" Valid="1">
         <Description Translatable="1">A list of dynamic fields that are merged into the main ticket during a merge operation. Only dynamic fields that are empty in the main ticket will be set.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -81,7 +81,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CustomQueue" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomQueue" Required="1" Valid="1">
         <Description Translatable="1">Name of custom queue. The custom queue is a queue selection of your preferred queues and can be selected in the preferences settings.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -89,7 +89,7 @@
             <String Regex="" Translatable="1">My Queues</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CustomService" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomService" Required="1" Valid="1">
         <Description Translatable="1">Name of custom service. The custom service is a service selection of your preferred services and can be selected in the preferences settings.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -97,7 +97,7 @@
             <String Regex="" Translatable="1">My Services</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::NewArticleIgnoreSystemSender" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::NewArticleIgnoreSystemSender" Required="1" Valid="1">
         <Description Translatable="1">Ignore article with system sender type for new article feature (e. g. auto responses or email notifications).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -108,7 +108,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ChangeOwnerToEveryone" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ChangeOwnerToEveryone" Required="1" Valid="1">
         <Description Translatable="1">Changes the owner of tickets to everyone (useful for ASP). Normally only agent with rw permissions in the queue of the ticket will be shown.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -119,7 +119,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Responsible" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Responsible" Required="0" Valid="1">
         <Description Translatable="1">Enables ticket responsible feature, to keep track of a specific ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -130,7 +130,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ResponsibleAutoSet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsibleAutoSet" Required="0" Valid="1">
         <Description Translatable="1">Automatically sets the owner of a ticket as the responsible for it (if ticket responsible feature is enabled). This will only work by manually actions of the logged in user. It does not work for automated actions e.g. Automation, Postmaster and API.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -141,7 +141,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Type" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Type" Required="1" Valid="1">
         <Description Translatable="1">Allows defining new types for ticket (if ticket type feature is enabled).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -152,7 +152,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Type::Default" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Type::Default" Required="1" Valid="1">
         <Description Translatable="1">Defines the default ticket type.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -160,7 +160,7 @@
             <String Regex="" Translatable="1">Unclassified</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Service" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Service" Required="1" Valid="1">
         <Description Translatable="1">Allows defining services and SLAs for tickets (e. g. email, desktop, network, ...), and escalation attributes for SLAs (if ticket service/SLA feature is enabled).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -171,7 +171,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Service::KeepChildren" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Service::KeepChildren" Required="1" Valid="1">
         <Description Translatable="1">Retains all services in listings even if they are children of invalid elements.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -182,7 +182,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Service::Default::UnknownCustomer" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Service::Default::UnknownCustomer" Required="1" Valid="1">
         <Description Translatable="1">Allows default services to be selected also for non existing customers.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -193,7 +193,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ArchiveSystem" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ArchiveSystem" Required="1" Valid="1">
         <Description Translatable="1">Activates the ticket archive system to have a faster system by moving some tickets out of the daily scope. To search for these tickets, the archive flag has to be enabled in the ticket search.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -204,7 +204,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ArchiveSystem::RemoveSeenFlags" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ArchiveSystem::RemoveSeenFlags" Required="1" Valid="1">
         <Description Translatable="1">Controls if the ticket and article seen flags are removed when a ticket is archived.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -215,7 +215,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ArchiveSystem::RemoveTicketWatchers" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ArchiveSystem::RemoveTicketWatchers" Required="1" Valid="1">
         <Description Translatable="1">Removes the ticket watcher information when a ticket is archived.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -226,7 +226,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CustomerArchiveSystem" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomerArchiveSystem" Required="1" Valid="1">
         <Description Translatable="1">Activates the ticket archive system search in the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -238,7 +238,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::NumberGenerator" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::NumberGenerator" Required="1" Valid="1">
         <Description Translatable="1">Selects the ticket number generator module. "AutoIncrement" increments the ticket number, the SystemID and the counter are used with SystemID.counter format (e.g. 1010138, 1010139). With "Date" the ticket numbers will be generated by the current date, the SystemID and the counter. The format looks like Year.Month.Day.SystemID.counter (e.g. 200206231010138, 200206231010139). With "DateChecksum"  the counter will be appended as checksum to the string of date and SystemID. The checksum will be rotated on a daily basis. The format looks like Year.Month.Day.SystemID.Counter.CheckSum (e.g. 2002070110101520, 2002070110101535). "Random" generates randomized ticket numbers in the format "SystemID.Random" (e.g. 100057866352, 103745394596).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -246,7 +246,7 @@
             <Option Location="Kernel/System/Ticket/Number/*.pm" SelectedID="Kernel::System::Ticket::Number::DateChecksum"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::NumberGenerator::CheckSystemID" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::NumberGenerator::CheckSystemID" Required="1" Valid="1">
         <Description Translatable="1">Checks the SystemID in ticket number detection for follow-ups (use "No" if SystemID has been changed after using the system).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -257,7 +257,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::NumberGenerator::MinCounterSize" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::NumberGenerator::MinCounterSize" Required="1" Valid="1">
         <Description Translatable="1">Sets the minimal ticket counter size if "AutoIncrement" was selected as TicketNumberGenerator. Default is 5, this means the counter starts from 10000.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -265,7 +265,7 @@
             <String Regex="^[0-9]$">5</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::NumberGenerator::Date::UseFormattedCounter" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::NumberGenerator::Date::UseFormattedCounter" Required="1" Valid="1">
         <Description Translatable="1">Enables the minimal ticket counter size (if "Date" was selected as TicketNumberGenerator).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -276,7 +276,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CounterLog" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CounterLog" Required="1" Valid="1">
         <Description Translatable="1">Log file for the ticket counter.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -284,7 +284,7 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/log/TicketCounter.log</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::IndexModule" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::IndexModule" Required="1" Valid="1">
         <Description Translatable="1">IndexAccelerator: to choose your backend TicketViewAccelerator module. "RuntimeDB" generates each queue view on the fly from ticket table (no performance problems up to approx. 60.000 tickets in total and 6.000 open tickets in the system). "StaticDB" is the most powerful module, it uses an extra ticket-index table that works like a view (recommended if more than 80.000 and 6.000 open tickets are stored in the system). Use the command "bin/kix.Console.pl Maint::Ticket::QueueIndexRebuild" for initial index creation.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -293,7 +293,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::StorageModule" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::StorageModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Saves the attachments of articles. "DB" stores all data in the database (not recommended for storing big attachments). "FS" stores the data on the filesystem; this is faster but the KIX applications should not be running as root. You can switch between the modules even on a system that is already in production without any loss of data. Note: Searching for attachment names is not supported when "FS" is used.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -302,7 +302,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::StorageModule::CheckAllBackends" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::StorageModule::CheckAllBackends" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Specifies whether all storage backends should be checked when looking for attachments. This is only required for installations where some attachments are in the file system, and others in the database.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -313,7 +313,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ArticleDir" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ArticleDir" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Specifies the directory to store the data in, if "FS" was selected for TicketStorageModule.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -321,7 +321,7 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/article</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="EscalationEvents::DecayTime" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="EscalationEvents::DecayTime" Required="0" Valid="1">
         <Description Translatable="1">The duration in minutes after emitting an event, in which the new escalation notify and start events are suppressed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -329,7 +329,7 @@
             <String Regex="^[0-9]+$">1440</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###100-ArchiveRestore" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###100-ArchiveRestore" Required="0" Valid="1">
         <Description Translatable="1">Restores a ticket from the archive (only if the event is a state change, from closed to any open available state).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -340,7 +340,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###110-AcceleratorUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###110-AcceleratorUpdate" Required="0" Valid="1">
         <Description Translatable="1">Updates the ticket index accelerator.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -351,7 +351,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###120-ForceOwnerResetOnMove" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###120-ForceOwnerResetOnMove" Required="0" Valid="0">
         <Description Translatable="1">Resets and unlocks the owner of a ticket if it was moved to another queue.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -362,7 +362,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###130-ForceStateChangeOnLock" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###130-ForceStateChangeOnLock" Required="0" Valid="0">
         <Description Translatable="1">Forces to choose a different ticket state (from current) after lock action. Define the current state as key, and the next state after lock action as content.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -374,7 +374,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###140-ResponsibleAutoSet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###140-ResponsibleAutoSet" Required="0" Valid="1">
         <Description Translatable="1">Automatically sets the responsible of a ticket (if it is not set yet) after the first owner update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -385,7 +385,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###150-TicketPendingTimeReset" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###150-TicketPendingTimeReset" Required="0" Valid="1">
         <Description Translatable="1">Sets the PendingTime of a ticket to 0 if the state is changed to a non-pending state.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -396,7 +396,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###500-NotificationEvent" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###500-NotificationEvent" Required="0" Valid="1">
         <Description Translatable="1">Sends the notifications which are configured in the admin interface under "Notfication (Event)".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -408,7 +408,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###910-EscalationIndex" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###910-EscalationIndex" Required="0" Valid="1">
         <Description Translatable="1">Updates the ticket escalation index after a ticket attribute got updated.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -419,7 +419,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###920-EscalationStopEvents" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###920-EscalationStopEvents" Required="0" Valid="1">
         <Description Translatable="1">Ticket event module that triggers the escalation stop events.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -430,7 +430,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###930-ForceUnlockOnMove" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###930-ForceUnlockOnMove" Required="0" Valid="1">
         <Description Translatable="1">Forces to unlock tickets after being moved to another queue.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -441,7 +441,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###940-TicketArticleNewMessageUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###940-TicketArticleNewMessageUpdate" Required="0" Valid="1">
         <Description Translatable="1">Update Ticket "Seen" flag if every article got seen or a new Article got created.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -452,7 +452,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicFieldFromContact::Mapping" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="DynamicFieldFromContact::Mapping" Required="0" Valid="0">
         <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
         <Description Translatable="1">Define a mapping between variables of the contact data (keys) and dynamic fields of a ticket (values). The purpose is to store contact data in ticket dynamic fields. The dynamic fields must be present in the system and should be enabled for AgentTicketFreeText, so that they can be set/updated manually by the agent. They mustn't be enabled for AgentTicketPhone, AgentTicketEmail and AgentTicketCustomer. If they were, they would have precedence over the automatically set values. To use this mapping, you have to also activate the next setting below.</Description>
         <Group>Ticket</Group>
@@ -463,7 +463,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###950-DynamicFieldFromContact" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###950-DynamicFieldFromContact" Required="0" Valid="0">
         <Description Translatable="1">This event module stores attributes from Contact as DynamicFields tickets. Please see the setting above for how to configure the mapping.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -474,7 +474,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CustomModule###001-CustomModule" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###001-CustomModule" Required="0" Valid="0">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -482,7 +482,7 @@
             <String Regex="">Kernel::System::Ticket::Custom</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchBackend" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchBackend" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -491,7 +491,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndexModule" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndexModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -500,7 +500,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::WarnOnStopWordUsage" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::WarnOnStopWordUsage" Required="1" Valid="1">
         <Description Translatable="1">Display a warning and prevent search when using stop words within fulltext search.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -511,7 +511,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::Attribute" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::Attribute" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Basic fulltext index settings. Execute "bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild" in order to generate a new index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -523,7 +523,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::Filters" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::Filters" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Fulltext index regex filters to remove parts of the text.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -535,7 +535,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###en" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###en" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">English stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -718,7 +718,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###de" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###de" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">German stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -856,7 +856,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###nl" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###nl" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Dutch stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -1008,7 +1008,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###es" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###es" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Spanish stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -1195,7 +1195,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###fr" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###fr" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">French stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -1330,7 +1330,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###it" Required="0" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###it" Required="0" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Italian stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -1473,7 +1473,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchIndex::StopWords###Custom" Required="0" Valid="0" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndex::StopWords###Custom" Required="0" Valid="0" ConfigLevel="200">
         <Description Translatable="1">Customizable stop words for fulltext index. These words will be removed from the search index.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -1483,7 +1483,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###098-ArticleSearchIndex" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###098-ArticleSearchIndex" Required="0" Valid="1">
         <Description Translatable="1">Builds an article index right after the article's creation.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::FulltextSearch</SubGroup>
@@ -1494,7 +1494,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::PendingDiffTime" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::PendingDiffTime" Required="1" Valid="1">
         <Description Translatable="1">Time in seconds that gets added to the actual time if setting a pending-state (default: 86400 = 1 day).</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent</SubGroup>
@@ -1502,7 +1502,7 @@
             <String Regex="^\d+$">86400</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::PlainView" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::PlainView" Required="1" Valid="1">
         <Description Translatable="1">Shows a link to see a zoomed email ticket in plain text.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewZoom</SubGroup>
@@ -1513,7 +1513,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::HistoryTypes###000-Framework" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::HistoryTypes###000-Framework" Required="1" Valid="1">
         <Description Translatable="1">Controls how to display the ticket history entries as readable values.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewHistory</SubGroup>
@@ -1571,7 +1571,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::TextAreaNote" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::TextAreaNote" Required="1" Valid="1">
         <Description Translatable="1">Permitted width for compose note windows.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent</SubGroup>
@@ -1579,7 +1579,7 @@
             <String Regex="^[0-9]{1,3}$">78</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::CustomerDisableCompanyTicketAccess" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::CustomerDisableCompanyTicketAccess" Required="1" Valid="1">
         <Description Translatable="1">This option will deny the access to customer company tickets, which are not created by the contact.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer</SubGroup>
@@ -1590,7 +1590,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::AccountTime" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AccountTime" Required="1" Valid="1">
         <Description Translatable="1">Activates time accounting.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent</SubGroup>
@@ -1601,7 +1601,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::TimeUnits" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::TimeUnits" Required="1" Valid="1">
         <Description Translatable="1">Sets the prefered time units (e.g. work units, hours, minutes).</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent</SubGroup>
@@ -1609,7 +1609,7 @@
             <String Regex="" Translatable="1"> (work units)</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::NeedAccountedTime" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::NeedAccountedTime" Required="1" Valid="1">
         <Description Translatable="1">Defines if time accounting is mandatory in the agent interface. If activated, a note must be entered for all ticket actions (no matter if the note itself is configured as active or is originally mandatory for the individual ticket action screen).</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent</SubGroup>
@@ -1620,7 +1620,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::ShowCustomerTickets" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::ShowCustomerTickets" Required="1" Valid="1">
         <Description Translatable="1">Shows customer history tickets in AgentTicketPhone, AgentTicketEmail and AgentTicketCustomer.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent</SubGroup>
@@ -1631,7 +1631,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::ResponseFormat" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::ResponseFormat" Required="1" Valid="1">
         <Description Translatable="1">Defines the format of responses in the ticket compose screen of the agent interface ([% Data.OrigFrom | html %] is From 1:1, [% Data.OrigFromName | html %] is only realname of From).</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewCompose</SubGroup>
@@ -1645,7 +1645,7 @@
 </TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::Quote" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::Quote" Required="0" Valid="1">
         <Description Translatable="1">Defines the used character for plaintext email quotes in the ticket compose screen of the agent interface. If this is empty or inactive, original emails will not be quoted but appended to the response.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewCompose</SubGroup>
@@ -1653,7 +1653,7 @@
             <String Regex="">&gt;</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::ResponseQuoteMaxLines" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::ResponseQuoteMaxLines" Required="0" Valid="0">
         <Description Translatable="1">Defines the maximum number of quoted lines to be added to responses.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewCompose</SubGroup>
@@ -1661,7 +1661,7 @@
             <String Regex="^[1-9][0-9]*$">99</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::AutomaticMergeSubject" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AutomaticMergeSubject" Required="1" Valid="1">
         <Description Translatable="1">When tickets are merged, a note will be added automatically to the ticket which is no longer active. Here you can define the subject of this note (this subject cannot be changed by the agent).</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewMerge</SubGroup>
@@ -1669,7 +1669,7 @@
             <String Regex="">Ticket Merged</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::AutomaticMergeText" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AutomaticMergeText" Required="1" Valid="1">
         <Description Translatable="1">When tickets are merged, a note will be added automatically to the ticket which is no longer active. Here you can define the body of this note (this text cannot be changed by the agent).</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewMerge</SubGroup>
@@ -1677,7 +1677,7 @@
             <TextArea Translatable="1">Merged Ticket &lt;KIX_TICKET&gt; to &lt;KIX_MERGE_TO_TICKET&gt;.</TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ViewableSenderTypes" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ViewableSenderTypes" Required="1" Valid="1">
         <Description Translatable="1">Defines the default viewable sender types of a ticket (default: customer).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1687,7 +1687,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ViewableLocks" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ViewableLocks" Required="1" Valid="1">
         <Description Translatable="1">Defines the viewable locks of a ticket. NOTE: When you change this setting, make sure to delete the cache in order to use the new value. Default: unlock.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1697,7 +1697,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ViewableStateType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ViewableStateType" Required="1" Valid="1">
         <Description Translatable="1">Defines the valid state types for a ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1710,7 +1710,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::UnlockStateType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::UnlockStateType" Required="1" Valid="1">
         <Description Translatable="1">Defines the valid states for unlocked tickets. To unlock tickets the script "bin/kix.Console.pl Maint::Ticket::UnlockTimeout" can be used.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1721,7 +1721,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::PendingReminderStateType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::PendingReminderStateType" Required="1" Valid="1">
         <Description Translatable="1">Defines the state type of the reminder for pending tickets.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1731,7 +1731,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::PendingAutoStateType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::PendingAutoStateType" Required="1" Valid="1">
         <Description Translatable="1">Determines the possible states for pending tickets that changed state after reaching time limit.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1741,7 +1741,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::StateAfterPending" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::StateAfterPending" Required="1" Valid="1">
         <Description Translatable="1">Defines which states should be set automatically (Content), after the pending time of state (Key) has been reached.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1752,7 +1752,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="System::Permission" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="System::Permission" Required="1" Valid="1">
         <Description Translatable="1">Standard available permissions for agents within the application. If more permissions are needed, they can be entered here. Permissions must be defined to be effective. Some other good permissions have also been provided built-in: note, close, pending, customer, freetext, move, compose, responsible, forward, and bounce. Make sure that "rw" is always the last registered permission.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1768,7 +1768,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission###1-OwnerCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###1-OwnerCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to grant access to the owner of a ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1780,7 +1780,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission::OwnerCheck::Queues" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::OwnerCheck::Queues" Required="0" Valid="0">
         <Description Translatable="1">Optional queue limitation for the OwnerCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1792,7 +1792,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission###2-ResponsibleCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###2-ResponsibleCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to grant access to the agent responsible of a ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1804,7 +1804,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission::ResponsibleCheck::Queues" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::ResponsibleCheck::Queues" Required="0" Valid="0">
         <Description Translatable="1">Optional queue limitation for the ResponsibleCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1816,7 +1816,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission###4-WatcherCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###4-WatcherCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to grant access to the watcher agents of a ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1828,7 +1828,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission###5-CreatorCheck" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###5-CreatorCheck" Required="0" Valid="0">
         <Description Translatable="1">Module to grant access to the creator of a ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1840,7 +1840,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission::CreatorCheck::Queues" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::CreatorCheck::Queues" Required="0" Valid="0">
         <Description Translatable="1">Optional queue limitation for the CreatorCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1852,7 +1852,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission###6-InvolvedCheck" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###6-InvolvedCheck" Required="0" Valid="0">
         <Description Translatable="1">Module to grant access to any agent that has been involved in a ticket in the past (based on ticket history entries).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1864,7 +1864,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Permission::InvolvedCheck::Queues" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::InvolvedCheck::Queues" Required="0" Valid="0">
         <Description Translatable="1">Optional queue limitation for the InvolvedCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1876,7 +1876,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerTicket::Permission###2-ContactIDCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerTicket::Permission###2-ContactIDCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to grant access if the ContactID of the ticket matches the ContactID of the customer.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1888,7 +1888,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerTicket::Permission###3-CustomerIDCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerTicket::Permission###3-CustomerIDCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to grant access if the CustomerID of the ticket matches the CustomerID of the customer.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1900,7 +1900,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::DefineEmailFrom" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::DefineEmailFrom" Required="1" Valid="1">
         <Description Translatable="1">Defines how the From field from the emails (sent from answers and email tickets) should look like.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1912,7 +1912,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::DefineEmailFromSeparator" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::DefineEmailFromSeparator" Required="1" Valid="1">
         <Description Translatable="1">Defines the separator between the agents real name and the given queue email address.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -1920,53 +1920,7 @@
             <String>via</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DashboardEventsTicketCalendar::DynamicFieldStartTime" Required="0" Valid="1">
-        <Description Translatable="1">Define dynamic field name for start time. This field has to be manually added to the system as Ticket: "Date / Time" and must be activated in ticket creation screens and/or in any other ticket action screens.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Dashboard::EventsTicketCalendar</SubGroup>
-        <Setting>
-            <String>TicketCalendarStartTime</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DashboardEventsTicketCalendar::DynamicFieldEndTime" Required="0" Valid="1">
-        <Description Translatable="1">Define dynamic field name for end time. This field has to be manually added to the system as Ticket: "Date / Time" and must be activated in ticket creation screens and/or in any other ticket action screens.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Dashboard::EventsTicketCalendar</SubGroup>
-        <Setting>
-            <String>TicketCalendarEndTime</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DashboardEventsTicketCalendar::DynamicFieldsForEvents" Required="1" Valid="1">
-        <Description Translatable="1">Defines the dynamic fields that are used for displaying on calendar events.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Dashboard::EventsTicketCalendar</SubGroup>
-        <Setting>
-            <Array>
-                <Item>TicketCalendarStartTime</Item>
-                <Item>TicketCalendarEndTime</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="DashboardEventsTicketCalendar::TicketFieldsForEvents" Required="1" Valid="1">
-        <Description Translatable="1">Defines the ticket fields that are going to be displayed calendar events. The "Key" defines the field or ticket attribute and the "Content" defines the display name.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Dashboard::EventsTicketCalendar</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="CustomerID" Translatable="1">Customer ID</Item>
-                <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-                <Item Key="ContactID" Translatable="1">Contact</Item>
-                <Item Key="Priority" Translatable="1">Priority</Item>
-                <Item Key="Queue" Translatable="1">Queue</Item>
-                <Item Key="SLA" Translatable="1">SLA</Item>
-                <Item Key="Service" Translatable="1">Service</Item>
-                <Item Key="State" Translatable="1">State</Item>
-                <Item Key="Title" Translatable="1">Title</Item>
-                <Item Key="Type" Translatable="1">Type</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###CustomQueue" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CustomQueue" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the CustomQueue object in the preference view of the agent interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Preferences</SubGroup>
@@ -1983,7 +1937,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###CustomService" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CustomService" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the CustomService object in the preference view of the agent interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Preferences</SubGroup>
@@ -1999,7 +1953,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###CreateNextMask" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CreateNextMask" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the CreateNextMask object in the preference view of the agent interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Preferences</SubGroup>
@@ -2023,7 +1977,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="QueuePreferences###Comment2" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="QueuePreferences###Comment2" Required="0" Valid="0">
         <Description Translatable="1">Parameters of the example queue attribute Comment2.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Queue::Preferences</SubGroup>
@@ -2039,7 +1993,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ServicePreferences###Comment2" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ServicePreferences###Comment2" Required="0" Valid="0">
         <Description Translatable="1">Parameters of the example service attribute Comment2.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Service::Preferences</SubGroup>
@@ -2055,7 +2009,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="SLAPreferences###Comment2" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="SLAPreferences###Comment2" Required="0" Valid="0">
         <Description Translatable="1">Parameters of the example SLA attribute Comment2.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::SLA::Preferences</SubGroup>
@@ -2071,7 +2025,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerNotifyJustToRealCustomer" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerNotifyJustToRealCustomer" Required="1" Valid="1">
         <Description Translatable="1">Sends customer notifications just to the mapped customer.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -2082,7 +2036,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-        <ConfigItem Name="AgentSelfNotifyOnAction" Required="1" Valid="1">
+        <ConfigItem AccessLevel="internal" Name="AgentSelfNotifyOnAction" Required="1" Valid="1">
         <Description Translatable="1">Specifies if an agent should receive email notification of his own actions.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -2093,7 +2047,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ContactPreferencesGroups###ShownTickets" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###ShownTickets" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for the ShownTickets object in the customer preferences of the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -2118,7 +2072,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ContactPreferencesGroups###RefreshTime" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###RefreshTime" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for the RefreshTime object in the customer preferences of the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer::Preferences</SubGroup>
@@ -2145,7 +2099,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::CommonParam###Action" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerFrontend::CommonParam###Action" Required="1" Valid="1">
         <Description Translatable="1">Defines the default used Frontend-Module if no Action parameter given in the url on the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer</SubGroup>
@@ -2153,7 +2107,7 @@
             <String Regex="">CustomerTicketOverview</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::CommonParam###TicketID" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerFrontend::CommonParam###TicketID" Required="1" Valid="1">
         <Description Translatable="1">Default ticket ID used by the system in the customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Customer</SubGroup>
@@ -2161,7 +2115,7 @@
             <String Regex=""></String>
         </Setting>
     </ConfigItem>
-        <ConfigItem Name="Ticket::EventModulePost###900-Automation" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-Automation" Required="0" Valid="1">
         <Description Translatable="1">Event module registration.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -2174,7 +2128,26 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::UnlockOnAway" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::GenericAgentTicketSearch###ExtendedSearchCondition" Required="1" Valid="1">
+        <Description Translatable="1">Allows extended search conditions in ticket search of the generic agent interface. With this feature you can search e. g. ticket title with this kind of conditions like "(*key1*&amp;&amp;*key2*)" or "(*key1*||*key2*)".</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::GenericAgentRunLimit" Required="0" Valid="1">
+        <Description Translatable="1">Set the limit of tickets that will be executed on a single genericagent job execution.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="^[0-9]{1,6}$">4000</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::UnlockOnAway" Required="1" Valid="1">
         <Description Translatable="1">Unlock tickets whenever a note is added and the owner is out of office.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -2185,7 +2158,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Events###Ticket" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Events###Ticket" Required="1" Valid="1">
         <Description Translatable="1">List of all ticket events to be displayed in the GUI.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Admin</SubGroup>
@@ -2244,7 +2217,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Events###Article" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Events###Article" Required="1" Valid="1">
         <Description Translatable="1">List of all article events to be displayed in the GUI.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Admin</SubGroup>
@@ -2262,7 +2235,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Events###Queue" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Events###Queue" Required="1" Valid="1">
         <Description Translatable="1">List of all queue events to be displayed in the GUI.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Admin</SubGroup>
@@ -2273,7 +2246,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Queue::EventModulePost###130-UpdateQueue" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Queue::EventModulePost###130-UpdateQueue" Required="0" Valid="1">
         <Description Translatable="1">Event module that performs an update statement on TicketIndex to rename the queue name there if needed and if StaticDB is actually used.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Queue</SubGroup>
@@ -2285,7 +2258,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Notification::Transport###Email" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Notification::Transport###Email" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this notification transport.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Admin::AdminNotificationEvent</SubGroup>
@@ -2299,7 +2272,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PreferencesGroups###NotificationEvent" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###NotificationEvent" Required="0" Valid="1">
         <Description Translatable="1">Transport selection for ticket notifications.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Preferences</SubGroup>
@@ -2315,7 +2288,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###1-Ticket::Acl::Module" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###1-Ticket::Acl::Module" Required="0" Valid="0">
         <Description Translatable="1">ACL module that allows closing parent tickets only if all its children are already closed ("State" shows which states are not available for the parent ticket until all child tickets are closed).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2330,7 +2303,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TicketACL::Default::Action" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TicketACL::Default::Action" Required="1" Valid="1">
         <Description Translatable="1">Default ACL values for ticket actions.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2339,7 +2312,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel1Match" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel1Match" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in first level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2350,7 +2323,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel1Change" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel1Change" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in first level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2362,7 +2335,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel2::Possible" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::Possible" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2376,7 +2349,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel2::PossibleAdd" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::PossibleAdd" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2389,7 +2362,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel2::PossibleNot" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::PossibleNot" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2403,7 +2376,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel2::Properties" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::Properties" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2426,7 +2399,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACLKeysLevel2::PropertiesDatabase" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::PropertiesDatabase" Required="0" Valid="1">
         <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2448,7 +2421,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ACL::CacheTTL" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ACL::CacheTTL" Required="1" Valid="1">
         <Description Translatable="1">Cache time in seconds for the DB ACL backend.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2456,7 +2429,7 @@
             <String Regex="">3600</String><!-- default 1 hour -->
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TicketACL::Debug::Enabled" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TicketACL::Debug::Enabled" Required="1" Valid="1">
         <Description Translatable="1">If enabled debugging information for ACLs is logged.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2467,7 +2440,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TicketACL::Debug::LogPriority" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="TicketACL::Debug::LogPriority" Required="0" Valid="0">
         <Description Translatable="1">Defines the priority in which the information is logged and presented.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2480,7 +2453,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="TicketACL::Debug::Filter###00-Default" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="TicketACL::Debug::Filter###00-Default" Required="0" Valid="0">
         <Description Translatable="1">Filter for debugging ACLs. Note: More ticket attributes can be added in the format &lt;KIX_TICKET_Attribute&gt; e.g. &lt;KIX_TICKET_Priority&gt;.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -2491,7 +2464,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterMaxEmails" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterMaxEmails" Required="1" Valid="1">
         <Description Translatable="1">Maximal auto email responses to own email-address a day (Loop-Protection).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2499,7 +2472,7 @@
             <String Regex="^[0-9]{1,3}$">40</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMasterMaxEmailSize" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMasterMaxEmailSize" Required="1" Valid="1">
         <Description Translatable="1">Maximal size in KBytes for mails that can be fetched via POP3/POP3S/IMAP/IMAPS (KBytes).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2507,7 +2480,7 @@
             <String Regex="^[0-9]{1,6}$">16384</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMasterReconnectMessage" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMasterReconnectMessage" Required="1" Valid="1">
         <Description Translatable="1">The maximum number of mails fetched at once before reconnecting to the server.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2515,7 +2488,7 @@
             <String Regex="^[0-9]{1,3}$">20</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LoopProtectionModule" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="LoopProtectionModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Default loop protection module.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2523,7 +2496,7 @@
             <Option Location="Kernel/System/PostMaster/LoopProtection/*.pm" SelectedID="Kernel::System::PostMaster::LoopProtection::DB"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LoopProtectionLog" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="LoopProtectionLog" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Path for the log file (it only applies if "FS" was selected for LoopProtectionModule and it is mandatory).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2531,7 +2504,7 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/log/LoopProtection</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterAutoHTML2Text" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterAutoHTML2Text" Required="1" Valid="1">
         <Description Translatable="1">Converts HTML mails into text messages.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2542,7 +2515,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterUserID" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterUserID" Required="1" Valid="1">
         <Description Translatable="1">Specifies user id of the postmaster data base.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2550,7 +2523,7 @@
             <String Regex="^[0-9]{1,3}$">1</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterDefaultQueue" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterDefaultQueue" Required="1" Valid="1">
         <Description Translatable="1">Defines the postmaster default queue.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2559,7 +2532,7 @@
             <String Regex="">Service Desk</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterDefaultPriority" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterDefaultPriority" Required="1" Valid="1">
         <Description Translatable="1">Defines the default priority of new tickets.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2568,7 +2541,7 @@
             <String Regex="">3 normal</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterDefaultState" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterDefaultState" Required="1" Valid="1">
         <Description Translatable="1">Defines the default state of new tickets.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2577,7 +2550,7 @@
             <String Regex="">new</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterFollowUpState" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterFollowUpState" Required="1" Valid="1">
         <Description Translatable="1">Defines the state of a ticket if it gets a follow-up.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2586,7 +2559,7 @@
             <String Regex="">open</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterFollowUpStateClosed" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostmasterFollowUpStateClosed" Required="0" Valid="0">
         <Description Translatable="1">Defines the state of a ticket if it gets a follow-up and the ticket was already closed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2595,7 +2568,7 @@
             <String Regex="">open</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostmasterX-Header" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostmasterX-Header" Required="1" Valid="1">
         <Description Translatable="1">Defines all the X-headers that should be scanned.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2668,7 +2641,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::StrictFollowUp" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::StrictFollowUp" Required="1" Valid="1">
         <Description Translatable="1">Postmaster handles followups and new tickets based on the system address assigned queues.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2679,7 +2652,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###1-Match" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###1-Match" Required="0" Valid="0">
         <Description Translatable="1">Module to filter and manipulate incoming messages. Block/ignore all spam email with From: noreply@ address.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2699,7 +2672,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###2-Match" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###2-Match" Required="0" Valid="0">
         <Description Translatable="1">Module to filter and manipulate incoming messages. Get a 4 digit number to ticket free text, use regex in Match e. g. From =&gt; '(.+?)@.+?', and use () as [***] in Set =&gt;.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2720,7 +2693,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###3-NewTicketReject" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###3-NewTicketReject" Required="0" Valid="0">
         <Description Translatable="1">Blocks all the incoming emails that do not have a valid ticket number in subject with From: @example.com address.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2740,7 +2713,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule::NewTicketReject::Sender" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule::NewTicketReject::Sender" Required="0" Valid="0">
         <Description Translatable="1">Defines the sender for rejected emails.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2748,7 +2721,7 @@
             <String Regex="">noreply@example.com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule::NewTicketReject::Subject" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule::NewTicketReject::Subject" Required="1" Valid="1">
         <Description Translatable="1">Defines the subject for rejected emails.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2756,7 +2729,7 @@
             <String Regex="">Email Rejected</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule::NewTicketReject::Body" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule::NewTicketReject::Body" Required="1" Valid="1">
         <Description Translatable="1">Defines the body text for rejected emails.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2775,7 +2748,7 @@ Thanks for your help!
 </TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###4-CMD" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###4-CMD" Required="0" Valid="0">
         <Description Translatable="1">CMD example setup. Ignores emails where external CMD returns some output on STDOUT (email will be piped into STDIN of some.bin).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2791,7 +2764,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###5-SpamAssassin" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###5-SpamAssassin" Required="0" Valid="0">
         <Description Translatable="1">Spam Assassin example setup. Ignores emails that are marked with SpamAssassin.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2807,7 +2780,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###6-SpamAssassin" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###6-SpamAssassin" Required="0" Valid="0">
         <Description Translatable="1">Spam Assassin example setup. Moves marked mails to spam queue.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2823,7 +2796,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-MatchDBSource" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-MatchDBSource" Required="1" Valid="1">
         <Description Translatable="1">Module to use database filter storage.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2833,7 +2806,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PostFilterModule###000-FollowUpChannelCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PostFilterModule###000-FollowUpChannelCheck" Required="0" Valid="1">
         <Description Translatable="1">Module to check if arrived emails should be marked as email-internal (because of original forwarded internal email). ArticleType and SenderType define the values for the arrived email/article.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2845,7 +2818,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition1" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition1" Required="0" Valid="0">
         <Description Translatable="1">Recognize if a ticket is a follow-up to an existing ticket using an external ticket number.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2864,7 +2837,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition2" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition2" Required="0" Valid="0">
         <Description Translatable="1">Recognize if a ticket is a follow-up to an existing ticket using an external ticket number.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2883,7 +2856,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition3" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition3" Required="0" Valid="0">
         <Description Translatable="1">Recognize if a ticket is a follow-up to an existing ticket using an external ticket number.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2902,7 +2875,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition4" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-ExternalTicketNumberRecognition4" Required="0" Valid="0">
         <Description Translatable="1">Recognize if a ticket is a follow-up to an existing ticket using an external ticket number.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2921,7 +2894,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-DecryptBody" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-DecryptBody" Required="0" Valid="0">
         <Description Translatable="1">Module to filter encrypted bodies of incoming messages.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2932,7 +2905,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::PreFilterModule###000-SMIMEFetchFromCustomer" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-SMIMEFetchFromCustomer" Required="0" Valid="1">
         <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
         <Description Translatable="1">Module to fetch contacts SMIME certificates of incoming messages.</Description>
         <Group>Ticket</Group>
@@ -2943,7 +2916,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::CheckFollowUpModule###0100-Subject" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0100-Subject" Required="0" Valid="1">
         <Description Translatable="1">Checks if an E-Mail is a followup to an existing ticket by searching the subject for a valid ticket number.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2955,7 +2928,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::CheckFollowUpModule###0200-References" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0200-References" Required="0" Valid="1">
         <Description Translatable="1">Executes follow-up checks on In-Reply-To or References headers for mails that don't have a ticket number in the subject.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2967,7 +2940,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::CheckFollowUpModule###0300-Body" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0300-Body" Required="0" Valid="0">
         <Description Translatable="1">Executes follow-up checks on email body for mails that don't have a ticket number in the subject.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2979,7 +2952,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::CheckFollowUpModule###0400-Attachments" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0400-Attachments" Required="0" Valid="0">
         <Description Translatable="1">Executes follow-up checks on attachment contents for mails that don't have a ticket number in the subject.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2991,7 +2964,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="PostMaster::CheckFollowUpModule###0500-RawEmail" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0500-RawEmail" Required="0" Valid="0">
         <Description Translatable="1">Executes follow-up checks on the raw source email for mails that don't have a ticket number in the subject.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -3003,7 +2976,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="SendNoAutoResponseRegExp" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="SendNoAutoResponseRegExp" Required="1" Valid="1">
         <Description Translatable="1">If this regex matches, no message will be send by the autoresponder.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -3011,7 +2984,7 @@ Thanks for your help!
             <String Regex="">(MAILER-DAEMON|postmaster|abuse)@.+?\..+?</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="AutoResponseForWebTickets" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="AutoResponseForWebTickets" Required="1" Valid="1">
         <Description Translatable="1">If this option is set to 'Yes', tickets created via the web interface, via Customers or Agents, will receive an autoresponse if configured. If this option is set to 'No', no autoresponses will be sent.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -3022,7 +2995,7 @@ Thanks for your help!
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0200" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0200" Required="0" Valid="1">
         <Description Translatable="1">Links 2 tickets using a "Normal" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3034,7 +3007,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0201" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0201" Required="0" Valid="1">
         <Description Translatable="1">Links 2 tickets using a "ParentChild" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3046,7 +3019,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0202" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0202" Required="0" Valid="1">
         <Description Translatable="1">Links a ticket with an FAQArticle using a "Normal" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3058,7 +3031,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0203" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0203" Required="0" Valid="1">
         <Description Translatable="1">Links ticket with an FAQArticle using a "ParentChild" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3070,7 +3043,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0204" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0204" Required="0" Valid="1">
         <Description Translatable="1">Links a ticket with a ConfigItem using a "DependsOn" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3082,7 +3055,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0205" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0205" Required="0" Valid="1">
         <Description Translatable="1">Links ticket with a ConfigItem using a "RelevantTo" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3094,7 +3067,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###0206" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0206" Required="0" Valid="1">
         <Description Translatable="1">Links a ticket with a ConfigItem using a "Normal" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3106,7 +3079,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::IgnoreLinkedTicketStateTypes" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::IgnoreLinkedTicketStateTypes" Required="0" Valid="1">
         <Description Translatable="1">Defines, which tickets of which ticket state types should not be listed in linked ticket lists.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3117,7 +3090,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Stats::DynamicObjectRegistration###Ticket" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Stats::DynamicObjectRegistration###Ticket" Required="0" Valid="1">
         <Description Translatable="1">Module to generate ticket statistics.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Stats</SubGroup>
@@ -3127,7 +3100,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Stats::DynamicObjectRegistration###TicketList" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Stats::DynamicObjectRegistration###TicketList" Required="0" Valid="1">
         <Description Translatable="1">Determines if the statistics module may generate ticket lists.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Stats</SubGroup>
@@ -3137,7 +3110,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Stats::DynamicObjectRegistration###TicketAccountedTime" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Stats::DynamicObjectRegistration###TicketAccountedTime" Required="0" Valid="1">
         <Description Translatable="1">Module to generate accounted time ticket statistics.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Stats</SubGroup>
@@ -3147,7 +3120,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Stats::DynamicObjectRegistration###TicketSolutionResponseTime" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Stats::DynamicObjectRegistration###TicketSolutionResponseTime" Required="0" Valid="1">
         <Description Translatable="1">Module to generate ticket solution and response time statistics.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Stats</SubGroup>
@@ -3157,7 +3130,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::HTMLArticleHeightDefault" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::HTMLArticleHeightDefault" Required="1" Valid="1">
         <Description Translatable="1">Set the default height (in pixels) of inline HTML articles in AgentTicketZoom.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewZoom</SubGroup>
@@ -3165,7 +3138,7 @@ Thanks for your help!
             <String Regex="^[0-9]{1,4}$">100</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::HTMLArticleHeightMax" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::HTMLArticleHeightMax" Required="1" Valid="1">
         <Description Translatable="1">Set the maximum height (in pixels) of inline HTML articles in AgentTicketZoom.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::Ticket::ViewZoom</SubGroup>
@@ -3173,7 +3146,7 @@ Thanks for your help!
             <String Regex="^[0-9]{1,5}$">2500</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###TicketDynamicFieldDefault" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###TicketDynamicFieldDefault" Required="0" Valid="0">
         <Description Translatable="1">Event module registration. For more performance you can define a trigger event (e. g. Event =&gt; TicketCreate). This is only possible if all Ticket dynamic fields need the same event.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3184,7 +3157,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element1" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element1" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3196,7 +3169,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element2" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element2" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3208,7 +3181,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element3" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element3" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3220,7 +3193,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element4" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element4" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3232,7 +3205,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element5" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element5" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3244,7 +3217,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element6" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element6" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3256,7 +3229,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element7" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element7" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3268,7 +3241,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element8" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element8" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3280,7 +3253,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element9" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element9" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3292,7 +3265,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element10" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element10" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3304,7 +3277,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element11" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element11" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3316,7 +3289,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element12" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element12" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3328,7 +3301,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element13" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element13" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3340,7 +3313,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element14" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element14" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3352,7 +3325,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element15" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element15" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3364,7 +3337,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketDynamicFieldDefault###Element16" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketDynamicFieldDefault###Element16" Required="0" Valid="0">
         <Description Translatable="1">Configures a default TicketDynamicField setting. "Name" defines the dynamic field which should be used, "Value" is the data that will be set, and "Event" defines the trigger event. Please check the developer manual (http://otrs.github.io/doc/), chapter "Ticket Event Module".</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketDynamicFieldDefault</SubGroup>
@@ -3376,7 +3349,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="StandardTemplate::Types" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="StandardTemplate::Types" Required="0" Valid="1">
         <Description Translatable="1">Defines the list of types for templates.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3391,7 +3364,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="StandardTemplate2QueueByCreating" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="StandardTemplate2QueueByCreating" Required="0" Valid="0">
         <Description Translatable="1">List of default Standard Templates which are assigned automatically to new Queues upon creation.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3401,7 +3374,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###ProcessProgressAfterClosedChilds" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###ProcessProgressAfterClosedChilds" Required="0" Valid="1">
         <Description Translatable="1">ACL module that allows progress of parent tickets only if all its children are already closed ("ActivityDialog" shows which ActivityDialogs are not available for the parent ticket until all child tickets are closed).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketACL</SubGroup>
@@ -3416,7 +3389,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###900-EscalationIndex" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-EscalationIndex" Required="0" Valid="1">
         <Description Translatable="1">Updates the ticket escalation index after a ticket attribute got updated.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3427,7 +3400,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ResponsetimeSetByPhoneTicket" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByPhoneTicket" Required="1" Valid="1">
         <Description Translatable="1">Disables response time SLA, if the newly created ticket is a phone ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3438,7 +3411,7 @@ Thanks for your help!
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ResponsetimeSetByPhoneTicket::OnlyForTheseTicketTypes" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByPhoneTicket::OnlyForTheseTicketTypes" Required="0" Valid="1">
         <Description Translatable="1">Restricts the ResponsetimeSetByPhoneTicket to these ticket types.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3447,7 +3420,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ResponsetimeSetByAutoReply" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByAutoReply" Required="1" Valid="1">
         <Description Translatable="1">Disables response time SLA, if an auto reply was sent for this ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3458,7 +3431,7 @@ Thanks for your help!
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ResponsetimeSetByAutoReply::OnlyForTheseTicketTypes" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByAutoReply::OnlyForTheseTicketTypes" Required="0" Valid="1">
         <Description Translatable="1">Restricts the ResponsetimeSetByAutoReply to these ticket types.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3467,7 +3440,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EscalationDisabled::RelevantStates" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDisabled::RelevantStates" Required="0" Valid="1">
         <Description Translatable="1">Defines state names for which the SLA time is disabled. Is a ticket set to on of these states, the SLA-destination times are set to hold. The time a ticket stays in this state is not SLA-relevant.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3476,7 +3449,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EscalationDisabled::RelevantTypes" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDisabled::RelevantTypes" Required="0" Valid="1">
         <Description Translatable="1">Defines ticket type names for which the SLA calulation time is disabled.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3485,7 +3458,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EscalationDisabled::RelevantQueues" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDisabled::RelevantQueues" Required="0" Valid="1">
         <Description Translatable="1">Defines queue names for which the SLA calulation time is disabled.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3494,7 +3467,7 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EscalationDelayed::FreeTimeField" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDelayed::FreeTimeField" Required="0" Valid="0">
         <Description Translatable="1">Defines a dynamic field of type date/time which is used as start time for solution SLA-computation rather than ticket creation time, thus allowing to start SLA-countdown with begin of customer desired times.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3504,36 +3477,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::KIXSidebarBackend###KIXSBCustomer" Required="0" Valid="0">
-        <Description Translatable="1">Sidebar module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::KIXSidebarCustomer</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Actions">CustomerTicketMessage</Item>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::Customer</Item>
-                <Item Key="Title">Kontaktperson</Item>
-                <Item Key="Description">Suche nach Personen zur Verlinkung am Ticket.</Item>
-                <Item Key="Prio">0530</Item>
-                <Item Key="InitialCollapsed"></Item>
-                <Item Key="Identifier">KIXSBCustomer</Item>
-                <Item Key="Callback"></Item>
-                <Item Key="AutoSearch"></Item>
-                <Item Key="AutoSelectOne"></Item>
-                <Item Key="CustomerBackends">Contact1</Item>
-                <Item Key="LinkType"></Item>
-                <Item Key="MaxResultCount">20</Item>
-                <Item Key="MaxResultDisplay">5</Item>
-                <Item Key="MaxResultSize">35</Item>
-                <Item Key="NoActionWithoutSelection"></Item>
-                <Item Key="QueryDelay">200</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="ShowData">UserFullname</Item>
-                <Item Key="ShowDataHead">Name</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateDefault" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateDefault" Required="1" Valid="1">
         <Description Translatable="1">Defines the default item state for new items. It should be one of the item states out of the list below.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
@@ -3541,7 +3485,7 @@ Thanks for your help!
             <String Regex="">open</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###ItemState" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemState" Required="1" Valid="1">
         <Description Translatable="1">Defines all possible item states for the checklist sidebar. Key has to be unique and used for StateIcon list and StateStyle list below.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
@@ -3554,7 +3498,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateIcon" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateIcon" Required="1" Valid="1">
         <Description Translatable="1">Defines the item state icons for the item states defined above.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
@@ -3567,7 +3511,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateStyle" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateStyle" Required="1" Valid="1">
         <Description Translatable="1">Defines the item state styles for the item states defined above. Use CSS-styles.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
@@ -3580,7 +3524,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###NonEditableTicketStates" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###NonEditableTicketStates" Required="1" Valid="1">
         <Description Translatable="1">Defines all the ticket states in which the checklist cannot be changed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
@@ -3589,7 +3533,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::KIXSidebarChecklist###NonEditableTicketStateTypes" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###NonEditableTicketStateTypes" Required="1" Valid="1">
         <Description Translatable="1">Defines all the ticket state types in which the checklist cannot be changed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
@@ -3599,7 +3543,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###500-RestrictTicketActionsOnMerged" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###500-RestrictTicketActionsOnMerged" Required="0" Valid="1">
         <Description Translatable="1">Ticket-ACL to restrict ticket actions for merged tickets.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3610,7 +3554,7 @@ Thanks for your help!
             </Hash>
         </Setting>
      </ConfigItem>
-    <ConfigItem Name="Ticket::RestrictTicketActionsOnMerged::ActionsMapping" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::RestrictTicketActionsOnMerged::ActionsMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines allowed and not allowed actions for merged and removed tickets.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3647,7 +3591,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="0">
         <Description Translatable="1">Create new linked person on create new Article or Update Owner.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3658,7 +3602,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###AddToAddressBook" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###AddToAddressBook" Required="0" Valid="1">
         <Description Translatable="1">Creates a new address book entry if necessary.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3669,7 +3613,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CustomModule###010-TicketExtensionsKIX4OTRSITSMIncidentProblem" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###010-TicketExtensionsKIX4OTRSITSMIncidentProblem" Required="0" Valid="1">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3677,7 +3621,7 @@ Thanks for your help!
             <String Regex="">Kernel::System::Ticket::TicketExtensionsKIX4OTRSITSMIncidentProblem</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###200-CreateFAQEntry" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###200-CreateFAQEntry" Required="0" Valid="0">
         <Description Translatable="1">Enables creation of a FAQ entry from currently created article.</Description>
         <Group>Ticket</Group>
         <SubGroup>FAQWorkflow</SubGroup>
@@ -3689,7 +3633,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###230-TicketCreateChecklistFromTicketTemplate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###230-TicketCreateChecklistFromTicketTemplate" Required="0" Valid="1">
         <Description Translatable="1">Ticket event module to create a checklist from ticket template on ticket create.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3700,7 +3644,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###995_HideProcessTicketTabs" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###995_HideProcessTicketTabs" Required="0" Valid="1">
         <Description Translatable="1">Ticket-ACLs to define shown tabs if ticket is process ticket.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Agent::AgentTicketZoom</SubGroup>
@@ -3711,7 +3655,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###500-TicketAutoLinkConfigItem" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###500-TicketAutoLinkConfigItem" Required="0" Valid="0">
         <Description Translatable="1">Workflowmodule which links the ticket to related CIs - event handler supports only following events: ArticleCreate, TicketFreeTextUpdate.</Description>
         <Group>Ticket</Group>
         <SubGroup>TicketAutoLinkConfigItem</SubGroup>
@@ -3722,38 +3666,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::KIXSidebarBackend###KIXSBSimiliarFAQ" Required="0" Valid="0">
-        <Description Translatable="1">Sidebar module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::KIXSidebarFAQ</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Actions">CustomerTicket(Zoom|Message)</Item>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::FAQ</Item>
-                <Item Key="Title">Relevant FAQ items</Item>
-                <Item Key="Description">Shows FAQ items relevant to current ticket.</Item>
-                <Item Key="Prio">0530</Item>
-                <Item Key="InitialCollapsed"></Item>
-                <Item Key="Identifier">KIXSBSimiliarFAQ</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Callback"></Item>
-                <Item Key="FAQLink">0</Item>
-                <Item Key="LinkType"></Item>
-                <Item Key="MatchAll">1</Item>
-                <Item Key="MaxResultCount">20</Item>
-                <Item Key="MaxResultDisplay">5</Item>
-                <Item Key="MaxResultSize">35</Item>
-                <Item Key="NoComposeMaskRegExp">CustomerTicketZoom</Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="SearchMode">Fulltext</Item>
-                <Item Key="SearchStateTypes">external,public</Item>
-                <Item Key="SearchSubject">1</Item>
-                <Item Key="TicketIDSearchMaskRegExp">CustomerTicketZoom</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###950_TicketStateWorkflow" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###950_TicketStateWorkflow" Required="0" Valid="0">
         <Description Translatable="1">Ticket-ACLs to define the following possible state.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3765,7 +3678,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###700-TicketStateWorkflowTypeUpdate" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###700-TicketStateWorkflowTypeUpdate" Required="0" Valid="0">
         <Description Translatable="1">Updates ticket state if configured or required after type update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3776,7 +3689,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###701-TicketStateWorkflowAutomaticStateAction" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###701-TicketStateWorkflowAutomaticStateAction" Required="0" Valid="0">
         <Description Translatable="1">Moves ticket after state update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3788,7 +3701,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###910-TicketQueueMoveWorkflowTickettype" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###910-TicketQueueMoveWorkflowTickettype" Required="0" Valid="0">
         <Description Translatable="1">Updates ticket type if configured or required after queue move.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3799,7 +3712,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketQueueMoveWorkflowTickettype" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketQueueMoveWorkflowTickettype" Required="0" Valid="1">
         <Description Translatable="1">Defines Queue, TicketType and new TicketType for TicketQueueMoveWorkflowTickettype.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3808,7 +3721,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###920-TicketQueueMoveWorkflowState" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###920-TicketQueueMoveWorkflowState" Required="0" Valid="0">
         <Description Translatable="1">Updates ticket state if configured or required after queue move.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3819,7 +3732,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::TicketQueueMoveWorkflowState" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::TicketQueueMoveWorkflowState" Required="0" Valid="1">
         <Description Translatable="1">Defines Queue, TicketType and new State for TicketQueueMoveWorkflowState.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3828,7 +3741,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###900-TicketStateAutoUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-TicketStateAutoUpdate" Required="0" Valid="1">
         <Description Translatable="1">Updates ticket state after unlock ticket based on selected ticket type.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3839,7 +3752,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###900-TicketUnlockOnStateUpdate" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-TicketUnlockOnStateUpdate" Required="1" Valid="1">
         <Description Translatable="1">Performs ticket update actions after state update - currently limited to state update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3850,7 +3763,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###701-StateUpdateOnWebrequestFollowUp" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###701-StateUpdateOnWebrequestFollowUp" Required="0" Valid="0">
         <Description Translatable="1">State update for closed tickets if a new article of type webrequest is created in customer interface.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3861,7 +3774,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###955-RemoveArticleFlagsOnTicketClose" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###955-RemoveArticleFlagsOnTicketClose" Required="1" Valid="1">
         <Description Translatable="1">Performs ticket update actions after state update - currently limited to state update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
@@ -3872,7 +3785,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="0">
         <Description Translatable="1">Create link between ticket and config item on DynamicFieldUpdate (This event only create link, links can only be deleted manually).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -3884,7 +3797,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###890-HideAgentTicketMove" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###890-HideAgentTicketMove" Required="0" Valid="1">
         <Description Translatable="1">Hide AgentTicketMove if service of current ticket has a configured AssignedQueue and ticket is not excluded from automatic queue assigment.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket::ServiceQueueAssignment</SubGroup>
@@ -3894,7 +3807,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###300-TicketServiceQueueAssignment" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###300-TicketServiceQueueAssignment" Required="0" Valid="1">
         <Description Translatable="1">Performs queue update on setting service.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket::ServiceQueueAssignment</SubGroup>
@@ -3906,7 +3819,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ServiceQueueAssignment###TypeStateExclusions" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ServiceQueueAssignment###TypeStateExclusions" Required="1" Valid="1">
         <Description Translatable="1">Tickets with key Type:::State and value not null will not be moved automatically upon service update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket::ServiceQueueAssignment</SubGroup>
@@ -3917,40 +3830,7 @@ Thanks for your help!
              </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::KIXSidebarBackend###KIXSBSimilarTickets" Required="0" Valid="0">
-        <Description Translatable="1">Sidebar module registration for the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::KIXSidebarTicket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Actions">CustomerTicket(Message|Zoom)</Item>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::Ticket</Item>
-                <Item Key="Title">Similar Tickets</Item>
-                <Item Key="Description">Shows similar tickets to current ticket.</Item>
-                <Item Key="Prio">0600</Item>
-                <Item Key="InitialCollapsed"></Item>
-                <Item Key="Identifier">KIXSBSimilarTickets</Item>
-                <Item Key="Group"></Item>
-                <Item Key="Callback"></Item>
-                <Item Key="LinkType">ParentChild</Item>
-                <Item Key="MaxResultCount">20</Item>
-                <Item Key="MaxResultDisplay">5</Item>
-                <Item Key="MaxResultSize"></Item>
-                <Item Key="QueryDelay">1000</Item>
-                <Item Key="QueryMinLength">1</Item>
-                <Item Key="SearchCustomer">0</Item>
-                <Item Key="SearchExtended">0</Item>
-                <Item Key="SearchQueues"></Item>
-                <Item Key="SearchStates">new,open</Item>
-                <Item Key="SearchSubject">1</Item>
-                <Item Key="SearchTypes"></Item>
-                <Item Key="SelectionDisabled">1</Item>
-                <Item Key="ShowColumns">TicketNumber,Title</Item>
-                <Item Key="TicketIDSearchMaskRegExp">^(?:(?!(CustomerTicketMessage$)).)*$</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###9-SystemMonitoringAcknowledgeX" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###9-SystemMonitoringAcknowledgeX" Required="1" Valid="1">
         <Description Translatable="1">Ticket event module to send an acknowledge to registered system monitoring tools.</Description>
         <Group>Ticket</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
@@ -3961,7 +3841,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Notification::Transport###AgentOverlay" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Notification::Transport###AgentOverlay" Required="0" Valid="1">
         <Description Translatable="1">Defines all the parameters for this notification transport.</Description>
         <Group>Ticket</Group>
         <SubGroup>Frontend::Admin::AdminNotificationEvent</SubGroup>
@@ -3975,21 +3855,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerFrontend::KIXSidebarBackend###LinkedCIs" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the KIXSidebar backend linked config items.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::KIXSidebar::LinkedCIs</Item>
-                <Item Key="Title">Assigned CIs</Item>
-                <Item Key="Description">Shows all config items assigned to selected customers.</Item>
-                <Item Key="Prio">0400</Item>
-                <Item Key="Actions">CustomerTicketMessage</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="1">
         <Description Translatable="1">Sends all agent's notifications to its configured out of office substitute while agent is out of office.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4000,7 +3866,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###802-MatchTicketDataRestrictions" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###802-MatchTicketDataRestrictions" Required="0" Valid="0">
         <Description Translatable="1">Ticket-ACL to restrict some ticket data selections based on current ticket data.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4010,7 +3876,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###803-MatchActionRestrictions" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###803-MatchActionRestrictions" Required="0" Valid="0">
         <Description Translatable="1">Ticket-ACL to restrict some ticket actions based on current ticket data.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4021,7 +3887,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###800-ResponsibleAutoSetPerTickettype" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###800-ResponsibleAutoSetPerTickettype" Required="0" Valid="0">
         <Description Translatable="1">Workflowmodule which sets the ticket responsible based on ticket type if not given.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4033,7 +3899,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ResponsibleAutoSetPerTickettype" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsibleAutoSetPerTickettype" Required="0" Valid="1">
         <Description Translatable="1">If ticket responsible feature is enabled, set responsible on ticket creation or state update.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4046,7 +3912,7 @@ Thanks for your help!
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::CustomModule###001-TicketExtensionsKIX4OTRS" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###001-TicketExtensionsKIX4OTRS" Required="0" Valid="1">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4054,7 +3920,7 @@ Thanks for your help!
             <String Regex="">Kernel::System::Ticket::TicketExtensionsKIX4OTRS</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::ACL-PossiblePropertiesSubsumption" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::ACL-PossiblePropertiesSubsumption" Required="1" Valid="1">
         <Description Translatable="1">Defines whether results of PossibleNot for tickets of multiple ACLs are subsumed, thus allowing a more modular approach to ACLS (default behavior is disabled).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4065,7 +3931,7 @@ Thanks for your help!
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Frontend::DynamicField###DisabledDynamicFields" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::DynamicField###DisabledDynamicFields" Required="0" Valid="1">
         <Description Translatable="1">Configures which dynamic fields were disabled depending on used frontend module, attributes like service, type, state or priority and its value. The key is composed like FrontendModule:::Attribute::Value. The key should contain the names of the disabled fields using regular expressions. If dynamic fields should be hidden on empty values, use EMPTY like FrontendModule:::Attribute::EMPTY.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4074,15 +3940,7 @@ Thanks for your help!
                 </Hash>
             </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::SearchProfileQueue" Required="1" Valid="1">
-        <Description Translatable="1">Name of search profile queue. The search profile queue is a queue selection of your preferred search profiles.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="">My Search Profiles</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###990_DependingDynamicFieldSelection" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###990_DependingDynamicFieldSelection" Required="0" Valid="1">
         <Description Translatable="1">Ticket-ACLs to define dynamic fields dependencies.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::DynamicField</SubGroup>
@@ -4093,7 +3951,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::Acl::Module###991_DisabledDynamicFields" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###991_DisabledDynamicFields" Required="0" Valid="0">
         <Description Translatable="1">Ticket-ACLs to define shown or hidden dynamic fields in forms.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::DynamicField</SubGroup>
@@ -4104,7 +3962,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###330-DFTypeObjectReferenceAddLink" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###330-DFTypeObjectReferenceAddLink" Required="0" Valid="1">
         <Description Translatable="1"></Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -4115,7 +3973,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="KIXMobileApp::TicketDynamicFields" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::TicketDynamicFields" Required="0" Valid="1">
         <Description Translatable="1">Defines a list of Ticket Dynamic Fields which are evaluated by the KIXMobileApp. The lists consists of dynamic field names (e.g. 'MobileProcessingState') or regular expressions matching dynamic field names (e.g. 'MobileProcessingChecklist.*').</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::DynamicField</SubGroup>

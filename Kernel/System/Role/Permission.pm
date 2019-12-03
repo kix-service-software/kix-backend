@@ -452,7 +452,7 @@ sub PermissionAdd {
     if ( !$Self->ValidatePermission(%Param) ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "The permission target doesn't match the possible ones for type PropertyValue.",
+            Message  => "The permission target is invalid.",
         );
         return;
     }
@@ -761,9 +761,6 @@ sub PermissionListForObject {
         }
     }
 
-use Data::Dumper;
-print STDERR "RelevantPropertyValuePermissions: ".Dumper(\%RelevantPropertyValuePermissions);
-
     my %PermissionTypeList = reverse $Self->PermissionTypeList();
 
     # get all relevant permissions
@@ -789,10 +786,13 @@ print STDERR "RelevantPropertyValuePermissions: ".Dumper(\%RelevantPropertyValue
                 Message  => "Unable to get permission ID $ID!"
             );
             return;
-        }        
+        }
+
+        # ignore permissions of type Resource without filters (non PropertyValue)
+        next if ( $Permission{TypeID} == $PermissionTypeList{Resource} && $Permission{Target} !~ /[{}]/ );
 
         # ignore wildcard targets on type Object 
-        next if ( $Permission{Target} =~ /\*/ && $Permission{TypeID} == $PermissionTypeList{Object} );
+        next if ( $PermissionTypeList{Object} && $Permission{Target} =~ /\*/ && $Permission{TypeID} == $PermissionTypeList{Object} );
 
         # prepare target
         my $Target = $Permission{Target};
@@ -802,13 +802,11 @@ print STDERR "RelevantPropertyValuePermissions: ".Dumper(\%RelevantPropertyValue
         my @SplitParts = split(/\//, $Param{Target});
         my $ObjectID = $SplitParts[-1];
 
-print STDERR "$Param{Target} <=> $Target\n";
         # check for assigned permission
         if ( $Param{Target} =~ /^$Target/ ) {
             push(@AssignedPermissions, \%Permission);
         }
 
-print STDERR "$Permission{Target}\n";
         # check for PropertyValue permission (depending objects)
         if ( $RelevantPropertyValuePermissions{$Permission{Target}} ) {
             push(@DependingObjectsPermissions, \%Permission);
@@ -836,29 +834,12 @@ sub ValidatePermission {
     # validate new PropertyValue permission
     my %PermissionTypeList = $Self->PermissionTypeList( Valid => 1 );
     
-    if ( $PermissionTypeList{$Param{TypeID}} && $PermissionTypeList{$Param{TypeID}} eq 'PropertyValue' ) {
-        # check if the target pattern matches the possible ones
-        my $PossibleList = $Kernel::OM->Get('Kernel::Config')->Get('Permission::PropertyValue');
-        my $Found = 0;
-        foreach my $Possible ( sort keys %{$PossibleList} ) {
-            my $Pattern = $PossibleList->{$Possible}->{'READ_UPDATE_DELETE'};
-            if ( ($Param{Value} & $Self->PERMISSION->{CREATE}) == $Self->PERMISSION->{CREATE} ) {
-                $Pattern = $PossibleList->{$Possible}->{CREATE};
-            }
-            my $Target = $Param{Target};
+    # check type
+    return if !$PermissionTypeList{$Param{TypeID}};
 
-            $Pattern =~ s/\*/.*?/g;
-            $Pattern =~ s/\//\\\//g;
-            $Pattern =~ s/\{(.+?)\}/\\{$1\\}/g;
-            $Pattern =~ s/<.+?>/\\d+?/g;
-
-            if ( $Target =~ /^$Pattern$/ ) {
-                $Found = 1;
-                last;
-            }
-        }
-
-        if ( !$Found ) {
+    if ( $PermissionTypeList{$Param{TypeID}} eq 'PropertyValue' ) {
+        # check if the target contains a filter expression and the pattern matches the required format
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/ ) {
             return;
         }
     }

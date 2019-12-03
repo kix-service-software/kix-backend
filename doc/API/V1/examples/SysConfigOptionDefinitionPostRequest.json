@@ -1,5 +1,6 @@
 {
     "SysConfigOptionDefinition": {
+        "AccessLevel": "internal",
         "Name": "test",
         "Type": "String",
         "Description": "this is just a test option",
