@@ -945,7 +945,7 @@ sub Rebuild {
         }
 
         my ($Setting, $DefaultValue) = $Self->{OptionTypeModules}->{$Type}->ValidateSetting(
-            Setting => $OptionRaw->{Setting}->{$Type}
+            Setting => $OptionRaw->{Setting}->{$Type},
         );
 
         my %Option = (

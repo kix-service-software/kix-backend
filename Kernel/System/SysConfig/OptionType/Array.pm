@@ -48,6 +48,7 @@ sub ValidateSetting {
     my @DefaultValue;
 
     if ( IsArrayRefWithData($Param{Setting}->{Item}) ) {
+        ITEM:
         foreach my $Item ( @{$Param{Setting}->{Item}} ) {
             if ( IsHashRefWithData($Item) ) {
                 foreach my $Key ( keys %{$Item} ) { 
@@ -60,6 +61,7 @@ sub ValidateSetting {
                             Setting => $Item->{$Key}
                         );
                         push(@DefaultValue, $DefaultValueSub);
+                        next ITEM;
                     }
                     else {
                         push(@DefaultValue, $Item->{content});
