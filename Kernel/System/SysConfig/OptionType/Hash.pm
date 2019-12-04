@@ -56,7 +56,6 @@ sub ValidateSetting {
                     my ($SettingSub, $DefaultValueSub) = $Self->SUPER::ValidateSetting(
                         Type    => $Key,
                         Setting => $Item->{$Key},
-                        Debug => $Param{Debug},
                     );
                     $DefaultValue{$Item->{Key}} = $DefaultValueSub;
                     next ITEM;
