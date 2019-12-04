@@ -10148,7 +10148,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Automation::MacroActionType::Ticket###PrioritySet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###PrioritySet" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
@@ -10166,7 +10166,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Automation::MacroActionType::Ticket###StateSet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###StateSet" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
@@ -10175,7 +10175,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Automation::MacroActionType::Ticket###TeamSet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TeamSet" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
@@ -10184,7 +10184,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Automation::MacroActionType::Ticket###TicketCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TicketCreate" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
@@ -10193,7 +10193,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Automation::MacroActionType::Ticket###TicketDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TicketDelete" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
@@ -10202,7 +10202,7 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Automation::MacroActionType::Ticket###TitleSet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TitleSet" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
