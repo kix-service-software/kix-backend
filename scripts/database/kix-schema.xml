@@ -2517,6 +2517,10 @@
     <Column Name="attachment_directory_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="preferences_value" Required="false" Size="350" Type="VARCHAR"/>
+    <Unique Name="attachment_dir_preferences_uniq">
+        <UniqueColumn Name="attachment_directory_id"/>
+        <UniqueColumn Name="preferences_key"/>
+    </Unique>
     <Index Name="attachment_dir_preferences_attachment_directory_id">
         <IndexColumn Name="attachment_directory_id"/>
     </Index>
