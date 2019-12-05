@@ -137,12 +137,12 @@ sub Run {
     # check if Number already exists
     if ( IsStringWithData($Organisation->{Number}) ) {
         my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
-            Search => $Organisation->{Number},
+            Number => $Organisation->{Number},
         );
         if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update organisation. Another organisation with the name already exists.',
+                Message => 'Cannot update organisation. Another organisation with this number already exists.',
             );
         }
     }
@@ -150,12 +150,12 @@ sub Run {
     # check if Name already exists
     if ( IsStringWithData($Organisation->{Name}) ) {
         my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
-            Search => $Organisation->{Name},
+            Name => $Organisation->{Name},
         );
         if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update organisation. Another organisation with the name already exists.',
+                Message => 'Cannot update organisation. Another organisation with this name already exists.',
             );
         }
     }
