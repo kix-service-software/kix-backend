@@ -46,11 +46,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the title of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the title of a ticket.'));
     $Self->AddOption(
         Name        => 'Title',
-        Label       => 'Title',
-        Description => 'The new title of a ticket to be set.',
+        Label       => Kernel::Language::Translatable('Title'),
+        Description => Kernel::Language::Translatable('The new title of a ticket to be set.'),
         Required    => 1,
     );
 

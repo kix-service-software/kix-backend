@@ -47,59 +47,59 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Creates an article for a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Creates an article for a ticket.'));
     $Self->AddOption(
         Name        => 'Channel',
-        Label       => 'Channel',
-        Description => '(Optional) The channel of the new article. "note" will be used if omitted.',
+        Label       => Kernel::Language::Translatable('Channel'),
+        Description => Kernel::Language::Translatable('(Optional) The channel of the new article. "note" will be used if omitted.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'SenderType',
-        Label       => 'Sender Type',
-        Description => '(Optional) The sender type of the new article. "agent" will be used if omitted.',
+        Label       => Kernel::Language::Translatable('Sender Type'),
+        Description => Kernel::Language::Translatable('(Optional) The sender type of the new article. "agent" will be used if omitted.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'From',
-        Label       => 'From',
-        Description => '(Optional) The email address of the sender for the new article. Agent data will be used if omitted.',
+        Label       => Kernel::Language::Translatable('From'),
+        Description => Kernel::Language::Translatable('(Optional) The email address of the sender for the new article. Agent data will be used if omitted.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'To',
-        Label       => 'To',
-        Description => '(Optional) The email addresses of the receiver of the new article.',
+        Label       => Kernel::Language::Translatable('To'),
+        Description => Kernel::Language::Translatable('(Optional) The email addresses of the receiver of the new article.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Cc',
-        Label       => 'Cc',
-        Description => '(Optional) The email addresses of the Cc receiver of the new article.',
+        Label       => Kernel::Language::Translatable('Cc'),
+        Description => Kernel::Language::Translatable('(Optional) The email addresses of the Cc receiver of the new article.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Bcc',
-        Label       => 'Bcc',
-        Description => '(Optional) The email addresses of the Bcc receiver of the new article.',
+        Label       => Kernel::Language::Translatable('Bcc'),
+        Description => Kernel::Language::Translatable('(Optional) The email addresses of the Bcc receiver of the new article.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Subject',
-        Label       => 'Subject',
-        Description => 'The subject of the new article.',
+        Label       => Kernel::Language::Translatable('Subject'),
+        Description => Kernel::Language::Translatable('The subject of the new article.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'Body',
-        Label       => 'Body',
-        Description => 'The text of the new article.',
+        Label       => Kernel::Language::Translatable('Body'),
+        Description => Kernel::Language::Translatable('The text of the new article.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'TimeUnits',
-        Label       => 'TimeUnits',
-        Description => 'The time units to add for the new article.',
+        Label       => Kernel::Language::Translatable('TimeUnits'),
+        Description => Kernel::Language::Translatable('The time units to add for the new article.'),
         Required    => 0,
     );
     # FIXME: add if necessary
