@@ -1,6 +1,6 @@
 {
    "$id" : "#ValidCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of valid items.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "Valid" : {
          "$id" : "#Valid",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The valid object.",
          "type" : "object",
          "properties" : {

@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemClassDefinitionCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item class definitions.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
          "properties" : {

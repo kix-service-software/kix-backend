@@ -1,6 +1,6 @@
 {
    "$id" : "#ClientRegistrationPostResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ID of the created client registration.",
    "type" : "object",
    "properties" : {

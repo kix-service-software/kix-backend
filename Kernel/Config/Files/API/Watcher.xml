@@ -13,6 +13,19 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Watcher::WatcherGet" Required="0" Valid="1">
+        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">WatcherGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">WatcherID</Item>
+                <Item Key="ResponseSchema">WatcherResponse</Item>
+                <Item Key="CacheType">API_watchers</Item>
+                <Item Key="CacheTypeDependency">Watcher</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Watcher::WatcherCreate" Required="0" Valid="1">
         <Description TranWatchertable="1">API module registration for the operation layer.</Description>
         <Setting>

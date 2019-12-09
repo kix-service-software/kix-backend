@@ -1,6 +1,6 @@
 {
    "$id" : "#MacroPatchRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The macro request object for update.",
    "type" : "object",
    "properties" : {

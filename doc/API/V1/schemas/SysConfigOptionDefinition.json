@@ -1,9 +1,13 @@
 {
    "$id" : "#SysConfigOptionDefinition",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The SysConfig option definition object.",
    "type" : "object",
    "properties" : {
+      "AccessLevel" : {
+         "type" : "string",
+         "readOnly" : true
+      },
       "ChangeBy" : {
          "type" : "integer",
          "readOnly" : true
@@ -71,6 +75,17 @@
          "type" : "string",
          "readOnly" : true
       },
+      "ExperienceLevel" : {
+         "anyOf" : [
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ],
+         "readOnly" : true
+      },
       "Group" : {
          "type" : "string",
          "readOnly" : true
@@ -81,17 +96,6 @@
       },
       "IsRequired" : {
          "type" : "integer",
-         "readOnly" : true
-      },
-      "Level" : {
-         "anyOf" : [
-            {
-               "type" : "integer"
-            },
-            {
-               "type" : "null"
-            }
-         ],
          "readOnly" : true
       },
       "Name" : {

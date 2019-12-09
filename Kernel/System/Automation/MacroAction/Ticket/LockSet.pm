@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the lock state of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the lock state of a ticket.'));
     $Self->AddOption(
         Name        => 'Lock',
-        Label       => 'Lock',
-        Description => 'The lock state to be set.',
+        Label       => Kernel::Language::Translatable('Lock'),
+        Description => Kernel::Language::Translatable('The lock state to be set.'),
         Required    => 1,
     );
 

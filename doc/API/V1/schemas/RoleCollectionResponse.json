@@ -1,6 +1,6 @@
 {
    "$id" : "#RoleCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of roles.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "Role" : {
          "$id" : "#Role",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The role object.",
          "type" : "object",
          "properties" : {
@@ -82,7 +82,7 @@
       },
       "Permission" : {
          "$id" : "#Permission",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
          "type" : "object",
          "properties" : {

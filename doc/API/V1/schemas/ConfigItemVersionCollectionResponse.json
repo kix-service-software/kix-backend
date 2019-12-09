@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemVersionCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item versions.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
          "type" : "object",
          "properties" : {
@@ -133,7 +133,7 @@
       },
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
          "properties" : {

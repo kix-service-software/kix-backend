@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the team of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the team of a ticket.'));
     $Self->AddOption(
         Name        => 'Team',
-        Label       => 'Team',
-        Description => 'The name of the team to be set.',
+        Label       => Kernel::Language::Translatable('Team'),
+        Description => Kernel::Language::Translatable('The name of the team to be set.'),
         Required    => 1
     );
 

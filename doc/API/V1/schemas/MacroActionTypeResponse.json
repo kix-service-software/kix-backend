@@ -1,6 +1,6 @@
 {
    "$id" : "#MacroActionTypeResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for macro action type GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "MacroActionType" : {
          "$id" : "#MacroActionType",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action type object.",
          "type" : "object",
          "properties" : {

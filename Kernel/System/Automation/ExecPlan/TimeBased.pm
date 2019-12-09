@@ -51,17 +51,17 @@ Describe this execution plan module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Allows a time based execution of automation jobs. At least one weekday and time must be configured.');
+    $Self->Description(Kernel::Language::Translatable('Allows a time based execution of automation jobs. At least one weekday and time must be configured.'));
     $Self->AddOption(
         Name        => 'Weekday',
-        Label       => 'Weekday',
-        Description => 'An array of weekdays (Mon,Tue,Wed,Thu,Fri,Sat,Sun) when the job should be executed.',
+        Label       => Kernel::Language::Translatable('Weekday'),
+        Description => Kernel::Language::Translatable('An array of weekdays (Mon,Tue,Wed,Thu,Fri,Sat,Sun) when the job should be executed.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'Time',
-        Label       => 'Time',
-        Description => 'An array of times when the job should be executed on every configured weekday.',
+        Label       => Kernel::Language::Translatable('Time'),
+        Description => Kernel::Language::Translatable('An array of times when the job should be executed on every configured weekday.'),
         Required    => 1,
     );
 

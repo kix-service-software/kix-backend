@@ -301,4 +301,5 @@
 /tickets/:TicketID                                                             |   PATCH           | V1::Ticket::TicketUpdate
 /watchers                                                                      |   GET             | V1::Watcher::WatcherSearch
 /watchers                                                                      |   POST            | V1::Watcher::WatcherCreate
+/watchers/:WatcherID                                                           |   GET             | V1::Watcher::WatcherGet
 /watchers/:WatcherID                                                           |   DELETE          | V1::Watcher::WatcherDelete

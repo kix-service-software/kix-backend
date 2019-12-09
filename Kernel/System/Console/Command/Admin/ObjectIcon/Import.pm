@@ -100,7 +100,7 @@ sub Run {
         );
         if ( !$Content ) {
             $Self->PrintError("Could not read icon file $File!");
-            return $Self->ExitCodeError();
+            next;
         }
 
         # lookup object 
@@ -111,7 +111,7 @@ sub Run {
         );
         if ( !$Value ) {
             $Self->PrintError("Unable to lookup object value of line ".($Count + 1)."!");
-            return $Self->ExitCodeError();
+            next;
         }
 
         my $ObjectIconList = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList(

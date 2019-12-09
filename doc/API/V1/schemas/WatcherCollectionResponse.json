@@ -1,6 +1,6 @@
 {
    "$id" : "#WatcherCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of watchers.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "Watcher" : {
          "$id" : "#Watcher",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
          "type" : "object",
          "properties" : {

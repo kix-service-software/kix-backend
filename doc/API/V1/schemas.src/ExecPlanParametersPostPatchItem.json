@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "#ExecPlanParametersPostPatchItem",
   "type": "object",
   "description": "The parameters object for creation and update, for when and/or by what the corresponding job of the execution plan will be triggert.",

@@ -1,6 +1,6 @@
 {
    "$id" : "#RoleUserIDCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of user IDs.",
    "type" : "object",
    "properties" : {

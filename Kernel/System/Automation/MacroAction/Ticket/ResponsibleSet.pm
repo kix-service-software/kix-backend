@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the responsible of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the responsible of a ticket.'));
     $Self->AddOption(
         Name        => 'Responsible',
-        Label       => 'Responsible',
-        Description => 'The login of the agent to be set.',
+        Label       => Kernel::Language::Translatable('Responsible'),
+        Description => Kernel::Language::Translatable('The login of the agent to be set.'),
         Required    => 1,
     );
 

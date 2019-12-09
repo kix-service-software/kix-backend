@@ -1,6 +1,6 @@
 {
    "$id" : "#TicketTypeResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for ticket type GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "TicketType" : {
          "$id" : "#TicketType",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket type object.",
          "type" : "object",
          "properties" : {

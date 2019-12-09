@@ -1,6 +1,6 @@
 {
    "$id" : "#NotificationResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for notification GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "Notification" : {
          "$id" : "#Notification",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The notification object.",
          "type" : "object",
          "properties" : {

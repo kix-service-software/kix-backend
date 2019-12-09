@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item objects.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
          "type" : "object",
          "properties" : {
@@ -56,7 +56,7 @@
       },
       "ConfigItemHistory" : {
          "$id" : "#ConfigItemHistory",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
          "type" : "object",
          "properties" : {
@@ -119,7 +119,7 @@
       },
       "ConfigItem" : {
          "$id" : "#ConfigItem",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item object.",
          "type" : "object",
          "properties" : {
@@ -221,7 +221,7 @@
       },
       "ConfigItemVersion" : {
          "$id" : "#ConfigItemVersion",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
          "type" : "object",
          "properties" : {
@@ -337,7 +337,7 @@
       },
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
          "properties" : {

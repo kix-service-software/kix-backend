@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the owner of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the owner of a ticket.'));
     $Self->AddOption(
         Name        => 'Owner',
-        Label       => 'Owner',
-        Description => 'The login of the agent to be set.',
+        Label       => Kernel::Language::Translatable('Owner'),
+        Description => Kernel::Language::Translatable('The login of the agent to be set.'),
         Required    => 1,
     );
 
