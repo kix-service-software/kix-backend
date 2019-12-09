@@ -783,6 +783,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::I18n::TranslationLanguageCreate
+    V1::ImportExport::TemplateSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ImportExport::TemplateSearch
+    V1::ImportExport::TemplateGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ImportExport::TemplateGet
     V1::Log::LogFileSearch:
         Description: ''
         MappingInbound:
@@ -2571,6 +2585,14 @@ Provider:
           RequestMethod:
           - POST
           Route: /system/i18n/translations/:PatternID/languages
+        V1::ImportExport::TemplateSearch:
+          RequestMethod:
+          - GET
+          Route: /system/importexport/templates
+        V1::ImportExport::TemplateGet:
+          RequestMethod:
+          - GET
+          Route: /system/importexport/templates/:TemplateID
         V1::Log::LogFileSearch:
           RequestMethod:
           - GET
