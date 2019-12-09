@@ -1,11 +1,14 @@
 {
    "$id" : "#SysConfigOptionDefinitionPatchRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The SysConfig option definition request object for update.",
    "type" : "object",
    "properties" : {
       "SysConfigOptionDefinition" : {
          "properties" : {
+            "AccessLevel" : {
+               "type" : "string"
+            },
             "Comment" : {
                "anyOf" : [
                   {
@@ -52,13 +55,7 @@
             "Description" : {
                "type" : "string"
             },
-            "Group" : {
-               "type" : "string"
-            },
-            "IsRequired" : {
-               "type" : "integer"
-            },
-            "Level" : {
+            "ExperienceLevel" : {
                "anyOf" : [
                   {
                      "type" : "integer"
@@ -67,6 +64,12 @@
                      "type" : "null"
                   }
                ]
+            },
+            "Group" : {
+               "type" : "string"
+            },
+            "IsRequired" : {
+               "type" : "integer"
             },
             "Name" : {
                "type" : "string"

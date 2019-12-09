@@ -1,6 +1,6 @@
 {
    "$id" : "#GeneralCatalogItemResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for GeneralCatalog item GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "GeneralCatalogItem" : {
          "$id" : "#GeneralCatalogItem",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The GeneralCatalog item object.",
          "type" : "object",
          "properties" : {

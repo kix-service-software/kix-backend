@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemImagePostItem",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The config item image request object for creation.",
    "type" : "object",
    "properties" : {

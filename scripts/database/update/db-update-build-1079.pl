@@ -41,7 +41,7 @@ sub _RemovePermissionTypeObject {
 
     # get all ticket watchers
     return if !$DBObject->Do(
-        SQL => "DELETE FROM permission_type WHERE name IN ['Object']",
+        SQL => "DELETE FROM permission_type WHERE name IN ('Object')",
     );
 
     return 1;

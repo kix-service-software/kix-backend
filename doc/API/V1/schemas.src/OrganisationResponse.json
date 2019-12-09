@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "#OrganisationResponse",
   "type": "object",
   "description": "A response for organisation GET request.",

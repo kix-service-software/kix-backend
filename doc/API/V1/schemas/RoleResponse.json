@@ -1,6 +1,6 @@
 {
    "$id" : "#RoleResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for role GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "Role" : {
          "$id" : "#Role",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The role object.",
          "type" : "object",
          "properties" : {
@@ -79,7 +79,7 @@
       },
       "Permission" : {
          "$id" : "#Permission",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
          "type" : "object",
          "properties" : {

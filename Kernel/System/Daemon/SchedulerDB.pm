@@ -1620,24 +1620,13 @@ sub AutomationTaskToExecute {
         # skip if job is not valid
         next JOBNAME if $Job{ValidID} != 1;
 
-
-        my $LastExecutionSystemTime;
-        if ( $Job{LastExecutionTime} ) {
-            $LastExecutionSystemTime = $TimeObject->TimeStamp2SystemTime(
-                String => $Job{LastExecutionTime}
-            );
-        }
-        else {
-            $LastExecutionSystemTime = $TimeObject->SystemTime();
-        }
-
         # execute recurrent tasks
         $Self->RecurrentTaskExecute(
             NodeID                   => $Param{NodeID},
             PID                      => $Param{PID},
             TaskName                 => $JobList{$JobID},
             TaskType                 => 'AsynchronousExecutor',
-            PreviousEventTimestamp   => $LastExecutionSystemTime,
+            PreviousEventTimestamp   => $TimeObject->SystemTime(),
             MaximumParallelInstances => 1,
             Data                     => {
                 Object   => 'Kernel::System::Automation',

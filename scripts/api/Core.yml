@@ -2107,6 +2107,13 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Watcher::WatcherCreate
+    V1::Watcher::WatcherGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Watcher::WatcherGet
     V1::Watcher::WatcherDelete:
         Description: ''
         MappingInbound:
@@ -3320,6 +3327,10 @@ Provider:
           RequestMethod:
           - POST
           Route: /watchers
+        V1::Watcher::WatcherGet:
+          RequestMethod:
+          - GET
+          Route: /watchers/:WatcherID
         V1::Watcher::WatcherDelete:
           RequestMethod:
           - DELETE

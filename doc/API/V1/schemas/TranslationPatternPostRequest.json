@@ -1,6 +1,6 @@
 {
    "$id" : "#TranslationPatternPostRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The translation pattern request object for creation.",
    "type" : "object",
    "properties" : {
@@ -28,7 +28,7 @@
    "definitions" : {
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation language object.",
          "type" : "object",
          "properties" : {

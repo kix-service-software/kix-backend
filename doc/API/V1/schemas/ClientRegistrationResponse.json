@@ -1,6 +1,6 @@
 {
    "$id" : "#ClientRegistrationResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for client registration GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "ClientRegistration" : {
          "$id" : "#ClientRegistration",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The client registration object.",
          "type" : "object",
          "properties" : {

@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the contact (and its primary organisation as organisation) of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the contact (and its primary organisation as organisation) of a ticket.'));
     $Self->AddOption(
         Name        => 'Contact',
-        Label       => 'Contact',
-        Description => 'The login of the contact to be set.',
+        Label       => Kernel::Language::Translatable('Contact'),
+        Description => Kernel::Language::Translatable('The login of the contact to be set.'),
         Required    => 1,
     );
 

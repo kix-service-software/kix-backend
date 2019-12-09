@@ -1,6 +1,6 @@
 {
    "$id" : "#TranslationPatternResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for translation pattern GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "TranslationPattern" : {
          "$id" : "#TranslationPattern",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation pattern object.",
          "type" : "object",
          "properties" : {
@@ -69,7 +69,7 @@
       },
       "TranslationLanguage" : {
          "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation language object.",
          "type" : "object",
          "properties" : {

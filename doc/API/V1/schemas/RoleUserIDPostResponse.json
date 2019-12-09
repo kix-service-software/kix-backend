@@ -1,6 +1,6 @@
 {
    "$id" : "#RoleUserIDPostResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The UserID of the created role user.",
    "type" : "object",
    "properties" : {

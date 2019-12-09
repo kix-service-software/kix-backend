@@ -1,6 +1,6 @@
 {
    "$id" : "#LockCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket locks.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "Lock" : {
          "$id" : "#Lock",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket lock object.",
          "type" : "object",
          "properties" : {

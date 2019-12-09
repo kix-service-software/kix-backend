@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemClassResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for config item class GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "ConfigItemClass" : {
          "$id" : "#ConfigItemClass",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class object.",
          "type" : "object",
          "properties" : {
@@ -91,7 +91,7 @@
       },
       "ConfigItemClassDefinition" : {
          "$id" : "#ConfigItemClassDefinition",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
          "properties" : {

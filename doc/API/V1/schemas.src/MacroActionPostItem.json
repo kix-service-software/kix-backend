@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/schema",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "#MacroActionPostItem",
   "type": "object",
   "description": "The macro action object for creation.",
