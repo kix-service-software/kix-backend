@@ -1,0 +1,11 @@
+  displayName: "[System] ImportExport"
+  description: !include ../../descriptions/resources/system/importexport.md
+  /templates:
+    description: !include ../../descriptions/resources/system/importexport/templates.md
+    type: { collection-readonly: { typeName: ImportExportTemplate } }
+    /{templateId}:
+      type: { item-readonly: { typeName: ImportExportTemplate } }
+      uriParameters:
+        templateId:
+          displayName: TemplateID
+          type: integer

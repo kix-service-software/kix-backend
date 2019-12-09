@@ -110,6 +110,8 @@
 /system/i18n/translations/:PatternID/languages/:Language                       |   GET             | V1::I18n::TranslationLanguageGet
 /system/i18n/translations/:PatternID/languages/:Language                       |   PATCH           | V1::I18n::TranslationLanguageUpdate
 /system/i18n/translations/:PatternID/languages                                 |   POST            | V1::I18n::TranslationLanguageCreate
+/system/importexport/templates                                                 |   GET             | V1::ImportExport::TemplateSearch
+/system/importexport/templates/:TemplateID                                      |   GET             | V1::ImportExport::TemplateGet
 /system/logs                                                                   |   GET             | V1::Log::LogFileSearch
 /system/logs/:LogFileID                                                        |   GET             | V1::Log::LogFileGet
 /system/objectdefinitions                                                      |   GET             | V1::ObjectDefinition::ObjectDefinitionSearch

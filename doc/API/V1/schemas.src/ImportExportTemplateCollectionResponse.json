@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#ImportExportTemplateCollectionResponse",
+  "type": "object",
+  "description": "A list of import export templates.",
+  "properties": {
+    "ImportExportTemplate": {
+      "type": "array",
+      "items": {
+        "$ref": "ImportExportTemplate.json"
+      }
+    }
+  },
+  "required": [
+    "ImportExportTemplate"
+  ]
+}
