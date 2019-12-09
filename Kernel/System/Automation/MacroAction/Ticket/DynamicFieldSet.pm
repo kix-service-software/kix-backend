@@ -48,17 +48,17 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets a dynamic field value of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets a dynamic field value of a ticket.'));
     $Self->AddOption(
         Name        => 'DynamicFieldName',
-        Label       => 'Dynamic Field Name',
-        Description => 'The name of the dynamic field.',
+        Label       => Kernel::Language::Translatable('Dynamic Field Name'),
+        Description => Kernel::Language::Translatable('The name of the dynamic field.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'DynamicFieldValue',
-        Label       => 'Dynamic Field Value',
-        Description => 'The value for the dynamic field to be set.',
+        Label       => Kernel::Language::Translatable('Dynamic Field Value'),
+        Description => Kernel::Language::Translatable('The value for the dynamic field to be set.'),
         Required    => 1,
     );
 

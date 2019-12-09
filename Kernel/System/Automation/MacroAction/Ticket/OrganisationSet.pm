@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the organisation of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the organisation of a ticket.'));
     $Self->AddOption(
         Name        => 'Organisation',
-        Label       => 'Organisation',
-        Description => 'The number of the organisation to be set.',
+        Label       => Kernel::Language::Translatable('Organisation'),
+        Description => Kernel::Language::Translatable('The number of the organisation to be set.'),
         Required    => 1,
     );
 

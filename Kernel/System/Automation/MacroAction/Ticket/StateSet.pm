@@ -48,17 +48,17 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the state of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the state of a ticket.'));
     $Self->AddOption(
         Name        => 'State',
-        Label       => 'State',
-        Description => 'The name of the state to be set.',
+        Label       => Kernel::Language::Translatable('State'),
+        Description => Kernel::Language::Translatable('The name of the state to be set.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'PendingTimeDiff',
-        Label       => 'Pending Time Difference',
-        Description => '(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.',
+        Label       => Kernel::Language::Translatable('Pending Time Difference'),
+        Description => Kernel::Language::Translatable('(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.'),
         Required    => 0,
     );
 

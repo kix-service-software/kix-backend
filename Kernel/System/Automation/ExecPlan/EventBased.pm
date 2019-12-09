@@ -49,11 +49,11 @@ Describe this execution plan module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Allows an event based execution of automation jobs. At least one event must be configured.');
+    $Self->Description(Kernel::Language::Translatable('Allows an event based execution of automation jobs. At least one event must be configured.'));
     $Self->AddOption(
         Name        => 'Event',
-        Label       => 'Event',
-        Description => 'An array of events that should trigger the execution of the job.',
+        Label       => Kernel::Language::Translatable('Event'),
+        Description => Kernel::Language::Translatable('An array of events that should trigger the execution of the job.'),
         Required    => 1,
     );
 

@@ -47,11 +47,11 @@ Describe this macro action module.
 sub Describe {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sets the priority of a ticket.');
+    $Self->Description(Kernel::Language::Translatable('Sets the priority of a ticket.'));
     $Self->AddOption(
         Name        => 'Priority',
-        Label       => 'Priority',
-        Description => 'The name of the priority to be set.',
+        Label       => Kernel::Language::Translatable('Priority'),
+        Description => Kernel::Language::Translatable('The name of the priority to be set.'),
         Required    => 1
     );
 

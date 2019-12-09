@@ -54,71 +54,71 @@ sub Describe {
     my ( $Self, %Param ) = @_;
 
     $Self->SUPER::Describe(%Param);
-    $Self->Description('Creates an ticket.');
+    $Self->Description(Kernel::Language::Translatable('Creates an ticket.'));
     $Self->AddOption(
         Name        => 'Contact',
-        Label       => 'Contact',
-        Description => 'The login of the contact of the new ticket.',
+        Label       => Kernel::Language::Translatable('Contact'),
+        Description => Kernel::Language::Translatable('The login of the contact of the new ticket.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'Lock',
-        Label       => 'Lock',
-        Description => 'The lock state of the new ticket.',
+        Label       => Kernel::Language::Translatable('Lock'),
+        Description => Kernel::Language::Translatable('The lock state of the new ticket.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Organisation',
-        Label       => 'Organisation',
-        Description => 'The number of the organisation of the new ticket. Primary organisation of contact will be used if omitted.',
+        Label       => Kernel::Language::Translatable('Organisation'),
+        Description => Kernel::Language::Translatable('The number of the organisation of the new ticket. Primary organisation of contact will be used if omitted.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Owner',
-        Label       => 'Owner',
-        Description => 'The login of the owner of the new ticket. Current user will be used if omitted.',
+        Label       => Kernel::Language::Translatable('Owner'),
+        Description => Kernel::Language::Translatable('The login of the owner of the new ticket. Current user will be used if omitted.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Priority',
-        Label       => 'Priority',
-        Description => 'The name of the priority of the new ticket.',
+        Label       => Kernel::Language::Translatable('Priority'),
+        Description => Kernel::Language::Translatable('The name of the priority of the new ticket.'),
         Required    => 1
     );
     $Self->AddOption(
         Name        => 'Responsible',
-        Label       => 'Responsible',
-        Description => 'The login of the responsible of the new ticket. Root user (ID = 1) will be used if omitted.',
+        Label       => Kernel::Language::Translatable('Responsible'),
+        Description => Kernel::Language::Translatable('The login of the responsible of the new ticket. Root user (ID = 1) will be used if omitted.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'State',
-        Label       => 'State',
-        Description => 'The name of the state of the new ticket.',
+        Label       => Kernel::Language::Translatable('State'),
+        Description => Kernel::Language::Translatable('The name of the state of the new ticket.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'PendingTimeDiff',
-        Label       => 'Pending Time Difference',
-        Description => '(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.',
+        Label       => Kernel::Language::Translatable('Pending Time Difference'),
+        Description => Kernel::Language::Translatable('(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.'),
         Required    => 0,
     );
     $Self->AddOption(
         Name        => 'Title',
-        Label       => 'Title',
-        Description => 'The title of the new ticket and subject of the first article.',
+        Label       => Kernel::Language::Translatable('Title'),
+        Description => Kernel::Language::Translatable('The title of the new ticket and subject of the first article.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'Team',
-        Label       => 'Team',
-        Description => 'The name of the team of the new ticket.',
+        Label       => Kernel::Language::Translatable('Team'),
+        Description => Kernel::Language::Translatable('The name of the team of the new ticket.'),
         Required    => 1,
     );
     $Self->AddOption(
         Name        => 'Type',
-        Label       => 'Type',
-        Description => 'The name of the type of the new ticket. Configured default will be used (Ticket::Type::Default) if omitted.',
+        Label       => Kernel::Language::Translatable('Type'),
+        Description => Kernel::Language::Translatable('The name of the type of the new ticket. Configured default will be used (Ticket::Type::Default) if omitted.'),
         Required    => 0,
     );
     delete $Self->{Definition}->{Options}->{Subject};
