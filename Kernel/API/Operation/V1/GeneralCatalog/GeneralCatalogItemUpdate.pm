@@ -157,7 +157,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        GeneralCatalogItemID => $Param{Data}->{GeneralCatalogID},
+        GeneralCatalogItemID => 0 + $Param{Data}->{GeneralCatalogItemID},
     );    
 }
 

@@ -1,0 +1,11 @@
+{
+    "ExecPlan": {
+        "Comment": "new comment",
+        "Name": "new execution plan name",
+        "Parameters": {
+            "Weekdays": [ 1 ],
+            "Time": "12:00:00"
+        },
+        "ValidID": 2
+    }
+}

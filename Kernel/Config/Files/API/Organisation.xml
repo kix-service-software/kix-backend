@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">OrganisationID</Item>
-                <Item Key="ResponseObject">OrganisationResponse</Item>
+                <Item Key="ResponseSchema">OrganisationResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>
                 <Item Key="CacheTypeDependency">Organisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">OrganisationCollectionResponse</Item>
+                <Item Key="ResponseSchema">OrganisationCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                
                 <Item Key="CacheTypeDependency">Organisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">OrganisationPostRequest</Item>
-                <Item Key="ResponseObject">OrganisationPostPatchResponse</Item>
+                <Item Key="RequestSchema">OrganisationPostRequest</Item>
+                <Item Key="ResponseSchema">OrganisationPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Group>BIS Connector</Group>
         <SubGroup>API::Operation::ModuleRegistration</SubGroup>
@@ -45,12 +45,12 @@
             <Hash>
                 <Item Key="Name">OrganisationUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">OrganisationPatchRequest</Item>
-                <Item Key="ResponseObject">OrganisationPostPatchResponse</Item>
+                <Item Key="RequestSchema">OrganisationPatchRequest</Item>
+                <Item Key="ResponseSchema">OrganisationPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Group>BIS Connector</Group>
         <SubGroup>API::Operation::ModuleRegistration</SubGroup>
@@ -62,40 +62,40 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationContactSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationContactSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">ContactCollectionResponse</Item>
+                <Item Key="ResponseSchema">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                
                 <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Organisation::OrganisationTicketSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Organisation::OrganisationTicketSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::V1::Organisation::OrganisationGet###AttributeWhitelist" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::Organisation::OrganisationGet###AttributeWhitelist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the organisation data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
             </Hash>
         </Setting>
     </ConfigItem>    
-    <ConfigItem Name="API::Operation::V1::Organisation::OrganisationGet###AttributeBlacklist" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::Organisation::OrganisationGet###AttributeBlacklist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the organisation data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>

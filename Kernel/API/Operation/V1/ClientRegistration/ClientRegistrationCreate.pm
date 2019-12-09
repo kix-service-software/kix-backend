@@ -172,6 +172,66 @@ sub Run {
         }
     }
 
+    # import SysConfig definitions if given
+    if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
+        my %SysConfigOptions = map { $_ => 1 } $Kernel::OM->Get('Kernel::System::SysConfig')->OptionList();
+
+        foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
+            if ( !$SysConfigOptions{$Item->{Name}} ) {
+                # create new option
+                my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionAdd(
+                    Name            => $Item->{Name},
+                    AccessLevel     => $Item->{AccessLevel},
+                    Type            => $Item->{Type},
+                    Context         => $Item->{Context},
+                    ContextMetadata => $Item->{ContextMetadata},
+                    Description     => $Item->{Description},
+                    Comment         => $Item->{Comment},
+                    Level           => $Item->{Level},
+                    Group           => $Item->{Group},
+                    IsRequired      => $Item->{IsRequired},
+                    Setting         => $Item->{Setting},
+                    Default         => $Item->{Default},
+                    ValidID         => $Item->{ValidID} || 1,
+                    UserID          => $Self->{Authorization}->{UserID},
+                );
+
+                if ( !$Success ) {
+                    return $Self->_Error(
+                        Code    => 'Object.UnableToCreate',
+                        Message => 'Could not create SysConfigOptionDefinition "'.$Item->{Name}.'", please contact the system administrator',
+                    );
+                }                
+            }
+            else {
+                # update existing option
+                my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
+                    Name            => $Item->{Name},
+                    AccessLevel     => $Item->{AccessLevel},
+                    Type            => $Item->{Type},
+                    Context         => $Item->{Context},
+                    ContextMetadata => $Item->{ContextMetadata},
+                    Description     => $Item->{Description},
+                    Comment         => $Item->{Comment},
+                    Level           => $Item->{Level},
+                    Group           => $Item->{Group},
+                    IsRequired      => $Item->{IsRequired},
+                    Setting         => $Item->{Setting},
+                    Default         => $Item->{Default},
+                    ValidID         => $Item->{ValidID} || 1,
+                    UserID          => $Self->{Authorization}->{UserID},
+                );
+
+                if ( !$Success ) {
+                    return $Self->_Error(
+                        Code => 'Object.UnableToUpdate',
+                        Message => 'Could not update SysConfigOptionDefinition "'.$Item->{Name}.'", please contact the system administrator',
+                    );
+                }
+            }
+        }
+    }
+
     my %SystemInfo;
     foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
         $SystemInfo{$Key} = $Kernel::OM->Get('Kernel::Config')->Get($Key);

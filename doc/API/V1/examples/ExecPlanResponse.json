@@ -1,0 +1,18 @@
+{
+    "ExecPlan": {
+        "ChangeBy": 1,
+        "ChangeTime": "2019-10-10 09:13:05",
+        "Comment": "...",
+        "CreateBy": 1,
+        "CreateTime": "2019-05-02 13:35:42",
+        "ID": 1,
+        "Name": "Some Job",
+        "Parameters": {
+            "Weekdays": [ 0,3 ],
+            "Time": "10:00:00",
+            "Events": [ "TicketCreate" ]
+        },
+        "Type": "Ticket",
+        "ValidID": 1
+    }
+}

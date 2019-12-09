@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="ITSMConfigItem::SetIncidentStateOnLink" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::SetIncidentStateOnLink" Required="1" Valid="1">
         <Description Translatable="1">Set the incident state of a CI automatically when a Ticket is Linked to a CI.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -11,7 +11,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePost###042-ITSMConfigItemTicketStatusLink" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###042-ITSMConfigItemTicketStatusLink" Required="1" Valid="1">
         <Description Translatable="1">Event module to set configitem-status on ticket-configitem-link.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -22,7 +22,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Ticket::EventModulePost###042-ITSMConfigItemTicketStatusLink" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###042-ITSMConfigItemTicketStatusLink" Required="1" Valid="1">
         <Description Translatable="1">Event module to set configitem-status on ticket-configitem-link.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -33,7 +33,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::LinkStatus::TicketTypes" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::LinkStatus::TicketTypes" Required="0" Valid="0">
         <Description Translatable="1">Defines which type of ticket can affect the status of a linked CI.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -43,7 +43,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::LinkStatus::DeploymentStates" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::LinkStatus::DeploymentStates" Required="0" Valid="0">
         <Description Translatable="1">Defines the relevant deployment states where linked tickets can affect the status of a CI.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -53,7 +53,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::LinkStatus::IncidentStates" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::LinkStatus::IncidentStates" Required="1" Valid="1">
         <Description Translatable="1">Defines the order of incident states from high (e.g. cricital) to low (e.g. functional).</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -65,7 +65,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::LinkStatus::LinkTypes" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::LinkStatus::LinkTypes" Required="1" Valid="1">
         <Description Translatable="1">Defines which type of link (named from the ticket perspective) can affect the status of a linked CI.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkStatus</SubGroup>
@@ -75,7 +75,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="AttachmentStorage::DefaultStorageBackendModule" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="AttachmentStorage::DefaultStorageBackendModule" Required="1" Valid="1">
         <Description Translatable="1">Defines the backend module used for attachment storage.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::AttachmentStorage</SubGroup>
@@ -84,7 +84,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="AttachmentStorageFS::StorageDirectory" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="AttachmentStorageFS::StorageDirectory" Required="1" Valid="1">
         <Description Translatable="1">The path to the directory where the file system backend stores new attachments. The path needs to be specified relative to the KIX home.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::AttachmentStorage</SubGroup>
@@ -92,7 +92,7 @@
             <String Regex="">/var/attachments</String>
         </Setting>
      </ConfigItem>
-    <ConfigItem Name="ITSM::Core::IncidentLinkTypeDirection" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSM::Core::IncidentLinkTypeDirection" Required="1" Valid="1">
         <Description Translatable="1">Set the type and direction of links to be used to calculate the incident state. The key is the name of the link type (as defined in LinkObject::Type), and the value is the direction of the IncidentLinkType that should be followed to calculate the incident state. For example if the IncidentLinkType is set to 'DependsOn', and the Direction is 'Source', only 'Depends on' links will be followed (and not the opposite link 'Required for') to calculate the incident state. You can add more link types ad directions as you like, e.g. 'Includes' with the direction 'Target'. All link types defined in the sysconfig options LinkObject::Type are possible and the direction can be 'Source', 'Target', or 'Both'. IMPORTANT: AFTER YOU MAKE CHANGES TO THIS SYSCONFIG OPTION YOU NEED TO RUN THE SCRIPT bin/otrs.ITSMConfigItemIncidentStateRecalculate.pl SO THAT ALL INCIDENT STATES WILL BE RECALCULATED BASED ON THE NEW SETTINGS!</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMCore</SubGroup>
@@ -102,7 +102,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="GeneralCatalogPreferences###IncidentStates" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="GeneralCatalogPreferences###IncidentStates" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the incident states in the preference view.</Description>
         <Group>ITSM</Group>
         <SubGroup>GeneralCatalog::Preferences</SubGroup>
@@ -124,7 +124,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePre###999-Test" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePre###999-Test" Required="0" Valid="0">
         <Description Translatable="1">Config item event module that shows passed parameters BEFORE action is perdormed. May be used as template for own CI-events.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -135,7 +135,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePost###999-Test" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###999-Test" Required="0" Valid="0">
         <Description Translatable="1">Config item event module that shows passed parameters AFTER action is performed. May be used as template for own CI-events.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -147,7 +147,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMCIAttributeCollection::OrganisationBackendMapping" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMCIAttributeCollection::OrganisationBackendMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines information shown for Organisation attributes.</Description>
         <Group>ITSM</Group>
         <SubGroup>CIACCustomerCompany</SubGroup>
@@ -160,7 +160,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMCIAttributeCollection::Organisation::Content" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMCIAttributeCollection::Organisation::Content" Required="1" Valid="1">
         <Description Translatable="1">Defines information imported/exported as Organisation attribute.</Description>
         <Group>ITSM</Group>
         <SubGroup>CIACCustomerCompany</SubGroup>
@@ -171,7 +171,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePost###502-RefreshCIClassReferenceLinks" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###502-RefreshCIClassReferenceLinks" Required="0" Valid="1">
         <Description Translatable="1">Searches for attributes of type CIClassReference in the new CIs version data and refreshes all links to that class. It deletes links to this class if the value is not existent in the CIs version data.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItemEvents</SubGroup>
@@ -182,7 +182,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePost###502-RefreshServiceReferenceLinks" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###502-RefreshServiceReferenceLinks" Required="0" Valid="1">
         <Description Translatable="1">Searches for attributes of type ServiceReference in the new CIs version data and refreshes all links to that class. It deletes links to this class if the value is not existent in the CIs version data.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItemEvents</SubGroup>
@@ -193,7 +193,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePost###502-RefreshTicketReferenceLinks" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###502-RefreshTicketReferenceLinks" Required="0" Valid="1">
         <Description Translatable="1">Searches for attributes of type CIClassReference in the new CIs version data and refreshes all links to that class. It deletes links to this class if the value is not existent in the CIs version data.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItemEvents</SubGroup>
@@ -204,7 +204,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::NumberGenerator" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::NumberGenerator" Required="1" Valid="1">
         <Description Translatable="1">Selects the configuration item number generator module. "AutoIncrement" increments the configuration item number, the SystemID, the ConfigItemClassID and the counter are used. The format is "SystemID.ConfigItemClassID.Counter", e.g. 1205000004, 1205000005.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -212,7 +212,7 @@
             <Option Location="Kernel/System/ITSMConfigItem/Number/*.pm" SelectedID="Kernel::System::ITSMConfigItem::Number::AutoIncrement"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::CINameRegex" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::CINameRegex" Required="0" Valid="0">
         <Description Translatable="1">Defines regular expressions individually for each ConfigItem class to check the ConfigItem name and to show corresponding error messages.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -225,7 +225,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::DefaultSubObject###ITSMConfigItem" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::DefaultSubObject###ITSMConfigItem" Required="1" Valid="1">
         <Description Translatable="1">Defines the default subobject of the class 'ITSMConfigItem'.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -233,7 +233,7 @@
             <String Regex="">Computer</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::EventModulePost###100-History" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###100-History" Required="0" Valid="1">
         <Description Translatable="1">Config item event module that enables logging to history in the agent interface.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -245,7 +245,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="GeneralCatalogPreferences###DeploymentStates" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="GeneralCatalogPreferences###DeploymentStates" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the deployment states in the preferences view of the agent interface.</Description>
         <Group>ITSM</Group>
         <SubGroup>GeneralCatalog::Preferences</SubGroup>
@@ -267,7 +267,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="GeneralCatalogPreferences###DeploymentStatesColors" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="GeneralCatalogPreferences###DeploymentStatesColors" Required="0" Valid="1">
         <Description Translatable="1">Parameters for the deployment states color in the preferences view of the agent interface.</Description>
         <Group>ITSM</Group>
         <SubGroup>GeneralCatalog::Preferences</SubGroup>
@@ -283,7 +283,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::Hook" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a configuration item, e.g. ConfigItem#, MyConfigItem#. The default is ConfigItem#.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -291,7 +291,7 @@
             <String Regex="">A#</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="UniqueCIName::EnableUniquenessCheck" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="UniqueCIName::EnableUniquenessCheck" Required="0" Valid="1">
         <Description Translatable="1">Enables/disables the functionality to check ConfigItems for unique names. Before enabling this option you should check your system for already existing config items with duplicate names. You can do this with the script bin/otrs.ITSMConfigItemListDuplicates.pl.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -302,7 +302,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="UniqueCIName::UniquenessCheckScope" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="UniqueCIName::UniquenessCheckScope" Required="0" Valid="1">
         <Description Translatable="1">Check for a unique name only within the same ConfigItem class ('class') or globally ('global'), which means every existing ConfigItem is taken into account when looking for duplicates.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -313,7 +313,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="GeneralCatalogPreferences###Comment2" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="GeneralCatalogPreferences###Comment2" Required="0" Valid="0">
         <Description Translatable="1">Parameters for the example comment 2 of the general catalog attributes.</Description>
         <Group>ITSM</Group>
         <SubGroup>GeneralCatalog::Preferences</SubGroup>
@@ -329,7 +329,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::CustomModules###030-CustomModule" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::CustomModules###030-CustomModule" Required="0" Valid="1">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::ITSMConfigItem. Used to easily add customizations.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -337,7 +337,7 @@
             <String Regex="">Kernel::System::PreEventHandler</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ITSMConfigItem::CILinkDirection" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::CILinkDirection" Required="0" Valid="1">
         <Description Translatable="1">ConfigItem link direction for propagating of warning/error incident states.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
@@ -349,89 +349,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Frontend::Agent::AgentLinkGraphITSMConfigItem###LinkColors" Required="1" Valid="1">
-        <Description Translatable="1">Defines the colors for link visualization - links are just black if no color is given.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::ViewZoomTabLinkGraph</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DependsOn">#407ca8</Item>
-                <Item Key="AlternativeTo">#95b740</Item>
-                <Item Key="ConnectedTo">#F58500</Item>
-                <Item Key="Includes">#323232</Item>
-                <Item Key="RelevantTo">#95b7d6</Item>
-                <Item Key="LinkHover">#cc2222</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Agent::AgentLinkGraphITSMConfigItem###ClassAttributesToConsider" Required="0" Valid="0">
-        <Description Translatable="1">Defines which class-attribute should be considered for the icons. Sub-attributes are possible. Value must be key not name of attribute!</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::ViewZoomTabLinkGraph</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Computer">Type</Item>
-                <Item Key="Location">Type</Item>
-                <Item Key="Network">Type</Item>
-                <Item Key="Hardware">Type</Item>
-                <Item Key="Software">Type</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Agent::AgentLinkGraphITSMConfigItem###ObjectImages" Required="1" Valid="1">
-        <Description Translatable="1">Defines the icons for node visualization - key could be a CI-Class (if applicable - e.g. "Computer") or a CI-Class followed by a triple colon and a value of the specified class-attribute (if attribute is "Type" - e.g. "Computer:::Server"). The Icon for a CI-Class is the fallback if no icon for the class-attribute is specified and "Default" is the fallback if no icon for a CI-Class is specified.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::ViewZoomTabLinkGraph</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Computer">GraphComputer.png</Item>
-                <Item Key="Location">GraphLocation.png</Item>
-                <Item Key="Network">GraphNetwork.png</Item>
-                <Item Key="Hardware">GraphHardware.png</Item>
-                <Item Key="Software">GraphSoftware.png</Item>
-                <Item Key="Default">GraphDefault.png</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Agent::AgentLinkGraphITSMConfigItem###ObjectImagesNotActive" Required="0" Valid="1">
-        <Description Translatable="1">Defines the icons for node visualization if CIs with a certain deployment state are not shown in CMDB overview (postproductive or configured) - key could be a CI-Class (if applicable - e.g. "Computer") or a CI-Class followed by a triple colon and a value of the specified class-attribute (if attribute is "Type" - e.g. "Computer:::Server"). The Icon for a CI-Class is the fallback if no icon for the class-attribute is specified and "Default" is the fallback if no icon for a CI-Class is specified.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::ViewZoomTabLinkGraph</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Computer">GraphComputerGray.png</Item>
-                <Item Key="Location">GraphLocationGray.png</Item>
-                <Item Key="Network">GraphNetworkGray.png</Item>
-                <Item Key="Hardware">GraphHardwareGray.png</Item>
-                <Item Key="Software">GraphSoftwareGray.png</Item>
-                <Item Key="Default">GraphDefaultGray.png</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="Frontend::Agent::AgentLinkGraphITSMConfigItem###IncidentStateImages" Required="1" Valid="1">
-        <Description Translatable="1">Defines the icons for the incident-states - key is the state-type (if applicable - e.g. "operational").</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Agent::ITSMConfigItem::ViewZoomTabLinkGraph</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="operational">IncGreen.png</Item>
-                <Item Key="incident">IncRed.png</Item>
-                <Item Key="warning">IncYellow.png</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIXSidebarConfigItemLink::ShownAttributes" Required="1" Valid="1">
-        <Description Translatable="1">Defines which attributes are shown in customer table.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="0100::Class">Class</Item>
-                <Item Key="0200::Name::Link">Name</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="CustomerDashboardConfigItemLink::ShownAttributes" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::ShownAttributes" Required="1" Valid="1">
         <Description Translatable="1">Defines which attributes are shown in customer table.</Description>
         <Group>ITSM</Group>
         <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
@@ -444,7 +362,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerDashboardConfigItemLink::CISearchInClasses" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::CISearchInClasses" Required="1" Valid="1">
         <Description Translatable="1">Defines in which CI-classes (keys) which attributes need to match the search pattern (values, comma separated if more than one attribute should be searched). For use with sub-attributes try this, key: attribute::sub-attribute, value: owner</Description>
         <Group>ITSM</Group>
         <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
@@ -456,7 +374,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerDashboardConfigItemLink::CIExcludeDeploymentStates" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::CIExcludeDeploymentStates" Required="1" Valid="1">
         <Description Translatable="1">Defined DeploymentStates to hide ConfigItems.</Description>
         <Group>ITSM</Group>
         <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
@@ -466,165 +384,13 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="CustomerDashboardConfigItemLink::CIExcludeIncidentStates" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::CIExcludeIncidentStates" Required="1" Valid="1">
         <Description Translatable="1">Defined IncidentStates to hide ConfigItems.</Description>
         <Group>ITSM</Group>
         <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
         <Setting>
             <Array>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIXSidebarConfigItemLink::KIXSidebarLinkedCIsParams" Required="1" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Common Parameters for the KIXSidebarLinkedCIs backend. You can use CI class specific contact attributes (SearchAttribute:::&lt;CIClass&gt;) as well as multiple customer user attributes, separated by comma.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SearchAttribute">UserLogin</Item>
-                <Item Key="ShowLinkCheckbox">1</Item>
-                <Item Key="ShowLinkCheckboxReadonly">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIXSidebarConfigItemLink::CISearchInClasses" Required="1" Valid="1">
-        <Description Translatable="1">Defines in which CI-classes (keys) which attributes need to match the search pattern (values, comma separated if more than one attribute should be searched). For use with sub-attributes try this, key: attribute::sub-attribute, value: owner</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Computer">Owner</Item>
-                <Item Key="Hardware">Owner</Item>
-                <Item Key="Software">Owner</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIXSidebarConfigItemLink::CIExcludeDeploymentStates" Required="1" Valid="1">
-        <Description Translatable="1">Defined DeploymentStates to hide ConfigItems.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Inactive</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIXSidebarConfigItemLink::CIExcludeIncidentStates" Required="1" Valid="1">
-        <Description Translatable="1">Defined IncidentStates to hide ConfigItems.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="KIXSidebarConfigItemLink::LinkType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the link type which is used for the link creation between ticket and config item.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <String Regex="">RelevantTo</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###ConfigItem::ConfigItemCreate" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ConfigItemCreate</Item>
-                <Item Key="Controller">ConfigItem</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###ConfigItem::ConfigItemGet" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ConfigItemGet</Item>
-                <Item Key="Controller">ConfigItem</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###ConfigItem::ConfigItemUpdate" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ConfigItemUpdate</Item>
-                <Item Key="Controller">ConfigItem</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###ConfigItem::ConfigItemSearch" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ConfigItemSearch</Item>
-                <Item Key="Controller">ConfigItem</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::Module###ConfigItem::ConfigItemDelete" Required="0" Valid="1">
-        <Description Translatable="1">GenericInterface module registration for the operation layer.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ConfigItemDelete</Item>
-                <Item Key="Controller">ConfigItem</Item>
-                <Item Key="ConfigDialog">AdminGenericInterfaceOperationDefault</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::ConfigItemGet###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Defines Required permissions to get ITSM configuration items using the Generic Interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ConfigItemGet</SubGroup>
-        <Setting>
-            <String Regex="">ro</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::ConfigItemSearch###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Defines Required permissions to search ITSM configuration items using the Generic Interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ConfigItemSearch</SubGroup>
-        <Setting>
-            <String Regex="">ro</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::ConfigItemCreate###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Defines Required permissions to create ITSM configuration items using the Generic Interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ConfigItemCreate</SubGroup>
-        <Setting>
-            <String Regex="">rw</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::ConfigItemUpdate###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Defines Required permissions to update ITSM configuration items using the Generic Interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ConfigItemUpdate</SubGroup>
-        <Setting>
-            <String Regex="">rw</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="GenericInterface::Operation::ConfigItemDelete###Permission" Required="1" Valid="1">
-        <Description Translatable="1">Defines Required permissions to delete ITSM configuration items using the Generic Interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GenericInterface::Operation::ConfigItemDelete</SubGroup>
-        <Setting>
-            <String Regex="">rw</String>
         </Setting>
     </ConfigItem>
 </kix_config>

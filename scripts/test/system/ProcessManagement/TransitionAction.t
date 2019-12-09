@@ -119,7 +119,7 @@ my @Tests = (
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
                 Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
-                    Queue => 'Raw',
+                    Queue => 'Junk',
                 },
             },
         },

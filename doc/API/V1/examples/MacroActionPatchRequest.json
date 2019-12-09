@@ -1,0 +1,7 @@
+{
+    "MacroAction": {
+        "Comment": "new comment",
+        "Name": "new macro action name",
+        "ValidID": 2
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "ExecPlanType": [
+        {
+            "Description": "Allows an event based execution of automation jobs. At least one event must be configured.",
+            "Name": "EventBased",
+            "Options": {
+                "Event": {
+                    "Description": "An array of events that should trigger the execution of the job.",
+                    "Name": "Event",
+                    "Required": 1
+                }
+            }
+        },
+        {
+            "Description": "Allows a time based execution of automation jobs. At least one weekday and time must be configured.",
+            "Name": "TimeBased",
+            "Options": {
+                "Time": {
+                    "Description": "An array of times when the job should be executed on every configured weekday.",
+                    "Name": "Time",
+                    "Required": 1
+                },
+                "Weekday": {
+                    "Description": "An array of weekdays (Mon,Tue,Wed,Thu,Fri,Sat,Sun) when the job should be executed.",
+                    "Name": "Weekday",
+                    "Required": 1
+                }
+            }
+        }
+    ]
+}

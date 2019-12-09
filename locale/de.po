@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-05 15:52+0000\n"
-"PO-Revision-Date: 2019-09-17 09:33+0000\n"
+"POT-Creation-Date: 2019-11-19 14:49+0000\n"
+"PO-Revision-Date: 2019-11-12 16:48+0000\n"
 "Last-Translator: fuhlig <Frank.Uhlig@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
@@ -1724,46 +1724,6 @@ msgstr ""
 msgid "FAQ Item suggested in source ticket:"
 msgstr ""
 
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "PGP and SMIME not enabled."
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "PGP encrypt only"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "PGP sign and encrypt"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "PGP sign only"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "SMIME encrypt only"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "SMIME sign and encrypt"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "SMIME sign only"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "Send unencrypted notification"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "Send unsigned notification"
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm
-msgid "Skip notification delivery"
-msgstr ""
-
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -1840,12 +1800,6 @@ msgid ""
 "Defines which attributes of the organisation data hash should be exported. "
 "Key = Attribute, Value = 1 if attribute should be exported. If nothing is "
 "defined, every attribute will be exported"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Role.xml
-msgid ""
-"Defines a generic include available for all GET (including SEARCH) "
-"operations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -1927,6 +1881,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Watcher.xml
+msgid ""
+"Defines a generic include available for all GET (including SEARCH) "
+"operations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
@@ -2199,7 +2159,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Alternative to"
-msgstr ""
+msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Article"
@@ -2270,7 +2230,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Child"
-msgstr ""
+msgstr "Kind"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2328,7 +2288,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Connected to"
-msgstr ""
+msgstr "Verbunden mit"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3208,7 +3168,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Depends on"
-msgstr ""
+msgstr "Hängt ab von"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3322,6 +3282,10 @@ msgstr "Englisch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enter your shared secret to enable two factor authentication."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Event Based"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3733,7 +3697,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
-msgstr ""
+msgstr "Beinhaltet"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Input"
@@ -4004,11 +3968,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Parent"
-msgstr ""
+msgstr "Eltern"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Part of"
-msgstr ""
+msgstr "Teil von"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Position"
@@ -4082,6 +4046,22 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a execution plan type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a job type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a macro action type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a macro type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a supported permission of type PropertyValue."
 msgstr ""
 
@@ -4093,7 +4073,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Relevant to"
-msgstr ""
+msgstr "Relevant für"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4110,7 +4090,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Required for"
-msgstr ""
+msgstr "Benötigt für"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4741,6 +4721,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Ticket-ACL to show/hide ticket action AgentTicketPrintForwardFax."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Time Based"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -5596,6 +5580,14 @@ msgid ""
 "Defines a dynamic field of type date/time which is used as start time for "
 "solution SLA-computation rather than ticket creation time, thus allowing to "
 "start SLA-countdown with begin of customer desired times."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Defines a list of Ticket Dynamic Fields which are evaluated by the "
+"KIXMobileApp. The lists consists of dynamic field names (e.g. "
+"'MobileProcessingState') or regular expressions matching dynamic field names "
+"(e.g. 'MobileProcessingChecklist.*')."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6975,6 +6967,41 @@ msgid "system"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid ""
+"(Optional) The channel of the new article. \"note\" will be used if omitted."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid ""
+"(Optional) The email address of the sender for the new article. Agent data "
+"will be used if omitted."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "(Optional) The email addresses of the Bcc receiver of the new article."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "(Optional) The email addresses of the Cc receiver of the new article."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "(Optional) The email addresses of the receiver of the new article."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid ""
+"(Optional) The pending time in seconds. Will be added to the actual time "
+"when the macro action is executed. Used for pending states only."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid ""
+"(Optional) The sender type of the new article. \"agent\" will be used if "
+"omitted."
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Address Information"
 msgstr "Adressinformationen"
 
@@ -7050,12 +7077,36 @@ msgid "Country"
 msgstr "Land"
 
 #. manual entry from templates.pot.manual
+msgid "Create Article"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Creates an article for a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Delete Ticket"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Deletes a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
 msgstr "Abhängige Objekte verhindern die Ausführung dieser Operation."
 
 #. manual entry from templates.pot.manual
 msgid "Description"
 msgstr "Beschreibung"
+
+#. manual entry from templates.pot.manual
+msgid "Dynamic Field Name"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Dynamic Field Value"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Expiration Date"
@@ -7180,6 +7231,10 @@ msgid "Parent Location"
 msgstr "Übergeordneter Standort"
 
 #. manual entry from templates.pot.manual
+msgid "Pending Time Difference"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
 msgstr ""
 "Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein."
@@ -7213,8 +7268,101 @@ msgid "Room Type"
 msgstr "Raumtyp"
 
 #. manual entry from templates.pot.manual
+msgid "Sender Type"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Serial Number"
 msgstr "Seriennummer"
+
+#. manual entry from templates.pot.manual
+msgid "Set Contact"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Dynamic Field"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Lock"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Organisation"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Owner"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Priority"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Responsible"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set State"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Team"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Title"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Set Type"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets a dynamic field value of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid ""
+"Sets the contact (and its primary organisation as organisation) of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the lock state of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the organisation of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the owner of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the priority of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the responsible of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the state of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the team of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the title of a ticket."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sets the type of a ticket."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Software Information"
@@ -7231,6 +7379,46 @@ msgstr "Straße 2"
 #. manual entry from templates.pot.manual
 msgid "Subnet Mask"
 msgstr "Subnetzmaske"
+
+#. manual entry from templates.pot.manual
+msgid "The lock state to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The login of the agent to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The login of the contact to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The name of the dynamic field."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The name of the priority to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The name of the state to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The name of the team to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The name of the type to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The new title of a ticket to be set."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The number of the organisation to be set."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "The parent item(s) cannot be found."
@@ -7251,6 +7439,22 @@ msgid ""
 msgstr ""
 "Die Ressource unterstützt die anfragte Methode nicht. Der \"Allow\"-Header "
 "enthält Informationen welche Methoden diese Ressource unterstützt."
+
+#. manual entry from templates.pot.manual
+msgid "The subject of the new article."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The text of the new article."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The time units to add for the new article."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "The value for the dynamic field to be set."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Type"

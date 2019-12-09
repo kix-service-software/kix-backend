@@ -1,5 +1,8 @@
 {
     "SysConfigOption": {
+        "AccessLevel": "public",
+        "Context": null,
+        "ContextMetadata": null,
         "Name": "DefaultUsedLanguages",
         "Value": {
             "de": "German",

@@ -65,7 +65,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     for my $TitleDataItem ( 'Ticket One Title', 'Ticket Two Title' ) {
         my $TicketID = $TicketObject->TicketCreate(
             Title        => "$TitleDataItem$RandomID",
-            Queue        => 'Raw',
+            Queue        => 'Junk',
             Lock         => 'unlock',
             Priority     => '3 normal',
             State        => 'new',

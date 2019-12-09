@@ -27,7 +27,7 @@ my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::T
 
 my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
     Title        => 'My ticket created by Agent A',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'lock',
     Priority     => '3 normal',
     State        => 'open',

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="sysconfig">
+        <ColumnAdd Name="access_level" Required="true" Type="VARCHAR" Size="50"/>
+        <ColumnChange NameOld="level" NameNew="experience_level" Required="false" Default="0" Type="INTEGER" />
+    </TableAlter>
+
+</database>

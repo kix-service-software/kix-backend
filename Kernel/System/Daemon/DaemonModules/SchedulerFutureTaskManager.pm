@@ -78,7 +78,7 @@ sub new {
 
     # Do not change the following values!
     # Modulo in PreRun() can be damaged after a change.
-    $Self->{SleepPost} = 1;          # sleep 60 seconds after each loop
+    $Self->{SleepPost} = 1;          # sleep 1 second after each loop
     $Self->{Discard}   = 60 * 60;    # discard every hour
 
     $Self->{DiscardCount} = $Self->{Discard} / $Self->{SleepPost};

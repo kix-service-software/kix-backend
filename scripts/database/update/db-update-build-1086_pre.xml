@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="attachment_dir_preferences">
+        <UniqueCreate Name="attachment_dir_preferences_uniq">
+            <UniqueColumn Name="attachment_directory_id"/>
+            <UniqueColumn Name="preferences_key"/>
+        </UniqueCreate>
+    </TableAlter>
+
+    <TableAlter Name="contact_preferences">
+        <UniqueCreate Name="contact_preferences_unique">
+            <UniqueColumn Name="contact_id"/>
+            <UniqueColumn Name="preferences_key"/>
+        </UniqueCreate>
+    </TableAlter>
+
+    <TableAlter Name="organisation_prefs">
+        <UniqueCreate Name="organisation_prefs_unique">
+            <UniqueColumn Name="org_id"/>
+            <UniqueColumn Name="preferences_key"/>
+        </UniqueCreate>
+        <IndexCreate Name="organisation_prefs_org_id">
+            <IndexColumn Name="org_id"/>
+        </IndexCreate>        
+    </TableAlter>
+
+</database>

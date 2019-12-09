@@ -189,7 +189,8 @@ sub Run {
         Calendar            => $Queue->{Calendar} || $QueueData{Calendar},
         UnlockTimeout       => $Queue->{UnlockTimeout} || $QueueData{UnlockTimeout},
         FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID},
-        FollowUpLock        => $Queue->{FollowUpLock} || $QueueData{FollowUpLock},
+        FollowUpLock        =>
+            $Queue->{FollowUpLock} != $QueueData{FollowUpLock} ? $Queue->{FollowUpLock} : $QueueData{FollowUpLock},
         DefaultSignKey      => $Queue->{DefaultSignKey} || $QueueData{DefaultSignKey},
         SystemAddressID     => $Queue->{SystemAddressID} || $QueueData{SystemAddressID},
         Signature           => exists $Queue->{Signature} ? $Queue->{Signature} : $QueueData{Signature},            

@@ -108,7 +108,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     for my $Item ( 0 .. 1 ) {
         my $TicketID = $TicketObject->TicketCreate(
             Title        => "Ticket$RandomID",
-            Queue        => 'Raw',
+            Queue        => 'Junk',
             Lock         => 'unlock',
             Priority     => '3 normal',
             State        => 'closed',

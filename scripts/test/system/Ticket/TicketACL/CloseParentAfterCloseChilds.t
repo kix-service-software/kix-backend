@@ -63,7 +63,7 @@ my @TicketIDs;
 for my $TitleDataItem (@TitleData) {
     my $TicketID = $TicketObject->TicketCreate(
         Title        => $TitleDataItem,
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',

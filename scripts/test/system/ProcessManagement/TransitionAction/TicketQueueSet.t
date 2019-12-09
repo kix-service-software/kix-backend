@@ -127,7 +127,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => 1,
             Config => {
-                Queue => 'Raw',
+                Queue => 'Junk',
             },
         },
         Success => 0,
@@ -169,7 +169,7 @@ my @Tests = (
             UserID => $UserID,
             Ticket => \%Ticket,
             Config => {
-                Queue => 'Raw',
+                Queue => 'Junk',
             },
         },
         Success => 1,

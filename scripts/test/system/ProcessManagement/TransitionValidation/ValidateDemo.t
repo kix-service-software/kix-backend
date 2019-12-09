@@ -61,7 +61,7 @@ my @Tests = (
         Config => {
             Data => {
                 Queue => {
-                    Name => 'Raw'
+                    Name => 'Junk'
                 },
             },
         },
@@ -89,7 +89,7 @@ my @Tests = (
         Name   => '8 - Correct Queue (Raw)',
         Config => {
             Data => {
-                Queue => 'Raw',
+                Queue => 'Junk',
             },
         },
         Success => 1,

@@ -46,7 +46,7 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 # create some content
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',

@@ -48,15 +48,18 @@ sub ValidateSetting {
     my %DefaultValue;
 
     if ( IsArrayRefWithData($Param{Setting}->{Item}) ) {
+        ITEM:
         foreach my $Item ( @{$Param{Setting}->{Item}} ) {
             next if !IsHashRefWithData($Item);
             foreach my $Key ( keys %{$Item} ) { 
                 if ( IsHashRefWithData($Item->{$Key}) && IsArrayRefWithData($Item->{$Key}->{Item}) ) {
                     my ($SettingSub, $DefaultValueSub) = $Self->SUPER::ValidateSetting(
                         Type    => $Key,
-                        Setting => $Item->{$Key}
+                        Setting => $Item->{$Key},
+                        Debug => $Param{Debug},
                     );
                     $DefaultValue{$Item->{Key}} = $DefaultValueSub;
+                    next ITEM;
                 }
                 else {
                     $DefaultValue{$Item->{Key}} = $Item->{content};

@@ -1,0 +1,8 @@
+{
+    "Job": {
+        "Comment": "some comment",
+        "Name": "new job",
+        "Type": "Ticket",
+        "ValidID": 1
+    }
+}

@@ -1,0 +1,61 @@
+{
+   "$id" : "#WatcherCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of watchers.",
+   "type" : "object",
+   "properties" : {
+      "Watcher" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Watcher"
+         }
+      }
+   },
+   "required" : [
+      "Watcher"
+   ],
+   "definitions" : {
+      "Watcher" : {
+         "$id" : "#Watcher",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The watcher object.",
+         "type" : "object",
+         "properties" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "description" : "The type of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "description" : "The ID of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID",
+            "UserID"
+         ]
+      }
+   }
+}

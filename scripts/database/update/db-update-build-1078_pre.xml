@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableCreate Name="job_run_state">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+        <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+        <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+        <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Unique Name="job_run_state_name">
+            <UniqueColumn Name="name"/>
+        </Unique>
+        <ForeignKey ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+    <TableCreate Name="job_run">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <Column Name="job_id" Required="true" Type="INTEGER"/>
+        <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
+        <Column Name="state_id" Required="false" Type="SMALLINT"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="start_time" Required="true" Type="DATE"/>
+        <Column Name="end_time" Required="false" Type="DATE"/>
+        <ForeignKey ForeignTable="job">
+            <Reference Local="job_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="job_run_state">
+            <Reference Local="state_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+    <TableAlter Name="automation_log">
+        <ColumnAdd Name="object_id" Required="false" Type="BIGINT"/>
+        <ColumnAdd Name="run_id" Required="false" Type="INTEGER"/>
+        <IndexCreate Name="automation_log_run_id">
+            <IndexColumn Name="run_id"/>
+        </IndexCreate>        
+    </TableAlter>
+
+    <Insert Table="job_run_state">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">running</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">The job is running.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_run_state">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">finished</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">The last job run has been finished.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_run_state">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">warning</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">The last job run has been finished but some errors occured.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+</database>

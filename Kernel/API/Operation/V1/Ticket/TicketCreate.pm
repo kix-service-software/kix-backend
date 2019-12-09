@@ -200,6 +200,14 @@ sub Run {
         Data => $Param{Data}->{Ticket}
     );
 
+    # Lock can only be set if OwnerID != 1
+    if ( $Ticket->{LockID} && $Ticket->{LockID} == 2 && $Ticket->{OwnerID} && $Ticket->{OwnerID} == 1 ) {
+        return $Self->_Error(
+            Code    => 'Conflict',
+            Message => "Ticket can't be locked if OwnerID is 1!",
+        );            
+    }
+
     # check Ticket attribute values
     my $TicketCheck = $Self->_CheckTicket(
         Ticket => $Ticket
@@ -462,7 +470,7 @@ sub _TicketCreate {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                     )
             }
         }
@@ -482,7 +490,7 @@ sub _TicketCreate {
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
-                    ${$Result},
+                    %{$Result},
                     )
             }
         }
@@ -490,7 +498,7 @@ sub _TicketCreate {
 
     return $Self->_Success(
         Code     => 'Object.Created',
-        TicketID => $TicketID,
+        TicketID => 0 + $TicketID,
     );
 }
 

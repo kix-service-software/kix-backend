@@ -33,7 +33,7 @@ my $RandomID = $Helper->GetRandomNumber();
 # create a ticket
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',

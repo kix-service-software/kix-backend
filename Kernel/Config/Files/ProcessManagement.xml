@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="Ticket::EventModulePost###998-TicketProcessTransitions" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###998-TicketProcessTransitions" Required="0" Valid="1">
         <Description Translatable="1">Event module registration. For more performance you can define a trigger event (e. g. Event =&gt; TicketCreate).</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -12,7 +12,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::DynamicFieldProcessManagementProcessID" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::DynamicFieldProcessManagementProcessID" Required="1" Valid="1">
         <Description Translatable="1">This option defines the dynamic field in which a Process Management process entity id is stored.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -20,7 +20,7 @@
             <String Regex="">ProcessManagementProcessID</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::DynamicFieldProcessManagementActivityID" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::DynamicFieldProcessManagementActivityID" Required="1" Valid="1">
         <Description Translatable="1">This option defines the dynamic field in which a Process Management activity entity id is stored.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -28,7 +28,7 @@
             <String Regex="">ProcessManagementActivityID</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::DefaultQueue" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::DefaultQueue" Required="1" Valid="1">
         <Description Translatable="1">This option defines the process tickets default queue.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -37,7 +37,7 @@
             <String Regex="">Service Desk</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::DefaultState" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::DefaultState" Required="1" Valid="1">
         <Description Translatable="1">This option defines the process tickets default state.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -46,7 +46,7 @@
             <String Regex="">new</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::DefaultLock" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::DefaultLock" Required="1" Valid="1">
         <Description Translatable="1">This option defines the process tickets default lock.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -54,7 +54,7 @@
             <String Regex="">unlock</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::DefaultPriority" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::DefaultPriority" Required="1" Valid="1">
         <Description Translatable="1">This option defines the process tickets default priority.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -63,7 +63,7 @@
             <String Regex="">3 normal</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::Entity::Prefix" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::Entity::Prefix" Required="1" Valid="1">
         <Description Translatable="1">Default ProcessManagement entity prefixes for entity IDs that are automatically generated.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -77,7 +77,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="Process::CacheTTL" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Process::CacheTTL" Required="1" Valid="1">
         <Description Translatable="1">Cache time in seconds for the DB process backend.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core</SubGroup>
@@ -85,7 +85,7 @@
             <String Regex="">3600</String><!-- default 1 hour -->
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ProcessManagement::Transition::Debug::Enabled" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="ProcessManagement::Transition::Debug::Enabled" Required="1" Valid="1">
         <Description Translatable="1">If enabled debugging information for transitions is logged.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core::Transition</SubGroup>
@@ -96,7 +96,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ProcessManagement::Transition::Debug::LogPriority" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ProcessManagement::Transition::Debug::LogPriority" Required="0" Valid="0">
         <Description Translatable="1">Defines the priority in which the information is logged and presented.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core::Transition</SubGroup>
@@ -109,7 +109,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="ProcessManagement::Transition::Debug::Filter###00-Default" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="ProcessManagement::Transition::Debug::Filter###00-Default" Required="0" Valid="0">
         <Description Translatable="1">Filter for debugging Transitions. Note: More filters can be added in the format &lt;KIX_TICKET_Attribute&gt; e.g. &lt;KIX_TICKET_Priority&gt;.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>Core::Transition</SubGroup>
@@ -120,7 +120,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicFields::Driver###ProcessID" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###ProcessID" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
@@ -133,7 +133,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicFields::Driver###ActivityID" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###ActivityID" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>ProcessManagement</Group>
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>

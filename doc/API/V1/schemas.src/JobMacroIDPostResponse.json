@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "#JobMacroIDPostResponse",
+  "type": "object",
+  "description": "A response for job - macro ID POST request.",
+  "properties": {
+    "MacroID": {
+        "type": "integer"
+    }
+  },
+  "required": [
+    "MacroID"
+  ]
+}

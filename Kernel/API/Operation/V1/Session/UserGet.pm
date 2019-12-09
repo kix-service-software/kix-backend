@@ -159,8 +159,15 @@ sub Run {
             $UserData{Tickets}->{Watched}          = $Tickets->{All};
             $UserData{Tickets}->{WatchedAndUnseen} = $Tickets->{Unseen};
 
+            # force integer TicketIDs in response
+            foreach my $Type ( sort keys %{$UserData{Tickets}} ) {
+                my @TicketIDs = map { 0 + $_ } @{$UserData{Tickets}->{$Type}};
+                $UserData{Tickets}->{$Type} = \@TicketIDs;
+            }
+
             # inform API caching about a new dependency
             $Self->AddCacheDependency( Type => 'Ticket' );
+            $Self->AddCacheDependency( Type => 'Watcher' );
         }
 
         # include roleids if requested

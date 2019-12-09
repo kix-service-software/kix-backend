@@ -1,0 +1,71 @@
+{
+   "$id" : "#MacroPostRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The macro request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Macro" : {
+         "type" : "object",
+         "properties" : {
+            "Actions" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/MacroActionPostItem"
+               }
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "Macro"
+   ],
+   "definitions" : {
+      "MacroActionPostItem" : {
+         "$id" : "#MacroActionPostItem",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The macro action object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
+            },
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "MacroID",
+            "Type"
+         ]
+      }
+   }
+}

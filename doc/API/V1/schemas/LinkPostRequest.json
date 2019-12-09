@@ -12,7 +12,7 @@
                "type" : "string"
             },
             "SourceObject" : {
-               "description" : "The type source object. See resource /links/types for possible object types.",
+               "description" : "The type of the source object. See resource /links/types for possible object types.",
                "type" : "string"
             },
             "TargetKey" : {
@@ -20,7 +20,7 @@
                "type" : "string"
             },
             "TargetObject" : {
-               "description" : "The type target object. See resource /links/types for possible object types.",
+               "description" : "The type of the target object. See resource /links/types for possible object types.",
                "type" : "string"
             },
             "Type" : {

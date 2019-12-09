@@ -28,7 +28,7 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'My ticket created by Agent A',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'open',
@@ -218,7 +218,7 @@ for ( 1 .. 2 ) {
 # create some content
 $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',

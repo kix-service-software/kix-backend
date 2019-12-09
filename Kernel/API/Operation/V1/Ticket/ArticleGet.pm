@@ -243,7 +243,32 @@ sub Run {
 
             $ArticleData{Flags} = [ sort keys %ArticleFlags ];
         }
-            
+
+        if ($Kernel::OM->Get('Kernel::System::Queue')->NameExistsCheck(Name => $ArticleData{To})) {
+            my %QueueInfo = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+                Name => $ArticleData{To},
+            );
+
+            if ($Self->{Debug} > 0) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'info',
+                    Message  => Data::Dumper::Dumper \%QueueInfo,
+                );
+            }
+
+            my %QueueSystemeMailAddress = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+                ID => $QueueInfo{SystemAddressID},
+            );
+
+            if ($Self->{Debug} > 0) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'info',
+                    Message  => $QueueSystemeMailAddress{Name},
+                );
+            }
+
+            $ArticleData{To} = $ArticleData{To} . ' <' . $QueueSystemeMailAddress{Name} . '>';
+        }
         # add
         push(@ArticleList, \%ArticleData);
     }

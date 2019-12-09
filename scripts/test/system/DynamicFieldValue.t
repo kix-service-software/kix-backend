@@ -32,7 +32,7 @@ my $RandomID = $Helper->GetRandomID();
 # create a ticket
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
@@ -805,7 +805,7 @@ $Self->True(
 # set info to create some tickets
 my %TicketInfo = (
     Title        => 'Some Ticket Title',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',

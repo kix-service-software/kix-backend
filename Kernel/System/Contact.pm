@@ -80,6 +80,11 @@ sub new {
         Config => 'Contact::EventModulePost',
     );
 
+    $Self->{Lower} = '';
+    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+        $Self->{Lower} = 'LOWER';
+    }
+
     return $Self;
 }
 
@@ -301,6 +306,131 @@ sub ContactGet {
     );
 
     return %Contact;
+}
+
+=item ContactLookup()
+
+contact id or login lookup
+
+    my $Login = $ContactObject->ContactLookup(
+        ID     => 1,
+        Silent => 1, # optional, don't generate log entry if user was not found
+    );
+
+    my $ID = $ContactObject->ContactLookup(
+        Login  => 'some_user_login',
+        Silent => 1, # optional, don't generate log entry if user was not found
+    );
+
+=cut
+
+sub ContactLookup {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Login} && !$Param{ID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need Login or ID!'
+        );
+        return;
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    if ( $Param{Login} ) {
+
+        # check cache
+        my $CacheKey = 'ContactLookup::ID::' . $Param{Login};
+        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+            Type => $Self->{CacheType},
+            Key  => $CacheKey,
+        );
+        return $Cache if $Cache;
+
+        # build sql query
+        my $Login = lc $Param{Login};
+
+        return if !$DBObject->Prepare(
+            SQL => "SELECT id FROM contact WHERE $Self->{Lower}(login) = ?",
+            Bind  => [ \$Login ],
+            Limit => 1,
+        );
+
+        # fetch the result
+        my $ID;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $ID = $Row[0];
+        }
+
+        if ( !$ID ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "No ID found for contact login '$Param{Login}'!",
+                );
+            }
+            return;
+        }
+
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $ID,
+        );
+
+        return $ID;
+    }
+
+    else {
+
+        # ignore non-numeric IDs
+        return if $Param{ID} && $Param{ID} !~ /^\d+$/;
+
+        # check cache
+        my $CacheKey = 'ContactLookup::Login::' . $Param{ID};
+        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+            Type => $Self->{CacheType},
+            Key  => $CacheKey,
+        );
+        return $Cache if $Cache;
+
+        # build sql query
+        return if !$DBObject->Prepare(
+            SQL => "SELECT login FROM contact WHERE id = ?",
+            Bind  => [ \$Param{ID} ],
+            Limit => 1,
+        );
+
+        # fetch the result
+        my $Login;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $Login = $Row[0];
+        }
+
+        if ( !$Login ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "No contact login found for ID '$Param{ID}'!",
+                );
+            }
+            return;
+        }
+
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Login,
+        );
+
+        return $Login;
+    }
 }
 
 =item ContactUpdate()
@@ -580,9 +710,10 @@ sub ContactSearch {
             $SQL .= " AND ";
         }
 
-        $SQL .= "(primary_org_id = ? OR org_ids LIKE CONCAT('%,', ?, ',%'))";
+        $SQL .= "(primary_org_id = ? OR org_ids LIKE ?)";
         push(@Bind, \$Param{OrganisationID});
-        push(@Bind, \$Param{OrganisationID});
+        my $LikeOrganisationID = "%,$Param{OrganisationID},%";
+        push(@Bind, \$LikeOrganisationID);
     }
 
     # ask database
@@ -1079,10 +1210,6 @@ sub DESTROY {
 }
 
 1;
-
-
-
-
 
 =back
 

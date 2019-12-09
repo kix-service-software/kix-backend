@@ -36,7 +36,7 @@ my @Tests = (
             {
                 TicketCreate => {
                     Title        => 'HistoryCreateTitle',
-                    Queue        => 'Raw',
+                    Queue        => 'Junk',
                     Lock         => 'unlock',
                     PriorityID   => '3',
                     State        => 'new',
@@ -86,7 +86,7 @@ my @Tests = (
                     {
                         CreateBy    => 1,
                         HistoryType => 'NewTicket',
-                        Queue       => 'Raw',
+                        Queue       => 'Junk',
                         OwnerID     => 1,
                         PriorityID  => 3,
                         State       => 'new',
@@ -96,7 +96,7 @@ my @Tests = (
                     {
                         CreateBy    => 1,
                         HistoryType => 'CustomerUpdate',
-                        Queue       => 'Raw',
+                        Queue       => 'Junk',
                         OwnerID     => 1,
                         PriorityID  => 3,
                         State       => 'new',
@@ -106,7 +106,7 @@ my @Tests = (
                     {
                         CreateBy    => 1,
                         HistoryType => 'OwnerUpdate',
-                        Queue       => 'Raw',
+                        Queue       => 'Junk',
                         OwnerID     => 1,
                         PriorityID  => 3,
                         State       => 'new',
@@ -116,7 +116,7 @@ my @Tests = (
                     {
                         CreateBy    => 1,
                         HistoryType => 'OwnerUpdate',
-                        Queue       => 'Raw',
+                        Queue       => 'Junk',
                         OwnerID     => 1,
                         PriorityID  => 3,
                         State       => 'new',
@@ -134,7 +134,7 @@ my @Tests = (
             {
                 TicketCreate => {
                     Title                => 'HistoryCreateTitle',
-                    Queue                => 'Raw',
+                    Queue                => 'Junk',
                     Lock                 => 'unlock',
                     PriorityID           => '3',
                     State                => 'new',
@@ -163,7 +163,7 @@ my @Tests = (
             {
                 TicketCreate => {
                     Title                => 'HistoryCreateTitle',
-                    Queue                => 'Raw',
+                    Queue                => 'Junk',
                     Lock                 => 'unlock',
                     PriorityID           => '3',
                     State                => 'new',
