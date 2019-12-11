@@ -912,7 +912,7 @@ update queue attributes
         FollowUpID          => 1,
         Comment             => 'Some Comment2',
         DefaultSignKey      => ''
-        UnlockTimeOut       => ''
+        UnlockTimeout       => ''
         FollowUpLock        => 1,
         ParentQueueID       => '',
         CheckSysConfig      => 0,   # (optional) default 1
@@ -944,6 +944,8 @@ sub QueueUpdate {
 
     # FollowUpLock 0 | 1
     $Param{FollowUpLock} = $Param{FollowUpLock} || 0;
+
+    $Param{UnlockTimeout} = $Param{UnlockTimeout} || 0;
 
     # DefaultSignKey   '' || 'string'
     $Param{DefaultSignKey} = $Param{DefaultSignKey} || '';
