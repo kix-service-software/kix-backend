@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#ImportExportTemplateRunPostResponse",
+    "type": "object",
+    "description": "The ID of the scheduler task wich will execute the run.",
+    "properties": {
+        "TaskID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "TaskID"
+    ]
+}

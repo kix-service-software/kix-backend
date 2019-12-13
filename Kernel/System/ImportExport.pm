@@ -13,6 +13,8 @@ package Kernel::System::ImportExport;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::CheckItem',
@@ -50,6 +52,10 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
+
+    $Self->{CacheType} = 'ImportExportTemplate';
+    $Self->{RunCacheType} = 'ImportExportTemplateRun';
+    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     return $Self;
 }
@@ -150,9 +156,14 @@ sub TemplateGet {
         }
     }
 
-    # check if result is already cached
-    return $Self->{Cache}->{TemplateGet}->{ $Param{TemplateID} }
-        if $Self->{Cache}->{TemplateGet}->{ $Param{TemplateID} };
+    my $CacheKey = 'TemplateGet::TemplateID::' . $Param{TemplateID};
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
     # get DB object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
@@ -182,8 +193,13 @@ sub TemplateGet {
         $TemplateData{Number} = sprintf "%06d", $TemplateData{TemplateID};
     }
 
-    # cache the result
-    $Self->{Cache}->{TemplateGet}->{ $Param{TemplateID} } = \%TemplateData;
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \%TemplateData,
+        TTL   => $Self->{CacheTTL},
+    );
 
     return \%TemplateData;
 }
@@ -294,6 +310,18 @@ sub TemplateAdd {
         $TemplateID = $Row[0];
     }
 
+    # cleanup cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'POST',
+        Namespace => 'ImportExportTemplate',
+        ObjectID  => $TemplateID,
+    );
+
     return $TemplateID;
 }
 
@@ -388,11 +416,8 @@ sub TemplateUpdate {
         return;
     }
 
-    # reset cache
-    delete $Self->{Cache}->{TemplateGet}->{ $Param{TemplateID} };
-
     # update template
-    return $DBObject->Do(
+    my $Success = $DBObject->Do(
         SQL => 'UPDATE imexport_template SET name = ?,'
             . 'valid_id = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? '
@@ -402,6 +427,22 @@ sub TemplateUpdate {
             \$Param{UserID}, \$Param{TemplateID},
         ],
     );
+
+    # cleanup cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    if ($Success) {
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event     => 'PATCH',
+            Namespace => 'ImportExportTemplate',
+            ObjectID  => $Param{TemplateID},
+        );
+    }
+
+    return $Success;
 }
 
 =item TemplateDelete()
@@ -482,14 +523,27 @@ sub TemplateDelete {
     # create and add bind parameters
     my @BIND = map { \$_ } @{ $Param{TemplateID} };
 
-    # reset cache
-    delete $Self->{Cache}->{TemplateGet};
+    # cleanup cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # delete templates
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL  => "DELETE FROM imexport_template WHERE id IN ( $TemplateIDString )",
         Bind => \@BIND,
     );
+
+    # push client callback event
+    if ($Success) {
+        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            Event     => 'DELETE',
+            Namespace => 'ImportExportTemplate',
+            ObjectID  => $Param{TemplateID},
+        );
+    }
+
+    return $Success;
 }
 
 =item ObjectList()
@@ -2252,6 +2306,10 @@ sub Import {
 
     return if !$FormatBackend;
 
+    if (IsStringWithData($Param{SourceContent})) {
+        $Param{SourceContent} = \$Param{SourceContent};
+    }
+
     # get import data
     my $ImportData = $FormatBackend->ImportDataGet(
         TemplateID    => $Param{TemplateID},
@@ -2280,6 +2338,13 @@ sub Import {
         RetCode => {},
         Counter => 0,
     );
+
+    # create import run
+    my $RunID = $Self->_ImportRunAdd(
+        TemplateID => $Param{TemplateID},
+        UserID     => $Param{UserID}
+    );
+
     IMPORTDATAROW:
     for my $ImportDataRow ( @{$ImportData} ) {
 
@@ -2307,6 +2372,18 @@ sub Import {
         }
     }
 
+    # update run entry
+    my $StateID = 2;
+    $Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL => 'UPDATE imexport_template_run SET end_time = current_timestamp, state_id = ?, success_count = ?, fail_count = ? WHERE id = ?',
+        Bind => [ \$StateID, \$Result{Success}, \$Result{Failed}, \$RunID ],
+    );
+
+    $Self->_ClearCacheAndNotify(
+        RunID      => $RunID,
+        TemplateID => $Param{TemplateID}
+    );
+
     # log result
     $LogObject->Log(
         Priority => 'notice',
@@ -2332,11 +2409,202 @@ sub Import {
     return \%Result;
 }
 
+=item TemplateRunList()
+
+returns an array of all imports/exports of a template
+
+    my %Runs = $ImportExportObject->TemplateRunList(
+        TemplateID    => 123,
+        Type          => 'import',    # optional - import | export, both if omitted
+        UserID        => 1
+    );    
+
+the result looks like
+
+    @Runs = (
+        {
+            ID           => 1,
+            TemplateID   => 1,
+            StateID      => 1,
+            State        => 'running',
+            SuccessCount => 10,           # number of successfully imported objects
+            FailCount    => 2,            # number of failed imported objects,
+            Type         => 'import',
+            CreateBy     => 1,
+            StartTime    => '2019-12-04 10:00:00',
+            EndTime      => '2019-12-04 12:00:00'
+        },
+        { ... },
+        ...
+    );
+
+=cut
+
+sub TemplateRunList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(TemplateID UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    if ( $Param{Type} && $Param{Type} !~ m/(export|import)/i) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Unknown Type!",
+        );
+        return;
+    }
+
+    my $SQL = 'SELECT id, template_id, state_id, success_count, fail_count, create_by, start_time, end_time, type FROM imexport_template_run WHERE template_id = ?';
+    my $Bind = [ \$Param{TemplateID} ];
+
+    if ($Param{Type}) {
+        $SQL .= ' AND type = ?';
+        push(@{$Bind}, \$Param{Type});
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # get runs
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => $Bind
+    );
+
+    # fetch the result
+    my @TemplateRuns;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+
+        push(@TemplateRuns, {
+            ID           => $Row[0],
+            TemplateID   => $Row[1],
+            StateID      => $Row[2],
+            SuccessCount => $Row[3] ? 0 + $Row[3] : 0,
+            FailCount    => $Row[4] ? 0 + $Row[4] : 0,
+            CreateBy     => $Row[5],
+            StartTime    => $Row[6],
+            EndTime      => $Row[7],
+            Type         => $Row[8]
+        });
+    }
+
+    # get states names
+    if (@TemplateRuns) {
+        my %RunStates;
+        if ( IsHashRefWithData($Self->{Cache}->{RunStates}) ) {
+            %RunStates = %{$Self->{Cache}->{RunStates}};
+        } elsif (
+            $DBObject->Prepare(
+                SQL => 'SELECT id, name FROM imexport_template_run_state'
+            )
+        ) {
+            while ( my @Row = $DBObject->FetchrowArray() ) {
+                $RunStates{$Row[0]} = $Row[1];
+            }
+            $Self->{Cache}->{RunStates} = \%RunStates;
+        }
+
+        for my $Run (@TemplateRuns) {
+            if ($Run->{StateID}) {
+                $Run->{State} = $RunStates{$Run->{StateID}} || '';
+                # keep StateID as number
+                $Run->{StateID} = 0 + $Run->{StateID};
+            }
+        }
+    }
+
+    return @TemplateRuns;
+}
+
+sub _ImportRunAdd {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(TemplateID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get template data
+    my $TemplateData = $Self->TemplateGet(
+        TemplateID => $Param{TemplateID},
+        UserID     => $Param{UserID},
+    );
+
+    # check template data
+    if ( !$TemplateData ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No Template with ID $Param{TemplateID}!",
+        );
+        return;
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    my $Type = 'import';
+    return if !$DBObject->Do(
+        SQL => 'INSERT INTO imexport_template_run (template_id, state_id, start_time, create_by, type) '
+             . 'VALUES (?, 1, current_timestamp, ?, ?)',
+        Bind => [
+            \$Param{TemplateID}, \$Param{UserID}, \$Type
+        ],
+    );
+
+    # get new id
+    return if !$DBObject->Prepare(
+        SQL  => 'SELECT id FROM imexport_template_run WHERE template_id = ? AND type = ? ORDER by id DESC',
+        Bind => [ 
+            \$Param{TemplateID}, \$Type
+        ],
+        Limit => 1,
+    );
+
+    # fetch the result
+    my $ID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $ID = $Row[0];
+    }
+
+    $Self->_ClearCacheAndNotify(
+        RunID      => $ID,
+        TemplateID => $Param{TemplateID}
+    );
+
+    return $ID;
+}
+
+sub _ClearCacheAndNotify {
+    my ( $Self, %Param ) = @_;
+
+    # delete cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'POST',
+        Namespace => 'ImportExportTemplate.ImportExportTemplateRun',
+        ObjectID  => $Param{TemplateID}.'::'.$Param{RunID},
+    );
+}
+
 1;
-
-
-
-
 
 =back
 

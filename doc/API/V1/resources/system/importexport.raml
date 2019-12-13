@@ -9,3 +9,6 @@
         templateId:
           displayName: TemplateID
           type: integer
+      /runs:
+        description: !include ../../descriptions/resources/system/importexport/templatesrun.md
+        type: { collection-nopatch: { typeName: ImportExportTemplateRun } }
