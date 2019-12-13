@@ -2,13 +2,15 @@
     "$schema": "http://json-schema.org/schema",
     "$id": "#ImportExportTemplateRunPostResponse",
     "type": "object",
-    "description": "The ID of the scheduler task wich will execute the run.",
+    "description": "The response of the run create request.",
     "properties": {
         "TaskID": {
-            "type": "integer"
+            "type": "integer",
+            "description": "ID of the scheduler task wich will execute the run (if type is 'import')"
+        },
+        "ExportContent": {
+            "type": "string",
+            "description": "the base64 encoded export result - content for a csv file (if type is 'export')"
         }
-    },
-    "required": [
-        "TaskID"
-    ]
+    }
 }

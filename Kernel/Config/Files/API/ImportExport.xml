@@ -20,8 +20,8 @@
                 <Item Key="Name">TemplateGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TemplateID</Item>
-                <Item Key="ResponseSchema">TemplateResponse</Item>
-                <Item Key="CacheType">API_import_export_templatess</Item>
+                <Item Key="ResponseSchema">ImportExportTemplateResponse</Item>
+                <Item Key="CacheType">API_import_export_templates</Item>
                 <Item Key="CacheTypeDependency">ImportExportTemplate</Item>
             </Hash>
         </Setting>

@@ -116,7 +116,8 @@ perform TemplateRunCreate Operation. This function will return the ID of the sch
         Code         => '',                      # in case of an error
         Message      => '',                      # in case of an error
         Data         => {
-            TaskID => 123            # ID of the scheduler task
+            TaskID        => 123                # ID of the scheduler task             - with type 'import',
+            ExportContent => 'some csv string'  # base64 encoded string of the export  - with type 'export'
         },
     };
 
@@ -142,13 +143,13 @@ sub Run {
         );
     }
 
-    my $TaskID;
     if ( $TemplateRun->{Type} =~ m/^import$/i ) {
+        my $TaskID;
 
         if (!$TemplateRun->{ImportFileContent}) {
             return $Self->_Error(
                 Code    => 'Object.ExecFailed',
-                Message => "ImportFileContent not given!",
+                Message => "No value for ImportFileContent given!",
             );
         }
 
@@ -185,12 +186,48 @@ sub Run {
                 Message => "An error occured during import execution task creation (error: $LogMessage).",
             );
         }
+
+        # return result
+        return $Self->_Success(
+            TaskID => $TaskID
+        );
     }
 
-    # return result
-    return $Self->_Success(
-        TaskID => $TaskID
-    );
+    elsif ( $TemplateRun->{Type} =~ m/^export$/i ) {
+        my $Result = $Kernel::OM->Get('Kernel::System::ImportExport')->Export(
+            TemplateID => $Param{Data}->{TemplateID},
+            UserID     => 1,
+        );
+
+        if ( !$Result ) {
+            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+                Type => 'error', 
+                What => 'Message',
+            );
+            return $Self->_Error(
+                Code    => 'Object.ExecFailed',
+                Message => "An error occured during export execution (error: $LogMessage).",
+            );
+        }
+
+        my $FileContent = join("\n", @{ $Result->{DestinationContent} });
+
+        if (utf8::is_utf8($FileContent)) {
+            $FileContent = Encode::encode_utf8($FileContent);
+        }
+
+        $FileContent = encode_base64( $FileContent );
+
+        # return result
+        return $Self->_Success(
+            ExportContent => $FileContent
+        );
+    } else {
+        return $Self->_Error(
+            Code    => 'Object.ExecFailed',
+            Message => "Type has to be 'import' or 'export'.",
+        );
+    }
 }
 
 1;
