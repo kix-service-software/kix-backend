@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ImportExport::TemplateSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TemplateSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">TemplateCollectionResponse</Item>
+                <Item Key="CacheType">API_import_export_templates</Item>
+                <Item Key="CacheTypeDependency">ImportExportTemplate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ImportExport::TemplateGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TemplateGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">TemplateID</Item>
+                <Item Key="ResponseSchema">ImportExportTemplateResponse</Item>
+                <Item Key="CacheType">API_import_export_templates</Item>
+                <Item Key="CacheTypeDependency">ImportExportTemplate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ImportExport::TemplateRunSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TemplateRunSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">TemplateID</Item>
+                <Item Key="ResponseSchema">ImportExportTemplateRunCollectionResponse</Item>
+                <Item Key="CacheType">API_import_export_templates_runs</Item>
+                <Item Key="CacheTypeDependency">ImportExportTemplate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ImportExport::TemplateRunCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TemplateRunCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">ImportExportTemplateRunPostRequest</Item>
+                <Item Key="ResponseSchema">ImportExportTemplateRunPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>

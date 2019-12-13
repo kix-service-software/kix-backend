@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemClassPostRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The config item class object for creation.",
    "type" : "object",
    "properties" : {

@@ -1,6 +1,6 @@
 {
    "$id" : "#UserCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of users.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "User" : {
          "$id" : "#User",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user object.",
          "type" : "object",
          "properties" : {
@@ -130,7 +130,7 @@
       },
       "UserPreference" : {
          "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
          "type" : "object",
          "properties" : {

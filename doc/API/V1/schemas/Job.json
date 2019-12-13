@@ -1,6 +1,6 @@
 {
    "$id" : "#Job",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The job object.",
    "type" : "object",
    "properties" : {
@@ -90,7 +90,7 @@
    "definitions" : {
       "MacroAction" : {
          "$id" : "#MacroAction",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
          "type" : "object",
          "properties" : {
@@ -148,7 +148,7 @@
       },
       "Macro" : {
          "$id" : "#Macro",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
          "type" : "object",
          "properties" : {
@@ -218,7 +218,7 @@
       },
       "ExecPlan" : {
          "$id" : "#ExecPlan",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The execution plan object.",
          "type" : "object",
          "properties" : {

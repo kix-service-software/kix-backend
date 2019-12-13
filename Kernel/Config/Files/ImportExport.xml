@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+
+    <!-- config item class csv mapping auto creation -->
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###910-CSVMappingAutoCreate" Required="1" Valid="1">
+        <Description Translatable="1">Event module to add or change the CSV-mapping if config item class defintion is changed.</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>Core::ITSMConfigItem</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ITSMConfigItem::Event::CSVMappingAutoCreate</Item>
+                <Item Key="Event">(DefinitionCreate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###ForceCSVMappingRecreation" Required="1" Valid="1">
+        <Description Translatable="1">Defines if CSV-mappings are re-created if already existent.</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###CountMax" Required="1" Valid="1">
+        <Description Translatable="1">Defines the maximum number of each array attribute in CSV-mapping.</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <String Default="10">10</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###EmptyFieldsLeaveTheOldValues" Required="1" Valid="1">
+        <Description Translatable="1">Defines whether empty fields should retain the old values during imports (option for CSV-mapping).</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <Option SelectedID="on">
+                <Item Key="">No</Item>
+                <Item Key="on">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###Charset" Required="1" Valid="1">
+        <Description Translatable="1">Defines which character should be used in CSV-mapping.</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <String Default="UTF-8">UTF-8</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###ColumnSeparator" Required="1" Valid="1">
+        <Description Translatable="1">Defines which column separator should be used in CSV-mapping.</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <Option SelectedID="Semicolon">
+                <Item Key="Colon" Translatable="1">: (colon)</Item>
+                <Item Key="Comma" Translatable="1">, (comma)</Item>
+                <Item Key="Dot" Translatable="1">. (dot)</Item>
+                <Item Key="Semicolon" Translatable="1">; (semicolon)</Item>
+                <Item Key="Tabulator" Translatable="1">-> (tab)</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###IncludeColumnHeaders" Required="1" Valid="1">
+        <Description Translatable="1">Defines whether the column headings should be used for CSV-mapping.</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###DefaultIncidentState" Required="1" Valid="1">
+        <Description Translatable="1">Defines which default incident status should be used during imports (option for CSV-mapping).</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <String Default="Operational">Operational</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###DefaultDeploymentState" Required="1" Valid="1">
+        <Description Translatable="1">Defines which default deployment status should be used during imports (option for CSV-mapping).</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <String Default="Planned">Planned</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ImportExport::CSVMappingAutoCreate###DefaultName" Required="1" Valid="1">
+        <Description Translatable="1">Defines which default name should be used during imports (option for CSV-mapping).</Description>
+        <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
+        <SubGroup>ImportExportITSMConfigItem</SubGroup>
+        <Setting>
+            <String Default=""></String>
+        </Setting>
+    </ConfigItem>
+</kix_config>
+    

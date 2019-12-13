@@ -72,6 +72,7 @@ Get a client registration.
 
     my %Data = $ClientRegistrationObject->ClientRegistrationGet(
         ClientID      => '...',
+        Silent        => 1|0       # optional - default 0
     );
 
 =cut
@@ -118,10 +119,12 @@ sub ClientRegistrationGet {
     
     # no data found...
     if ( !%Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Registration for client '$Param{ClientID}' not found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Registration for client '$Param{ClientID}' not found!",
+            );
+        }
         return;
     }
     

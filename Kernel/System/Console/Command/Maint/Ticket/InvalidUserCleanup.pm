@@ -181,7 +181,7 @@ sub Run {
             push @TicketIDs, $Row[0];
         }
 
-        my $Count = 0;
+        $Count = 0;
         for my $TicketID (@TicketIDs) {
 
             $TicketObject->TicketWatchUnsubscribe(
