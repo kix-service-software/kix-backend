@@ -134,6 +134,7 @@ sub Run {
     # check if ClientRegistration exists
     my %ClientRegistration = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationGet(
         ClientID => $ClientRegistration->{ClientID},
+        Silent   => 1
     );
 
     if ( IsHashRefWithData(\%ClientRegistration) ) {

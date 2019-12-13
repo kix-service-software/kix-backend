@@ -144,6 +144,19 @@ sub Run {
         $TemplateDataRef->{ID} = $TemplateDataRef->{TemplateID};
         delete $TemplateDataRef->{TemplateID};
 
+        # get object data if included
+        if ( $Param{Data}->{include}->{ObjectData} ) {
+            my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+                TemplateID => $TemplateID,
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+            if (IsHashRefWithData($ObjectData)) {
+                $TemplateDataRef->{ObjectData} = $ObjectData;
+            } else {
+                $TemplateDataRef->{ObjectData} = {};
+            }
+        }
+
         # add
         push(@TemplateList, $TemplateDataRef);
     }

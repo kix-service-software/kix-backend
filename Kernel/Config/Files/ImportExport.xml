@@ -57,11 +57,11 @@
         <SubGroup>ImportExportITSMConfigItem</SubGroup>
         <Setting>
             <Option SelectedID="Semicolon">
-                <Item Key="Colon">Doppelpunkt (:)</Item>
-                <Item Key="Comma">Komma (,)</Item>
-                <Item Key="Dot">Punkt (.)</Item>
-                <Item Key="Semicolon">Semikolon (;)</Item>
-                <Item Key="Tabulator">Tabulator (TAB)</Item>
+                <Item Key="Colon" Translatable="1">: (colon)</Item>
+                <Item Key="Comma" Translatable="1">, (comma)</Item>
+                <Item Key="Dot" Translatable="1">. (dot)</Item>
+                <Item Key="Semicolon" Translatable="1">; (semicolon)</Item>
+                <Item Key="Tabulator" Translatable="1">-> (tab)</Item>
             </Option>
         </Setting>
     </ConfigItem>
