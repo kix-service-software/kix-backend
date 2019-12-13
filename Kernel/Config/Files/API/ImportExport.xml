@@ -34,7 +34,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TemplateID</Item>
                 <Item Key="ResponseSchema">ImportExportTemplateRunCollectionResponse</Item>
-                <Item Key="CacheType">API_import_export_templates_runs</Item>
+                <Item Key="CacheType">API_import_export_templates</Item>
                 <Item Key="CacheTypeDependency">ImportExportTemplate</Item>
             </Hash>
         </Setting>

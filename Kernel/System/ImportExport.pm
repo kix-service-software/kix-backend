@@ -2639,9 +2639,6 @@ sub _ClearCacheAndNotify {
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => 'API_import_export_templates'
     );
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'API_import_export_templates_runs'
-    );
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
