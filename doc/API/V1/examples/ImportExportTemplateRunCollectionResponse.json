@@ -1,0 +1,28 @@
+{
+    "ImportExportTemplateRun": [
+        {
+            "CreateBy": 1,
+            "EndTime": null,
+            "FailCount": null,
+            "ID": 1,
+            "StartTime": "2019-12-03 10:45:27",
+            "State": "running",
+            "StateID": 1,
+            "SuccessCount": null,
+            "TemplateID": 4,
+            "Type": "import"
+        },
+        {
+            "CreateBy": 1,
+            "EndTime": "2019-12-05 23:47:12",
+            "FailCount": 0,
+            "ID": 1,
+            "StartTime": "2019-12-05 23:30:00",
+            "State": "finished",
+            "StateID": 1,
+            "SuccessCount": 12,
+            "TemplateID": 7,
+            "Type": "import"
+        }
+    ]
+}

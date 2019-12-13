@@ -5300,6 +5300,258 @@ pre code {
       "Organisation" : {
          "type" : "object",
          "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "City" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Country" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Email" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fax" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Firstname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Lastname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Login" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Mobile" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "OrganisationIDs" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "Phone" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PrimaryOrganisationID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Street" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Tickets" : {
+               "description" : "added via include \"Tickets\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "Ticket.json"
+               },
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Zip" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "PrimaryOrganisationID",
+            "OrganisationIDs",
+            "CreateBy",
+            "CreateTime",
+            "Firstname",
+            "Email",
+            "ID",
+            "Lastname",
+            "Login",
+            "ValidID"
+         ]
+      },
+      "_Organisation_json" : {
+         "$id" : "#Organisation",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The organisation object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "City" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Contacts" : {
+               "description" : "added via include \"Contacts\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_Contact_json"
+               },
+               "readOnly" : true
+            },
+            "Country" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Number" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Street" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Tickets" : {
+               "description" : "added via include \"Tickets\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "Ticket.json"
+               },
+               "readOnly" : true
+            },
+            "Url" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Zip" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "Number",
+            "ValidID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "Organisation": {
+    "ChangeBy": 1,
+    "ChangeTime": "2019-03-12 18:24:18",
+    "City": "Rostock",
+    "Comment": "",
+    "Country": "Germany",
+    "CreateBy": 1,
+    "CreateTime": "2018-11-01 14:21:35",
+    "ID": 10,
+    "Name": "Albatros Reederei",
+    "Number": "ALB",
+    "Street": "Kurfürstendamm 89",
+    "Url": "http://www.albatros-shipping.eu",
+    "ValidID": 1,
+    "Zip": "18010"
+  }
+}</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#Error",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="organisations__organisationid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="organisations__organisationid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="organisations__organisationid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/organisations</span><span class="uri">/{organisationId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#organisations__organisationid__patch_request" data-toggle="tab">Request</a></li><li><a href="#organisations__organisationid__patch_response" data-toggle="tab">Response</a></li><li><a href="#organisations__organisationid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="organisations__organisationid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">organisationId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OrganisationPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "#OrganisationPatchRequest",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "The organisation request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Organisation" : {
+         "type" : "object",
+         "properties" : {
             "City" : {
                "type" : "string"
             },
@@ -10852,35 +11104,13 @@ pre code {
          "description" : "The config item class object.",
          "type" : "object",
          "properties" : {
-            "ChangeBy" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
                "type" : "integer",
                "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ConfigItemStats" : {
-               "description" : "result of include \"ConfigItemStats\"",
-               "type" : "object",
-               "properties" : {
-                  "PostProductiveCount" : {
-                     "type" : "integer",
-                     "readOnly" : true
-                  },
-                  "ProductiveCount" : {
-                     "type" : "integer",
-                     "readOnly" : true
-                  }
-               },
-               "required" : [
-                  "PostProductiveCount",
-                  "ProductiveCount"
-               ]
             },
             "CreateBy" : {
                "type" : "integer",
@@ -10888,6 +11118,13 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
                "readOnly" : true
             },
             "CurrentDefinition" : {
@@ -10904,23 +11141,24 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "Name" : {
+            "DefinitionString" : {
                "type" : "string",
                "readOnly" : true
             },
-            "ValidID" : {
+            "Version" : {
                "type" : "integer",
                "readOnly" : true
             }
          },
          "required" : [
-            "ChangeBy",
-            "ChangeTime",
+            "Class",
+            "ClassID",
             "CreateBy",
             "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
          ]
       }
    }
@@ -17428,7 +17666,7 @@ pre code {
    "description" : "A list of GeneralCatalog items.",
    "type" : "object",
    "properties" : {
-      "GeneralCatalogItem" : {
+      "ImportExportTemplate" : {
          "type" : "array",
          "items" : {
             "$ref" : "#/definitions/_GeneralCatalogItem_json"
@@ -17436,7 +17674,7 @@ pre code {
       }
    },
    "required" : [
-      "GeneralCatalogItem"
+      "ImportExportTemplate"
    ],
    "definitions" : {
       "_GeneralCatalogItem_json" : {

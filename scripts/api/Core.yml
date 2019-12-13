@@ -797,6 +797,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::ImportExport::TemplateGet
+    V1::ImportExport::TemplateRunSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ImportExport::TemplateRunSearch
+    V1::ImportExport::TemplateRunCreate:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::ImportExport::TemplateRunCreate
     V1::Log::LogFileSearch:
         Description: ''
         MappingInbound:
@@ -2593,6 +2607,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /system/importexport/templates/:TemplateID
+        V1::ImportExport::TemplateRunSearch:
+          RequestMethod:
+          - GET
+          Route: /system/importexport/templates/:TemplateID/runs
+        V1::ImportExport::TemplateRunCreate:
+          RequestMethod:
+          - POST
+          Route: /system/importexport/templates/:TemplateID/runs
         V1::Log::LogFileSearch:
           RequestMethod:
           - GET

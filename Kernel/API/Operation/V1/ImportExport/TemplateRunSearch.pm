@@ -6,12 +6,11 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::ImportExport::TemplateSearch;
+package Kernel::API::Operation::V1::ImportExport::TemplateRunSearch;
 
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::ImportExport::TemplateGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -22,7 +21,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::ImportExport::TemplateSearch - API ImportExport Template Search Operation backend
+Kernel::API::Operation::ImportExport::TemplateRunSearch - API ImportExport Template Run Search Operation backend
 
 =head1 PUBLIC INTERFACE
 
@@ -58,9 +57,35 @@ sub new {
     return $Self;
 }
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TemplateID' => {
+            Required => 1
+        }
+    }
+}
+
 =item Run()
 
-perform ImportExport Template Search Operation. This will return a Template list.
+perform ImportExport Template Run Search Operation. This will return a Template Run list.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -72,7 +97,7 @@ perform ImportExport Template Search Operation. This will return a Template list
         Code    => '',                          # In case of an error
         Message => '',                          # In case of an error
         Data    => {
-            ImportExportTemplate => [
+            ImportExportTemplateRun => [
                 {},
                 {}
             ]
@@ -84,37 +109,33 @@ perform ImportExport Template Search Operation. This will return a Template list
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform template search
-    my $TemplateListRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateList(
-        UserID => $Self->{Authorization}->{UserID}
+    # check if Template exists
+    my $TemplateDataRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+        TemplateID => $Param{Data}->{TemplateID},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
-    # get already prepared Template data from TemplateGet operation
-    if ( IsArrayRefWithData($TemplateListRef) ) {
-        my $TemplateGetResult = $Self->ExecOperation(
-            OperationType => 'V1::ImportExport::TemplateGet',
-            Data      => {
-                TemplateID => join(',', @{$TemplateListRef}),
-            }
+    if ( !IsHashRefWithData( $TemplateDataRef ) ) {
+        return $Self->_Error(
+            Code => 'Object.NotFound',
         );
+    }
 
-        if ( !IsHashRefWithData($TemplateGetResult) || !$TemplateGetResult->{Success} ) {
-            return $TemplateGetResult;
-        }
+    # perform template run search
+    my @TemplateRunList = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateRunList(
+        TemplateID => $Param{Data}->{TemplateID},
+        UserID     => $Self->{Authorization}->{UserID}
+    );
 
-        my @TemplateDataList = IsArrayRefWithData($TemplateGetResult->{Data}->{ImportExportTemplate})
-            ? @{$TemplateGetResult->{Data}->{ImportExportTemplate}} : ( $TemplateGetResult->{Data}->{ImportExportTemplate} );
-
-        if ( IsArrayRefWithData(\@TemplateDataList) ) {
-            return $Self->_Success(
-                ImportExportTemplate => \@TemplateDataList,
-            );
-        }
+    if ( IsArrayRefWithData(\@TemplateRunList) ) {
+        return $Self->_Success(
+            ImportExportTemplateRun => \@TemplateRunList,
+        );
     }
 
     # return result
     return $Self->_Success(
-        ImportExportTemplate => [],
+        ImportExportTemplateRun => [],
     );
 }
 
