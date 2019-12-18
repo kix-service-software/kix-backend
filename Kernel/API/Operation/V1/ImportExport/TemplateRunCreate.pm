@@ -189,6 +189,7 @@ sub Run {
 
         # return result
         return $Self->_Success(
+            Code   => 'Object.Created',
             TaskID => $TaskID
         );
     }
@@ -220,6 +221,7 @@ sub Run {
 
         # return result
         return $Self->_Success(
+            Code   => 'Object.Created',
             ExportContent => $FileContent
         );
     } else {
