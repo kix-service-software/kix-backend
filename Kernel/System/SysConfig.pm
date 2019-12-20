@@ -961,15 +961,6 @@ sub Rebuild {
             ValidID         => $OptionRaw->{Valid} == 1 ? 1 : 2,
         );
 
-        # ignore changed options
-        if ( $AllOptions{$Option{Name}}->{IsModified} || $AllOptions{$Option{Name}}->{ValidID} != $Option{ValidID} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'info',
-                Message  => "Item \"$Option{Name}\" has been modified. Rebuild skipped.",
-            );    
-            next;            
-        }
-
         # check if this is a new option
         if ( !$AllOptions{ $Option{Name} } ) {
             # just import the new option
@@ -979,6 +970,15 @@ sub Rebuild {
             );
         }
         else {
+            # ignore changed options
+            if ( $AllOptions{$Option{Name}}->{IsModified} || $AllOptions{$Option{Name}}->{ValidID} != $Option{ValidID} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'info',
+                    Message  => "Item \"$Option{Name}\" has been modified. Rebuild skipped.",
+                );    
+                next;
+            }
+
             # we have to update the option
             my %ExistingOption = $Self->OptionGet(
                 Name    => $Option{Name},
