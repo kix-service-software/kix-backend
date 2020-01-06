@@ -2371,6 +2371,47 @@
         <IndexColumn Name="template_id" />
     </Index>
 </Table>
+<!-- import run -->
+<Table Name="imexport_template_run">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
+    <Column Name="template_id" Required="true" Type="INTEGER" />
+    <Column Name="state_id" Required="false" Type="SMALLINT" />
+    <Column Name="success_count" Required="false" Type="INTEGER" />
+    <Column Name="fail_count" Required="false" Type="INTEGER" />
+    <Column Name="type" Required="true" Size="10" Type="VARCHAR" />
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="start_time" Required="true" Type="DATE"/>
+    <Column Name="end_time" Required="false" Type="DATE"/>
+    <ForeignKey ForeignTable="imexport_template">
+        <Reference Local="template_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="imexport_template_run_state">
+        <Reference Local="state_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+<Table Name="imexport_template_run_state">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique Name="imexport_template_run_state_name">
+        <UniqueColumn Name="name"/>
+    </Unique>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
 
 <!-- itsm core -->
 <Table Name="cip_allocate">

@@ -1,6 +1,6 @@
 {
    "$id" : "#Valid",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The valid object.",
    "type" : "object",
    "properties" : {

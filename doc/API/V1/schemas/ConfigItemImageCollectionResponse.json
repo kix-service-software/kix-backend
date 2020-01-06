@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemImageCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item images.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "ConfigItemImage" : {
          "$id" : "#ConfigItemImage",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
          "type" : "object",
          "properties" : {

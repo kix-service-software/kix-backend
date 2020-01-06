@@ -1,12 +1,12 @@
 {
    "$id" : "#ClientRegistrationCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of client registrations.",
    "type" : "object",
    "definitions" : {
       "ClientRegistration" : {
          "$id" : "#ClientRegistration",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The client registration object.",
          "type" : "object",
          "properties" : {

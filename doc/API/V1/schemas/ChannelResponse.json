@@ -1,6 +1,6 @@
 {
    "$id" : "#ChannelResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for channel GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "Channel" : {
          "$id" : "#Channel",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The channel object.",
          "type" : "object",
          "properties" : {

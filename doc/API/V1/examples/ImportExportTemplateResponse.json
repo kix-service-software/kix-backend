@@ -1,0 +1,15 @@
+{
+    "ImportExportTemplate": {
+        "ChangeBy": 1,
+        "ChangeTime": "2019-11-28 14:49:44",
+        "Comment": "Automatically created",
+        "CreateBy": 1,
+        "CreateTime": "2019-11-28 14:49:44",
+        "Format": "CSV",
+        "ID": 1,
+        "Name": "Computer (auto-created map)",
+        "Number": "000001",
+        "Object": "ITSMConfigItem",
+        "ValidID": 1
+    }
+}

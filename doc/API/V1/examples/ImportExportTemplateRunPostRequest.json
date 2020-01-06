@@ -1,0 +1,6 @@
+{
+    "ImportExportTemplateRun": {
+        "Type": "import",
+        "ImportFileContent": "some base64 encoded file-content"
+    }
+}

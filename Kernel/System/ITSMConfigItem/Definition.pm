@@ -359,6 +359,7 @@ sub DefinitionAdd {
         Event => 'DefinitionCreate',
         Data  => {
             Comment => $DefinitionID,
+            ClassID => $Param{ClassID}
         },
         UserID => $Param{UserID},
     );

@@ -1,6 +1,6 @@
 {
    "$id" : "#MailFilterPostRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The mail filter request object for creation.",
    "type" : "object",
    "properties" : {

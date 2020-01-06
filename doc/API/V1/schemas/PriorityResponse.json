@@ -1,6 +1,6 @@
 {
    "$id" : "#PriorityResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for priority GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "Priority" : {
          "$id" : "#Priority",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
          "type" : "object",
          "properties" : {

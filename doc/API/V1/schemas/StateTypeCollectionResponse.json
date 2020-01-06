@@ -1,6 +1,6 @@
 {
    "$id" : "#StateTypeCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of state types.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "StateType" : {
          "$id" : "#StateType",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The state type object.",
          "type" : "object",
          "properties" : {

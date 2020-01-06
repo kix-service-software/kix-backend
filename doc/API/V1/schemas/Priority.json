@@ -1,6 +1,6 @@
 {
    "$id" : "#Priority",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The priority object.",
    "type" : "object",
    "properties" : {

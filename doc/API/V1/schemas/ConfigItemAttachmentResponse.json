@@ -1,6 +1,6 @@
 {
    "$id" : "#ConfigItemAttachmentResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for config item attachment GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "ConfigItemAttachment" : {
          "$id" : "#ConfigItemAttachment",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item attachment object.",
          "type" : "object",
          "properties" : {
