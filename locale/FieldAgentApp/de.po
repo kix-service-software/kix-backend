@@ -1,0 +1,476 @@
+msgid "Failed to connect to the given host. Please check your KIX Url."
+msgstr "Verbindung zu KIX-Server konnte nicht hergestellt werden. Bitte prüfen Sie die angegebene Adresse."
+
+msgid "Firstname ({0})"
+msgstr "Vorname ({0})"
+
+msgid "Lastname ({0})"
+msgstr "Name ({0})"
+
+msgid "Signature ({0})"
+msgstr "Unterschrift ({0})"
+
+msgid "work report (complete)"
+msgstr "Arbeitsbericht (vollständig)"
+
+msgid "work report (customer)"
+msgstr "Arbeitsbericht (Kunde)"
+
+msgid "work report (declined)"
+msgstr "Arbeitsbericht (abgelehnt)"
+
+msgid "KIX Field Agent User"
+msgstr "KIX Field Agent Nutzer"
+
+msgid "Time Accounting"
+msgstr "Zeitbuchungen"
+
+msgid "Working Notes"
+msgstr "Arbeitsnotizen"
+
+msgid "Signature"
+msgstr "Unterschrift"
+
+msgid "Risk Assumption"
+msgstr "Gefahrenübergang"
+
+msgid "Customer Visible"
+msgstr "Sichtbar für Kunde"
+
+msgid "Begin"
+msgstr "Beginn"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Duration (hh:mm)"
+msgstr "Dauer (HH:mm)"
+
+msgid "Note"
+msgstr "Notiz"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Attached as: "
+msgstr "Angehangen als: "
+
+msgid "Signature ({0} {1}) - {2}"
+msgstr "Unterschrift ({0} {1}) - {2}"
+
+msgid "min"
+msgstr "min"
+
+msgid "h"
+msgstr "h"
+
+msgid "Required"
+msgstr "Erforderlich"
+
+msgid "Abort"
+msgstr "Abbrechen"
+
+msgid "Remove"
+msgstr "Löschen"
+
+msgid "Ok"
+msgstr "OK"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "Save"
+msgstr "Sichern"
+
+msgid "Stop"
+msgstr "Stopp"
+
+msgid "Confirm"
+msgstr "Bestätigen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "Reload"
+msgstr "Neu Laden"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Risk Assumption"
+msgstr "Gefahrenübergang"
+
+msgid "Work report"
+msgstr "Arbeitsbericht"
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "Articles"
+msgstr "Artikel"
+
+msgid "CI"
+msgstr "Asset"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "FAQ"
+msgstr "FAQ"
+
+msgid "New Note"
+msgstr "Neue Notiz"
+
+msgid "Edit Note"
+msgstr "Notiz Bearbeiten"
+
+msgid "All Tickets ({0})"
+msgstr "Alle Tickets ({0})"
+
+msgid "general error"
+msgstr "Allgemeiner Fehler"
+
+msgid "Missing internet connection."
+msgstr "Internetverbindung unterbrochen."
+
+msgid "Ticket is overdued."
+msgstr "Ticketfälligkeit erreicht."
+
+msgid "Ticket is almost overdue."
+msgstr "Ticketfälligkeit fast erreicht."
+
+msgid "Due date: "
+msgstr "Fälligkeitsdatum: "
+
+msgid "Update tickets"
+msgstr "Tickets Aktualisieren"
+
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "Ticket"
+msgstr "Ticket"
+
+msgid "Declined tickets"
+msgstr "Abgelehnte Tickets"
+
+msgid "No tickets found"
+msgstr "Keine Tickets gefunden"
+
+msgid "Recent"
+msgstr "Kürzlich"
+
+msgid "Attachments ({0})"
+msgstr "Anhänge ({0})"
+
+msgid "KIX Login"
+msgstr "KIX Anmeldename"
+
+msgid "Username"
+msgstr "Nutzername"
+
+msgid "Password"
+msgstr "Passwort"
+
+msgid "KIX URL"
+msgstr "KIX URL"
+
+msgid "KIX Customer Number"
+msgstr "KIX Kundennummer"
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Logged in as {0} ({1})"
+msgstr "Angemeldet als {0} ({1})"
+
+msgid "Delete data"
+msgstr "Daten löschen"
+
+msgid "General"
+msgstr "Allgemein"
+
+msgid "KIX"
+msgstr "KIX"
+
+msgid "About"
+msgstr "Über"
+
+msgid "Analytics"
+msgstr "Analytics"
+
+msgid "Automatic stop"
+msgstr "Automatisch Stoppen"
+
+msgid "Checklists"
+msgstr "Checklisten"
+
+msgid "completed"
+msgstr "vollständig"
+
+msgid "{0} open items"
+msgstr "{0} offene Einträge"
+
+msgid "State"
+msgstr "Status"
+
+msgid "CI Class"
+msgstr "Asset Klasse"
+
+msgid "Usage"
+msgstr "Nutzung"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Last changed"
+msgstr "Zuletzt geändert"
+
+msgid "No work report"
+msgstr "Kein Arbeitsbericht"
+
+msgid "Agent"
+msgstr "Agent"
+
+msgid "Customer"
+msgstr "Kunde"
+
+msgid "Firstname ({0})"
+msgstr "Vorname ({0})"
+
+msgid "Closure code (required)"
+msgstr "Abschlusscode (Pflichtangabe)"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Username"
+msgstr "Nutzername"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Mobile"
+msgstr "Mobil"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Comment"
+msgstr "Kommentar"
+
+msgid "KNR"
+msgstr "KNR"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Start time"
+msgstr "Startzeit"
+
+msgid "Start date"
+msgstr "Startdatum"
+
+msgid "End time"
+msgstr "Endzeit"
+
+msgid "End date"
+msgstr "Enddatum"
+
+msgid "15 min"
+msgstr "15 min"
+
+msgid "Task"
+msgstr "Ausgabe"
+
+msgid "work report (customer)"
+msgstr "Arbeitsbericht (Kunde)"
+
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "Attachment"
+msgstr "Anhang"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Revert unsaved changes?"
+msgstr "Ungespeicherte Änderungen verwerfen?"
+
+msgid "More information"
+msgstr "Mehr Informationen"
+
+msgid "Pending time"
+msgstr "Wartezeit"
+
+msgid "Pending time"
+msgstr "Wartezeit"
+
+msgid "Queue"
+msgstr "Team"
+
+msgid "Owner"
+msgstr "Bearbeiter"
+
+msgid "Responsible"
+msgstr "Verantwortlicher"
+
+msgid "Created by"
+msgstr "Erstellt von"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Changed by"
+msgstr "Geändert von"
+
+msgid "Priority"
+msgstr "Priorität"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Offline available"
+msgstr "Offline Verfügbar"
+
+msgid "Start timetracking"
+msgstr "Start Zeiterfassung"
+
+msgid "Signature by customer"
+msgstr "Unterschrift durch Kunde"
+
+msgid "Signature by me"
+msgstr "Unterschrift durch mich"
+
+msgid "Items"
+msgstr "Einträge"
+
+msgid "Item"
+msgstr "Eintrag"
+
+msgid "Articles"
+msgstr "Artikel"
+
+msgid "Article"
+msgstr "Artikel"
+
+msgid "Checklists"
+msgstr "Checklisten"
+
+msgid "Checklist"
+msgstr "Checkliste"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Time tracking"
+msgstr "Zeiterfassung"
+
+msgid "no task set"
+msgstr "Keine Aufgabe"
+
+msgid "Decline"
+msgstr "Ablehnen"
+
+msgid "Finish Process"
+msgstr "Bearbeitung Beenden"
+
+msgid "Checkout"
+msgstr "Herunterladen"
+
+msgid "Communication History"
+msgstr "Kommunikations-/Fallhistorie"
+
+msgid "Time tracking stopped automatically."
+msgstr "Zeiterfassung automatisch angehalten."
+
+msgid "The ticket is not in the correct state to initiate a download."
+msgstr "Das Ticket ist auf Grund seines Status nicht herunterladbar."
+
+msgid "The ticket with the number {0} is still checked out. Please finish this ticket first."
+msgstr "Das Ticket mit der Nummer {0} ist noch heruntergeladen. Bitte beenden Sie dessen Bearbeitung zunächst."
+
+msgid "The ticket is still checked out. Please finish this ticket first."
+msgstr "Das Ticket ist noch heruntergeladen. Bitte beenden Sie die Bearbeitung zunächst."
+
+msgid "Failed to update the ticket's state. Please try again later."
+msgstr "Konnte Ticketstatus nicht aktualisieren. Bitte probieren Sie es später erneut."
+
+msgid "Invalid authentication. Please check your login data."
+msgstr "Ungültige Authentifizierung. Bitte prüfen Sie Ihre Anmeldedaten."
+
+msgid "Invalid session. Coulnd't verify your session."
+msgstr "Ungültige Sitzung. Verifizierung nicht möglich."
+
+msgid "Missing internet connection."
+msgstr "Internetverbindung nicht vorhanden."
+
+msgid "Another time tracking is still running."
+msgstr "Eine andere Zeiterfassung läuft bereits."
+
+msgid "The start date has to be before the end date."
+msgstr "Startdatum muss vor dem Endedatum liegen"
+
+msgid "You need to enter a reason to decline the ticket."
+msgstr "Zur Ablehnung eines Tickets geben Sie bitte eine Begründung ein."
+
+msgid "The time tracking stopped because it exceeded the automatic stop duration."
+msgstr "Die Zeiterfassung wurde autom. gestoppt, da die Maximaldauer überschritten wurde."
+
+msgid "Deletes all locally stored ticket information and attachments"
+msgstr "Löscht alle lokal gespeicherten Ticketinformationen und Anhänge."
+
+msgid "Timetracking will be stopped autoamtically after {0} h"
+msgstr "Zeiterfassugn wird autom. naxh {0}h gestoppt."
+
+msgid "Entry is not visible on the exernal work report."
+msgstr "Eintrag ist nicht sichtbar im Arbeitsbericht (Kunde)."
+
+msgid "Entry is visible on the external work report."
+msgstr "Eintrag ist sichtbar im Arbeitsbericht (Kunde)."
+
+msgid "Note is not visble on the exernal work report."
+msgstr "Notiz ist nicht sichtbar im Arbeitsbericht (Kunde)."
+
+msgid "Note is visible on the external work report."
+msgstr "Notiz ist sichtbar im Arbeitsbericht (Kunde)."
+
+msgid "Ticket can be edited without internet connection"
+msgstr "Ticket kann ohne Internetverbindung bearbeitet werden."
+
+msgid "The time tracking is active for another ticket and has to be stopped."
+msgstr "Die Zeiterfassung für ein anderes Ticket ist aktiv und muss zunächst beendet werden."
+
+msgid "The requested ressource couldn't be found."
+msgstr "Die angefragte Ressource konnte nicht gefunden werden."
+
+msgid "Something went wrong with the request to the server."
+msgstr "Fehler in Kommunikation mit Server."
+
+msgid "There was an error on the server. Please try again later."
+msgstr "Es ist ein Serverfehler aufgetreten. Bitte probieren Sie es später erneut."
+
+msgid "The connection was lost. The ticket couldn't be changed."
+msgstr "Die Verbindung ist abgebrochen. Das Ticket konnte nicht geändert werden."

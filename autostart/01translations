@@ -1,2 +1,5 @@
 # refresh translations from PO file
 Admin::Translation::Import --allow-root
+
+# import translations from PO file of FieldAgent app 
+Admin::Translation::Import --allow-root --locale-directory <KIX_CONFIG_Home>/locale/FieldAgentApp
