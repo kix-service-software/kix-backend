@@ -1,0 +1,30 @@
+{
+   "$id" : "#MacroTypeCollectionResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of macro types.",
+   "type" : "object",
+   "properties" : {
+      "MacroType" : {
+         "type" : "array",
+         "items" : {
+            "type" : "object",
+            "properties" : {
+               "DisplayName" : {
+                  "type" : "string",
+                  "readOnly" : true
+               },
+               "Name" : {
+                  "type" : "string",
+                  "readOnly" : true
+               }
+            },
+            "required" : [
+               "Name"
+            ]
+         }
+      }
+   },
+   "required" : [
+      "MacroType"
+   ]
+}

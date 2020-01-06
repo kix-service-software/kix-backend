@@ -53,7 +53,7 @@ my @TicketIDs;
 for my $Item ( 1 .. 2 ) {
     my $TicketID = $TicketObject->TicketCreate(
         Title => ( $Item == 1 ) ? ( $RandomID . 'Ticket One Title' ) : ( $RandomID . 'Ticket Two Title ' . $RandomID ),
-        Queue => 'Raw',
+        Queue => 'Junk',
         Lock  => 'unlock',
         Priority     => '3 normal',
         State        => 'new',

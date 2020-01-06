@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#MacroActionPostItem",
+  "type": "object",
+  "description": "The macro action object for creation.",
+  "properties": {
+    "Comment": {
+      "type": "string"
+    },
+    "MacroID": {
+      "type": "integer",
+      "description": "ID of the corresponding macro."
+    },
+    "Parameters": {
+      "type": "object",
+      "description": ""
+    },
+    "Type": {
+      "type": "string",
+      "description": ""
+    },
+    "ValidID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "MacroID",
+    "Type"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#ExecPlanPostPatchResponse",
+  "type": "object",
+  "description": "The ID of the created or updated execution plan.",
+  "properties": {
+    "ExecPlanID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ExecPlanID"
+  ]
+}

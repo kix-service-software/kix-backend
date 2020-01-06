@@ -1,6 +1,6 @@
 {
    "$id" : "#FollowUpTypeCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of followup types.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "FollowUpType" : {
          "$id" : "#FollowUpType",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The followup type object.",
          "type" : "object",
          "properties" : {

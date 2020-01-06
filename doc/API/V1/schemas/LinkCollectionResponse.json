@@ -1,6 +1,6 @@
 {
    "$id" : "#LinkCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of links.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "Link" : {
          "$id" : "#Link",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The link object.",
          "type" : "object",
          "properties" : {
@@ -39,7 +39,7 @@
                "readOnly" : true
             },
             "SourceObject" : {
-               "description" : "The type source object. See resource /links/types for possible object types.",
+               "description" : "The type of the source object. See resource /links/types for possible object types.",
                "type" : "string",
                "readOnly" : true
             },
@@ -49,7 +49,7 @@
                "readOnly" : true
             },
             "TargetObject" : {
-               "description" : "The type target object. See resource /links/types for possible object types.",
+               "description" : "The type of the target object. See resource /links/types for possible object types.",
                "type" : "string",
                "readOnly" : true
             },

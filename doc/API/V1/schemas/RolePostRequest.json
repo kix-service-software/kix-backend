@@ -1,6 +1,6 @@
 {
    "$id" : "#RolePostRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The role request object for creation.",
    "type" : "object",
    "properties" : {
@@ -40,9 +40,9 @@
    ],
    "definitions" : {
       "PermissionPostItem" : {
-         "$id" : "#PermissionPostRequest",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The permission request object for creation.",
+         "$id" : "#PermissionPostItem",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The permission item object for creation.",
          "type" : "object",
          "properties" : {
             "Comment" : {

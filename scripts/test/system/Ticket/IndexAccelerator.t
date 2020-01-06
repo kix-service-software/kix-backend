@@ -28,7 +28,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     );
     my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
-    my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup( Queue => 'Raw' );
+    my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup( Queue => 'Junk' );
 
     $Kernel::OM->Get('Kernel::Config')->Set(
         Key   => 'Ticket::IndexModule',
@@ -46,7 +46,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     my @TicketIDs;
     my $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket_Title - ticket index accelerator tests',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'new',
@@ -68,7 +68,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     );
     $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket_Title - ticket index accelerator tests',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'closed',
@@ -84,7 +84,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     );
     $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket_Title - ticket index accelerator tests',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'lock',
         Priority     => '3 normal',
         State        => 'closed',
@@ -100,7 +100,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     );
     $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket_Title - ticket index accelerator tests',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'lock',
         Priority     => '3 normal',
         State        => 'open',
@@ -116,7 +116,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     );
     $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket_Title - ticket index accelerator tests',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'open',
@@ -142,9 +142,9 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
         "$Module TicketAcceleratorIndex() - AllTickets",
     );
     for my $ItemNow ( @{ $IndexNow{Queues} } ) {
-        if ( $ItemNow->{Queue} eq 'Raw' ) {
+        if ( $ItemNow->{Queue} eq 'Junk' ) {
             for my $ItemBefore ( @{ $IndexBefore{Queues} } ) {
-                if ( $ItemBefore->{Queue} eq 'Raw' ) {
+                if ( $ItemBefore->{Queue} eq 'Junk' ) {
                     $Self->Is(
                         $ItemBefore->{Count}  || 0,
                         $ItemNow->{Count} - 1 || '',
@@ -175,9 +175,9 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
         "$Module TicketAcceleratorIndex() - AllTickets",
     );
     for my $ItemNow ( @{ $IndexNow{Queues} } ) {
-        if ( $ItemNow->{Queue} eq 'Raw' ) {
+        if ( $ItemNow->{Queue} eq 'Junk' ) {
             for my $ItemBefore ( @{ $IndexBefore{Queues} } ) {
-                if ( $ItemBefore->{Queue} eq 'Raw' ) {
+                if ( $ItemBefore->{Queue} eq 'Junk' ) {
                     $Self->Is(
                         $ItemBefore->{Count}  || 0,
                         $ItemNow->{Count} - 1 || '',
@@ -208,9 +208,9 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
         "$Module TicketAcceleratorIndex() - AllTickets",
     );
     for my $ItemNow ( @{ $IndexNow{Queues} } ) {
-        if ( $ItemNow->{Queue} eq 'Raw' ) {
+        if ( $ItemNow->{Queue} eq 'Junk' ) {
             for my $ItemBefore ( @{ $IndexBefore{Queues} } ) {
-                if ( $ItemBefore->{Queue} eq 'Raw' ) {
+                if ( $ItemBefore->{Queue} eq 'Junk' ) {
                     $Self->Is(
                         $ItemBefore->{Count} || 0,
                         $ItemNow->{Count}    || '',
@@ -241,9 +241,9 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
         "$Module TicketAcceleratorIndex() - AllTickets",
     );
     for my $ItemNow ( @{ $IndexNow{Queues} } ) {
-        if ( $ItemNow->{Queue} eq 'Raw' ) {
+        if ( $ItemNow->{Queue} eq 'Junk' ) {
             for my $ItemBefore ( @{ $IndexBefore{Queues} } ) {
-                if ( $ItemBefore->{Queue} eq 'Raw' ) {
+                if ( $ItemBefore->{Queue} eq 'Junk' ) {
                     $Self->Is(
                         $ItemBefore->{Count}  || 0,
                         $ItemNow->{Count} - 1 || '',
@@ -284,9 +284,9 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
         "$Module TicketAcceleratorIndex() - AllTickets",
     );
     for my $ItemNow ( @{ $IndexNow{Queues} } ) {
-        if ( $ItemNow->{Queue} eq 'Raw' ) {
+        if ( $ItemNow->{Queue} eq 'Junk' ) {
             for my $ItemBefore ( @{ $IndexBefore{Queues} } ) {
-                if ( $ItemBefore->{Queue} eq 'Raw' ) {
+                if ( $ItemBefore->{Queue} eq 'Junk' ) {
                     $Self->Is(
                         $ItemBefore->{Count}  || 0,
                         $ItemNow->{Count} - 2 || '',

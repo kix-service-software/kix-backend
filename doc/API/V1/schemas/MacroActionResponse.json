@@ -1,0 +1,74 @@
+{
+   "$id" : "#MacroActionResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for macro action GET request.",
+   "type" : "object",
+   "properties" : {
+      "MacroAction" : {
+         "$ref" : "#/definitions/MacroAction"
+      }
+   },
+   "required" : [
+      "MacroAction"
+   ],
+   "definitions" : {
+      "MacroAction" : {
+         "$id" : "#MacroAction",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro action object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
+            },
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "MacroID",
+            "Type",
+            "ValidID"
+         ]
+      }
+   }
+}

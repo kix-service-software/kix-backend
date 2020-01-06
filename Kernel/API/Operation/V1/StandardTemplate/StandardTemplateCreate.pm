@@ -141,7 +141,7 @@ sub Run {
     if ( $Exist ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create StandardTemplate entry. Another StandardTemplate with same name already exists.",
+            Message => "Can not create StandardTemplate entry. Another StandardTemplate with the name already exists.",
         );
     }
     

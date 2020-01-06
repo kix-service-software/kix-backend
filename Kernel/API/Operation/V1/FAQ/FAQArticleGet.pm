@@ -149,44 +149,6 @@ sub Run {
         my @Keywords = split(/\s+/, $FAQArticle{Keywords});
         $FAQArticle{Keywords} = \@Keywords;
 
-        if ( $Param{Data}->{include}->{Attachments} ) {
-            # get attachment index (without attachments)
-            my @AtmIndex = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentIndex(
-                ItemID => $FAQArticleID,
-                UserID => $Self->{Authorization}->{UserID},
-            );
-
-            my @Attachments;
-            foreach my $Attachment ( sort {$a->{FileID} <=> $b->{FileID}} @AtmIndex ) {
-                push(@Attachments, $Attachment->{FileID});
-            }
-
-            # set Attachments data
-            $FAQArticle{Attachments} = \@Attachments;
-        }
-
-        if ( $Param{Data}->{include}->{History} ) {
-            # get history list (only IDs)
-            my $HistoryIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryList(
-                ItemID => $FAQArticleID,
-                UserID => $Self->{Authorization}->{UserID},
-            );
-
-            # set History data
-            $FAQArticle{History} = $HistoryIDs;
-        }
-
-        if ( $Param{Data}->{include}->{Votes} ) {
-            # get Vote list (only IDs)
-            my $VoteIDs = $Kernel::OM->Get('Kernel::System::FAQ')->VoteSearch(
-                ItemID => $FAQArticleID,
-                UserID => $Self->{Authorization}->{UserID},
-            );
-
-            # set Vote data
-            $FAQArticle{Votes} = $VoteIDs;
-        }
-
         # add
         push(@FAQArticleData, \%FAQArticle);
     }

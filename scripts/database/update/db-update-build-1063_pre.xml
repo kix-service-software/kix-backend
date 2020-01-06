@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+<!-- job -->
+<TableCreate Name="job">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
+    <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="last_exec_time" Required="false" Type="DATE"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Index Name="job_name">
+        <IndexColumn Name="name"/>
+    </Index>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+<!-- exec_plan -->
+<TableCreate Name="exec_plan">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
+    <Column Name="parameters" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Index Name="exec_plan_name">
+        <IndexColumn Name="name"/>
+    </Index>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+<!-- macro -->
+<TableCreate Name="macro">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
+    <Column Name="exec_order" Required="false" Size="10000" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Index Name="macro_name">
+        <IndexColumn Name="name"/>
+    </Index>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+<!-- macro_action -->
+<TableCreate Name="macro_action">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="macro_id" Required="true" Type="INTEGER"/>
+    <Column Name="type" Required="true" Size="250" Type="VARCHAR"/>
+    <Column Name="parameters" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <ForeignKey ForeignTable="macro">
+        <Reference Local="macro_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+<!-- job_exec_plan - relation job<->exec_plan -->
+<TableCreate Name="job_exec_plan">
+    <Column Name="job_id" Required="true" Type="INTEGER"/>
+    <Column Name="exec_plan_id" Required="true" Type="INTEGER"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique Name="job_exec_plan_pkey">
+        <UniqueColumn Name="job_id"/>
+        <UniqueColumn Name="exec_plan_id"/>
+    </Unique>
+    <Index Name="job_exec_plan_job_id">
+        <IndexColumn Name="job_id"/>
+    </Index>
+    <Index Name="job_exec_plan_ep_id">
+        <IndexColumn Name="exec_plan_id"/>
+    </Index>
+    <ForeignKey ForeignTable="job">
+        <Reference Local="job_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="exec_plan">
+        <Reference Local="exec_plan_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+<!-- job_macro - relation job<->macro -->
+<TableCreate Name="job_macro">
+    <Column Name="job_id" Required="true" Type="INTEGER"/>
+    <Column Name="macro_id" Required="true" Type="INTEGER"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Unique Name="job_macro_pkey">
+        <UniqueColumn Name="job_id"/>
+        <UniqueColumn Name="macro_id"/>
+    </Unique>
+    <Index Name="job_macro_job_id">
+        <IndexColumn Name="job_id"/>
+    </Index>
+    <Index Name="job_macro_macro_id">
+        <IndexColumn Name="macro_id"/>
+    </Index>
+    <ForeignKey ForeignTable="job">
+        <Reference Local="job_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="macro">
+        <Reference Local="macro_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+<!-- automation_log -->
+<TableCreate Name="automation_log">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+    <Column Name="job_id" Required="false" Type="INTEGER"/>
+    <Column Name="macro_id" Required="false" Type="INTEGER"/>
+    <Column Name="macro_action_id" Required="false" Type="INTEGER"/>
+    <Column Name="priority" Required="false" Size="20" Type="VARCHAR"/>
+    <Column Name="message" Required="false" Size="10000" Type="VARCHAR"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Index Name="automation_log_job_id">
+        <IndexColumn Name="job_id"/>
+    </Index>
+    <Index Name="automation_log_macro_id">
+        <IndexColumn Name="macro_id"/>
+    </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+    </ForeignKey>
+</TableCreate>
+
+</database>

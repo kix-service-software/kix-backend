@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Queue::QueueGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">QueueGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">QueueID</Item>
-                <Item Key="ResponseObject">QueueResponse</Item>
+                <Item Key="ResponseSchema">QueueResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
                 <Item Key="AdditionalUriParameters">TicketStats.StateType, TicketStats.StateID</Item>
@@ -16,41 +16,41 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Queue::QueueSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">QueueSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">QueueCollectionResponse</Item>
+                <Item Key="ResponseSchema">QueueCollectionResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Queue::QueueCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">QueueCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">QueuePostRequest</Item>
-                <Item Key="ResponseObject">QueuePostPatchResponse</Item>
+                <Item Key="RequestSchema">QueuePostRequest</Item>
+                <Item Key="ResponseSchema">QueuePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Queue::QueueUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">QueueUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">QueuePatchRequest</Item>
-                <Item Key="ResponseObject">QueuePostPatchResponse</Item>
+                <Item Key="RequestSchema">QueuePatchRequest</Item>
+                <Item Key="ResponseSchema">QueuePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Queue::QueueDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -60,20 +60,20 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Queue::FollowUpTypeSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::FollowUpTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">FollowUpTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">FollowUpTypeCollectionResponse</Item>
+                <Item Key="ResponseSchema">FollowUpTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Queue.SubQueues" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Queue.SubQueues" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -82,7 +82,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Queue.Tickets" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Queue.Tickets" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

@@ -57,6 +57,11 @@ sub Run {
         'Customer Manager' => 12
     );
 
+    my %PermissionTypeList = (
+        'Resource'         => 1,
+        'PropertyValue'    => 2,
+    );
+
     my $CSVFile = $Self->GetOption('file');
     if ( !-f $CSVFile ) {
         die "File $CSVFile does not exist or is not readable.\n";
@@ -83,6 +88,7 @@ sub Run {
 
     foreach my $Line (@Lines) {        
         my $Role   = $Line->[0];
+        my $Type   = $Line->[1];
         my $Target = $Line->[2];
         my $Value  = 0
             + ( $Line->[3] ? Kernel::System::Role::Permission->PERMISSION->{CREATE} : 0 )
@@ -104,7 +110,7 @@ sub Run {
             "    <!-- role \"$Role\": permission $PermissionStr on $Target -->
     <Insert Table=\"role_permission\">
         <Data Key=\"role_id\">$RoleList{$Role}</Data>
-        <Data Key=\"type_id\">1</Data>
+        <Data Key=\"type_id\">$PermissionTypeList{$Type}</Data>
         <Data Key=\"target\" Type=\"Quote\">$Target</Data>
         <Data Key=\"value\">$Value</Data>
         <Data Key=\"create_by\">1</Data>

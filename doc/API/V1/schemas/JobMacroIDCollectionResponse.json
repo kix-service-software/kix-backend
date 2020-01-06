@@ -1,0 +1,18 @@
+{
+   "$id" : "#JobMacroIDCollectionResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for job - macro IDs GET request.",
+   "type" : "object",
+   "properties" : {
+      "MacroID" : {
+         "description" : "List of IDs of assigned macros of the job",
+         "type" : "array",
+         "item" : {
+            "type" : "integer"
+         }
+      }
+   },
+   "required" : [
+      "MacroID"
+   ]
+}

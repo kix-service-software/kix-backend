@@ -209,7 +209,6 @@ sub _DaemonSort {
     my %DefaultDaemons = (
         SchedulerFutureTaskManager       => 100,
         SchedulerCronTaskManager         => 110,
-        SchedulerGenericAgentTaskManager => 111,
         SchedulerTaskWorker              => 112,
     );
 

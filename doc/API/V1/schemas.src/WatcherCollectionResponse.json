@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#WatcherCollectionResponse",
+  "type": "object",
+  "description": "A list of watchers.",
+  "properties": {
+    "Watcher": {
+      "type": "array",
+      "items": {
+        "$ref": "Watcher.json"
+      }
+    }
+  },
+  "required": [
+    "Watcher"
+  ]
+}

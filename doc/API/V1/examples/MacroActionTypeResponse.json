@@ -1,0 +1,22 @@
+{
+    "MacroActionType": {
+        "Description": "Sets the state of a ticket.",
+        "DisplayName": "Set Ticket State",
+        "MacroType": "Ticket",
+        "Name": "StateSet",
+        "Options": {
+            "PendingTimeDiff": {
+                "Description": "(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.",
+                "Label": "Pending Time Difference",
+                "Name": "PendingTimeDiff",
+                "Required": 0
+            },
+            "State": {
+                "Description": "The name of the state to be set.",
+                "Label": "State",
+                "Name": "State",
+                "Required": 1
+            }
+        }
+    }
+}

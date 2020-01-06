@@ -1,6 +1,6 @@
 {
    "$id" : "#QueueCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of queues.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "Queue" : {
          "$id" : "#Priority",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
          "type" : "object",
          "properties" : {

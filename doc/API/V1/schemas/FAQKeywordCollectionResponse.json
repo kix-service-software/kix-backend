@@ -1,6 +1,6 @@
 {
    "$id" : "#FAQKeywordCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of all FAQ article keywords.",
    "type" : "object",
    "properties" : {

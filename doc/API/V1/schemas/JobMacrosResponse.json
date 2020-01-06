@@ -1,0 +1,148 @@
+{
+   "$id" : "#JobMacrosResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for job - macros GET request.",
+   "type" : "object",
+   "properties" : {
+      "Macro" : {
+         "description" : "List of assigned macros of the job",
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/_Macro_json"
+         }
+      }
+   },
+   "required" : [
+      "Macro"
+   ],
+   "definitions" : {
+      "_MacroAction_json" : {
+         "$id" : "#MacroAction",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro action object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
+            },
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "MacroID",
+            "Type",
+            "ValidID"
+         ]
+      },
+      "_Macro_json" : {
+         "$id" : "#Macro",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro object.",
+         "type" : "object",
+         "properties" : {
+            "Actions" : {
+               "description" : "added via include \"Actions\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_MacroAction_json"
+               },
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ExecOrder" : {
+               "description" : "Order of corresponding macro actions as IDs.",
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "Type",
+            "ValidID"
+         ]
+      }
+   }
+}

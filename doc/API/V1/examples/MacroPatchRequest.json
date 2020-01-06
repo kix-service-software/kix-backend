@@ -1,0 +1,8 @@
+{
+    "Macro": {
+        "Comment": "new comment",
+        "ExecOrder": [ 2,1 ],
+        "Name": "new macro name",
+        "ValidID": 2
+    }
+}

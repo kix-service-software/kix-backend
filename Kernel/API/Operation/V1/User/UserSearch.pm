@@ -54,6 +54,22 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{RequiredPermission} = {
+        TicketRead => {
+            Target => '/tickets',
+            Permission => 'READ'
+        },
+        TicketCreate => {
+            Target => '/tickets',
+            Permission => 'CREATE'
+        },
+        # FIXME: currently with placeholder, until specific object permission are implemented
+        TicketUpdate => {
+            Target => '/tickets/placeholder',
+            Permission => 'UPDATE'
+        }
+    };
+
     return $Self;
 }
 
@@ -67,13 +83,13 @@ perform UserSearch Operation. This will return a User ID list.
     );
 
     $Result = {
-        Success      => 1,                                # 0 or 1
+        Success      => 1,                           # 0 or 1
         Message => '',                               # In case of an error
         Data         => {
             User => [
                 {
                 },
-                {                    
+                {
                 }
             ],
         },
@@ -92,11 +108,38 @@ sub Run {
 
     if (IsHashRefWithData(\%UserList)) {
 
+        # check requested permissions (AND combined)
+        my @GetUserIDs = sort keys %UserList;
+        if( $Param{Data} && $Param{Data}->{requiredPermission} ) {
+            my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission});
+
+            for my $Permission (@Permissions) {
+                next if (!$Self->{RequiredPermission} || !$Self->{RequiredPermission}->{$Permission});
+
+                my @AllowedUserIDs;
+                for my $UserID (@GetUserIDs) {
+
+                    my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                        UserID              => $UserID,
+                        Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
+                        RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission}
+                    );
+
+                    if ($Granted) {
+                        push(@AllowedUserIDs, $UserID);
+                    }
+                }
+
+                # set allowed ids for next permission
+                @GetUserIDs = @AllowedUserIDs;
+            }
+        }
+
         # get already prepared user data from UserGet operation
         my $UserGetResult = $Self->ExecOperation(
             OperationType => 'V1::User::UserGet',
             Data          => {
-                UserID => join(',', sort keys %UserList),
+                UserID => join(',', @GetUserIDs),
             }
         );
         if ( !IsHashRefWithData($UserGetResult) || !$UserGetResult->{Success} ) {

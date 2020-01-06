@@ -141,7 +141,7 @@ sub Run {
     if ( %OrganisationSearch ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Cannot create organisation. Another organisation with same name already exists.',
+            Message => 'Cannot create organisation. Another organisation with the name already exists.',
         );
     }
     

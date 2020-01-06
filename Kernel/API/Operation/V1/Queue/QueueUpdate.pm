@@ -102,18 +102,18 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 Name                => '...',
                 ParentID            => 123,
                 Comment             => '...',     # (optional)
-                ValidID             => '...',     # (optional)              
+                ValidID             => '...',     # (optional)
                 Calendar            => '...',     # (optional)
                 UnlockTimeout       => '...',,    # (optional)
                 FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
                 FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
                 DefaultSignKey      => '...',     # (optional)
                 SystemAddressID     => '...',
-                Signature           => '...',                                     
+                Signature           => '...',
             },
-	    },
-	);
-    
+        },
+    );
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
@@ -123,13 +123,13 @@ perform QueueUpdate Operation. This will return the updated TypeID.
             QueueID  => 123,                     # ID of the updated Queue 
         },
     };
-   
+
 =cut
 
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # isolate and trim Queue parameter
     my $Queue = $Self->_Trim(
         Data => $Param{Data}->{Queue}
@@ -139,12 +139,12 @@ sub Run {
     my $QueueFullName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
         QueueID => $Param{Data}->{QueueID},
     );
-        
+
     if ( !$QueueFullName ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
-    } 
+    }
 
     my %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
         ID => $Param{Data}->{QueueID},
@@ -181,33 +181,34 @@ sub Run {
             $Queue->{Name} = join('::', @NameParts);
         }
     }
-      
+
     # update Queue
-    my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueUpdate(    
+    my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueUpdate(
         QueueID             => $Param{Data}->{QueueID},
         Name                => $Queue->{Name} || $QueueData{Name},
         Calendar            => $Queue->{Calendar} || $QueueData{Calendar},
-        UnlockTimeout       => $Queue->{UnlockTimeout} || $QueueData{UnlockTimeout},
+        UnlockTimeout       => exists $Queue->{UnlockTimeout} ? $Queue->{UnlockTimeout} : $QueueData{UnlockTimeout},
         FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID},
-        FollowUpLock        => $Queue->{FollowUpLock} || $QueueData{FollowUpLock},
+        FollowUpLock        =>
+            $Queue->{FollowUpLock} != $QueueData{FollowUpLock} ? $Queue->{FollowUpLock} : $QueueData{FollowUpLock},
         DefaultSignKey      => $Queue->{DefaultSignKey} || $QueueData{DefaultSignKey},
         SystemAddressID     => $Queue->{SystemAddressID} || $QueueData{SystemAddressID},
-        Signature           => exists $Queue->{Signature} ? $Queue->{Signature} : $QueueData{Signature},            
+        Signature           => exists $Queue->{Signature} ? $Queue->{Signature} : $QueueData{Signature},
         Comment             => exists $Queue->{Comment} ? $Queue->{Comment} : $QueueData{Comment},
         ValidID             => $Queue->{ValidID}  || $QueueData{ValidID},
         UserID              => $Self->{Authorization}->{UserID},
     ); 
-    
+
     if ( !$Success ) {
         return $Self->_Error(
             Code => 'Object.UnableToUpdate',
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         QueueID => $Param{Data}->{QueueID},
-    );    
+    );
 }
 
 1;

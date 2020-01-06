@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::TicketGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TicketID</Item>
-                <Item Key="ResponseObject">TicketResponse</Item>
+                <Item Key="ResponseSchema">TicketResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
                 <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; OrganisationID; ContactID; OwnerID; ResponsibleID; TypeID; ServiceID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangeBy; Unseen; UntilTime]</Item>
@@ -16,41 +16,41 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::TicketSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::TicketCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketPostRequest</Item>
-                <Item Key="ResponseObject">TicketPostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketPostRequest</Item>
+                <Item Key="ResponseSchema">TicketPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::TicketUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">TicketUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketPatchRequest</Item>
-                <Item Key="ResponseObject">TicketPostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketPatchRequest</Item>
+                <Item Key="ResponseSchema">TicketPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::TicketDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::TicketDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -59,13 +59,13 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketSearch###SearchLimit" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::TicketSearch###SearchLimit" Required="1" Valid="1">
         <Description Translatable="1">Maximum number of tickets to be displayed in the result of this operation.</Description>
         <Setting>
             <String Regex="^[0-9]{1,8}$">500</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketSearch###SortBy::Default" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::TicketSearch###SortBy::Default" Required="1" Valid="1">
         <Description Translatable="1">Defines the default ticket attribute for ticket sorting of the ticket search result of this operation.</Description>
         <Setting>
             <Option SelectedID="Age">
@@ -78,7 +78,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::TicketSearch###Order::Default" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::TicketSearch###Order::Default" Required="1" Valid="1">
         <Description Translatable="1">Defines the default ticket order in the ticket search result of the this operation. Up: oldest on top. Down: latest on top.</Description>
         <Setting>
             <Option SelectedID="Down">
@@ -88,54 +88,54 @@
         </Setting>
     </ConfigItem>
     
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ArticleID</Item>
-                <Item Key="ResponseObject">TicketArticleResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketArticleCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketArticlePostRequest</Item>
-                <Item Key="ResponseObject">TicketArticlePostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketArticlePostRequest</Item>
+                <Item Key="ResponseSchema">TicketArticlePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketArticlePatchRequest</Item>
-                <Item Key="ResponseObject">TicketArticlePostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketArticlePatchRequest</Item>
+                <Item Key="ResponseSchema">TicketArticlePostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -144,190 +144,190 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::ArticleCreate###HistoryType" Required="1" Valid="1">
         <Description Translatable="1">Defines the history type for this operation, which gets used for ticket history in the agent interface.</Description>
         <Setting>
             <String Regex="">AddNote</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleCreate###HistoryComment" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::ArticleCreate###HistoryComment" Required="1" Valid="1">
         <Description Translatable="1">Defines the history comment for this operation, which gets used for ticket history in the agent interface.</Description>
         <Setting>
             <String Regex="">%%</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleCreate###Channel" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::ArticleCreate###Channel" Required="1" Valid="1">
         <Description Translatable="1">Defines the default type of the article for this operation.</Description>
         <Setting>
             <String Regex="">note</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::V1::ArticleCreate###AutoResponseType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::V1::ArticleCreate###AutoResponseType" Required="1" Valid="1">
         <Description Translatable="1">Defines the default auto response type of the article for this operation.</Description>
         <Setting>
             <String Regex=""></String>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleAttachmentGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
-                <Item Key="ResponseObject">TicketArticleAttachmentResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleAttachmentResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleAttachmentSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketArticleAttachmentCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleAttachmentCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleAttachmentCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketArticleAttachmentPostRequest</Item>
-                <Item Key="ResponseObject">TicketArticleAttachmentPostResponse</Item>
+                <Item Key="RequestSchema">TicketArticleAttachmentPostRequest</Item>
+                <Item Key="ResponseSchema">TicketArticleAttachmentPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleFlagGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">FlagName</Item>
-                <Item Key="ResponseObject">TicketArticleFlagResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleFlagResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleFlagSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketArticleFlagCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleFlagCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleFlagCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketArticleFlagPostRequest</Item>
-                <Item Key="ResponseObject">TicketArticleFlagPostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketArticleFlagPostRequest</Item>
+                <Item Key="ResponseSchema">TicketArticleFlagPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleFlagUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleFlagUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketArticleFlagPostRequest</Item>
-                <Item Key="ResponseObject">TicketArticleFlagPostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketArticleFlagPostRequest</Item>
+                <Item Key="ResponseSchema">TicketArticleFlagPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::HistoryGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::HistoryGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">HistoryGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">HistoryID</Item>
-                <Item Key="ResponseObject">TicketHistoryResponse</Item>
+                <Item Key="ResponseSchema">TicketHistoryResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::HistorySearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::HistorySearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">HistorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketHistoryCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketHistoryCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ChecklistID</Item>
-                <Item Key="ResponseObject">TicketChecklistResponse</Item>
+                <Item Key="ResponseSchema">TicketChecklistResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketChecklistCollectionResponse</Item>
+                <Item Key="ResponseSchema">TicketChecklistCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistCreate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketChecklistPostRequest</Item>
-                <Item Key="ResponseObject">TicketChecklistPostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketChecklistPostRequest</Item>
+                <Item Key="ResponseSchema">TicketChecklistPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistUpdate" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketChecklistPatchRequest</Item>
-                <Item Key="ResponseObject">TicketChecklistPostPatchResponse</Item>
+                <Item Key="RequestSchema">TicketChecklistPatchRequest</Item>
+                <Item Key="ResponseSchema">TicketChecklistPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ChecklistDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistDelete" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -336,66 +336,21 @@
             </Hash>
         </Setting>
     </ConfigItem>
-
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherGet" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketWatcherResponse</Item>
-                <Item Key="CacheType">API_tickets</Item>
-                <Item Key="CacheTypeDependency">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherSearch" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherSearch</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketWatcherCollectionResponse</Item>
-                <Item Key="CacheType">API_tickets</Item>
-                <Item Key="CacheTypeDependency">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherCreate" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherCreate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">TicketWatcherPostRequest</Item>
-                <Item Key="ResponseObject">TicketWatcherPostResponse</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::WatcherDelete" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">WatcherDelete</Item>
-                <Item Key="APIVersion">V1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     
-    <ConfigItem Name="API::Operation::Module###V1::Ticket::ArticleAttachmentZipGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleAttachmentZipGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentZipGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">TicketArticleAttachmentZipResponse</Item>
+                <Item Key="ResponseSchema">TicketArticleAttachmentZipResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Ticket.Articles" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.Articles" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -405,7 +360,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Ticket.History" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.History" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -415,7 +370,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Article.Attachments" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.Attachments" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
@@ -425,7 +380,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::GenericExpand###Article.Flags" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.Flags" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

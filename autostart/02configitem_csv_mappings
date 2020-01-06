@@ -1,0 +1,2 @@
+# auto creation of config item csv mappings
+Admin::ITSM::ImportExport::AutoCreateMapping --allow-root

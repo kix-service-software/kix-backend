@@ -1,6 +1,6 @@
 {
    "$id" : "#ContactResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for contact GET request.",
    "type" : "object",
    "properties" : {

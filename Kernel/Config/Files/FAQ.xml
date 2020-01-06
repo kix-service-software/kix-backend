@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem Name="FAQ::Agent::StateTypes" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Agent::StateTypes" Required="1" Valid="1">
         <Description Translatable="1">List of state types which can be used in the agent interface.</Description>
         <Group>FAQ</Group>
         <SubGroup>Interface</SubGroup>
@@ -12,7 +12,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Public::StateTypes" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Public::StateTypes" Required="1" Valid="1">
         <Description Translatable="1">List of state types which can be used in the public interface.</Description>
         <Group>FAQ</Group>
         <SubGroup>Interface</SubGroup>
@@ -22,7 +22,7 @@
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Explorer::ItemList::VotingResultDecimalPlaces" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Explorer::ItemList::VotingResultDecimalPlaces" Required="1" Valid="1">
         <Description Translatable="1">Decimal places of the voting result.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Explorer</SubGroup>
@@ -30,7 +30,7 @@
             <String>2</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::FAQHook" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::FAQHook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a FAQ, e.g. FAQ#, KB#, MyFAQ#. The default is FAQ#.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core</SubGroup>
@@ -38,7 +38,7 @@
             <String>FAQ#</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::TitleSize" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::TitleSize" Required="1" Valid="1">
         <Description Translatable="1">Default maximum size of the titles in a FAQ article to be shown.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core</SubGroup>
@@ -46,7 +46,7 @@
             <String Regex="^[0-9]{1,3}$">50</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalRequired" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalRequired" Required="1" Valid="1">
         <Description Translatable="1">New FAQ articles need approval before they get published.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -57,7 +57,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalGroup" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalGroup" Required="1" Valid="1">
         <Description Translatable="1">Group for the approval of FAQ articles.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -65,7 +65,7 @@
             <String>faq_approval</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalQueue" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalQueue" Required="1" Valid="1">
         <Description Translatable="1">Queue for the approval of FAQ articles.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -73,7 +73,7 @@
             <String>FAQ_Approval</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalTicketSubject" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalTicketSubject" Required="1" Valid="1">
         <Description Translatable="1">Ticket subject for approval of FAQ article.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -81,7 +81,7 @@
             <String>FAQ approval required for FAQ# &lt;KIX_FAQ_NUMBER&gt;</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalTicketBody" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalTicketBody" Required="1" Valid="1">
         <Description Translatable="1">Ticket body for approval of FAQ article.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -103,7 +103,7 @@ Your KIX Notification Master
             </TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalTicketPriority" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalTicketPriority" Required="1" Valid="1">
         <Description Translatable="1">Default priority of tickets for the approval of FAQ articles.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -111,7 +111,7 @@ Your KIX Notification Master
             <String>3 normal</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalTicketDefaultState" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalTicketDefaultState" Required="1" Valid="1">
         <Description Translatable="1">Default state of tickets for the approval of FAQ articles.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -119,7 +119,7 @@ Your KIX Notification Master
             <String>new</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::ApprovalTicketType" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::ApprovalTicketType" Required="1" Valid="1">
         <Description Translatable="1">Default type of tickets for the approval of FAQ articles.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Approval</SubGroup>
@@ -127,7 +127,7 @@ Your KIX Notification Master
             <String>Unclassified</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::Field1" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::Field1" Required="1" Valid="1">
         <Description Translatable="1">Definition of FAQ item free text field.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -139,7 +139,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::Field2" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::Field2" Required="1" Valid="1">
         <Description Translatable="1">Definition of FAQ item free text field.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -151,7 +151,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::Field3" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::Field3" Required="1" Valid="1">
         <Description Translatable="1">Definition of FAQ item free text field.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -163,7 +163,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::Field4" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::Field4" Required="1" Valid="1">
         <Description Translatable="1">Definition of FAQ item free text field.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -175,7 +175,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::Field5" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::Field5" Required="1" Valid="1">
         <Description Translatable="1">Definition of FAQ item free text field.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -187,7 +187,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::Field6" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::Field6" Required="1" Valid="1">
         <Description Translatable="1">Definition of FAQ item free text field.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -199,7 +199,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###8301" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8301" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'FAQ' objects using the 'Normal' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -211,7 +211,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###8302" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8302" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'FAQ' objects using the 'ParentChild' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -223,7 +223,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###8303" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8303" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'Ticket' objects using the 'Normal' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -235,7 +235,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###8304" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8304" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'Ticket' objects using the 'ParentChild' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -247,7 +247,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###8305" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8305" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'ConfigItem' objects using the 'Normal' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -259,7 +259,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="LinkObject::PossibleLink###8306" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8306" Required="0" Valid="1">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'ConfigItem' objects using the 'RelevantTo' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -271,7 +271,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::Item::HTML" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Item::HTML" Required="1" Valid="1">
         <Description Translatable="1">Show FAQ Article with HTML.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::Item</SubGroup>
@@ -282,84 +282,7 @@ Your KIX Notification Master
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###InsertMethod" Required="1" Valid="1">
-        <Description Translatable="1">Defines the information to be inserted in a FAQ based Ticket. "Full FAQ" includes text, attachments and inline images.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="Full">
-                <Item Translatable="1" Key="Full">Full FAQ</Item>
-                <Item Translatable="1" Key="Text">Text Only</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###IncludeInternal" Required="1" Valid="1">
-        <Description Translatable="1">Include internal fields on a FAQ based Ticket.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Translatable="1" Key="0">No</Item>
-                <Item Translatable="1" Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###ShowFieldNames" Required="1" Valid="1">
-        <Description Translatable="1">Include the name of each field in a FAQ based Ticket.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Translatable="1" Key="0">No</Item>
-                <Item Translatable="1" Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###ShowInsertTextButton" Required="1" Valid="1">
-        <Description Translatable="1">Show "Insert FAQ Text" / "Insert Full FAQ" Button in AgentFAQZoomSmall.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Translatable="1" Key="0">No</Item>
-                <Item Translatable="1" Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###ShowInsertLinkButton" Required="1" Valid="1">
-        <Description Translatable="1">Show "Insert FAQ Link" Button in AgentFAQZoomSmall for public FAQ Articles.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Translatable="1" Key="0">No</Item>
-                <Item Translatable="1" Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###ShowInsertTextAndLinkButton" Required="1" Valid="1">
-        <Description Translatable="1">Show "Insert FAQ Text &amp; Link" / "Insert Full FAQ &amp; Link" Button in AgentFAQZoomSmall for public FAQ Articles.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Translatable="1" Key="0">No</Item>
-                <Item Translatable="1" Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::TicketCompose###UpdateArticleSubject" Required="1" Valid="1">
-        <Description Translatable="1">Define if the FAQ title should be concatenated to article subject.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::TicketCompose</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Translatable="1" Key="0">No</Item>
-                <Item Translatable="1" Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="FAQ::Voting" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::Voting" Required="1" Valid="1">
         <Description Translatable="1">Enable voting mechanism on FAQ module.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core</SubGroup>
@@ -370,7 +293,7 @@ Your KIX Notification Master
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="FAQ::CacheTTL" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="FAQ::CacheTTL" Required="1" Valid="1">
         <Description Translatable="1">Cache Time To Leave for FAQ items.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core</SubGroup>
@@ -378,7 +301,7 @@ Your KIX Notification Master
             <String Regex="">172800</String> <!-- default 172,800 (60 * 60 * 24 * 2) -->
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="DynamicFields::ObjectType###FAQ" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectType###FAQ" Required="0" Valid="1">
         <Description Translatable="1">DynamicField object registration.</Description>
         <Group>FAQ</Group>
         <SubGroup>DynamicFields::ObjectType::Registration</SubGroup>

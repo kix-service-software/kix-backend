@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#MacroActionTypeResponse",
+  "type": "object",
+  "description": "A response for macro action type GET request.",
+  "properties": {
+    "MacroActionType": {
+        "$ref": "MacroActionType.json"
+    }
+  },
+  "required": [
+    "MacroActionType"
+  ]  
+}

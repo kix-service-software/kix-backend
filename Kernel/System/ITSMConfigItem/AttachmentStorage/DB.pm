@@ -179,7 +179,7 @@ sub AttachmentGet {
     if (@Data) {
         my $SQL = "SELECT data FROM attachment_storage " . $WHERE;
 
-        if ( !$Kernel::OM->Get('Kernel::System::DB')->Prepare( SQL => $SQL ) ) {
+        if ( !$Kernel::OM->Get('Kernel::System::DB')->Prepare( SQL => $SQL, Encode => [ 0 ] ) ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "Failed to prepare SQL for FetchrowArray!"

@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id": "#ImportExportTemplateRunPostRequest",
+    "type": "object",
+    "description": "The import export template run post request object for create.",
+    "properties": {
+        "ImportExportTemplateRun": {
+            "type": "object",
+            "properties": {
+                "ImportFileContent": {
+                    "type": "string",
+                    "description": "required if type is 'import', the base64 encoded file content"
+                },
+                "Type": {
+                    "type": "string",
+                    "description": "the type of the run: use 'import' trigger an import and 'export' for export action"
+                }
+            },
+            "required": [
+              "Type"
+            ]
+        }
+    },
+    "required": [
+        "ImportExportTemplateRun"
+    ]
+}

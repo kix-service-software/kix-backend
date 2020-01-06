@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#JobTypeCollectionResponse",
+  "type": "object",
+  "description": "A list of job types.",
+  "properties": {
+    "MailAccountType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+            "DisplayName": {
+               "type": "string",
+               "readOnly": true
+            },
+            "Name": {
+              "type": "string",
+              "readOnly": true
+            }
+        },
+        "required": [
+            "Name"
+        ]  
+      }
+    }
+  },
+  "required": [
+    "JobType"
+  ]  
+}

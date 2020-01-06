@@ -1,6 +1,6 @@
 {
    "$id" : "#ContactPatchRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The contact request object for update.",
    "type" : "object",
    "properties" : {

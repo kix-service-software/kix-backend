@@ -1,6 +1,6 @@
 {
    "$id" : "#ConsoleCommandPostResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "ExitCode and result output of the command execution.",
    "type" : "object",
    "properties" : {

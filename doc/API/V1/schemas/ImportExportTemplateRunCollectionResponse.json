@@ -1,0 +1,79 @@
+{
+   "$id" : "#ImportExportTemplateRunCollectionResponse",
+   "$schema" : "http://json-schema.org/schema",
+   "description" : "A list of import export template runs (imports and exports).",
+   "type" : "object",
+   "properties" : {
+      "ImportExportTemplateRun" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_ImportExportTemplateRun_json"
+         }
+      }
+   },
+   "required" : [
+      "ImportExportTemplateRun"
+   ],
+   "definitions" : {
+      "_ImportExportTemplateRun_json" : {
+         "$id" : "#ImportExportTemplateRun",
+         "$schema" : "http://json-schema.org/schema",
+         "description" : "The import export template run object.",
+         "type" : "object",
+         "properties" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "EndTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FailCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StartTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "State" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SuccessCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TemplateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "EndTime",
+            "FailCount",
+            "ID",
+            "StartTime",
+            "State",
+            "StateID",
+            "SuccessCount",
+            "TemplateID",
+            "Type"
+         ]
+      }
+   }
+}

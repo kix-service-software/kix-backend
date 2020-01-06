@@ -46,7 +46,7 @@ my @Objects = (
     'Kernel::System::Encode',
     'Kernel::System::Environment',
     'Kernel::System::FileTemp',
-    'Kernel::System::GenericAgent',
+    'Kernel::System::Automation',
     'Kernel::System::GenericInterface::DebugLog',
     'Kernel::System::GenericInterface::Webservice',
     'Kernel::System::Group',

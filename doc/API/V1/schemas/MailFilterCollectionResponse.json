@@ -1,6 +1,6 @@
 {
    "$id" : "#MailFilterCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of mail filters.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "MailFilter" : {
          "$id" : "#MailFilter",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The mail filter object.",
          "type" : "object",
          "properties" : {

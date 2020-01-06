@@ -182,7 +182,7 @@ sub Run {
 
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Can not create DynamicField. Another DynamicField with same name already exists.',
+            Message => 'Can not create DynamicField. Another DynamicField with the name already exists.',
         );
     }
 

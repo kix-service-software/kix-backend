@@ -1,6 +1,6 @@
 {
    "$id" : "#SystemAddressResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for system address GET request.",
    "type" : "object",
    "properties" : {
@@ -14,7 +14,7 @@
    "definitions" : {
       "SystemAddress" : {
          "$id" : "#SystemAddress",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The system address object.",
          "type" : "object",
          "properties" : {

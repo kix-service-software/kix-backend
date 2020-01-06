@@ -27,7 +27,7 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some test ticket for ArticleContentIndex',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',

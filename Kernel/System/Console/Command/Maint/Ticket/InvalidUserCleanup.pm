@@ -172,7 +172,7 @@ sub Run {
             SQL => "
                 SELECT DISTINCT(ticket.id)
                 FROM ticket
-                    INNER JOIN ticket_watcher ON ticket.id = ticket_watcher.ticket_id",
+                    INNER JOIN watcher ON ticket.id = watcher.object_id",
             Limit => 1_000_000,
         );
 
@@ -181,7 +181,7 @@ sub Run {
             push @TicketIDs, $Row[0];
         }
 
-        my $Count = 0;
+        $Count = 0;
         for my $TicketID (@TicketIDs) {
 
             $TicketObject->TicketWatchUnsubscribe(

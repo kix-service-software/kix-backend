@@ -1,0 +1,48 @@
+{
+   "$id" : "#JobPostRequest",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The job request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Job" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "ExecPlanIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "Filter" : {
+               "type" : "object"
+            },
+            "MacroIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "Job"
+   ]
+}

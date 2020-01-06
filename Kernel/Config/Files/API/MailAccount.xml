@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountGet" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::MailAccount::MailAccountGet" Required="0" Valid="1">
         <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">MailAccountID</Item>
-                <Item Key="ResponseObject">MailAccountResponse</Item>
+                <Item Key="ResponseSchema">MailAccountResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::MailAccount::MailAccountSearch" Required="0" Valid="1">
         <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">MailAccountCollectionResponse</Item>
+                <Item Key="ResponseSchema">MailAccountCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::MailAccount::MailAccountCreate" Required="0" Valid="1">
         <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">MailAccountPostRequest</Item>
-                <Item Key="ResponseObject">MailAccountPostPatchResponse</Item>
+                <Item Key="RequestSchema">MailAccountPostRequest</Item>
+                <Item Key="ResponseSchema">MailAccountPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountUpdate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::MailAccount::MailAccountUpdate" Required="0" Valid="1">
         <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestObject">MailAccountPatchRequest</Item>
-                <Item Key="ResponseObject">MailAccountPostPatchResponse</Item>
+                <Item Key="RequestSchema">MailAccountPatchRequest</Item>
+                <Item Key="ResponseSchema">MailAccountPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountDelete" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::MailAccount::MailAccountDelete" Required="0" Valid="1">
         <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
@@ -54,13 +54,13 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem Name="API::Operation::Module###V1::MailAccount::MailAccountTypeSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::MailAccount::MailAccountTypeSearch" Required="0" Valid="1">
         <Description TranMailAccounttable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseObject">MailAccountTypeCollectionResponse</Item>
+                <Item Key="ResponseSchema">MailAccountTypeCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

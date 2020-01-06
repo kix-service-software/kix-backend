@@ -23,7 +23,7 @@ our @ObjectDependencies = (
     'Kernel::System::CronEvent',
     'Kernel::System::DB',
     'Kernel::System::Encode',
-    'Kernel::System::GenericAgent',
+    'Kernel::System::Automation',
     'Kernel::System::Log',
     'Kernel::System::Storable',
     'Kernel::System::Time',
@@ -1562,18 +1562,18 @@ sub CronTaskSummary {
     );
 }
 
-=item GenericAgentTaskToExecute()
+=item AutomationTaskToExecute()
 
-creates generic agent tasks that needs to be run in the current time into the task table to execute
+creates automation tasks that needs to be run in the current time into the task table to execute
 
-    my $Success = $SchedulerDBObject->GenericAgentTaskToExecute(
+    my $Success = $SchedulerDBObject->AutomationTaskToExecute(
         NodeID => 1,    # the ID of the node in a cluster environment
         PID    => 456,  # the process ID of the daemon that is creating the tasks to execution
     );
 
 =cut
 
-sub GenericAgentTaskToExecute {
+sub AutomationTaskToExecute {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1588,204 +1588,94 @@ sub GenericAgentTaskToExecute {
         }
     }
 
-    # get generic agent object
-    my $GenericAgentObject = $Kernel::OM->Get('Kernel::System::GenericAgent');
+    # get objects
+    my $AutomationObject = $Kernel::OM->Get('Kernel::System::Automation');
+    my $TimeObject       = $Kernel::OM->Get('Kernel::System::Time');
 
-    # get a list of generic agent jobs
-    my %JobList = $GenericAgentObject->JobList();
+    # get a list of automation jobs
+    my %JobList = $AutomationObject->JobList();
 
-    # do noting if there are no generic agent jobs
+    # do noting if there are no automation jobs
     return 1 if !%JobList;
 
-    # get CRON event objects
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+    my $CurrentTimestamp = $TimeObject->CurrentTimestamp();
 
     JOBNAME:
-    for my $JobName ( sort keys %JobList ) {
+    for my $JobID ( sort keys %JobList ) {
 
-        # get job
-        my %Job = $GenericAgentObject->JobGet(
-            Name => $JobName,
+        # check if job can be executed now
+        my $CanExecute = $AutomationObject->JobIsExecutable(
+            ID     => $JobID,
+            Time   => $CurrentTimestamp,
+            UserID => 1,
         );
 
-        # skip if job is invalid
-        next JOBNAME if !$Job{Valid};
+        # skip if job can't be executed
+        next JOBNAME if !$CanExecute;
 
-        # get required params
-        my $ScheduleCheck = 1;
-        for my $Key (qw( ScheduleDays ScheduleMinutes ScheduleHours )) {
-            if ( !$Job{$Key} ) {
-                $ScheduleCheck = 0;
-            }
-        }
-
-        # skip if job is not time based
-        next JOBNAME if !$ScheduleCheck;
-
-        # get CRON tab for Generic Agent Schedule
-        my $Schedule = $CronEventObject->GenericAgentSchedule2CronTab(%Job);
-
-        next JOBNAME if !$Schedule;
-
-        # get the last time the GenericAgent job should be executed, this returns even THIS minute
-        my $EventSystemTime = $CronEventObject->PreviousEventGet(
-            Schedule => $Schedule,
+        my %Job = $AutomationObject->JobGet(
+            ID => $JobID
         );
 
-        next JOBNAME if !$EventSystemTime;
+        # skip if job is not valid
+        next JOBNAME if $Job{ValidID} != 1;
 
         # execute recurrent tasks
         $Self->RecurrentTaskExecute(
             NodeID                   => $Param{NodeID},
             PID                      => $Param{PID},
-            TaskName                 => $JobName,
-            TaskType                 => 'GenericAgent',
-            PreviousEventTimestamp   => $EventSystemTime,
+            TaskName                 => $JobList{$JobID},
+            TaskType                 => 'AsynchronousExecutor',
+            PreviousEventTimestamp   => $TimeObject->SystemTime(),
             MaximumParallelInstances => 1,
-            Data                     => \%Job,
+            Data                     => {
+                Object   => 'Kernel::System::Automation',
+                Function => 'JobExecute',
+                Params   => {
+                    ID     => $JobID,
+                    UserID => 1,
+                },                
+            },
         );
     }
 
     return 1;
 }
 
-=item GenericAgentTaskCleanup()
+=item AutomationTaskSummary()
 
-removes recurrent tasks that does not have a matching generic agent job
+get a summary of the automation tasks from the recurrent task table
 
-    my $Success = $SchedulerDBObject->GenericAgentTaskCleanup();
-
-=cut
-
-sub GenericAgentTaskCleanup {
-    my ( $Self, %Param ) = @_;
-
-    # get generic agent object
-    my $GenericAgentObject = $Kernel::OM->Get('Kernel::System::GenericAgent');
-
-    # get a list of generic agent jobs
-    my %JobList = $GenericAgentObject->JobList();
-
-    # do noting if there are no generic agent jobs
-    return 1 if !%JobList;
-
-    my %GenericAgentJobLookup;
-
-    # get CRON event objects
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
-
-    JOBNAME:
-    for my $JobName ( sort keys %JobList ) {
-
-        # get job
-        my %Job = $GenericAgentObject->JobGet(
-            Name => $JobName,
-        );
-
-        # skip if job is invalid
-        next JOBNAME if !$Job{Valid};
-
-        # get required params
-        my $ScheduleCheck = 1;
-        for my $Key (qw( ScheduleDays ScheduleMinutes ScheduleHours )) {
-            if ( !$Job{$Key} ) {
-                $ScheduleCheck = 0;
-            }
-        }
-
-        # skip if job is not time based
-        next JOBNAME if !$ScheduleCheck;
-
-        # get CRON tab for Generic Agent Schedule
-        my $Schedule = $CronEventObject->GenericAgentSchedule2CronTab(%Job);
-
-        next JOBNAME if !$Schedule;
-
-        $GenericAgentJobLookup{$JobName} = 1;
-    }
-
-    # get a list of all generic agent recurrent tasks
-    my @TaskList = $Self->RecurrentTaskList(
-        Type => 'GenericAgent',
-    );
-
-    TASK:
-    for my $Task (@TaskList) {
-
-        # skip if task has an active generic agent job in the DB
-        next TASK if $GenericAgentJobLookup{ $Task->{Name} };
-
-        my $Success = $Self->RecurrentTaskDelete(
-            TaskID => $Task->{TaskID},
-        );
-
-        if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Task $Task->{Name}-$Task->{Type} ($Task->{TaskID}) could not be deleted!",
-            );
-        }
-    }
-
-    return 1;
-}
-
-=item GenericAgentTaskSummary()
-
-get a summary of the generic agent tasks from the recurrent task table
-
-    my @Summary = $SchedulerDBObject->GenericAgentTaskSummary();
+    my @Summary = $SchedulerDBObject->AutomationTaskSummary();
 
 =cut
 
-sub GenericAgentTaskSummary {
+sub AutomationTaskSummary {
     my ( $Self, %Param ) = @_;
 
-    # get generic agent object
-    my $GenericAgentObject = $Kernel::OM->Get('Kernel::System::GenericAgent');
+    # get automation object
+    my $AutomationObject = $Kernel::OM->Get('Kernel::System::Automation');
 
-    # get a list of generic agent jobs from the DB
-    my %JobList = $GenericAgentObject->JobList();
-
-    # get cron event object
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+    # get a list of automation jobs from the DB
+    my %JobList = $AutomationObject->JobList();
 
     my %TaskLookup;
 
     JOBNAME:
-    for my $JobName ( sort keys %JobList ) {
+    for my $JobID ( sort keys %JobList ) {
 
         # get job
-        my %JobConfig = $GenericAgentObject->JobGet(
-            Name => $JobName,
+        my %Job = $AutomationObject->JobGet(
+            ID => $JobID,
         );
 
-        next JOBNAME if !%JobConfig;
-        next JOBNAME if !$JobConfig{Valid};
-
-        # get required params
-        my $ScheduleCheck = 1;
-        for my $Key (qw( ScheduleDays ScheduleMinutes ScheduleHours )) {
-            if ( !$JobConfig{$Key} ) {
-                $ScheduleCheck = 0;
-            }
-        }
-
-        # skip if job is not time based
-        next JOBNAME if !$ScheduleCheck;
-
-        # get CRON tab for Generic Agent Schedule
-        my $Schedule = $CronEventObject->GenericAgentSchedule2CronTab(%JobConfig);
-
-        next JOBNAME if !$Schedule;
-
-        $TaskLookup{$JobName} = $Schedule;
+        next JOBNAME if !%Job;
+        next JOBNAME if $Job{ValidID} != 1;
     }
 
     return $Self->RecurrentTaskSummary(
-        Type        => 'GenericAgent',
-        DisplayType => 'generic agent',
-        TaskLookup  => \%TaskLookup,
+        Type        => 'AsynchronousExecutor',
+        DisplayType => 'automation',
     );
 }
 
@@ -1983,7 +1873,7 @@ sub RecurrentTaskDelete {
 
 =item RecurrentTaskExecute()
 
-executes recurrent tasks like cron or generic agent tasks
+executes recurrent tasks like cron or automation tasks
 
     my $Success = $SchedulerDBObject->RecurrentTaskExecute(
         NodeID                   => 1,                 # the ID of the node in a cluster environment

@@ -40,7 +40,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AutoResponseObject = $Kernel::OM->Get('Kernel::System::AutoResponse');
+    my $AutoResponseSchema = $Kernel::OM->Get('Kernel::System::AutoResponse');
 
 =cut
 
@@ -58,7 +58,7 @@ sub new {
 
 add auto response with attributes
 
-    $AutoResponseObject->AutoResponseAdd(
+    $AutoResponseSchema->AutoResponseAdd(
         Name        => 'Some::AutoResponse',
         ValidID     => 1,
         Subject     => 'Some Subject..',
@@ -143,7 +143,7 @@ sub AutoResponseAdd {
 
 get auto response with attributes
 
-    my %Data = $AutoResponseObject->AutoResponseGet(
+    my %Data = $AutoResponseSchema->AutoResponseGet(
         ID => 123,
     );
 
@@ -204,7 +204,7 @@ sub AutoResponseGet {
 
 update auto response with attributes
 
-    $AutoResponseObject->AutoResponseUpdate(
+    $AutoResponseSchema->AutoResponseUpdate(
         ID          => 123,
         Name        => 'Some::AutoResponse',
         ValidID     => 1,
@@ -267,7 +267,7 @@ sub AutoResponseUpdate {
 
 get a hash with data from Auto Response and it's corresponding System Address
 
-    my %QueueAddressData = $AutoResponseObject->AutoResponseGetByTypeQueueID(
+    my %QueueAddressData = $AutoResponseSchema->AutoResponseGetByTypeQueueID(
         QueueID => 3,
         Type    => 'auto reply/new ticket',
     );
@@ -357,7 +357,7 @@ sub AutoResponseGetByTypeQueueID {
 
 get a list of the Queues that do not have Auto Response
 
-    my %AutoResponseWithoutQueue = $AutoResponseObject->AutoResponseWithoutQueue();
+    my %AutoResponseWithoutQueue = $AutoResponseSchema->AutoResponseWithoutQueue();
 
 Return example:
 
@@ -398,7 +398,7 @@ sub AutoResponseWithoutQueue {
 
 get a list of the Auto Responses
 
-    my %AutoResponse = $AutoResponseObject->AutoResponseList();
+    my %AutoResponse = $AutoResponseSchema->AutoResponseList();
 
 Return example:
 
@@ -425,7 +425,7 @@ sub AutoResponseList {
 
 get a list of the Auto Response Types
 
-    my %AutoResponseType = $AutoResponseObject->AutoResponseTypeList();
+    my %AutoResponseType = $AutoResponseSchema->AutoResponseTypeList();
 
 Return example:
 
@@ -456,7 +456,7 @@ assigns a list of auto-responses to a queue
 
     my @AutoResponseIDs = (1,2,3);
 
-    $AutoResponseObject->AutoResponseQueue (
+    $AutoResponseSchema->AutoResponseQueue (
         QueueID         => 1,
         AutoResponseIDs => \@AutoResponseIDs,
         UserID          => 1,
@@ -516,7 +516,7 @@ sub AutoResponseQueue {
 
 return if another auto-response with this name already exits
 
-    $AutoResponseObject->_NameExistsCheck(
+    $AutoResponseSchema->_NameExistsCheck(
         Name => 'Some::AutoResponse',
         ID   => 1, # optional
     );

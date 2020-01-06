@@ -1,6 +1,6 @@
 {
    "$id" : "#SysConfigOptionCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of SysConfig option value.",
    "type" : "object",
    "properties" : {
@@ -17,10 +17,36 @@
    "definitions" : {
       "SysConfigOption" : {
          "$id" : "#SysConfigOption",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The SysConfig option object.",
          "type" : "object",
          "properties" : {
+            "AccessLevel" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Context" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ContextMetadata" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true

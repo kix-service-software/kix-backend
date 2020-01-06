@@ -70,7 +70,7 @@ for my $Test (@Tests) {
 
     my $TicketID = $TicketObject->TicketCreate(
         Title        => 'Some Ticket_Title',
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'closed',
@@ -148,26 +148,27 @@ for my $Test (@Tests) {
     );
 
     # subscribe user to ticket
-    my $Success = $TicketObject->TicketWatchSubscribe(
-        TicketID    => $TicketID,
+    my $Success = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherAdd(
+        Object      => 'Ticket',
+        ObjectID    => $TicketID,
         WatchUserID => 1,
         UserID      => 1,
     );
 
     $Self->True(
         $Success,
-        "$Test->{Name} - TicketWatchSubscribe()",
+        "$Test->{Name} - subscribe watcher",
     );
 
-    my @Watchers = $TicketObject->TicketWatchGet(
-        TicketID => $TicketID,
-        Result   => 'ARRAY',
+    my @Watchers = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherList(
+        ObjectType  => 'Ticket',
+        ObjectID    => $TicketID,
     );
 
     $Self->IsDeeply(
         \@Watchers,
         [1],
-        "$Test->{Name} - TicketWatchGet()",
+        "$Test->{Name} - get watchers",
     );
 
     # Now set the archive flag

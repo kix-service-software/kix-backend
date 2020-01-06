@@ -1,6 +1,6 @@
 {
    "$id" : "#LinkTypeCollectionResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of link types.",
    "type" : "object",
    "properties" : {
@@ -17,7 +17,7 @@
    "definitions" : {
       "LinkType" : {
          "$id" : "#LinkType",
-         "$schema" : "http://json-schema.org/schema",
+         "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The link type object.",
          "type" : "object",
          "properties" : {

@@ -49,7 +49,7 @@ my $InternalAddress = 'internal@example.com';
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'My ticket created by Agent A',
-    Queue        => 'Raw',
+    Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'open',

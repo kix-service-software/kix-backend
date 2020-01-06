@@ -117,7 +117,7 @@ my @TicketData;
 for ( 1 .. 2 ) {
     my $TicketID = $TicketObject->TicketCreate(
         Title        => "Ticket$RandomID",
-        Queue        => 'Raw',
+        Queue        => 'Junk',
         Lock         => 'unlock',
         Priority     => '3 normal',
         State        => 'closed',

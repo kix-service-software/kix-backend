@@ -1,0 +1,117 @@
+{
+   "$id" : "#SysConfigOptionDefinitionPostRequest",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The SysConfig option definition request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "SysConfigOptionDefinition" : {
+         "properties" : {
+            "AccessLevel" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            },
+            "Context" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            },
+            "ContextMetadata" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            },
+            "Default" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            },
+            "Description" : {
+               "type" : "string"
+            },
+            "ExperienceLevel" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            },
+            "Group" : {
+               "type" : "string"
+            },
+            "IsRequired" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Setting" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            },
+            "Type" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            },
+            "Value" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Description",
+            "Name",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "SysConfigOptionDefinition"
+   ]
+}

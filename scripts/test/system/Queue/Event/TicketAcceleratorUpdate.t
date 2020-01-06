@@ -57,7 +57,7 @@ my @Tests = (
     },
 );
 
-my $QueueBefore = 'Raw';
+my $QueueBefore = 'Junk';
 my %Queue       = $QueueObject->QueueGet( Name => $QueueBefore );
 my $QueueID     = $Queue{QueueID};
 
@@ -114,7 +114,7 @@ $Self->Is(
     "$Module TicketAcceleratorIndex() - AllTickets",
 );
 
-my ($ItemBefore) = grep { $_->{Queue} eq 'Raw' } @{ $IndexBefore{Queues} };
+my ($ItemBefore) = grep { $_->{Queue} eq 'Junk' } @{ $IndexBefore{Queues} };
 my ($ItemAfter)  = grep { $_->{Queue} eq 'Raw2' } @{ $IndexAfter{Queues} };
 
 $Self->Is(

@@ -70,6 +70,11 @@ sub new {
         Config => 'Organisation::EventModulePost',
     );
 
+    $Self->{Lower} = '';
+    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+        $Self->{Lower} = 'LOWER';
+    }
+
     return $Self;
 }
 
@@ -260,6 +265,131 @@ sub OrganisationGet {
     );
 
     return %Organisation;
+}
+
+=item OrganisationLookup()
+
+contact id or login lookup
+
+    my $Number = $OrganisationObject->OrganisationLookup(
+        ID     => 1,
+        Silent => 1, # optional, don't generate log entry if user was not found
+    );
+
+    my $ID = $OrganisationObject->OrganisationLookup(
+        Number => 'some_organisation_number',
+        Silent => 1, # optional, don't generate log entry if user was not found
+    );
+
+=cut
+
+sub OrganisationLookup {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Number} && !$Param{ID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need Number or ID!'
+        );
+        return;
+    }
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    if ( $Param{Number} ) {
+
+        # check cache
+        my $CacheKey = 'OrganisationLookup::ID::' . $Param{Number};
+        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+            Type => $Self->{CacheType},
+            Key  => $CacheKey,
+        );
+        return $Cache if $Cache;
+
+        # build sql query
+        my $Number = lc $Param{Number};
+
+        return if !$DBObject->Prepare(
+            SQL => "SELECT id FROM organisation WHERE $Self->{Lower}(number) = ?",
+            Bind  => [ \$Number ],
+            Limit => 1,
+        );
+
+        # fetch the result
+        my $ID;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $ID = $Row[0];
+        }
+
+        if ( !$ID ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "No ID found for organisation number '$Param{Number}'!",
+                );
+            }
+            return;
+        }
+
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $ID,
+        );
+
+        return $ID;
+    }
+
+    else {
+
+        # ignore non-numeric IDs
+        return if $Param{ID} && $Param{ID} !~ /^\d+$/;
+
+        # check cache
+        my $CacheKey = 'OrganisationLookup::Number::' . $Param{ID};
+        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+            Type => $Self->{CacheType},
+            Key  => $CacheKey,
+        );
+        return $Cache if $Cache;
+
+        # build sql query
+        return if !$DBObject->Prepare(
+            SQL => "SELECT number FROM organisation WHERE id = ?",
+            Bind  => [ \$Param{ID} ],
+            Limit => 1,
+        );
+
+        # fetch the result
+        my $Number;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $Number = $Row[0];
+        }
+
+        if ( !$Number ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "No organisation number found for ID '$Param{ID}'!",
+                );
+            }
+            return;
+        }
+
+        # set cache
+        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Number,
+        );
+
+        return $Number;
+    }
 }
 
 =item OrganisationUpdate()
@@ -565,7 +695,7 @@ sub OrganisationDelete {
 
 get customer user preferences
 
-    my %Preferences = $ContactObject->GetPreferences(
+    my %Preferences = $OrganisationObject->GetPreferences(
         UserID => 'some-login',
     );
 
@@ -606,7 +736,7 @@ sub GetPreferences {
 
 set customer user preferences
 
-    $ContactObject->SetPreferences(
+    $OrganisationObject->SetPreferences(
         Key    => 'UserComment',
         Value  => 'some comment',
         UserID => 'some-login',

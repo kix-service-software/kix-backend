@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#JobExecPlanIDCollectionResponse",
+  "type": "object",
+  "description": "A response for job - execution plan IDs GET request.",
+  "properties": {
+    "ExecPlanID": {
+      "type": "array",
+      "item": {
+        "type": "integer"
+      },
+      "description": "List of IDs of assigned execution plans of the job"
+    }
+  },
+  "required": [
+    "ExecPlanID"
+  ]
+}

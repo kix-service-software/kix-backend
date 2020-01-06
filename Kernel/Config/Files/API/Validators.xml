@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem Name="API::Validator::Module###ArticleValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ArticleValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -12,18 +12,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###ChannelValidator" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the validator layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">ChannelValidator</Item>
-                <Item Key="Validates">Channel,ChannelID</Item>
-                <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(ChannelGet|NotificationCreate|NotificationUpdate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###AutoResponseTypeValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###AutoResponseTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -34,7 +23,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###AttachmentsValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###AttachmentsValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -45,7 +34,18 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###CharsetValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ChannelValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ChannelValidator</Item>
+                <Item Key="Validates">Channel,ChannelID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(ChannelGet|NotificationCreate|NotificationUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###CharsetValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -56,7 +56,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###ContactValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ContactValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -67,7 +67,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###DeploymentStateValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###DeploymentStateValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -78,7 +78,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###DynamicFieldsValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###DynamicFieldsValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -89,18 +89,29 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###EmailAddressValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###EmailAddressValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Module">EmailAddressValidator</Item>
-                <Item Key="Validates">From,Cc,Bcc,To</Item>
+                <Item Key="Validates">From,Cc,Bcc,To,Email</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###HistoryTypeValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ExecPlanValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ExecPlanValidator</Item>
+                <Item Key="Validates">ExecPlanID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">ExecPlanGet|ExecPlanDelete|JobExecPlanIDDelete</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###HistoryTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -111,7 +122,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###IncidentStateValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###IncidentStateValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -122,7 +133,18 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###LockValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###JobValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">JobValidator</Item>
+                <Item Key="Validates">JobID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">JobGet|JobDelete|JobMacroIDSearch|JobExecPlanIDSearch</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###LockValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -133,7 +155,18 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###MimeTypeValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###MacroValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">MacroValidator</Item>
+                <Item Key="Validates">MacroID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">MacroGet|MacroDelete|JobMacroIDDelete</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###MimeTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -144,7 +177,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###PriorityValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###PriorityValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -155,7 +188,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###QueueValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###QueueValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -166,7 +199,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###RoleValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###RoleValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -177,7 +210,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###ServiceValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ServiceValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -188,7 +221,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###SenderTypeValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###SenderTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -199,7 +232,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###SLAValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###SLAValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -210,7 +243,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###StateValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###StateValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -221,7 +254,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###StateTypeValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###StateTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -232,7 +265,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###TimeUnitValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###TimeUnitValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -243,7 +276,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###TicketValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###TicketValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -254,7 +287,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###TypeValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###TypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -265,7 +298,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###UserValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###UserValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -276,7 +309,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem Name="API::Validator::Module###ValidValidator" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ValidValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
@@ -289,4 +322,3 @@
     </ConfigItem>
 
 </kix_config>
-    
