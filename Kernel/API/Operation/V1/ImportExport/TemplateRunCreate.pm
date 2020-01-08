@@ -153,27 +153,10 @@ sub Run {
             );
         }
 
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$TemplateRun->{ImportFileContent} );
-        my $FileContent = decode_base64( $TemplateRun->{ImportFileContent} );
-
-        # Get current time.
-        my $ExecutionTime = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
-
-        # Create a new future task for import.
-        $TaskID = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskAdd(
-            ExecutionTime => $ExecutionTime,
-            Type          => 'AsynchronousExecutor',
-            Name          => 'Import for template "'.$TemplateDataRef->{Name}.'" ('.$Param{Data}->{TemplateID}.')',
-            Attempts      => 1,
-            Data          => {
-                Object   => 'Kernel::System::ImportExport',
-                Function => 'Import',
-                Params   => {
-                    TemplateID    => $Param{Data}->{TemplateID},
-                    SourceContent => \$FileContent,
-                    UserID        => $Self->{Authorization}->{UserID}
-                },
-            }
+        $TaskID = $Kernel::OM->Get('Kernel::System::ImportExport')->ImportTaskCreate(
+            TemplateID    => $Param{Data}->{TemplateID},
+            SourceContent => $TemplateRun->{ImportFileContent},
+            UserID        => $Self->{Authorization}->{UserID}
         );
 
         if ( !$TaskID ) {
@@ -183,7 +166,7 @@ sub Run {
             );
             return $Self->_Error(
                 Code    => 'Object.ExecFailed',
-                Message => "An error occured during import execution task creation (error: $LogMessage).",
+                Message => "An error occured during import execution task creation (error: $LogMessage)",
             );
         }
 
