@@ -335,6 +335,9 @@ sub Run {
         my %TicketData;
         my @DynamicFields;
 
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'DynamicField');
+
         # remove all dynamic fields from main ticket hash and set them into an array.
         ATTRIBUTE:
         for my $Attribute ( sort keys %TicketRaw ) {
@@ -345,17 +348,35 @@ sub Run {
                         Name => $1,
                     );
                     if ( IsHashRefWithData($DynamicFieldConfig) ) {
-                        my $DFDisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
+                        my $DFPreparedValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Key                => $TicketRaw{$Attribute},
                         );
+
+                        my @Values;
+                        if ( ref $DFPreparedValue eq 'ARRAY' ) {
+                            @Values = @{ $DFPreparedValue };
+                        }
+                        else {
+                            @Values = ($DFPreparedValue);
+                        }
+
+                        my $Separator = ', ';
+                        if (
+                            IsHashRefWithData($DynamicFieldConfig) &&
+                            IsHashRefWithData($DynamicFieldConfig->{Config}) &&
+                            defined $DynamicFieldConfig->{Config}->{ItemSeparator}
+                        ) {
+                            $Separator = $DynamicFieldConfig->{Config}->{ItemSeparator};
+                        }
                         
                         push @DynamicFields, {
-                            ID           => $DynamicFieldConfig->{ID},
-                            Name         => $DynamicFieldConfig->{Name},
-                            Label        => $DynamicFieldConfig->{Label},
-                            Value        => $TicketRaw{$Attribute},
-                            DisplayValue => $DFDisplayValue,
+                            ID            => $DynamicFieldConfig->{ID},
+                            Name          => $DynamicFieldConfig->{Name},
+                            Label         => $DynamicFieldConfig->{Label},
+                            Value         => $TicketRaw{$Attribute},
+                            DisplayValue  => join($Separator, @Values),
+                            PreparedValue => $DFPreparedValue
                         };
                     }
                 }
@@ -396,10 +417,6 @@ sub Run {
 }
 
 1;
-
-
-
-
 
 =back
 
