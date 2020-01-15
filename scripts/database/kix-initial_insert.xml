@@ -9338,4 +9338,136 @@ vielen Dank für Ihre Nachricht.
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
+<!-- dynamic fields for use in app -->
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="internal_field">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">MobileProcessingState</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Mobile Processing</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Dropdown</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="displaygroup_id">0</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+CountMin: '1'
+CountMax: '1'
+CountDefault: '1'
+DefaultValue: 
+Link: ''
+PossibleNone: '1'
+PossibleValues:
+   assigned: assigned
+   downloaded: downloaded
+   rejected: rejected
+   accepted: accepted
+   processing: processing
+   suspended: suspended
+   completed: completed
+   partiallyexecuted: partially executed
+   cancelled: cancelled
+TranslatableValues: '1'
+        ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="internal_field">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">RiskAssumptionRemark</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Risk Assumption Remark</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="displaygroup_id">0</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+CountMin: '0'
+CountMax: '1'
+CountDefault: '0'
+DefaultValue: ''
+        ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="internal_field">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">MobileProcessingChecklist010</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Checklist 01</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="displaygroup_id">0</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+TTL: ''
+CountMin: '1'
+CountMax: '1'
+CountDefault: '1'
+Link: ''
+ItemSeparator: ''
+Cols: ''
+DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n 
+  \   \"description\": \"Announce shut off to all possibly affected personell directly
+  or indirectly working with the device.\",\r\n    \"input\": \"ChecklistState\",\r\n
+  \   \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"200\",\r\n    \"title\": \"Identify
+  energy source(s)\",\r\n    \"description\": \"Check for connected external and internal
+  energy sources.\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n
+  \ },\r\n  {\r\n    \"id\": \"300\",\r\n    \"title\": \"Isolate energy source(s)\",\r\n
+  \   \"description\": \"Document measures you took in order to isolate energy source(s).\",\r\n
+  \   \"input\": \"ChecklistState\",\r\n    \"value\": \"-\",\r\n    \"sub\": [{\r\n
+  \     \"id\": \"210\",\r\n      \"title\": \"Isolation by\",\r\n      \"input\":
+  \"Text\",\r\n      \"value\": \"\"\r\n    }]\r\n  },\r\n  {\r\n    \"id\": \"400\",\r\n
+  \   \"title\": \"Lock & Tag energy source(s)\",\r\n    \"description\": \"Lock energy
+  sources to avoid accidential re-energizing while working on the device. Tag the
+  device as out of order due to maintenance actions.\",\r\n    \"input\": \"ChecklistState\",\r\n
+  \   \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"500\",\r\n    \"title\": \"Ensure
+  that equipment isolation is effective\",\r\n    \"description\": \"Before starting
+  maintenance or repair tasks ensure that isolation is working.\",\r\n    \"input\":
+  \"ChecklistState\",\r\n    \"value\": \"\"\r\n  }\r\n]"
+RegExList: []
+Rows: ''
+        ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="internal_field">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">MobileProcessingChecklist020</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Checklist 02</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="displaygroup_id">0</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+TTL: ''
+CountMin: '1'
+CountMax: '1'
+CountDefault: '1'
+Link: ''
+ItemSeparator: ''
+Cols: ''
+DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \"description\":
+  \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
+  \ {\r\n    \"id\": \"200\",\r\n    \"title\": \"task 2\",\r\n    \"description\":
+  \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
+  \ {\r\n    \"id\": \"300\",\r\n    \"title\": \"task 3\",\r\n    \"description\":
+  \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  }\r\n]"
+RegExList: []
+Rows: ''
+        ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
 </database>
