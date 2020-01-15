@@ -142,13 +142,27 @@ sub ValueSet {
     }
     else {
         @Values = ( $Param{Value} );
-    }
+    }    
 
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
 
     my $Success;
     if ( IsArrayRefWithData( \@Values ) ) {
+
+        my $valid = $Self->ValueValidate(
+            Value => $Param{Value},
+            UserID => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig}
+        );
+
+        if (!$valid) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "The value for the field Multiselect is invalid!"                  
+            );
+            return;
+        }
 
         # if there is at least one value to set, this means one or more values are selected,
         #    set those values!
@@ -216,6 +230,32 @@ sub ValueValidate {
     }
     else {
         @Values = ( $Param{Value} );
+    }
+
+    my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
+    if ($CountMin && scalar(@Values) < $CountMin) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message => "At least $CountMin values must be selected."
+        );
+        return;
+    }
+
+    my $CountMax = $Param{DynamicFieldConfig}->{Config}->{CountMax};
+    if ($CountMax && $CountMax > 1 && scalar(@Values) > $CountMax) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message => "A maximum of $CountMax values can be selected."
+        );
+        return;
+    }
+
+    if((!$CountMax || 1 == $CountMax || 0 == $CountMax) && scalar(@Values) > 1) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message => "A maximum of 1 value can be selected. (Singleselect)"
+        );
+        return;
     }
 
     # get dynamic field value object
