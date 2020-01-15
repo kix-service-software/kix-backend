@@ -101,6 +101,84 @@ sub new {
     return $Self;
 }
 
+sub ValueGet {
+    my ( $Self, %Param ) = @_;
+
+    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+        FieldID  => $Param{DynamicFieldConfig}->{ID},
+        ObjectID => $Param{ObjectID},
+    );
+
+    return if !$DFValue;
+    return if !IsArrayRefWithData($DFValue);
+    return if !IsHashRefWithData( $DFValue->[0] );
+
+    # extract real values
+    my @ReturnData;
+    for my $Item ( @{$DFValue} ) {
+        push @ReturnData, $Item->{ValueDateTime}
+    }
+
+    return \@ReturnData;
+}
+
+sub ValueSet {
+    my ( $Self, %Param ) = @_;
+
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    # get dynamic field value object
+    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    
+    my $Success;
+
+    if ( IsArrayRefWithData( \@Values ) ) {
+
+        # if there is at least one value to set, this means one or more values are selected,
+        #    set those values!
+        my @ValueDateTime;
+        for my $Item (@Values) {           
+            my $valid = $Self->ValueValidate(
+                Value => $Item,
+                UserID => $Param{UserID},
+                DynamicFieldConfig => $Param{DynamicFieldConfig}
+            );
+
+            if (!$valid) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "The value for the field DateTime is invalid!"                  
+                );
+                return;
+            }
+
+            push @ValueDateTime, { ValueDateTime => $Item };
+        }
+
+        $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            Value    => \@ValueDateTime,
+            UserID => $Param{UserID},
+        );
+    } else {
+        # delete all existing values for the dynamic field
+        $Success = $DynamicFieldValueObject->ValueDelete(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            UserID   => $Param{UserID},
+        );
+    }
+
+    return $Success;
+}
+
 1;
 
 

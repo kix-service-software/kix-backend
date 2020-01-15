@@ -137,14 +137,7 @@ sub ValueSet {
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
 
-    my $Success;
-
-    # delete all existing values for the dynamic field
-    $Success = $DynamicFieldValueObject->ValueDelete(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-        UserID   => $Param{UserID},
-    );
+    my $Success;    
 
     if ( IsArrayRefWithData( \@Values ) ) {
 
@@ -152,6 +145,21 @@ sub ValueSet {
         #    set those values!
         my @ValueText;
         for my $Item (@Values) {
+
+            my $valid = $Self->ValueValidate(
+                Value => $Item,
+                UserID => $Param{UserID},
+                DynamicFieldConfig => $Param{DynamicFieldConfig}
+            );
+
+            if (!$valid) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "The value for the field Text is invalid!"                  
+                );
+                return;
+            }
+
             push @ValueText, { ValueText => $Item };
         }
 
@@ -159,6 +167,13 @@ sub ValueSet {
             FieldID  => $Param{DynamicFieldConfig}->{ID},
             ObjectID => $Param{ObjectID},
             Value    => \@ValueText,
+            UserID   => $Param{UserID},
+        );
+    } else {
+        # delete all existing values for the dynamic field
+        $Success = $DynamicFieldValueObject->ValueDelete(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
             UserID   => $Param{UserID},
         );
     }
