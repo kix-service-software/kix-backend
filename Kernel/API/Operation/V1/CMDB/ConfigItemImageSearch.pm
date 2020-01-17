@@ -143,7 +143,7 @@ sub Run {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRefWithData($GetResult->{Data}->{Image}) ? @{$GetResult->{Data}->{Image}} : ( $GetResult->{Data}->{Image} );
+        my @DataList = IsArrayRef($GetResult->{Data}->{Image}) ? @{$GetResult->{Data}->{Image}} : ( $GetResult->{Data}->{Image} );
 
         if ( IsArrayRefWithData(\@DataList) ) {
             return $Self->_Success(

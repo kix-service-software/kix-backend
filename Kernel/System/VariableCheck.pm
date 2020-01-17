@@ -16,7 +16,9 @@ use warnings;
 use Exporter qw(import);
 our %EXPORT_TAGS = (    ## no critic
     all => [
+        'IsArrayRef',
         'IsArrayRefWithData',
+        'IsHashRef',
         'IsHashRefWithData',
         'IsInteger',
         'IsIPv4Address',
@@ -140,6 +142,27 @@ sub IsStringWithData {
     return 1;
 }
 
+=item IsArrayRef()
+
+test supplied data to determine if it is an array reference
+
+returns 1 if data matches criteria or undef otherwise
+
+    my $Result = IsArrayRef(
+        [ # data to be tested
+            'key',
+            ...
+        ],
+    );
+
+=cut
+
+sub IsArrayRef {
+    my $TestData = $_[0];
+
+    return ref $TestData eq 'ARRAY';
+}
+
 =item IsArrayRefWithData()
 
 test supplied data to determine if it is an array reference and contains at least one key
@@ -163,6 +186,27 @@ sub IsArrayRefWithData {
     return if !@{$TestData};
 
     return 1;
+}
+
+=item IsHashRef()
+
+test supplied data to determine if it is an hash reference
+
+returns 1 if data matches criteria or undef otherwise
+
+    my $Result = IsHashRef(
+        [ # data to be tested
+            'key',
+            ...
+        ],
+    );
+
+=cut
+
+sub IsHashRef {
+    my $TestData = $_[0];
+
+    return ref $TestData eq 'HASH';
 }
 
 =item IsHashRefWithData()

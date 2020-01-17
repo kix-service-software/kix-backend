@@ -100,7 +100,7 @@ sub Run {
             return $ValidGetResult;
         }
 
-        my @ValidDataList = IsArrayRefWithData($ValidGetResult->{Data}->{Valid}) ? @{$ValidGetResult->{Data}->{Valid}} : ( $ValidGetResult->{Data}->{Valid} );
+        my @ValidDataList = IsArrayRef($ValidGetResult->{Data}->{Valid}) ? @{$ValidGetResult->{Data}->{Valid}} : ( $ValidGetResult->{Data}->{Valid} );
 
         if ( IsArrayRefWithData(\@ValidDataList) ) {
             return $Self->_Success(

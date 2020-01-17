@@ -101,7 +101,7 @@ sub Run {
             return $DynamicFieldGetResult;
         }
 
-        my @DynamicFieldDataList = IsArrayRefWithData($DynamicFieldGetResult->{Data}->{DynamicField}) ? @{$DynamicFieldGetResult->{Data}->{DynamicField}} : ( $DynamicFieldGetResult->{Data}->{DynamicField} );
+        my @DynamicFieldDataList = IsArrayRef($DynamicFieldGetResult->{Data}->{DynamicField}) ? @{$DynamicFieldGetResult->{Data}->{DynamicField}} : ( $DynamicFieldGetResult->{Data}->{DynamicField} );
 
         if ( IsArrayRefWithData(\@DynamicFieldDataList) ) {
             return $Self->_Success(

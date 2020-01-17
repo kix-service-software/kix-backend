@@ -116,7 +116,7 @@ sub Run {
             return $LinkGetResult;
         }
 
-        my @LinkDataList = IsArrayRefWithData($LinkGetResult->{Data}->{Link}) ? @{$LinkGetResult->{Data}->{Link}} : ( $LinkGetResult->{Data}->{Link} );
+        my @LinkDataList = IsArrayRef($LinkGetResult->{Data}->{Link}) ? @{$LinkGetResult->{Data}->{Link}} : ( $LinkGetResult->{Data}->{Link} );
 
         if ( IsArrayRefWithData(\@LinkDataList) ) {
             return $Self->_Success(

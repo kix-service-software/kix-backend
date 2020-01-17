@@ -605,9 +605,8 @@ sub _RecipientsGet {
                         Short => 1,
                     );
                     foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                             UserID              => $UserID,
-                            Types               => [ 'Resource' ],
                             Target              => '/tickets/' . $Ticket{TicketID},
                             RequestedPermission => 'READ'
                         );
@@ -627,9 +626,8 @@ sub _RecipientsGet {
                         Short => 1,
                     );
                     foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                             UserID              => $UserID,
-                            Types               => [ 'Resource' ],
                             Target              => '/tickets/' . $Ticket{TicketID},
                             RequestedPermission => 'UPDATE'
                         );
@@ -880,7 +878,7 @@ sub _RecipientsGet {
         }
 
         # skip users with out READ permissions
-        my ($Granted) = $UserObject->CheckPermission(
+        my ($Granted) = $UserObject->CheckResourcePermission(
             UserID              => $User{UserID},
             Target              => '/tickets/' . $Ticket{TicketID},
             RequestedPermission => 'READ'

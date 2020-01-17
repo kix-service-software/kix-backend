@@ -100,7 +100,7 @@ sub Run {
             return $ClientRegistrationGetResult;
         }
 
-        my @ClientRegistrationDataList = IsArrayRefWithData($ClientRegistrationGetResult->{Data}->{ClientRegistration}) ? @{$ClientRegistrationGetResult->{Data}->{ClientRegistration}} : ( $ClientRegistrationGetResult->{Data}->{ClientRegistration} );
+        my @ClientRegistrationDataList = IsArrayRef($ClientRegistrationGetResult->{Data}->{ClientRegistration}) ? @{$ClientRegistrationGetResult->{Data}->{ClientRegistration}} : ( $ClientRegistrationGetResult->{Data}->{ClientRegistration} );
 
         if ( IsArrayRefWithData(\@ClientRegistrationDataList) ) {
             return $Self->_Success(

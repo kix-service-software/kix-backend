@@ -110,7 +110,7 @@ sub Run {
             return $AttachmentGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($AttachmentGetResult->{Data}->{Attachment}) ? @{$AttachmentGetResult->{Data}->{Attachment}} : ( $AttachmentGetResult->{Data}->{Attachment} );
+        my @ResultList = IsArrayRef($AttachmentGetResult->{Data}->{Attachment}) ? @{$AttachmentGetResult->{Data}->{Attachment}} : ( $AttachmentGetResult->{Data}->{Attachment} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

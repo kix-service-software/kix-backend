@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::ArticleFlagSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -156,7 +156,7 @@ sub Run {
             return $FlagGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($FlagGetResult->{Data}->{ArticleFlag}) ? @{$FlagGetResult->{Data}->{ArticleFlag}} : ( $FlagGetResult->{Data}->{ArticleFlag} );
+        my @ResultList = IsArrayRef($FlagGetResult->{Data}->{ArticleFlag}) ? @{$FlagGetResult->{Data}->{ArticleFlag}} : ( $FlagGetResult->{Data}->{ArticleFlag} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

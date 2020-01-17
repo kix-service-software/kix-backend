@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::ArticleSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -134,7 +134,7 @@ sub Run {
             return $ArticleGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($ArticleGetResult->{Data}->{Article}) ? @{$ArticleGetResult->{Data}->{Article}} : ( $ArticleGetResult->{Data}->{Article} );
+        my @ResultList = IsArrayRef($ArticleGetResult->{Data}->{Article}) ? @{$ArticleGetResult->{Data}->{Article}} : ( $ArticleGetResult->{Data}->{Article} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
