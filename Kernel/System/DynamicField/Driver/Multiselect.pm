@@ -900,7 +900,7 @@ sub ValueLookup {
 
     KEYITEM:
     for my $Item (@Keys) {
-        next KEYITEM if !$Item;
+        next KEYITEM if (!(defined $Item) || $Item eq "");
 
         # set the value as the key by default
         my $Value = $Item;
