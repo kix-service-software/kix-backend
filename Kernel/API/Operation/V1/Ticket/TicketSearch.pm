@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::TicketSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -93,7 +93,7 @@ sub Run {
     my @TicketIndex = $TicketObject->TicketSearch(
         Result     => 'ARRAY',
         Search     => $Self->{Search}->{Ticket},
-        Limit      => $Self->{Limit}->{Ticket} || $Self->{Limit}->{'__COMMON'},
+        #Limit      => $Self->{Limit}->{Ticket} || $Self->{Limit}->{'__COMMON'},
         Sort       => $Self->{Sort}->{Ticket},
         UserType   => $Self->{Authorization}->{UserType},
         UserID     => $Self->{Authorization}->{UserID},
@@ -114,7 +114,7 @@ sub Run {
             return $TicketGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
+        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

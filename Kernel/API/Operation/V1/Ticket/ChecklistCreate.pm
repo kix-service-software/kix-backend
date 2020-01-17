@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::ChecklistCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common

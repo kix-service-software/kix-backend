@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Organisation::OrganisationSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -102,7 +102,7 @@ sub Run {
             return $OrganisationGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($OrganisationGetResult->{Data}->{Organisation}) ? @{$OrganisationGetResult->{Data}->{Organisation}} : ( $OrganisationGetResult->{Data}->{Organisation} );
+        my @ResultList = IsArrayRef($OrganisationGetResult->{Data}->{Organisation}) ? @{$OrganisationGetResult->{Data}->{Organisation}} : ( $OrganisationGetResult->{Data}->{Organisation} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

@@ -99,7 +99,7 @@ sub Run {
             return $CommandGetResult;
         }
 
-        my @CommandDataList = IsArrayRefWithData($CommandGetResult->{Data}->{ConsoleCommand}) ? @{$CommandGetResult->{Data}->{ConsoleCommand}} : ( $CommandGetResult->{Data}->{ConsoleCommand} );
+        my @CommandDataList = IsArrayRef($CommandGetResult->{Data}->{ConsoleCommand}) ? @{$CommandGetResult->{Data}->{ConsoleCommand}} : ( $CommandGetResult->{Data}->{ConsoleCommand} );
 
         if ( IsArrayRefWithData(\@CommandDataList) ) {
             return $Self->_Success(

@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::ArticleAttachmentSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -170,7 +170,7 @@ sub Run {
             return $AttachmentGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($AttachmentGetResult->{Data}->{Attachment}) ? @{$AttachmentGetResult->{Data}->{Attachment}} : ( $AttachmentGetResult->{Data}->{Attachment} );
+        my @ResultList = IsArrayRef($AttachmentGetResult->{Data}->{Attachment}) ? @{$AttachmentGetResult->{Data}->{Attachment}} : ( $AttachmentGetResult->{Data}->{Attachment} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

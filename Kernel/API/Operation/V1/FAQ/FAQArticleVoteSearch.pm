@@ -134,7 +134,7 @@ sub Run {
             return $FAQArticleVoteGetResult;
         }
 
-        my @FAQArticleVoteDataList = IsArrayRefWithData($FAQArticleVoteGetResult->{Data}->{FAQVote}) ? @{$FAQArticleVoteGetResult->{Data}->{FAQVote}} : ( $FAQArticleVoteGetResult->{Data}->{FAQVote} );
+        my @FAQArticleVoteDataList = IsArrayRef($FAQArticleVoteGetResult->{Data}->{FAQVote}) ? @{$FAQArticleVoteGetResult->{Data}->{FAQVote}} : ( $FAQArticleVoteGetResult->{Data}->{FAQVote} );
 
         if ( IsArrayRefWithData(\@FAQArticleVoteDataList) ) {
             return $Self->_Success(

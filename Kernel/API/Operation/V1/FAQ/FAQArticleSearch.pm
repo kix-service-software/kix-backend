@@ -110,7 +110,7 @@ sub Run {
             return $FAQArticleGetResult;
         }
 
-        my @FAQArticleDataList = IsArrayRefWithData( $FAQArticleGetResult->{Data}->{FAQArticle} ) ? @{ $FAQArticleGetResult->{Data}->{FAQArticle} } : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
+        my @FAQArticleDataList = IsArrayRef( $FAQArticleGetResult->{Data}->{FAQArticle} ) ? @{ $FAQArticleGetResult->{Data}->{FAQArticle} } : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
 
         if ( IsArrayRefWithData( \@FAQArticleDataList ) ) {
             return $Self->_Success(

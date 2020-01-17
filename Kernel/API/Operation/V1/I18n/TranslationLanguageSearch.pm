@@ -134,7 +134,7 @@ sub Run {
             return $TranslationLanguageGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($TranslationLanguageGetResult->{Data}->{TranslationLanguage}) ? @{$TranslationLanguageGetResult->{Data}->{TranslationLanguage}} : ( $TranslationLanguageGetResult->{Data}->{TranslationLanguage} );
+        my @ResultList = IsArrayRef($TranslationLanguageGetResult->{Data}->{TranslationLanguage}) ? @{$TranslationLanguageGetResult->{Data}->{TranslationLanguage}} : ( $TranslationLanguageGetResult->{Data}->{TranslationLanguage} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

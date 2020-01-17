@@ -103,7 +103,7 @@ sub Run {
             return $StateTypeGetResult;
         }
 
-        my @StateTypeDataList = IsArrayRefWithData($StateTypeGetResult->{Data}->{StateType}) ? @{$StateTypeGetResult->{Data}->{StateType}} : ( $StateTypeGetResult->{Data}->{StateType} );
+        my @StateTypeDataList = IsArrayRef($StateTypeGetResult->{Data}->{StateType}) ? @{$StateTypeGetResult->{Data}->{StateType}} : ( $StateTypeGetResult->{Data}->{StateType} );
 
         if ( IsArrayRefWithData(\@StateTypeDataList) ) {
             return $Self->_Success(

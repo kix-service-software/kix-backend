@@ -99,7 +99,7 @@ sub Run {
             return $ChannelGetResult;
         }
 
-        my @ChannelDataList = IsArrayRefWithData($ChannelGetResult->{Data}->{Channel}) ? @{$ChannelGetResult->{Data}->{Channel}} : ( $ChannelGetResult->{Data}->{Channel} );
+        my @ChannelDataList = IsArrayRef($ChannelGetResult->{Data}->{Channel}) ? @{$ChannelGetResult->{Data}->{Channel}} : ( $ChannelGetResult->{Data}->{Channel} );
 
         if ( IsArrayRefWithData(\@ChannelDataList) ) {
             return $Self->_Success(

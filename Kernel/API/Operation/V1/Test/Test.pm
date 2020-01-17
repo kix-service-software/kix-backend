@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Test::Test;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsHashRefWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
 

@@ -1339,20 +1339,19 @@ sub RoleList {
     return @Result;
 }
 
-=item CheckPermission()
+=item CheckResourcePermission()
 
 returns true if the requested permission is granted
 
-    my ($Granted, $ResultingPermission) = $UserObject->CheckPermission(
+    my ($Granted, $ResultingPermission) = $UserObject->CheckResourcePermission(
         UserID              => 123,
-        Types               => [ 'Resource', 'Object' ]
         Target              => '/tickets',
         RequestedPermission => 'READ'
     );
 
 =cut
 
-sub CheckPermission {
+sub CheckResourcePermission {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1398,7 +1397,7 @@ sub CheckPermission {
         my $TargetPermission;
         ROLEID:
         foreach my $RoleID ( sort @UserRoleList ) {
-            my ($RoleGranted, $RolePermission) = $Self->_CheckPermissionForRole(
+            my ($RoleGranted, $RolePermission) = $Self->_CheckResourcePermissionForRole(
                 %Param,
                 Target => $Target,
                 RoleID => $RoleID,
@@ -1459,21 +1458,20 @@ sub CheckPermission {
     return ( $Granted, $ResultingPermission);
 }
 
-=item CheckPermissionForRole()
+=item _CheckResourcePermissionForRole()
 
 returns true if the requested permission is granted for a given role
 
-    my ($Granted, $ResultingPermission) = $UserObject->CheckPermissionForRole(
+    my ($Granted, $ResultingPermission) = $UserObject->_CheckResourcePermissionForRole(
         UserID              => 123,
         RoleID              => 456,
-        Types               => [ 'Resource' ]
         Target              => '/tickets',
         RequestedPermission => 'READ'
     );
 
 =cut
 
-sub _CheckPermissionForRole {
+sub _CheckResourcePermissionForRole {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1495,7 +1493,7 @@ sub _CheckPermissionForRole {
     my %PermissionList = $Self->PermissionList(
         UserID => $Param{UserID},
         RoleID => $Param{RoleID},
-        Types  => $Param{Types},
+        Types  => [ 'Resource' ],
     );
 
     my $Result = 0;
