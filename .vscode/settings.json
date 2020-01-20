@@ -1,5 +1,0 @@
-{
-    "raml.customTemplate": "_raml2html_template/index.nunjucks",
-    "raml.useExternalBrowser": true,
-    "raml.externalBrowserStartCmd": "\"c:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" ",
-}

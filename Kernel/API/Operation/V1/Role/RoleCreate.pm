@@ -186,10 +186,9 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code   => 'Object.Created',
-        RoleID => $RoleID,
+        RoleID => 0 + $RoleID,
     );    
 }
-
 
 1;
 

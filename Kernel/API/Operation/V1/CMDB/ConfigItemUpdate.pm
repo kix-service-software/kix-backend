@@ -158,7 +158,7 @@ sub Run {
     }
 
     return $Self->_Success(
-        ConfigItemID => $Param{Data}->{ConfigItemID},
+        ConfigItemID => 0 + $Param{Data}->{ConfigItemID},
     );
 }
 

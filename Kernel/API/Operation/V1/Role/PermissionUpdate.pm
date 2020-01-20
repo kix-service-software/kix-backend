@@ -132,7 +132,7 @@ sub Run {
     my $Permission = $Self->_Trim(
         Data => $Param{Data}->{Permission}
     );
-
+ 
     # check if role exists 
     my $Rolename = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
