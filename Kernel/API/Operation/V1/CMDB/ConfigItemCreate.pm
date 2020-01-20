@@ -199,7 +199,7 @@ sub Run {
 
     return $Self->_Success(
         Code         => 'Object.Created',
-        ConfigItemID => $ConfigItemID,
+        ConfigItemID => 0 + $ConfigItemID,
     );
 }
 

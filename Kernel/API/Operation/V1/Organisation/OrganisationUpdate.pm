@@ -175,7 +175,7 @@ sub Run {
     }
     
     return $Self->_Success(
-        OrganisationID => $Param{Data}->{OrganisationID},
+        OrganisationID => 0 + $Param{Data}->{OrganisationID},
     );   
 }
 =back

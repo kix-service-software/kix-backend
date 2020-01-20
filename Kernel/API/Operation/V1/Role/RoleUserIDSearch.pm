@@ -118,6 +118,7 @@ sub Run {
     foreach my $UserID ( sort @UserList ) {
         push(@ResultList, 0 + $UserID);     # enforce nummeric ID
     }
+
     if ( IsArrayRefWithData(\@ResultList) ) {
         return $Self->_Success(
             UserIDs => \@ResultList,

@@ -7629,7 +7629,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::WebUserAgent</SubGroup>
         <Setting>
-            <String Regex="">http://proxy.sn.no:8001/</String>
+            <String Regex=""></String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::DisableSSLVerification" Required="1" Valid="1" ConfigLevel="200">

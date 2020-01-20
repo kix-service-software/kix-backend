@@ -629,7 +629,7 @@ sub ServiceLookup {
         );
         return;
     }
-
+  
     if ( $Param{ServiceID} ) {
 
         # check cache
@@ -670,7 +670,7 @@ sub ServiceLookup {
             Key  => $CacheKey,
         );
         return $Cache if defined $Cache;
-
+ 
         # lookup
         $Self->{DBObject}->Prepare(
             SQL   => 'SELECT id FROM service WHERE name = ?',
@@ -689,7 +689,7 @@ sub ServiceLookup {
             Key   => $CacheKey,
             Value => $Result,
         );
-
+        
         return $Result;
     }
 }

@@ -206,7 +206,7 @@ sub Run {
     
     return $Self->_Success(
         Code   => 'Object.Created',
-        ContactID => $ContactID,
+        ContactID => 0 + $ContactID,
     );    
 }
 

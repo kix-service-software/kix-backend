@@ -104,7 +104,7 @@ perform ServiceUpdate Operation. This will return the updated ServcieID.
                 ValidID => 1,
                 ParentID    => '...',
                 TypeID      => '...',
-                Criticality => '...',	            
+                Criticality => '...',               
             },
         },
     );

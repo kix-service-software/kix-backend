@@ -2128,25 +2128,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::GenericAgentTicketSearch###ExtendedSearchCondition" Required="1" Valid="1">
-        <Description Translatable="1">Allows extended search conditions in ticket search of the generic agent interface. With this feature you can search e. g. ticket title with this kind of conditions like "(*key1*&amp;&amp;*key2*)" or "(*key1*||*key2*)".</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::GenericAgentRunLimit" Required="0" Valid="1">
-        <Description Translatable="1">Set the limit of tickets that will be executed on a single genericagent job execution.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="^[0-9]{1,6}$">4000</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::UnlockOnAway" Required="1" Valid="1">
         <Description Translatable="1">Unlock tickets whenever a note is added and the owner is out of office.</Description>
         <Group>Ticket</Group>

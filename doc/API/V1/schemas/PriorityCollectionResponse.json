@@ -30,7 +30,14 @@
                "readOnly" : true
             },
             "Comment" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "CreateBy" : {
@@ -46,7 +53,8 @@
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string"
+               "type" : "string",
+               "readOnly" : true               
             },
             "ValidID" : {
                "type" : "integer"

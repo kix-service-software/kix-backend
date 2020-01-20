@@ -141,7 +141,7 @@ sub Run {
        
         my %Valid;
         
-        $Valid{ID} = $ValidID;
+        $Valid{ID} = 0 + $ValidID;
         $Valid{Name} = $ValidName;
 
         
