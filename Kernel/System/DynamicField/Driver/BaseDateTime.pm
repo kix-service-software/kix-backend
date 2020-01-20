@@ -86,7 +86,7 @@ sub ValueValidate {
         UserID => $Param{UserID}
     );
 
-    if ($DateRestriction && IsStringWithData( $Param{Value} )) {
+    if (!$Param{SearchValidation} && IsStringWithData($Param{Value}) && $DateRestriction) {
 
         # get time object
         my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
