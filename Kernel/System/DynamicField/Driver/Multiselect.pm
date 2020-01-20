@@ -232,30 +232,33 @@ sub ValueValidate {
         @Values = ( $Param{Value} );
     }
 
-    my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
-    if ($CountMin && scalar(@Values) < $CountMin) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message => "At least $CountMin values must be selected."
-        );
-        return;
-    }
+    if(!$Param{SearchValidation}) {        
 
-    my $CountMax = $Param{DynamicFieldConfig}->{Config}->{CountMax};
-    if ($CountMax && $CountMax > 1 && scalar(@Values) > $CountMax) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message => "A maximum of $CountMax values can be selected."
-        );
-        return;
-    }
+        my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
+        if ($CountMin && scalar(@Values) < $CountMin) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => "At least $CountMin values must be selected."
+            );
+            return;
+        }
 
-    if((!$CountMax || 1 == $CountMax || 0 == $CountMax) && scalar(@Values) > 1) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message => "A maximum of 1 value can be selected. (Singleselect)"
-        );
-        return;
+        my $CountMax = $Param{DynamicFieldConfig}->{Config}->{CountMax};
+        if ($CountMax && $CountMax > 1 && scalar(@Values) > $CountMax) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => "A maximum of $CountMax values can be selected."
+            );
+            return;
+        }
+
+        if((!$CountMax || 1 == $CountMax || 0 == $CountMax) && scalar(@Values) > 1) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => "A maximum of 1 value can be selected. (Singleselect)"
+            );
+            return;
+        }
     }
 
     # get dynamic field value object

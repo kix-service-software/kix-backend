@@ -82,7 +82,8 @@ sub ValueValidate {
     );
 
     if (
-        IsArrayRefWithData( $Param{DynamicFieldConfig}->{Config}->{RegExList} )
+        !$Param{SearchValidation}
+        && IsArrayRefWithData( $Param{DynamicFieldConfig}->{Config}->{RegExList} )
         && IsStringWithData( $Param{Value} )
         )
     {
@@ -128,11 +129,19 @@ sub SearchSQLGet {
         return $SQL;
     }
 
+    my $SearchValue;
     if ( $Param{Operator} eq 'Like' ) {
+        $SearchValue = "%$Param{SearchTerm}%";
+    } elsif ( $Param{Operator} eq 'StartsWith' ) {
+        $SearchValue = "$Param{SearchTerm}%";
+    } elsif ( $Param{Operator} eq 'EndsWith' ) {
+        $SearchValue = "%$Param{SearchTerm}";
+    }
 
+    if($SearchValue) {
         my $SQL = $DBObject->QueryCondition(
             Key   => "$Param{TableAlias}.value_text",
-            Value => $Param{SearchTerm},
+            Value => $SearchValue,
         );
 
         return $SQL;
