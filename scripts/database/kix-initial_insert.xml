@@ -2220,7 +2220,7 @@
 
     <Insert Table="notification_event">
         <Data Key="id" Type="AutoIncrement">5</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Agent - Owner Assginment</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Agent - Owner Assignment</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="comments" Type="Quote"></Data>
         <Data Key="create_by">1</Data>
