@@ -550,9 +550,6 @@ sub DisplayValueRender {
 
     # Output transformations
     $Value = join( $Separator, @LocalizedValues );
-
-    # in this Driver there is no need for HTMLOutput
-    # Title is always equal to Value
     my $Title = $Value;
 
     # set field link form config
@@ -1156,13 +1153,43 @@ sub StatsSearchFieldParameterBuild {
 sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
 
-    my $Value = defined $Param{Value} ? $Param{Value} : '';
+    # set Value and Title variables
+    my $Value = '';
+    my $Title = '';
 
-    # only keep date and time without seconds or milliseconds
-    $Value =~ s{\A (\d{4} - \d{2} - \d{2} [ ] \d{2} : \d{2} ) }{$1}xms;
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
 
-    # Title is always equal to Value
-    my $Title = $Value;
+    my @ReadableValues;
+
+    VALUEITEM:
+    for my $Date (@Values) {
+        next VALUEITEM if !$Date;
+
+        # only keep date and time without seconds or milliseconds
+        $Date =~ s{\A (\d{4} - \d{2} - \d{2} [ ] \d{2} : \d{2} ) }{$1}xms;
+
+        push @ReadableValues, $Date;
+    }
+
+    # set new line separator
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
+
+    $Value = join( $Separator, @ReadableValues );
+    $Title = $Value;
 
     my $Data = {
         Value => $Value,
@@ -1260,10 +1287,6 @@ sub ValueLookup {
 }
 
 1;
-
-
-
-
 
 =back
 

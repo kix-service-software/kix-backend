@@ -88,14 +88,22 @@ sub Run {
         return;
     }
 
+    my $Title = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Title},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # do nothing if the desired title is already set
-    if ( $Param{Title} && $Param{Title} eq $Ticket{Title} ) {
+    if ( $Title && $Title eq $Ticket{Title} ) {
         return 1;
     }
 
     my $Success = $TicketObject->TicketTitleUpdate(
         TicketID => $Param{TicketID},
-        Title    => $Param{Config}->{Title},
+        Title    => $Title,
         UserID   => $Param{UserID},
     );
 

@@ -89,8 +89,16 @@ sub Run {
         return;
     }
 
+    my $Contact = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Contact},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
-        Login  => $Param{Config}->{Contact},
+        Login  => $Contact,
         Silent => 1
     );
 
@@ -103,8 +111,8 @@ sub Run {
             $OrganisationID = $Contact{PrimaryOrganisationID};
         }
     } else {
-        $ContactID = $Param{Config}->{Contact};
-        $OrganisationID = $Param{Config}->{Contact};
+        $ContactID = $Contact;
+        $OrganisationID = $Contact;
     }
 
     # do nothing if the desired contact is already set
