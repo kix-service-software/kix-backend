@@ -466,10 +466,17 @@ sub TicketCreate {
     # check ticket title
     if ( !defined $Param{Title} ) {
         $Param{Title} = '';
-    }
+    } else {
 
-    # substitute title if needed
-    else {
+        # TODO: replace placeholders
+        # $Param{Title} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        #     RichText => 0,
+        #     Text     => $Param{Title},
+        #     Data     => \%Param,
+        #     UserID   => $Param{UserID},
+        # );
+
+        # substitute title if needed
         $Param{Title} = substr( $Param{Title}, 0, 255 );
     }
 

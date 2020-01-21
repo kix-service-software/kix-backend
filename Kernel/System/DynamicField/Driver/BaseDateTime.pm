@@ -53,22 +53,69 @@ sub ValueGet {
     return if !IsArrayRefWithData($DFValue);
     return if !IsHashRefWithData( $DFValue->[0] );
 
-    return $DFValue->[0]->{ValueDateTime};
+    # extract real values
+    my @ReturnData;
+    for my $Item ( @{$DFValue} ) {
+        push @ReturnData, $Item->{ValueDateTime}
+    }
+
+    return \@ReturnData;
 }
 
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-        Value    => [
-            {
-                ValueDateTime => $Param{Value},
-            },
-        ],
-        UserID => $Param{UserID},
-    );
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    # get dynamic field value object
+    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+
+    my $Success;
+
+    if ( IsArrayRefWithData( \@Values ) ) {
+
+        # if there is at least one value to set, this means one or more values are selected,
+        #    set those values!
+        my @ValueDateTime;
+        for my $Item (@Values) {
+            my $Valid = $Self->ValueValidate(
+                Value => $Item,
+                UserID => $Param{UserID},
+                DynamicFieldConfig => $Param{DynamicFieldConfig}
+            );
+
+            if (!$Valid) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "The value for the field is invalid!"
+                );
+                return;
+            }
+
+            push @ValueDateTime, { ValueDateTime => $Item };
+        }
+
+        $Success = $DynamicFieldValueObject->ValueSet(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            Value    => \@ValueDateTime,
+            UserID   => $Param{UserID},
+        );
+    } else {
+
+        # delete all existing values for the dynamic field
+        $Success = $DynamicFieldValueObject->ValueDelete(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            UserID   => $Param{UserID},
+        );
+    }
 
     return $Success;
 }
@@ -468,14 +515,41 @@ sub DisplayValueRender {
 
     my $Value = '';
 
-    # convert date to localized string
-    if ( defined $Param{Value} ) {
-        $Value = $Param{LayoutObject}->{LanguageObject}->FormatTimeString(
-            $Param{Value},
-            'DateFormat',
-            'NoSeconds',
-        );
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
     }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    # convert date to localized string
+    my @LocalizedValues;
+    for my $Date ( @Values) {
+        next if !$Date;
+        if ( defined $Date ) {
+            my $LocalizedValue = $Param{LayoutObject}->{LanguageObject}->FormatTimeString(
+                $Date,
+                'DateFormat',
+                'NoSeconds',
+            );
+            push(@LocalizedValues, $LocalizedValue);
+        }
+    }
+
+    # set new line separator
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
+
+    # Output transformations
+    $Value = join( $Separator, @LocalizedValues );
 
     # in this Driver there is no need for HTMLOutput
     # Title is always equal to Value

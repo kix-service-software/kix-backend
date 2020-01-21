@@ -348,7 +348,7 @@ sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(DynamicFieldConfig LayoutObject)) {
+    for my $Needed (qw(DynamicFieldConfig)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -357,6 +357,7 @@ sub DisplayValueRender {
             return;
         }
     }
+    $Param{LayoutObject} //= $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 
     # check DynamicFieldConfig (general)
     if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {

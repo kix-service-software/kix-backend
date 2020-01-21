@@ -348,26 +348,40 @@ sub Run {
                         Name => $1,
                     );
                     if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                        # get prepared value
                         my $DFPreparedValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Key                => $TicketRaw{$Attribute},
                         );
 
-                        my @Values;
-                        if ( ref $DFPreparedValue eq 'ARRAY' ) {
-                            @Values = @{ $DFPreparedValue };
-                        }
-                        else {
-                            @Values = ($DFPreparedValue);
-                        }
+                        # get display value string
+                        my $DisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->DisplayValueRender(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $TicketRaw{$Attribute},
+                        );
 
-                        my $Separator = ', ';
-                        if (
-                            IsHashRefWithData($DynamicFieldConfig) &&
-                            IsHashRefWithData($DynamicFieldConfig->{Config}) &&
-                            defined $DynamicFieldConfig->{Config}->{ItemSeparator}
-                        ) {
-                            $Separator = $DynamicFieldConfig->{Config}->{ItemSeparator};
+                        if (!IsHashRefWithData($DisplayValue)) {
+                            my $Separator = ', ';
+                            if (
+                                IsHashRefWithData($DynamicFieldConfig) &&
+                                IsHashRefWithData($DynamicFieldConfig->{Config}) &&
+                                defined $DynamicFieldConfig->{Config}->{ItemSeparator}
+                            ) {
+                                $Separator = $DynamicFieldConfig->{Config}->{ItemSeparator};
+                            }
+
+                            my @Values;
+                            if ( ref $DFPreparedValue eq 'ARRAY' ) {
+                                @Values = @{ $DFPreparedValue };
+                            }
+                            else {
+                                @Values = ($DFPreparedValue);
+                            }
+
+                            $DisplayValue = {
+                                Value => join($Separator, @Values)
+                            };
                         }
                         
                         push @DynamicFields, {
@@ -375,7 +389,7 @@ sub Run {
                             Name          => $DynamicFieldConfig->{Name},
                             Label         => $DynamicFieldConfig->{Label},
                             Value         => $TicketRaw{$Attribute},
-                            DisplayValue  => join($Separator, @Values),
+                            DisplayValue  => $DisplayValue->{Value},
                             PreparedValue => $DFPreparedValue
                         };
                     }

@@ -32,6 +32,27 @@ Kernel::System::DynamicField::Driver::Base - common fields backend functions
 
 =cut
 
+sub ValueGet {
+    my ( $Self, %Param ) = @_;
+
+    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+        FieldID  => $Param{DynamicFieldConfig}->{ID},
+        ObjectID => $Param{ObjectID},
+    );
+
+    return if !$DFValue;
+    return if !IsArrayRefWithData($DFValue);
+    return if !IsHashRefWithData( $DFValue->[0] );
+
+    # extract real values
+    my @ReturnData;
+    for my $Item ( @{$DFValue} ) {
+        push @ReturnData, $Item->{ValueText}
+    }
+
+    return \@ReturnData;
+}
+
 sub ValueIsDifferent {
     my ( $Self, %Param ) = @_;
 

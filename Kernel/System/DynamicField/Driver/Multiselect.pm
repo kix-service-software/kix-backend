@@ -148,6 +148,7 @@ sub ValueSet {
     my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
 
     my $Success;
+
     if ( IsArrayRefWithData( \@Values ) ) {
 
         my $valid = $Self->ValueValidate(
@@ -166,6 +167,20 @@ sub ValueSet {
 
         # if there is at least one value to set, this means one or more values are selected,
         #    set those values!
+        my $Valid = $Self->ValueValidate(
+            Value              => $Param{Value},
+            UserID             => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig}
+        );
+
+        if (!$Valid) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "The value for the field Multiselect is invalid!"
+            );
+            return;
+        }
+
         my @ValueText;
         for my $Item (@Values) {
             push @ValueText, { ValueText => $Item };
@@ -177,11 +192,9 @@ sub ValueSet {
             Value    => \@ValueText,
             UserID   => $Param{UserID},
         );
-    }
-    else {
+    } else {
 
-        # otherwise no value was selected, then in fact this means that any value there should be
-        # deleted
+        # otherwise no value was selected, then in fact this means that any value there should be deleted
         $Success = $DynamicFieldValueObject->ValueDelete(
             FieldID  => $Param{DynamicFieldConfig}->{ID},
             ObjectID => $Param{ObjectID},
@@ -587,6 +600,7 @@ sub DisplayValueRender {
 
         if ( $PossibleValues->{$Item} ) {
             $ReadableValue = $PossibleValues->{$Item};
+
             if ($TranslatableValues) {
                 $ReadableValue = $Param{LayoutObject}->{LanguageObject}->Translate($ReadableValue);
             }
@@ -626,7 +640,7 @@ sub DisplayValueRender {
             }
         }
 
-        # HTMLOuput transformations
+        # HTMLOutput transformations
         if ( $Param{HTMLOutput} ) {
 
             $ReadableValue = $Param{LayoutObject}->Ascii2Html(
@@ -646,14 +660,18 @@ sub DisplayValueRender {
         }
     }
 
-    # get specific field settings
-    my $FieldConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Driver')->{Multiselect} || {};
-
     # set new line separator
-    my $ItemSeparator = $FieldConfig->{ItemSeparator} || ', ';
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
 
-    $Value = join( $ItemSeparator, @ReadableValues );
-    $Title = join( $ItemSeparator, @ReadableTitles );
+    $Value = join( $Separator, @ReadableValues );
+    $Title = join( $Separator, @ReadableTitles );
 
     if ($ShowValueEllipsis) {
         $Value .= '...';
@@ -794,10 +812,17 @@ sub ReadableValueRender {
     }
 
     # set new line separator
-    my $ItemSeparator = ', ';
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
 
     # Output transformations
-    $Value = join( $ItemSeparator, @ReadableValues );
+    $Value = join( $Separator, @ReadableValues );
     $Title = $Value;
 
     # cut strings if needed

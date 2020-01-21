@@ -364,54 +364,6 @@ sub EditFieldValueValidate {
     return $Result;
 }
 
-sub DisplayValueRender {
-    my ( $Self, %Param ) = @_;
-
-    # set HTMLOuput as default if not specified
-    if ( !defined $Param{HTMLOutput} ) {
-        $Param{HTMLOutput} = 1;
-    }
-
-    # get raw Title and Value strings from field value
-    my $Value = defined $Param{Value} ? $Param{Value} : '';
-    my $Title = $Value;
-
-    # HTMLOuput transformations
-    if ( $Param{HTMLOutput} ) {
-
-        $Value = $Param{LayoutObject}->Ascii2Html(
-            Text           => $Value,
-            HTMLResultMode => 1,
-            Max            => $Param{ValueMaxChars} || '',
-        );
-
-        $Title = $Param{LayoutObject}->Ascii2Html(
-            Text => $Title,
-            Max  => $Param{TitleMaxChars} || '',
-        );
-    }
-    else {
-        if ( $Param{ValueMaxChars} && length($Value) > $Param{ValueMaxChars} ) {
-            $Value = substr( $Value, 0, $Param{ValueMaxChars} ) . '...';
-        }
-        if ( $Param{TitleMaxChars} && length($Title) > $Param{TitleMaxChars} ) {
-            $Title = substr( $Title, 0, $Param{TitleMaxChars} ) . '...';
-        }
-    }
-
-    # this field type does not support the Link Feature
-    my $Link;
-
-    # create return structure
-    my $Data = {
-        Value => $Value,
-        Title => $Title,
-        Link  => $Link,
-    };
-
-    return $Data;
-}
-
 sub SearchFieldRender {
     my ( $Self, %Param ) = @_;
 
@@ -506,10 +458,6 @@ sub StatsSearchFieldParameterBuild {
 }
 
 1;
-
-
-
-
 
 =back
 
