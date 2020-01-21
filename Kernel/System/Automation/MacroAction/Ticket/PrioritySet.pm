@@ -89,9 +89,17 @@ sub Run {
         return;
     }
 
+    my $Priority = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Priority},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # set the new priority
     my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
-        Priority => $Param{Config}->{Priority}
+        Priority => $Priority
     );
 
     if ( !$PriorityID ) {

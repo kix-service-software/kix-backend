@@ -217,7 +217,10 @@ sub Run {
         RichText => 0,
         Text     => $TicketParam{Title},
         TicketID => $Param{TicketID},
-        Data     => {},
+        Data     => {
+            %TicketParam,
+            Queue => $TicketParam{Team}
+        },
         UserID   => $Param{UserID},
     );
 
@@ -281,7 +284,10 @@ sub Run {
         RichText => 1,
         Text     => $ArticleParam{Body},
         TicketID => $Param{TicketID},
-        Data     => {},
+        Data     => {
+            %TicketParam,
+            Queue => $TicketParam{Team}
+        },
         UserID   => $Param{UserID},
     );
 

@@ -460,7 +460,7 @@ sub ValueSet {
         ObjectID           => $Param{ObjectID},
     );
 
-    my $NewValue = $Param{Value};
+    my $NewValue = ref $OldValue eq 'ARRAY' && ref $Param{Value} ne 'ARRAY' ? [$Param{Value}] : $Param{Value};
 
     # do not proceed if there is nothing to update, each dynamic field requires special handling to
     #    determine if two values are different or not, this to prevent false update events,
@@ -472,8 +472,7 @@ sub ValueSet {
             Value1             => $OldValue,
             Value2             => $NewValue,
         )
-        )
-    {
+    ) {
         return 1;
     }
 

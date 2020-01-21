@@ -89,9 +89,17 @@ sub Run {
         return;
     }
 
-    # set the new owner
+    my $Lock = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Lock},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
+    # set the new lock
     my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
-        Lock => $Param{Config}->{Lock},
+        Lock => $Lock,
     );
 
     if ( !$LockID ) {
