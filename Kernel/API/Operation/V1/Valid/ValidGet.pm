@@ -13,7 +13,7 @@ use warnings;
 
 use MIME::Base64;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -141,7 +141,7 @@ sub Run {
        
         my %Valid;
         
-        $Valid{ID} = $ValidID;
+        $Valid{ID} = 0 + $ValidID;
         $Valid{Name} = $ValidName;
 
         

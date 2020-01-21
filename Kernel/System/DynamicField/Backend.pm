@@ -348,7 +348,7 @@ sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(DynamicFieldConfig LayoutObject)) {
+    for my $Needed (qw(DynamicFieldConfig)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -357,6 +357,7 @@ sub DisplayValueRender {
             return;
         }
     }
+    $Param{LayoutObject} //= $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 
     # check DynamicFieldConfig (general)
     if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
@@ -459,7 +460,7 @@ sub ValueSet {
         ObjectID           => $Param{ObjectID},
     );
 
-    my $NewValue = $Param{Value};
+    my $NewValue = ref $OldValue eq 'ARRAY' && ref $Param{Value} ne 'ARRAY' ? [$Param{Value}] : $Param{Value};
 
     # do not proceed if there is nothing to update, each dynamic field requires special handling to
     #    determine if two values are different or not, this to prevent false update events,
@@ -471,8 +472,7 @@ sub ValueSet {
             Value1             => $OldValue,
             Value2             => $NewValue,
         )
-        )
-    {
+    ) {
         return 1;
     }
 

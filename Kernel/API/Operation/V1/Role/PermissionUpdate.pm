@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Role::PermissionUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -132,7 +132,7 @@ sub Run {
     my $Permission = $Self->_Trim(
         Data => $Param{Data}->{Permission}
     );
-
+ 
     # check if role exists 
     my $Rolename = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},

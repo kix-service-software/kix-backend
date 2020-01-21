@@ -89,9 +89,17 @@ sub Run {
         return;
     }
 
+    my $Responsible = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Responsible},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # set the new responsible
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
-        UserLogin => $Param{Config}->{Responsible},
+        UserLogin => $Responsible
     );
 
     if ( !$UserID ) {

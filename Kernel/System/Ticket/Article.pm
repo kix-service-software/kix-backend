@@ -43,7 +43,7 @@ create an article
         TicketID         => 123,
         Channel          => 'note',                                 # ...
         CustomerVisible  => 0|1,                                    # optional
-        SenderType       => 'agent',                                # agent|system|customer
+        SenderType       => 'agent',                                # agent|system|external
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
         Cc               => 'Some Customer B <customer-b@example.com>', # not required but useful
@@ -149,12 +149,13 @@ sub ArticleCreate {
     # lookups if no ids are passed
     if ( $Param{Channel} && !$Param{ChannelID} ) {
         $Param{ChannelID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $Param{Channel} );
-    }
-    elsif ( !$Param{Channel} && $Param{ChannelID} ) {
+    } elsif ( !$Param{Channel} && $Param{ChannelID} ) {
         $Param{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $Param{ChannelID} );
     }
     if ( $Param{SenderType} && !$Param{SenderTypeID} ) {
         $Param{SenderTypeID} = $Self->ArticleSenderTypeLookup( SenderType => $Param{SenderType} );
+    } elsif ( !$Param{SenderType} && $Param{SenderTypeID} ) {
+        $Param{SenderType} = $Self->ArticleSenderTypeLookup( SenderTypeID => $Param{SenderTypeID} );
     }
 
     # check needed stuff
@@ -212,6 +213,18 @@ sub ArticleCreate {
         DynamicFields => 1,
     );
 
+    # TODO: replace placeholder in subject
+    # $Param{Subject} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    #     RichText => 0,
+    #     Text     => $Param{Subject},
+    #     TicketID => $Param{TicketID},
+    #     Data     => {},
+    #     UserID   => $Param{UserID},
+    # );
+    # if (IsHashRefWithData($Param{OrigHeader}) && $Param{OrigHeader}->{Subject}) {
+    #     $Param{OrigHeader}->{Subject} = $Param{Subject};
+    # }
+
     # get html utils object
     my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
 
@@ -219,55 +232,68 @@ sub ArticleCreate {
     my @AttachmentConvert;
     if ( !length $Param{Body} ) {    # allow '0' as body
         $Param{Body} = 'No body';
-    }
+    } else {
 
-    # process html article
-    elsif ( $Param{MimeType} =~ /text\/html/i ) {
-
-        # add html article as attachment
-        my $Attach = {
-            Content     => $Param{Body},
-            ContentType => "text/html; charset=\"$Param{Charset}\"",
-            Filename    => 'file-2',
-        };
-        push @AttachmentConvert, $Attach;
-
-        # get ascii body
-        $Param{MimeType} = 'text/plain';
-        $Param{ContentType} =~ s/html/plain/i;
-        $Param{Body} = $HTMLUtilsObject->ToAscii(
-            String => $Param{Body},
+        # replace placeholders
+        $Param{Body} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+            RichText => $Param{MimeType} =~ m/text\/html/i ? 1 : 0,
+            Text     => $Param{Body},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
         );
-    }
-    elsif ( $Param{MimeType} && $Param{MimeType} eq "application/json" ) {
-
-        # Keep JSON body unchanged
-    }
-
-    # if body isn't text, attach body as attachment (mostly done by OE) :-/
-    elsif ( $Param{MimeType} && $Param{MimeType} !~ /\btext\b/i ) {
-
-        # add non text as attachment
-        my $FileName = 'unknown';
-        if ( $Param{ContentType} =~ /name="(.+?)"/i ) {
-            $FileName = $1;
+        if (IsHashRefWithData($Param{OrigHeader}) && $Param{OrigHeader}->{Body}) {
+            $Param{OrigHeader}->{Body} = $Param{Body};
         }
-        my $Attach = {
-            Content     => $Param{Body},
-            ContentType => $Param{ContentType},
-            Filename    => $FileName,
-        };
-        push @{ $Param{Attachment} }, $Attach;
 
-        # set ascii body
-        $Param{MimeType}    = 'text/plain';
-        $Param{ContentType} = 'text/plain';
-        $Param{Body}        = '- no text message => see attachment -';
-    }
+        # process html article
+        if ( $Param{MimeType} =~ /text\/html/i ) {
 
-    # fix some bad stuff from some browsers (Opera)!
-    else {
-        $Param{Body} =~ s/(\n\r|\r\r\n|\r\n)/\n/g;
+            # add html article as attachment
+            my $Attach = {
+                Content     => $Param{Body},
+                ContentType => "text/html; charset=\"$Param{Charset}\"",
+                Filename    => 'file-2',
+            };
+            push @AttachmentConvert, $Attach;
+
+            # get ascii body
+            $Param{MimeType} = 'text/plain';
+            $Param{ContentType} =~ s/html/plain/i;
+            $Param{Body} = $HTMLUtilsObject->ToAscii(
+                String => $Param{Body},
+            );
+        }
+        elsif ( $Param{MimeType} && $Param{MimeType} eq "application/json" ) {
+
+            # Keep JSON body unchanged
+        }
+
+        # if body isn't text, attach body as attachment (mostly done by OE) :-/
+        elsif ( $Param{MimeType} && $Param{MimeType} !~ /\btext\b/i ) {
+
+            # add non text as attachment
+            my $FileName = 'unknown';
+            if ( $Param{ContentType} =~ /name="(.+?)"/i ) {
+                $FileName = $1;
+            }
+            my $Attach = {
+                Content     => $Param{Body},
+                ContentType => $Param{ContentType},
+                Filename    => $FileName,
+            };
+            push @{ $Param{Attachment} }, $Attach;
+
+            # set ascii body
+            $Param{MimeType}    = 'text/plain';
+            $Param{ContentType} = 'text/plain';
+            $Param{Body}        = '- no text message => see attachment -';
+        }
+
+        # fix some bad stuff from some browsers (Opera)!
+        else {
+            $Param{Body} =~ s/(\n\r|\r\r\n|\r\n)/\n/g;
+        }
     }
 
     # handle some special things for channel "email"

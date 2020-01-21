@@ -89,9 +89,17 @@ sub Run {
         return;
     }
 
+    my $Owner = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Owner},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # set the new owner
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
-        UserLogin => $Param{Config}->{Owner},
+        UserLogin => $Owner,
     );
 
     if ( !$UserID ) {

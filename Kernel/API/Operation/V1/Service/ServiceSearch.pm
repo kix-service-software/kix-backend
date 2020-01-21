@@ -102,7 +102,7 @@ sub Run {
             return $ServiceGetResult;
         }
 
-        my @ServiceDataList = IsArrayRefWithData($ServiceGetResult->{Data}->{Service}) ? @{$ServiceGetResult->{Data}->{Service}} : ( $ServiceGetResult->{Data}->{Service} );
+        my @ServiceDataList = IsArrayRef($ServiceGetResult->{Data}->{Service}) ? @{$ServiceGetResult->{Data}->{Service}} : ( $ServiceGetResult->{Data}->{Service} );
 
         if ( IsArrayRefWithData(\@ServiceDataList) ) {
             return $Self->_Success(

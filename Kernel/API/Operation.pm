@@ -115,18 +115,20 @@ sub new {
 
     # check permission
     if ( IsHashRefWithData($Param{Authorization}) ) {
-        my ($Granted, @AllowedMethods) = $Self->_CheckPermission(
-            Authorization => $Param{Authorization},
-        );
-        if ( !$Granted ) {
-            return $Self->_Error(
-                Code => 'Forbidden',
-                Additional => {
-                    AddHeader => {
-                        Allow => join(', ', @AllowedMethods),
-                    }
-                }
+        if ( !$Param{IgnorePermissions} ) {
+            my ($Granted, @AllowedMethods) = $Self->_CheckPermission(
+                Authorization => $Param{Authorization},
             );
+            if ( !$Granted ) {
+                return $Self->_Error(
+                    Code => 'Forbidden',
+                    Additional => {
+                        AddHeader => {
+                            Allow => join(', ', @AllowedMethods),
+                        }
+                    }
+                );
+            }
         }
 
         $Self->{Authorization} = $Param{Authorization};        
@@ -161,13 +163,13 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods) ) {
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions) ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 
     # add call level
     $Self->{Level} = $Param{Level};
-    $Self->{BackendObject}->{Level} = $Self->{Level};
+    $Self->{BackendObject}->{Level} = $Self->{Level};    
 
     return $Self;
 }
@@ -315,10 +317,9 @@ sub _CheckPermission {
     my $AllowedPermission;
     my @GrantedResources;
     foreach my $Resource ( @Resources ) {
-        ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+        ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
             UserID              => $Param{Authorization}->{UserID},
             Target              => $ResourceBase.$Resource,
-            Types               => [ 'Resource', 'Object' ],
             RequestedPermission => $RequestedPermission,
         );
 

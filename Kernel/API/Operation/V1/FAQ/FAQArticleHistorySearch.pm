@@ -134,7 +134,7 @@ sub Run {
             return $FAQArticleHistoryGetResult;
         }
 
-        my @FAQArticleHistoryDataList = IsArrayRefWithData($FAQArticleHistoryGetResult->{Data}->{FAQHistory}) ? @{$FAQArticleHistoryGetResult->{Data}->{FAQHistory}} : ( $FAQArticleHistoryGetResult->{Data}->{FAQHistory} );
+        my @FAQArticleHistoryDataList = IsArrayRef($FAQArticleHistoryGetResult->{Data}->{FAQHistory}) ? @{$FAQArticleHistoryGetResult->{Data}->{FAQHistory}} : ( $FAQArticleHistoryGetResult->{Data}->{FAQHistory} );
 
         if ( IsArrayRefWithData(\@FAQArticleHistoryDataList) ) {
             return $Self->_Success(

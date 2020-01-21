@@ -86,7 +86,7 @@ sub Run {
         my $Filename = basename $File;
         my ($Language) = split(/\./, $Filename);
 
-        $Self->Print("    importing $Filename...");
+        $Self->Print("    importing $LocaleDir/$Filename...");
 
         my ($CountTotal, $CountOK) = $Kernel::OM->Get('Kernel::System::Translation')->ImportPO(
             Language => $Language,

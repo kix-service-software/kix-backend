@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Organisation::OrganisationContactSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -129,7 +129,7 @@ sub Run {
             return $ContactGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($ContactGetResult->{Data}->{Contact}) ? @{$ContactGetResult->{Data}->{Contact}} : ( $ContactGetResult->{Data}->{Contact} );
+        my @ResultList = IsArrayRef($ContactGetResult->{Data}->{Contact}) ? @{$ContactGetResult->{Data}->{Contact}} : ( $ContactGetResult->{Data}->{Contact} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

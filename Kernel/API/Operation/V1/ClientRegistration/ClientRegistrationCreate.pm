@@ -13,7 +13,7 @@ use warnings;
 
 use MIME::Base64;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -175,10 +175,10 @@ sub Run {
 
     # import SysConfig definitions if given
     if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
-        my %SysConfigOptions = map { $_ => 1 } $Kernel::OM->Get('Kernel::System::SysConfig')->OptionList();
+        my %SysConfigOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->ValueGetAll();
 
         foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
-            if ( !$SysConfigOptions{$Item->{Name}} ) {
+            if ( !exists $SysConfigOptions{$Item->{Name}} ) {
                 # create new option
                 my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionAdd(
                     Name            => $Item->{Name},
@@ -220,6 +220,7 @@ sub Run {
                     Setting         => $Item->{Setting},
                     Default         => $Item->{Default},
                     ValidID         => $Item->{ValidID} || 1,
+                    Value           => exists $Item->{Value} ? $Item->{Value} : $SysConfigOptions{$Item->{Name}},
                     UserID          => $Self->{Authorization}->{UserID},
                 );
 

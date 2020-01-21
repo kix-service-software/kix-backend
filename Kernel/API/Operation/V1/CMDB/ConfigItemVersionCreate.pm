@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::CMDB::ConfigItemVersionCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::CMDB::Common

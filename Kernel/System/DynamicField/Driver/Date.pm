@@ -60,7 +60,7 @@ sub new {
     # set field behaviors
     $Self->{Behaviors} = {
         'IsACLReducible'               => 0,
-        'IsNotificationEventCondition' => 0,
+        'IsNotificationEventCondition' => 1,
         'IsSortable'                   => 1,
         'IsFiltrable'                  => 0,
         'IsStatsCondition'             => 1,
@@ -106,33 +106,6 @@ sub new {
     return $Self;
 }
 
-sub ValueSet {
-    my ( $Self, %Param ) = @_;
-
-    # check for no time in date fields
-    if ( $Param{Value} && $Param{Value} !~ m{\A \d{4}-\d{2}-\d{2}\s00:00:00 \z}xms ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "The value for the field Date is invalid!\n"
-                . "The date must be valid and the time must be 00:00:00",
-        );
-        return;
-    }
-
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-        Value    => [
-            {
-                ValueDateTime => $Param{Value},
-            },
-        ],
-        UserID => $Param{UserID},
-    );
-
-    return $Success;
-}
-
 sub ValueValidate {
     my ( $Self, %Param ) = @_;
 
@@ -162,7 +135,10 @@ sub ValueValidate {
         UserID => $Param{UserID},
     );
 
-    if ($DateRestriction) {
+    if (
+        !$Param{SearchValidation}
+        && $DateRestriction
+    ) {
 
         # get time object
         my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
@@ -565,55 +541,6 @@ sub EditFieldValueValidate {
     };
 
     return $Result;
-}
-
-sub DisplayValueRender {
-    my ( $Self, %Param ) = @_;
-
-    my $Value = '';
-
-    # convert date to localized string
-    if ( defined $Param{Value} ) {
-        $Value = $Param{LayoutObject}->{LanguageObject}->FormatTimeString(
-            $Param{Value},
-            'DateFormatShort',
-        );
-
-    }
-
-    # in this Driver there is no need for HTMLOutput
-    # Title is always equal to Value
-    my $Title = $Value;
-
-    # set field link form config
-    my $Link = $Param{DynamicFieldConfig}->{Config}->{Link} || '';
-
-    my $Data = {
-        Value => $Value,
-        Title => $Title,
-        Link  => $Link,
-    };
-
-    return $Data;
-}
-
-sub ReadableValueRender {
-    my ( $Self, %Param ) = @_;
-
-    my $Value = defined $Param{Value} ? $Param{Value} : '';
-
-    # only keep date part, loose time part of time-stamp
-    $Value =~ s{ \A (\d{4} - \d{2} - \d{2}) .+?\z }{$1}xms;
-
-    # Title is always equal to Value
-    my $Title = $Value;
-
-    my $Data = {
-        Value => $Value,
-        Title => $Title,
-    };
-
-    return $Data;
 }
 
 sub SearchFieldRender {

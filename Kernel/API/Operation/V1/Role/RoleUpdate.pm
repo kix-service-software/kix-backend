@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Role::RoleUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -155,7 +155,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        RoleID => $Param{Data}->{RoleID},
+        RoleID => 0 + $Param{Data}->{RoleID},
     );    
 }
 

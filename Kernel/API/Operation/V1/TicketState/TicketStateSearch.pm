@@ -99,7 +99,7 @@ sub Run {
             return $TicketStateGetResult;
         }
 
-        my @TicketStateDataList = IsArrayRefWithData($TicketStateGetResult->{Data}->{TicketState}) ? @{$TicketStateGetResult->{Data}->{TicketState}} : ( $TicketStateGetResult->{Data}->{TicketState} );
+        my @TicketStateDataList = IsArrayRef($TicketStateGetResult->{Data}->{TicketState}) ? @{$TicketStateGetResult->{Data}->{TicketState}} : ( $TicketStateGetResult->{Data}->{TicketState} );
 
         if ( IsArrayRefWithData(\@TicketStateDataList) ) {
             return $Self->_Success(

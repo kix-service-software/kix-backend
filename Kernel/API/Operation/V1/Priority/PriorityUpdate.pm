@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Priority::PriorityUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -82,7 +82,8 @@ sub ParameterDefinition {
 
     return {
         'PriorityID' => {
-            Required => 1
+            DataType => 'NUMERIC',
+            Required => 1,
         },
         'Priority' => {
             Type => 'HASH',
@@ -139,11 +140,12 @@ sub Run {
 
     # update Priority
     my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityUpdate(
-        PriorityID => $Param{Data}->{PriorityID},
-        Name       => $Priority->{Name} || $PriorityData{Name},
-        Comment    => exists $Priority->{Comment} ? $Priority->{Comment} : $PriorityData{Comment},
-        ValidID    => $Priority->{ValidID} || $PriorityData{ValidID} || 1,
-        UserID     => $Self->{Authorization}->{UserID},
+        PriorityID     => $Param{Data}->{PriorityID},
+        Name           => $Priority->{Name} || $PriorityData{Name},
+        Comment        => exists $Priority->{Comment} ? $Priority->{Comment} : $PriorityData{Comment},
+        ValidID        => $Priority->{ValidID} || $PriorityData{ValidID} || 1,
+        UserID         => $Self->{Authorization}->{UserID},
+        CheckSysConfig => 0,
     );
 
     if ( !$Success ) {
@@ -154,7 +156,7 @@ sub Run {
 
     # return result    
     return $Self->_Success(
-        PriorityID => $Param{Data}->{PriorityID},
+        PriorityID => 0 + $Param{Data}->{PriorityID},
     );    
 }
 

@@ -1,0 +1,68 @@
+use warnings;
+
+use Cwd;
+use lib cwd();
+use lib cwd() . '/Kernel/cpan-lib';
+use lib cwd() . '/Custom';
+use lib cwd() . '/scripts/test/api/Cucumber';
+
+use LWP::UserAgent;
+use HTTP::Request;
+use JSON::XS qw(encode_json decode_json);
+use JSON::Validator;
+
+use Test::More;
+use Test::BDD::Cucumber::StepFile;
+
+use Data::Dumper;
+
+use Kernel::System::ObjectManager;
+
+$Kernel::OM = Kernel::System::ObjectManager->new();
+
+# require our helper
+require '_Helper.pl';
+
+# require our common library
+require '_StepsLib.pl';
+
+# feature specific steps 
+
+When qr/I query the collection of users$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/users',
+   );
+};
+
+When qr/I query the collection of users with filter of "(.*?)"$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/users',
+      Filter => '{"User": {"AND": [{"Field": "UserEmail","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
+   );
+};
+
+When qr/I query the collection of users with AND-filter of "(.*?)" and "(.*?)"$/, sub {  
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/users',
+      Filter => '{"User": {"AND": [{"Field": "UserEmail","Operator": "CONTAINS","Value": "'.$1.'"},{"Field": "UserFirstname","Operator": "STARTSWITH","Value": "'.$2.'"}]}}',
+   );
+};
+
+When qr/I query the collection of users with AND-filter of UserEmail "(.*?)" and UserID's and UserFirstname "(.*?)"$/, sub {  
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/users',
+      Filter => '{"User": {"AND": [{"Field": "UserEmail","Operator": "CONTAINS","Value": "'.$1.'"},{"Field": "UserID","Operator": "IN","Value": [ 1, 2, 3 ],"Type": "numeric"},{"Field": "UserFirstname","Operator": "STARTSWITH","Value": "'.$2.'","Not": true}]}}',
+   );
+};
+
+When qr/I query the collection of users with a limit of (\d+)$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/users',
+      Limit => $1,
+   );
+};

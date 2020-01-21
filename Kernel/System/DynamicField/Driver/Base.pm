@@ -32,12 +32,47 @@ Kernel::System::DynamicField::Driver::Base - common fields backend functions
 
 =cut
 
+sub ValueGet {
+    my ( $Self, %Param ) = @_;
+
+    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+        FieldID  => $Param{DynamicFieldConfig}->{ID},
+        ObjectID => $Param{ObjectID},
+    );
+
+    return if !$DFValue;
+    return if !IsArrayRefWithData($DFValue);
+    return if !IsHashRefWithData( $DFValue->[0] );
+
+    # extract real values
+    my @ReturnData;
+    for my $Item ( @{$DFValue} ) {
+        push @ReturnData, $Item->{ValueText}
+    }
+
+    return \@ReturnData;
+}
+
 sub ValueIsDifferent {
     my ( $Self, %Param ) = @_;
 
     # special cases where the values are different but they should be reported as equals
-    return if !defined $Param{Value1} && ( defined $Param{Value2} && $Param{Value2} eq '' );
-    return if !defined $Param{Value2} && ( defined $Param{Value1} && $Param{Value1} eq '' );
+    if (
+        !defined $Param{Value1}
+        && ref $Param{Value2} eq 'ARRAY'
+        && !IsArrayRefWithData( $Param{Value2} )
+        )
+    {
+        return
+    }
+    if (
+        !defined $Param{Value2}
+        && ref $Param{Value1} eq 'ARRAY'
+        && !IsArrayRefWithData( $Param{Value1} )
+        )
+    {
+        return
+    }
 
     # compare the results
     return DataIsDifferent(
@@ -185,11 +220,40 @@ EOF
     return $HTMLString;
 }
 
+sub ObjectMatch {
+    my ( $Self, %Param ) = @_;
+
+    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
+
+    # return false if field is not defined
+    return 0 if ( !defined $Param{ObjectAttributes}->{$FieldName} );
+
+    my @Values;
+    if ( ref  $Param{ObjectAttributes}->{$FieldName} eq 'ARRAY' ) {
+        @Values = @{  $Param{ObjectAttributes}->{$FieldName} };
+    }
+    else {
+        @Values = (  $Param{ObjectAttributes}->{$FieldName} );
+    }
+
+    my $Match = 0;
+    # search in all values for this attribute
+    VALUE:
+    for my $AttributeValue ( @Values ) {
+
+        next VALUE if !defined $AttributeValue;
+
+        # only need to match one
+        if ( $Param{Value} eq $AttributeValue ) {
+            $Match = 1;
+            last VALUE;
+        }
+    }
+
+    return $Match;
+}
+
 1;
-
-
-
-
 
 =back
 

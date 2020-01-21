@@ -13,6 +13,7 @@ package Kernel::System::ImportExport;
 use strict;
 use warnings;
 
+use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -2419,6 +2420,82 @@ sub Import {
     return \%Result;
 }
 
+=item ImportTaskCreate()
+
+adds future task for import
+
+    my $TaskID = $ImportExportObject->ImportTaskCreate(
+        TemplateID    => 123,
+        SourceContent => 'import content'
+        UserID        => 1,
+    );
+
+    returns ID of scheduler future task
+
+=cut
+
+sub ImportTaskCreate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(TemplateID SourceContent UserID)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # check if Template exists
+    my $TemplateDataRef = $Self->TemplateGet(
+        TemplateID => $Param{TemplateID},
+        UserID     => $Param{UserID},
+    );
+
+    if ( !IsHashRefWithData( $TemplateDataRef ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "No Template with ID $Param{TemplateID} found.",
+        );
+        return;
+    }
+
+    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Param{SourceContent} );
+    my $FileContent = decode_base64( $Param{SourceContent} );
+
+    # Get current time.
+    my $ExecutionTime = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+
+    # Create a new future task for import.
+    my $TaskID = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskAdd(
+        ExecutionTime => $ExecutionTime,
+        Type          => 'AsynchronousExecutor',
+        Name          => 'Import for template "'.$TemplateDataRef->{Name}.'" ('.$Param{TemplateID}.')',
+        Attempts      => 1,
+        Data          => {
+            Object   => 'Kernel::System::ImportExport',
+            Function => 'Import',
+            Params   => {
+                TemplateID    => $Param{TemplateID},
+                SourceContent => \$FileContent,
+                UserID        => $Param{UserID}
+            },
+        }
+    );
+
+    if ( !$TaskID) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Could not create import execution task.",
+        );
+        return;
+    }
+
+    return $TaskID;
+}
+
 =item TemplateRunList()
 
 returns an array of all imports/exports of a template
@@ -2634,10 +2711,6 @@ sub _ClearCacheAndNotify {
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType}
-    );
-    # FIXME: added because of possible missing cache dependency (on UPDATE)
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-        Type => 'API_import_export_templates'
     );
 
     # push client callback event

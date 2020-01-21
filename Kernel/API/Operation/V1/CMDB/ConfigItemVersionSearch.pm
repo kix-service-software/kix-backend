@@ -143,7 +143,7 @@ sub Run {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRefWithData($GetResult->{Data}->{ConfigItemVersion}) ? @{$GetResult->{Data}->{ConfigItemVersion}} : ( $GetResult->{Data}->{ConfigItemVersion} );
+        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItemVersion}) ? @{$GetResult->{Data}->{ConfigItemVersion}} : ( $GetResult->{Data}->{ConfigItemVersion} );
 
         if ( IsArrayRefWithData(\@DataList) ) {
             return $Self->_Success(

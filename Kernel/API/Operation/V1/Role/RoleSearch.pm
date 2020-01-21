@@ -102,7 +102,7 @@ sub Run {
             return $RoleGetResult;
         }
 
-        my @RoleDataList = IsArrayRefWithData($RoleGetResult->{Data}->{Role}) ? @{$RoleGetResult->{Data}->{Role}} : ( $RoleGetResult->{Data}->{Role} );
+        my @RoleDataList = IsArrayRef($RoleGetResult->{Data}->{Role}) ? @{$RoleGetResult->{Data}->{Role}} : ( $RoleGetResult->{Data}->{Role} );
 
         if ( IsArrayRefWithData(\@RoleDataList) ) {
             return $Self->_Success(

@@ -768,22 +768,6 @@ sub RandomValueSet {
     };
 }
 
-sub ObjectMatch {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # return false if field is not defined
-    return 0 if ( !defined $Param{ObjectAttributes}->{$FieldName} );
-
-    # return false if not match
-    if ( $Param{ObjectAttributes}->{$FieldName} ne $Param{Value} ) {
-        return 0;
-    }
-
-    return 1;
-}
-
 sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
