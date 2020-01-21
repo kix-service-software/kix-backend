@@ -870,32 +870,6 @@ sub TemplateValueTypeGet {
     }
 }
 
-sub ObjectMatch {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # the attribute must be an array
-    return 0 if !IsArrayRefWithData( $Param{ObjectAttributes}->{$FieldName} );
-
-    my $Match;
-
-    # search in all values for this attribute
-    VALUE:
-    for my $AttributeValue ( @{ $Param{ObjectAttributes}->{$FieldName} } ) {
-
-        next VALUE if !defined $AttributeValue;
-
-        # only need to match one
-        if ( $Param{Value} eq $AttributeValue ) {
-            $Match = 1;
-            last VALUE;
-        }
-    }
-
-    return $Match;
-}
-
 sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 

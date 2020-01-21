@@ -220,11 +220,40 @@ EOF
     return $HTMLString;
 }
 
+sub ObjectMatch {
+    my ( $Self, %Param ) = @_;
+
+    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
+
+    # return false if field is not defined
+    return 0 if ( !defined $Param{ObjectAttributes}->{$FieldName} );
+
+    my @Values;
+    if ( ref  $Param{ObjectAttributes}->{$FieldName} eq 'ARRAY' ) {
+        @Values = @{  $Param{ObjectAttributes}->{$FieldName} };
+    }
+    else {
+        @Values = (  $Param{ObjectAttributes}->{$FieldName} );
+    }
+
+    my $Match = 0;
+    # search in all values for this attribute
+    VALUE:
+    for my $AttributeValue ( @Values ) {
+
+        next VALUE if !defined $AttributeValue;
+
+        # only need to match one
+        if ( $Param{Value} eq $AttributeValue ) {
+            $Match = 1;
+            last VALUE;
+        }
+    }
+
+    return $Match;
+}
+
 1;
-
-
-
-
 
 =back
 
