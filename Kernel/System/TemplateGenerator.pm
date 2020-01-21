@@ -1115,19 +1115,21 @@ sub _Replace {
 
     # Dropdown, Checkbox and MultipleSelect DynamicFields, can store values (keys) that are
     # different from the the values to display
-    # <KIX_TICKET_DynamicField_NameX> returns the stored key
+    # <KIX_TICKET_DynamicField_NameX> and
     # <KIX_TICKET_DynamicField_NameX_Value> returns the display value
+    # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for multiselect fields
 
     my %DynamicFields;
 
     # For systems with many Dynamic fields we do not want to load them all unless needed
     # Find what Dynamic Field Values are requested
-    while ( $Param{Text} =~ m/$Tag DynamicField_(\S+?)(_Value)? $End/gixms ) {
+    while ( $Param{Text} =~ m/$Tag DynamicField_(\S+?)(_Value|_Key)? $End/gixms ) {
         $DynamicFields{$1} = 1;
     }
 
     # to store all the required DynamicField display values
     my %DynamicFieldDisplayValues;
+    my %DynamicFieldDisplayKeys;
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
@@ -1164,8 +1166,8 @@ sub _Replace {
             LanguageObject     => $LanguageObject,
         );
 
-        # get the readable value (value) for each dynamic field
-        my $DisplayValueStrg = $DynamicFieldBackendObject->ReadableValueRender(
+        # get the display value (value) for each dynamic field
+        my $DisplayValueStrg = $DynamicFieldBackendObject->DisplayValueRender(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $DisplayValue,
         );
@@ -1177,19 +1179,25 @@ sub _Replace {
         }
 
         # get the readable value (key) for each dynamic field
-        my $ValueStrg = $DynamicFieldBackendObject->ReadableValueRender(
+        my $DisplayKeyStrg = $DynamicFieldBackendObject->ReadableValueRender(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
         );
 
+        # fill the DynamicFielsDisplayKeys
+        if ($DynamicFieldConfig && $DynamicFieldConfig->{FieldType}) {
+            $DynamicFieldDisplayKeys{ 'DynamicField_' . $DynamicFieldConfig->{Name} . '_Key' }
+                = $DisplayKeyStrg->{Value};
+        }
+
         # replace ticket content with the value from ReadableValueRender (if any)
-        if ( IsHashRefWithData($ValueStrg) ) {
-            $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $ValueStrg->{Value};
+        if ( IsHashRefWithData($DisplayValueStrg) ) {
+            $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $DisplayValueStrg->{Value};
         }
     }
 
     # replace it
-    $HashGlobalReplace->( $Tag, %Ticket, %DynamicFieldDisplayValues );
+    $HashGlobalReplace->( $Tag, %Ticket, %DynamicFieldDisplayValues, %DynamicFieldDisplayKeys );
 
     # COMPAT
     $Param{Text} =~ s/$Start KIX_TICKET_ID $End/$Ticket{TicketID}/gixms;
