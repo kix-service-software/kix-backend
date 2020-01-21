@@ -428,6 +428,7 @@ sub _NotificationFilter {
             next VALUE if !$Value;
 
             if ( $Key =~ /^Ticket::/ ) {
+
                 # check if key is a search dynamic field
                 if ( $Attribute =~ m{\A DynamicField_(.*?)$}xms ) {
 
@@ -437,14 +438,14 @@ sub _NotificationFilter {
                     # get the dynamic field config for this field
                     my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
 
-                    next VALUE if !$DynamicFieldConfig;
+                    last VALUE if !$DynamicFieldConfig;
 
                     my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
                         DynamicFieldConfig => $DynamicFieldConfig,
                         Behavior           => 'IsNotificationEventCondition',
                     );
 
-                    next VALUE if !$IsNotificationEventCondition;
+                    last VALUE if !$IsNotificationEventCondition;
 
                     # Get match value from the dynamic field backend, if applicable (bug#12257).
                     my $MatchValue;
@@ -483,7 +484,7 @@ sub _NotificationFilter {
 
                 if ( $Article{$Attribute} && $Attribute =~ /(Body|Subject)/ && $Article{$Attribute} =~ /\Q$Value\E/i ) {
                     $Match = 1;
-                    last VALUE;                    
+                    last VALUE;
                 }
                 elsif ( $Article{$Attribute} && $Value eq $Article{$Attribute} ) {
                     $Match = 1;

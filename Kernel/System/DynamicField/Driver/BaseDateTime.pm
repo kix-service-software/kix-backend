@@ -1256,15 +1256,6 @@ sub RandomValueSet {
     };
 }
 
-sub ObjectMatch {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # not supported
-    return 0;
-}
-
 sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
