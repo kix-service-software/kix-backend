@@ -140,6 +140,7 @@ sub _Filter {
 
     KEY:
     for my $Key ( sort keys %{ $Param{Filter} } ) {
+
         # ignore not ticket or article related attributes
         next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
 
@@ -158,13 +159,12 @@ sub _Filter {
         # ignore anything that isn't ok
         next KEY if !$Param{Filter}->{$Key};
         next KEY if !@{ $Param{Filter}->{$Key} };
-        next KEY if !$Param{Filter}->{$Key}->[0];
+        next KEY if !defined $Param{Filter}->{$Key}->[0];
         my $Match = 0;
 
         VALUE:
         for my $Value ( @{ $Param{Filter}->{$Key} } ) {
-
-            next VALUE if !$Value;
+            next VALUE if !defined $Value;
 
             if ( $Key =~ /^Ticket::/ ) {
                 # check if key is a search dynamic field
