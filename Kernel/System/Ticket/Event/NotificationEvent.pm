@@ -401,6 +401,7 @@ sub _NotificationFilter {
 
     KEY:
     for my $Key ( sort keys %{ $Notification{Data} } ) {
+
         # ignore not ticket or article related attributes
         next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
 
@@ -419,13 +420,13 @@ sub _NotificationFilter {
         # ignore anything that isn't ok
         next KEY if !$Notification{Data}->{$Key};
         next KEY if !@{ $Notification{Data}->{$Key} };
-        next KEY if !$Notification{Data}->{$Key}->[0];
+        next KEY if !defined $Notification{Data}->{$Key}->[0];
         my $Match = 0;
 
         VALUE:
         for my $Value ( @{ $Notification{Data}->{$Key} } ) {
 
-            next VALUE if !$Value;
+            next VALUE if !defined $Value;
 
             if ( $Key =~ /^Ticket::/ ) {
 
