@@ -137,9 +137,9 @@ sub Search {
                         Priority => 'error',
                         Message  => "No states found for StateType $StateType!",
                     );
-                    return;
-                }                
-                push(@StateIDs, @StateTypeStateIDs);
+                } else {
+                    push(@StateIDs, @StateTypeStateIDs);
+                }
             }
         }
 
