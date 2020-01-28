@@ -220,7 +220,7 @@ sub Run {
                     Setting         => $Item->{Setting},
                     Default         => $Item->{Default},
                     ValidID         => $Item->{ValidID} || 1,
-                    Value           => exists $Item->{Value} ? $Item->{Value} : $SysConfigOptions{$Item->{Name}},
+                    Value           => $SysConfigOptions{$Item->{Name}},
                     UserID          => $Self->{Authorization}->{UserID},
                 );
 
