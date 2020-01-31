@@ -257,6 +257,9 @@ sub ArticleCreate {
             };
             push @AttachmentConvert, $Attach;
 
+            # save HTML body for later use
+            $Param{HTMLBody} = $Param{Body};
+
             # get ascii body
             $Param{MimeType} = 'text/plain';
             $Param{ContentType} =~ s/html/plain/i;
@@ -710,10 +713,21 @@ sub ArticleCreate {
     # send article through email channel if it was created by an agent
     if ( $Param{Channel} eq 'email' && $Param{SenderType} eq 'agent' ) {
 
+        # prepare body and charset
+        my $Body = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->RichTextDocumentComplete(
+            String => $Param{HTMLBody} || $Param{Body},
+        );        
+
+        my $Charset = $Param{Charset};
+        $Charset =~ s/plain/html/i;
+
         # send mail
         my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
             'Message-ID' => $Param{MessageID},
             %Param,
+            MimeType => 'text/html',
+            Charset  => $Charset,
+            Body     => $Body
         );
 
         # return if no mail was able to send
