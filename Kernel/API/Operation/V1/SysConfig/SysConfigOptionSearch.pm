@@ -100,8 +100,6 @@ sub Run {
         if ( !IsHashRefWithData($SysConfigGetResult) || !$SysConfigGetResult->{Success} ) {
             return $SysConfigGetResult;
         }
-use Data::Dumper;
-print STDERR "GetResult: ".Dumper($SysConfigGetResult);
 
         my @SysConfigDataList = ref $SysConfigGetResult->{Data}->{SysConfigOption} eq 'ARRAY' ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
 

@@ -187,7 +187,7 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="permission_type">
-        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">PropertyValue</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1).</Data>
         <Data Key="valid_id">1</Data>
