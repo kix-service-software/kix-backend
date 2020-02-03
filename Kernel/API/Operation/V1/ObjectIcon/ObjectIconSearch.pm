@@ -100,7 +100,7 @@ sub Run {
             return $ObjectIconGetResult;
         }
 
-        my @ObjectIconDataList = IsArrayRefWithData($ObjectIconGetResult->{Data}->{ObjectIcon}) ? @{$ObjectIconGetResult->{Data}->{ObjectIcon}} : ( $ObjectIconGetResult->{Data}->{ObjectIcon} );
+        my @ObjectIconDataList = IsArrayRef($ObjectIconGetResult->{Data}->{ObjectIcon}) ? @{$ObjectIconGetResult->{Data}->{ObjectIcon}} : ( $ObjectIconGetResult->{Data}->{ObjectIcon} );
 
         if ( IsArrayRefWithData(\@ObjectIconDataList) ) {
             return $Self->_Success(

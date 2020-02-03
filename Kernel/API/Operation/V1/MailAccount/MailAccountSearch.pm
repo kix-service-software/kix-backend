@@ -100,7 +100,7 @@ sub Run {
             return $MailAccountGetResult;
         }
 
-        my @MailAccountDataList = IsArrayRefWithData( $MailAccountGetResult->{Data}->{MailAccount} )
+        my @MailAccountDataList = IsArrayRef( $MailAccountGetResult->{Data}->{MailAccount} )
             ? @{ $MailAccountGetResult->{Data}->{MailAccount} }
             : ( $MailAccountGetResult->{Data}->{MailAccount} );
 

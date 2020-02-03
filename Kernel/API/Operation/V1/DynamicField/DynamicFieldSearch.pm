@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform DynamicField search
-    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList();
+    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(Valid => 0);
 
 	# get already prepared DynamicField data from DynamicFieldGet operation
     if ( IsArrayRefWithData($DynamicFieldList) ) {  	
@@ -101,7 +101,7 @@ sub Run {
             return $DynamicFieldGetResult;
         }
 
-        my @DynamicFieldDataList = IsArrayRefWithData($DynamicFieldGetResult->{Data}->{DynamicField}) ? @{$DynamicFieldGetResult->{Data}->{DynamicField}} : ( $DynamicFieldGetResult->{Data}->{DynamicField} );
+        my @DynamicFieldDataList = IsArrayRef($DynamicFieldGetResult->{Data}->{DynamicField}) ? @{$DynamicFieldGetResult->{Data}->{DynamicField}} : ( $DynamicFieldGetResult->{Data}->{DynamicField} );
 
         if ( IsArrayRefWithData(\@DynamicFieldDataList) ) {
             return $Self->_Success(

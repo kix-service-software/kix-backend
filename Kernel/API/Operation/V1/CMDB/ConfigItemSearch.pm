@@ -202,7 +202,7 @@ sub Run {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRefWithData($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
+        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
 
         if ( IsArrayRefWithData(\@DataList) ) {
             return $Self->_Success(

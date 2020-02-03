@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::CMDB::ConfigItemUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::CMDB::Common
@@ -158,7 +158,7 @@ sub Run {
     }
 
     return $Self->_Success(
-        ConfigItemID => $Param{Data}->{ConfigItemID},
+        ConfigItemID => 0 + $Param{Data}->{ConfigItemID},
     );
 }
 

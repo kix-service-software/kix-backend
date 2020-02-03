@@ -89,13 +89,16 @@ sub Search {
 
     # validate operator
     my %OperatorMap = (
-        'EQ'    => 'Equals',
-        'LIKE'  => 'Like',
-        'GT'    => 'GreaterThan',
-        'GTE'   => 'GreaterThanEquals',
-        'LT'    => 'SmallerThan',
-        'LTE'   => 'SmallerThanEquals',
-        'IN'    => 'Like'
+        'EQ'         => 'Equals',
+        'LIKE'       => 'Like',
+        'GT'         => 'GreaterThan',
+        'GTE'        => 'GreaterThanEquals',
+        'LT'         => 'SmallerThan',
+        'LTE'        => 'SmallerThanEquals',
+        'IN'         => 'Like',
+        'CONTAINS'   => 'Like',
+        'STARTSWITH' => 'StartsWith',
+        'ENDSWITH'   => 'EndsWith'
     );
     if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -152,6 +155,7 @@ sub Search {
         my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $ValueItem,
+            SearchValidation   => 1,
             UserID             => 1,
         );
         if ( !$ValidateSuccess ) {

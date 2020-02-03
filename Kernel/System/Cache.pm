@@ -576,13 +576,11 @@ sub _HandleDependingCacheTypes {
 
     $Param{Indent} = $Param{Indent} || '';
 
-    if ( !$Self->{TypeDependencies} ) {
-        # load information from backend
-        $Self->{TypeDependencies} = $Self->{CacheObject}->Get(
-            Type => 'Cache',
-            Key  => 'TypeDependencies',
-        );
-    }
+    # load information from backend - do not use list in self (necessary for scheduler tasks)
+    $Self->{TypeDependencies} = $Self->{CacheObject}->Get(
+        Type => 'Cache',
+        Key  => 'TypeDependencies',
+    );
 
     if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {        
         $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));

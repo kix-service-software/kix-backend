@@ -79,10 +79,25 @@ sub Run {
 
     # filter given objects
     if ( IsHashRefWithData($Param{Filter}) ) {
+
+        # get dynamic fields
+        my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+            Valid      => 1,
+            ObjectType => ['Ticket'],
+        );
+
+        # create a dynamic field config lookup table
+        my %DynamicFieldConfigLookup;
+        for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+            $DynamicFieldConfigLookup{ $DynamicFieldConfig->{Name} } = $DynamicFieldConfig;
+        }
+
         my @Result;
         foreach my $TicketID ( sort @TicketIDs ) {
             my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
-                TicketID => $TicketID
+                TicketID      => $TicketID,
+                UserID        => $Param{UserID},
+                DynamicFields => 1
             );
 
             if ( !%Ticket ) {
@@ -99,6 +114,7 @@ sub Run {
                 Ticket => \%Ticket,
                 Filter => $Param{Filter},
                 UserID => $Param{UserID},
+                DynamicFieldConfigLookup => \%DynamicFieldConfigLookup
             );
 
             if ( $Accepted ) {
@@ -115,7 +131,7 @@ sub _Filter {
     my ( $Self, %Param ) = @_;
 
     # check needed params
-    for my $Needed (qw(Ticket Filter UserID)) {
+    for my $Needed (qw(Ticket Filter UserID DynamicFieldConfigLookup)) {
         return if !$Param{$Needed};
     }
 
@@ -124,6 +140,7 @@ sub _Filter {
 
     KEY:
     for my $Key ( sort keys %{ $Param{Filter} } ) {
+
         # ignore not ticket or article related attributes
         next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
 
@@ -142,13 +159,12 @@ sub _Filter {
         # ignore anything that isn't ok
         next KEY if !$Param{Filter}->{$Key};
         next KEY if !@{ $Param{Filter}->{$Key} };
-        next KEY if !$Param{Filter}->{$Key}->[0];
+        next KEY if !defined $Param{Filter}->{$Key}->[0];
         my $Match = 0;
 
         VALUE:
         for my $Value ( @{ $Param{Filter}->{$Key} } ) {
-
-            next VALUE if !$Value;
+            next VALUE if !defined $Value;
 
             if ( $Key =~ /^Ticket::/ ) {
                 # check if key is a search dynamic field
@@ -160,7 +176,7 @@ sub _Filter {
                     # get the dynamic field config for this field
                     my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
 
-                    next VALUE if !$DynamicFieldConfig;
+                    last VALUE if !$DynamicFieldConfig;
 
                     # here we are using the same behaviour as in NotificationEvent at the moment
                     my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
@@ -168,7 +184,7 @@ sub _Filter {
                         Behavior           => 'IsNotificationEventCondition',
                     );
 
-                    next VALUE if !$IsNotificationEventCondition;
+                    last VALUE if !$IsNotificationEventCondition;
 
                     # Get match value from the dynamic field backend, if applicable (bug#12257).
                     my $MatchValue;
@@ -206,7 +222,7 @@ sub _Filter {
 
                 if ( $Article{$Attribute} && $Attribute =~ /(Body|Subject)/ && $Article{$Attribute} =~ /\Q$Value\E/i ) {
                     $Match = 1;
-                    last VALUE;                    
+                    last VALUE;
                 }
                 elsif ( $Article{$Attribute} && $Value eq $Article{$Attribute} ) {
                     $Match = 1;

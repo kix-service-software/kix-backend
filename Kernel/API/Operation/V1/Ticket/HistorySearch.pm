@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::HistorySearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -131,7 +131,7 @@ sub Run {
             return $HistoryGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($HistoryGetResult->{Data}->{History}) ? @{$HistoryGetResult->{Data}->{History}} : ( $HistoryGetResult->{Data}->{History} );
+        my @ResultList = IsArrayRef($HistoryGetResult->{Data}->{History}) ? @{$HistoryGetResult->{Data}->{History}} : ( $HistoryGetResult->{Data}->{History} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

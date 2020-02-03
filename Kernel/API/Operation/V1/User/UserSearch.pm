@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::User::UserSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -119,7 +119,7 @@ sub Run {
                 my @AllowedUserIDs;
                 for my $UserID (@GetUserIDs) {
 
-                    my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                    my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                         UserID              => $UserID,
                         Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
                         RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission}
@@ -146,7 +146,7 @@ sub Run {
             return $UserGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
+        my @ResultList = IsArrayRef($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

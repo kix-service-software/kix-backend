@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Organisation::OrganisationTicketSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -138,7 +138,7 @@ sub Run {
             return $TicketGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
+        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

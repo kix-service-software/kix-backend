@@ -89,9 +89,17 @@ sub Run {
         return;
     }
 
+    my $Team = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Team},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # set the new team
     my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-        Queue => $Param{Config}->{Team}
+        Queue => $Team
     );
 
     if ( !$QueueID ) {

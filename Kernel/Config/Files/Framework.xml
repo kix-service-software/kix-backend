@@ -7629,7 +7629,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::WebUserAgent</SubGroup>
         <Setting>
-            <String Regex="">http://proxy.sn.no:8001/</String>
+            <String Regex=""></String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::DisableSSLVerification" Required="1" Valid="1" ConfigLevel="200">
@@ -8130,6 +8130,13 @@ You can log in via the following URL:
         <Group>Framework</Group>
         <Setting>
             <Option Location="Kernel/System/Auth/*.pm" SelectedID="Kernel::System::Auth::DB"></Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">Defines default auth sync module.</Description>
+        <Group>Framework</Group>
+        <Setting>
+            <Option Location="Kernel/System/Auth/Sync/LDAP.pm" SelectedID="Kernel::System::Auth::Sync::LDAP"></Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
@@ -8842,6 +8849,249 @@ via the Preferences button after logging in.
                 <Item Key="Prio">1100</Item>
                 <Item Key="Active">0</Item>
             </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, the LDAP host can be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">ldap.example.com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, the BaseDN must be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">dc=example,dc=com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, the user identifier must be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">uid</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use KIX. Specify the group, who may access the system.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">cn=otrsallow,ou=posixGroups,dc=example,dc=com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, you can specify access attributes here.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">memberUid</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Option SelectedID="UID">
+                <Item Key="UID">UID</Item>
+                <Item Key="DN">DN</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">cn=binduser,ou=users,dc=example,dc=com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="" Type="Password">some_password</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">(!objectclass=computer)</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">@domain.com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="port">389</Item>
+                <Item Key="timeout">120</Item>
+                <Item Key="async">0</Item>
+                <Item Key="version">3</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::Die" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="1" Translatable="1">Yes</Item>
+                <Item Key="0" Translatable="1">No</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserSyncAttributeRolesDefinition" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify which LDAP attribute(s) are synced to which roles.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="LDAPAttribute">
+                    <Hash>
+                    <Item Key="ldap attribute value">
+                        <Hash>
+                            <Item Key="RoleName">1 or 0</Item>
+                        </Hash>
+                    </Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserSyncMap" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify which LDAP attribute(s) are synced to which DB attribute.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="DB-Attribute">LDAP Attribute</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, the LDAP host can be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">ldap.example.com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, the BaseDN must be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">dc=example,dc=com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, the user identifier must be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">uid</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use KIX. Specify the group, who may access the system.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">cn=otrsallow,ou=posixGroups,dc=example,dc=com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify access attributes here.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">memberUid</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Option SelectedID="UID">
+                <Item Key="UID">UID</Item>
+                <Item Key="DN">DN</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">cn=binduser,ou=users,dc=example,dc=com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="" Type="Password">some_password</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">(!objectclass=computer)</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
+        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
+        <Description Translatable="1">If "LDAP" was selected for AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <String Regex="">@domain.com</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="port">389</Item>
+                <Item Key="timeout">120</Item>
+                <Item Key="async">0</Item>
+                <Item Key="version">3</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::Die" Required="0" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Auth</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="1" Translatable="1">Yes</Item>
+                <Item Key="0" Translatable="1">No</Item>
+            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###Language" Required="0" Valid="1">

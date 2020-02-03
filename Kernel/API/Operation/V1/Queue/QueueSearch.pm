@@ -102,7 +102,7 @@ sub Run {
             return $QueueGetResult;
         }
 
-        my @QueueDataList = IsArrayRefWithData($QueueGetResult->{Data}->{Queue}) ? @{$QueueGetResult->{Data}->{Queue}} : ( $QueueGetResult->{Data}->{Queue} );
+        my @QueueDataList = IsArrayRef($QueueGetResult->{Data}->{Queue}) ? @{$QueueGetResult->{Data}->{Queue}} : ( $QueueGetResult->{Data}->{Queue} );
 
         if ( IsArrayRefWithData(\@QueueDataList) ) {
             return $Self->_Success(

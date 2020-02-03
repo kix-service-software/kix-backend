@@ -100,7 +100,7 @@ sub Run {
             return $MailFilterGetResult;
         }
 
-        my @MailFilterDataList = IsArrayRefWithData( $MailFilterGetResult->{Data}->{MailFilter} )
+        my @MailFilterDataList = IsArrayRef( $MailFilterGetResult->{Data}->{MailFilter} )
             ? @{ $MailFilterGetResult->{Data}->{MailFilter} }
             : ( $MailFilterGetResult->{Data}->{MailFilter} );
 

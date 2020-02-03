@@ -16,7 +16,7 @@ use MIME::Base64;
 use File::Temp qw( tempfile tempdir );
 use IO::Compress::Zip qw(:all);
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common

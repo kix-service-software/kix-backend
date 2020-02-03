@@ -401,6 +401,7 @@ sub _NotificationFilter {
 
     KEY:
     for my $Key ( sort keys %{ $Notification{Data} } ) {
+
         # ignore not ticket or article related attributes
         next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
 
@@ -419,15 +420,16 @@ sub _NotificationFilter {
         # ignore anything that isn't ok
         next KEY if !$Notification{Data}->{$Key};
         next KEY if !@{ $Notification{Data}->{$Key} };
-        next KEY if !$Notification{Data}->{$Key}->[0];
+        next KEY if !defined $Notification{Data}->{$Key}->[0];
         my $Match = 0;
 
         VALUE:
         for my $Value ( @{ $Notification{Data}->{$Key} } ) {
 
-            next VALUE if !$Value;
+            next VALUE if !defined $Value;
 
             if ( $Key =~ /^Ticket::/ ) {
+
                 # check if key is a search dynamic field
                 if ( $Attribute =~ m{\A DynamicField_(.*?)$}xms ) {
 
@@ -437,14 +439,14 @@ sub _NotificationFilter {
                     # get the dynamic field config for this field
                     my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
 
-                    next VALUE if !$DynamicFieldConfig;
+                    last VALUE if !$DynamicFieldConfig;
 
                     my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
                         DynamicFieldConfig => $DynamicFieldConfig,
                         Behavior           => 'IsNotificationEventCondition',
                     );
 
-                    next VALUE if !$IsNotificationEventCondition;
+                    last VALUE if !$IsNotificationEventCondition;
 
                     # Get match value from the dynamic field backend, if applicable (bug#12257).
                     my $MatchValue;
@@ -483,7 +485,7 @@ sub _NotificationFilter {
 
                 if ( $Article{$Attribute} && $Attribute =~ /(Body|Subject)/ && $Article{$Attribute} =~ /\Q$Value\E/i ) {
                     $Match = 1;
-                    last VALUE;                    
+                    last VALUE;
                 }
                 elsif ( $Article{$Attribute} && $Value eq $Article{$Attribute} ) {
                     $Match = 1;
@@ -605,9 +607,8 @@ sub _RecipientsGet {
                         Short => 1,
                     );
                     foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                             UserID              => $UserID,
-                            Types               => [ 'Resource' ],
                             Target              => '/tickets/' . $Ticket{TicketID},
                             RequestedPermission => 'READ'
                         );
@@ -627,9 +628,8 @@ sub _RecipientsGet {
                         Short => 1,
                     );
                     foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckPermission(
+                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                             UserID              => $UserID,
-                            Types               => [ 'Resource' ],
                             Target              => '/tickets/' . $Ticket{TicketID},
                             RequestedPermission => 'UPDATE'
                         );
@@ -880,7 +880,7 @@ sub _RecipientsGet {
         }
 
         # skip users with out READ permissions
-        my ($Granted) = $UserObject->CheckPermission(
+        my ($Granted) = $UserObject->CheckResourcePermission(
             UserID              => $User{UserID},
             Target              => '/tickets/' . $Ticket{TicketID},
             RequestedPermission => 'READ'

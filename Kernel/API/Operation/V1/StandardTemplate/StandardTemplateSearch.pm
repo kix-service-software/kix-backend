@@ -100,7 +100,7 @@ sub Run {
             return $StandardTemplateGetResult;
         }
 
-        my @StandardTemplateDataList = IsArrayRefWithData($StandardTemplateGetResult->{Data}->{StandardTemplate}) ? @{$StandardTemplateGetResult->{Data}->{StandardTemplate}} : ( $StandardTemplateGetResult->{Data}->{StandardTemplate} );
+        my @StandardTemplateDataList = IsArrayRef($StandardTemplateGetResult->{Data}->{StandardTemplate}) ? @{$StandardTemplateGetResult->{Data}->{StandardTemplate}} : ( $StandardTemplateGetResult->{Data}->{StandardTemplate} );
 
         if ( IsArrayRefWithData(\@StandardTemplateDataList) ) {
             return $Self->_Success(

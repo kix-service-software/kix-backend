@@ -89,13 +89,21 @@ sub Run {
         return;
     }
 
+    my $Organisation = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Organisation},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     my $OrganisationID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationLookup(
-        Number => $Param{Config}->{Organisation},
+        Number => $Organisation,
         Silent => 1
     );
 
     if ( !$OrganisationID ) {
-        $OrganisationID = $Param{Config}->{Organisation};
+        $OrganisationID = $Organisation;
     }
 
     # do nothing if the desired organisation is already set

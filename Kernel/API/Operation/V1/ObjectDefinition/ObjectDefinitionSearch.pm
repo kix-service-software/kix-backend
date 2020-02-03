@@ -100,7 +100,7 @@ sub Run {
             return $ObjectDefinitionGetResult;
         }
 
-        my @ObjectDefinitionDataList = IsArrayRefWithData($ObjectDefinitionGetResult->{Data}->{ObjectDefinition}) ? @{$ObjectDefinitionGetResult->{Data}->{ObjectDefinition}} : ( $ObjectDefinitionGetResult->{Data}->{ObjectDefinition} );
+        my @ObjectDefinitionDataList = IsArrayRef($ObjectDefinitionGetResult->{Data}->{ObjectDefinition}) ? @{$ObjectDefinitionGetResult->{Data}->{ObjectDefinition}} : ( $ObjectDefinitionGetResult->{Data}->{ObjectDefinition} );
 
         if ( IsArrayRefWithData(\@ObjectDefinitionDataList) ) {
             return $Self->_Success(

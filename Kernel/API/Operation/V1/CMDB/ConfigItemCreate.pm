@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::CMDB::ConfigItemCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::CMDB::Common
@@ -199,7 +199,7 @@ sub Run {
 
     return $Self->_Success(
         Code         => 'Object.Created',
-        ConfigItemID => $ConfigItemID,
+        ConfigItemID => 0 + $ConfigItemID,
     );
 }
 

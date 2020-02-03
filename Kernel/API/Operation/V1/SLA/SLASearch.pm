@@ -102,7 +102,7 @@ sub Run {
             return $SLAGetResult;
         }
 
-        my @SLADataList = IsArrayRefWithData($SLAGetResult->{Data}->{SLA}) ? @{$SLAGetResult->{Data}->{SLA}} : ( $SLAGetResult->{Data}->{SLA} );
+        my @SLADataList = IsArrayRef($SLAGetResult->{Data}->{SLA}) ? @{$SLAGetResult->{Data}->{SLA}} : ( $SLAGetResult->{Data}->{SLA} );
 
         if ( IsArrayRefWithData(\@SLADataList) ) {
             return $Self->_Success(

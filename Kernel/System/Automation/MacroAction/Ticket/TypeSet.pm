@@ -89,9 +89,17 @@ sub Run {
         return;
     }
 
+    my $Type = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{Type},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # set the new type
     my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
-        Type => $Param{Config}->{Type},
+        Type => $Type,
     );
 
     if ( !$TypeID ) {

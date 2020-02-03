@@ -27,7 +27,14 @@
                "readOnly" : true
             },
             "Comment" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "CreateBy" : {

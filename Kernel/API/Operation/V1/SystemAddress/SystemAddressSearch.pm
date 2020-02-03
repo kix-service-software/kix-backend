@@ -102,7 +102,7 @@ sub Run {
             return $SystemAddressGetResult;
         }
 
-        my @SystemAddressDataList = IsArrayRefWithData($SystemAddressGetResult->{Data}->{SystemAddress}) ? @{$SystemAddressGetResult->{Data}->{SystemAddress}} : ( $SystemAddressGetResult->{Data}->{SystemAddress} );
+        my @SystemAddressDataList = IsArrayRef($SystemAddressGetResult->{Data}->{SystemAddress}) ? @{$SystemAddressGetResult->{Data}->{SystemAddress}} : ( $SystemAddressGetResult->{Data}->{SystemAddress} );
 
         if ( IsArrayRefWithData(\@SystemAddressDataList) ) {
             return $Self->_Success(

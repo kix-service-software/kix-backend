@@ -127,7 +127,7 @@ sub Run {
             return $MacroActionTypeGetResult;
         }
 
-        my @MacroActionTypeDataList = IsArrayRefWithData($MacroActionTypeGetResult->{Data}->{MacroActionType}) ? @{$MacroActionTypeGetResult->{Data}->{MacroActionType}} : ( $MacroActionTypeGetResult->{Data}->{MacroActionType} );
+        my @MacroActionTypeDataList = IsArrayRef($MacroActionTypeGetResult->{Data}->{MacroActionType}) ? @{$MacroActionTypeGetResult->{Data}->{MacroActionType}} : ( $MacroActionTypeGetResult->{Data}->{MacroActionType} );
 
         if ( IsArrayRefWithData(\@MacroActionTypeDataList) ) {
             return $Self->_Success(
