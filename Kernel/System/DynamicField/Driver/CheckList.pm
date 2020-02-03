@@ -59,7 +59,7 @@ sub new {
     # set field behaviors
     $Self->{Behaviors} = {
         'IsACLReducible'               => 0,
-        'IsNotificationEventCondition' => 1,
+        'IsNotificationEventCondition' => 0,
         'IsSortable'                   => 0,
         'IsFiltrable'                  => 0,
         'IsStatsCondition'             => 1,
@@ -103,38 +103,6 @@ sub new {
     }
 
     return $Self;
-}
-
-sub ValueSet {
-    my ( $Self, %Param ) = @_;
-
-    # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
-
-    my $Success;
-
-    my $Valid = $Self->ValueValidate(
-        Value => $Param{Value},
-        UserID => $Param{UserID},
-        DynamicFieldConfig => $Param{DynamicFieldConfig}
-    );
-
-    if (!$Valid) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "The value for the field Text is invalid!"
-        );
-        return;
-    }
-
-    $Success = $DynamicFieldValueObject->ValueSet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-        Value    => $Param{Value},
-        UserID   => $Param{UserID},
-    );
-
-    return $Success;
 }
 
 1;
