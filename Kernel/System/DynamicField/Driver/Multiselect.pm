@@ -102,27 +102,6 @@ sub new {
     return $Self;
 }
 
-sub ValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-    );
-
-    return if !$DFValue;
-    return if !IsArrayRefWithData($DFValue);
-    return if !IsHashRefWithData( $DFValue->[0] );
-
-    # extract real values
-    my @ReturnData;
-    for my $Item ( @{$DFValue} ) {
-        push @ReturnData, $Item->{ValueText}
-    }
-
-    return \@ReturnData;
-}
-
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
@@ -135,162 +114,7 @@ sub ValueSet {
         return;
     }
 
-    # check value
-    my @Values;
-    if ( ref $Param{Value} eq 'ARRAY' ) {
-        @Values = @{ $Param{Value} };
-    }
-    else {
-        @Values = ( $Param{Value} );
-    }    
-
-    # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
-
-    my $Success;
-
-    if ( IsArrayRefWithData( \@Values ) ) {
-
-        my $valid = $Self->ValueValidate(
-            Value => $Param{Value},
-            UserID => $Param{UserID},
-            DynamicFieldConfig => $Param{DynamicFieldConfig}
-        );
-
-        if (!$valid) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "The value for the field Multiselect is invalid!"                  
-            );
-            return;
-        }
-
-        # if there is at least one value to set, this means one or more values are selected,
-        #    set those values!
-        my $Valid = $Self->ValueValidate(
-            Value              => $Param{Value},
-            UserID             => $Param{UserID},
-            DynamicFieldConfig => $Param{DynamicFieldConfig}
-        );
-
-        if (!$Valid) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "The value for the field Multiselect is invalid!"
-            );
-            return;
-        }
-
-        my @ValueText;
-        for my $Item (@Values) {
-            push @ValueText, { ValueText => $Item };
-        }
-
-        $Success = $DynamicFieldValueObject->ValueSet(
-            FieldID  => $Param{DynamicFieldConfig}->{ID},
-            ObjectID => $Param{ObjectID},
-            Value    => \@ValueText,
-            UserID   => $Param{UserID},
-        );
-    } else {
-
-        # otherwise no value was selected, then in fact this means that any value there should be deleted
-        $Success = $DynamicFieldValueObject->ValueDelete(
-            FieldID  => $Param{DynamicFieldConfig}->{ID},
-            ObjectID => $Param{ObjectID},
-            UserID   => $Param{UserID},
-        );
-    }
-
-    return $Success;
-}
-
-sub ValueIsDifferent {
-    my ( $Self, %Param ) = @_;
-
-    # special cases where the values are different but they should be reported as equals
-    if (
-        !defined $Param{Value1}
-        && ref $Param{Value2} eq 'ARRAY'
-        && !IsArrayRefWithData( $Param{Value2} )
-        )
-    {
-        return
-    }
-    if (
-        !defined $Param{Value2}
-        && ref $Param{Value1} eq 'ARRAY'
-        && !IsArrayRefWithData( $Param{Value1} )
-        )
-    {
-        return
-    }
-
-    # compare the results
-    return DataIsDifferent(
-        Data1 => \$Param{Value1},
-        Data2 => \$Param{Value2}
-    );
-}
-
-sub ValueValidate {
-    my ( $Self, %Param ) = @_;
-
-    # check value
-    my @Values;
-    if ( IsArrayRefWithData( $Param{Value} ) ) {
-        @Values = @{ $Param{Value} };
-    }
-    else {
-        @Values = ( $Param{Value} );
-    }
-
-    if(!$Param{SearchValidation}) {        
-
-        my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
-        if ($CountMin && scalar(@Values) < $CountMin) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message => "At least $CountMin values must be selected."
-            );
-            return;
-        }
-
-        my $CountMax = $Param{DynamicFieldConfig}->{Config}->{CountMax};
-        if ($CountMax && $CountMax > 1 && scalar(@Values) > $CountMax) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message => "A maximum of $CountMax values can be selected."
-            );
-            return;
-        }
-
-        if((!$CountMax || 1 == $CountMax || 0 == $CountMax) && scalar(@Values) > 1) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message => "A maximum of 1 value can be selected. (Singleselect)"
-            );
-            return;
-        }
-    }
-
-    # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
-
-    my $Success;
-    for my $Item (@Values) {
-
-        $Success = $DynamicFieldValueObject->ValueValidate(
-            Value => {
-                ValueText => $Item,
-            },
-            UserID => $Param{UserID}
-        );
-
-        return if !$Success
-    }
-
-    return $Success;
+    return $Self->SUPER::ValueSet(%Param);
 }
 
 sub EditFieldRender {
@@ -910,17 +734,6 @@ sub ValueLookup {
         # try to convert key to real value
         if ( $PossibleValues->{$Item} ) {
             $Value = $PossibleValues->{$Item};
-
-            # check if translation is possible
-            if (
-                defined $Param{LanguageObject}
-                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-                )
-            {
-
-                # translate value
-                $Value = $Param{LanguageObject}->Translate($Value);
-            }
         }
         push @Values, $Value;
     }
@@ -1042,10 +855,6 @@ sub BuildSelectionDataGet {
 }
 
 1;
-
-
-
-
 
 =back
 

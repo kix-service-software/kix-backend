@@ -1272,9 +1272,16 @@ sub HistoricalValuesGet {
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    my $Value = defined $Param{Key} ? $Param{Key} : '';
+    # check key
+    my @Keys;
+    if ( ref $Param{Key} eq 'ARRAY' ) {
+        @Keys = @{ $Param{Key} };
+    }
+    else {
+        @Keys = ( $Param{Key} );
+    }
 
-    return $Value;
+    return \@Keys;
 }
 
 1;
