@@ -358,7 +358,7 @@ sub Run {
                         # get display value string
                         my $DisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->DisplayValueRender(
                             DynamicFieldConfig => $DynamicFieldConfig,
-                            Value              => $TicketRaw{$Attribute},
+                            Value              => $TicketRaw{$Attribute}
                         );
 
                         if (!IsHashRefWithData($DisplayValue)) {
@@ -383,14 +383,28 @@ sub Run {
                                 Value => join($Separator, @Values)
                             };
                         }
+
+                        # get html display value string
+                        my $DisplayValueHTML = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->HTMLDisplayValueRender(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $TicketRaw{$Attribute},
+                        );
+
+                        # get short display value string
+                        my $DisplayValueShort = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ShortDisplayValueRender(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $TicketRaw{$Attribute}
+                        );
                         
                         push @DynamicFields, {
-                            ID            => $DynamicFieldConfig->{ID},
-                            Name          => $DynamicFieldConfig->{Name},
-                            Label         => $DynamicFieldConfig->{Label},
-                            Value         => $TicketRaw{$Attribute},
-                            DisplayValue  => $DisplayValue->{Value},
-                            PreparedValue => $DFPreparedValue
+                            ID                => $DynamicFieldConfig->{ID},
+                            Name              => $DynamicFieldConfig->{Name},
+                            Label             => $DynamicFieldConfig->{Label},
+                            Value             => $TicketRaw{$Attribute},
+                            DisplayValue      => $DisplayValue->{Value},
+                            DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
+                            DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
+                            PreparedValue     => $DFPreparedValue
                         };
                     }
                 }

@@ -253,6 +253,24 @@ sub ObjectMatch {
     return $Match;
 }
 
+sub HTMLDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(%Param);
+}
+
+sub ShortDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(%Param);
+}
+
+sub DisplayKeyRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(%Param);
+}
+
 1;
 
 =back

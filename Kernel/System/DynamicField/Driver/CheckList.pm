@@ -105,6 +105,186 @@ sub new {
     return $Self;
 }
 
+sub DisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    # set HTMLOutput as default if not specified
+    if ( !defined $Param{HTMLOutput} ) {
+        $Param{HTMLOutput} = 1;
+    }
+
+    my $LineBreak = "\n";
+    if ($Param{HTMLOutput}) {
+        $LineBreak = "<br />";
+    }
+
+    # set Value and Title variables
+    my $Value = $Param{DynamicFieldConfig}->{Label} . $LineBreak;
+    my $Title = '';
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    for my $ChecklistItemString ( @Values) {
+        next if !$ChecklistItemString;
+
+        my $ChecklistItems = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            Data => $ChecklistItemString,
+        );
+        my $Items = $Self->_GetChecklistRows(Items => $ChecklistItems);
+
+        if (IsArrayRefWithData($Items)) {
+            for my $Item (@{$Items}) {
+                $Value .= "- $Item->{Title}: $Item->{Value}$LineBreak";
+            }
+        }
+        $Value .= $LineBreak;
+    }
+
+    # create return structure
+    my $Data = {
+        Value => $Value,
+        Title => $Title
+    };
+
+    return $Data;
+}
+
+sub HTMLDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    # set Value and Title variables
+    my $Value = '<h3>' . $Param{DynamicFieldConfig}->{Label} . '</h3>';
+    my $Title = '';
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    for my $ChecklistItemString ( @Values) {
+        next if !$ChecklistItemString;
+
+        my $ChecklistItems = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            Data => $ChecklistItemString,
+        );
+        my $Items = $Self->_GetChecklistRows(Items => $ChecklistItems);
+
+        if (IsArrayRefWithData($Items)) {
+            $Value .= '<table style="border:none; width:90%">'
+                . '<thead><tr>'
+                    . '<th style="padding:10px 15px;">Action</th>'
+                    . '<th style="padding:10px 15px;">State</th>'
+                . '<tr></thead>'
+                . '<tbody>';
+
+            for my $Item (@{$Items}) {
+                $Value .= '<tr>'
+                    . '<td style="padding:10px 15px;">' . $Item->{Title} . '</td>'
+                    . '<td style="padding:10px 15px;">' . $Item->{Value} . '</td>'
+                    . '</tr>';
+            }
+
+            $Value .= '</tbody></table>';
+        }
+    }
+
+    # create return structure
+    my $Data = {
+        Value => $Value,
+        Title => $Title
+    };
+
+    return $Data;
+}
+
+sub ShortDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    # set Value and Title variables
+    my $Value = '';
+    my $Title = '';
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    for my $ChecklistItemString ( @Values) {
+        next if !$ChecklistItemString;
+
+        my $ChecklistItems = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            Data => $ChecklistItemString,
+        );
+
+        my $Items = $Self->_GetChecklistRows(Items => $ChecklistItems);
+
+        if (IsArrayRefWithData($Items)) {
+            my $Done = 0;
+            my $All = 0;
+            for my $Item ( @{ $Items } ) {
+                if ($Item && $Item->{IsCheckList}) {
+                    $All++;
+                    if ($Item->{Value} eq 'OK' || $Item->{Value} eq 'NOK' || $Item->{Value} eq 'n.a.') {
+                        $Done++;
+                    }
+                }
+            }
+            $Value .= ($Value ? ', ' : '') . "$Done/$All";
+        }
+    }
+
+    # create return structure
+    my $Data = {
+        Value => $Value,
+        Title => $Title
+    };
+
+    return $Data;
+}
+
+sub _GetChecklistRows {
+    my ( $Self, %Param ) = @_;
+
+    my @Rows;
+
+    if ( IsArrayRefWithData($Param{Items}) ) {
+        for my $Item ( @{ $Param{Items} } ) {
+            if (IsHashRefWithData($Item)) {
+                push(
+                    @Rows,
+                    {
+                        Title       => $Item->{title} || '',
+                        Value       => $Item->{value} || '',
+                        IsCheckList => $Item->{input} eq 'ChecklistState' ? 1 : 0
+                    }
+                );
+
+                if ( IsArrayRefWithData($Item->{sub}) ) {
+                    my $SubRows = $Self->_GetChecklistRows(Items => $Item->{sub});
+                    push(@Rows, @{$SubRows});
+                }
+            }
+        }
+    }
+
+    return \@Rows;
+}
+
 1;
 
 =back

@@ -11,9 +11,9 @@ package Kernel::System::DynamicField::Driver::ITSMConfigItemReference;
 use strict;
 use warnings;
 
-use base qw(Kernel::System::DynamicField::Driver::Base);
-
 use Kernel::System::VariableCheck qw(:all);
+
+use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -105,70 +105,6 @@ sub new {
     return $Self;
 }
 
-sub ValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $DFValue = $Self->{DynamicFieldValueObject}->ValueGet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-    );
-
-    return if !$DFValue;
-    return if !IsArrayRefWithData($DFValue);
-    return if !IsHashRefWithData( $DFValue->[0] );
-
-    # extract real values
-    my @ReturnData;
-    for my $Item ( @{$DFValue} ) {
-        push @ReturnData, $Item->{ValueText}
-    }
-
-    return \@ReturnData;
-}
-
-sub ValueSet {
-    my ( $Self, %Param ) = @_;
-
-    # check value
-    my @Values;
-    if ( ref $Param{Value} eq 'ARRAY' ) {
-        @Values = @{ $Param{Value} };
-    }
-    else {
-        @Values = ( $Param{Value} );
-    }
-
-    my $Success;
-    if ( IsArrayRefWithData( \@Values ) ) {
-
-        # if there is at least one value to set, this means one or more values are selected,
-        #    set those values!
-        my @ValueText;
-        for my $Item (@Values) {
-            push @ValueText, { ValueText => $Item };
-        }
-
-        $Success = $Self->{DynamicFieldValueObject}->ValueSet(
-            FieldID  => $Param{DynamicFieldConfig}->{ID},
-            ObjectID => $Param{ObjectID},
-            Value    => \@ValueText,
-            UserID   => $Param{UserID},
-        );
-    }
-    else {
-
-        # otherwise no value was selected, then in fact this means that any value there should be
-        # deleted
-        $Success = $Self->{DynamicFieldValueObject}->ValueDelete(
-            FieldID  => $Param{DynamicFieldConfig}->{ID},
-            ObjectID => $Param{ObjectID},
-            UserID   => $Param{UserID},
-        );
-    }
-
-    return $Success;
-}
-
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
@@ -210,62 +146,6 @@ sub ValueLookup {
     }
 
     return \@Values;
-}
-
-sub ValueIsDifferent {
-    my ( $Self, %Param ) = @_;
-
-    # special cases where the values are different but they should be reported as equals
-    if (
-        !defined $Param{Value1}
-        && ref $Param{Value2} eq 'ARRAY'
-        && !IsArrayRefWithData( $Param{Value2} )
-        )
-    {
-        return
-    }
-    if (
-        !defined $Param{Value2}
-        && ref $Param{Value1} eq 'ARRAY'
-        && !IsArrayRefWithData( $Param{Value1} )
-        )
-    {
-        return
-    }
-
-    # compare the results
-    return DataIsDifferent(
-        Data1 => \$Param{Value1},
-        Data2 => \$Param{Value2}
-    );
-}
-
-sub ValueValidate {
-    my ( $Self, %Param ) = @_;
-
-    # check value
-    my @Values;
-    if ( IsArrayRefWithData( $Param{Value} ) ) {
-        @Values = @{ $Param{Value} };
-    }
-    else {
-        @Values = ( $Param{Value} );
-    }
-
-    my $Success;
-    for my $Item (@Values) {
-
-        $Success = $Self->{DynamicFieldValueObject}->ValueValidate(
-            Value => {
-                ValueText => $Item,
-            },
-            UserID => $Param{UserID}
-        );
-
-        return if !$Success
-    }
-
-    return $Success;
 }
 
 sub PossibleValuesGet {
@@ -1173,7 +1053,8 @@ sub DisplayValueRender {
             # set field link form config
             my $HasLink = 0;
             if (
-                $Param{LayoutObject}->{UserType} eq 'User'
+                $Param{LayoutObject} && $Param{LayoutObject}->{UserType}
+                && $Param{LayoutObject}->{UserType} eq 'User'
                 && $Param{DynamicFieldConfig}->{Config}->{AgentLink}
                 )
             {
@@ -1187,7 +1068,8 @@ sub DisplayValueRender {
                 $HasLink = 1;
             }
             elsif (
-                $Param{LayoutObject}->{UserType} eq 'Customer'
+                $Param{LayoutObject} && $Param{LayoutObject}->{UserType}
+                && $Param{LayoutObject}->{UserType} eq 'Customer'
                 && $Param{DynamicFieldConfig}->{Config}->{CustomerLink}
                 )
             {
@@ -1405,10 +1287,6 @@ sub _ExportXMLSearchDataPrepare {
 }
 
 1;
-
-
-
-
 
 =back
 

@@ -101,11 +101,61 @@ sub new {
     return $Self;
 }
 
+sub ValueGet {
+    my ( $Self, %Param ) = @_;
+
+    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+        FieldID  => $Param{DynamicFieldConfig}->{ID},
+        ObjectID => $Param{ObjectID},
+    );
+
+    return if !$DFValue;
+    return if !IsArrayRefWithData($DFValue);
+    return if !IsHashRefWithData( $DFValue->[0] );
+
+    return $DFValue->[0]->{ValueText};
+}
+
+sub ValueSet {
+    my ( $Self, %Param ) = @_;
+
+    # check for valid possible values list
+    if ( !$Param{DynamicFieldConfig}->{Config}->{PossibleValues} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Need PossibleValues in DynamicFieldConfig!",
+        );
+        return;
+    }
+
+    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
+        FieldID  => $Param{DynamicFieldConfig}->{ID},
+        ObjectID => $Param{ObjectID},
+        Value    => [
+            {
+                ValueText => $Param{Value},
+            },
+        ],
+        UserID => $Param{UserID},
+    );
+
+    return $Success;
+}
+
+sub ValueValidate {
+    my ( $Self, %Param ) = @_;
+
+    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueValidate(
+        Value => {
+            ValueText => $Param{Value},
+        },
+        UserID => $Param{UserID}
+    );
+
+    return $Success;
+}
+
 1;
-
-
-
-
 
 =back
 
