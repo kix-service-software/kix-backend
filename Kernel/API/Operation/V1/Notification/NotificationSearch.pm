@@ -103,7 +103,7 @@ sub Run {
             return $NotificationGetResult;
         }
 
-        my @NotificationDataList = IsArrayRefWithData( $NotificationGetResult->{Data}->{Notification} )
+        my @NotificationDataList = IsArrayRef( $NotificationGetResult->{Data}->{Notification} )
             ? @{ $NotificationGetResult->{Data}->{Notification} }
             : ( $NotificationGetResult->{Data}->{Notification} );
 

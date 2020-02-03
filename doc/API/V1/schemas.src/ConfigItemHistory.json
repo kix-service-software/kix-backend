@@ -5,7 +5,10 @@
   "description": "The config item history object.",
   "properties": {
     "Comment": {
-      "type": "string",
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
       "readOnly": true
     },    
     "CreateBy": {

@@ -114,7 +114,7 @@ sub Run {
             return $SearchProfileGetResult;
         }
 
-        my @SearchProfileDataList = IsArrayRefWithData($SearchProfileGetResult->{Data}->{SearchProfile}) ? @{$SearchProfileGetResult->{Data}->{SearchProfile}} : ( $SearchProfileGetResult->{Data}->{SearchProfile} );
+        my @SearchProfileDataList = IsArrayRef($SearchProfileGetResult->{Data}->{SearchProfile}) ? @{$SearchProfileGetResult->{Data}->{SearchProfile}} : ( $SearchProfileGetResult->{Data}->{SearchProfile} );
 
         if ( IsArrayRefWithData(\@SearchProfileDataList) ) {
             return $Self->_Success(

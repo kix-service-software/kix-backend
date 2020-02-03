@@ -13,7 +13,7 @@ use warnings;
 
 use MIME::Base64;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -139,7 +139,7 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
-        
+
         # add
         push(@RoleList, \%RoleData);
     }

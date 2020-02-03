@@ -98,14 +98,6 @@ sub Run {
         return;
     }
 
-    # do nothing if the desired value is already set
-    if ( 
-        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } &&
-        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } eq $Param{Config}->{DynamicFieldValue}
-    ) {
-        return 1;
-    }
-
     # get required DynamicField config
     my $DynamicFieldConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
         Name => $Param{Config}->{DynamicFieldName},
@@ -121,11 +113,27 @@ sub Run {
         return;
     }
 
+    my $DFValue = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{DynamicFieldValue},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
+    # do nothing if the desired value is already set
+    if ( 
+        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } &&
+        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } eq $DFValue
+    ) {
+        return 1;
+    }
+
     # set the new value
     my $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueSet(
         DynamicFieldConfig => $DynamicFieldConfig,
         ObjectID           => $Param{TicketID},
-        Value              => $Param{Config}->{DynamicFieldValue},
+        Value              => $DFValue,
         UserID             => $Param{UserID},
     );
 

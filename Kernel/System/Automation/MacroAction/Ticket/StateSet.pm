@@ -97,9 +97,17 @@ sub Run {
         return;
     }
 
+    my $State = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        RichText => 0,
+        Text     => $Param{Config}->{State},
+        TicketID => $Param{TicketID},
+        Data     => {},
+        UserID   => $Param{UserID},
+    );
+
     # set the new state
     my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
-        Name => $Param{Config}->{State}
+        Name => $State
     );
 
     if ( !%State || !$State{ID} ) {

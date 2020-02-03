@@ -99,7 +99,7 @@ sub Run {
             return $LogFileGetResult;
         }
 
-        my @LogFileDataList = IsArrayRefWithData($LogFileGetResult->{Data}->{LogFile}) ? @{$LogFileGetResult->{Data}->{LogFile}} : ( $LogFileGetResult->{Data}->{LogFile} );
+        my @LogFileDataList = IsArrayRef($LogFileGetResult->{Data}->{LogFile}) ? @{$LogFileGetResult->{Data}->{LogFile}} : ( $LogFileGetResult->{Data}->{LogFile} );
 
         if ( IsArrayRefWithData(\@LogFileDataList) ) {
             return $Self->_Success(

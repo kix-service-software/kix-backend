@@ -102,7 +102,7 @@ sub Run {
             return $LockGetResult;
         }
 
-        my @LockDataList = IsArrayRefWithData($LockGetResult->{Data}->{Lock}) ? @{$LockGetResult->{Data}->{Lock}} : ( $LockGetResult->{Data}->{Lock} );
+        my @LockDataList = IsArrayRef($LockGetResult->{Data}->{Lock}) ? @{$LockGetResult->{Data}->{Lock}} : ( $LockGetResult->{Data}->{Lock} );
 
         if ( IsArrayRefWithData(\@LockDataList) ) {
             return $Self->_Success(

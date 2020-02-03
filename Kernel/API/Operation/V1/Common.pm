@@ -54,7 +54,7 @@ initialize and run the current operation
 
 sub RunOperation {
     my ( $Self, %Param ) = @_;
-    my %FilteredPermissionObjects;
+    my %PermissionFilteredObjects;
 
     # init webservice
     my $Result = $Self->Init(
@@ -70,13 +70,23 @@ sub RunOperation {
 
     # check user permissions based on property values
     # UserID 1 has God Mode if SecureMode isn't active
-    if ( $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Kernel::Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
+    # also ignore all this if we have been told to ignore permissions
+    if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Kernel::Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
 
+        # we have to check the permission only for the current request method
+        # all other permissions are irrelevant (except DENY)
+
+        # get the relevant permission for the current request method
+        my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
+
+        # get all PropertyValue permissions for this user
         my %Permissions = $Kernel::OM->Get('Kernel::System::User')->PermissionList(
             UserID => $Self->{Authorization}->{UserID},
             Types  => [ 'PropertyValue' ],
         );
 
+        # get all relevant PropertyValue permissions
+        my @RelevantPropertyValuePermissions;
         foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
 
             # ignore targets without filter expression (non PropertyValue permission)
@@ -94,21 +104,54 @@ sub RunOperation {
             # extract property value permission
             next if $Permission->{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/;
 
-            my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
-            # replace string quotes
-            $Value =~ s/["']//g;
+            push @RelevantPropertyValuePermissions, $Permission;
+        }
 
-            $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
-
-            if ( $Self->{RequestMethod} =~ /GET|POST/ ) {
-                # GET and POST need some special handling
-                my $Not = 0;
-
-                # add a NOT filter if we have no READ permission (including DENY)
-                $Not = 1 if (
-                    ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{READ} ) != Kernel::System::Role::Permission->PERMISSION->{READ}
-                    || ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
+        # do something if we have at least one PropertyValue permission
+        if ( IsArrayRefWithData(\@RelevantPropertyValuePermissions) ) {
+            # load the object data (if we have to)
+            my $ObjectData = {};
+            if ( $Self->{RequestMethod} eq 'POST' ) {
+                # we need some special handling here since we don't have an object in the DB yet
+                # so we have to use the object given in the request data
+                $ObjectData = $Param{Data};
+            }
+            elsif ( $Self->{RequestMethod} ne 'GET' && IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+                # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
+                # a GET request will be handled differently
+                my $GetResult = $Self->ExecOperation(
+                    RequestMethod     => 'GET',
+                    OperationType     => $Self->{AvailableMethods}->{GET}->{Operation},
+                    Data              => $Param{Data},
+                    IgnorePermissions => 1,
                 );
+
+                if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+                    # no success, simply return what we got
+                    return $GetResult;
+                }
+
+                $ObjectData = $GetResult->{Data};
+            }
+
+            my $ResultingPermission = -1;
+
+            # check each permission
+            PERMISSION:
+            foreach my $Permission ( @RelevantPropertyValuePermissions ) {
+
+                # extract property value permission
+                next if $Permission->{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/;
+
+                my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+
+                # init Result
+                $ResultingPermission = 0 if $ResultingPermission == -1;
+
+                # replace string quotes
+                $Value =~ s/["']//g;
+
+                $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
 
                 # prepare value for IN operator
                 if ( $Operator eq 'IN' ) {
@@ -125,87 +168,88 @@ sub RunOperation {
                     }
                 }
 
+                my $Not = 0;
+                if ( $Self->{RequestMethod} eq 'GET') {
+                    # GET need some special handling
+
+                    # add a NOT filter if we have no READ permission (including DENY)
+                    $Not = 1 if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{READ} ) != Kernel::System::Role::Permission->PERMISSION->{READ} );
+
+                    if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                        $Not = 1;
+                        # also clear all existing permission filters
+                        $Self->_ClearPermissionFilters();
+                    }
+                }
+
                 # add a filter accordingly
-                my $Result = $Self->AddPermissionFilterForObject(
+                my %Filter = $Self->_AddPermissionFilterForObject(
                     Object   => $Object,
                     Field    => $Attribute,
                     Operator => $Operator,
                     Value    => $Value,
                     Not      => $Not,
                 );
-                if ( !$Result->{Success} ) {
+                if ( !%Filter ) {
 
                     return $Self->_Error(
-                        %{$Result},
+                        Code    => 'InternalError',
+                        Message => 'Unable to add permission filter!',
                     );
                 }
 
-                if ( $Self->{RequestMethod} eq 'POST' ) {
+                # save info that this object is permission filtered for later use
+                $PermissionFilteredObjects{$Object} = 1;
 
-                    # we need some special handling here since we don't have the object yet to be read
-                    # we use the same GET filters but apply them to the given object
+                if ( $Self->{RequestMethod} ne 'GET' ) {
+                    my %ObjectDataToFilter = %{$ObjectData};        # a deref is required here, because the filter method will change the data
 
-                    # return 403 if we don't have permission to execute this
-                    my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
+                    # we use the permission filters in order to apply them to the given object
+                    my $Result = $Self->_ApplyFilter(
+                        Data               => \%ObjectDataToFilter,       
+                        Filter             => \%Filter,
+                        IsPermissionFilter => 1,
+                    );
 
-                    if (
-                        ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
-                        || ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
-                    ) {
+                    # if the filtered object is undef then the filter doesn't match and we have to determine what to do depending on the desired permission
+                    if ( defined $ObjectDataToFilter{$Object} ) {
+                        $ResultingPermission |= $Permission->{Value};
 
-                        my %Data = %{ $Param{Data} };       # a deref is required here
-
-                        # active the permission filters
-                        $Self->_ActivatePermissionFilters();
-
-                        # we need to check the object against the filters
-                        my $Result = $Self->_ApplyFilter(
-                            Data               => \%Data,       
-                            IsPermissionFilter => 1,
+                        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+                            Value  => $ResultingPermission,
+                            Format => 'Short'
                         );
 
-                        # if the filtered object is undef then we don't have permission to create it
-                        if ( !$Data{$Object} ) {
-                            $Self->_PermissionDebug( sprintf("object to be created matches the permission target --> denying request") );
+                        $Self->_PermissionDebug("resulting PropertyValue permission: $ResultingPermissionShort");
 
-                            return $Self->_Error(
-                                Code => 'Forbidden',
-                            );
+                        # check if we have a DENY already
+                        if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                            $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                            last PERMISSION;
                         }
                     }
-                }
 
-                # save the filtered object so that we know which object has permission filters
-                $FilteredPermissionObjects{$Object} = 1;
+                    # check if we have the desired permission
+                    if ( $ResultingPermission != -1 && ( ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} 
+                        || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
+                    ) {
+                        $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
+
+                        # return 403, because we don't have permission to execute this
+                        return $Self->_Error(
+                            Code => 'Forbidden',
+                        );
+                    }
+                }
+                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                    # if we have a GET request and a DENY permission we can stop here and just use the DENY filter
+                    last PERMISSION;
+                }
             }
-            else {
-                # PATCH and DELETE will be handled here 
-
-                # for all other methods we need to get the object with permission filters to check if it matches (use a "faked" ExecOperation)
-                my $GetResult = $Self->ExecOperation(
-                    RequestMethod => 'GET',
-                    OperationType => $Self->{AvailableMethods}->{GET}->{Operation},
-                    Data          => $Param{Data}
-                );
-
-                if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
-
-                    # no success, simply return what we got
-                    return $GetResult;
-                }
-
-                # return 403 if we don't have permission to execute this
-                my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
-
-                if (
-                    ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
-                    || ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
-                ) {
-
-                    return $Self->_Error(
-                        Code => 'Forbidden',
-                    );
-                }
+        
+            if ( $Self->{RequestMethod} eq 'GET' && IsArrayRefWithData($Self->{PermissionFilters}) ) {
+                # activate the permission filters for the GET operation
+                $Self->_ActivatePermissionFilters();        
             }
         }
     }
@@ -264,9 +308,9 @@ sub RunOperation {
     }
 
     # check the result for filtered objects
-    if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($Result) && $Result->{Success} && %FilteredPermissionObjects ) {
+    if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($Result) && $Result->{Success} && %PermissionFilteredObjects ) {
 
-        foreach my $Object ( keys %FilteredPermissionObjects ) {
+        foreach my $Object ( keys %PermissionFilteredObjects ) {
             next if !exists $Result->{Data}->{$Object};
 
             # if the filtered object is undef then we don't have permission to read it
@@ -278,6 +322,7 @@ sub RunOperation {
         }
     }
 
+
     # log created ID of POST requests
     if ( $Self->{RequestMethod} eq 'POST' && IsHashRefWithData($Result) && $Result->{Success} ) {
         my @Data = %{ $Result->{Data} };
@@ -285,56 +330,6 @@ sub RunOperation {
     }
 
     return $Result
-}
-
-=item AddPermissionFilterForObject()
-
-adds a permission filter 
-
-    my $Return = $CommonObject->AddPermissionFilterForObject(
-        Object    => 'Ticket',
-        Field     => 'QueueID',
-        Operator  => 'EQ',
-        Value     => 12,
-        Not       => 0|1
-    );
-
-    $Return = {
-        Success => 1,                       # or 0 in case of failure,
-        Code    => 123
-        Message => 'Error Message',
-        Data => {
-            ...
-        }
-    }
-
-=cut
-
-sub AddPermissionFilterForObject {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Object Field Operator Value)) {
-        if ( !$Param{$Needed} ) {
-
-            # use Forbidden here to prevent access to data
-            return $Self->_Error(
-                Code    => 'Forbidden',
-                Message => "$Needed parameter is missing!",
-            );
-        }
-    }
-
-    use Data::Dumper;
-    $Self->_PermissionDebug( "adding permission filter: " . Dumper( \%Param ) );
-
-    # init PermissionFilters if not done already
-    $Self->{PermissionFilters} ||= [];
-
-    # store the required filter information for use in PrepareData
-    push( @{ $Self->{PermissionFilters} }, {%Param} );
-
-    return $Self->_Success();
 }
 
 =item Options()
@@ -553,11 +548,6 @@ sub PrepareData {
         $Self->{Search} = $Result;
     }
 
-    # extend filter and search with permission filters
-    if ( IsArrayRefWithData( $Self->{PermissionFilters} ) ) {
-        $Self->_ActivatePermissionFilters();
-    }
-
     # prepare field selector
     if ( ( exists( $Param{Data}->{fields} ) && IsStringWithData( $Param{Data}->{fields} ) ) || IsStringWithData( $Self->{OperationConfig}->{'FieldSet::Default'} ) ) {
         my $FieldSet = $Param{Data}->{fields} || ':Default';
@@ -585,7 +575,7 @@ sub PrepareData {
     if ( exists( $Param{Data}->{limit} ) && IsStringWithData( $Param{Data}->{limit} ) ) {
         foreach my $Limiter ( split( /,/, $Param{Data}->{limit} ) ) {
             my ( $Object, $Limit ) = split( /\:/, $Limiter, 2 );
-            if ( $Limit && $Limit =~ /\d+/ ) {
+            if ( $Limit && $Limit =~ /^\d+$/ ) {
                 $Self->{Limit}->{$Object} = $Limit;
             }
             else {
@@ -598,7 +588,7 @@ sub PrepareData {
     if ( exists( $Param{Data}->{offset} ) && IsStringWithData( $Param{Data}->{offset} ) ) {
         foreach my $Offset ( split( /,/, $Param{Data}->{offset} ) ) {
             my ( $Object, $Index ) = split( /\:/, $Offset, 2 );
-            if ( $Index && $Index =~ /\d+/ ) {
+            if ( $Index && $Index =~ /^\d+$/ ) {
                 $Self->{Offset}->{$Object} = $Index;
             }
             else {
@@ -1097,10 +1087,9 @@ sub _Error {
 helper function to execute another operation to work with its result.
 
     my $Return = $CommonObject->ExecOperation(
-        OperationType => '...'                              # required
-        Data          => {
-
-        }
+        OperationType     => '...',                              # required
+        Data              => {},                                 # required
+        IgnorePermissions => 1,                                  # optional
     );
 
 =cut
@@ -1171,6 +1160,7 @@ sub ExecOperation {
         OperationRouteMapping   => $Self->{OperationRouteMapping},
         Authorization           => $Self->{Authorization},
         Level                   => $Self->{Level} + 1,
+        IgnorePermissions       => $Param{IgnorePermissions},
     );
 
     # if operation init failed, bail out
@@ -1196,7 +1186,8 @@ sub ExecOperation {
             %AdditionalData,
             include => $Self->{RequestData}->{include},
             expand  => $Self->{RequestData}->{expand},
-            }
+        },
+        IgnorePermissions => $Param{IgnorePermissions},
     );
 
     # check result and add cachetype if neccessary
@@ -1366,13 +1357,16 @@ sub _ApplyFilter {
 
         if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
 
-            # if we do permission filtering and the relevant object is a hashref then its a GET request to an item resource
+            # if we do permission filtering and the relevant object is a hashref then its a request to an item resource
             # we have to prepare something so the filter can handle it
-            # if nothing comes out of the filter, the object can't be read
             $ObjectData = [ $Param{Data}->{$Object} ];
         }
         if ( IsArrayRefWithData($ObjectData) ) {
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
+
+            if ( $Param{IsPermissionFilter} ) {
+                $Self->_PermissionDebug( "using the following permission filter: " . Dumper( $Param{Filter} ) );            
+            }
 
             # filter each contained hash
             my @FilteredResult;
@@ -1632,12 +1626,13 @@ sub _ApplyFilter {
                         push @FilteredResult, $ObjectItem;
                     }
                 }
-            }
+            }            
             if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
 
                 # if we are in the permission filter mode and have prepared something in the beginning, check if we have an item in the filtered result
                 # if not, the item cannot be read
                 $Param{Data}->{$Object} = $FilteredResult[0];
+                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @FilteredResult));
             }
             else {
                 $Param{Data}->{$Object} = \@FilteredResult;
@@ -1728,7 +1723,7 @@ sub _ApplyOffset {
         }
         elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
             my @ResultArray = splice @{ $Param{Data}->{$Object} }, $Self->{Offset}->{$Object};
-            $Param{$Object} = \@ResultArray;
+            $Param{Data}->{$Object} = \@ResultArray;
         }
     }
 }
@@ -1757,7 +1752,7 @@ sub _ApplyLimit {
         }
         elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
             my @LimitedArray = splice @{ $Param{Data}->{$Object} }, 0, $Self->{Limit}->{$Object};
-            $Param{$Object} = \@LimitedArray;
+            $Param{Data}->{$Object} = \@LimitedArray;
         }
     }
 }
@@ -2046,34 +2041,10 @@ sub _ApplyExpand {
     return 1;
 }
 
-sub _ActivatePermissionFilters {
+sub _ClearPermissionFilters {
     my ( $Self, %Param ) = @_;
 
-    $Self->{PermissionFilters} ||= [];
-
-    use Data::Dumper;
-    $Self->_PermissionDebug( "activating permission filters: " . Dumper( $Self->{PermissionFilters} ) );
-    foreach my $Filter ( @{ $Self->{PermissionFilters} } ) {
-
-        # prepare filter definition
-        my %FilterDef = (
-            Field    => $Filter->{Field},
-            Operator => $Filter->{Operator},
-            Value    => $Filter->{Value},
-            Not      => $Filter->{Not},
-        );
-
-        # init filter and search if not done already
-        $Self->{Filter}->{ $Filter->{Object} }->{OR} ||= [];
-        $Self->{Search}->{ $Filter->{Object} }->{OR} ||= [];
-
-        # add definition to filters
-        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
-        push( @{ $Self->{Search}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
-    }
-
-    $Self->_PermissionDebug( "filter after activation of permission filters: " . Dumper( $Self->{Filter} ) );
-    $Self->_PermissionDebug( "search after activation of permission filters: " . Dumper( $Self->{Search} ) );
+    $Self->{PermissionFilters} = [];
 
     return 1;
 }
@@ -2292,6 +2263,82 @@ sub _CacheRequest {
             TTL      => 60 * 60 * 24 * 7,                        # 7 days
         );
     }
+
+    return 1;
+}
+
+=item _AddPermissionFilterForObject()
+
+adds a permission filter 
+
+    my $Return = $CommonObject->_AddPermissionFilterForObject(
+        Object    => 'Ticket',
+        Field     => 'QueueID',
+        Operator  => 'EQ',
+        Value     => 12,
+        Not       => 0|1
+    );
+
+    $Return = %Filter
+
+=cut
+
+sub _AddPermissionFilterForObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Object Field Operator Value)) {
+        if ( !defined $Param{$Needed} ) {
+
+            # use Forbidden here to prevent access to data
+            return;
+        }
+    }
+
+    use Data::Dumper;
+    $Self->_PermissionDebug( "adding permission filter: " . Dumper( \%Param ) );
+
+    # init PermissionFilters if not done already
+    $Self->{PermissionFilters} ||= [];
+
+    # store the required filter information for use in PrepareData
+    push( @{ $Self->{PermissionFilters} }, {%Param} );
+
+    my %Filter;
+    $Filter{ $Param{Object} }->{OR} = [];
+    push( @{ $Filter{ $Param{Object} }->{OR} }, { %Param } );
+
+    return %Filter;
+}
+
+sub _ActivatePermissionFilters {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{PermissionFilters} ||= [];
+
+    use Data::Dumper;
+    $Self->_PermissionDebug( "activating permission filters: " . Dumper( $Self->{PermissionFilters} ) );
+    foreach my $Filter ( @{ $Self->{PermissionFilters} } ) {
+
+        # prepare filter definition
+        my %FilterDef = (
+            Field    => $Filter->{Field},
+            Operator => $Filter->{Operator},
+            Value    => $Filter->{Value},
+            Not      => $Filter->{Not},
+        );
+
+        # init filter and search if not done already
+        $Self->{Filter}->{ $Filter->{Object} }->{OR} ||= [];
+        $Self->{Search}->{ $Filter->{Object} }->{OR} ||= [];
+
+        # add definition to filters
+        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
+        push( @{ $Self->{Search}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
+    }
+
+    $Self->_PermissionDebug( "filter after activation of permission filters: " . Dumper( $Self->{Filter} ) );
+    $Self->_PermissionDebug( "search after activation of permission filters: " . Dumper( $Self->{Search} ) );
 
     return 1;
 }

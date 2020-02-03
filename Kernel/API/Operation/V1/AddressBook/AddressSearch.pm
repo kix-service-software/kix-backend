@@ -102,7 +102,7 @@ sub Run {
             return $AddressBookGetResult;
         }
 
-        my @AddressDataList = IsArrayRefWithData($AddressBookGetResult->{Data}->{Address}) ? @{$AddressBookGetResult->{Data}->{Address}} : ( $AddressBookGetResult->{Data}->{Address} );
+        my @AddressDataList = IsArrayRef($AddressBookGetResult->{Data}->{Address}) ? @{$AddressBookGetResult->{Data}->{Address}} : ( $AddressBookGetResult->{Data}->{Address} );
 
         if ( IsArrayRefWithData(\@AddressDataList) ) {
             return $Self->_Success(

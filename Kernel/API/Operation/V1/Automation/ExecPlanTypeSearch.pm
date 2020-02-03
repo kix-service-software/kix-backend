@@ -99,7 +99,7 @@ sub Run {
             return $ExecPlanTypeGetResult;
         }
 
-        my @ExecPlanTypeDataList = IsArrayRefWithData($ExecPlanTypeGetResult->{Data}->{ExecPlanType}) ? @{$ExecPlanTypeGetResult->{Data}->{ExecPlanType}} : ( $ExecPlanTypeGetResult->{Data}->{ExecPlanType} );
+        my @ExecPlanTypeDataList = IsArrayRef($ExecPlanTypeGetResult->{Data}->{ExecPlanType}) ? @{$ExecPlanTypeGetResult->{Data}->{ExecPlanType}} : ( $ExecPlanTypeGetResult->{Data}->{ExecPlanType} );
 
         if ( IsArrayRefWithData(\@ExecPlanTypeDataList) ) {
             return $Self->_Success(

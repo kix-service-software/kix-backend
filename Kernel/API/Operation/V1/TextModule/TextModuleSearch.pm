@@ -114,7 +114,7 @@ sub Run {
             return $TextModuleGetResult;
         }
 
-        my @TextModuleDataList = IsArrayRefWithData($TextModuleGetResult->{Data}->{TextModule}) ? @{$TextModuleGetResult->{Data}->{TextModule}} : ( $TextModuleGetResult->{Data}->{TextModule} );
+        my @TextModuleDataList = IsArrayRef($TextModuleGetResult->{Data}->{TextModule}) ? @{$TextModuleGetResult->{Data}->{TextModule}} : ( $TextModuleGetResult->{Data}->{TextModule} );
 
         if ( IsArrayRefWithData(\@TextModuleDataList) ) {
             return $Self->_Success(

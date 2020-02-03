@@ -151,7 +151,7 @@ sub Run {
             return $GetResult;
         }
 
-        my @ClassDataList = IsArrayRefWithData($GetResult->{Data}->{ConfigItemClassDefinition}) ? @{$GetResult->{Data}->{ConfigItemClassDefinition}} : ( $GetResult->{Data}->{ConfigItemClassDefinition} );
+        my @ClassDataList = IsArrayRef($GetResult->{Data}->{ConfigItemClassDefinition}) ? @{$GetResult->{Data}->{ConfigItemClassDefinition}} : ( $GetResult->{Data}->{ConfigItemClassDefinition} );
 
         if ( IsArrayRefWithData(\@ClassDataList) ) {
             return $Self->_Success(

@@ -102,7 +102,7 @@ sub Run {
             return $SenderTypeGetResult;
         }
 
-        my @SenderTypeDataList = IsArrayRefWithData($SenderTypeGetResult->{Data}->{SenderType}) ? @{$SenderTypeGetResult->{Data}->{SenderType}} : ( $SenderTypeGetResult->{Data}->{SenderType} );
+        my @SenderTypeDataList = IsArrayRef($SenderTypeGetResult->{Data}->{SenderType}) ? @{$SenderTypeGetResult->{Data}->{SenderType}} : ( $SenderTypeGetResult->{Data}->{SenderType} );
 
         if ( IsArrayRefWithData(\@SenderTypeDataList) ) {
             return $Self->_Success(

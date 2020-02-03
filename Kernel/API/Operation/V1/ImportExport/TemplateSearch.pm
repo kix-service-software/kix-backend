@@ -102,7 +102,7 @@ sub Run {
             return $TemplateGetResult;
         }
 
-        my @TemplateDataList = IsArrayRefWithData($TemplateGetResult->{Data}->{ImportExportTemplate})
+        my @TemplateDataList = IsArrayRef($TemplateGetResult->{Data}->{ImportExportTemplate})
             ? @{$TemplateGetResult->{Data}->{ImportExportTemplate}} : ( $TemplateGetResult->{Data}->{ImportExportTemplate} );
 
         if ( IsArrayRefWithData(\@TemplateDataList) ) {

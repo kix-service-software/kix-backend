@@ -39,34 +39,61 @@ Text common functions.
 
 =cut
 
-sub ValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-    );
-
-    return if !$DFValue;
-    return if !IsArrayRefWithData($DFValue);
-    return if !IsHashRefWithData( $DFValue->[0] );
-
-    return $DFValue->[0]->{ValueText};
-}
-
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-        Value    => [
-            {
-                ValueText => $Param{Value},
-            },
-        ],
-        UserID => $Param{UserID},
-    );
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    # get dynamic field value object
+    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+
+    my $Success;
+
+    if ( IsArrayRefWithData( \@Values ) ) {
+
+        # if there is at least one value to set, this means one or more values are selected,
+        #    set those values!
+        my @ValueText;
+        for my $Item (@Values) {
+            my $Valid = $Self->ValueValidate(
+                Value => $Item,
+                UserID => $Param{UserID},
+                DynamicFieldConfig => $Param{DynamicFieldConfig}
+            );
+
+            if (!$Valid) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "The value for the field Text is invalid!"
+                );
+                return;
+            }
+
+            push @ValueText, { ValueText => $Item };
+        }
+
+        $Success = $DynamicFieldValueObject->ValueSet(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            Value    => \@ValueText,
+            UserID   => $Param{UserID},
+        );
+    } else {
+
+        # delete all existing values for the dynamic field
+        $Success = $DynamicFieldValueObject->ValueDelete(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            UserID   => $Param{UserID},
+        );
+    }
 
     return $Success;
 }
@@ -82,7 +109,8 @@ sub ValueValidate {
     );
 
     if (
-        IsArrayRefWithData( $Param{DynamicFieldConfig}->{Config}->{RegExList} )
+        !$Param{SearchValidation}
+        && IsArrayRefWithData( $Param{DynamicFieldConfig}->{Config}->{RegExList} )
         && IsStringWithData( $Param{Value} )
         )
     {
@@ -128,11 +156,19 @@ sub SearchSQLGet {
         return $SQL;
     }
 
+    my $SearchValue;
     if ( $Param{Operator} eq 'Like' ) {
+        $SearchValue = "%$Param{SearchTerm}%";
+    } elsif ( $Param{Operator} eq 'StartsWith' ) {
+        $SearchValue = "$Param{SearchTerm}%";
+    } elsif ( $Param{Operator} eq 'EndsWith' ) {
+        $SearchValue = "%$Param{SearchTerm}";
+    }
 
+    if($SearchValue) {
         my $SQL = $DBObject->QueryCondition(
             Key   => "$Param{TableAlias}.value_text",
-            Value => $Param{SearchTerm},
+            Value => $SearchValue,
         );
 
         return $SQL;
@@ -339,34 +375,106 @@ sub DisplayValueRender {
         $Param{HTMLOutput} = 1;
     }
 
-    # get raw Title and Value strings from field value
-    my $Value = defined $Param{Value} ? $Param{Value} : '';
-    my $Title = $Value;
+    my $ValueMaxChars = $Param{ValueMaxChars} || '';
+    my $TitleMaxChars = $Param{TitleMaxChars} || '';
 
-    # HTMLOuput transformations
-    if ( $Param{HTMLOutput} ) {
-        $Value = $Param{LayoutObject}->Ascii2Html(
-            Text => $Value,
-            Max  => $Param{ValueMaxChars} || '',
-        );
-
-        $Title = $Param{LayoutObject}->Ascii2Html(
-            Text => $Title,
-            Max  => $Param{TitleMaxChars} || '',
-        );
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
     }
     else {
-        if ( $Param{ValueMaxChars} && length($Value) > $Param{ValueMaxChars} ) {
-            $Value = substr( $Value, 0, $Param{ValueMaxChars} ) . '...';
+        @Values = ( $Param{Value} );
+    }
+
+    my @ReadableValues;
+    my @ReadableTitles;
+
+    my $ShowValueEllipsis;
+    my $ShowTitleEllipsis;
+
+    for my $Text (@Values) {
+        next if !$Text;
+
+        my $ReadableValue = $Text;
+
+        my $ReadableLength = length $ReadableValue;
+
+        # set title equal value
+        my $ReadableTitle = $ReadableValue;
+
+        # cut strings if needed
+        if ( $ValueMaxChars ne '' ) {
+
+            if ( length $ReadableValue > $ValueMaxChars ) {
+                $ShowValueEllipsis = 1;
+            }
+            $ReadableValue = substr $ReadableValue, 0, $ValueMaxChars;
+
+            # decrease the max parameter
+            $ValueMaxChars = $ValueMaxChars - $ReadableLength;
+            if ( $ValueMaxChars < 0 ) {
+                $ValueMaxChars = 0;
+            }
         }
-        if ( $Param{TitleMaxChars} && length($Title) > $Param{TitleMaxChars} ) {
-            $Title = substr( $Title, 0, $Param{TitleMaxChars} ) . '...';
+
+        if ( $TitleMaxChars ne '' ) {
+
+            if ( length $ReadableTitle > $ValueMaxChars ) {
+                $ShowTitleEllipsis = 1;
+            }
+            $ReadableTitle = substr $ReadableTitle, 0, $TitleMaxChars;
+
+            # decrease the max parameter
+            $TitleMaxChars = $TitleMaxChars - $ReadableLength;
+            if ( $TitleMaxChars < 0 ) {
+                $TitleMaxChars = 0;
+            }
+        }
+
+        # HTMLOutput transformations
+        if ( $Param{HTMLOutput} ) {
+
+            $ReadableValue = $Param{LayoutObject}->Ascii2Html(
+                Text => $ReadableValue,
+            );
+
+            $ReadableTitle = $Param{LayoutObject}->Ascii2Html(
+                Text => $ReadableTitle,
+            );
+        }
+
+        if ( length $ReadableValue ) {
+            push @ReadableValues, $ReadableValue;
+        }
+        if ( length $ReadableTitle ) {
+            push @ReadableTitles, $ReadableTitle;
         }
     }
 
     # set field link form config
     my $Link        = $Param{DynamicFieldConfig}->{Config}->{Link}        || '';
     my $LinkPreview = $Param{DynamicFieldConfig}->{Config}->{LinkPreview} || '';
+
+    # set new line separator
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
+
+    my $Value = join( $Separator, @ReadableValues );
+    my $Title = join( $Separator, @ReadableTitles );
+
+    if ($ShowValueEllipsis) {
+        $Value .= '...';
+    }
+    if ($ShowTitleEllipsis) {
+        $Title .= '...';
+    }
 
     # create return structure
     my $Data = {
@@ -525,8 +633,40 @@ sub StatsSearchFieldParameterBuild {
 sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
 
-    my $Value = defined $Param{Value} ? $Param{Value} : '';
-    my $Title = $Value;
+    my $Value = '';
+    my $Title = '';
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    my @ReadableValues;
+
+    VALUEITEM:
+    for my $Item (@Values) {
+        next VALUEITEM if !$Item;
+
+        push @ReadableValues, $Item;
+    }
+
+    # set new line separator
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
+
+    # Output transformations
+    $Value = join( $Separator, @ReadableValues );
+    $Title = $Value;
 
     # cut strings if needed
     if ( $Param{ValueMaxChars} && length($Value) > $Param{ValueMaxChars} ) {
@@ -594,22 +734,6 @@ sub RandomValueSet {
     };
 }
 
-sub ObjectMatch {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # return false if field is not defined
-    return 0 if ( !defined $Param{ObjectAttributes}->{$FieldName} );
-
-    # return false if not match
-    if ( $Param{ObjectAttributes}->{$FieldName} ne $Param{Value} ) {
-        return 0;
-    }
-
-    return 1;
-}
-
 sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
@@ -632,10 +756,6 @@ sub ValueLookup {
 }
 
 1;
-
-
-
-
 
 =back
 

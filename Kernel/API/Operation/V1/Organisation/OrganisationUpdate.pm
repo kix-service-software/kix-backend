@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Organisation::OrganisationUpdate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -175,7 +175,7 @@ sub Run {
     }
     
     return $Self->_Success(
-        OrganisationID => $Param{Data}->{OrganisationID},
+        OrganisationID => 0 + $Param{Data}->{OrganisationID},
     );   
 }
 

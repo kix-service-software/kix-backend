@@ -103,7 +103,7 @@ sub Run {
             return $PriorityGetResult;
         }
 
-        my @PriorityDataList = IsArrayRefWithData($PriorityGetResult->{Data}->{Priority}) ? @{$PriorityGetResult->{Data}->{Priority}} : ( $PriorityGetResult->{Data}->{Priority} );
+        my @PriorityDataList = IsArrayRef($PriorityGetResult->{Data}->{Priority}) ? @{$PriorityGetResult->{Data}->{Priority}} : ( $PriorityGetResult->{Data}->{Priority} );
 
         if ( IsArrayRefWithData(\@PriorityDataList) ) {
             return $Self->_Success(

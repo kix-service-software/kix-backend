@@ -100,7 +100,7 @@ sub Run {
             return $StandardAttachmentGetResult;
         }
 
-        my @StandardAttachmentDataList = IsArrayRefWithData($StandardAttachmentGetResult->{Data}->{StandardAttachment}) ? @{$StandardAttachmentGetResult->{Data}->{StandardAttachment}} : ( $StandardAttachmentGetResult->{Data}->{StandardAttachment} );
+        my @StandardAttachmentDataList = IsArrayRef($StandardAttachmentGetResult->{Data}->{StandardAttachment}) ? @{$StandardAttachmentGetResult->{Data}->{StandardAttachment}} : ( $StandardAttachmentGetResult->{Data}->{StandardAttachment} );
 
         if ( IsArrayRefWithData(\@StandardAttachmentDataList) ) {
             return $Self->_Success(

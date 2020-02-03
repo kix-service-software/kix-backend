@@ -142,7 +142,7 @@ sub Run {
             return $PermissionGetResult;
         }
 
-        my @PermissionDataList = IsArrayRefWithData($PermissionGetResult->{Data}->{Permission}) ? @{$PermissionGetResult->{Data}->{Permission}} : ( $PermissionGetResult->{Data}->{Permission} );
+        my @PermissionDataList = IsArrayRef($PermissionGetResult->{Data}->{Permission}) ? @{$PermissionGetResult->{Data}->{Permission}} : ( $PermissionGetResult->{Data}->{Permission} );
 
         if ( IsArrayRefWithData(\@PermissionDataList) ) {
             return $Self->_Success(

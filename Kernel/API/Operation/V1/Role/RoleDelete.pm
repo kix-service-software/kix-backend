@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Role::RoleDelete;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -94,7 +94,7 @@ perform RoleDelete Operation. This will return the deleted RoleID.
     my $Result = $OperationObject->Run(
         Data => {
             RoleID  => '...',
-        },		
+        },      
     );
 
     $Result = {
@@ -121,7 +121,7 @@ sub Run {
             );
         }
 
-        # delete Role	    
+        # delete Role       
         my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleDelete(
             ID  => $RoleID,
         );

@@ -11,7 +11,9 @@ package Kernel::API::Operation::V1::Ticket::ArticleCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use MIME::Base64();
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -341,6 +343,15 @@ sub _ArticleCreate {
         }
     }
 
+    # prepare attachments
+    if ( IsArrayRefWithData($Article->{Attachments}) ) {
+
+        foreach my $Attachment ( @{$Article->{Attachments}} ) {
+            $Attachment->{Content} = MIME::Base64::decode_base64( $Attachment->{Content} );
+            $Attachment->{Disposition} = 'attachment';
+        }
+    }
+
     # create article
     my $ArticleID = $TicketObject->ArticleCreate(
         NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
@@ -371,6 +382,7 @@ sub _ArticleCreate {
             Body    => $Article->{Body},
 
         },
+        Attachment     => $Article->{Attachments},
     );
 
     if ( !$ArticleID ) {
@@ -412,27 +424,6 @@ sub _ArticleCreate {
                     Code    => 'Operation.InternalError',
                     Message => "Dynamic Field $DynamicField->{Name} could not be set, please contact the system administrator",
                 );
-            }
-        }
-    }
-
-    # set attachments
-    if ( IsArrayRefWithData($Article->{Attachments}) ) {
-
-        foreach my $Attachment ( @{$Article->{Attachments}} ) {
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::ArticleAttachmentCreate',
-                Data          => {
-                    TicketID   => $Ticket->{TicketID},
-                    ArticleID  => $ArticleID,
-                    Attachment => $Attachment,
-                }
-            );
-            
-            if ( !$Result->{Success} ) {
-                return $Self->_Error(
-                    %{$Result},
-                )
             }
         }
     }

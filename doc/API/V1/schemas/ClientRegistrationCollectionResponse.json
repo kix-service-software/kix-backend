@@ -39,7 +39,7 @@
             "LastNotificationTimestamp" : {
                "anyOf" : [
                   {
-                     "type" : "number"
+                     "type" : "string"
                   },
                   {
                      "type" : "null"

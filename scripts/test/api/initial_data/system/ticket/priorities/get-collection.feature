@@ -1,0 +1,20 @@
+Feature: GET request to the /system/ticket/priorities resource
+
+  Background: 
+    Given the API URL is __BACKEND_API_URL__
+    Given the API schema files are located at __API_SCHEMA_LOCATION__
+    Given I am logged in as agent user "admin" with password "Passw0rd"
+
+  Scenario: check is the existing priorities are consistent with the delivery defaults
+    When I query the collection of ticket priorities
+    Then the response code is 200
+    And the response object is PriorityCollectionResponse
+    Then the response contains 5 items of type "Priority"
+    Then the response contains the following items of type Priority
+      | Name        | ValidID |
+      | 1 very low  | 1       |
+      | 2 low       | 1       |
+      | 3 normal    | 1       |
+      | 4 high      | 1       |
+      | 5 very high | 1       |
+

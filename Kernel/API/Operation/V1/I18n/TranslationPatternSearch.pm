@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::I18n::TranslationPatternSearch;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw( :all );
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Operation::V1::Common
@@ -102,7 +102,7 @@ sub Run {
             return $PatternGetResult;
         }
 
-        my @ResultList = IsArrayRefWithData($PatternGetResult->{Data}->{TranslationPattern}) ? @{$PatternGetResult->{Data}->{TranslationPattern}} : ( $PatternGetResult->{Data}->{TranslationPattern} );
+        my @ResultList = IsArrayRef($PatternGetResult->{Data}->{TranslationPattern}) ? @{$PatternGetResult->{Data}->{TranslationPattern}} : ( $PatternGetResult->{Data}->{TranslationPattern} );
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

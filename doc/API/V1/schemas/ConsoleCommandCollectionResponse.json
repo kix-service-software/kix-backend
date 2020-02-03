@@ -22,7 +22,14 @@
          "type" : "object",
          "properties" : {
             "AdditionalHelp" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Arguments" : {
