@@ -178,6 +178,9 @@ sub Run {
         OrganisationID => 0 + $Param{Data}->{OrganisationID},
     );   
 }
+
+1;
+
 =back
 
 =head1 TERMS AND CONDITIONS

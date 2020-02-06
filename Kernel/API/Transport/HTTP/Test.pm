@@ -218,9 +218,7 @@ sub RequesterPerformRequest {
     };
 }
 
-
-
-
+1;
 
 =back
 
