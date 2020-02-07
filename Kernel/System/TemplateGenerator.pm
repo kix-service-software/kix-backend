@@ -1167,6 +1167,7 @@ sub _Replace {
         my $DisplayValueStrg = $DynamicFieldBackendObject->DisplayValueRender(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+            HTMLOutput         => $Param{RichText}
         );
         if ( IsHashRefWithData($DisplayValueStrg) ) {
             $DynamicFieldDisplayValues{ 'DynamicField_' . $DynamicFieldConfig->{Name} . '_Value' }
