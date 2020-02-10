@@ -149,6 +149,11 @@ sub Run {
         my @Keywords = split(/\s+/, $FAQArticle{Keywords});
         $FAQArticle{Keywords} = \@Keywords;
 
+        $FAQArticle{CustomerVisible} = $FAQArticle{Visibility} 
+            && ($FAQArticle{Visibility} eq 'external' || $FAQArticle{Visibility} eq 'public' )
+            ? 1 : 0;
+        delete $FAQArticle{Visibility};
+
         # add
         push(@FAQArticleData, \%FAQArticle);
     }

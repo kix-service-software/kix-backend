@@ -83,7 +83,14 @@ sub ParameterDefinition {
     return {
         'FAQArticleID' => {
             Required => 1
-        },      
+        },
+        'FAQArticle::CustomerVisible' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [
+                0,
+                1
+            ]
+        },
     }
 }
 
@@ -95,16 +102,16 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
         Data => {
             FAQArticleID => 123,
             FAQArticle  => {
-                CategoryID  => 1,
-                StateID     => 1,
-                LanguageID  => 1,
-                Approved    => 1,
-                Keywords    => [                 # optional
+                Title           => 'Some Text',
+                CategoryID      => 1,
+                ValidID         => 1,
+                CustomerVisible => 1,                # optional, 1|0, default 0
+                LanguageID      => 'en',             # optional
+                ContentType     => 'text/plain',     # optional, or 'text/plain'
+                Number          => '13402',          # optional
+                Keywords        => [                 # optional
                     'some', 'keywords',  
                 ],
-                ValidID     => 1,
-                ContentType => 'text/plan',     # or 'text/html'
-                Title       => 'Some Text',
                 Field1      => 'Problem...',
                 Field2      => 'Solution...',
                 Field3      => '...',
@@ -112,6 +119,7 @@ perform FAQArticleUpdate Operation. This will return the updated TypeID.
                 Field5      => '...',
                 Field6      => '...',
                 UserID      => 1,
+                Approved    => 1,
                 ApprovalOff => 1,               # optional, (if set to 1 approval is ignored. This is
                                                 #   important when called from FAQInlineAttachmentURLUpdate)
             },
@@ -153,8 +161,14 @@ sub Run {
 
     # merge attributes
     my %FAQArticle;
-    foreach my $Key ( qw(Name StateID CategoryID Language Approved Visibility ContentType Title Field1 Field2 Field3 Field4 Field5 Field6 ApprovalOff ValidID) ) {
+    foreach my $Key ( qw(Name StateID CategoryID Language Approved ContentType Title Field1 Field2 Field3 Field4 Field5 Field6 ApprovalOff ValidID) ) {
        $FAQArticle{$Key} = exists $IncomingFAQArticle->{$Key} ? $IncomingFAQArticle->{$Key} : $FAQArticleData{$Key};
+    }
+
+    if (exists $IncomingFAQArticle->{CustomerVisible}) {
+        $FAQArticle{Visibility} = $IncomingFAQArticle->{CustomerVisible} ? 'external' : 'internal';
+    } else {
+        $FAQArticle{Visibility} = $FAQArticleData{Visibility};
     }
 
     # add keywords
