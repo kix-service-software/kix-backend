@@ -642,7 +642,7 @@ update an article
         ItemID      => 123,
         Title       => 'Some Text',
         CategoryID  => 1,
-        Visibility  => 'agent',          # possible values 'agent', 'customer' or 'public'
+        Visibility  => 'internal',       # possible values 'internal', 'external' or 'public'
         Language    => 'en',
         Number      => '13402',          # (optional)
         Keywords    => 'some keywords',  # (optional)
