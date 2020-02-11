@@ -408,10 +408,10 @@ sub ExportDataGet {
     );
 
     # check object data
-    if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
+    if ( !$ObjectData || ref $ObjectData ne 'HASH'  || !$ObjectData->{ClassID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "No object data found for the template id $Param{TemplateID}",
+            Message  => "No valid object data found for the template id $Param{TemplateID}",
         );
         return;
     }
