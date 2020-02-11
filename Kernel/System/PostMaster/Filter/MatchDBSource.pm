@@ -48,7 +48,9 @@ sub Run {
     my $PostMasterFilter = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
 
     # get all db filters
-    my %JobList = $PostMasterFilter->FilterList();
+    my %JobList = $PostMasterFilter->FilterList(
+        Valid => 1
+    );
 
     for ( sort keys %JobList ) {
 
