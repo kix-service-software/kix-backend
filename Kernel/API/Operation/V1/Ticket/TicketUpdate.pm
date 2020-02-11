@@ -182,7 +182,10 @@ sub Run {
     # everything is ok, let's update the ticket
     my $Result = $Self->_TicketUpdate(
         TicketID => $Param{Data}->{TicketID},
-        Ticket   => $Ticket,
+        Ticket   => {
+            StateID => $TicketData{StateID},
+            %{$Ticket}
+        },
         UserID   => $Self->{Authorization}->{UserID},
     );
 
