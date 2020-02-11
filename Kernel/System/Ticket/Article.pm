@@ -105,7 +105,7 @@ example with "Charset & MimeType" and no "ContentType"
         TicketID         => 123,
         Channel          => 'note',                                 # Channel or 
         ChannelID        => 1,                                      # ChannelID
-        CustomerVisible  => 0|1,                                    # optional
+        CustomerVisible  => 0|1,                                    # optional - will be set to 1 on special conditions (only if not given)
         SenderType       => 'agent',                                # agent|system|customer
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
@@ -299,6 +299,21 @@ sub ArticleCreate {
         }
     }
 
+    # strip not wanted stuff
+    for my $Attribute (qw(From To Cc Bcc Subject MessageID InReplyTo References ReplyTo)) {
+        if ( defined $Param{$Attribute} ) {
+            $Param{$Attribute} =~ s/\n|\r//g;
+        }
+        else {
+            $Param{$Attribute} = '';
+        }
+    }
+    ATTRIBUTE:
+    for my $Attribute (qw(InReplyTo References)) {
+        next ATTRIBUTE if !$Param{$Attribute};
+        $Param{$Attribute} = substr( $Param{$Attribute}, 0, 3800 );
+    }
+
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
         # check needed stuff
@@ -310,6 +325,13 @@ sub ArticleCreate {
                 );
                 return;
             }
+        }
+
+        if (!defined $Param{CustomerVisible} || $Param{CustomerVisible} eq '') {
+            $Param{CustomerVisible} = $Self->_HandleCustomerVisible(
+                Article => \%Param,
+                Ticket  => \%OldTicketData,
+            )
         }
 
         $Param{ToOrig}      = $Param{To}          || '';
@@ -357,21 +379,8 @@ sub ArticleCreate {
         my $Random    = rand 999999;
         my $FQDN      = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
         $Param{MessageID} = "<$Time.$Random\@$FQDN>";
-    }
-
-    # strip not wanted stuff
-    for my $Attribute (qw(From To Cc Subject MessageID InReplyTo References ReplyTo)) {
-        if ( defined $Param{$Attribute} ) {
-            $Param{$Attribute} =~ s/\n|\r//g;
-        }
-        else {
-            $Param{$Attribute} = '';
-        }
-    }
-    ATTRIBUTE:
-    for my $Attribute (qw(InReplyTo References)) {
-        next ATTRIBUTE if !$Param{$Attribute};
-        $Param{$Attribute} = substr( $Param{$Attribute}, 0, 3800 );
+    } else {
+        $Param{CustomerVisible} = (defined $Param{CustomerVisible} && $Param{CustomerVisible} ne '') ? $Param{CustomerVisible} : 0;
     }
 
     # prepare IncomingTime if given
@@ -3132,11 +3141,92 @@ sub ArticleExists {
     return $Exists;
 }
 
+sub _HandleCustomerVisible {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Ticket Article)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_"
+            );
+            return 0;
+        }
+    }
+
+    return 0 if !$Param{Ticket}->{OrganisationID};
+
+    # get mail addresses of receivers
+    my %ReceiverMailAddresses;
+    for my $Property ( qw(To Cc Bcc) ) {
+        next if ( !$Param{Article}->{$Property} );
+
+        my @PropertyAddresses = split(',', $Param{Article}->{$Property});
+
+        for my $Address (@PropertyAddresses) {
+
+            # get plain address and trim
+            $Address =~ s/.+ <(.+)>/$1/;
+            $Address =~ s/^\s+|\n|\s+$//g;
+
+            if ( !$ReceiverMailAddresses{$Address} ) {
+                $ReceiverMailAddresses{$Address} = 1;
+            }
+        }
+    }
+
+    return 0 if (!scalar keys %ReceiverMailAddresses);
+
+    # get mail addresses of contacts of organisation
+    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+        OrganisationID => $Param{Ticket}->{OrganisationID},
+        Valid          => 0
+    );
+
+    return 0 if ( !IsHashRefWithData(\%ContactList) );
+
+    my %ContactMailAddresses;
+    for my $ContactID (keys %ContactList) {
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            ID => $ContactID
+        );
+        if ( IsHashRefWithData(\%Contact) ) {
+
+            my $MailAddress = $Contact{Email};
+
+            # get plain address
+            $MailAddress =~ s/.+ <(.+)>/$1/;
+
+            if ( !$ContactMailAddresses{$MailAddress} ) {
+                $ContactMailAddresses{$MailAddress} = 1;
+            }
+        }
+    }
+
+    # TODO: use with KIX2018-3057
+    # for my $ContactMail (values %ContactList) {
+    #     if ($ContactMail) {
+    #
+    #         # get plain address
+    #         $ContactMail =~ s/.+ <(.+)>/$1/;
+    #
+    #         if ( !$ContactMailAddresses{$ContactMail} ) {
+    #             $ContactMailAddresses{$ContactMail} = 1;
+    #         }
+    #     }
+    # }
+
+    return 0 if (!scalar keys %ContactMailAddresses);
+
+    for my $Address (keys %ContactMailAddresses) {
+        return 1 if ($ReceiverMailAddresses{$Address});
+    }
+
+    return 0;
+}
+
 1;
-
-
-
-
 
 =back
 
