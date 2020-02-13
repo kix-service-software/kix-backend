@@ -542,11 +542,13 @@ sub TemplateDelete {
 
     # push client callback event
     if ($Success) {
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event     => 'DELETE',
-            Namespace => 'ImportExportTemplate',
-            ObjectID  => $Param{TemplateID},
-        );
+        for my $TemplateID ( @{$Param{TemplateID}} ) {
+            $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+                Event     => 'DELETE',
+                Namespace => 'ImportExportTemplate',
+                ObjectID  => $TemplateID
+            );
+        }
     }
 
     return $Success;
