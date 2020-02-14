@@ -172,9 +172,7 @@ sub LogFileList {
     return %LogFileList;
 }
 
-
 1;
-
 
 =back
 

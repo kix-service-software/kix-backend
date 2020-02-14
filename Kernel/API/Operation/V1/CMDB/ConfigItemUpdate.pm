@@ -128,7 +128,7 @@ sub Run {
     }
 
     # isolate and trim ConfigItem parameter
-    my $ConfigItem = $Self->_Trim(
+    $ConfigItem = $Self->_Trim(
         Data => $Param{Data}->{ConfigItem}
     );
 

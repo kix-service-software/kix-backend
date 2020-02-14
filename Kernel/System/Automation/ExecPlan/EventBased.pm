@@ -96,6 +96,8 @@ sub Run {
     return $RelevantEvents{$Param{Event}} || 0;
 }
 
+1;
+
 =back
 
 =head1 TERMS AND CONDITIONS

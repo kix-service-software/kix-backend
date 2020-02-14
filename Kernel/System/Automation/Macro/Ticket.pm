@@ -81,6 +81,8 @@ sub Run {
     return 1;
 }
 
+1;
+
 =back
 
 =head1 TERMS AND CONDITIONS

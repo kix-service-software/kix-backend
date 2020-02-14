@@ -386,7 +386,8 @@ sub Options {
             my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                    Location => "$SchemaLocation/$Object.json",
+                    Location        => "$SchemaLocation/$Object.json",
+                    DisableWarnings => 1, 
                 );
                 if ($Content) {
                     $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
@@ -404,7 +405,8 @@ sub Options {
             my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                    Location => "$ExampleLocation/$Object.json",
+                    Location        => "$ExampleLocation/$Object.json",
+                    DisableWarnings => 1,
                 );
                 if ($Content) {
                     $Data{$Type}->{Example} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
