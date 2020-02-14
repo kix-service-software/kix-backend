@@ -7,68 +7,11 @@
       "Priority" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Priority"
+            "$ref" : "Priority.json"
          }
       }
    },
    "required" : [
       "Priority"
-   ],
-   "definitions" : {
-      "Priority" : {
-         "$id" : "#Priority",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The priority object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true               
-            },
-            "ValidID" : {
-               "type" : "integer"
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      }
-   }
+   ]
 }

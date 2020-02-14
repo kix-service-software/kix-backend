@@ -1039,20 +1039,21 @@ sub _ArticleToUpdate {
     # get needed objects
     my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
     # not update if its not a note article
     return 1 if $Param{Channel} ne 'note';
 
     my $NewTo = $Param{To} || '';
     for my $UserID ( sort keys %{ $Param{UserIDs} } ) {
-        my %UserData = $UserObject->GetUserData(
+        my %ContactData = $ContactObject->ContactGet(
             UserID => $UserID,
             Valid  => 1,
         );
         if ($NewTo) {
             $NewTo .= ', ';
         }
-        $NewTo .= "$UserData{UserFirstname} $UserData{UserLastname} <$UserData{UserEmail}>";
+        $NewTo .= "$ContactData{Firstname} $ContactData{Lastname} <$ContactData{Email}>";
     }
 
     # not update if To is the same

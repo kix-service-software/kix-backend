@@ -132,17 +132,20 @@ sub SendNotification {
             my $AddressLine = '';
             # handle dynamic field by type
             if ($Recipient{DynamicFieldType} eq 'User') {
-                my %UserData = $UserObject->GetUserData(
-                    User  => $FieldRecipient,
-                    Valid => 1
+                my $ExistingUserID = $Kernel::OM->('Kernel::System::User')->UserLookup(
+                    UserLogin => $FieldRecipient,
                 );
-                next FIELDRECIPIENT if !$UserData{UserEmail};
-                $AddressLine = $UserData{UserEmail};
+                my %UserContactData = $ContactObject->ContactGet(
+                    UserID => $ExistingUserID,
+                    Valid  => 1,
+                );
+                next FIELDRECIPIENT if !$UserContactData{Email};
+                $AddressLine = $UserContactData{Email};
             } elsif ($Recipient{DynamicFieldType} eq 'Contact') {
                 my %Contact = $ContactObject->ContactGet(
                     ID => $FieldRecipient,
                 );
-                next FIELDRECIPIENT if !$Contact{UserEmail};
+                next FIELDRECIPIENT if !$Contact{Email};
                 $AddressLine = $Contact{Email};
             } else {
                 $AddressLine = $FieldRecipient;

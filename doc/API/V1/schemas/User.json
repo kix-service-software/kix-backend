@@ -24,7 +24,7 @@
          "description" : "added via include \"Preferences\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/UserPreference"
+            "$ref" : "UserPreference.json"
          }
       },
       "RoleIDs" : {
@@ -109,32 +109,5 @@
       "UserFirstname",
       "UserLastname",
       "UserLogin"
-   ],
-   "definitions" : {
-      "UserPreference" : {
-         "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The user preference object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "UserID",
-            "Value"
-         ]
-      }
-   }
+   ]
 }

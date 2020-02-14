@@ -155,6 +155,15 @@ sub Run {
                 delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
             }
         }
+
+        if ($Param{Data}->{include}->{Contact}) {
+            $Self->AddCacheDependency( Type => 'Contact' );
+            $UserData{Contact} = undef;
+            my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                    UserID => $UserID,
+            );
+            $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
+        }
                 
         # add
         push(@UserList, \%UserData);

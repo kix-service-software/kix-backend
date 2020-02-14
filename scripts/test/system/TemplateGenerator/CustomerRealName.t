@@ -98,16 +98,20 @@ $Self->True(
     "AutoResponseQueue() - success"
 );
 
+#add organisation
+my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+    Name   => $RandomID . "Company",
+    Number => $RandomID,
+);
+
 # add customer user
 my $Contact   = $RandomID;
 my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
     Source         => 'Contact',
-    UserFirstname  => $Contact,
-    UserLastname   => $Contact,
-    UserCustomerID => 'TestCompany',
-    UserLogin      => $Contact,
-    UserPassword   => $Contact,
-    UserEmail      => $Contact . '@home.com',
+    Firstname  => $Contact,
+    Lastname   => $Contact,
+    OrganisationID => $OrgID,
+    Email      => $Contact . '@home.com',
     ValidID        => 1,
     UserID         => 1,
 );

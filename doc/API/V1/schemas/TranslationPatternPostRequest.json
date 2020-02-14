@@ -10,7 +10,7 @@
             "Languages" : {
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TranslationLanguage"
+                  "$ref" : "TranslationLanguage.json"
                }
             },
             "Value" : {
@@ -24,32 +24,5 @@
    },
    "required" : [
       "TranslationPattern"
-   ],
-   "definitions" : {
-      "TranslationLanguage" : {
-         "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "PatternID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "PatternID",
-            "Language",
-            "Value"
-         ]
-      }
-   }
+   ]
 }

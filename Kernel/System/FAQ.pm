@@ -2503,7 +2503,7 @@ sub _FAQApprovalTicketCreate {
             last CATEGORY if !$Category{ParentID};
             $CategoryID = $Category{ParentID};
         }
-        my $Category = join( '::', reverse @CategoryNames );
+        my $Category = join('::', reverse @CategoryNames);
 
         # get body from config
         my $Body = $ConfigObject->Get('FAQ::ApprovalTicketBody');
@@ -2516,33 +2516,35 @@ sub _FAQApprovalTicketCreate {
         $Body =~ s{ <KIX_FAQ_AUTHOR>     }{$UserName}xms;
         $Body =~ s{ <KIX_FAQ_STATE>      }{$Param{Visibility}}xms;
 
-        #  gather user data
-        my %User = $UserObject->GetUserData(
-            UserID => $Param{UserID},
-        );
+        #  gather contact data
+        if ($Param{UserID}) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $Param{UserID},
+            );
 
-        # create from string
-        my $From = "\"$User{UserFirstname} $User{UserLastname}\" <$User{UserEmail}>";
+            # create from string
+            my $From = "\"$ContactData{Firstname} $ContactData{Lastname}\" <$ContactData{Email}>";
 
-        # create article
-        my $ArticleID = $TicketObject->ArticleCreate(
-            TicketID    => $TicketID,
-            Channel     => 'note',
-            SenderType  => 'agent',
-            From        => $From,
-            Subject     => $Subject,
-            Body        => $Body,
-            ContentType => 'text/plain; charset=utf-8',
-            UserID      => $Param{UserID},
-            HistoryType =>
-                $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryType}
-                || 'AddNote',
-            HistoryComment =>
-                $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryComment}
-                || '%%Note',
-        );
+            # create article
+            my $ArticleID = $TicketObject->ArticleCreate(
+                TicketID       => $TicketID,
+                Channel        => 'note',
+                SenderType     => 'agent',
+                From           => $From,
+                Subject        => $Subject,
+                Body           => $Body,
+                ContentType    => 'text/plain; charset=utf-8',
+                UserID         => $Param{UserID},
+                HistoryType    =>
+                    $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryType}
+                        || 'AddNote',
+                HistoryComment =>
+                    $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryComment}
+                        || '%%Note',
+            );
 
-        return $ArticleID;
+            return $ArticleID;
+        }
     }
 
     return;

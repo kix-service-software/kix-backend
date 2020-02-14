@@ -24,8 +24,15 @@ sub Configure {
     $Self->AddOption(
         Name        => 'role-name',
         Description => 'Name of the role.',
-        Required    => 1,
+        Required    => 0,
         HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'all',
+        Description => 'List all users grouped by role.',
+        Required    => 0,
+        HasValue    => 0,
         ValueRegex  => qr/.*/smx,
     );
 
@@ -37,11 +44,16 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     $Self->{RoleName} = $Self->GetOption('role-name');
+    $Self->{ListAll} =  $Self->GetOption('all');
+    #deleteme
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+        Priority => 'info',
+        Message  => '$Self' . Data::Dumper::Dumper \$Self,
+    );
 
-    # check role
-    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
-    if ( !$Self->{RoleID} ) {
-        die "Role $Self->{RoleName} does not exist.\n";
+    if (!$Self->{ListAll} && !$Self->{RoleName}) {
+        print $Self->GetUsageHelp();
+        return $Self->ExitCodeOk();
     }
 
     return;
@@ -50,22 +62,61 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing users assigned to role $Self->{RoleName}...</yellow>\n");
-
-    my @UserIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
-        RoleID  => $Self->{RoleID},
-        UserID  => 1,
-    );
-
-    foreach my $ID ( sort @UserIDs ) {
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID => $ID
-        );
-        $Self->Print("$User{UserFullname} ($User{UserLogin})\n");
+    if ($Self->{ListAll}) {
+        my %Roles = $Kernel::OM->Get('Kernel::System::Role')->RoleList();
+        for my $RoleID (keys %Roles) {
+            $Self->_ListUsers(
+                RoleID   => $RoleID,
+                RoleName => $Roles{$RoleID},
+            );
+        }
     }
+    elsif($Self->{RoleName}) {
+        # check role
+        $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+        if ( !$Self->{RoleID} ) {
+            die "Role $Self->{RoleName} does not exist.\n";
+        }
+        $Self->_ListUsers(
+            RoleID   => $Self->{RoleID},
+            RoleName => $Self->{RoleName},
+        );
+    }
+
 
     $Self->Print("<green>Done</green>\n");
     return $Self->ExitCodeOk();
+}
+
+sub _ListUsers {
+    my ($Self, %Param) = @_;
+
+    $Self->Print("<yellow>Listing users assigned to role $Param{RoleName}...</yellow>\n");
+
+    my @UserIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+        RoleID => $Param{RoleID},
+        UserID => 1,
+    );
+
+    foreach my $ID (sort @UserIDs) {
+        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            UserID => $ID
+        );
+        my %UserContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            UserID => $User{UserID}
+        );
+        my $Fullname;
+        my $FirstnameLastnameOrder = $Kernel::OM->Get('Kernel::Config')->Get('FirstnameLastnameOrder') || 2;
+        if (%UserContactData) {
+            $Fullname = $Kernel::OM->Get('Kernel::System::Contact')->_ContactFullname(
+                Firstname => $UserContactData{Firstname},
+                Lastname  => $UserContactData{Lastname},
+                UserLogin => $User{UserLogin},
+                NameOrder => $FirstnameLastnameOrder,
+            );
+        }
+        $Self->Print("" . (!$Fullname) ? $User{UserLogin} : $Fullname . "\n");
+    }
 }
 
 1;

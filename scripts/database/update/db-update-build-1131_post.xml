@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="contact_organisation">
+        <ForeignKey ForeignTable="contact">
+            <Reference Local="contact_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="organisation">
+            <Reference Local="org_id" Foreign="id"/>
+        </ForeignKey>
+    </TableAlter>
+
+    <TableAlter Name="ticket">
+        <ColumnDrop Name="organisation_id"/>
+        <ColumnDrop Name="contact_id"/>
+        <ColumnChange NameOld="contact_id_new" NameNew="contact_id"  Required="false" Type="INTEGER"/>
+        <ColumnChange NameOld="organisation_id_new" NameNew="organisation_id"  Required="false" Type="INTEGER"/>
+        <ForeignKey ForeignTable="contact">
+            <Reference Local="contact_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="organisation">
+            <Reference Local="organisation_id" Foreign="id"/>
+        </ForeignKey>
+    </TableAlter>
+
+    <TableAlter Name="contact">
+        <ForeignKey ForeignTable="users">
+            <Reference Local="user_id" Foreign="id"/>
+        </ForeignKey>
+        <UniqueDrop Name="contact_login"/>
+        <ColumnDrop Name="login"/>
+        <ColumnDrop Name="primary_org_id"/>
+        <ColumnDrop Name="org_ids"/>
+        <ColumnDrop Name="password"/>
+        <UniqueCreate Name="contact_email">
+            <UniqueColumn Name="email"/>
+        </UniqueCreate>
+    </TableAlter>
+
+    <TableAlter Name="organisation">
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </TableAlter>
+
+    <TableAlter Name="users">
+        <ColumnDrop Name="title"/>
+        <ColumnDrop Name="first_name"/>
+        <ColumnDrop Name="last_name"/>
+        <ColumnDrop Name="email"/>
+        <ColumnDrop Name="phone"/>
+        <ColumnDrop Name="mobile"/>
+    </TableAlter>
+
+</database>

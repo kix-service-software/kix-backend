@@ -49,9 +49,7 @@ my $ContactID = $ContactObject->ContactAdd(
     OrganisationIDs => [
         $OrgID
     ],
-    Login      => $Contact,
     Email      => "john.doe.$Contact\@example.com",
-    Password   => 'some_pass',
     ValidID        => 1,
     UserID         => 1,
 );

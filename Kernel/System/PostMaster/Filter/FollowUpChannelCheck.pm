@@ -78,7 +78,7 @@ sub Run {
     my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         ID => $Ticket{ContactID},
     );
-    my $CustomerEmailAddress = $CustomerData{UserEmail} || $Ticket{ContactID};
+    my $CustomerEmailAddress = $CustomerData{Email} || $Ticket{ContactID};
 
     # Email sender address
     my $SenderAddress = $Param{GetParam}->{'X-Sender'};

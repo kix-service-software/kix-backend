@@ -282,10 +282,7 @@ my %User = $UserObject->GetUserData(
 $Login = 'new' . $Login;
 $UserObject->UserUpdate(
     UserID        => $UserID,
-    UserFirstname => $User{UserFirstname},
-    UserLastname  => $User{UserLastname},
     UserLogin     => $Login,
-    UserEmail     => $User{UserEmail},
     ValidID       => 1,
     ChangeUserID  => 1,
 );

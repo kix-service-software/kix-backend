@@ -47,6 +47,7 @@ sub new {
 
     $Self->{LogObject}  = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{UserObject} = $Kernel::OM->Get('Kernel::System::User');
+    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
 
     return $Self;
 }
@@ -67,15 +68,15 @@ sub ValueLookup {
     return '' if !$Param{Value};
 
     # get User data
-    my %UserSearchList = $Self->{UserObject}->GetUserData(
+    my %ContactInfo = $Self->{ContactObject}->ContactGet(
         UserID => $Param{Value},
     );
     my $UserName = '';
-    if (%UserSearchList) {
+    if (%ContactInfo) {
         $UserName = '"'
-            . $UserSearchList{UserFirstname} . ' '
-            . $UserSearchList{UserLastname} . '" <'
-            . $UserSearchList{UserEmail} . '>';
+            . $ContactInfo{Firstname} . ' '
+            . $ContactInfo{Lastname} . '" <'
+            . $ContactInfo{Email} . '>';
     }
 
     return $UserName || '';

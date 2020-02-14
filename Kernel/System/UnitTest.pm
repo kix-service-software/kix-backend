@@ -17,7 +17,7 @@ use base qw(
     Kernel::System::UnitTest::Method
 );
 
-use Term::ANSIColor();
+use Term::ANSIColor ();
 use SOAP::Lite;
 use FileHandle;
 use Time::HiRes qw(time);
@@ -26,6 +26,8 @@ use Kernel::System::ObjectManager;
 
 # UnitTest helper must be loaded to override the builtin time functions!
 use Kernel::System::UnitTest::Helper;
+
+use Kernel::System::UnitTest::AllureAdapter;
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -63,19 +65,22 @@ create unit test object. Do not use it directly, instead use:
 =cut
 
 sub new {
-    my ( $Type, %Param ) = @_;
+    my ($Type, %Param) = @_;
 
     # allocate new hash for object
     my $Self = {};
-    bless( $Self, $Type );
+    bless($Self, $Type);
 
     $Self->{Debug} = $Param{Debug} || 0;
 
     $Self->{Output} = $Param{Output} || 'ASCII';
 
     $Self->{ANSI} = $Param{ANSI};
+    if ($Self->{Output} eq 'ALLURE') {
+        $Self->{Adapter} = $Kernel::OM->Get('Kernel::System::UnitTest::AllureAdapter')->new();
+    }
 
-    if ( $Self->{Output} eq 'HTML' ) {
+    if ($Self->{Output} eq 'HTML') {
         print "
 <html>
 <head>
@@ -107,7 +112,7 @@ sub new {
         $Self->{Content} = "<table width='100%'>\n";
     }
 
-    $Self->{XML}     = undef;
+    $Self->{XML} = undef;
     $Self->{XMLUnit} = '';
 
     $Self->{OriginalSTDOUT} = *STDOUT;
@@ -135,24 +140,25 @@ Run all tests located in scripts/test/*.t and print result to stdout.
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;
-
+    my ($Self, %Param) = @_;
     # set environment
     $ENV{UnitTest} = 1;
-    
+
+    $Self->{Adapter}->IgnoreSkipped() if ($Param{AllureIgnoreSkipped});
+
     my %ResultSummary;
     my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
 
     my $Directory = "$Home/scripts/test";
 
     # custom subdirectory passed
-    if ( $Param{Directory} ) {
+    if ($Param{Directory}) {
         $Directory .= "/$Param{Directory}";
         $Directory =~ s/\.//g;
     }
 
     $Self->{Verbose} = $Param{Verbose};
-    $Self->{Pretty}  = $Param{Pretty};
+    $Self->{Pretty} = $Param{Pretty};
 
     my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
         Directory => $Directory,
@@ -161,46 +167,57 @@ sub Run {
     );
 
     my $StartTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
-    my $Product   = $Param{Product}
+    $Self->{Adapter}->SetContainerStartTime($Self->{runningContainerId}, int(time() * 1000)) if ($Self->{Output} eq 'ALLURE');
+    my $Product = $Param{Product}
         || $Kernel::OM->Get('Kernel::Config')->Get('Product') . " "
         . $Kernel::OM->Get('Kernel::Config')->Get('Version');
 
-    $Self->{Product} = $Product;    # we need this in the Selenium object
+    $Self->{Product} = $Product; # we need this in the Selenium object
 
-    my @Names = split( /:/, $Param{Name} || '' );
+    my @Names = split(/:/, $Param{Name} || '');
 
     my $FileCount = 0;
     my $FileTotal = scalar(@Files);
 
-    $Self->{TestCountOk}    = 0;
+    $Self->{TestCountOk} = 0;
     $Self->{TestCountNotOk} = 0;
     FILE:
     for my $File (sort @Files) {
-
+        if ($Self->{Output} eq 'ALLURE') {
+            $Self->{runningTestId} = '';
+            $Self->{runningContainerId} = $Self->{Adapter}->NewContainer($File =~ /(?:.+\/test\/)(.+)/);
+        }
         # check if only some tests are requested
         if (@Names) {
             my $Use = 0;
             for my $Name (@Names) {
-                if ( $Name && $File =~ /\/\Q$Name\E\.t$/ ) {
+                if ($Name && $File =~ /\/\Q$Name\E\.t$/) {
                     $Use = 1;
                 }
             }
-            if ( !$Use ) {
+            if (!$Use) {
+                $Self->_Print(-1, 'Tests skipped by user request');
                 next FILE;
             }
         }
 
         # check if we have to exclude something
-        next FILE if ($Param{Exclude} && $File =~ /$Param{Exclude}/);
+        if ($Param{Exclude} && $File =~ /$Param{Exclude}/) {
+            $Self->_Print(-1, 'Tests skipped by user request');
+            next FILE;
+        }
 
         $Self->{TestCount} = 0;
-        my $UnitTestFile = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $File );
-        if ( !$UnitTestFile ) {
-            $Self->True( 0, "ERROR: $!: $File" );
+        my $UnitTestFile = $Kernel::OM->Get('Kernel::System::Main')->FileRead(Location => $File);
+
+        if (!$UnitTestFile) {
             print STDERR "ERROR: $!: $File\n";
+            $Self->_Print(0, "ERROR: $!: $File") if ($Self->{Output} ne 'ALLURE');
+            $Self->{OutputBuffer} = "$File is no Unit Test File! \n \$EVAL_ERROR:\n$@\n---\n\$EXTENDED_OS_ERROR\n$^E\n---\n\$CHILD_ERROR\n$?\n";
+            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'ALLURE');
         }
         else {
-            $Self->_PrintHeadlineStart($File, ++$FileCount, $FileTotal);
+            $Self->_PrintHeadlineStart($File, ++$FileCount, $FileTotal) if ($Self->{Output} ne 'ALLURE');
 
             # create a new scope to be sure to destroy local object of the test files
             {
@@ -218,61 +235,57 @@ sub Run {
                     Dependencies => [],
                 );
 
-                push @{ $Self->{NotOkInfo} }, [$File];
+                push @{$Self->{NotOkInfo}}, [ $File ];
 
-                $Self->{OutputBuffer} = '';
-                local *STDOUT = *STDOUT;
-                local *STDERR = *STDERR;
-                if ( !$Param{Verbose} ) {
-                    undef *STDOUT;
-                    undef *STDERR;
-                    open STDOUT, '>:utf8', \$Self->{OutputBuffer};    ## no critic
-                    open STDERR, '>:utf8', \$Self->{OutputBuffer};    ## no critic
-                }
+                $Self->_ResetSelfOutputBuffer;
 
                 # HERE the actual tests are run!!!
-                if ( !eval ${$UnitTestFile} ) {                       ## no critic
+                $Self->{StartTime} = int(time() * 1000);
+                if (!eval ${$UnitTestFile}) {
+                    $Self->{OutputBuffer} = "\$EVAL_ERROR:\n$@\n---\n\$EXTENDED_OS_ERROR\n$^E\n---\n\$CHILD_ERROR\n$?\n";
                     if ($@) {
-                        $Self->True( 0, "ERROR: Error in $File: $@" );
-
-                        #print STDERR "ERROR: Error in $File: $@\n";
+                        $Self->_Print(0, "ERROR: Error in $File: $@") if ($Self->{Output} ne 'ALLURE');
+                        $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'ALLURE');
                     }
                     else {
-                        $Self->True( 0, "ERROR: $File did not return a true value." );
-
-                        #print STDERR "ERROR: $File did not return a true value.\n";
+                        $Self->_Print(0, "ERROR: $File did not return a true value.") if ($Self->{Output} ne 'ALLURE');
+                        $Self->{OutputBuffer} = 'Did not return a true value.\n ' . $Self->{OutputBuffer} if ($Self->{Output} eq 'ALLURE');
+                        $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'ALLURE');
                     }
                 }
             }
-
-            $Self->_PrintHeadlineEnd($File);
+            if ($Self->{Output} ne 'ALLURE') {
+                $Self->_PrintHeadlineEnd($File);
+            }
+            else {
+                $Self->{Adapter}->SetContainerStopTime($Self->{runningContainerId}, int(time() * 1000));
+            }
         }
     }
-
     my $Time = $Kernel::OM->Get('Kernel::System::Time')->SystemTime() - $StartTime;
     $ResultSummary{TimeTaken} = $Time;
-    $ResultSummary{Time}      = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+    $ResultSummary{Time} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
         SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
     );
     my %OSInfo = $Kernel::OM->Get('Kernel::System::Environment')->OSInfoGet();
-    $ResultSummary{Product}   = $Product;
-    $ResultSummary{Host}      = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
-    $ResultSummary{Perl}      = sprintf "%vd", $^V;
-    $ResultSummary{OS}        = $OSInfo{OS};
-    $ResultSummary{Vendor}    = $OSInfo{OSName};
-    $ResultSummary{Database}  = lc $Kernel::OM->Get('Kernel::System::DB')->Version();
-    $ResultSummary{TestOk}    = $Self->{TestCountOk};
+    $ResultSummary{Product} = $Product;
+    $ResultSummary{Host} = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    $ResultSummary{Perl} = sprintf "%vd", $^V;
+    $ResultSummary{OS} = $OSInfo{OS};
+    $ResultSummary{Vendor} = $OSInfo{OSName};
+    $ResultSummary{Database} = lc $Kernel::OM->Get('Kernel::System::DB')->Version();
+    $ResultSummary{TestOk} = $Self->{TestCountOk};
     $ResultSummary{TestNotOk} = $Self->{TestCountNotOk};
 
     $Self->_PrintSummary(%ResultSummary);
-    if ( $Self->{Content} ) {
+    if ($Self->{Content}) {
         print $Self->{Content};
     }
 
     my $XML = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
     $XML .= "<kix_test>\n";
     $XML .= "<Summary>\n";
-    for my $Key ( sort keys %ResultSummary ) {
+    for my $Key (sort keys %ResultSummary) {
         $ResultSummary{$Key} =~ s/&/&amp;/g;
         $ResultSummary{$Key} =~ s/</&lt;/g;
         $ResultSummary{$Key} =~ s/>/&gt;/g;
@@ -280,22 +293,22 @@ sub Run {
         $XML .= "  <Item Name=\"$Key\">$ResultSummary{$Key}</Item>\n";
     }
     $XML .= "</Summary>\n";
-    for my $Key ( sort keys %{ $Self->{XML}->{Test} } ) {
+    for my $Key (sort keys %{$Self->{XML}->{Test}}) {
 
         # extract duration time
-        my $Duration = $Self->{Duration}->{$Key};
+        my $Duration = $Self->{Duration}->{$Key} || 0;
 
         $XML .= "<Unit Name=\"$Key\" Duration=\"$Duration\">\n";
 
-        for my $TestCount ( sort { $a <=> $b } keys %{ $Self->{XML}->{Test}->{$Key}->{Tests} } ) {
-            my $Result  = $Self->{XML}->{Test}->{$Key}->{Tests}->{$TestCount}->{Result};
+        for my $TestCount (sort {$a <=> $b} keys %{$Self->{XML}->{Test}->{$Key}->{Tests}}) {
+            my $Result = $Self->{XML}->{Test}->{$Key}->{Tests}->{$TestCount}->{Result};
             my $Content = $Self->{XML}->{Test}->{$Key}->{Tests}->{$TestCount}->{Name};
             $Content =~ s/&/&amp;/g;
             $Content =~ s/</&lt;/g;
             $Content =~ s/>/&gt;/g;
 
             # Replace characters that are invalid in XML (https://www.w3.org/TR/REC-xml/#charsets)
-            $Content =~ s/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/"\x{FFFD}"/eg;
+            $Content =~ s/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/"\x{FFFD}" /eg;
             $XML .= qq|  <Test Result="$Result" Count="$TestCount">$Content</Test>\n|;
         }
 
@@ -303,12 +316,12 @@ sub Run {
     }
     $XML .= "</kix_test>\n";
 
-    if ( $Self->{Output} eq 'XML' ) {
+    if ($Self->{Output} eq 'XML') {
         print $XML;
     }
 
-    if ( $Param{SubmitURL} ) {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$XML );
+    if ($Param{SubmitURL}) {
+        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput(\$XML);
 
         # my $RPC = SOAP::Lite->new(
         #     proxy => $Param{SubmitURL},
@@ -328,12 +341,16 @@ sub Run {
         #     return 1;
         # }
     }
-
+    if ($Self->{Output} eq 'ALLURE') {
+        $Self->{Adapter}->SetExecutorInfo();
+        $Self->{Adapter}->AddEnvironmentInfoFromSystem();
+        $Self->{Adapter}->CreateResults('/tmp/unit-test/allure-results');
+    }
     return $ResultSummary{TestNotOk} ? 0 : 1;
 }
 
 sub _PrintHeadlineStart {
-    my ( $Self, $Name, $FileCount, $FileTotal ) = @_;
+    my ($Self, $Name, $FileCount, $FileTotal) = @_;
 
     # set default name
     $Name ||= '->>No Name!<<-';
@@ -341,11 +358,11 @@ sub _PrintHeadlineStart {
     my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
     $Name =~ s/^$Home\/scripts\/test\///;
 
-    if ( $Self->{Output} eq 'HTML' ) {
+    if ($Self->{Output} eq 'HTML') {
         $Self->{Content} .= "<tr><td nowrap style='width:60px;text-align:right'>$FileCount/$FileTotal</td>";
         $Self->{Content} .= "<td nowrap style='width:500px'>$Name</td><td>";
     }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
+    elsif ($Self->{Output} eq 'ASCII') {
         printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
     }
 
@@ -359,7 +376,7 @@ sub _PrintHeadlineStart {
 }
 
 sub _PrintHeadlineEnd {
-    my ( $Self, $Name ) = @_;
+    my ($Self, $Name) = @_;
 
     # set default name
     $Name ||= '->>No Name!<<-';
@@ -369,7 +386,7 @@ sub _PrintHeadlineEnd {
 
     # calculate duration time
     my $Duration = '';
-    if ( $Self->{DurationStartTime}->{$Name} ) {
+    if ($Self->{DurationStartTime}->{$Name}) {
 
         $Duration = time() - $Self->{DurationStartTime}->{$Name};
 
@@ -377,13 +394,13 @@ sub _PrintHeadlineEnd {
     }
     $Self->{Duration}->{$Name} = $Duration;
 
-    if ( $Self->{Output} eq 'HTML' ) {
-        if ( $Self->{CurrentColor} ) {
+    if ($Self->{Output} eq 'HTML') {
+        if ($Self->{CurrentColor}) {
             $Self->{Content} .= "</span>";
         }
         my $Color = 'green';
         my $Result = 'OK';
-        if ( $Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED' ) {
+        if ($Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED') {
             $Color = 'red';
             $Result = 'FAILED';
         }
@@ -391,19 +408,19 @@ sub _PrintHeadlineEnd {
         $Self->{Content} .= "<td style='width:50px;color:$Color'>$Result</td>\n";
         $Self->{Content} .= "</tr>\n";
     }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
-        if ( $Self->{Pretty} || $Self->{Verbose} ) {
-            print { $Self->{OriginalSTDOUT} } "\n";
+    elsif ($Self->{Output} eq 'ASCII') {
+        if ($Self->{Pretty} || $Self->{Verbose}) {
+            print {$Self->{OriginalSTDOUT}} "\n";
         }
-        if ( !$Self->{Verbose} ) {
-            if ( $Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED' ) {
-                print { $Self->{OriginalSTDOUT} } $Self->_Color('red', 'FAILED');
+        if (!$Self->{Verbose}) {
+            if ($Self->{XML}->{Test}->{ $Name }->{Result} && $Self->{XML}->{Test}->{ $Name }->{Result} eq 'FAILED') {
+                print {$Self->{OriginalSTDOUT}} $Self->_Color('red', 'FAILED');
             }
-            else  {
-                print { $Self->{OriginalSTDOUT} } $Self->_Color('green', 'OK');
+            else {
+                print {$Self->{OriginalSTDOUT}} $Self->_Color('green', 'OK');
             }
 
-            printf { $Self->{OriginalSTDOUT} } " (%i tests in %i ms)\n", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
+            printf {$Self->{OriginalSTDOUT}} " (%i tests in %i ms)\n", scalar(keys %{$Self->{XML}->{Test}->{ $Name }->{ Tests }}), $Duration * 1000;
         }
     }
 
@@ -411,13 +428,13 @@ sub _PrintHeadlineEnd {
 }
 
 sub _PrintSummary {
-    my ( $Self, %ResultSummary ) = @_;
+    my ($Self, %ResultSummary) = @_;
 
     # show result
-    if ( $Self->{Output} eq 'HTML' ) {
+    if ($Self->{Output} eq 'HTML') {
         print "</table>\n";
         print "<table width='600' border='0'>\n";
-        if ( $ResultSummary{TestNotOk} ) {
+        if ($ResultSummary{TestNotOk}) {
             print "<tr><td bgcolor='red' colspan='2'>Summary</td></tr>\n";
         }
         else {
@@ -435,7 +452,7 @@ sub _PrintSummary {
         print "<tr><td>Test FAILED:</td><td>$ResultSummary{TestNotOk}</td></tr>\n";
         print "</table><br>\n";
     }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
+    elsif ($Self->{Output} eq 'ASCII') {
         print "=====================================================================\n";
         print " Product:     $ResultSummary{Product}\n";
         print " Test Time:   $ResultSummary{TimeTaken} s\n";
@@ -448,11 +465,11 @@ sub _PrintSummary {
         print " Test OK:     $ResultSummary{TestOk}\n";
         print " Test FAILED: $ResultSummary{TestNotOk}\n";
 
-        if ( $ResultSummary{TestNotOk} ) {
+        if ($ResultSummary{TestNotOk}) {
             print " Failed Tests:\n";
             FAILEDFILE:
-            for my $FailedFile ( @{ $Self->{NotOkInfo} || [] } ) {
-                my ( $File, @Tests ) = @{ $FailedFile || [] };
+            for my $FailedFile (@{$Self->{NotOkInfo} || []}) {
+                my ($File, @Tests) = @{$FailedFile || []};
                 next FAILEDFILE if !@Tests;
                 print sprintf "  %s #%s\n", $File, join ", ", @Tests;
             }
@@ -464,87 +481,131 @@ sub _PrintSummary {
 }
 
 sub _Print {
-    my ( $Self, $Test, $Name ) = @_;
+    my ($Self, $Test, $Name) = @_;
+
+    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     $Name ||= '->>No Name!<<-';
 
-    my $PrintName = $Name;
-    if ( length $PrintName > 1000 ) {
-        $PrintName = substr( $PrintName, 0, 1000 ) . "...";
-    }
     my $TestStep = $Name;
     $TestStep =~ s/^(.*?)\s\(.+?\)$/$1/s;
 
-    if ( $Self->{Output} eq 'ASCII' && $Self->{Verbose} ) {
-        print { $Self->{OriginalSTDOUT} } $Self->{OutputBuffer};
-    }
-    $Self->{OutputBuffer} = '';
+    if ($Self->{Output} eq 'ALLURE') {
 
-    $Self->{TestCount}++;
-    if ( $Self->{Pretty} && ( $Self->{TestCount} == 1 || $Self->{TestCount} % 160 == 1 ) && !$Self->{Verbose} ) {
-        print { $Self->{OriginalSTDOUT} } "\n";
-    }
-    if ($Test) {
-        $Self->{TestCountOk}++;
-        if ( $Self->{Output} eq 'HTML' ) {
-            if ( $Self->{Verbose} ) {
-                $Self->{Content} .= "<span style='color:green'>OK</span> $Self->{TestCount} - $PrintName<br/>";
-            }
-            else {
-                $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $TestStep'>&#x25FC</span>";
+        $Self->{runningTestId} = $Self->{Adapter}->NewTest($Name, '', $Self->{runningContainerId});
+        $Self->{Adapter}->SetTestSubSuite($Self->{runningTestId}, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
+        $Self->{Adapter}->SetTestStartTime($Self->{runningTestId}, $Self->{StartTime});
+        $Self->{Adapter}->SetTestStopTime($Self->{runningTestId}, int(time() * 1000));
+        $Self->{Adapter}->SetTestSuite($Self->{runningTestId}, 'KIX18 Backend Unit Tests');
+        $Self->{Adapter}->SetTestPackage($Self->{runningTestId}, 'KIX18 Backend Unit Tests');
+        #PASSED tests
+        if ($Test == 1) {
+            $Self->{Adapter}->SetTestPassed($Self->{runningTestId});
+
+        }
+
+        #FAILED tests
+        if ($Test == 0) {
+            $Self->{Adapter}->SetTestFailed($Self->{runningTestId});
+            if ($Self->{OutputBuffer}) {
+                $Self->{Adapter}->SetTestTrace($Self->{runningTestId}, $Self->{OutputBuffer});
+                $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, "Error in File: $Name");
             }
         }
-        elsif ( $Self->{Output} eq 'ASCII' ) {
-            if ( $Self->{Verbose} ) {
-                print { $Self->{OriginalSTDOUT} } " " . $Self->_Color( 'green', "\n OK" ) . " $Self->{TestCount} - $PrintName\n";
-            }
-            else {
-                print { $Self->{OriginalSTDOUT} } $Self->_Color( 'green', "." );
-            }
+
+        #SKIPPED tests
+        if ($Test == -1) {
+            $Self->{Adapter}->SetTestSkipped($Self->{runningTestId});
+            $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, 'Test was skipped by user request.');
         }
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Result} = 'OK';
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Name}   = $Name;
+
+        #BROKEN tests
+        if ($Test == -2) {
+            $Self->{Adapter}->SetTestBroken($Self->{runningTestId});
+            $Self->{Adapter}->SetTestTrace($Self->{runningTestId}, $Self->{OutputBuffer});
+            $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, "Error in File: $Name \n");
+        }
+        $Self->_ResetSelfOutputBuffer;
+        $Self->{StartTime} = int(time() * 1000);
         return 1;
     }
     else {
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{Result} = 'FAILED';
-
-        $Self->{TestCountNotOk}++;
-        if ( $Self->{Output} eq 'HTML' ) {
-            if ( $Self->{Verbose} ) {
-                $Self->{Content} .= "<span style='color:red'>FAILED</span> $Self->{TestCount} - $PrintName<br/>";
-            }
-            else {
-                $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $TestStep'>&#x25FC</span>";
-            }
+        my $PrintName = $Name;
+        if (length $PrintName > 1000) {
+            $PrintName = substr($PrintName, 0, 1000) . "...";
         }
-        elsif ( $Self->{Output} eq 'ASCII' ) {
-            if ( $Self->{Verbose} ) {
-                print { $Self->{OriginalSTDOUT} } "\n";
-                print { $Self->{OriginalSTDOUT} } " "
-                    . $Self->_Color( 'red', "FAILED" )
-                    . " $Self->{TestCount} - $PrintName\n";
 
-                my $TestFailureDetails = $Name;
-                $TestFailureDetails =~ s{\(.+\)$}{};
-                if ( length $TestFailureDetails > 200 ) {
-                    $TestFailureDetails = substr( $TestFailureDetails, 0, 200 ) . "...";
+        if ($Self->{Output} eq 'ASCII' && $Self->{Verbose}) {
+            print {$Self->{OriginalSTDOUT}} $Self->{OutputBuffer};
+        }
+
+        $Self->{TestCount}++;
+        if ($Self->{Pretty} && ($Self->{TestCount} == 1 || $Self->{TestCount} % 160 == 1) && !$Self->{Verbose}) {
+            print {$Self->{OriginalSTDOUT}} "\n";
+        }
+        if ($Test) {
+
+            $Self->{TestCountOk}++;
+
+            if ($Self->{Output} eq 'HTML') {
+                if ($Self->{Verbose}) {
+                    $Self->{Content} .= "<span style='color:green'>OK</span> $Self->{TestCount} - $PrintName<br/>";
                 }
-
-                # Store information about failed tests, but only if we are running in a toplevel unit test object
-                #   that is actually processing filed, and not in an embedded object that just runs individual tests.
-                if ( ref $Self->{NotOkInfo} eq 'ARRAY' ) {
-                    push @{ $Self->{NotOkInfo}->[-1] }, sprintf "%s - %s", $Self->{TestCount},
-                        $TestFailureDetails;
+                else {
+                    $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $TestStep'>&#x25FC</span>";
                 }
             }
-            else {
-                print { $Self->{OriginalSTDOUT} } $Self->_Color( 'red', "x" );
+            elsif ($Self->{Output} eq 'ASCII') {
+                if ($Self->{Verbose}) {
+                    print {$Self->{OriginalSTDOUT}} " " . $Self->_Color('green', "\n OK") . " $Self->{TestCount} - $PrintName\n";
+                }
+                else {
+                    print {$Self->{OriginalSTDOUT}} $Self->_Color('green', ".");
+                }
             }
+            $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Result} = 'OK';
+            $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Name} = $Name;
+            return 1;
         }
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Result} = 'FAILED';
-        $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Name}   = $Name;
+        else {
+            $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{Result} = 'FAILED';
 
+            $Self->{TestCountNotOk}++;
+            if ($Self->{Output} eq 'HTML') {
+                if ($Self->{Verbose}) {
+                    $Self->{Content} .= "<span style='color:red'>FAILED</span> $Self->{TestCount} - $PrintName<br/>";
+                }
+                else {
+                    $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $TestStep'>&#x25FC</span>";
+                }
+            }
+            elsif ($Self->{Output} eq 'ASCII') {
+                if ($Self->{Verbose}) {
+                    print {$Self->{OriginalSTDOUT}} "\n";
+                    print {$Self->{OriginalSTDOUT}} " "
+                        . $Self->_Color('red', "FAILED")
+                        . " $Self->{TestCount} - $PrintName\n";
+
+                    my $TestFailureDetails = $Name;
+                    $TestFailureDetails =~ s{\(.+\)$}{};
+                    if (length $TestFailureDetails > 200) {
+                        $TestFailureDetails = substr($TestFailureDetails, 0, 200) . "...";
+                    }
+
+                    # Store information about failed tests, but only if we are running in a toplevel unit test object
+                    #   that is actually processing filed, and not in an embedded object that just runs individual tests.
+                    if (ref $Self->{NotOkInfo} eq 'ARRAY') {
+                        push @{$Self->{NotOkInfo}->[-1]}, sprintf "%s - %s", $Self->{TestCount},
+                            $TestFailureDetails;
+                    }
+                }
+                else {
+                    print {$Self->{OriginalSTDOUT}} $Self->_Color('red', "x");
+                }
+            }
+            $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Result} = 'FAILED';
+            $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{ Tests }->{ $Self->{TestCount} }->{Name} = $Name;
+        }
         return;
     }
 }
@@ -559,18 +620,18 @@ ANSI output is available and active, otherwise the text stays unchanged.
 =cut
 
 sub _Color {
-    my ( $Self, $Color, $Text ) = @_;
+    my ($Self, $Color, $Text) = @_;
 
-    if ( $Self->{Output} eq 'HTML' ) {
-        if ( !$Self->{CurrentColor} ) {
+    if ($Self->{Output} eq 'HTML') {
+        if (!$Self->{CurrentColor}) {
             $Text = "<span style='color:$Color'>$Text";
         }
-        elsif ( $Self->{CurrentColor} ne $Color ) {
+        elsif ($Self->{CurrentColor} ne $Color) {
             $Text = "</span><span style='color:$Color'>$Text";
         }
         $Self->{CurrentColor} = $Color;
     }
-    elsif ( $Self->{Output} eq 'ASCII' ) {
+    elsif ($Self->{Output} eq 'ASCII') {
         return $Text if !$Self->{ANSI};
         return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
     }
@@ -578,10 +639,25 @@ sub _Color {
     return $Text;
 }
 
+sub _ResetSelfOutputBuffer {
+    my ($Self, %Param) = @_;
+
+    $Self->{OutputBuffer} = '';
+    local *STDOUT = *STDOUT;
+    local *STDERR = *STDERR;
+    if (!$Param{Verbose}) {
+        undef * STDOUT;
+        undef * STDERR;
+        open STDOUT, '>:utf8', \$Self->{OutputBuffer}; ## no critic
+        open STDERR, '>:utf8', \$Self->{OutputBuffer}; ## no critic
+    }
+    return;
+}
+
 sub DESTROY {
     my $Self = shift;
 
-    if ( $Self->{Output} eq 'HTML' ) {
+    if ($Self->{Output} eq 'HTML') {
         print "</table>\n";
         print "</body>\n";
         print "</html>\n";

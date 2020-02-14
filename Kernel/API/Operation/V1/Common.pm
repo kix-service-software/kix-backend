@@ -481,7 +481,7 @@ prepare data, check given parameters and parse them according to type
             ...
         },
         Parameters => {
-            <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserFirstname"
+            <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserLogin"
                 Type                => 'ARRAY' | 'ARRAYtoHASH',         # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values
                 DataType            => 'NUMERIC',                       # optional, use this to force numeric datatype in JSON response
                 Required            => 1,                               # optional

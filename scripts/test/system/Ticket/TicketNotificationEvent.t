@@ -57,6 +57,10 @@ my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
 
 my $UserID = $UserData{UserID};
 
+my %UserContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    UserID => $UserID,
+);
+
 # create new customer user for current test
 my $ContactID = $Helper->TestContactCreate();
 
@@ -103,7 +107,7 @@ my $ArticleID = $TicketObject->ArticleCreate(
     CustomerVisible => 1,
     SenderType     => 'external',
     From           => $ContactData{Email},
-    To             => $UserData{UserEmail},
+    To             => $UserContactData{Email},
     Subject        => 'some short description',
     Body           => 'the message text',
     Charset        => 'utf8',
@@ -135,7 +139,7 @@ my $NotificationID = $NotificationEventObject->NotificationAdd(
             Subject => 'Test external note',
 
             # include non-breaking space (bug#10970)
-            Body => 'Ticket:&nbsp;<KIX_TICKET_TicketID>&nbsp;<KIX_OWNER_UserFirstname>',
+            Body => 'Ticket:&nbsp;<KIX_TICKET_TicketID>&nbsp;<KIX_OWNER_Firstname>',
 
             ContentType => 'text/html',
         },

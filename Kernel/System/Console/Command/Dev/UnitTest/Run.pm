@@ -47,10 +47,10 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'output',
-        Description => "Select output format (ASCII|HTML|XML).",
+        Description => "Select output format (ASCII|HTML|XML|ALLURE).",
         Required    => 0,
         HasValue    => 1,
-        ValueRegex  => qr/^(ASCII|HTML|XML)$/smx,
+        ValueRegex  => qr/^(ASCII|HTML|XML|ALLURE)$/smx,
     );
     $Self->AddOption(
         Name        => 'submit-url',
@@ -85,6 +85,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'allure-ignore-skipped',
+        Description => "Hides skipped tests in report if output ALLURE is chosen.",
+        Required    => 0,
+        HasValue    => 0,
+    );
 }
 
 sub PreRun {
@@ -115,6 +121,7 @@ sub Run {
         SubmitResultAsExitCode => $Self->GetOption('submit-result-as-exit-code') || '',
         Verbose                => $Self->GetOption('verbose')                    || '',
         Pretty                 => $Self->GetOption('pretty')                     || '',
+        AllureIgnoreSkipped    => $Self->GetOption('allure-ignore-skipped')      || '',
     );
 
     if ($FunctionResult) {

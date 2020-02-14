@@ -616,10 +616,10 @@ for my $Test (@Tests) {
             my $ExpectedValue = $Test->{Config}->{Config}->{$Attribute};
 
             if ( $Attribute eq 'From' && !defined $Test->{Config}->{Config}->{$Attribute} ) {
-                my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+                my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
                     UserID => $UserID,
                 );
-                $ExpectedValue = "$User{UserFullName} <$User{UserEmail}>";
+                $ExpectedValue = "$UserContact{FullName} <$UserContact{Email}>";
             }
 
             if (

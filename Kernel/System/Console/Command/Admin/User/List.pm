@@ -41,8 +41,13 @@ sub Run {
         3 => 'no(temp)',
     );
 
-    $Self->Print("    ID Login                          Firstname            Lastname             Email                                              Valid\n");
-    $Self->Print("------ ------------------------------ -------------------- -------------------- -------------------------------------------------- --------\n");
+    my %BoolStr = (
+        0 => 'no',
+        1 => 'yes',
+    );
+
+    $Self->Print("    ID Login                          Agent    Customer Valid\n");
+    $Self->Print("------ ------------------------------ -------- -------- --------\n");
 
     foreach my $ID ( sort { $Users{$a} cmp $Users{$b} } keys %Users ) {
         my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
@@ -50,8 +55,10 @@ sub Run {
         );
 
         my $Valid = $ValidStr{$User{ValidID}};
+        my $IsAgent = $BoolStr{ $User{IsAgent} };
+        my $IsCustomer = $BoolStr{ $User{IsCustomer} };
 
-        $Self->Print(sprintf("%6i %-30s %-20s %-20s %-50s %-8s\n", $User{UserID}, $User{UserLogin}, $User{UserFirstname}, $User{UserLastname}, $User{UserEmail}, $Valid));
+        $Self->Print(sprintf("%6i %-30s %-8s %-8s %-8s\n", $User{UserID}, $User{UserLogin}, $IsAgent, $IsCustomer, $Valid));
     }
 
     $Self->Print("<green>Done</green>\n");

@@ -44,33 +44,19 @@ $ConfigItemObject->ConfigItemCount();
 my @UserIDs;
 {
 
-    # disable email checks to create new user
-    my $CheckEmailAddressesOrg = $ConfigObject->Get('CheckEmailAddresses') || 1;
-    $ConfigObject->Set(
-        Key   => 'CheckEmailAddresses',
-        Value => 0,
-    );
-
     for my $Counter ( 1 .. 3 ) {
 
         # create new users for the tests
         my $UserID = $UserObject->UserAdd(
-            UserFirstname => 'ITSMConfigItem' . $Counter,
-            UserLastname  => 'UnitTest',
-            UserLogin     => 'UnitTest-ITSMConfigItem-' . $Counter . $RandomID,
-            UserEmail     => 'UnitTest-ITSMConfigItem-' . $Counter . '@localhost',
-            ValidID       => 1,
-            ChangeUserID  => 1,
+            UserLogin    => 'UnitTest-ITSMConfigItem-' . $Counter . $RandomID,
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsAgent      => 1,
         );
 
         push @UserIDs, $UserID;
     }
 
-    # restore original email check param
-    $ConfigObject->Set(
-        Key   => 'CheckEmailAddresses',
-        Value => $CheckEmailAddressesOrg,
-    );
 }
 
 my $GeneralCatalogClass = 'UnitTest' . $RandomID;

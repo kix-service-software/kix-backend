@@ -124,33 +124,34 @@ sub Sender {
     if ( $UseAgentRealName && $UseAgentRealName =~ /^(AgentName|AgentNameSystemAddressName)$/ ) {
 
         # get data from current agent
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID        => $Param{UserID},
-            NoOutOfOffice => 1,
-        );
+        if ($Param{UserID}) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $Param{UserID},
+            );
 
-        # set real name with user name
-        if ( $UseAgentRealName eq 'AgentName' ) {
+            # set real name with user name
+            if ($UseAgentRealName eq 'AgentName') {
 
-            # check for user data
-            if ( $UserData{UserLastname} && $UserData{UserFirstname} ) {
+                # check for user data
+                if ($ContactData{Lastname} && $ContactData{Firstname}) {
 
-                # rewrite RealName
-                $Address{RealName} = "$UserData{UserFirstname} $UserData{UserLastname}";
+                    # rewrite RealName
+                    $Address{RealName} = "$ContactData{Firstname} $ContactData{Lastname}";
+                }
             }
-        }
 
-        # set real name with user name
-        if ( $UseAgentRealName eq 'AgentNameSystemAddressName' ) {
+            # set real name with user name
+            if ($UseAgentRealName eq 'AgentNameSystemAddressName') {
 
-            # check for user data
-            if ( $UserData{UserLastname} && $UserData{UserFirstname} ) {
+                # check for user data
+                if ($ContactData{Lastname} && $ContactData{Firstname}) {
 
-                # rewrite RealName
-                my $Separator = ' ' . $ConfigObject->Get('Ticket::DefineEmailFromSeparator')
-                    || '';
-                $Address{RealName} = $UserData{UserFirstname} . ' ' . $UserData{UserLastname}
-                    . $Separator . ' ' . $Address{RealName};
+                    # rewrite RealName
+                    my $Separator = ' ' . $ConfigObject->Get('Ticket::DefineEmailFromSeparator')
+                        || '';
+                    $Address{RealName} = $ContactData{Firstname} . ' ' . $ContactData{Lastname}
+                        . $Separator . ' ' . $Address{RealName};
+                }
             }
         }
     }
@@ -1067,28 +1068,27 @@ sub _Replace {
 
         # EO KIX4OTRS-capeIT
 
-        my %CurrentUser = $UserObject->GetUserData(
+        my %CurrentContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID        => $Param{UserID},
-            NoOutOfOffice => 1,
         );
 
         # html quoting of content
         if ( $Param{RichText} ) {
 
             ATTRIBUTE:
-            for my $Attribute ( sort keys %CurrentUser ) {
-                next ATTRIBUTE if !$CurrentUser{$Attribute};
-                $CurrentUser{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
-                    String => $CurrentUser{$Attribute},
+            for my $Attribute ( sort keys %CurrentContact ) {
+                next ATTRIBUTE if !$CurrentContact{$Attribute};
+                $CurrentContact{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                    String => $CurrentContact{$Attribute},
                 );
             }
         }
 
-        $HashGlobalReplace->( "$Tag|$Tag2", %CurrentUser );
+        $HashGlobalReplace->( "$Tag|$Tag2", %CurrentContact );
 
         # replace other needed stuff
-        $Param{Text} =~ s/$Start KIX_FIRST_NAME $End/$CurrentUser{UserFirstname}/gxms;
-        $Param{Text} =~ s/$Start KIX_LAST_NAME $End/$CurrentUser{UserLastname}/gxms;
+        $Param{Text} =~ s/$Start KIX_FIRST_NAME $End/$CurrentContact{Firstname}/gxms;
+        $Param{Text} =~ s/$Start KIX_LAST_NAME $End/$CurrentContact{Lastname}/gxms;
 
         # cleanup
         $Param{Text} =~ s/$Tag2.+?$End/-/gi;
@@ -1422,18 +1422,20 @@ sub _Replace {
 
                     if (
 
-                        # Check if Customer 'UserEmail' match article data 'From'.
+                        # Check if Contact 'Email' match article data 'From'.
                         # Or check if this is auto response replacement.
                         # Take ticket customer as 'From'.
                         (
-                            $ContactData{UserEmail}
+                            $ContactData{Email}
                             && $Data{From}
-                            && $ContactData{UserEmail} =~ /$Data{From}/
+                            && $ContactData{Email} =~ /$Data{From}/
                         )
                         || $Param{AutoResponse}
                         )
                     {
-                        $From = $Kernel::OM->Get('Kernel::System::Contact')->CustomerName(
+                        $From = $Kernel::OM->Get('Kernel::System::Contact')->_ContactFullname(
+                            Firstname => $ContactData{Firstname},
+                            Lastname => $ContactData{Lastname},
                             UserLogin => $Ticket{ContactID}
                         );
                     }

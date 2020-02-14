@@ -343,14 +343,14 @@ $ContactObject->ContactUpdate(
     %ContactData,
     Source    => 'Contact',       # Contact source config
     ID        => $TestContactID,
-    UserEmail => $CustomerAddress,
+    Email     => $CustomerAddress,
     UserID    => 1,
 );
 %ContactData = $ContactObject->ContactGet(
     ID => $TestContactID,
 );
 $TicketObject->TicketCustomerSet(
-    OrganisationID => $ContactData{CustomerID},
+    OrganisationID => $ContactData{PrimaryOrganisationID},
     ContactID      => $TestContactID,
     TicketID       => $TicketID,
     UserID         => 1,

@@ -240,6 +240,8 @@ sub Run {
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency(Type => 'Ticket');
+            $Self->AddCacheDependency( Type => 'User' );
+            $Self->AddCacheDependency( Type => 'Contact' );
         }
 
         # add

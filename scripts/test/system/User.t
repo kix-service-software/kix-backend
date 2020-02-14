@@ -55,97 +55,15 @@ for my $Try ( 1 .. 20 ) {
 
 # add user
 my $UserID = $UserObject->UserAdd(
-    UserFirstname => 'Firstname Test1',
-    UserLastname  => 'Lastname Test1',
-    UserLogin     => $UserRand,
-    UserEmail     => $UserRand . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
+    UserLogin    => $UserRand,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
 );
 
 $Self->True(
     $UserID,
     'UserAdd()',
-);
-
-$ConfigObject->Set(
-    Key   => 'FirstnameLastnameOrder',
-    Value => 0,
-);
-$Self->Is(
-    $UserObject->UserName( UserID => $UserID ),
-    'Firstname Test1 Lastname Test1',
-    'UserName - Order 0',
-);
-
-my %NameCheckList0 = $UserObject->UserList( Type => 'Long' );
-$Self->Is(
-    $NameCheckList0{$UserID},
-    'Firstname Test1 Lastname Test1',
-    'Username in List - Order 0',
-);
-
-$ConfigObject->Set(
-    Key   => 'FirstnameLastnameOrder',
-    Value => 1,
-);
-$Self->Is(
-    $ConfigObject->Get('FirstnameLastnameOrder'),
-    1,
-    'Check if NameOrder option is set correctly',
-);
-
-$Self->Is(
-    $UserObject->UserName( UserID => $UserID ),
-    'Lastname Test1, Firstname Test1',
-    'UserName - Order 1',
-);
-
-my %NameCheckList1 = $UserObject->UserList( Type => 'Long' );
-$Self->Is(
-    $NameCheckList1{$UserID},
-    'Lastname Test1, Firstname Test1',
-    'Username in List - Order 1',
-);
-
-$ConfigObject->Set(
-    Key   => 'FirstnameLastnameOrder',
-    Value => 2,
-);
-$Self->Is(
-    $UserObject->UserName( UserID => $UserID ),
-    "Firstname Test1 Lastname Test1 ($UserRand)",
-    'UserName - Order 2',
-);
-
-my %NameCheckList2 = $UserObject->UserList( Type => 'Long' );
-$Self->Is(
-    $NameCheckList2{$UserID},
-    "Firstname Test1 Lastname Test1 ($UserRand)",
-    'Username in List - Order 2',
-);
-
-my %UserData = $UserObject->GetUserData( UserID => $UserID );
-
-$Self->Is(
-    $UserData{UserFirstname} || '',
-    'Firstname Test1',
-    'GetUserData() - UserFirstname',
-);
-$Self->Is(
-    $UserData{UserLastname} || '',
-    'Lastname Test1',
-    'GetUserData() - UserLastname',
-);
-$Self->Is(
-    $UserData{UserLogin} || '',
-    $UserRand,
-    'GetUserData() - UserLogin',
-);
-$Self->Is(
-    $UserData{UserEmail} || '',
-    $UserRand . '@example.com',
-    'GetUserData() - UserEmail',
 );
 
 my %UserList = $UserObject->UserList(
@@ -194,10 +112,7 @@ $Self->Is(
 
 my $Update = $UserObject->UserUpdate(
     UserID        => $UserID,
-    UserFirstname => 'Михаил',
-    UserLastname  => 'Lastname Tëst2',
     UserLogin     => $UserRand . '房治郎',
-    UserEmail     => $UserRand . '@example2.com',
     ValidID       => 2,
     ChangeUserID  => 1,
 );
@@ -210,24 +125,9 @@ $Self->True(
 %UserData = $UserObject->GetUserData( UserID => $UserID );
 
 $Self->Is(
-    $UserData{UserFirstname} || '',
-    'Михаил',
-    'GetUserData() - UserFirstname',
-);
-$Self->Is(
-    $UserData{UserLastname} || '',
-    'Lastname Tëst2',
-    'GetUserData() - UserLastname',
-);
-$Self->Is(
     $UserData{UserLogin} || '',
     $UserRand . '房治郎',
     'GetUserData() - UserLogin',
-);
-$Self->Is(
-    $UserData{UserEmail} || '',
-    $UserRand . '@example2.com',
-    'GetUserData() - UserEmail',
 );
 
 %UserList = $UserObject->UserList(

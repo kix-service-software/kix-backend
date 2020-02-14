@@ -1144,16 +1144,16 @@ returns the ticket Responsible name for ticket info sidebar
 sub TicketResponsibleName {
     my ( $Self, %Param ) = @_;
 
-    my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %UserContact = $Kernel::OM->Get('Kernel::System::User')->ContactGet(
         UserID => $Param{ResponsibleID},
     );
-    return if !%User;
+    return if !%UserContact;
 
     return $Self->_GetUserInfoString(
         %{$Self},
         %Param,
         UserType => 'Responsible',
-        User     => \%User,
+        User     => \%UserContact,
     );
 
 }
@@ -1162,10 +1162,10 @@ sub _GetUserInfoString {
     my ( $Self, %Param ) = @_;
 
     return '' if !$Param{UserType};
-    my %User = %{ $Param{User} };
+    my %UserContact = %{ $Param{User} };
 
     my %Contacts = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
-        Login => $User{UserLogin},
+        Login => $UserContact{UserLogin},
         Limit => 1,
         Valid => 0
     );
@@ -1181,7 +1181,7 @@ sub _GetUserInfoString {
     # if no customer data found use agent data
     if ( !%ContactData ) {
         my @EmptyArray = ();
-        %ContactData = %User;
+        %ContactData = %UserContact;
         $ContactData{Config}->{Map} = \@EmptyArray;
 
         my $AgentConfig
@@ -1213,8 +1213,8 @@ sub _GetUserInfoString {
         = $Self->{LayoutObject}->{LanguageObject}
         ->Translate( $Param{UserType} . ' Information' );
     my $Output
-        = $User{UserFirstname} . ' '
-        . $User{UserLastname}
+        = $UserContact{Firstname} . ' '
+        . $UserContact{Lastname}
         . '<span class="' . $Param{UserType} . 'DetailsMagnifier">'
         . ' <i class="fa fa-search"></i>'
         . '</span>'

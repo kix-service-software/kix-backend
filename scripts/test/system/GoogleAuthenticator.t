@@ -68,32 +68,45 @@ $ConfigObject->Set(
 );
 
 my $UserRand     = 'example-user' . $Helper->GetRandomID();
-my $CustomerRand = 'example-customer' . $Helper->GetRandomID();
+my $TestCustomerID = 'example-customer' . $Helper->GetRandomID();
 
-my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
+my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 
-# add test user and customer
-my $TestUserID = $UserObject->UserAdd(
-    UserFirstname => 'Firstname Test1',
-    UserLastname  => 'Lastname Test1',
-    UserLogin     => $UserRand,
-    UserEmail     => $UserRand . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
-) || die "Could not create test user";
+# add test agent and contact
+my $TestAgentID = $UserObject->UserAdd(
+    UserLogin    => $UserRand,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
+) || die "Could not create test agent";
 
-my $TestContactID = $ContactObject->ContactAdd(
-    Source         => 'Contact',
-    UserFirstname  => 'Firstname Test',
-    UserLastname   => 'Lastname Test',
-    UserCustomerID => $CustomerRand,
-    UserLogin      => $CustomerRand,
-    UserEmail      => $CustomerRand . '@example.com',
-    UserPassword   => 'some_pass',
+my $TestAgentContactID = $ContactObject->ContactAdd(
+    Firstname      => 'Firstname Test1',
+    Lastname       => 'Lastname Test1',
+    Email          => $UserRand . '@example.com',
+    AssignedUserID => $TestAgentID,
     ValidID        => 1,
     UserID         => 1,
+) || die "Could not create test agent contact";
+
+
+# add test custoemr and contact
+my $TestCustomerID = $UserObject->UserAdd(
+    UserLogin    => $TestCustomerID,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsCustomer   => 1,
 ) || die "Could not create test customer";
+
+my $TestCustomerContactID = $ContactObject->ContactAdd(
+    Source         => 'Contact',
+    Firstname      => 'Firstname Test',
+    Lastname       => 'Lastname Test',
+    AssignedUserID => $TestCustomerID,
+    ValidID        => 1,
+    UserID         => 1,
+) || die "Could not create test customer contact";
 
 # configure two factor auth backend
 my %CurrentConfig = (
@@ -207,12 +220,12 @@ for my $Test (@Tests) {
         $UserObject->SetPreferences(
             Key    => 'UnitTestUserGoogleAuthenticatorSecretKey',
             Value  => $CurrentConfig{Secret},
-            UserID => $TestUserID,
+            UserID => $TestAgentID,
         );
         $ContactObject->SetPreferences(
-            Key    => 'UnitTestUserGoogleAuthenticatorSecretKey',
-            Value  => $CurrentConfig{Secret},
-            UserID => $CustomerRand,
+            Key       => 'UnitTestUserGoogleAuthenticatorSecretKey',
+            Value     => $CurrentConfig{Secret},
+            ContactID => $TestCustomerID,
         );
     }
 
@@ -254,7 +267,7 @@ for my $Test (@Tests) {
     # test agent auth
     my $AuthResult = $AuthTwoFactorObject->Auth(
         User           => $UserRand,
-        UserID         => $TestUserID,
+        UserID         => $TestAgentID,
         TwoFactorToken => $Test->{TwoFactorToken},
     );
     $Self->Is(
@@ -265,7 +278,7 @@ for my $Test (@Tests) {
 
     # test customer auth
     my $ContactAuthResult = $ContactAuthTwoFactorObject->Auth(
-        User           => $CustomerRand,
+        User           => $TestCustomerID,
         TwoFactorToken => $Test->{TwoFactorToken},
     );
     $Self->Is(

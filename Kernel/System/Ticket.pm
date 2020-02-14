@@ -24,6 +24,7 @@ use Kernel::System::Ticket::TicketACL;
 use Kernel::System::Ticket::TicketChecklist;
 use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::EmailParser;
 
 use vars qw(@ISA);
 
@@ -484,21 +485,68 @@ sub TicketCreate {
     $Param{ServiceID} ||= undef;
     $Param{SLAID}     ||= undef;
 
+    if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
+        $Self->{ParserObject} = Kernel::System::EmailParser->new(
+            Mode => 'Standalone',
+        );
+        my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
+            Email => $Param{ContactID},
+        );
+        my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
+            Email => $Param{ContactID},
+        );
+
+        if (!$ContactEmail && !$ContactEmailRealname) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => 'No Contact ID or valid Email provided.',
+            );
+        }
+
+        my @NameChunks = split(' ', $ContactEmailRealname);
+        my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            Email  => $ContactEmail,
+            Silent => 1,
+        );
+
+        if (!$ExistingContactID) {
+            $Param{ContactID} = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+                Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
+                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                Email                 => $ContactEmail,
+                PrimaryOrganisationID => ($Param{OrganisationID}) ? $Param{OrganisationID} : undef,
+                ValidID               => 1,
+                UserID                => $Self->{Authorization}->{UserID}
+            );
+        }
+        else {
+            $Param{ContactID} = $ExistingContactID;
+        }
+    }
+
+    $Param{OrganisationID} = ($Param{OrganisationID}) ? $Param{OrganisationID} : undef;
+
+
     # create db record
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => '
-            INSERT INTO ticket (tn, title, create_time_unix, type_id, queue_id, ticket_lock_id,
-                user_id, responsible_user_id, ticket_priority_id, ticket_state_id,
-                escalation_time, escalation_update_time, escalation_response_time,
-                escalation_solution_time, timeout, service_id, sla_id, until_time,
-                archive_flag, create_time, create_by, change_time, change_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, ?, ?, 0, ?,
-                current_timestamp, ?, current_timestamp, ?)',
+            INSERT INTO ticket (
+                tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
+                responsible_user_id, ticket_priority_id, ticket_state_id,
+                escalation_time, escalation_update_time, escalation_response_time, escalation_solution_time, timeout,
+                service_id, sla_id, until_time, archive_flag, create_time, create_by, change_time, change_by,
+                contact_id, organisation_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?,
+                    0, 0, 0, 0, 0,
+                    ?, ?, 0, ?, current_timestamp, ?, current_timestamp, ?,
+                    ?, ?)',
         Bind => [
-            \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID},
-            \$Param{LockID},     \$Param{OwnerID}, \$Param{ResponsibleID},
-            \$Param{PriorityID}, \$Param{StateID}, \$Param{ServiceID},
-            \$Param{SLAID}, \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
+            \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
+            \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
+
+            \$Param{ServiceID}, \$Param{SLAID}, \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
+            \$Param{ContactID}, \$Param{OrganisationID},
         ],
     );
 
@@ -540,15 +588,6 @@ sub TicketCreate {
         );
     }
 
-    # set customer data if given
-    if ( $Param{OrganisationID} || $Param{ContactID} ) {
-        $Self->TicketCustomerSet(
-            TicketID => $TicketID,
-            OrganisationID => $Param{OrganisationID} || '',
-            ContactID => $Param{ContactID} || '',
-            UserID => $Param{UserID},
-        );
-    }
 
     # update ticket view index
     $Self->TicketAcceleratorAdd( TicketID => $TicketID );
@@ -4810,15 +4849,11 @@ Returns:
 
     @Owner = (
         {
-            UserFirstname => 'SomeName',
-            UserLastname  => 'SomeName',
-            UserEmail     => 'some@example.com',
+            UserLogin => 'SomeName',
             # custom attributes
         },
         {
-            UserFirstname => 'SomeName',
-            UserLastname  => 'SomeName',
-            UserEmail     => 'some@example.com',
+            UserLogin => 'SomeName',
             # custom attributes
         },
     );
@@ -5040,15 +5075,11 @@ Returns:
 
     @Responsible = (
         {
-            UserFirstname => 'SomeName',
-            UserLastname  => 'SomeName',
-            UserEmail     => 'some@example.com',
+            UserLogin => 'someName',
             # custom attributes
         },
         {
-            UserFirstname => 'SomeName',
-            UserLastname  => 'SomeName',
-            UserEmail     => 'some@example.com',
+            UserLogin => 'someName',
             # custom attributes
         },
     );
@@ -5130,15 +5161,11 @@ Returns:
 
     @InvolvedAgents = (
         {
-            UserFirstname => 'SomeName',
-            UserLastname  => 'SomeName',
-            UserEmail     => 'some@example.com',
+            UserLogin => 'someName',
             # custom attributes
         },
         {
-            UserFirstname => 'AnotherName',
-            UserLastname  => 'AnotherName',
-            UserEmail     => 'another@example.com',
+            UserLogin => 'someName',
             # custom attributes
         },
     );
