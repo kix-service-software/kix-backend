@@ -12,25 +12,9 @@ use strict;
 use warnings;
 use utf8;
 
-# Perl 5.10.0 is the required minimum version to use KIX.
-use 5.010_000;
-
 # prepend '../Custom', '../Kernel/cpan-lib' and '../' to the module search path @INC
 use File::Basename;
 use FindBin qw($Bin);
-use lib dirname($Bin);
-use lib dirname($Bin) . '/Kernel/cpan-lib';
-use lib dirname($Bin) . '/Custom';
-
-use File::stat;
-use Digest::MD5;
-use Module::Refresh;
-
-use Exporter qw(import);
-
-use Kernel::System::SysConfig;
-
-our @EXPORT = qw(Translatable);
 
 our @ObjectDependencies = ();
 
@@ -40,9 +24,8 @@ Kernel::Config - the ConfigObject.
 
 =head1 DESCRIPTION
 
-This class implements several internal functions that are used internally in
-L<Kernel::Config>. The two externally used functions are documented as part
-of L<Kernel::Config>, even though they are actually implemented here.
+This is them common object holding the systems low level config. It combines the options and values defined 
+in the SysConfig as well as the config value set in the different config files in $KIX_HOME/config
 
 =head1 PUBLIC INTERFACE
 
@@ -250,15 +233,6 @@ sub Set {
     return 1;
 }
 
-## nofilter(TidyAll::Plugin::OTRS::Perl::Translatable)
-
-# This is a no-op to mark a text as translatable in the Perl code.
-#   We use our own version here instead of importing Language::Translatable to not add a dependency.
-
-sub Translatable {
-    return shift;
-}
-
 1;
 
 =head1 TERMS AND CONDITIONS
@@ -270,9 +244,6 @@ the enclosed file COPYING for license information (AGPL). If you
 did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
 
 =cut
-
-
-
 
 =back
 

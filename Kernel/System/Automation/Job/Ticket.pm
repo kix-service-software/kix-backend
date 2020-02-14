@@ -237,6 +237,8 @@ sub _Filter {
     return 1;
 }
 
+1;
+
 =back
 
 =head1 TERMS AND CONDITIONS

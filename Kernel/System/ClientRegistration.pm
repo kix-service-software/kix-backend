@@ -352,7 +352,7 @@ sub NotifyClients {
         return;
     }    
 
-    return 1;    
+    return 1;
 }
 
 =item NotificationCleanup()
@@ -399,7 +399,7 @@ sub NotificationCleanup {
         return;
     }    
 
-    return 1;    
+    return 1;
 }
 
 =item NotificationSend()
@@ -456,7 +456,7 @@ sub NotificationSend {
         }
 
         $Self->{LogObject}->Log( 
-            Priority => 'info', 
+            Priority => 'debug', 
             Message  => "Sending ". @EventList . " notifications to client \"$Param{ClientID}\" (" . (join(', ', @StatsParts)) . ').' 
         );
 
@@ -505,7 +505,7 @@ sub NotificationSend {
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'info',
+                Priority => 'debug',
                 Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
             );
         }
@@ -523,7 +523,7 @@ sub NotificationSend {
     # schedule new task if the scheduler executed this method
     if ( $Param{IsScheduler} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'info',
+            Priority => 'debug',
             Message  => "Rescheduling notification task for client \"$Param{ClientID}\".",
         );
         my $Result = $Self->ScheduleNotificationTask(
@@ -536,7 +536,7 @@ sub NotificationSend {
         Type => $Self->{CacheType}
     );
 
-    return 1;    
+    return 1;
 }
 
 =item ScheduleNotificationTask()

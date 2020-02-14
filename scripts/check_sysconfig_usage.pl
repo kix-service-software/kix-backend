@@ -71,7 +71,7 @@ foreach my $File (sort @FileList) {
         if ( $Content =~ /$Key/m ) {
             if ( $SubKey && $Content =~ /$SubKey/m ) {
                 print STDERR "     subkey $SubKey found\n";
-                $ConfigItemUsage{$OptionName}->{$File} = 1;                
+                $ConfigItemUsage{$OptionName}->{$File} = 1;
             }
             else {
                 print STDERR "     key $Key found\n";

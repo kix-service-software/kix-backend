@@ -2185,7 +2185,6 @@ sub ObjectMatch {
     return $Self->{$DynamicFieldBackend}->ObjectMatch(%Param);
 }
 
-
 sub _CheckParams {
     my ( $Self, %Param ) = @_;
 

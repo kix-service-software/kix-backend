@@ -146,7 +146,7 @@ sub Run {
     }
 
     # create job
-    my $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobAdd(
+    $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobAdd(
         Name     => $Job->{Name},
         Type     => $Job->{Type},
         Filter   => $Job->{Filter},
